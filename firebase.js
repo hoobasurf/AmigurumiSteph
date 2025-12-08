@@ -1,20 +1,18 @@
-<!-- À inclure en début de owner.html ou visitor.html -->
-<script src="https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js"></script>
-<script src="https://www.gstatic.com/firebasejs/12.6.0/firebase-storage.js"></script>
+// Firebase global configuration pour amigurumisteph
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
+import { getFirestore } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
+import { getStorage } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-storage.js";
 
-<script>
-  const firebaseConfig = {
-    apiKey: "AIzaSyDbkbhXdZO20XdQpg3GhShFnqBVSpTdJKQ",
-    authDomain: "amigurumi-2e7df.firebaseapp.com",
-    projectId: "amigurumi-2e7df",
-    storageBucket: "amigurumi-2e7df.appspot.com",
-    messagingSenderId: "92443765428",
-    appId: "1:92443765428:web:23e5aab383547b6f8885e1"
-  };
+const firebaseConfig = {
+  apiKey: "AIzaSyAKUqhiGi1ZHIfZRwslMIUip8ohwOiLhFA",
+  authDomain: "amigurumisteph.firebaseapp.com",
+  projectId: "amigurumisteph",
+  storageBucket: "amigurumisteph.appspot.com",
+  messagingSenderId: "175290001202",
+  appId: "1:175290001202:web:b53e4255e699d65bd4192b"
+};
 
-  // Initialisation Firebase
-  const app = firebase.initializeApp(firebaseConfig);
-  const db = firebase.firestore();
-  const storage = firebase.storage();
-</script>
+// Initialisation Firebase
+export const app = initializeApp(firebaseConfig);
+export const db = getFirestore(app);
+export const storage = getStorage(app);
