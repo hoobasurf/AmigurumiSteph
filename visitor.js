@@ -1,25 +1,41 @@
 import { db } from "./firebase.js";
 import { collection, getDocs } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
 
-async function loadVisitorCreations() {
-  try {
-    const snap = await getDocs(collection(db, "creations"));
-    const list = document.getElementById("visitor-list");
-    list.innerHTML = "";
+const gallery = document.getElementById("gallery");
+const modal = document.getElementById("modal");
+const modalImg = document.getElementById("modal-img");
+const modalThumbs = document.getElementById("modal-thumbnails");
+const commentModal = document.getElementById("comment-modal");
+const commentBtn = document.getElementById("comment-btn");
+const closeModal = document.getElementById("close-modal");
+const closeComment = document.getElementById("close-comment");
 
-    snap.docs.forEach(docu => {
-      const div = document.createElement("div");
-      div.className = "visitor-item";
-      div.innerHTML = `
-        <img src="${docu.data().imageUrl}" class="visitor-thumb">
-        <span>${docu.data().name}</span>
-      `;
-      list.appendChild(div);
-    });
-  } catch (err) {
-    alert("Erreur lors du chargement des créations côté visiteur !");
-    console.error(err);
-  }
+async function loadVisitorCreations() {
+  const snap = await getDocs(collection(db, "creations"));
+  gallery.innerHTML = "";
+
+  snap.docs.forEach(docu => {
+    const div = document.createElement("div");
+    div.className = "gallery-item";
+    div.innerHTML = `
+      <img src="${docu.data().imageUrl}">
+      <div class="like-comment">❤️ 0 💬 0</div>
+    `;
+    div.onclick = () => openModal(docu.data());
+    gallery.appendChild(div);
+  });
 }
+
+function openModal(data) {
+  modal.classList.remove("hidden");
+  modalImg.src = data.imageUrl;
+  modalThumbs.innerHTML = ""; // ici tu peux ajouter d'autres images si elles existent
+}
+
+closeModal.onclick = () => modal.classList.add("hidden");
+commentBtn.onclick = () => {
+  commentModal.classList.remove("hidden");
+};
+closeComment.onclick = () => commentModal.classList.add("hidden");
 
 loadVisitorCreations();
