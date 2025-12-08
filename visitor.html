@@ -5,7 +5,6 @@
   <title>Amigurumi Galerie</title>
   <link rel="stylesheet" href="style.css">
 </head>
-
 <body>
   <h1 class="title">Mes Petites Créations</h1>
 
@@ -15,7 +14,6 @@
   <div class="modal hidden" id="modal">
     <div class="modal-content">
       <img id="modal-img" class="modal-image">
-      <div class="modal-thumbnails" id="modal-thumbnails"></div>
       <button id="comment-btn" class="comment-btn">💬 Commentaires</button>
       <button id="close-modal" class="close-btn">✖</button>
     </div>
@@ -32,6 +30,9 @@
     </div>
   </div>
 
-  <script type="module" src="visitor.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/12.6.0/firebase-storage.js"></script>
+  <script src="visitor.js"></script>
 </body>
 </html>
