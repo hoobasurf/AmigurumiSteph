@@ -18,11 +18,11 @@ const nameInput = document.getElementById("name");
 const photoInput = document.getElementById("photo");
 const ownerList = document.getElementById("owner-list");
 
-// Vérification Firebase
-alert("Firebase chargé ? " + (db ? "OUI" : "NON"));
-
-// Ajouter création
+// Debug vérification bouton
 addBtn.onclick = async () => {
+  alert("Clique détecté !");
+  console.log("Nom :", nameInput.value, "Photo :", photoInput.files[0]);
+
   const name = nameInput.value.trim();
   const file = photoInput.files[0];
 
@@ -35,6 +35,7 @@ addBtn.onclick = async () => {
     const storageRef = storage.ref("photos/" + Date.now() + "-" + file.name);
     await storageRef.put(file);
     const url = await storageRef.getDownloadURL();
+    console.log("URL upload :", url);
 
     await db.collection("creations").add({
       name: name,
@@ -42,6 +43,7 @@ addBtn.onclick = async () => {
       createdAt: Date.now()
     });
 
+    alert("Création ajoutée !");
     nameInput.value = "";
     photoInput.value = "";
     loadCreations();
@@ -57,11 +59,12 @@ async function loadCreations() {
   const snap = await db.collection("creations").get();
 
   snap.docs.forEach(docu => {
+    const data = docu.data();
     const div = document.createElement("div");
     div.className = "owner-item";
     div.innerHTML = `
-      <span>${docu.data().name}</span>
-      <img src="${docu.data().imageUrl}" class="owner-thumb">
+      <span>${data.name}</span>
+      <img src="${data.imageUrl}" class="owner-thumb">
       <button class="delete-btn">🗑</button>
     `;
 
