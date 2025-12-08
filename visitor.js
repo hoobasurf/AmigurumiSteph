@@ -1,48 +1,61 @@
-import { db } from "./firebase.js";
-import { collection, getDocs } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
+// ⚡ Config Firebase
+const firebaseConfig = {
+  apiKey: "AIzaSyAKUqhiGi1ZHIfZRwslMIUip8ohwOiLhFA",
+  authDomain: "amigurumisteph.firebaseapp.com",
+  projectId: "amigurumisteph",
+  storageBucket: "amigurumisteph.appspot.com",
+  messagingSenderId: "175290001202",
+  appId: "1:175290001202:web:b53e4255e699d65bd4192b"
+};
+
+// Initialize Firebase
+const app = firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+const storage = firebase.storage();
 
 const gallery = document.getElementById("gallery");
-const modal = document.getElementById("modal");
-const modalImg = document.getElementById("modal-img");
-const modalThumbs = document.getElementById("modal-thumbnails");
-const commentModal = document.getElementById("comment-modal");
-const commentBtn = document.getElementById("comment-btn");
-const closeModal = document.getElementById("close-modal");
-const closeComment = document.getElementById("close-comment");
 
-async function loadVisitorCreations() {
-  const snap = await getDocs(collection(db, "creations"));
+// Chargement en temps réel
+db.collection("creations").orderBy("createdAt").onSnapshot(snapshot => {
   gallery.innerHTML = "";
 
-  snap.docs.forEach(docu => {
+  snapshot.docs.forEach(docu => {
+    const data = docu.data();
     const div = document.createElement("div");
     div.className = "gallery-item";
+
     div.innerHTML = `
-      <img src="${docu.data().imageUrls[0]}">
-      <div class="like-comment">❤️ 0 💬 0</div>
+      <img src="${data.imageUrl}" class="gallery-thumb">
+      <div class="gallery-info">
+        <span class="gallery-name">${data.name}</span>
+        <span class="like-count">❤️ 0</span>
+        <span class="comment-count">💬 0</span>
+      </div>
     `;
-    div.onclick = () => openModal(docu.data());
+
+    div.querySelector(".gallery-thumb").onclick = () => {
+      openModal(data);
+    };
+
     gallery.appendChild(div);
   });
-}
+});
 
+// Modal photo + commentaires
 function openModal(data) {
+  const modal = document.getElementById("modal");
+  const modalImg = document.getElementById("modal-img");
+  modalImg.src = data.imageUrl;
   modal.classList.remove("hidden");
-  modalImg.src = data.imageUrls[0];
-  modalThumbs.innerHTML = "";
 
-  if (data.imageUrls.length > 1) {
-    data.imageUrls.forEach(url => {
-      const thumb = document.createElement("img");
-      thumb.src = url;
-      thumb.onclick = () => modalImg.src = url;
-      modalThumbs.appendChild(thumb);
-    });
-  }
+  document.getElementById("close-modal").onclick = () => {
+    modal.classList.add("hidden");
+  };
+
+  document.getElementById("comment-btn").onclick = () => {
+    document.getElementById("comment-modal").classList.remove("hidden");
+    document.getElementById("close-comment").onclick = () => {
+      document.getElementById("comment-modal").classList.add("hidden");
+    };
+  };
 }
-
-closeModal.onclick = () => modal.classList.add("hidden");
-commentBtn.onclick = () => commentModal.classList.remove("hidden");
-closeComment.onclick = () => commentModal.classList.add("hidden");
-
-loadVisitorCreations();
