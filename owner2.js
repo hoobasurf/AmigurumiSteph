@@ -1,6 +1,17 @@
-import { db, storage } from "./firebase.js";
-import { collection, addDoc, getDocs, deleteDoc, doc } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
-import { ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-storage.js";
+// ⚡ Config Firebase
+const firebaseConfig = {
+  apiKey: "AIzaSyAKUqhiGi1ZHIfZRwslMIUip8ohwOiLhFA",
+  authDomain: "amigurumisteph.firebaseapp.com",
+  projectId: "amigurumisteph",
+  storageBucket: "amigurumisteph.appspot.com",
+  messagingSenderId: "175290001202",
+  appId: "1:175290001202:web:b53e4255e699d65bd4192b"
+};
+
+// Initialize Firebase
+const app = firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+const storage = firebase.storage();
 
 const addBtn = document.getElementById("add");
 const nameInput = document.getElementById("name");
@@ -23,14 +34,14 @@ addBtn.onclick = async () => {
   try {
     const urls = [];
     for (let file of files) {
-      const storageRef = ref(storage, "photos/" + Date.now() + "-" + file.name);
-      await uploadBytes(storageRef, file);
-      const url = await getDownloadURL(storageRef);
+      const storageRef = storage.ref("photos/" + Date.now() + "-" + file.name);
+      await storageRef.put(file);
+      const url = await storageRef.getDownloadURL();
       urls.push(url);
     }
 
-    await addDoc(collection(db, "creations"), {
-      name,
+    await db.collection("creations").add({
+      name: name,
       imageUrls: urls,
       createdAt: Date.now()
     });
@@ -47,7 +58,7 @@ addBtn.onclick = async () => {
 // Charger créations
 async function loadCreations() {
   ownerList.innerHTML = "";
-  const snap = await getDocs(collection(db, "creations"));
+  const snap = await db.collection("creations").get();
 
   snap.docs.forEach(docu => {
     const div = document.createElement("div");
@@ -61,7 +72,7 @@ async function loadCreations() {
     `;
 
     div.querySelector(".delete-btn").onclick = async () => {
-      await deleteDoc(doc(db, "creations", docu.id));
+      await db.collection("creations").doc(docu.id).delete();
       loadCreations();
     };
 
