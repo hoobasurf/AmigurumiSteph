@@ -29,17 +29,14 @@ addBtn.onclick = async () => {
       urls.push(url);
     }
 
-    // Ajouter dans Firestore
     await addDoc(collection(db, "creations"), {
       name,
       imageUrls: urls,
       createdAt: Date.now()
     });
 
-    // Reset champs
     nameInput.value = "";
     photoInput.value = "";
-
     loadCreations();
   } catch (err) {
     alert("Erreur lors de l'ajout !");
