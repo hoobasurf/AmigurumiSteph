@@ -18,7 +18,7 @@ async function loadVisitorCreations() {
     const div = document.createElement("div");
     div.className = "gallery-item";
     div.innerHTML = `
-      <img src="${docu.data().imageUrl}">
+      <img src="${docu.data().imageUrls[0]}">
       <div class="like-comment">❤️ 0 💬 0</div>
     `;
     div.onclick = () => openModal(docu.data());
@@ -28,14 +28,21 @@ async function loadVisitorCreations() {
 
 function openModal(data) {
   modal.classList.remove("hidden");
-  modalImg.src = data.imageUrl;
-  modalThumbs.innerHTML = ""; // ici tu peux ajouter d'autres images si elles existent
+  modalImg.src = data.imageUrls[0];
+  modalThumbs.innerHTML = "";
+
+  if (data.imageUrls.length > 1) {
+    data.imageUrls.forEach(url => {
+      const thumb = document.createElement("img");
+      thumb.src = url;
+      thumb.onclick = () => modalImg.src = url;
+      modalThumbs.appendChild(thumb);
+    });
+  }
 }
 
 closeModal.onclick = () => modal.classList.add("hidden");
-commentBtn.onclick = () => {
-  commentModal.classList.remove("hidden");
-};
+commentBtn.onclick = () => commentModal.classList.remove("hidden");
 closeComment.onclick = () => commentModal.classList.add("hidden");
 
 loadVisitorCreations();
