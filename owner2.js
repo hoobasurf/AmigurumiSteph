@@ -24,25 +24,21 @@ alert("Firebase chargé ? " + (db ? "OUI" : "NON"));
 // Ajouter création
 addBtn.onclick = async () => {
   const name = nameInput.value.trim();
-  const files = Array.from(photoInput.files);
+  const file = photoInput.files[0];
 
-  if (!name || files.length === 0) {
-    alert("Remplis le nom et choisis au moins une image 🧸");
+  if (!name || !file) {
+    alert("Remplis le nom et choisis une image 🧸");
     return;
   }
 
   try {
-    const urls = [];
-    for (let file of files) {
-      const storageRef = storage.ref("photos/" + Date.now() + "-" + file.name);
-      await storageRef.put(file);
-      const url = await storageRef.getDownloadURL();
-      urls.push(url);
-    }
+    const storageRef = storage.ref("photos/" + Date.now() + "-" + file.name);
+    await storageRef.put(file);
+    const url = await storageRef.getDownloadURL();
 
     await db.collection("creations").add({
       name: name,
-      imageUrls: urls,
+      imageUrl: url,
       createdAt: Date.now()
     });
 
@@ -63,11 +59,9 @@ async function loadCreations() {
   snap.docs.forEach(docu => {
     const div = document.createElement("div");
     div.className = "owner-item";
-
-    const images = docu.data().imageUrls.map(url => `<img src="${url}" class="owner-thumb">`).join("");
     div.innerHTML = `
-      <span class="owner-name">${docu.data().name}</span>
-      <div class="owner-images">${images}</div>
+      <span>${docu.data().name}</span>
+      <img src="${docu.data().imageUrl}" class="owner-thumb">
       <button class="delete-btn">🗑</button>
     `;
 
