@@ -16,30 +16,31 @@ const storage = firebase.storage();
 const gallery = document.getElementById("gallery");
 
 // Chargement en temps réel
-db.collection("creations").orderBy("createdAt").onSnapshot(snapshot => {
-  gallery.innerHTML = "";
+db.collection("creations").orderBy("createdAt")
+  .onSnapshot(snapshot => {
+    gallery.innerHTML = "";
 
-  snapshot.docs.forEach(docu => {
-    const data = docu.data();
-    const div = document.createElement("div");
-    div.className = "gallery-item";
+    snapshot.docs.forEach(docu => {
+      const data = docu.data();
+      const div = document.createElement("div");
+      div.className = "gallery-item";
 
-    div.innerHTML = `
-      <img src="${data.imageUrl}" class="gallery-thumb">
-      <div class="gallery-info">
-        <span class="gallery-name">${data.name}</span>
-        <span class="like-count">❤️ 0</span>
-        <span class="comment-count">💬 0</span>
-      </div>
-    `;
+      div.innerHTML = `
+        <img src="${data.imageUrl}" class="gallery-thumb">
+        <div class="gallery-info">
+          <span class="gallery-name">${data.name}</span>
+          <span class="like-count">❤️ 0</span>
+          <span class="comment-count">💬 0</span>
+        </div>
+      `;
 
-    div.querySelector(".gallery-thumb").onclick = () => {
-      openModal(data);
-    };
+      div.querySelector(".gallery-thumb").onclick = () => {
+        openModal(data);
+      };
 
-    gallery.appendChild(div);
+      gallery.appendChild(div);
+    });
   });
-});
 
 // Modal photo + commentaires
 function openModal(data) {
