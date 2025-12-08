@@ -1,8 +1,9 @@
-// Firebase global configuration pour amigurumisteph
+// Import des modules Firebase
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
 import { getFirestore } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
 import { getStorage } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-storage.js";
 
+// Configuration Firebase
 const firebaseConfig = {
   apiKey: "AIzaSyAKUqhiGi1ZHIfZRwslMIUip8ohwOiLhFA",
   authDomain: "amigurumisteph.firebaseapp.com",
