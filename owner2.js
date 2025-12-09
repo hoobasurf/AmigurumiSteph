@@ -1,58 +1,59 @@
-import { db, storage } from "./firebase.js";
-import { collection, addDoc, query, orderBy, onSnapshot } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
-import { ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-storage.js";
+// Connexion Firebase via CDN
+const db = firebase.firestore();
+const storage = firebase.storage();
 
+// Sélecteurs
+const nameInput = document.getElementById("nameInput");
+const photoInput = document.getElementById("photoInput");
 const addBtn = document.getElementById("addBtn");
-const nameInput = document.getElementById("name");
-const photoInput = document.getElementById("photo");
-const ownerList = document.getElementById("owner-list");
+const creationList = document.getElementById("creationList");
 
-alert("Owner JS chargé !");
-
+// --- CLICK AJOUTER ---
 addBtn.onclick = async () => {
-  const name = nameInput.value.trim();
-  const file = photoInput.files[0];
 
-  if (!name || !file) {
-    alert("Remplis le nom et choisis une image 🧸");
-    return;
-  }
+    const name = nameInput.value.trim();
+    const file = photoInput.files[0];
 
-  try {
-    // Upload image dans Firebase Storage
-    const storageRef = ref(storage, "photos/" + Date.now() + "-" + file.name);
-    await uploadBytes(storageRef, file);
-    const url = await getDownloadURL(storageRef);
+    if (!name || !file) {
+        alert("Nom + Photo obligatoires");
+        return;
+    }
 
-    // Ajout dans Firestore
-    await addDoc(collection(db, "creations"), {
-      name,
-      imageUrl: url,
-      createdAt: Date.now()
+    // Upload Storage
+    const path = `creations/${Date.now()}_${file.name}`;
+    const ref = storage.ref().child(path);
+    await ref.put(file);
+    const url = await ref.getDownloadURL();
+
+    // Enregistrer dans Firestore
+    await db.collection("creations").add({
+        name: name,
+        image: url,
+        createdAt: Date.now()
     });
 
-    // Reset champs
     nameInput.value = "";
     photoInput.value = "";
 
     alert("Création ajoutée !");
-  } catch (err) {
-    console.error(err);
-    alert("Erreur lors de l'ajout !");
-  }
 };
 
-// 🔥 Affichage live côté Owner
-const creationsCol = collection(db, "creations");
-const q = query(creationsCol, orderBy("createdAt", "desc"));
 
-onSnapshot(q, (snapshot) => {
-  ownerList.innerHTML = "";
-  snapshot.docs.forEach(docu => {
-    const data = docu.data();
-    const div = document.createElement("div");
-    div.className = "owner-item";
-    div.innerHTML = `<strong>${data.name}</strong><br><img src="${data.imageUrl}" width="150">`;
-    ownerList.appendChild(div);
-  });
+// --- AFFICHAGE AUTOMATIQUE DES PROJETS ---
+db.collection("creations")
+  .orderBy("createdAt", "desc")
+  .onSnapshot(snapshot => {
+
+    creationList.innerHTML = "";
+
+    snapshot.forEach(doc => {
+        const data = doc.data();
+
+        creationList.innerHTML += `
+            <div class="creation-item">
+                <img src="${data.image}" class="thumb">
+                <p>${data.name}</p>
+            </div>
+        `;
+    });
 });
