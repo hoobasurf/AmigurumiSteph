@@ -4,12 +4,6 @@
   <meta charset="UTF-8">
   <title>Owner - Ajout Création</title>
   <link rel="stylesheet" href="style.css">
-  <style>
-    body { font-family: sans-serif; padding: 20px; }
-    .owner-box { display: flex; gap: 10px; margin-bottom: 20px; }
-    .owner-item { margin-bottom: 10px; }
-    .mini-img { width: 100px; height: 100px; object-fit: cover; border-radius: 8px; }
-  </style>
 </head>
 <body>
   <h1>Ajouter une création</h1>
@@ -17,12 +11,14 @@
   <div class="owner-box">
     <input id="name" placeholder="Nom de la création">
     <input id="photo" type="file" accept="image/*">
-    <button id="add">Ajouter</button>
   </div>
 
   <h2>Liste des créations</h2>
   <div id="owner-list"></div>
 
+  <!-- Supabase -->
+  <script type="module" src="supabase.js"></script>
+  <!-- Owner JS -->
   <script type="module" src="owner.js"></script>
 </body>
 </html>
