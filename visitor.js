@@ -1,45 +1,24 @@
 import { db } from "./firebase.js";
-import { collection, getDocs, orderBy, query } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
 
 const gallery = document.getElementById("gallery");
-const modal = document.getElementById("modal");
-const modalImg = document.getElementById("modal-img");
-const miniThumbs = document.getElementById("mini-thumbs");
-const closeModal = document.getElementById("close-modal");
 
-async function loadGallery() {
-  gallery.innerHTML = "";
-  try {
-    const q = query(collection(db, "creations"), orderBy("createdAt"));
-    const snapshot = await getDocs(q);
+const creationsCol = db.collection ? db.collection("creations") : null; // fallback
 
-    snapshot.forEach(docu => {
+if (creationsCol) {
+  db.collection("creations").orderBy("createdAt").onSnapshot(snapshot => {
+    gallery.innerHTML = "";
+    snapshot.docs.forEach(docu => {
       const data = docu.data();
-      const div = document.createElement("div");
-      div.className = "gallery-item";
-      div.innerHTML = `
-        <img src="${data.imageUrl}" class="thumb" alt="${data.name}">
-        <div class="caption">${data.name} ❤️</div>
-      `;
-      div.querySelector("img").onclick = () => openModal(data);
-      gallery.appendChild(div);
+      const img = document.createElement("img");
+      img.src = data.imageUrl;
+      img.alt = data.name;
+      img.onclick = () => {
+        const modal = document.getElementById("imageModal");
+        const modalImg = document.getElementById("modalImg");
+        modalImg.src = data.imageUrl;
+        modal.style.display = "flex";
+      };
+      gallery.appendChild(img);
     });
-
-  } catch (err) {
-    console.error(err);
-    alert("Erreur lors du chargement de la galerie !");
-  }
+  });
 }
-
-function openModal(data) {
-  modal.classList.remove("hidden");
-  modalImg.src = data.imageUrl;
-  miniThumbs.innerHTML = "";
-  // Si tu veux ajouter d'autres miniatures, tu peux ici
-}
-
-closeModal.onclick = () => {
-  modal.classList.add("hidden");
-};
-
-loadGallery();
