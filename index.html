@@ -1,72 +1,98 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Amigurumi — Owner & Visiteur</title>
-  <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Galerie Projets – Amigurumi</title>
+  <link rel="stylesheet" href="style.css" />
+  
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background: #f5f5f5;
+      font-family: Arial, sans-serif;
+      overflow-x: hidden;
+    }
+
+    /* Bouton Owner */
+    #ownerBtn {
+      position: fixed;
+      top: 12px;
+      right: 12px;
+      padding: 12px 18px;
+      background: #ff7f50;
+      color: white;
+      font-size: 18px;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      z-index: 1000;
+      box-shadow: 0px 4px 15px rgba(0,0,0,0.2);
+    }
+
+    #ownerBtn:hover {
+      background: #ff5f26;
+    }
+
+    /* Galerie horizontale */
+    .gallery-scroll {
+      display: flex;
+      gap: 20px;
+      overflow-x: auto;
+      padding: 20px;
+      scroll-snap-type: x mandatory;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .gallery-scroll img {
+      height: 240px;
+      border-radius: 12px;
+      scroll-snap-align: start;
+      cursor: pointer;
+      box-shadow: 0px 4px 15px rgba(0,0,0,0.25);
+      transition: transform .2s;
+    }
+
+    .gallery-scroll img:hover {
+      transform: scale(1.05);
+    }
+
+    /* Modal zoom */
+    #imageModal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.8);
+      justify-content: center;
+      align-items: center;
+      z-index: 2000;
+    }
+
+    #imageModal img {
+      width: 90%;
+      max-width: 600px;
+      border-radius: 12px;
+    }
+  </style>
 </head>
+
 <body>
-  <header class="top">
-    <h1 class="brand">Amigurumi — Galerie</h1>
-    <div class="mode-switch">
-      <button id="btn-visitor" class="tab active">Visiteur</button>
-      <button id="btn-owner" class="tab">Owner</button>
-    </div>
-  </header>
 
-  <!-- VISITOR VIEW -->
-  <main id="view-visitor" class="view">
-    <section class="hero">
-      <h2 class="subtitle">Mes Petites Créations</h2>
-      <div id="gallery" class="gallery-scroll" aria-live="polite"></div>
-    </section>
-  </main>
+  <!-- Bouton Owner -->
+  <button id="ownerBtn" onclick="location.href='owner.html'">👑 Owner</button>
 
-  <!-- OWNER VIEW -->
-  <main id="view-owner" class="view hidden">
-    <section class="owner-panel">
-      <h2 class="subtitle">Ajouter une création</h2>
-      <div class="owner-box">
-        <input id="name" placeholder="Nom de la création" />
-        <input id="photo" type="file" accept="image/*" multiple />
-        <button id="add" class="validate-btn">Ajouter</button>
-      </div>
+  <h1 style="padding-left: 20px;">✨ Projets réalisés</h1>
 
-      <h3 class="subtitle small">Vos créations</h3>
-      <div id="owner-list" class="owner-gallery"></div>
-    </section>
-  </main>
+  <!-- Galerie horizontale -->
+  <div id="gallery" class="gallery-scroll"></div>
 
-  <!-- MODAL ZOOM -->
-  <div id="modal" class="modal hidden" role="dialog" aria-modal="true">
-    <div class="modal-overlay" id="modal-overlay"></div>
-    <div class="modal-content">
-      <button id="close-modal" class="close-btn">✖</button>
-      <img id="modal-img" class="modal-image" alt="Agrandissement">
-      <div id="modal-thumbs" class="modal-thumbnails"></div>
-      <button id="open-comment" class="comment-btn">💬 Commentaires</button>
-    </div>
+  <!-- Zoom modal -->
+  <div id="imageModal" onclick="this.style.display='none'">
+    <img id="modalImg" src="">
   </div>
 
-  <!-- MODAL COMMENT -->
-  <div id="comment-modal" class="modal hidden" role="dialog" aria-modal="true">
-    <div class="modal-overlay" id="comment-overlay"></div>
-    <div class="modal-content small">
-      <button id="close-comment" class="close-btn">✖</button>
-      <h3>Laisser un commentaire</h3>
-      <input id="prenom" placeholder="Votre prénom" />
-      <textarea id="commentaire" placeholder="Ton message..." rows="4"></textarea>
-      <button id="send-comment" class="validate-btn">Valider</button>
-    </div>
-  </div>
+  <script type="module" src="visitor.js"></script>
 
-  <!-- Firebase (compat - global API) -->
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-storage-compat.js"></script>
-
-  <!-- App JS -->
-  <script src="app.js"></script>
 </body>
 </html>
