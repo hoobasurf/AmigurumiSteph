@@ -1,4 +1,4 @@
-// ⚡ Config Firebase
+// Config Firebase
 const firebaseConfig = {
   apiKey: "AIzaSyAKUqhiGi1ZHIfZRwslMIUip8ohwOiLhFA",
   authDomain: "amigurumisteph.firebaseapp.com",
@@ -18,7 +18,7 @@ const nameInput = document.getElementById("name");
 const photoInput = document.getElementById("photo");
 const list = document.getElementById("owner-list");
 
-// 📂 Upload automatique quand le fichier change
+// Upload automatique
 photoInput.addEventListener("change", async () => {
   const file = photoInput.files[0];
   const name = nameInput.value.trim();
@@ -29,19 +29,23 @@ photoInput.addEventListener("change", async () => {
   }
 
   try {
-    // 1️⃣ Upload Storage
+    // 🔹 Crée une référence unique
     const imgRef = storage.ref("creations/" + Date.now() + "-" + file.name);
+
+    // 🔹 Upload le fichier
     await imgRef.put(file);
+
+    // 🔹 Récupère l'URL finale
     const url = await imgRef.getDownloadURL();
 
-    // 2️⃣ Firestore
+    // 🔹 Ajoute à Firestore
     await db.collection("creations").add({
       name: name,
       imageUrl: url,
       createdAt: firebase.firestore.FieldValue.serverTimestamp()
     });
 
-    // Reset
+    // Reset champs
     nameInput.value = "";
     photoInput.value = "";
 
@@ -51,7 +55,7 @@ photoInput.addEventListener("change", async () => {
   }
 });
 
-// 🔥 Affichage live des créations
+// Affichage live
 db.collection("creations").orderBy("createdAt", "desc").onSnapshot(snapshot => {
   list.innerHTML = "";
   snapshot.forEach(doc => {
