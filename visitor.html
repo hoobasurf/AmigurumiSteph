@@ -2,21 +2,54 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Visiteur - Galerie</title>
+  <title>Galerie visiteurs</title>
+
   <style>
-    body { font-family: sans-serif; padding: 20px; background: #f7f7f7; }
-    #visitor-list { display: flex; flex-wrap: wrap; gap: 15px; }
-    .item { background: white; padding: 10px; border-radius: 8px; box-shadow: 0 0 5px #ccc; }
-    .item img { max-width: 150px; border-radius: 8px; display: block; }
+    body {
+      font-family: sans-serif;
+      background: #f5f5f5;
+      padding: 20px;
+    }
+
+    #gallery {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 15px;
+    }
+
+    .item {
+      background: white;
+      border-radius: 10px;
+      padding: 10px;
+      box-shadow: 0 0 5px #ccc;
+      width: 120px;
+    }
+
+    .item img {
+      width: 100%;
+      border-radius: 8px;
+    }
+
+    .item p {
+      margin: 5px 0 0;
+      font-weight: bold;
+      text-align: center;
+    }
   </style>
 </head>
 <body>
 
-<h1>Galerie des créations</h1>
+<h1>Galerie</h1>
 
-<div id="visitor-list"></div>
+<div id="gallery"></div>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<!-- Supabase UMD -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js/dist/umd/supabase.min.js"></script>
+
+<!-- Init Supabase -->
+<script src="supabase-init.js"></script>
+
+<!-- Script Visitor -->
 <script src="visitor.js"></script>
 
 </body>
