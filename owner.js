@@ -10,7 +10,7 @@ const photoInput = document.getElementById('photo');
 const addBtn = document.getElementById('add');
 const list = document.getElementById('owner-list');
 
-// Fonction pour ajouter visuellement
+// Ajouter à la liste visuellement (affichage immédiat)
 function addToList(item) {
   const div = document.createElement('div');
   div.className = 'owner-item';
@@ -18,7 +18,7 @@ function addToList(item) {
   list.prepend(div);
 }
 
-// Charger les créations existantes
+// Charger les créations existantes depuis Supabase
 async function loadCreations() {
   const { data, error } = await supabase
     .from('creations')
@@ -31,47 +31,53 @@ async function loadCreations() {
 loadCreations();
 
 // Bouton Ajouter
-addBtn.onclick = async () => {
+addBtn.onclick = () => {
   const name = nameInput.value.trim();
   const file = photoInput.files[0];
   if (!name || !file) return alert("Merci de remplir le nom et choisir une photo !");
 
   console.log("Nom :", name);
   console.log("Fichier sélectionné :", file);
-  console.log("Upload commencé");
 
+  // ⚡ Affichage immédiat
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    const imgUrl = e.target.result;
+    addToList({ name, image_url: imgUrl });
+    nameInput.value = '';
+    photoInput.value = '';
+  };
+  reader.readAsDataURL(file);
+
+  // ⚡ Upload réel vers Supabase
+  uploadToSupabase(name, file);
+};
+
+// Fonction upload Supabase
+async function uploadToSupabase(name, file) {
   try {
     const timestamp = Date.now();
     const fileName = `${timestamp}-${file.name}`;
 
-    // Upload dans Supabase Storage
     const { data: uploadData, error: uploadError } = await supabase
       .storage
       .from('creations')
       .upload(fileName, file);
-
     if (uploadError) throw uploadError;
 
-    // URL publique
     const { publicURL } = supabase
       .storage
       .from('creations')
       .getPublicUrl(fileName);
 
-    console.log("URL publique :", publicURL);
+    console.log("Upload terminé, URL publique :", publicURL);
 
-    // Ajouter dans la table Supabase
-    const { data: insertData, error: insertError } = await supabase
+    await supabase
       .from('creations')
       .insert([{ name, image_url: publicURL }]);
-    if (insertError) throw insertError;
-
-    nameInput.value = '';
-    photoInput.value = '';
-    addToList({ name, image_url: publicURL });
 
   } catch (err) {
     console.error(err);
-    alert("Erreur : " + err.message);
+    alert("Erreur upload Supabase : " + err.message);
   }
-};
+}
