@@ -1,14 +1,18 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Galerie – Visiteur</title>
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <h1>Mes Petites Créations</h1>
 
+  <!-- Bouton Owner -->
+  <button id="ownerBtn" class="owner-btn">Owner</button>
+
+  <!-- Galerie horizontale -->
   <div id="gallery" class="gallery-scroll"></div>
 
   <!-- Modal image -->
@@ -34,14 +38,17 @@
       appId: "1:175290001202:web:b53e4255e699d65bd4192b"
     };
     firebase.initializeApp(firebaseConfig);
+
     const db = firebase.firestore();
 
     const gallery = document.getElementById("gallery");
     const modal = document.getElementById("modal");
     const modalImg = document.getElementById("modal-img");
     const closeModal = document.getElementById("close-modal");
+    const ownerBtn = document.getElementById("ownerBtn");
 
     closeModal.onclick = () => modal.classList.add("hidden");
+    ownerBtn.onclick = () => window.location.href = "owner.html";
 
     db.collection("creations").orderBy("createdAt", "desc")
       .onSnapshot(snapshot => {
@@ -51,6 +58,7 @@
           const img = document.createElement("img");
           img.src = data.imageUrl;
           img.alt = data.name;
+          img.className = "gallery-item";
           img.onclick = () => {
             modalImg.src = data.imageUrl;
             modal.classList.remove("hidden");
