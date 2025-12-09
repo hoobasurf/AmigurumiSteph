@@ -8,7 +8,7 @@ const firebaseConfig = {
   appId: "1:175290001202:web:b53e4255e699d65bd4192b"
 };
 
-// 🔹 Initialisation Firebase
+// 🔹 Initialisation Firebase v8
 firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 const storage = firebase.storage();
@@ -18,7 +18,7 @@ const nameInput = document.getElementById("name");
 const photoInput = document.getElementById("photo");
 const list = document.getElementById("owner-list");
 
-// 🔹 Upload et affichage
+// 🔹 Upload automatique au choix fichier
 photoInput.addEventListener("change", async () => {
   const file = photoInput.files[0];
   const name = nameInput.value.trim();
@@ -29,37 +29,29 @@ photoInput.addEventListener("change", async () => {
   }
 
   try {
-    // 1️⃣ Crée la référence Storage unique
     const timestamp = Date.now();
-    const storageRef = storage.ref().child(`creations/${timestamp}-${file.name}`);
-
-    // 2️⃣ Upload
+    const storageRef = storage.ref(`creations/${timestamp}-${file.name}`);
     const uploadTask = storageRef.put(file);
 
-    // 3️⃣ Listener pour mobile
     uploadTask.on(
       "state_changed",
       null,
-      error => {
+      (error) => {
         console.error(error);
-        alert("Erreur lors de l'upload : " + error.message);
+        alert("Erreur upload : " + error.message);
       },
       async () => {
-        // 4️⃣ Quand upload terminé, récupérer URL
         const url = await uploadTask.snapshot.ref.getDownloadURL();
 
-        // 5️⃣ Ajouter dans Firestore
-        const docRef = await db.collection("creations").add({
+        await db.collection("creations").add({
           name: name,
           imageUrl: url,
           createdAt: firebase.firestore.FieldValue.serverTimestamp()
         });
 
-        // 6️⃣ Reset champs
         nameInput.value = "";
         photoInput.value = "";
 
-        // ✅ Affichage immédiat
         addToList({ name, imageUrl: url });
       }
     );
@@ -70,7 +62,7 @@ photoInput.addEventListener("change", async () => {
   }
 });
 
-// 🔹 Fonction pour ajouter visuellement à la liste sans attendre snapshot
+// 🔹 Ajouter visuellement
 function addToList(data) {
   const item = document.createElement("div");
   item.className = "owner-item";
@@ -81,11 +73,10 @@ function addToList(data) {
   list.prepend(item);
 }
 
-// 🔹 Affichage live Firestore
-db.collection("creations").orderBy("createdAt", "desc")
-  .onSnapshot(snapshot => {
+// 🔹 Live Firestore
+db.collection("creations")
+  .orderBy("createdAt", "desc")
+  .onSnapshot((snapshot) => {
     list.innerHTML = "";
-    snapshot.forEach(doc => {
-      addToList(doc.data());
-    });
-});
+    snapshot.forEach((doc) => addToList(doc.data()));
+  });
