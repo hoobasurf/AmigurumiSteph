@@ -2,8 +2,12 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Owner - Ajout Création</title>
+  <title>Owner - Mes Créations</title>
   <link rel="stylesheet" href="style.css">
+  <!-- Firebase v8 -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-storage.js"></script>
 </head>
 <body>
   <h1 class="title">Ajouter une création</h1>
@@ -11,18 +15,11 @@
   <div class="owner-box">
     <input id="name" placeholder="Nom de la création">
     <input id="photo" type="file" accept="image/*">
-    <button id="add">Ajouter</button>
   </div>
 
   <h2 class="subtitle">Liste des créations</h2>
   <div id="owner-list"></div>
 
-  <!-- Firebase v8 -->
-  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-storage.js"></script>
-
-  <!-- Ton script -->
   <script src="owner.js"></script>
 </body>
 </html>
