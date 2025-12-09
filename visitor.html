@@ -1,16 +1,36 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="UTF-8">
-<title>Galerie</title>
-<link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <title>Visiteur - Galerie Amigurumi</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
+  <h1 class="title">Mes Petites Créations</h1>
 
-<h1 class="title">Mes Petites Créations</h1>
-<div class="gallery-scroll" id="gallery"></div>
+  <div id="gallery" class="gallery-scroll"></div>
 
-<script src="firebase.js"></script>
-<script src="visitor.js"></script>
+  <!-- MODAL ZOOM -->
+  <div id="modal" class="modal hidden">
+    <div class="modal-content">
+      <img id="modal-img" class="modal-image">
+      <div id="thumbnails" class="thumbnails"></div>
+      <button id="comment-btn" class="comment-btn">💬 Commentaires</button>
+      <button id="close-modal" class="close-btn">✖</button>
+    </div>
+  </div>
+
+  <!-- MODAL COMMENTAIRE -->
+  <div id="comment-modal" class="modal hidden">
+    <div class="comment-box">
+      <h2>Laisser un commentaire</h2>
+      <input id="prenom" placeholder="Votre prénom">
+      <textarea id="commentaire" placeholder="Votre message... 😊"></textarea>
+      <button id="send-comment" class="validate-btn">Valider</button>
+      <button id="close-comment" class="close-btn">✖</button>
+    </div>
+  </div>
+
+  <script type="module" src="visitor.js"></script>
 </body>
 </html>
