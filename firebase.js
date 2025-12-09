@@ -1,18 +1,21 @@
-// firebase.js
-import { initializeApp } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js";
-import { getFirestore } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
-import { getStorage } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-storage.js";
+<!-- Firebase v8 classique pour iPhone -->
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-storage.js"></script>
 
-// ⚡ Config Firebase
-const firebaseConfig = {
-  apiKey: "AIzaSyAKUqhiGi1ZHIfZRwslMIUip8ohwOiLhFA",
-  authDomain: "amigurumisteph.firebaseapp.com",
-  projectId: "amigurumisteph",
-  storageBucket: "amigurumisteph.appspot.com",
-  messagingSenderId: "175290001202",
-  appId: "1:175290001202:web:b53e4255e699d65bd4192b"
-};
+<script>
+  // 🔹 Config Firebase
+  const firebaseConfig = {
+    apiKey: "AIzaSyAKUqhiGi1ZHIfZRwslMIUip8ohwOiLhFA",
+    authDomain: "amigurumisteph.firebaseapp.com",
+    projectId: "amigurumisteph",
+    storageBucket: "amigurumisteph.appspot.com",
+    messagingSenderId: "175290001202",
+    appId: "1:175290001202:web:b53e4255e699d65bd4192b"
+  };
 
-export const app = initializeApp(firebaseConfig);
-export const db = getFirestore(app);
-export const storage = getStorage(app);
+  // 🔹 Initialisation Firebase
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.firestore();
+  const storage = firebase.storage();
+</script>
