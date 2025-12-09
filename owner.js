@@ -1,4 +1,4 @@
-// 🔹 Config Firebase v8
+// Firebase v8
 const firebaseConfig = {
   apiKey: "AIzaSyAKUqhiGi1ZHIfZRwslMIUip8ohwOiLhFA",
   authDomain: "amigurumisteph.firebaseapp.com",
@@ -14,11 +14,9 @@ const storage = firebase.storage();
 
 const nameInput = document.getElementById("name");
 const photoInput = document.getElementById("photo");
-const addBtn = document.getElementById("add");
 const list = document.getElementById("owner-list");
 
-// Ajouter une création
-addBtn.addEventListener("click", () => {
+photoInput.addEventListener("change", async () => {
   const file = photoInput.files[0];
   const name = nameInput.value.trim();
   if(!file || !name) return alert("Nom ou photo manquant !");
@@ -40,16 +38,14 @@ addBtn.addEventListener("click", () => {
     });
 });
 
-// Ajouter visuellement à la liste
-function addToList(data) {
+function addToList(data){
   const item = document.createElement("div");
   item.className = "owner-item";
   item.innerHTML = `<p>${data.name}</p><img src="${data.imageUrl}" class="mini-img">`;
   list.prepend(item);
 }
 
-// Affichage live Firestore
-db.collection("creations").orderBy("createdAt", "desc").onSnapshot(snapshot => {
+db.collection("creations").orderBy("createdAt","desc").onSnapshot(snapshot => {
   list.innerHTML = "";
   snapshot.forEach(doc => addToList(doc.data()));
 });
