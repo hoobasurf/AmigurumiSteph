@@ -2,16 +2,8 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Owner - Test Ajouter</title>
-  <style>
-    body { font-family: sans-serif; padding: 20px; background: #fff0f5; }
-    .owner-box { margin-bottom: 20px; }
-    input, button { padding: 10px; margin: 5px; border-radius: 8px; border: 1px solid #ccc; }
-    button { background-color: #ffb6c1; cursor: pointer; }
-    #owner-list { display: flex; flex-wrap: wrap; gap: 10px; }
-    .owner-item { background: #fff; padding: 10px; border-radius: 10px; box-shadow: 0 0 5px #ccc; }
-    .owner-item img { max-width: 100px; border-radius: 8px; display: block; }
-  </style>
+  <title>Owner - Ajouter Création</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
@@ -26,14 +18,6 @@
 <h2>Liste des créations</h2>
 <div id="owner-list"></div>
 
-<!-- Supabase UMD (global) -->
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js/dist/umd/supabase.min.js"></script>
-
-<!-- Init Supabase as a global (edit the anon key in supabase-init.js if needed) -->
-<script src="supabase-init.js"></script>
-
-<!-- Your original owner script (NO type="module") -->
-<script src="owner.js"></script>
-
+<script type="module" src="owner.js"></script>
 </body>
 </html>
