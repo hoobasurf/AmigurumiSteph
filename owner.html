@@ -2,24 +2,31 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Owner - Ajout Création</title>
-  <link rel="stylesheet" href="style.css">
+  <title>Owner - Test Ajouter</title>
+  <style>
+    body { font-family: sans-serif; padding: 20px; background: #fff0f5; }
+    .owner-box { margin-bottom: 20px; }
+    input, button { padding: 10px; margin: 5px; border-radius: 8px; border: 1px solid #ccc; }
+    button { background-color: #ffb6c1; cursor: pointer; }
+    #owner-list { display: flex; flex-wrap: wrap; gap: 10px; }
+    .owner-item { background: #fff; padding: 10px; border-radius: 10px; box-shadow: 0 0 5px #ccc; }
+    .owner-item img { max-width: 100px; border-radius: 8px; display: block; }
+  </style>
 </head>
 <body>
-  <h1>Ajouter une création</h1>
 
-  <div class="owner-box">
-    <input id="name" placeholder="Nom de la création">
-    <input id="photo" type="file" accept="image/*">
-    <button id="add">Ajouter</button>
-  </div>
+<h1>Ajouter une création</h1>
 
-  <h2>Liste des créations</h2>
-  <div id="owner-list"></div>
+<div class="owner-box">
+  <input id="name" placeholder="Nom de la création">
+  <input id="photo" type="file" accept="image/*">
+  <button id="add">Ajouter</button>
+</div>
 
-  <!-- Supabase client -->
-  <script type="module" src="supabase.js"></script>
-  <!-- Script Owner -->
-  <script type="module" src="owner.js"></script>
+<h2>Liste des créations</h2>
+<div id="owner-list"></div>
+
+<script type="module" src="owner.js"></script>
+
 </body>
 </html>
