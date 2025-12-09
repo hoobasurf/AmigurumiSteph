@@ -1,4 +1,4 @@
-// Config Firebase
+// 🔹 Config Firebase v8
 const firebaseConfig = {
   apiKey: "AIzaSyAKUqhiGi1ZHIfZRwslMIUip8ohwOiLhFA",
   authDomain: "amigurumisteph.firebaseapp.com",
@@ -40,6 +40,7 @@ addBtn.addEventListener("click", () => {
     });
 });
 
+// Ajouter visuellement à la liste
 function addToList(data) {
   const item = document.createElement("div");
   item.className = "owner-item";
