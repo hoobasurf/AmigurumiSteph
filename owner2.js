@@ -1,4 +1,4 @@
-// --- Initialisation Firebase ---
+// ⚡ Config Firebase
 const firebaseConfig = {
   apiKey: "AIzaSyAKUqhiGi1ZHIfZRwslMIUip8ohwOiLhFA",
   authDomain: "amigurumisteph.firebaseapp.com",
@@ -8,44 +8,40 @@ const firebaseConfig = {
   appId: "1:175290001202:web:b53e4255e699d65bd4192b"
 };
 
-firebase.initializeApp(firebaseConfig);
+// Initialisation
+const app = firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 const storage = firebase.storage();
 
-// --- Éléments HTML ---
+// Éléments HTML
 const nameInput = document.getElementById("name");
 const photoInput = document.getElementById("photo");
-const addBtn = document.getElementById("add");
 const list = document.getElementById("owner-list");
 
-// --- Vérif du script ---
-alert("Script chargé correctement");
-
-// --- Ajouter création ---
-addBtn.onclick = async () => {
-  alert("Bouton cliqué !");
-  const name = nameInput.value.trim();
+// 📂 Upload automatique quand le fichier change
+photoInput.addEventListener("change", async () => {
   const file = photoInput.files[0];
+  const name = nameInput.value.trim();
 
-  if (!name || !file) {
-    alert("Nom ou photo manquant !");
+  if (!file || !name) {
+    alert("Merci de remplir le nom et choisir une photo !");
     return;
   }
 
   try {
-    // Upload Storage
+    // 1️⃣ Upload Storage
     const imgRef = storage.ref("creations/" + Date.now() + "-" + file.name);
-    const uploadTask = await imgRef.put(file);
+    await imgRef.put(file);
     const url = await imgRef.getDownloadURL();
 
-    // Firestore
+    // 2️⃣ Firestore
     await db.collection("creations").add({
       name: name,
-      image: url,
+      imageUrl: url,
       createdAt: firebase.firestore.FieldValue.serverTimestamp()
     });
 
-    alert("Création ajoutée !");
+    // Reset
     nameInput.value = "";
     photoInput.value = "";
 
@@ -53,11 +49,10 @@ addBtn.onclick = async () => {
     console.error(err);
     alert("Erreur : " + err.message);
   }
-};
+});
 
-// --- Affichage live ---
-db.collection("creations").orderBy("createdAt", "desc")
-.onSnapshot(snapshot => {
+// 🔥 Affichage live des créations
+db.collection("creations").orderBy("createdAt", "desc").onSnapshot(snapshot => {
   list.innerHTML = "";
   snapshot.forEach(doc => {
     const data = doc.data();
@@ -65,7 +60,7 @@ db.collection("creations").orderBy("createdAt", "desc")
     item.className = "owner-item";
     item.innerHTML = `
       <p>${data.name}</p>
-      <img src="${data.image}" class="mini-img">
+      <img src="${data.imageUrl}" class="mini-img">
     `;
     list.appendChild(item);
   });
