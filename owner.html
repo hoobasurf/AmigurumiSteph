@@ -1,26 +1,28 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <title>Owner - Ajout Création</title>
-  <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Owner Panel</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
+
 <body>
-  <h1 class="title">Ajouter une création</h1>
 
-  <div class="owner-box">
-    <input id="name" placeholder="Nom de la création">
-    <input id="photo" type="file" accept="image/*">
-  </div>
+  <h1>Panneau Owner</h1>
 
-  <h2 class="subtitle">Liste des créations</h2>
-  <div id="owner-list"></div>
+  <input type="file" id="fileInput" accept="image/*" />
+  <button id="addBtn">Ajouter</button>
 
-  <!-- Firebase SDK CDN -->
-  <script src="https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/12.6.0/firebase-storage.js"></script>
+  <div id="gallery"></div>
 
-  <script src="owner.js"></script>
+  <!-- ⚡ Test : est-ce que le JS se charge ? -->
+  <script type="module">
+    alert("JS chargé !");
+  </script>
+
+  <!-- ⚡ Ton vrai script -->
+  <script type="module" src="owner.js"></script>
+
 </body>
 </html>
