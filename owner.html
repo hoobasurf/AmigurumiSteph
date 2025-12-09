@@ -1,34 +1,29 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Owner Panel</title>
-  <link rel="stylesheet" href="style.css" />
+  <meta charset="UTF-8">
+  <title>Owner - Ajout Création</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 
 <body>
+  <h1 class="title">Ajouter une création</h1>
 
-  <h1>Panneau Owner</h1>
+  <div class="owner-box">
+    <input id="name" placeholder="Nom de la création">
+    <input id="photo" type="file" accept="image/*">
+  </div>
 
-  <input type="file" id="fileInput" accept="image/*" />
-  <button id="addBtn">Ajouter</button>
+  <h2 class="subtitle">Liste</h2>
+  <div id="owner-list"></div>
 
-  <div id="gallery"></div>
+  <!-- 🔥 Firebase v8 (compatible avec ton code) -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-storage.js"></script>
 
-  <!-- ⚡ Test : est-ce que le JS se charge ? -->
-  <script type="module">
-    alert("JS chargé !");
-  </script>
+  <!-- 🟩 Ton fichier JS -->
+  <script src="owner.js"></script>
 
-  <!-- ⚡ Ton vrai script -->
-  <script type="module" src="owner.js"></script>
-<!-- Firebase v8 (compatible avec ton code) -->
-<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-storage.js"></script>
-
-<!-- Ton script -->
-<script src="owner.js"></script>
 </body>
 </html>
