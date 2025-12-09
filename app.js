@@ -1,127 +1,191 @@
-:root{
-  --bg: #fff5f8;
-  --card: #fff0f5;
-  --accent: #ff85b3;
-  --accent-2: #ffb3c6;
-  --muted: #7a5a67;
-  --radius: 16px;
-  --glass: rgba(255,255,255,0.6);
+// ---------- CONFIG Firebase (remplace si besoin) ----------
+const firebaseConfig = {
+  apiKey: "AIzaSyAKUqhiGi1ZHIfZRwslMIUip8ohwOiLhFA",
+  authDomain: "amigurumisteph.firebaseapp.com",
+  projectId: "amigurumisteph",
+  storageBucket: "amigurumisteph.appspot.com",
+  messagingSenderId: "175290001202",
+  appId: "1:175290001202:web:b53e4255e699d65bd4192b"
+};
+
+// Init (compat global API)
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+const storage = firebase.storage();
+
+// ---------- UI refs ----------
+const viewVisitor = document.getElementById("view-visitor");
+const viewOwner = document.getElementById("view-owner");
+const btnVisitor = document.getElementById("btn-visitor");
+const btnOwner = document.getElementById("btn-owner");
+
+const gallery = document.getElementById("gallery");
+const ownerList = document.getElementById("owner-list");
+const addBtn = document.getElementById("add");
+const nameInput = document.getElementById("name");
+const photoInput = document.getElementById("photo");
+
+// Modals
+const modal = document.getElementById("modal");
+const modalImg = document.getElementById("modal-img");
+const modalThumbs = document.getElementById("modal-thumbs");
+const closeModal = document.getElementById("close-modal");
+const openComment = document.getElementById("open-comment");
+
+const commentModal = document.getElementById("comment-modal");
+const closeComment = document.getElementById("close-comment");
+const sendComment = document.getElementById("send-comment");
+const prenomInput = document.getElementById("prenom");
+const commentaireInput = document.getElementById("commentaire");
+
+// ---------- NAV ----------
+btnVisitor.addEventListener("click", () => {
+  btnVisitor.classList.add("active");
+  btnOwner.classList.remove("active");
+  viewVisitor.classList.remove("hidden");
+  viewOwner.classList.add("hidden");
+});
+btnOwner.addEventListener("click", () => {
+  btnOwner.classList.add("active");
+  btnVisitor.classList.remove("active");
+  viewOwner.classList.remove("hidden");
+  viewVisitor.classList.add("hidden");
+});
+
+// ---------- OWNER: upload and list ----------
+addBtn.addEventListener("click", async () => {
+  // debug quick check
+  try {
+    alert("Clique détecté !");
+  } catch(e){}
+
+  const name = nameInput.value.trim();
+  const files = Array.from(photoInput.files || []);
+  if (!name || files.length === 0) {
+    alert("Remplis le nom et choisis une image !");
+    return;
+  }
+
+  try {
+    // upload all files, gather URLs
+    const urls = [];
+    for (let f of files) {
+      const path = "photos/" + Date.now() + "-" + f.name;
+      const ref = storage.ref(path);
+      await ref.put(f);
+      const url = await ref.getDownloadURL();
+      urls.push(url);
+    }
+
+    // add doc
+    await db.collection("creations").add({
+      name,
+      imageUrls: urls,
+      createdAt: Date.now()
+    });
+
+    // reset ui
+    nameInput.value = "";
+    photoInput.value = "";
+    // reload owner list will be automatic via snapshot
+  } catch (err) {
+    console.error(err);
+    alert("Erreur lors de l'ajout : " + (err && err.message ? err.message : ""));
+  }
+});
+
+// owner list realtime
+db.collection("creations").orderBy("createdAt").onSnapshot(snapshot => {
+  // update owner list
+  ownerList.innerHTML = "";
+  snapshot.docs.slice().reverse().forEach(doc => {
+    const data = doc.data();
+    const wrap = document.createElement("div");
+    wrap.className = "owner-item";
+    const first = (data.imageUrls && data.imageUrls[0]) || "";
+    wrap.innerHTML = `
+      <img src="${first}" alt="${data.name}">
+      <div class="owner-name">${escapeHtml(data.name)}</div>
+      <div style="text-align:center;margin-top:8px;">
+        <button class="validate-btn delete-local" data-id="${doc.id}">Supprimer</button>
+      </div>
+    `;
+    ownerList.appendChild(wrap);
+  });
+
+  // attach delete handlers
+  document.querySelectorAll(".delete-local").forEach(b => {
+    b.onclick = async (e) => {
+      const id = e.currentTarget.getAttribute("data-id");
+      if (!confirm("Supprimer cette création ?")) return;
+      await db.collection("creations").doc(id).delete();
+    };
+  });
+});
+
+// ---------- VISITOR: gallery realtime ----------
+db.collection("creations").orderBy("createdAt").onSnapshot(snapshot => {
+  gallery.innerHTML = "";
+  snapshot.docs.forEach(doc => {
+    const data = doc.data();
+    const div = document.createElement("div");
+    div.className = "gallery-item";
+    const thumb = (data.imageUrls && data.imageUrls[0]) || "";
+    div.innerHTML = `
+      <img src="${thumb}" alt="${escapeHtml(data.name)}">
+      <div class="gallery-info">
+        <span>${escapeHtml(data.name)}</span>
+      </div>
+    `;
+    div.onclick = () => openModalWithData(data, doc.id);
+    gallery.appendChild(div);
+  });
+});
+
+// ---------- MODAL behavior ----------
+function openModalWithData(data, docId) {
+  modal.classList.remove("hidden");
+  modalImg.src = (data.imageUrls && data.imageUrls[0]) || "";
+  modalThumbs.innerHTML = "";
+  if (data.imageUrls && data.imageUrls.length > 1) {
+    data.imageUrls.forEach((u, i) => {
+      const img = document.createElement("img");
+      img.src = u; if (i === 0) img.classList.add("active");
+      img.onclick = () => {
+        modalImg.src = u;
+        modalThumbs.querySelectorAll("img").forEach(t => t.classList.remove("active"));
+        img.classList.add("active");
+      };
+      modalThumbs.appendChild(img);
+    });
+  }
+  // prepare comment send: store docId in attribute
+  sendComment.setAttribute("data-doc", docId);
 }
 
-*{box-sizing:border-box}
-html,body{height:100%}
-body{
-  margin:0;
-  font-family: "Segoe UI", system-ui, -apple-system, "Helvetica Neue", Arial;
-  background: linear-gradient(180deg,var(--bg),#fff);
-  color:#332;
-  -webkit-font-smoothing:antialiased;
-  -moz-osx-font-smoothing:grayscale;
-  padding:16px;
-}
+closeModal.onclick = () => modal.classList.add("hidden");
+document.getElementById("modal-overlay").onclick = () => modal.classList.add("hidden");
 
-/* Header */
-.top{
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  gap:12px;
-  margin-bottom:12px;
-}
-.brand{
-  margin:0;
-  color:var(--accent);
-  font-weight:700;
-  letter-spacing:0.6px;
-}
-.mode-switch .tab{
-  background:transparent;
-  border:1px solid var(--accent-2);
-  padding:8px 12px;
-  border-radius:14px;
-  margin-left:6px;
-  cursor:pointer;
-}
-.mode-switch .tab.active{
-  background:var(--accent);
-  color:white;
-  box-shadow:0 6px 18px rgba(255,133,179,0.18);
-}
+// COMMENTS modal
+openComment.onclick = () => commentModal.classList.remove("hidden");
+closeComment.onclick = () => commentModal.classList.add("hidden");
+document.getElementById("comment-overlay").onclick = () => commentModal.classList.add("hidden");
 
-/* Views */
-.view{display:block}
-.hidden{display:none}
+// send comment
+sendComment.onclick = async () => {
+  const docId = sendComment.getAttribute("data-doc");
+  const prenom = prenomInput.value.trim();
+  const text = commentaireInput.value.trim();
+  if (!prenom || !text) { alert("Prénom et message requis"); return; }
+  await db.collection("creations").doc(docId).collection("comments").add({
+    prenom, text, createdAt: Date.now()
+  });
+  prenomInput.value = ""; commentaireInput.value = "";
+  commentModal.classList.add("hidden");
+  alert("Commentaire envoyé !");
+};
 
-/* Hero / gallery */
-.hero{margin-bottom:18px}
-.subtitle{margin:8px 0 14px 0;text-align:center;color:var(--muted)}
-.gallery-scroll{
-  display:flex;
-  gap:12px;
-  overflow-x:auto;
-  padding:10px 6px;
-  scroll-behavior:smooth;
+// helper escape
+function escapeHtml(s){
+  return String(s || "").replace(/[&<>"']/g, function(m){ return ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'})[m]; });
 }
-.gallery-item{
-  flex:0 0 220px;
-  height:220px;
-  border-radius:var(--radius);
-  background:var(--card);
-  box-shadow:0 8px 30px rgba(0,0,0,0.06);
-  overflow:hidden;
-  position:relative;
-  cursor:pointer;
-  transition:transform .18s;
-}
-.gallery-item:hover{transform:scale(1.03)}
-.gallery-item img{width:100%;height:100%;object-fit:cover}
-
-/* like / meta */
-.gallery-info{
-  position:absolute;
-  left:8px;bottom:8px;
-  background:var(--glass);
-  padding:6px 8px;border-radius:12px;
-  display:flex;gap:8px;align-items:center;font-size:13px;color:#5a3a44;
-}
-
-/* Owner */
-.owner-panel{max-width:760px;margin:0 auto}
-.owner-box{
-  display:flex;flex-direction:column;gap:8px;max-width:520px;margin:0 auto 18px auto;
-}
-.owner-box input[type="text"], .owner-box input[type="file"], .owner-box input, .owner-box textarea{
-  padding:10px;border-radius:12px;border:1px solid var(--accent-2);
-  background:white;
-}
-.validate-btn{
-  background:var(--accent);
-  color:white;border:none;padding:10px;border-radius:12px;cursor:pointer;font-weight:600;
-  box-shadow:0 6px 18px rgba(255,133,179,0.12);
-}
-
-/* owner gallery */
-.owner-gallery{display:flex;flex-wrap:wrap;gap:12px;justify-content:center}
-.owner-item{width:180px;background:var(--card);padding:10px;border-radius:12px;box-shadow:0 8px 20px rgba(0,0,0,0.06)}
-.owner-item img{width:100%;height:110px;border-radius:10px;object-fit:cover}
-.owner-name{display:block;text-align:center;margin-top:8px;font-weight:600;color:var(--muted)}
-
-/* modal */
-.modal{
-  position:fixed;left:0;top:0;width:100%;height:100%;display:flex;align-items:center;justify-content:center;
-  z-index:200;
-}
-.modal-overlay{position:absolute;left:0;top:0;width:100%;height:100%;backdrop-filter:blur(8px);background:rgba(255,235,242,0.5)}
-.modal-content{
-  position:relative;z-index:210;background:var(--card);padding:14px;border-radius:18px;max-width:92%;max-height:86%;overflow:auto;text-align:center;
-}
-.modal-image{max-width:100%;border-radius:12px}
-.modal-thumbnails{display:flex;gap:8px;margin-top:10px;overflow-x:auto;padding-bottom:6px}
-.modal-thumbnails img{width:64px;height:64px;border-radius:10px;object-fit:cover;cursor:pointer;border:2px solid transparent}
-.modal-thumbnails img.active{border-color:var(--accent)}
-
-/* small helpers */
-.small{max-width:420px}
-.close-btn{position:absolute;right:10px;top:8px;background:transparent;border:none;font-size:20px;cursor:pointer}
-.comment-btn{margin-top:8px;background:var(--accent-2);border:none;padding:8px 12px;border-radius:12px;cursor:pointer}
-input, textarea{font-size:15px}
