@@ -1,20 +1,21 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <title>Ajouter une Création</title>
-  <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Owner – Ajouter Créations</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <h1 class="title">Ajouter une création</h1>
+  <h1>Ajouter une création</h1>
 
   <div class="owner-box">
-    <input id="name" placeholder="Nom de la création">
-    <input id="photo" type="file" accept="image/*">
-    <button id="add" class="validate-btn">Ajouter</button>
+    <input type="text" id="name" placeholder="Nom du projet">
+    <input type="file" id="photo" accept="image/*">
+    <button id="addBtn">Ajouter</button>
   </div>
 
-  <h2 class="subtitle">Liste des créations</h2>
+  <h2>Liste des créations</h2>
   <div id="owner-list"></div>
 
   <script type="module" src="owner2.js"></script>
