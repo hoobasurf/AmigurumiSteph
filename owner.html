@@ -1,84 +1,36 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Owner – Ajouter Créations</title>
-  <link rel="stylesheet" href="style.css">
-</head>
-<body>
-  <h1>Ajouter une création</h1>
+  <meta charset="UTF-8" />
+  <title>Owner – Amigurumi</title>
 
-  <div class="owner-box">
-    <input type="text" id="name" placeholder="Nom du projet">
-    <input type="file" id="photo" accept="image/*">
-    <button id="addBtn">Ajouter</button>
+  <link rel="stylesheet" href="style.css">
+
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js"></script>
+  
+  <!-- Ta config Firebase -->
+  <script src="firebase.js"></script>
+
+  <!-- IMPORTANT : décaler le script, sinon bouton mort -->
+  <script src="owner.js" defer></script>
+</head>
+
+<body>
+
+  <h1 class="title">Ajouter une Création</h1>
+
+  <div class="form-box">
+    <input id="nameInput" placeholder="Nom du projet">
+    <input id="photoInput" type="file" accept="image/*">
+
+    <button id="addBtn" class="validate-btn">Ajouter</button>
   </div>
 
-  <h2>Liste des créations</h2>
-  <div id="owner-list"></div>
+  <h2>Mes créations</h2>
+  <div id="creationList"></div>
 
-  <!-- Firebase SDK via CDN -->
-  <script src="https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/12.6.0/firebase-storage.js"></script>
-
-  <script>
-    const firebaseConfig = {
-      apiKey: "AIzaSyAKUqhiGi1ZHIfZRwslMIUip8ohwOiLhFA",
-      authDomain: "amigurumisteph.firebaseapp.com",
-      projectId: "amigurumisteph",
-      storageBucket: "amigurumisteph.appspot.com",
-      messagingSenderId: "175290001202",
-      appId: "1:175290001202:web:b53e4255e699d65bd4192b"
-    };
-    firebase.initializeApp(firebaseConfig);
-
-    const db = firebase.firestore();
-    const storage = firebase.storage();
-
-    const addBtn = document.getElementById("addBtn");
-    const nameInput = document.getElementById("name");
-    const photoInput = document.getElementById("photo");
-    const ownerList = document.getElementById("owner-list");
-
-    addBtn.onclick = async () => {
-      const name = nameInput.value.trim();
-      const file = photoInput.files[0];
-      if(!name || !file){ alert("Merci de remplir le nom et choisir une photo !"); return; }
-
-      try {
-        const storageRef = storage.ref("photos/" + Date.now() + "-" + file.name);
-        await storageRef.put(file);
-        const url = await storageRef.getDownloadURL();
-
-        await db.collection("creations").add({
-          name,
-          imageUrl: url,
-          createdAt: Date.now()
-        });
-
-        nameInput.value = "";
-        photoInput.value = "";
-
-        alert("Création ajoutée !");
-      } catch(err) {
-        console.error(err);
-        alert("Erreur lors de l'ajout !");
-      }
-    };
-
-    db.collection("creations").orderBy("createdAt", "desc")
-      .onSnapshot(snapshot => {
-        ownerList.innerHTML = "";
-        snapshot.docs.forEach(docu => {
-          const data = docu.data();
-          const div = document.createElement("div");
-          div.className = "owner-item";
-          div.innerHTML = `<strong>${data.name}</strong><br><img src="${data.imageUrl}" width="150">`;
-          ownerList.appendChild(div);
-        });
-      });
-  </script>
 </body>
 </html>
