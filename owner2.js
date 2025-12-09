@@ -16,10 +16,11 @@ const storage = firebase.storage();
 // 🔹 Éléments HTML
 const nameInput = document.getElementById("name");
 const photoInput = document.getElementById("photo");
+const addBtn = document.getElementById("add");
 const list = document.getElementById("owner-list");
 
-// 🔹 Upload automatique au choix fichier
-photoInput.addEventListener("change", async () => {
+// 🔹 Ajouter la création
+addBtn.addEventListener("click", async () => {
   const file = photoInput.files[0];
   const name = nameInput.value.trim();
 
@@ -43,26 +44,28 @@ photoInput.addEventListener("change", async () => {
       async () => {
         const url = await uploadTask.snapshot.ref.getDownloadURL();
 
+        // Ajouter dans Firestore
         await db.collection("creations").add({
           name: name,
           imageUrl: url,
           createdAt: firebase.firestore.FieldValue.serverTimestamp()
         });
 
+        // Reset champs
         nameInput.value = "";
         photoInput.value = "";
 
+        // Affichage instantané
         addToList({ name, imageUrl: url });
       }
     );
-
   } catch (err) {
     console.error(err);
     alert("Erreur : " + err.message);
   }
 });
 
-// 🔹 Ajouter visuellement
+// 🔹 Fonction affichage liste
 function addToList(data) {
   const item = document.createElement("div");
   item.className = "owner-item";
@@ -73,10 +76,10 @@ function addToList(data) {
   list.prepend(item);
 }
 
-// 🔹 Live Firestore
+// 🔹 Affichage live Firestore
 db.collection("creations")
   .orderBy("createdAt", "desc")
-  .onSnapshot((snapshot) => {
+  .onSnapshot(snapshot => {
     list.innerHTML = "";
-    snapshot.forEach((doc) => addToList(doc.data()));
+    snapshot.forEach(doc => addToList(doc.data()));
   });
