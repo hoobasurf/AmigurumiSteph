@@ -2,14 +2,15 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Owner - Ajout Création</title>
+  <title>Owner - Test Ajouter</title>
   <style>
-    body { font-family: sans-serif; background: #fff0f5; color: #333; padding: 20px; }
+    body { font-family: sans-serif; padding: 20px; background: #fff0f5; }
     .owner-box { margin-bottom: 20px; }
-    input, button { padding: 10px; margin: 5px 0; border-radius: 8px; border: 1px solid #ccc; }
-    #owner-list { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 20px; }
-    .owner-item { border: 1px solid #f0c; border-radius: 10px; padding: 10px; background: #ffe4e1; text-align: center; width: 150px; }
-    .mini-img { width: 100%; border-radius: 8px; }
+    input, button { padding: 10px; margin: 5px; border-radius: 8px; border: 1px solid #ccc; }
+    button { background-color: #ffb6c1; cursor: pointer; }
+    #owner-list { display: flex; flex-wrap: wrap; gap: 10px; }
+    .owner-item { background: #fff; padding: 10px; border-radius: 10px; box-shadow: 0 0 5px #ccc; }
+    .owner-item img { max-width: 100px; border-radius: 8px; display: block; }
   </style>
 </head>
 <body>
@@ -25,100 +26,8 @@
 <h2>Liste des créations</h2>
 <div id="owner-list"></div>
 
-<script type="module">
-  import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
-
-  // ⚡ Met ici ton URL Supabase et la clé publishable
-  const SUPABASE_URL = 'https://iubbxvipgofxasatmvzg.supabase.co';
-  const SUPABASE_ANON_KEY = 'sb_publishable_GDoZmwIdoP28XOdrfYYVNw_E_HiCQB1';
-
-  const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-  console.log('Supabase initialisé', supabase);
-
-  const nameInput = document.getElementById('name');
-  const photoInput = document.getElementById('photo');
-  const addBtn = document.getElementById('add');
-  const list = document.getElementById('owner-list');
-
-  function addToList(item) {
-    const div = document.createElement('div');
-    div.className = 'owner-item';
-    div.innerHTML = `<p>${item.name}</p><img src="${item.image_url}" class="mini-img">`;
-    list.prepend(div);
-  }
-
-  async function loadCreations() {
-    const { data, error } = await supabase
-      .from('creations')
-      .select('*')
-      .order('created_at', { ascending: false });
-
-    if (error) { console.error('Erreur fetch:', error); return; }
-
-    list.innerHTML = '';
-    data.forEach(addToList);
-    console.log('Créations chargées', data.length);
-  }
-
-  addBtn.onclick = async () => {
-    const file = photoInput.files[0];
-    const name = nameInput.value.trim();
-
-    if (!file || !name) {
-      alert('Merci de remplir le nom et choisir une photo !');
-      return;
-    }
-
-    try {
-      console.log('Fichier sélectionné :', file);
-      console.log('Nom :', name);
-      console.log('Upload commencé');
-
-      const timestamp = Date.now();
-      const fileName = `${timestamp}-${file.name}`;
-
-      // Upload dans Supabase Storage
-      const { data: uploadData, error: uploadError } = await supabase
-        .storage
-        .from('creations')
-        .upload(fileName, file);
-
-      if (uploadError) throw uploadError;
-
-      console.log('Upload terminé', uploadData);
-
-      // URL publique
-      const { publicURL, error: urlError } = supabase
-        .storage
-        .from('creations')
-        .getPublicUrl(fileName);
-
-      if (urlError) throw urlError;
-
-      console.log('URL publique :', publicURL);
-
-      // Ajouter dans la table Supabase
-      const { data: insertData, error: insertError } = await supabase
-        .from('creations')
-        .insert([{ name, image_url: publicURL }]);
-
-      if (insertError) throw insertError;
-
-      console.log('Insertion réussie', insertData);
-
-      // Reset champs et affichage immédiat
-      nameInput.value = '';
-      photoInput.value = '';
-      addToList({ name, image_url: publicURL });
-
-    } catch(err) {
-      console.error('Erreur :', err);
-      alert('Erreur : ' + err.message);
-    }
-  };
-
-  loadCreations();
-</script>
+<script type="module" src="owner.js"></script>
 
 </body>
 </html>
+
