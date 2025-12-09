@@ -1,59 +1,66 @@
-// Connexion Firebase via CDN
-const db = firebase.firestore();
-const storage = firebase.storage();
+import { db, storage } from "./firebase.js";
+import { collection, addDoc, serverTimestamp, onSnapshot, orderBy, query } 
+  from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
+import { ref, uploadBytes, getDownloadURL } 
+  from "https://www.gstatic.com/firebasejs/12.6.0/firebase-storage.js";
 
-// Sélecteurs
-const nameInput = document.getElementById("nameInput");
-const photoInput = document.getElementById("photoInput");
-const addBtn = document.getElementById("addBtn");
-const creationList = document.getElementById("creationList");
+// Éléments HTML
+const nameInput = document.getElementById("name");
+const photoInput = document.getElementById("photo");
+const addBtn = document.getElementById("add");
+const list = document.getElementById("owner-list");
 
-// --- CLICK AJOUTER ---
+// 👉 Vérif du clic (important)
 addBtn.onclick = async () => {
+  console.log("CLICK détecté !");
 
-    const name = nameInput.value.trim();
-    const file = photoInput.files[0];
+  const name = nameInput.value.trim();
+  const file = photoInput.files[0];
 
-    if (!name || !file) {
-        alert("Nom + Photo obligatoires");
-        return;
-    }
+  if (!name || !file) {
+    alert("Nom ou photo manquant !");
+    return;
+  }
 
-    // Upload Storage
-    const path = `creations/${Date.now()}_${file.name}`;
-    const ref = storage.ref().child(path);
-    await ref.put(file);
-    const url = await ref.getDownloadURL();
+  try {
+    // 1️⃣ Upload image dans Storage
+    const imgRef = ref(storage, "creations/" + Date.now() + "-" + file.name);
+    const upload = await uploadBytes(imgRef, file);
+    const url = await getDownloadURL(upload.ref);
 
-    // Enregistrer dans Firestore
-    await db.collection("creations").add({
-        name: name,
-        image: url,
-        createdAt: Date.now()
+    // 2️⃣ Enregistrer Firestore
+    await addDoc(collection(db, "creations"), {
+      name: name,
+      image: url,
+      createdAt: serverTimestamp()
     });
 
+    alert("Création ajoutée !");
     nameInput.value = "";
     photoInput.value = "";
 
-    alert("Création ajoutée !");
+  } catch (err) {
+    console.error(err);
+    alert("Erreur : " + err.message);
+  }
 };
 
-
-// --- AFFICHAGE AUTOMATIQUE DES PROJETS ---
-db.collection("creations")
-  .orderBy("createdAt", "desc")
-  .onSnapshot(snapshot => {
-
-    creationList.innerHTML = "";
-
+// 3️⃣ 🔥 Affichage en direct des créations
+onSnapshot(
+  query(collection(db, "creations"), orderBy("createdAt", "desc")),
+  (snapshot) => {
+    list.innerHTML = "";
     snapshot.forEach(doc => {
-        const data = doc.data();
+      const data = doc.data();
 
-        creationList.innerHTML += `
-            <div class="creation-item">
-                <img src="${data.image}" class="thumb">
-                <p>${data.name}</p>
-            </div>
-        `;
+      const item = document.createElement("div");
+      item.className = "owner-item";
+      item.innerHTML = `
+        <p>${data.name}</p>
+        <img src="${data.image}" class="mini-img">
+      `;
+
+      list.appendChild(item);
     });
-});
+  }
+);
