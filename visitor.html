@@ -1,49 +1,143 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <title>Mes Petites Créations</title>
-  <link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Créations – Visiteur</title>
+
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background: #f4f4f4;
+      font-family: Arial, sans-serif;
+    }
+
+    /* --- BOUTON OWNER --- */
+    .owner-btn {
+      position: fixed;
+      top: 15px;
+      right: 15px;
+      background: #ff69b4;
+      color: white;
+      padding: 12px 20px;
+      border-radius: 10px;
+      font-weight: bold;
+      text-decoration: none;
+      font-size: 17px;
+      z-index: 9999;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+    }
+
+    .owner-btn:hover {
+      opacity: 0.85;
+    }
+
+    /* --- GALERIE --- */
+    .gallery {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+      gap: 12px;
+      padding: 20px;
+    }
+
+    .gallery-item {
+      background: white;
+      padding: 10px;
+      border-radius: 10px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.15);
+      text-align: center;
+      cursor: pointer;
+    }
+
+    .gallery-item img {
+      width: 100%;
+      border-radius: 10px;
+    }
+
+    /* --- MODAL PREVIEW --- */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.7);
+      justify-content: center;
+      align-items: center;
+      z-index: 10000;
+      padding: 20px;
+    }
+
+    .modal-content {
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      width: 90%;
+      max-width: 400px;
+      text-align: center;
+    }
+
+    .close-btn {
+      margin-top: 10px;
+      background: #ff69b4;
+      padding: 10px;
+      border-radius: 10px;
+      color: white;
+      font-weight: bold;
+      display: inline-block;
+    }
+  </style>
 </head>
+
 <body>
-  <h1 class="title">Mes Petites Créations</h1>
 
-  <!-- Bouton vers Owner -->
-  <div style="text-align:right; margin-bottom:20px;">
-    <a href="owner.html" class="owner-btn" style="
-        background:#ffc0cb; 
-        color:#fff; 
-        padding:10px 20px; 
-        border-radius:12px; 
-        text-decoration:none;
-        font-weight:bold;
-      ">Page Owner 🔑</a>
-  </div>
+  <!-- 🚀 BOUTON OWNER TOUJOURS VISIBLE -->
+  <a href="owner.html" class="owner-btn">🔑 Owner</a>
 
-  <!-- Galerie scroll horizontal -->
-  <div class="gallery-scroll" id="gallery"></div>
+  <h2 style="text-align:center; margin-top:80px;">Créations disponibles</h2>
 
-  <!-- MODAL ZOOM (caché par défaut) -->
-  <div class="modal hidden" id="modal">
+  <!-- GALERIE -->
+  <div class="gallery" id="gallery"></div>
+
+  <!-- MODAL -->
+  <div id="previewModal" class="modal">
     <div class="modal-content">
-      <img id="modal-img" class="modal-image">
-      <div id="mini-thumbs" class="mini-thumbs"></div>
-      <button id="comment-btn" class="comment-btn">💬 Commentaires</button>
-      <button id="close-modal" class="close-btn">✖</button>
+      <img id="previewImg" src="" style="width:100%; border-radius:10px;">
+      <div class="close-btn" onclick="closeModal()">Fermer</div>
     </div>
   </div>
 
-  <!-- MODAL COMMENTAIRE (caché par défaut) -->
-  <div class="modal hidden" id="comment-modal">
-    <div class="comment-box">
-      <h2>Laisser un commentaire</h2>
-      <input id="prenom" placeholder="Votre prénom">
-      <textarea id="commentaire" placeholder="Votre message... 😊"></textarea>
-      <button id="send-comment" class="validate-btn">Valider</button>
-      <button id="close-comment" class="close-btn">✖</button>
-    </div>
-  </div>
+  <script>
+    // 🔥 Simple version (sans Firebase pour éviter bug)
+    // Tu peux activer Firebase après si tu veux
+    const fakeImages = [
+      "https://placekitten.com/300/300",
+      "https://placekitten.com/301/300",
+      "https://placekitten.com/302/300"
+    ];
 
-  <script type="module" src="visitor.js"></script>
+    const gallery = document.getElementById("gallery");
+    const modal = document.getElementById("previewModal");
+    const preview = document.getElementById("previewImg");
+
+    // Génère des images
+    fakeImages.forEach(src => {
+      const item = document.createElement("div");
+      item.className = "gallery-item";
+      item.innerHTML = `<img src="${src}">`;
+      item.onclick = () => openModal(src);
+      gallery.appendChild(item);
+    });
+
+    function openModal(src) {
+      preview.src = src;
+      modal.style.display = "flex";
+    }
+
+    function closeModal() {
+      modal.style.display = "none";
+    }
+  </script>
+
 </body>
 </html>
