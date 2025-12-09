@@ -1,11 +1,54 @@
-// owner.js — keep original behavior, then also upload to Supabase (non-blocking for local display)
-
+// ---- DOM ----
 const nameInput = document.getElementById('name');
 const photoInput = document.getElementById('photo');
 const addBtn = document.getElementById('add');
 const list = document.getElementById('owner-list');
 
-addBtn.onclick = () => {
+// ---- UPLOAD + TABLE ----
+async function uploadToSupabase(name, file) {
+
+  // nom unique
+  const fileName = Date.now() + "_" + file.name;
+
+  // upload dans storage
+  const { data: uploadData, error: uploadError } =
+    await window.supabaseClient.storage
+      .from("creations")
+      .upload(fileName, file);
+
+  if (uploadError) {
+    console.error("Erreur upload :", uploadError);
+    alert("Erreur upload Supabase");
+    return;
+  }
+
+  // URL publique
+  const publicURL = window.supabaseClient.storage
+    .from("creations")
+    .getPublicUrl(fileName).data.publicUrl;
+
+  console.log("URL publique :", publicURL);
+
+  // insert dans la table
+  const { error: insertError } = await window.supabaseClient
+    .from("creations")
+    .insert({
+      name: name,
+      image_url: publicURL
+    });
+
+  if (insertError) {
+    console.error("Erreur insert table :", insertError);
+    alert("Erreur table Supabase");
+    return;
+  }
+
+  console.log("Enregistrement OK !");
+}
+
+
+// ---- Bouton Ajouter ----
+addBtn.onclick = async () => {
   const name = nameInput.value.trim();
   const file = photoInput.files[0];
 
@@ -17,12 +60,11 @@ addBtn.onclick = () => {
   console.log("Nom :", name);
   console.log("Fichier sélectionné :", file);
 
-  // --- ORIGINAL local display using FileReader (unchanged) ---
+  // Affichage immédiat dans owner (comme AVANT)
   const reader = new FileReader();
   reader.onload = (e) => {
     const imgUrl = e.target.result;
 
-    // Crée un élément dans la liste
     const div = document.createElement('div');
     div.className = 'owner-item';
     div.innerHTML = `
@@ -31,67 +73,11 @@ addBtn.onclick = () => {
     `;
     list.prepend(div);
 
-    // Reset local inputs
-    nameInput.value = '';
-    photoInput.value = '';
+    nameInput.value = "";
+    photoInput.value = "";
   };
+  reader.readAsDataURL(file);
 
-  reader.readAsDataURL(file); // Convertit l'image pour affichage immédiat
-
-  // --- NEW: upload to Supabase (doesn't remove the local display) ---
-  // We run the upload async and log results.
-  (async () => {
-    try {
-      if (!window.supabaseClient) {
-        console.warn("supabaseClient non trouvé — upload Supabase annulé.");
-        return;
-      }
-
-      console.log("Upload Supabase commencé...");
-
-      const fileName = `${Date.now()}-${file.name}`;
-
-      const { data: uploadData, error: uploadError } = await window.supabaseClient
-        .storage
-        .from('creations')
-        .upload(fileName, file);
-
-      if (uploadError) {
-        console.error("Erreur upload:", uploadError);
-        return;
-      }
-
-      console.log("Upload Supabase OK :", uploadData);
-
-      // getPublicUrl (no error returned by getPublicUrl in latest SDK)
-      const { data: urlData } = window.supabaseClient
-        .storage
-        .from('creations')
-        .getPublicUrl(fileName);
-
-      const publicURL = urlData && urlData.publicUrl ? urlData.publicUrl : null;
-      console.log("URL publique :", publicURL);
-
-      if (!publicURL) {
-        console.warn("Impossible d'obtenir l'URL publique.");
-        return;
-      }
-
-      // insert row into table 'creations' — adjust column name if yours is different
-      const { error: insertError } = await window.supabaseClient
-        .from('creations')
-        .insert([{ name: name, image_url: publicURL }]); // table column = image_url
-
-      if (insertError) {
-        console.error("Erreur insertion BD :", insertError);
-        return;
-      }
-
-      console.log("Création insérée dans la table 'creations'.");
-
-    } catch (err) {
-      console.error("Erreur upload Supabase (catch):", err);
-    }
-  })();
-
+  // Envoi réel vers Supabase
+  uploadToSupabase(name, file);
 };
