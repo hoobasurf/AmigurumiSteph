@@ -2,18 +2,23 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Amigurumi Galerie</title>
+  <title>Mes Petites Créations</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <h1 class="title">Mes Petites Créations</h1>
 
+  <!-- Bouton vers Owner (pour accès admin) -->
+  <a href="owner.html" class="owner-btn">Page Owner 🔑</a>
+
+  <!-- Galerie scroll horizontal -->
   <div class="gallery-scroll" id="gallery"></div>
 
   <!-- MODAL ZOOM -->
   <div class="modal hidden" id="modal">
     <div class="modal-content">
       <img id="modal-img" class="modal-image">
+      <div id="mini-thumbs" class="mini-thumbs"></div>
       <button id="comment-btn" class="comment-btn">💬 Commentaires</button>
       <button id="close-modal" class="close-btn">✖</button>
     </div>
@@ -30,9 +35,6 @@
     </div>
   </div>
 
-  <script src="https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/12.6.0/firebase-storage.js"></script>
-  <script src="visitor.js"></script>
+  <script type="module" src="visitor.js"></script>
 </body>
 </html>
