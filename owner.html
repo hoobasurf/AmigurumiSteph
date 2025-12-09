@@ -26,9 +26,14 @@
 <h2>Liste des créations</h2>
 <div id="owner-list"></div>
 
-<script src="supabase.js"></script>
+<!-- Supabase UMD (global) -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js/dist/umd/supabase.min.js"></script>
+
+<!-- Init Supabase as a global (edit the anon key in supabase-init.js if needed) -->
+<script src="supabase-init.js"></script>
+
+<!-- Your original owner script (NO type="module") -->
 <script src="owner.js"></script>
 
 </body>
 </html>
-
