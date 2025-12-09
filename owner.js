@@ -1,32 +1,12 @@
-// 🔹 Config Firebase
-const firebaseConfig = {
-  apiKey: "AIzaSyAKUqhiGi1ZHIfZRwslMIUip8ohwOiLhFA",
-  authDomain: "amigurumisteph.firebaseapp.com",
-  projectId: "amigurumisteph",
-  storageBucket: "amigurumisteph.appspot.com",
-  messagingSenderId: "175290001202",
-  appId: "1:175290001202:web:b53e4255e699d65bd4192b"
-};
-
-// 🔹 Initialisation Firebase v8
-firebase.initializeApp(firebaseConfig);
-const db = firebase.firestore();
-const storage = firebase.storage();
-
-// 🔹 Éléments HTML
 const nameInput = document.getElementById("name");
 const photoInput = document.getElementById("photo");
-const addBtn = document.getElementById("add");
 const list = document.getElementById("owner-list");
 
-// 🔹 Upload via bouton Ajouter
-addBtn.addEventListener("click", async () => {
+// Upload automatique dès que la photo est choisie
+photoInput.addEventListener("change", async () => {
   const file = photoInput.files[0];
   const name = nameInput.value.trim();
-  if (!file || !name) {
-    alert("Merci de remplir le nom et choisir une photo !");
-    return;
-  }
+  if (!file || !name) return alert("Nom et photo requis !");
 
   try {
     const timestamp = Date.now();
@@ -43,32 +23,25 @@ addBtn.addEventListener("click", async () => {
           createdAt: firebase.firestore.FieldValue.serverTimestamp()
         });
 
-        // Reset champs
         nameInput.value = "";
         photoInput.value = "";
 
         addToList({ name, imageUrl: url });
       }
     );
-  } catch(err) {
-    alert(err.message);
-  }
+  } catch(e) { alert(e.message); }
 });
 
-// 🔹 Fonction pour afficher la création
-function addToList(data) {
-  const item = document.createElement("div");
-  item.className = "owner-item";
-  item.innerHTML = `
-    <p>${data.name}</p>
-    <img src="${data.imageUrl}" class="mini-img">
-  `;
-  list.prepend(item);
+// Ajouter visuellement dans la liste
+function addToList(data){
+  const div = document.createElement("div");
+  div.className = "owner-item";
+  div.innerHTML = `<p>${data.name}</p><img src="${data.imageUrl}" class="mini-img">`;
+  list.prepend(div);
 }
 
-// 🔹 Affichage live Firestore
-db.collection("creations").orderBy("createdAt", "desc")
-  .onSnapshot(snapshot => {
-    list.innerHTML = "";
-    snapshot.forEach(doc => addToList(doc.data()));
-  });
+// Affichage live Firestore
+db.collection("creations").orderBy("createdAt", "desc").onSnapshot(snap => {
+  list.innerHTML = "";
+  snap.forEach(doc => addToList(doc.data()));
+});
