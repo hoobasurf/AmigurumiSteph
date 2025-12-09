@@ -1,66 +1,58 @@
 import { db, storage } from "./firebase.js";
-import { collection, addDoc, getDocs, orderBy, query } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
+import { collection, addDoc, getDocs, query, orderBy, onSnapshot } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
 import { ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-storage.js";
 
-const addBtn = document.getElementById("add");
+const addBtn = document.getElementById("addBtn");
 const nameInput = document.getElementById("name");
 const photoInput = document.getElementById("photo");
 const ownerList = document.getElementById("owner-list");
 
+alert("Owner JS chargé !");
+
 addBtn.onclick = async () => {
-  if (!nameInput.value || !photoInput.files[0]) {
-    alert("Merci de remplir le nom et choisir une photo !");
+  const name = nameInput.value.trim();
+  const file = photoInput.files[0];
+
+  if (!name || !file) {
+    alert("Remplis le nom et choisis une image 🧸");
     return;
   }
 
-  const file = photoInput.files[0];
-  const storageRef = ref(storage, "photos/" + Date.now() + "-" + file.name);
-
   try {
+    // Upload sur Firebase Storage
+    const storageRef = ref(storage, "photos/" + Date.now() + "-" + file.name);
     await uploadBytes(storageRef, file);
     const url = await getDownloadURL(storageRef);
 
+    // Ajout Firestore
     await addDoc(collection(db, "creations"), {
-      name: nameInput.value,
+      name,
       imageUrl: url,
       createdAt: Date.now()
     });
 
-    // Reset inputs
+    // Reset champs
     nameInput.value = "";
     photoInput.value = "";
 
-    alert("Création ajoutée ✅");
-    loadCreations(); // Met à jour la liste Owner
-
+    alert("Création ajoutée !");
   } catch (err) {
     console.error(err);
-    alert("Erreur lors de l'ajout !");
+    alert("Erreur lors de l'ajout de la création !");
   }
 };
 
-// --- Charger les créations côté Owner ---
-async function loadCreations() {
+// 🔥 Affichage live côté Owner
+const creationsCol = collection(db, "creations");
+const q = query(creationsCol, orderBy("createdAt", "desc"));
+
+onSnapshot(q, (snapshot) => {
   ownerList.innerHTML = "";
-  try {
-    const q = query(collection(db, "creations"), orderBy("createdAt"));
-    const snapshot = await getDocs(q);
-
-    snapshot.forEach(docu => {
-      const data = docu.data();
-      const div = document.createElement("div");
-      div.className = "owner-item";
-      div.innerHTML = `
-        <img src="${data.imageUrl}" class="owner-thumb">
-        <span>${data.name}</span>
-      `;
-      ownerList.appendChild(div);
-    });
-
-  } catch (err) {
-    console.error(err);
-    alert("Erreur lors du chargement des créations !");
-  }
-}
-
-loadCreations();
+  snapshot.docs.forEach(docu => {
+    const data = docu.data();
+    const div = document.createElement("div");
+    div.className = "owner-item";
+    div.innerHTML = `<strong>${data.name}</strong><br><img src="${data.imageUrl}" width="150">`;
+    ownerList.appendChild(div);
+  });
+});
