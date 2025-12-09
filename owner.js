@@ -12,7 +12,7 @@ const photoInput = document.getElementById('photo');
 const addBtn = document.getElementById('add');
 const list = document.getElementById('owner-list');
 
-// ⚡ Charger les créations existantes
+// ⚡ Affichage existant
 async function loadCreations() {
   const { data, error } = await supabase
     .from('creations')
@@ -25,7 +25,7 @@ async function loadCreations() {
   data.forEach(item => addToList(item));
 }
 
-// ⚡ Afficher visuellement dans la liste
+// ⚡ Ajouter visuellement à la liste
 function addToList(item) {
   const div = document.createElement('div');
   div.className = 'owner-item';
@@ -36,7 +36,7 @@ function addToList(item) {
   list.prepend(div);
 }
 
-// ⚡ Bouton Ajouter
+// ⚡ Ajouter image au clic
 addBtn.onclick = async () => {
   const file = photoInput.files[0];
   const name = nameInput.value.trim();
@@ -83,5 +83,5 @@ addBtn.onclick = async () => {
   }
 };
 
-// ⚡ Charger au départ
+// ⚡ Charger les créations existantes
 loadCreations();
