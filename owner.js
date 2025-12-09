@@ -1,5 +1,5 @@
 // 🔹 Config Firebase
-var firebaseConfig = {
+const firebaseConfig = {
   apiKey: "AIzaSyAKUqhiGi1ZHIfZRwslMIUip8ohwOiLhFA",
   authDomain: "amigurumisteph.firebaseapp.com",
   projectId: "amigurumisteph",
@@ -7,59 +7,68 @@ var firebaseConfig = {
   messagingSenderId: "175290001202",
   appId: "1:175290001202:web:b53e4255e699d65bd4192b"
 };
-firebase.initializeApp(firebaseConfig);
 
-var db = firebase.firestore();
-var storage = firebase.storage();
+// 🔹 Initialisation Firebase v8
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+const storage = firebase.storage();
 
 // 🔹 Éléments HTML
-var nameInput = document.getElementById("name");
-var photoInput = document.getElementById("photo");
-var list = document.getElementById("owner-list");
+const nameInput = document.getElementById("name");
+const photoInput = document.getElementById("photo");
+const addBtn = document.getElementById("add");
+const list = document.getElementById("owner-list");
 
-// 🔹 Upload automatique dès qu’on choisit une photo
-photoInput.addEventListener("change", function() {
-  var file = photoInput.files[0];
-  var name = nameInput.value.trim();
-
+// 🔹 Upload via bouton Ajouter
+addBtn.addEventListener("click", async () => {
+  const file = photoInput.files[0];
+  const name = nameInput.value.trim();
   if (!file || !name) {
     alert("Merci de remplir le nom et choisir une photo !");
     return;
   }
 
-  var timestamp = Date.now();
-  var storageRef = storage.ref("creations/" + timestamp + "-" + file.name);
-  var uploadTask = storageRef.put(file);
+  try {
+    const timestamp = Date.now();
+    const storageRef = storage.ref(`creations/${timestamp}-${file.name}`);
+    const uploadTask = storageRef.put(file);
 
-  uploadTask.on("state_changed", 
-    null,
-    function(error) { alert("Erreur upload : " + error.message); },
-    function() {
-      uploadTask.snapshot.ref.getDownloadURL().then(function(url) {
-        db.collection("creations").add({
-          name: name,
+    uploadTask.on("state_changed", null,
+      error => alert("Erreur upload : " + error.message),
+      async () => {
+        const url = await uploadTask.snapshot.ref.getDownloadURL();
+        await db.collection("creations").add({
+          name,
           imageUrl: url,
           createdAt: firebase.firestore.FieldValue.serverTimestamp()
-        }).then(function() {
-          nameInput.value = "";
-          photoInput.value = "";
         });
-      });
-    }
-  );
+
+        // Reset champs
+        nameInput.value = "";
+        photoInput.value = "";
+
+        addToList({ name, imageUrl: url });
+      }
+    );
+  } catch(err) {
+    alert(err.message);
+  }
 });
 
+// 🔹 Fonction pour afficher la création
+function addToList(data) {
+  const item = document.createElement("div");
+  item.className = "owner-item";
+  item.innerHTML = `
+    <p>${data.name}</p>
+    <img src="${data.imageUrl}" class="mini-img">
+  `;
+  list.prepend(item);
+}
+
 // 🔹 Affichage live Firestore
-db.collection("creations").orderBy("createdAt", "desc").onSnapshot(function(snapshot) {
-  list.innerHTML = "";
-  snapshot.forEach(function(doc) {
-    var data = doc.data();
-    var item = document.createElement("div");
-    item.className = "owner-item";
-    item.innerHTML = `
-      <p>${data.name}</p>
-      <img src="${data.imageUrl}" class="mini-img">
-    `;
-    list.prepend(item);
+db.collection("creations").orderBy("createdAt", "desc")
+  .onSnapshot(snapshot => {
+    list.innerHTML = "";
+    snapshot.forEach(doc => addToList(doc.data()));
   });
-});
