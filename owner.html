@@ -18,6 +18,75 @@
   <h2>Liste des créations</h2>
   <div id="owner-list"></div>
 
-  <script type="module" src="owner2.js"></script>
+  <!-- Firebase SDK via CDN -->
+  <script src="https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/12.6.0/firebase-storage.js"></script>
+
+  <script>
+    // ⚡ Config Firebase
+    const firebaseConfig = {
+      apiKey: "AIzaSyAKUqhiGi1ZHIfZRwslMIUip8ohwOiLhFA",
+      authDomain: "amigurumisteph.firebaseapp.com",
+      projectId: "amigurumisteph",
+      storageBucket: "amigurumisteph.appspot.com",
+      messagingSenderId: "175290001202",
+      appId: "1:175290001202:web:b53e4255e699d65bd4192b"
+    };
+
+    firebase.initializeApp(firebaseConfig);
+
+    const db = firebase.firestore();
+    const storage = firebase.storage();
+
+    const addBtn = document.getElementById("addBtn");
+    const nameInput = document.getElementById("name");
+    const photoInput = document.getElementById("photo");
+    const ownerList = document.getElementById("owner-list");
+
+    // 🔥 Fonction Ajouter
+    addBtn.onclick = async () => {
+      const name = nameInput.value.trim();
+      const file = photoInput.files[0];
+
+      if (!name || !file) {
+        alert("Merci de mettre un nom et choisir une photo !");
+        return;
+      }
+
+      try {
+        const storageRef = storage.ref("photos/" + Date.now() + "-" + file.name);
+        await storageRef.put(file);
+        const url = await storageRef.getDownloadURL();
+
+        await db.collection("creations").add({
+          name,
+          imageUrl: url,
+          createdAt: Date.now()
+        });
+
+        nameInput.value = "";
+        photoInput.value = "";
+
+        alert("Création ajoutée !");
+      } catch (err) {
+        console.error(err);
+        alert("Erreur lors de l'ajout !");
+      }
+    };
+
+    // 🔥 Affichage live côté Owner
+    db.collection("creations").orderBy("createdAt", "desc")
+      .onSnapshot(snapshot => {
+        ownerList.innerHTML = "";
+        snapshot.docs.forEach(docu => {
+          const data = docu.data();
+          const div = document.createElement("div");
+          div.className = "owner-item";
+          div.innerHTML = `<strong>${data.name}</strong><br><img src="${data.imageUrl}" width="150">`;
+          ownerList.appendChild(div);
+        });
+      });
+  </script>
 </body>
 </html>
