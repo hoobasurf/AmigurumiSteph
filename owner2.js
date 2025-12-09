@@ -18,7 +18,7 @@ const nameInput = document.getElementById("name");
 const photoInput = document.getElementById("photo");
 const list = document.getElementById("owner-list");
 
-// 🔹 Upload automatique à la sélection du fichier
+// 🔹 Upload et affichage
 photoInput.addEventListener("change", async () => {
   const file = photoInput.files[0];
   const name = nameInput.value.trim();
@@ -29,25 +29,40 @@ photoInput.addEventListener("change", async () => {
   }
 
   try {
-    // Référence unique dans Storage
-    const imgRef = storage.ref("creations/" + Date.now() + "-" + file.name);
+    // 1️⃣ Crée la référence Storage unique
+    const timestamp = Date.now();
+    const storageRef = storage.ref().child(`creations/${timestamp}-${file.name}`);
 
-    // Upload fichier
-    await imgRef.put(file);
+    // 2️⃣ Upload
+    const uploadTask = storageRef.put(file);
 
-    // Récupération URL finale
-    const url = await imgRef.getDownloadURL();
+    // 3️⃣ Listener pour mobile
+    uploadTask.on(
+      "state_changed",
+      null,
+      error => {
+        console.error(error);
+        alert("Erreur lors de l'upload : " + error.message);
+      },
+      async () => {
+        // 4️⃣ Quand upload terminé, récupérer URL
+        const url = await uploadTask.snapshot.ref.getDownloadURL();
 
-    // Ajout dans Firestore
-    await db.collection("creations").add({
-      name: name,
-      imageUrl: url,
-      createdAt: firebase.firestore.FieldValue.serverTimestamp()
-    });
+        // 5️⃣ Ajouter dans Firestore
+        const docRef = await db.collection("creations").add({
+          name: name,
+          imageUrl: url,
+          createdAt: firebase.firestore.FieldValue.serverTimestamp()
+        });
 
-    // Reset champs
-    nameInput.value = "";
-    photoInput.value = "";
+        // 6️⃣ Reset champs
+        nameInput.value = "";
+        photoInput.value = "";
+
+        // ✅ Affichage immédiat
+        addToList({ name, imageUrl: url });
+      }
+    );
 
   } catch (err) {
     console.error(err);
@@ -55,18 +70,22 @@ photoInput.addEventListener("change", async () => {
   }
 });
 
-// 🔹 Affichage live des créations
+// 🔹 Fonction pour ajouter visuellement à la liste sans attendre snapshot
+function addToList(data) {
+  const item = document.createElement("div");
+  item.className = "owner-item";
+  item.innerHTML = `
+    <p>${data.name}</p>
+    <img src="${data.imageUrl}" class="mini-img">
+  `;
+  list.prepend(item);
+}
+
+// 🔹 Affichage live Firestore
 db.collection("creations").orderBy("createdAt", "desc")
   .onSnapshot(snapshot => {
     list.innerHTML = "";
     snapshot.forEach(doc => {
-      const data = doc.data();
-      const item = document.createElement("div");
-      item.className = "owner-item";
-      item.innerHTML = `
-        <p>${data.name}</p>
-        <img src="${data.imageUrl}" class="mini-img">
-      `;
-      list.appendChild(item);
+      addToList(doc.data());
     });
 });
