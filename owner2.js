@@ -1,12 +1,16 @@
-alert("Script chargé");
-const addBtn = document.getElementById("add");
-alert("addBtn: " + addBtn);
-// --- Import Firebase ---
-import { db, storage } from "./firebase.js";
-import { collection, addDoc, serverTimestamp, onSnapshot, query, orderBy } 
-  from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
-import { ref, uploadBytes, getDownloadURL } 
-  from "https://www.gstatic.com/firebasejs/12.6.0/firebase-storage.js";
+// --- Initialisation Firebase ---
+const firebaseConfig = {
+  apiKey: "AIzaSyAKUqhiGi1ZHIfZRwslMIUip8ohwOiLhFA",
+  authDomain: "amigurumisteph.firebaseapp.com",
+  projectId: "amigurumisteph",
+  storageBucket: "amigurumisteph.appspot.com",
+  messagingSenderId: "175290001202",
+  appId: "1:175290001202:web:b53e4255e699d65bd4192b"
+};
+
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+const storage = firebase.storage();
 
 // --- Éléments HTML ---
 const nameInput = document.getElementById("name");
@@ -14,31 +18,31 @@ const photoInput = document.getElementById("photo");
 const addBtn = document.getElementById("add");
 const list = document.getElementById("owner-list");
 
-// --- Vérif que le script est chargé ---
-alert("OWNER JS chargé");
+// --- Vérif du script ---
+alert("Script chargé correctement");
 
-// --- Clic sur Ajouter ---
+// --- Ajouter création ---
 addBtn.onclick = async () => {
-  alert("Clique détecté !");
+  alert("Bouton cliqué !");
   const name = nameInput.value.trim();
   const file = photoInput.files[0];
 
   if (!name || !file) {
-    alert("Merci de remplir le nom et choisir une photo !");
+    alert("Nom ou photo manquant !");
     return;
   }
 
   try {
-    // Upload image dans Firebase Storage
-    const imgRef = ref(storage, "creations/" + Date.now() + "-" + file.name);
-    const upload = await uploadBytes(imgRef, file);
-    const url = await getDownloadURL(upload.ref);
+    // Upload Storage
+    const imgRef = storage.ref("creations/" + Date.now() + "-" + file.name);
+    const uploadTask = await imgRef.put(file);
+    const url = await imgRef.getDownloadURL();
 
-    // Ajouter dans Firestore
-    await addDoc(collection(db, "creations"), {
+    // Firestore
+    await db.collection("creations").add({
       name: name,
       image: url,
-      createdAt: serverTimestamp()
+      createdAt: firebase.firestore.FieldValue.serverTimestamp()
     });
 
     alert("Création ajoutée !");
@@ -51,9 +55,9 @@ addBtn.onclick = async () => {
   }
 };
 
-// --- Affichage en direct des créations ---
-const q = query(collection(db, "creations"), orderBy("createdAt", "desc"));
-onSnapshot(q, snapshot => {
+// --- Affichage live ---
+db.collection("creations").orderBy("createdAt", "desc")
+.onSnapshot(snapshot => {
   list.innerHTML = "";
   snapshot.forEach(doc => {
     const data = doc.data();
