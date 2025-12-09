@@ -1,18 +1,21 @@
-import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
+import { supabase } from './supabase.js';
 
-// ⚡ Supabase
-const SUPABASE_URL = 'https://iubbxvipgofxasatmvzg.supabase.co';
-const SUPABASE_ANON_KEY = 'sb_publishable_GDoZmwIdoP28XOdrfYYVNw_E_HiCQB1';
-const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-console.log('Supabase chargé', supabase);
-
-// ⚡ Éléments HTML
 const nameInput = document.getElementById('name');
 const photoInput = document.getElementById('photo');
-const addBtn = document.getElementById('add');
 const list = document.getElementById('owner-list');
 
-// ⚡ Affichage existant
+// Fonction pour ajouter visuellement dans la liste
+function addToList(item) {
+  const div = document.createElement('div');
+  div.className = 'owner-item';
+  div.innerHTML = `
+    <p>${item.name}</p>
+    <img src="${item.image_url}" class="mini-img">
+  `;
+  list.prepend(div);
+}
+
+// Charger les créations existantes au démarrage
 async function loadCreations() {
   const { data, error } = await supabase
     .from('creations')
@@ -25,19 +28,8 @@ async function loadCreations() {
   data.forEach(item => addToList(item));
 }
 
-// ⚡ Ajouter visuellement à la liste
-function addToList(item) {
-  const div = document.createElement('div');
-  div.className = 'owner-item';
-  div.innerHTML = `
-    <p>${item.name}</p>
-    <img src="${item.image_url}" class="mini-img">
-  `;
-  list.prepend(div);
-}
-
-// ⚡ Ajouter image au clic
-addBtn.onclick = async () => {
+// Upload automatique dès que l’image est sélectionnée
+photoInput.addEventListener('change', async () => {
   const file = photoInput.files[0];
   const name = nameInput.value.trim();
 
@@ -47,6 +39,9 @@ addBtn.onclick = async () => {
   }
 
   try {
+    console.log("Fichier sélectionné :", file);
+    console.log("Nom :", name);
+
     const timestamp = Date.now();
     const fileName = `${timestamp}-${file.name}`;
 
@@ -58,6 +53,8 @@ addBtn.onclick = async () => {
 
     if (uploadError) throw uploadError;
 
+    console.log("Upload commencé");
+
     // URL publique
     const { publicURL, error: urlError } = supabase
       .storage
@@ -66,6 +63,8 @@ addBtn.onclick = async () => {
 
     if (urlError) throw urlError;
 
+    console.log("URL publique :", publicURL);
+
     // Ajouter dans la table Supabase
     const { data: insertData, error: insertError } = await supabase
       .from('creations')
@@ -73,15 +72,18 @@ addBtn.onclick = async () => {
 
     if (insertError) throw insertError;
 
+    // Reset champs
     nameInput.value = '';
     photoInput.value = '';
+
+    // Ajouter visuellement
     addToList({ name, image_url: publicURL });
 
   } catch (err) {
     console.error(err);
     alert('Erreur : ' + err.message);
   }
-};
+});
 
-// ⚡ Charger les créations existantes
+// Charger au départ
 loadCreations();
