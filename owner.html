@@ -11,14 +11,14 @@
   <div class="owner-box">
     <input id="name" placeholder="Nom de la création">
     <input id="photo" type="file" accept="image/*">
+    <button id="add">Ajouter</button>
   </div>
 
   <h2>Liste des créations</h2>
   <div id="owner-list"></div>
 
-  <!-- Supabase -->
+  <!-- ⚡ Important : supabase.js chargé avant owner.js -->
   <script type="module" src="supabase.js"></script>
-  <!-- Owner JS -->
   <script type="module" src="owner.js"></script>
 </body>
 </html>
