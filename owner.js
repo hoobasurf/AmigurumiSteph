@@ -1,3 +1,8 @@
+// --- INITIALISATION SUPABASE ---
+const supabaseUrl = "https://iubbxvipgofxasatmvzg.supabase.co";
+const supabaseKey = "public-anon-key"; // remplace par ton vrai anon key
+const supabase = supabase.createClient(supabaseUrl, supabaseKey);
+console.log("Supabase initialisé");
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
 
 const SUPABASE_URL = 'https://iubbxvipgofxasatmvzg.supabase.co';
