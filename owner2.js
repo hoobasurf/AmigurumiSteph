@@ -1,5 +1,5 @@
 import { db, storage } from "./firebase.js";
-import { collection, addDoc, getDocs, query, orderBy, onSnapshot } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
+import { collection, addDoc, query, orderBy, onSnapshot } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
 import { ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-storage.js";
 
 const addBtn = document.getElementById("addBtn");
@@ -19,12 +19,12 @@ addBtn.onclick = async () => {
   }
 
   try {
-    // Upload sur Firebase Storage
+    // Upload image dans Firebase Storage
     const storageRef = ref(storage, "photos/" + Date.now() + "-" + file.name);
     await uploadBytes(storageRef, file);
     const url = await getDownloadURL(storageRef);
 
-    // Ajout Firestore
+    // Ajout dans Firestore
     await addDoc(collection(db, "creations"), {
       name,
       imageUrl: url,
@@ -38,7 +38,7 @@ addBtn.onclick = async () => {
     alert("Création ajoutée !");
   } catch (err) {
     console.error(err);
-    alert("Erreur lors de l'ajout de la création !");
+    alert("Erreur lors de l'ajout !");
   }
 };
 
