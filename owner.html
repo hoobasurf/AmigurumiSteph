@@ -1,23 +1,23 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="UTF-8">
-<title>Owner - Ajout Création</title>
-<link rel="stylesheet" href="style.css">
+  <meta charset="UTF-8">
+  <title>Owner - Ajout Création</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
+  <h1>Ajouter une création</h1>
 
-<h1>Ajouter une création</h1>
-<input id="name" placeholder="Nom de la création">
-<input id="photo" type="file" accept="image/*">
-<div id="owner-list"></div>
+  <div class="owner-box">
+    <input id="name" placeholder="Nom de la création">
+    <input id="photo" type="file" accept="image/*">
+    <button id="add">Ajouter</button>
+  </div>
 
-<!-- Firebase v8 -->
-<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
-<script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-storage.js"></script>
+  <h2>Liste des créations</h2>
+  <div id="owner-list"></div>
 
-<!-- Ton script -->
-<script src="owner.js"></script>
+  <script type="module" src="supabase.js"></script>
+  <script type="module" src="owner.js"></script>
 </body>
 </html>
