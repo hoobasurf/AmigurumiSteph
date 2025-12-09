@@ -1,61 +1,80 @@
-// 🔹 Config Firebase
-const firebaseConfig = {
-  apiKey: "...",
-  authDomain: "...",
-  projectId: "...",
-  storageBucket: "...",
-  messagingSenderId: "...",
-  appId: "..."
-};
+import { supabase } from './supabase.js';
 
-// 🔹 Initialisation Firebase v8
-firebase.initializeApp(firebaseConfig);
-const db = firebase.firestore();
-const storage = firebase.storage();
+const nameInput = document.getElementById('name');
+const photoInput = document.getElementById('photo');
+const addBtn = document.getElementById('add');
+const list = document.getElementById('owner-list');
 
-// 🔹 Éléments HTML
-const nameInput = document.getElementById("name");
-const photoInput = document.getElementById("photo");
-const list = document.getElementById("owner-list");
+// Affichage existant au chargement
+async function loadCreations() {
+  const { data, error } = await supabase
+    .from('creations')
+    .select('*')
+    .order('created_at', { ascending: false });
 
-// 🔹 Upload automatique dès qu’on choisit une photo
-photoInput.addEventListener("change", async () => {
-  const file = photoInput.files[0];
-  const name = nameInput.value.trim();
-  if (!file || !name) return alert("Merci de remplir le nom et choisir une photo !");
+  if (error) { console.error(error); return; }
 
-  const timestamp = Date.now();
-  const storageRef = storage.ref(`creations/${timestamp}-${file.name}`);
-  const uploadTask = storageRef.put(file);
-
-  uploadTask.on(
-    "state_changed",
-    null,
-    (error) => alert("Erreur upload : " + error.message),
-    async () => {
-      const url = await uploadTask.snapshot.ref.getDownloadURL();
-      await db.collection("creations").add({
-        name,
-        imageUrl: url,
-        createdAt: firebase.firestore.FieldValue.serverTimestamp()
-      });
-      nameInput.value = "";
-      photoInput.value = "";
-      addToList({ name, imageUrl: url });
-    }
-  );
-});
-
-function addToList(data) {
-  const item = document.createElement("div");
-  item.className = "owner-item";
-  item.innerHTML = `<p>${data.name}</p><img src="${data.imageUrl}" class="mini-img">`;
-  list.prepend(item);
+  list.innerHTML = '';
+  data.forEach(item => addToList(item));
 }
 
-// 🔹 Affichage live Firestore
-db.collection("creations").orderBy("createdAt", "desc")
-  .onSnapshot(snapshot => {
-    list.innerHTML = "";
-    snapshot.forEach(doc => addToList(doc.data()));
-  });
+// Ajouter à la liste visuellement
+function addToList(item) {
+  const div = document.createElement('div');
+  div.className = 'owner-item';
+  div.innerHTML = `
+    <p>${item.name}</p>
+    <img src="${item.image_url}" class="mini-img">
+  `;
+  list.prepend(div);
+}
+
+// Bouton Ajouter
+addBtn.onclick = async () => {
+  const file = photoInput.files[0];
+  const name = nameInput.value.trim();
+
+  if (!file || !name) {
+    alert("Merci de remplir le nom et choisir une photo !");
+    return;
+  }
+
+  try {
+    const timestamp = Date.now();
+    const fileName = `${timestamp}-${file.name}`;
+    
+    // Upload image dans Supabase Storage
+    const { data: uploadData, error: uploadError } = await supabase
+      .storage
+      .from('creations')
+      .upload(fileName, file);
+
+    if (uploadError) throw uploadError;
+
+    // Récupérer l'URL publique
+    const { publicURL, error: urlError } = supabase
+      .storage
+      .from('creations')
+      .getPublicUrl(fileName);
+
+    if (urlError) throw urlError;
+
+    // Ajouter dans la table Supabase
+    const { data: insertData, error: insertError } = await supabase
+      .from('creations')
+      .insert([{ name, image_url: publicURL }]);
+
+    if (insertError) throw insertError;
+
+    nameInput.value = '';
+    photoInput.value = '';
+    addToList({ name, image_url: publicURL });
+
+  } catch (err) {
+    console.error(err);
+    alert('Erreur : ' + err.message);
+  }
+};
+
+// Charger les créations au départ
+loadCreations();
