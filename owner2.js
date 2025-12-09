@@ -1,78 +1,66 @@
-// ⚡ Config Firebase
-const firebaseConfig = {
-  apiKey: "AIzaSyAKUqhiGi1ZHIfZRwslMIUip8ohwOiLhFA",
-  authDomain: "amigurumisteph.firebaseapp.com",
-  projectId: "amigurumisteph",
-  storageBucket: "amigurumisteph.appspot.com",
-  messagingSenderId: "175290001202",
-  appId: "1:175290001202:web:b53e4255e699d65bd4192b"
-};
-
-// Initialize Firebase
-const app = firebase.initializeApp(firebaseConfig);
-const db = firebase.firestore();
-const storage = firebase.storage();
+import { db, storage } from "./firebase.js";
+import { collection, addDoc, getDocs, orderBy, query } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js";
+import { ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/12.6.0/firebase-storage.js";
 
 const addBtn = document.getElementById("add");
 const nameInput = document.getElementById("name");
 const photoInput = document.getElementById("photo");
 const ownerList = document.getElementById("owner-list");
 
-// Ajouter création
 addBtn.onclick = async () => {
-  alert("Clique détecté !");
-  const name = nameInput.value.trim();
-  const file = photoInput.files[0];
-  if (!name || !file) {
-    alert("Remplis le nom et choisis une image 🧸");
+  if (!nameInput.value || !photoInput.files[0]) {
+    alert("Merci de remplir le nom et choisir une photo !");
     return;
   }
 
-  try {
-    const storageRef = storage.ref("photos/" + Date.now() + "-" + file.name);
-    await storageRef.put(file);
-    const url = await storageRef.getDownloadURL();
-    alert("Upload OK !");
+  const file = photoInput.files[0];
+  const storageRef = ref(storage, "photos/" + Date.now() + "-" + file.name);
 
-    await db.collection("creations").add({
-      name: name,
+  try {
+    await uploadBytes(storageRef, file);
+    const url = await getDownloadURL(storageRef);
+
+    await addDoc(collection(db, "creations"), {
+      name: nameInput.value,
       imageUrl: url,
       createdAt: Date.now()
     });
 
-    alert("Création ajoutée !");
+    // Reset inputs
     nameInput.value = "";
     photoInput.value = "";
 
-    loadCreations();
+    alert("Création ajoutée ✅");
+    loadCreations(); // Met à jour la liste Owner
+
   } catch (err) {
-    alert("Erreur lors de l'ajout !");
     console.error(err);
+    alert("Erreur lors de l'ajout !");
   }
 };
 
-// Charger créations côté owner
+// --- Charger les créations côté Owner ---
 async function loadCreations() {
   ownerList.innerHTML = "";
-  const snap = await db.collection("creations").orderBy("createdAt").get();
+  try {
+    const q = query(collection(db, "creations"), orderBy("createdAt"));
+    const snapshot = await getDocs(q);
 
-  snap.docs.forEach(docu => {
-    const data = docu.data();
-    const div = document.createElement("div");
-    div.className = "owner-item";
-    div.innerHTML = `
-      <span>${data.name}</span>
-      <img src="${data.imageUrl}" class="owner-thumb">
-      <button class="delete-btn">🗑</button>
-    `;
+    snapshot.forEach(docu => {
+      const data = docu.data();
+      const div = document.createElement("div");
+      div.className = "owner-item";
+      div.innerHTML = `
+        <img src="${data.imageUrl}" class="owner-thumb">
+        <span>${data.name}</span>
+      `;
+      ownerList.appendChild(div);
+    });
 
-    div.querySelector(".delete-btn").onclick = async () => {
-      await db.collection("creations").doc(docu.id).delete();
-      loadCreations();
-    };
-
-    ownerList.appendChild(div);
-  });
+  } catch (err) {
+    console.error(err);
+    alert("Erreur lors du chargement des créations !");
+  }
 }
 
 loadCreations();
