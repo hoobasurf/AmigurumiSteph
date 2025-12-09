@@ -1,3 +1,6 @@
+alert("Script chargé");
+const addBtn = document.getElementById("add");
+alert("addBtn: " + addBtn);
 // --- Import Firebase ---
 import { db, storage } from "./firebase.js";
 import { collection, addDoc, serverTimestamp, onSnapshot, query, orderBy } 
