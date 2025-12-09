@@ -1,11 +1,11 @@
-import { supabase } from './supabase.js';
+// owner.js — keep original behavior, then also upload to Supabase (non-blocking for local display)
 
 const nameInput = document.getElementById('name');
 const photoInput = document.getElementById('photo');
 const addBtn = document.getElementById('add');
 const list = document.getElementById('owner-list');
 
-addBtn.onclick = async () => {
+addBtn.onclick = () => {
   const name = nameInput.value.trim();
   const file = photoInput.files[0];
 
@@ -17,11 +17,12 @@ addBtn.onclick = async () => {
   console.log("Nom :", name);
   console.log("Fichier sélectionné :", file);
 
-  // --- TON CODE ORIGINAL, JE NE TOUCHE PAS ---
+  // --- ORIGINAL local display using FileReader (unchanged) ---
   const reader = new FileReader();
   reader.onload = (e) => {
     const imgUrl = e.target.result;
 
+    // Crée un élément dans la liste
     const div = document.createElement('div');
     div.className = 'owner-item';
     div.innerHTML = `
@@ -30,48 +31,67 @@ addBtn.onclick = async () => {
     `;
     list.prepend(div);
 
+    // Reset local inputs
     nameInput.value = '';
     photoInput.value = '';
   };
-  reader.readAsDataURL(file);
 
-  // --- AJOUT SUPABASE (ne touche pas ton bouton) ---
-  try {
-    const fileName = `${Date.now()}-${file.name}`;
-    console.log("Upload Supabase…");
+  reader.readAsDataURL(file); // Convertit l'image pour affichage immédiat
 
-    const { error: uploadError } = await supabase
-      .storage
-      .from('creations')
-      .upload(fileName, file);
+  // --- NEW: upload to Supabase (doesn't remove the local display) ---
+  // We run the upload async and log results.
+  (async () => {
+    try {
+      if (!window.supabaseClient) {
+        console.warn("supabaseClient non trouvé — upload Supabase annulé.");
+        return;
+      }
 
-    if (uploadError) {
-      console.error(uploadError);
-      alert("Erreur upload : " + uploadError.message);
-      return;
+      console.log("Upload Supabase commencé...");
+
+      const fileName = `${Date.now()}-${file.name}`;
+
+      const { data: uploadData, error: uploadError } = await window.supabaseClient
+        .storage
+        .from('creations')
+        .upload(fileName, file);
+
+      if (uploadError) {
+        console.error("Erreur upload:", uploadError);
+        return;
+      }
+
+      console.log("Upload Supabase OK :", uploadData);
+
+      // getPublicUrl (no error returned by getPublicUrl in latest SDK)
+      const { data: urlData } = window.supabaseClient
+        .storage
+        .from('creations')
+        .getPublicUrl(fileName);
+
+      const publicURL = urlData && urlData.publicUrl ? urlData.publicUrl : null;
+      console.log("URL publique :", publicURL);
+
+      if (!publicURL) {
+        console.warn("Impossible d'obtenir l'URL publique.");
+        return;
+      }
+
+      // insert row into table 'creations' — adjust column name if yours is different
+      const { error: insertError } = await window.supabaseClient
+        .from('creations')
+        .insert([{ name: name, image_url: publicURL }]); // table column = image_url
+
+      if (insertError) {
+        console.error("Erreur insertion BD :", insertError);
+        return;
+      }
+
+      console.log("Création insérée dans la table 'creations'.");
+
+    } catch (err) {
+      console.error("Erreur upload Supabase (catch):", err);
     }
+  })();
 
-    const { data: urlData } = supabase
-      .storage
-      .from('creations')
-      .getPublicUrl(fileName);
-
-    const image_url = urlData.publicUrl;
-    console.log("URL publique :", image_url);
-
-    const { error: insertError } = await supabase
-      .from('creations')
-      .insert([{ name, image_url }]);
-
-    if (insertError) {
-      console.error(insertError);
-      alert("Erreur base : " + insertError.message);
-      return;
-    }
-
-    console.log("Création ajoutée dans Supabase");
-  } catch (err) {
-    console.error(err);
-    alert("Erreur Supabase : " + err.message);
-  }
 };
