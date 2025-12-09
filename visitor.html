@@ -1,40 +1,16 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <title>Galerie</title>
-  <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+<title>Galerie</title>
+<link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <h1 class="title">Mes Petites Créations</h1>
 
-  <div class="gallery-scroll" id="gallery"></div>
+<h1 class="title">Mes Petites Créations</h1>
+<div class="gallery-scroll" id="gallery"></div>
 
-  <!-- Modal Zoom -->
-  <div class="modal hidden" id="modal">
-    <div class="modal-content">
-      <img id="modal-img" class="modal-image">
-      <button id="comment-btn" class="comment-btn">💬 Commentaires</button>
-      <button id="close-modal" class="close-btn">✖</button>
-    </div>
-  </div>
-
-  <!-- Modal Commentaire -->
-  <div class="modal hidden" id="comment-modal">
-    <div class="comment-box">
-      <h2>Laisser un commentaire</h2>
-      <input id="prenom" placeholder="Votre prénom">
-      <textarea id="commentaire" placeholder="Votre message... 😊"></textarea>
-      <button id="send-comment" class="validate-btn">Valider</button>
-      <button id="close-comment" class="close-btn">✖</button>
-    </div>
-  </div>
-
-  <!-- Firebase v8 -->
-  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-storage.js"></script>
-
-  <script src="visitor.js"></script>
+<script src="firebase.js"></script>
+<script src="visitor.js"></script>
 </body>
 </html>
