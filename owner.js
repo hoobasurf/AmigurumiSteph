@@ -1,11 +1,17 @@
-import { supabase } from './supabase.js';
+import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm';
 
+const SUPABASE_URL = 'https://iubbxvipgofxasatmvzg.supabase.co';
+const SUPABASE_ANON_KEY = 'sb_publishable_GDoZmwIdoP28XOdrfYYVNw_E_HiCQB1';
+const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+console.log('Supabase chargé', supabase);
+
+// === Le reste reste pareil ===
 const nameInput = document.getElementById('name');
 const photoInput = document.getElementById('photo');
 const addBtn = document.getElementById('add');
 const list = document.getElementById('owner-list');
 
-// Charger les créations existantes
 async function loadCreations() {
   const { data, error } = await supabase
     .from('creations')
@@ -18,7 +24,6 @@ async function loadCreations() {
   data.forEach(item => addToList(item));
 }
 
-// Ajouter visuellement
 function addToList(item) {
   const div = document.createElement('div');
   div.className = 'owner-item';
@@ -29,7 +34,6 @@ function addToList(item) {
   list.prepend(div);
 }
 
-// Upload + ajout
 addBtn.onclick = async () => {
   const file = photoInput.files[0];
   const name = nameInput.value.trim();
@@ -43,7 +47,6 @@ addBtn.onclick = async () => {
     const timestamp = Date.now();
     const fileName = `${timestamp}-${file.name}`;
 
-    // Upload image dans Supabase Storage
     const { data: uploadData, error: uploadError } = await supabase
       .storage
       .from('creations')
@@ -51,7 +54,6 @@ addBtn.onclick = async () => {
 
     if (uploadError) throw uploadError;
 
-    // Récupérer l'URL publique
     const { publicURL, error: urlError } = supabase
       .storage
       .from('creations')
@@ -59,7 +61,6 @@ addBtn.onclick = async () => {
 
     if (urlError) throw urlError;
 
-    // Ajouter dans la table Supabase
     const { data: insertData, error: insertError } = await supabase
       .from('creations')
       .insert([{ name, image_url: publicURL }]);
@@ -76,5 +77,4 @@ addBtn.onclick = async () => {
   }
 };
 
-// Charger au départ
 loadCreations();
