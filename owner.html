@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Owner – Ajouter Créations</title>
-  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <h1>Ajouter une création</h1>
@@ -24,7 +24,6 @@
   <script src="https://www.gstatic.com/firebasejs/12.6.0/firebase-storage.js"></script>
 
   <script>
-    // ⚡ Config Firebase
     const firebaseConfig = {
       apiKey: "AIzaSyAKUqhiGi1ZHIfZRwslMIUip8ohwOiLhFA",
       authDomain: "amigurumisteph.firebaseapp.com",
@@ -33,7 +32,6 @@
       messagingSenderId: "175290001202",
       appId: "1:175290001202:web:b53e4255e699d65bd4192b"
     };
-
     firebase.initializeApp(firebaseConfig);
 
     const db = firebase.firestore();
@@ -44,15 +42,10 @@
     const photoInput = document.getElementById("photo");
     const ownerList = document.getElementById("owner-list");
 
-    // 🔥 Fonction Ajouter
     addBtn.onclick = async () => {
       const name = nameInput.value.trim();
       const file = photoInput.files[0];
-
-      if (!name || !file) {
-        alert("Merci de mettre un nom et choisir une photo !");
-        return;
-      }
+      if(!name || !file){ alert("Merci de remplir le nom et choisir une photo !"); return; }
 
       try {
         const storageRef = storage.ref("photos/" + Date.now() + "-" + file.name);
@@ -69,13 +62,12 @@
         photoInput.value = "";
 
         alert("Création ajoutée !");
-      } catch (err) {
+      } catch(err) {
         console.error(err);
         alert("Erreur lors de l'ajout !");
       }
     };
 
-    // 🔥 Affichage live côté Owner
     db.collection("creations").orderBy("createdAt", "desc")
       .onSnapshot(snapshot => {
         ownerList.innerHTML = "";
