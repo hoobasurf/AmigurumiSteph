@@ -1,175 +1,28 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="utf-8"/>
-  <meta name="viewport" content="width=device-width,initial-scale=1"/>
-  <title>Owner — Debug Upload</title>
-  <style>
-    body{font-family:system-ui,Segoe UI,Arial;margin:18px;background:#fff;}
-    h1{color:#333}
-    .box{background:#fafafa;border:1px solid #eee;padding:14px;border-radius:10px;margin-bottom:12px}
-    input,button{padding:10px;margin:6px 0;border-radius:8px;border:1px solid #ddd}
-    #debug{white-space:pre-wrap;background:#111;color:#0f0;padding:12px;border-radius:8px;height:220px;overflow:auto}
-    .owner-item{display:flex;gap:10px;align-items:center;padding:8px;border-bottom:1px solid #eee}
-    .mini-img{width:80px;border-radius:6px;object-fit:cover}
-    .ok{color:green;font-weight:bold}
-    .err{color:crimson;font-weight:bold}
-  </style>
+  <meta charset="UTF-8">
+  <title>Owner - Ajout Création</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <h1>Owner — Debug Upload (version unique)</h1>
+  <h1 class="title">Ajouter une création</h1>
 
-  <div class="box">
-    <label>Nom du projet (obligatoire)</label><br>
-    <input id="name" placeholder="Ex : Chaton tricoté" /><br>
-    <label>Choisis la photo (l'upload démarre automatiquement)</label><br>
-    <input id="photo" type="file" accept="image/*" /><br>
-    <small>Si tu vois des popups d'alerte, accepte-les — elles confirment le script.</small>
+  <div class="owner-box">
+    <input id="name" placeholder="Nom de la création">
+    <input id="photo" type="file" accept="image/*">
+    <button id="add">Ajouter</button>
   </div>
 
-  <div class="box">
-    <h3>Résultat / Liste</h3>
-    <div id="owner-list"></div>
-  </div>
+  <h2 class="subtitle">Liste des créations</h2>
+  <div id="owner-list"></div>
 
-  <div class="box">
-    <h3>Debug (tout s’affiche ici)</h3>
-    <div id="debug">Démarrage…</div>
-  </div>
-
-  <!-- Firebase v8 (compatible mobile) -->
+  <!-- Firebase v8 -->
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
   <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-storage.js"></script>
 
-  <script>
-  // ---------- helper debug ----------
-  const dbg = (txt, cls='') => {
-    const d = document.getElementById('debug');
-    const time = new Date().toLocaleTimeString();
-    d.textContent = `${time} — ${txt}\n\n` + d.textContent;
-    if (cls === 'err') console.error(txt);
-    else console.log(txt);
-  };
-
-  try {
-    dbg('Script principal chargé.');
-    alert('owner.html script chargé (debug visible sur page)'); // quick confirmation
-  } catch(e){ /* ignore */ }
-
-  // ---------- firebase config (v8) ----------
-  try {
-    const firebaseConfig = {
-      apiKey: "AIzaSyAKUqhiGi1ZHIfZRwslMIUip8ohwOiLhFA",
-      authDomain: "amigurumisteph.firebaseapp.com",
-      projectId: "amigurumisteph",
-      storageBucket: "amigurumisteph.appspot.com",
-      messagingSenderId: "175290001202",
-      appId: "1:175290001202:web:b53e4255e699d65bd4192b"
-    };
-
-    dbg('Initialisation Firebase …');
-    firebase.initializeApp(firebaseConfig);
-    const db = firebase.firestore();
-    const storage = firebase.storage();
-    dbg('Firebase initialisé ✅', 'ok');
-
-    // quick connectivity tests
-    db.settings({ ignoreUndefinedProperties: true });
-    db.collection('test_connection').doc('_ping').set({ts: firebase.firestore.FieldValue.serverTimestamp()})
-      .then(()=> dbg('Ecriture test Firestore OK'), e=> dbg('Ecriture test Firestore ERREUR: '+e.message, 'err'));
-
-    // ---------- elements ----------
-    const nameInput = document.getElementById('name');
-    const photoInput = document.getElementById('photo');
-    const list = document.getElementById('owner-list');
-
-    // render helper
-    function renderItem(obj){
-      const wrap = document.createElement('div');
-      wrap.className = 'owner-item';
-      wrap.innerHTML = `<img src="${obj.imageUrl}" class="mini-img"><div><b>${obj.name}</b><div style="font-size:12px;color:#666">${new Date(obj._ts||Date.now()).toLocaleString()}</div></div>`;
-      list.prepend(wrap);
-    }
-
-    // Firestore live snapshot
-    db.collection('creations').orderBy('createdAt','desc')
-      .onSnapshot(snap => {
-        dbg('Snapshot Creations reçu: docs=' + snap.size);
-        list.innerHTML = '';
-        snap.forEach(doc => {
-          const d = doc.data();
-          renderItem({ name:d.name || '(sans nom)', imageUrl: d.imageUrl || d.image || '', _ts: (d.createdAt && d.createdAt.toDate) ? d.createdAt.toDate(): (d.createdAt ? d.createdAt : null)});
-        });
-      }, err => {
-        dbg('Erreur snapshot Firestore: '+err.message, 'err');
-      });
-
-    // ---------- upload handler ----------
-    photoInput.addEventListener('change', async () => {
-      dbg('Input file change détecté.');
-      alert('Fichier choisi — upload va démarrer'); // visible confirmation
-
-      const file = photoInput.files[0];
-      const name = nameInput.value.trim();
-      if (!file) { dbg('Aucun fichier choisi', 'err'); alert('Aucun fichier choisi'); return; }
-      if (!name)  { dbg('Nom absent — remplis le champ nom', 'err'); alert('Merci de remplir le champ Nom'); return; }
-
-      dbg('Préparation upload: ' + file.name + ' (' + file.size + ' bytes)');
-      try {
-        const stamp = Date.now();
-        const storageRef = storage.ref().child('creations/'+ stamp + '-' + file.name);
-
-        dbg('Lancement put() …');
-        const uploadTask = storageRef.put(file);
-
-        uploadTask.on('state_changed',
-          snapshot => {
-            const pct = Math.round((snapshot.bytesTransferred/snapshot.totalBytes)*100);
-            dbg('Upload progress: '+pct+'%');
-          },
-          error => {
-            dbg('Upload ERROR: ' + error.message, 'err');
-            alert('Upload échoué: '+error.message);
-          },
-          async () => {
-            dbg('Upload terminé, récupération URL …');
-            try {
-              const url = await uploadTask.snapshot.ref.getDownloadURL();
-              dbg('URL récupérée: ' + url, 'ok');
-
-              dbg('Écriture doc Firestore …');
-              await db.collection('creations').add({
-                name: name,
-                imageUrl: url,
-                createdAt: firebase.firestore.FieldValue.serverTimestamp()
-              });
-              dbg('Doc ajouté en Firestore ✅');
-
-              // show immediately
-              renderItem({ name, imageUrl: url, _ts: stamp });
-
-              // reset
-              nameInput.value = '';
-              photoInput.value = '';
-              alert('Upload et ajout OK ✅');
-            } catch(e2){
-              dbg('Erreur getDownloadURL / Firestore: '+ e2.message, 'err');
-              alert('Erreur après upload: '+e2.message);
-            }
-          }
-        );
-
-      } catch (ex) {
-        dbg('Exception pendant upload: ' + ex.message, 'err');
-        alert('Exception: '+ex.message);
-      }
-    });
-
-  } catch (initErr) {
-    dbg('Erreur initialisation script: ' + (initErr && initErr.message ? initErr.message : initErr), 'err');
-    alert('Erreur init: ' + (initErr && initErr.message ? initErr.message : initErr));
-  }
-  </script>
+  <!-- Ton script -->
+  <script src="owner.js"></script>
 </body>
 </html>
