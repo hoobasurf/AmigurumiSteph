@@ -1,36 +1,23 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8" />
-  <title>Owner – Amigurumi</title>
-
+  <meta charset="UTF-8">
+  <title>Owner - Ajout Création</title>
   <link rel="stylesheet" href="style.css">
-
-  <!-- Firebase SDK -->
-  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js"></script>
-  
-  <!-- Ta config Firebase -->
-  <script src="firebase.js"></script>
-
-  <!-- IMPORTANT : décaler le script, sinon bouton mort -->
-  <script src="owner.js" defer></script>
 </head>
 
 <body>
+  <h1 class="title">Ajouter une création</h1>
 
-  <h1 class="title">Ajouter une Création</h1>
-
-  <div class="form-box">
-    <input id="nameInput" placeholder="Nom du projet">
-    <input id="photoInput" type="file" accept="image/*">
-
-    <button id="addBtn" class="validate-btn">Ajouter</button>
+  <div class="owner-box">
+    <input id="name" placeholder="Nom de la création">
+    <input id="photo" type="file" accept="image/*">
+    <button id="add" class="validate-btn">Ajouter</button>
   </div>
 
-  <h2>Mes créations</h2>
-  <div id="creationList"></div>
+  <h2 class="subtitle">Liste</h2>
+  <div id="owner-list"></div>
 
+  <script type="module" src="owner.js"></script>
 </body>
 </html>
