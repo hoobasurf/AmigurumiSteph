@@ -5,7 +5,6 @@
   <title>Owner - Ajout Création</title>
   <link rel="stylesheet" href="style.css">
 </head>
-
 <body>
   <h1 class="title">Ajouter une création</h1>
 
@@ -15,9 +14,13 @@
     <button id="add" class="validate-btn">Ajouter</button>
   </div>
 
-  <h2 class="subtitle">Liste</h2>
+  <h2 class="subtitle">Liste des créations</h2>
   <div id="owner-list"></div>
 
-  <script type="module" src="owner.js"></script>
+  <!-- Firebase + Script -->
+  <script src="https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/12.6.0/firebase-storage.js"></script>
+  <script src="owner-simple.js"></script>
 </body>
 </html>
