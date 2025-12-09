@@ -1,50 +1,9 @@
-body {
-  font-family: 'Arial', sans-serif;
-  background: #ffe6f0;
-  color: #333;
-  padding: 20px;
-}
-
-h1, h2 {
-  text-align: center;
-}
-
-.owner-box {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin-bottom: 20px;
-}
-
-.owner-box input, .owner-box button {
-  margin: 5px;
-  padding: 10px;
-  border-radius: 10px;
-  border: 1px solid #ddd;
-}
-
-button#add {
-  background: #ff99cc;
-  color: white;
-  border: none;
-  cursor: pointer;
-}
-
-#owner-list {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 10px;
-}
-
-.owner-item {
-  background: #fff0f5;
-  border-radius: 10px;
-  padding: 10px;
-  text-align: center;
-}
-
-.owner-item img {
-  max-width: 100px;
-  border-radius: 10px;
-}
+body { font-family: 'Arial', sans-serif; background:#fff0f5; color:#333; margin:20px; }
+.title { text-align:center; color:#ff69b4; }
+.owner-box { display:flex; gap:10px; justify-content:center; margin:20px 0; }
+input { padding:8px; border-radius:10px; border:1px solid #f0a; }
+button { padding:8px 16px; border-radius:12px; background:#ffb6c1; border:none; cursor:pointer; }
+#owner-list, .gallery-scroll { display:flex; gap:10px; flex-wrap:wrap; justify-content:center; }
+.owner-item, .gallery-item { border-radius:12px; background:#ffe4e1; padding:10px; text-align:center; }
+.mini-img, .gallery-img { width:100px; border-radius:10px; }
+.gallery-scroll { overflow-x:auto; padding:10px; }
