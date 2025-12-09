@@ -1,28 +1,54 @@
-<!DOCTYPE html>
-<html lang="fr">
-<head>
-  <meta charset="UTF-8">
-  <title>Owner - Ajout Création</title>
-  <link rel="stylesheet" href="style.css">
-</head>
-<body>
-  <h1 class="title">Ajouter une création</h1>
+// Config Firebase
+const firebaseConfig = {
+  apiKey: "AIzaSyAKUqhiGi1ZHIfZRwslMIUip8ohwOiLhFA",
+  authDomain: "amigurumisteph.firebaseapp.com",
+  projectId: "amigurumisteph",
+  storageBucket: "amigurumisteph.appspot.com",
+  messagingSenderId: "175290001202",
+  appId: "1:175290001202:web:a24fbb27d2726eb7d4192b"
+};
 
-  <div class="owner-box">
-    <input id="name" placeholder="Nom de la création">
-    <input id="photo" type="file" accept="image/*">
-    <button id="add">Ajouter</button>
-  </div>
+firebase.initializeApp(firebaseConfig);
+const db = firebase.firestore();
+const storage = firebase.storage();
 
-  <h2 class="subtitle">Liste</h2>
-  <div id="owner-list"></div>
+const nameInput = document.getElementById("name");
+const photoInput = document.getElementById("photo");
+const addBtn = document.getElementById("add");
+const list = document.getElementById("owner-list");
 
-  <!-- Firebase v8 -->
-  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-storage.js"></script>
+// Ajouter une création
+addBtn.addEventListener("click", () => {
+  const file = photoInput.files[0];
+  const name = nameInput.value.trim();
+  if(!file || !name) return alert("Nom ou photo manquant !");
 
-  <!-- Script principal -->
-  <script src="owner.js"></script>
-</body>
-</html>
+  const timestamp = Date.now();
+  const storageRef = storage.ref(`creations/${timestamp}-${file.name}`);
+  const uploadTask = storageRef.put(file);
+
+  uploadTask.on("state_changed", null,
+    error => alert("Erreur upload : " + error.message),
+    async () => {
+      const url = await uploadTask.snapshot.ref.getDownloadURL();
+      await db.collection("creations").add({
+        name, imageUrl: url, createdAt: firebase.firestore.FieldValue.serverTimestamp()
+      });
+      nameInput.value = "";
+      photoInput.value = "";
+      addToList({name, imageUrl: url});
+    });
+});
+
+function addToList(data) {
+  const item = document.createElement("div");
+  item.className = "owner-item";
+  item.innerHTML = `<p>${data.name}</p><img src="${data.imageUrl}" class="mini-img">`;
+  list.prepend(item);
+}
+
+// Affichage live Firestore
+db.collection("creations").orderBy("createdAt", "desc").onSnapshot(snapshot => {
+  list.innerHTML = "";
+  snapshot.forEach(doc => addToList(doc.data()));
+});
