@@ -2,70 +2,39 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Galerie – Visiteur</title>
+  <title>Galerie</title>
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
-  <h1>Mes Petites Créations</h1>
+  <h1 class="title">Mes Petites Créations</h1>
 
-  <!-- Bouton Owner -->
-  <button id="ownerBtn" class="owner-btn">Owner</button>
+  <div class="gallery-scroll" id="gallery"></div>
 
-  <!-- Galerie horizontale -->
-  <div id="gallery" class="gallery-scroll"></div>
-
-  <!-- Modal image -->
-  <div id="modal" class="modal hidden">
+  <!-- Modal Zoom -->
+  <div class="modal hidden" id="modal">
     <div class="modal-content">
       <img id="modal-img" class="modal-image">
-      <button id="close-modal">✖</button>
+      <button id="comment-btn" class="comment-btn">💬 Commentaires</button>
+      <button id="close-modal" class="close-btn">✖</button>
     </div>
   </div>
 
-  <!-- Firebase SDK via CDN -->
-  <script src="https://www.gstatic.com/firebasejs/12.6.0/firebase-app.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/12.6.0/firebase-firestore.js"></script>
-  <script src="https://www.gstatic.com/firebasejs/12.6.0/firebase-storage.js"></script>
+  <!-- Modal Commentaire -->
+  <div class="modal hidden" id="comment-modal">
+    <div class="comment-box">
+      <h2>Laisser un commentaire</h2>
+      <input id="prenom" placeholder="Votre prénom">
+      <textarea id="commentaire" placeholder="Votre message... 😊"></textarea>
+      <button id="send-comment" class="validate-btn">Valider</button>
+      <button id="close-comment" class="close-btn">✖</button>
+    </div>
+  </div>
 
-  <script>
-    const firebaseConfig = {
-      apiKey: "AIzaSyAKUqhiGi1ZHIfZRwslMIUip8ohwOiLhFA",
-      authDomain: "amigurumisteph.firebaseapp.com",
-      projectId: "amigurumisteph",
-      storageBucket: "amigurumisteph.appspot.com",
-      messagingSenderId: "175290001202",
-      appId: "1:175290001202:web:b53e4255e699d65bd4192b"
-    };
-    firebase.initializeApp(firebaseConfig);
+  <!-- Firebase v8 -->
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-firestore.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-storage.js"></script>
 
-    const db = firebase.firestore();
-
-    const gallery = document.getElementById("gallery");
-    const modal = document.getElementById("modal");
-    const modalImg = document.getElementById("modal-img");
-    const closeModal = document.getElementById("close-modal");
-    const ownerBtn = document.getElementById("ownerBtn");
-
-    closeModal.onclick = () => modal.classList.add("hidden");
-    ownerBtn.onclick = () => window.location.href = "owner.html";
-
-    db.collection("creations").orderBy("createdAt", "desc")
-      .onSnapshot(snapshot => {
-        gallery.innerHTML = "";
-        snapshot.docs.forEach(docu => {
-          const data = docu.data();
-          const img = document.createElement("img");
-          img.src = data.imageUrl;
-          img.alt = data.name;
-          img.className = "gallery-item";
-          img.onclick = () => {
-            modalImg.src = data.imageUrl;
-            modal.classList.remove("hidden");
-          };
-          gallery.appendChild(img);
-        });
-      });
-  </script>
+  <script src="visitor.js"></script>
 </body>
 </html>
