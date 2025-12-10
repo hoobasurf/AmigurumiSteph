@@ -2,14 +2,19 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Visitor - Créations</title>
-  <link rel="stylesheet" href="style.css">
+  <title>Galerie visitor</title>
+  <style>
+    body { font-family: sans-serif; background: #f8f8f8; padding: 20px; }
+    #gallery { display: flex; flex-wrap: wrap; gap: 10px; }
+    .item { background: #fff; padding: 10px; border-radius: 10px; box-shadow: 0 0 5px #ccc; }
+    .item img { max-width: 120px; border-radius: 8px; display: block; }
+  </style>
 </head>
 <body>
 
-<h1>Liste des créations</h1>
-<div id="visitor-list"></div>
+<h1>Les créations</h1>
+<div id="gallery"></div>
 
-<script type="module" src="visitor.js"></script>
+<script src="visitor.js"></script>
 </body>
 </html>
