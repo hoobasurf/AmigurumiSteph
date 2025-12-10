@@ -27,9 +27,15 @@ addBtn.onclick = () => {
     `;
     list.prepend(div);
 
+    // 🔥 AJOUT pour Visitor ---------------------------------
+    const saved = JSON.parse(localStorage.getItem("creations") || "[]");
+    saved.unshift({ name, imgUrl });
+    localStorage.setItem("creations", JSON.stringify(saved));
+    // --------------------------------------------------------
+
     nameInput.value = '';
     photoInput.value = '';
   };
 
-  reader.readAsDataURL(file); // Affichage immédiat
+  reader.readAsDataURL(file);
 };
