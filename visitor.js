@@ -2,6 +2,7 @@
 const SUPABASE_URL = "https://iubbxvipgofxasatmvzg.supabase.co";
 const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Iml1YmJ4dmlwZ29meGFzYXRtdnpnIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjUyODg1NzgsImV4cCI6MjA4MDg2NDU3OH0.cg6AbfQ-av-nyEtAdWetdRjHSKaYJUw2QY2kgCFgkVs";
 
+// ⚠️ Supabase fonctionne maintenant car la librairie EST chargée dans visitor.html
 const client = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 // DOM
@@ -9,18 +10,20 @@ const gallery = document.getElementById("gallery");
 
 // --- FONCTION DE CHARGEMENT ---
 async function loadGallery() {
-  log("Chargement des images…");
+  console.log("Chargement des images…");
 
-  const { data, error } = await client.storage
+  // On liste le bucket "photos"
+  const { data, error } = await client
+    .storage
     .from("photos")
     .list("", { limit: 100 });
 
   if (error) {
-    log("Erreur LIST : " + error.message);
+    console.log("Erreur LIST : " + error.message);
     return;
   }
 
-  log("Fichiers trouvés : " + data.length);
+  console.log("Fichiers trouvés : " + data.length);
 
   data.forEach((file) => {
     const publicUrl = `${SUPABASE_URL}/storage/v1/object/public/photos/${file.name}`;
@@ -29,14 +32,14 @@ async function loadGallery() {
     div.className = "item";
 
     div.innerHTML = `
-      <img src="${publicUrl}">
+      <img src="${publicUrl}" alt="">
       <p>${file.name}</p>
     `;
 
     gallery.appendChild(div);
   });
 
-  log("Affichage terminé.");
+  console.log("Affichage terminé.");
 }
 
 // --- LANCEMENT ---
