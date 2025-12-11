@@ -1,137 +1,107 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <title>Galerie Amigurumi</title>
-  <style>
-    body {
-      font-family: 'Comic Sans MS', cursive, sans-serif;
-      background: #ffe6f0; /* rose pastel doux */
-      padding: 20px;
-      margin: 0;
-    }
+<meta charset="UTF-8">
+<title>Galerie Amigurumi</title>
+<style>
+  body {
+    font-family: 'Comic Sans MS', cursive, sans-serif;
+    background: #ffe6f0; /* rose pastel */
+    margin: 0;
+    padding: 20px;
+    overflow-x: hidden;
+  }
 
-    h1 {
-      text-align: center;
-      color: #ff66a3;
-      margin-bottom: 30px;
-    }
+  h1 {
+    text-align: center;
+    color: #b84c6f; /* bordeaux léger */
+    margin-bottom: 30px;
+  }
 
-    /* Container carousel */
-    #carousel {
-      position: relative;
-      max-width: 400px;
-      margin: 0 auto;
-      overflow: hidden;
-      border-radius: 20px;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-      background: #fff0f5;
-    }
+  #carousel-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    width: 100%;
+    max-width: 500px;
+    margin: 0 auto;
+    perspective: 1000px;
+  }
 
-    /* Slides */
-    .slide {
-      display: none;
-      text-align: center;
-      padding: 20px;
-    }
+  #carousel {
+    display: flex;
+    transition: transform 0.5s;
+    gap: 20px;
+  }
 
-    .slide img {
-      max-width: 90%;
-      border-radius: 15px;
-      box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-      transition: transform 0.3s;
-    }
+  .slide {
+    flex: 0 0 100px;
+    transition: transform 0.5s, opacity 0.5s;
+    opacity: 0.5;
+    text-align: center;
+  }
 
-    .slide img:hover {
-      transform: scale(1.05);
-    }
+  .slide img {
+    width: 100px;
+    border-radius: 15px;
+    box-shadow: 0 4px 12px rgba(184,76,111,0.3);
+    transition: transform 0.5s;
+  }
 
-    .slide p {
-      margin-top: 10px;
-      font-weight: bold;
-      color: #ff66a3;
-    }
+  .slide.active {
+    flex: 0 0 180px;
+    opacity: 1;
+  }
 
-    /* Flèches */
-    .prev, .next {
-      position: absolute;
-      top: 50%;
-      transform: translateY(-50%);
-      background: rgba(255, 182, 193, 0.8);
-      color: #fff;
-      font-weight: bold;
-      border: none;
-      border-radius: 50%;
-      width: 40px;
-      height: 40px;
-      cursor: pointer;
-      font-size: 24px;
-    }
+  .slide.active img {
+    transform: scale(1.2);
+  }
 
-    .prev { left: 10px; }
-    .next { right: 10px; }
+  .slide p {
+    margin-top: 5px;
+    font-weight: bold;
+    color: #b84c6f;
+    font-size: 14px;
+  }
 
-    /* Pagination dots */
-    #dots {
-      text-align: center;
-      margin-top: 15px;
-    }
-
-    .dot {
-      display: inline-block;
-      width: 12px;
-      height: 12px;
-      margin: 5px;
-      background: #ffb6c1;
-      border-radius: 50%;
-      cursor: pointer;
-    }
-
-    .active-dot {
-      background: #ff66a3;
-    }
-
-    /* Console mobile debug */
-    #mobileConsole {
-      position: fixed;
-      bottom: 0;
-      left: 0;
-      width: 100%;
-      max-height: 160px;
-      background: black;
-      color: lime;
-      font-size: 12px;
-      overflow-y: auto;
-      padding: 6px;
-      z-index: 9999;
-      border-top: 2px solid lime;
-    }
-
-  </style>
+  #mobileConsole {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    max-height: 160px;
+    background: black;
+    color: lime;
+    font-size: 12px;
+    overflow-y: auto;
+    padding: 6px;
+    z-index: 9999;
+    border-top: 2px solid lime;
+  }
+</style>
 </head>
 <body>
 
 <h1>Galerie Amigurumi</h1>
-
-<div id="carousel"></div>
-<div id="dots"></div>
+<div id="carousel-container">
+  <div id="carousel"></div>
+</div>
 
 <div id="mobileConsole"></div>
 
-<!-- Supabase -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="visitor.js"></script>
 
 <script>
-  // Console mobile pour iPhone
-  function log(msg) {
-    const el = document.getElementById("mobileConsole");
-    el.innerHTML += msg + "<br>";
-    el.scrollTop = el.scrollHeight;
-  }
-  console.log = log;
-  console.error = log;
-  console.warn = log;
+function log(msg) {
+  const el = document.getElementById("mobileConsole");
+  el.innerHTML += msg + "<br>";
+  el.scrollTop = el.scrollHeight;
+}
+console.log = log;
+console.error = log;
+console.warn = log;
 </script>
 
 </body>
