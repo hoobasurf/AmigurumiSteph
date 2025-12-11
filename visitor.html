@@ -28,16 +28,15 @@
       flex-shrink: 0;
     }
 
-    /* Zone centrale légèrement remontée */
+    /* Zone centrale remontée de ~1cm */
     .center-zone {
       flex: 1;
       display: flex;
       align-items: center;
       justify-content: center;
-      transform: translateY(-30px); /* remonte les cartes */
+      transform: translateY(-40px);
     }
 
-    /* Carrousel */
     #visitor-list {
       display: flex;
       gap: 40px;
@@ -55,11 +54,11 @@
       border-radius: 20px;
     }
 
-    /* Carte image */
     .visitor-item {
       flex: 0 0 auto;
       text-align: center;
       transition: transform 0.3s ease;
+      cursor: pointer;
     }
 
     .visitor-item img {
@@ -68,31 +67,94 @@
       object-fit: contain;
       background: white;
       padding: 12px;
-
-      /* contour plus visible mais doux */
-      border: 4px solid rgba(184, 76, 111, 0.25);
+      border: 4px solid rgba(184,76,111,0.25);
       border-radius: 30px;
-
       box-shadow: 0 6px 14px rgba(184,76,111,0.22);
       transition: transform 0.35s ease, box-shadow 0.35s ease;
     }
 
-    /* Zoom image mais NE PAS empiéter sur le nom */
     .active img {
       transform: scale(1.18);
       box-shadow: 0 10px 20px rgba(184,76,111,0.32);
     }
 
-    /* NOM PLUS GROS ET LISIBLE */
     .visitor-item p {
       margin-top: 16px;
       font-size: 22px;
       color: #b84c6f;
       font-weight: bold;
-      line-height: 1.1;
-      pointer-events: none;  /* évite tout chevauchement */
-      z-index: 10;
       position: relative;
+      z-index: 10;
+      pointer-events: none;
+    }
+
+    /* -------------------------------------------------- */
+    /* MODAL */
+    /* -------------------------------------------------- */
+    .modal-bg {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.65);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 1000;
+      padding: 20px;
+    }
+
+    .modal-box {
+      background: white;
+      border-radius: 20px;
+      padding: 20px;
+      max-width: 900px;
+      width: 90%;
+      box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+      text-align: center;
+      position: relative;
+    }
+
+    .modal-main-img {
+      width: 100%;
+      max-height: 500px;
+      object-fit: contain;
+      border-radius: 15px;
+      border: 4px solid #b84c6f44;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+      background: white;
+    }
+
+    .thumbs {
+      margin-top: 20px;
+      display: flex;
+      gap: 15px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    .thumbs img {
+      width: 120px;
+      height: 120px;
+      object-fit: contain;
+      cursor: pointer;
+      border-radius: 12px;
+      border: 3px solid #b84c6f33;
+      background: white;
+      transition: transform 0.2s;
+    }
+
+    .thumbs img:hover {
+      transform: scale(1.1);
+      border-color: #b84c6f;
+    }
+
+    .close-modal {
+      position: absolute;
+      top: 12px;
+      right: 15px;
+      font-size: 30px;
+      cursor: pointer;
+      color: #b84c6f;
+      font-weight: bold;
     }
   </style>
 
@@ -105,26 +167,43 @@
   <div id="visitor-list"></div>
 </div>
 
+<!-- MODAL -->
+<div class="modal-bg" id="modal">
+  <div class="modal-box">
+    <div class="close-modal" onclick="closeModal()">×</div>
+    <img id="modalMain" class="modal-main-img">
+    <div id="thumbsContainer" class="thumbs"></div>
+  </div>
+</div>
+
 <script>
   const list = document.getElementById("visitor-list");
+  const modal = document.getElementById("modal");
+  const modalMain = document.getElementById("modalMain");
+  const thumbs = document.getElementById("thumbsContainer");
+
   const creations = JSON.parse(localStorage.getItem("creations") || "[]");
 
   function renderVisitor() {
     list.innerHTML = "";
-    creations.forEach(item => {
+    creations.forEach((item, i) => {
       const div = document.createElement("div");
       div.className = "visitor-item";
+      div.setAttribute("data-index", i);
+
       div.innerHTML = `
         <img src="${item.imgUrl}">
         <p>${item.name}</p>
       `;
+
+      div.onclick = () => openModal(i);
       list.appendChild(div);
     });
   }
 
   renderVisitor();
 
-  /* Zoom auto sur l'image au centre */
+  /* Zoom auto au centre */
   function updateCenter() {
     const items = document.querySelectorAll(".visitor-item");
     const center = window.innerWidth / 2;
@@ -144,6 +223,51 @@
   updateCenter();
   list.addEventListener("scroll", updateCenter);
   window.addEventListener("resize", updateCenter);
+
+  /* -------------------------------------- */
+  /* MODAL */
+  /* -------------------------------------- */
+
+  let originalMainImage = "";   // pour restaurer au carrousel
+  let projectIndex = null;
+
+  function openModal(i) {
+    projectIndex = i;
+
+    const proj = creations[i];
+
+    // Image principale originale (pour restaurer après)
+    originalMainImage = proj.imgUrl;
+
+    // Affiche l’image principale dans le modal
+    modalMain.src = proj.imgUrl;
+
+    // Miniatures
+    thumbs.innerHTML = "";
+
+    if (Array.isArray(proj.images)) {
+      proj.images.forEach(img => {
+        const t = document.createElement("img");
+        t.src = img;
+        t.onclick = () => modalMain.src = img;
+        thumbs.appendChild(t);
+      });
+    }
+
+    modal.style.display = "flex";
+  }
+
+  function closeModal() {
+    modal.style.display = "none";
+
+    // → On restaure l’image principale dans le carrousel
+    const proj = creations[projectIndex];
+    proj.imgUrl = originalMainImage;
+
+    // Réaffiche le carrousel sans changement
+    renderVisitor();
+    updateCenter();
+  }
 </script>
 
 </body>
