@@ -4,7 +4,6 @@
 const SUPABASE_URL = "https://iubbxvipgofxasatmvzg.supabase.co";
 const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJra3hkc2p2anR4aWpvYWFyb3pvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mzg5MDQ3NDYsImV4cCI6MjA1NDQ4MDc0Nn0.bgPgL82VCPKsJBfqt-F8AdmcuxIV3qsPp3KFUvkgwzg";
 
-// ⚠️ CORRECTION ICI
 const client = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 // =======================
@@ -23,7 +22,7 @@ async function uploadToSupabase(name, file) {
 
   console.log("📤 Upload vers Supabase :", filePath);
 
-  const { data, error } = await client   // ⚠️ CORRECTION
+  const { data, error } = await client
     .storage
     .from("creations")
     .upload(filePath, file, {
@@ -38,8 +37,18 @@ async function uploadToSupabase(name, file) {
 
   console.log("✅ Upload réussi :", data);
 
-  const url = `${SUPABASE_URL}/storage/v1/object/public/creations/${filePath}`;
-  return url;
+  // Génération de l'URL publique
+  const { publicUrl, error: urlError } = client
+    .storage
+    .from("creations")
+    .getPublicUrl(filePath);
+
+  if (urlError) {
+    console.error("❌ Erreur génération URL publique :", urlError.message);
+    return null;
+  }
+
+  return publicUrl;
 }
 
 // =======================
@@ -57,7 +66,7 @@ addBtn.onclick = async () => {
   console.log("Nom :", name);
   console.log("Fichier sélectionné :", file);
 
-  // 4.1 Upload dans Supabase
+  // Upload dans Supabase
   const publicUrl = await uploadToSupabase(name, file);
 
   if (!publicUrl) {
@@ -65,7 +74,7 @@ addBtn.onclick = async () => {
     return;
   }
 
-  // 4.2 Prévisualisation immédiate
+  // Prévisualisation immédiate
   const div = document.createElement('div');
   div.className = 'owner-item';
   div.innerHTML = `
@@ -74,7 +83,7 @@ addBtn.onclick = async () => {
   `;
   list.prepend(div);
 
-  // 4.3 Sauvegarde pour visitor
+  // Sauvegarde locale
   const saved = JSON.parse(localStorage.getItem("creations") || "[]");
   saved.unshift({ name, imgUrl: publicUrl });
   localStorage.setItem("creations", JSON.stringify(saved));
