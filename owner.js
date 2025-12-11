@@ -2,7 +2,7 @@
 // 1. Connexion Supabase
 // =======================
 const SUPABASE_URL = "https://iubbxvipgofxasatmvzg.supabase.co";
-const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJra3hkc2p2anR4aWpvYWFyb3pvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mzg5MDQ3NDYsImV4cCI6MjA1NDQ4MDc0Nn0.bgPgL82VCPKsJBfqt-F8AdmcuxIV3qsPp3KFUvkgwzg";
+const SUPABASE_KEY = "sb_secret_pZQyjv-VVblqYWji7tKSTQ_9lr7E4MD"; // clé anon public
 
 const client = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
@@ -28,7 +28,7 @@ async function uploadToSupabase(name, file) {
       upsert: false
     });
 
-  // SI ERREUR
+  // === SI ERREUR ===
   if (error) {
     const msg = "❌ Erreur upload Supabase : " + JSON.stringify(error, null, 2);
     alert(msg);
@@ -45,7 +45,7 @@ async function uploadToSupabase(name, file) {
     return null;
   }
 
-  // SI OK
+  // === SI UPLOAD RÉUSSI ===
   const { publicUrl } = client
     .storage
     .from("creations")
@@ -69,11 +69,9 @@ addBtn.onclick = async () => {
   // 1️⃣ Upload vers Supabase
   const publicUrl = await uploadToSupabase(name, file);
 
-  if (!publicUrl) {
-    return; // erreur déjà affichée
-  }
+  if (!publicUrl) return; // erreur déjà affichée
 
-  // 2️⃣ AFFICHAGE immédiat dans la liste
+  // 2️⃣ Affichage immédiat dans la liste
   const div = document.createElement('div');
   div.className = 'owner-item';
   div.innerHTML = `
@@ -82,7 +80,12 @@ addBtn.onclick = async () => {
   `;
   list.prepend(div);
 
-  // 3️⃣ Reset champs
+  // 3️⃣ Sauvegarde locale (optionnel)
+  const saved = JSON.parse(localStorage.getItem("creations") || "[]");
+  saved.unshift({ name, imgUrl: publicUrl });
+  localStorage.setItem("creations", JSON.stringify(saved));
+
+  // 4️⃣ Reset des champs
   nameInput.value = '';
   photoInput.value = '';
 };
