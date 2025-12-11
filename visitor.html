@@ -9,7 +9,6 @@
     background: #ffe6f0; /* rose pastel */
     margin: 0;
     padding: 20px;
-    overflow-x: hidden;
   }
 
   h1 {
@@ -18,53 +17,43 @@
     margin-bottom: 30px;
   }
 
-  #carousel-container {
+  #gallery {
     display: flex;
+    flex-wrap: wrap;
     justify-content: center;
-    align-items: center;
-    overflow: hidden;
-    width: 100%;
-    max-width: 500px;
-    margin: 0 auto;
-    perspective: 1000px;
-  }
-
-  #carousel {
-    display: flex;
-    transition: transform 0.5s;
     gap: 20px;
   }
 
-  .slide {
-    flex: 0 0 100px;
-    transition: transform 0.5s, opacity 0.5s;
-    opacity: 0.5;
-    text-align: center;
-  }
-
-  .slide img {
-    width: 100px;
+  .item {
+    background: #fff0f5;
     border-radius: 15px;
-    box-shadow: 0 4px 12px rgba(184,76,111,0.3);
-    transition: transform 0.5s;
+    padding: 15px;
+    text-align: center;
+    box-shadow: 0 4px 12px rgba(184,76,111,0.2);
+    transition: transform 0.3s;
+    flex: 0 0 150px;
   }
 
-  .slide.active {
-    flex: 0 0 180px;
-    opacity: 1;
+  .item img {
+    max-width: 100%;
+    border-radius: 12px;
+    display: block;
+    margin: 0 auto 10px;
+    transition: transform 0.3s;
   }
 
-  .slide.active img {
-    transform: scale(1.2);
+  .item img:hover {
+    transform: scale(1.05); /* léger zoom au survol */
   }
 
-  .slide p {
-    margin-top: 5px;
-    font-weight: bold;
+  .item p {
     color: #b84c6f;
+    font-weight: bold;
+    margin: 0;
     font-size: 14px;
   }
 
+  /* Console mobile debug */
   #mobileConsole {
     position: fixed;
     bottom: 0;
@@ -84,24 +73,22 @@
 <body>
 
 <h1>Galerie Amigurumi</h1>
-<div id="carousel-container">
-  <div id="carousel"></div>
-</div>
 
+<div id="gallery"></div>
 <div id="mobileConsole"></div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="visitor.js"></script>
+<script src="visitor.js" type="module"></script>
 
 <script>
-function log(msg) {
-  const el = document.getElementById("mobileConsole");
-  el.innerHTML += msg + "<br>";
-  el.scrollTop = el.scrollHeight;
-}
-console.log = log;
-console.error = log;
-console.warn = log;
+  function log(msg) {
+    const el = document.getElementById("mobileConsole");
+    el.innerHTML += msg + "<br>";
+    el.scrollTop = el.scrollHeight;
+  }
+  console.log = log;
+  console.error = log;
+  console.warn = log;
 </script>
 
 </body>
