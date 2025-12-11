@@ -28,7 +28,7 @@
       flex-shrink: 0;
     }
 
-    /* Zone centrale remontée de ~1cm */
+    /* Zone centrale remontée */
     .center-zone {
       flex: 1;
       display: flex;
@@ -37,6 +37,7 @@
       transform: translateY(-40px);
     }
 
+    /* Carrousel */
     #visitor-list {
       display: flex;
       gap: 40px;
@@ -46,18 +47,9 @@
       align-items: center;
     }
 
-    #visitor-list::-webkit-scrollbar {
-      height: 8px;
-    }
-    #visitor-list::-webkit-scrollbar-thumb {
-      background: #b84c6f66;
-      border-radius: 20px;
-    }
-
     .visitor-item {
       flex: 0 0 auto;
       text-align: center;
-      transition: transform 0.3s ease;
       cursor: pointer;
     }
 
@@ -83,9 +75,6 @@
       font-size: 22px;
       color: #b84c6f;
       font-weight: bold;
-      position: relative;
-      z-index: 10;
-      pointer-events: none;
     }
 
     /* -------------------------------------------------- */
@@ -102,24 +91,40 @@
       padding: 20px;
     }
 
+    .modal-bg.click-close {
+      cursor: pointer;
+    }
+
     .modal-box {
       background: white;
       border-radius: 20px;
       padding: 20px;
       max-width: 900px;
       width: 90%;
+      max-height: 90vh;
+      overflow-y: auto;
       box-shadow: 0 5px 20px rgba(0,0,0,0.3);
       text-align: center;
       position: relative;
+      cursor: default;
+    }
+
+    .close-modal {
+      position: absolute;
+      top: 12px;
+      right: 15px;
+      font-size: 30px;
+      cursor: pointer;
+      color: #b84c6f;
+      font-weight: bold;
     }
 
     .modal-main-img {
       width: 100%;
-      max-height: 500px;
+      max-height: 450px;
       object-fit: contain;
       border-radius: 15px;
       border: 4px solid #b84c6f44;
-      box-shadow: 0 4px 12px rgba(0,0,0,0.25);
       background: white;
     }
 
@@ -135,11 +140,11 @@
       width: 120px;
       height: 120px;
       object-fit: contain;
-      cursor: pointer;
       border-radius: 12px;
       border: 3px solid #b84c6f33;
       background: white;
       transition: transform 0.2s;
+      cursor: pointer;
     }
 
     .thumbs img:hover {
@@ -147,18 +152,129 @@
       border-color: #b84c6f;
     }
 
-    .close-modal {
-      position: absolute;
-      top: 12px;
-      right: 15px;
-      font-size: 30px;
-      cursor: pointer;
-      color: #b84c6f;
-      font-weight: bold;
+    /* -------------------------------------------------- */
+    /* LIKE + COMMENT ICONS */
+    /* -------------------------------------------------- */
+    .icon-bar {
+      margin-top: 15px;
+      display: flex;
+      justify-content: center;
+      gap: 40px;
+      align-items: center;
     }
-  </style>
 
+    .icon-btn {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      font-size: 20px;
+      color: #b84c6f;
+      user-select: none;
+      transition: transform 0.2s;
+    }
+
+    .icon-btn:hover {
+      transform: scale(1.1);
+    }
+
+    .heart {
+      font-size: 28px;
+      transition: color 0.3s;
+    }
+
+    .heart.liked {
+      color: #ff4b82;
+    }
+
+    .comment-number {
+      background: #b84c6f;
+      color: white;
+      padding: 2px 8px;
+      font-size: 14px;
+      border-radius: 12px;
+    }
+
+    /* -------------------------------------------------- */
+    /* COMMENTAIRES LISTE */
+    /* -------------------------------------------------- */
+    .comment-section {
+      margin-top: 20px;
+      text-align: left;
+    }
+
+    .comment {
+      background: #ffe7f1;
+      border: 2px solid #b84c6f44;
+      padding: 10px;
+      border-radius: 12px;
+      margin-bottom: 10px;
+    }
+
+    /* Bouton ajouter un commentaire */
+    .add-comment-btn {
+      margin-top: 20px;
+      padding: 12px 25px;
+      background: #b84c6f;
+      color: white;
+      border-radius: 30px;
+      cursor: pointer;
+      font-size: 18px;
+      border: none;
+      transition: 0.2s;
+    }
+
+    .add-comment-btn:hover {
+      opacity: 0.8;
+    }
+
+    /* -------------------------------------------------- */
+    /* POPUP COMMENTAIRE */
+    /* -------------------------------------------------- */
+    .comment-form-bg {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.6);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 2000;
+    }
+
+    .comment-form {
+      background: white;
+      padding: 20px;
+      width: 350px;
+      border-radius: 20px;
+      box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+      text-align: center;
+    }
+
+    .comment-form input,
+    .comment-form textarea {
+      width: 100%;
+      padding: 10px;
+      border-radius: 10px;
+      border: 2px solid #b84c6f55;
+      margin-bottom: 12px;
+      font-size: 16px;
+      font-family: inherit;
+    }
+
+    .comment-form button {
+      width: 100%;
+      background: #b84c6f;
+      color: white;
+      border: none;
+      padding: 12px;
+      border-radius: 12px;
+      font-size: 18px;
+      cursor: pointer;
+    }
+
+  </style>
 </head>
+
 <body>
 
 <header>Galerie des créations</header>
@@ -168,106 +284,187 @@
 </div>
 
 <!-- MODAL -->
-<div class="modal-bg" id="modal">
+<div class="modal-bg click-close" id="modal" onclick="backgroundClose(event)">
   <div class="modal-box">
     <div class="close-modal" onclick="closeModal()">×</div>
+
     <img id="modalMain" class="modal-main-img">
+
+    <div class="icon-bar">
+      <div class="icon-btn" onclick="toggleLike()">
+        <span id="heart" class="heart">♡</span>
+        <span id="likeName"></span>
+      </div>
+
+      <div class="icon-btn" onclick="scrollToComments()">
+        💬 <span id="commentCount" class="comment-number">0</span>
+      </div>
+    </div>
+
     <div id="thumbsContainer" class="thumbs"></div>
+
+    <button class="add-comment-btn" onclick="openCommentForm()">
+      Ajouter un commentaire
+    </button>
+
+    <div id="commentsList" class="comment-section"></div>
   </div>
 </div>
 
+<!-- COMMENT FORM -->
+<div class="comment-form-bg" id="commentFormBg">
+  <div class="comment-form">
+    <h3>Laisser un commentaire</h3>
+    <input id="commentName" placeholder="Prénom">
+    <textarea id="commentText" rows="4" placeholder="Votre commentaire..."></textarea>
+    <button onclick="submitComment()">Envoyer</button>
+  </div>
+</div>
+
+
 <script>
-  const list = document.getElementById("visitor-list");
-  const modal = document.getElementById("modal");
-  const modalMain = document.getElementById("modalMain");
-  const thumbs = document.getElementById("thumbsContainer");
+const list = document.getElementById("visitor-list");
+const modal = document.getElementById("modal");
+const modalMain = document.getElementById("modalMain");
+const thumbs = document.getElementById("thumbsContainer");
 
-  const creations = JSON.parse(localStorage.getItem("creations") || "[]");
+let creations = JSON.parse(localStorage.getItem("creations") || "[]");
+let currentIndex = null;
+let originalImage = "";
 
-  function renderVisitor() {
-    list.innerHTML = "";
-    creations.forEach((item, i) => {
-      const div = document.createElement("div");
-      div.className = "visitor-item";
-      div.setAttribute("data-index", i);
+function renderVisitor() {
+  list.innerHTML = "";
+  creations.forEach((item, i) => {
+    const div = document.createElement("div");
+    div.className = "visitor-item";
+    div.innerHTML = `
+      <img src="${item.imgUrl}">
+      <p>${item.name}</p>
+    `;
+    div.onclick = () => openModal(i);
+    list.appendChild(div);
+  });
+}
+renderVisitor();
 
-      div.innerHTML = `
-        <img src="${item.imgUrl}">
-        <p>${item.name}</p>
-      `;
 
-      div.onclick = () => openModal(i);
-      list.appendChild(div);
+/* ------------ Zoom auto -------------- */
+function updateCenter() {
+  const items = document.querySelectorAll(".visitor-item");
+  const center = window.innerWidth / 2;
+  items.forEach(item => {
+    const rect = item.getBoundingClientRect();
+    const centerItem = rect.left + rect.width / 2;
+    if (Math.abs(centerItem - center) < 180) item.classList.add("active");
+    else item.classList.remove("active");
+  });
+}
+updateCenter();
+list.addEventListener("scroll", updateCenter);
+
+
+/* ------------ OUVERTURE MODAL -------------- */
+function openModal(i) {
+  currentIndex = i;
+  const proj = creations[i];
+
+  originalImage = proj.imgUrl;
+  modalMain.src = proj.imgUrl;
+
+  // Like text
+  likeName.textContent = proj.name;
+
+  // Load likes
+  loadLike();
+
+  // Load comments
+  loadComments();
+
+  // Load miniatures
+  thumbs.innerHTML = "";
+  if (Array.isArray(proj.images)) {
+    proj.images.forEach(img => {
+      const t = document.createElement("img");
+      t.src = img;
+      t.onclick = () => modalMain.src = img;
+      thumbs.appendChild(t);
     });
   }
 
-  renderVisitor();
+  modal.style.display = "flex";
+}
 
-  /* Zoom auto au centre */
-  function updateCenter() {
-    const items = document.querySelectorAll(".visitor-item");
-    const center = window.innerWidth / 2;
 
-    items.forEach(item => {
-      const rect = item.getBoundingClientRect();
-      const centerItem = rect.left + rect.width / 2;
+/* ------------ FERMETURE MODAL -------------- */
+function closeModal() {
+  modal.style.display = "none";
+}
 
-      if (Math.abs(centerItem - center) < 180) {
-        item.classList.add("active");
-      } else {
-        item.classList.remove("active");
-      }
-    });
-  }
 
-  updateCenter();
-  list.addEventListener("scroll", updateCenter);
-  window.addEventListener("resize", updateCenter);
+/* ----------- fermer en cliquant dans le vide ---------- */
+function backgroundClose(e) {
+  if (e.target === modal) closeModal();
+}
 
-  /* -------------------------------------- */
-  /* MODAL */
-  /* -------------------------------------- */
 
-  let originalMainImage = "";   // pour restaurer au carrousel
-  let projectIndex = null;
+/* ------------ LIKE SYSTEM -------------- */
+function toggleLike() {
+  const key = "like_" + currentIndex;
+  let liked = localStorage.getItem(key) === "1";
 
-  function openModal(i) {
-    projectIndex = i;
+  liked = !liked;
+  localStorage.setItem(key, liked ? "1" : "0");
 
-    const proj = creations[i];
+  loadLike();
+}
 
-    // Image principale originale (pour restaurer après)
-    originalMainImage = proj.imgUrl;
+function loadLike() {
+  const key = "like_" + currentIndex;
+  let liked = localStorage.getItem(key) === "1";
+  heart.textContent = liked ? "❤️" : "♡";
+}
 
-    // Affiche l’image principale dans le modal
-    modalMain.src = proj.imgUrl;
 
-    // Miniatures
-    thumbs.innerHTML = "";
+/* ------------ COMMENTS SYSTEM -------------- */
+function loadComments() {
+  const key = "comments_" + currentIndex;
+  let comments = JSON.parse(localStorage.getItem(key) || "[]");
 
-    if (Array.isArray(proj.images)) {
-      proj.images.forEach(img => {
-        const t = document.createElement("img");
-        t.src = img;
-        t.onclick = () => modalMain.src = img;
-        thumbs.appendChild(t);
-      });
-    }
+  commentCount.textContent = comments.length;
 
-    modal.style.display = "flex";
-  }
+  commentsList.innerHTML = comments.map(c => `
+    <div class="comment">
+      <strong>${c.name}</strong><br>
+      ${c.text}
+    </div>
+  `).join("");
+}
 
-  function closeModal() {
-    modal.style.display = "none";
+function openCommentForm() {
+  commentFormBg.style.display = "flex";
+}
 
-    // → On restaure l’image principale dans le carrousel
-    const proj = creations[projectIndex];
-    proj.imgUrl = originalMainImage;
+function submitComment() {
+  const name = commentName.value.trim();
+  const text = commentText.value.trim();
+  if (!name || !text) return;
 
-    // Réaffiche le carrousel sans changement
-    renderVisitor();
-    updateCenter();
-  }
+  const key = "comments_" + currentIndex;
+  let comments = JSON.parse(localStorage.getItem(key) || "[]");
+
+  comments.push({ name, text });
+  localStorage.setItem(key, JSON.stringify(comments));
+
+  commentName.value = "";
+  commentText.value = "";
+  commentFormBg.style.display = "none";
+
+  loadComments();
+}
+
+function scrollToComments() {
+  commentsList.scrollIntoView({ behavior: "smooth" });
+}
 </script>
 
 </body>
