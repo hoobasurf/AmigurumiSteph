@@ -1,68 +1,95 @@
-// --- CONFIG SUPABASE ---
-const SUPABASE_URL = "https://iubbxvipgofxasatmvzg.supabase.co";
-const SUPABASE_KEY = "sb_secret_pZQyjv-VVblqYWji7tKSTQ_9lr7E4MD";
-const client = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
-// DOM
-const carousel = document.getElementById("carousel");
-let slides = [];
-let currentIndex = 0;
-
-// --- LOAD GALLERY ---
-async function loadGallery() {
-  console.log("Chargement des images…");
-
-  const { data, error } = await client.storage.from("creations").list("", { limit: 100 });
-  if (error) {
-    console.error("Erreur LIST :", error.message);
-    return;
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>Galerie Amigurumi</title>
+<style>
+  body {
+    font-family: 'Comic Sans MS', cursive, sans-serif;
+    background: #ffe6f0; /* rose pastel */
+    margin: 0;
+    padding: 20px;
   }
 
-  console.log("Fichiers trouvés :", data.length);
+  h1 {
+    text-align: center;
+    color: #b84c6f; /* bordeaux léger */
+    margin-bottom: 30px;
+  }
 
-  data.forEach(file => {
-    const url = `${SUPABASE_URL}/storage/v1/object/public/creations/${file.name}`;
-    const div = document.createElement("div");
-    div.className = "slide";
-    div.innerHTML = `<img src="${url}" alt=""><p>${file.name}</p>`;
-    carousel.appendChild(div);
-    slides.push(div);
-  });
+  #gallery {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 20px;
+  }
 
-  if (slides.length > 0) updateCarousel();
-  console.log("Affichage terminé.");
-}
+  .item {
+    background: #fff0f5;
+    border-radius: 15px;
+    padding: 15px;
+    text-align: center;
+    box-shadow: 0 4px 12px rgba(184,76,111,0.2);
+    transition: transform 0.3s;
+    flex: 0 0 150px;
+  }
 
-// --- UPDATE CAROUSEL ---
-function updateCarousel() {
-  slides.forEach((slide, i) => {
-    slide.classList.remove("active");
-  });
-  slides[currentIndex].classList.add("active");
+  .item img {
+    max-width: 100%;
+    border-radius: 12px;
+    display: block;
+    margin: 0 auto 10px;
+    transition: transform 0.3s;
+  }
 
-  // Centre le carousel sur l'image active
-  const offset = slides[currentIndex].offsetLeft - carousel.parentElement.offsetWidth/2 + slides[currentIndex].offsetWidth/2;
-  carousel.style.transform = `translateX(${-offset}px)`;
-}
+  .item img:hover {
+    transform: scale(1.05); /* léger zoom au survol */
+  }
 
-// --- NAVIGATION TACTILE / AUTO ---
-let startX = 0;
-carousel.addEventListener("touchstart", e => { startX = e.touches[0].clientX; });
-carousel.addEventListener("touchend", e => {
-  const endX = e.changedTouches[0].clientX;
-  if (endX < startX - 20) nextSlide();
-  else if (endX > startX + 20) prevSlide();
-});
+  .item p {
+    color: #b84c6f;
+    font-weight: bold;
+    margin: 0;
+    font-size: 14px;
+  }
 
-function nextSlide() {
-  currentIndex = (currentIndex + 1) % slides.length;
-  updateCarousel();
-}
+  /* Console mobile debug */
+  #mobileConsole {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    max-height: 160px;
+    background: black;
+    color: lime;
+    font-size: 12px;
+    overflow-y: auto;
+    padding: 6px;
+    z-index: 9999;
+    border-top: 2px solid lime;
+  }
+</style>
+</head>
+<body>
 
-function prevSlide() {
-  currentIndex = (currentIndex - 1 + slides.length) % slides.length;
-  updateCarousel();
-}
+<h1>Galerie Amigurumi</h1>
 
-// --- LANCEMENT ---
-loadGallery();
+<div id="gallery"></div>
+<div id="mobileConsole"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="visitor.js" type="module"></script>
+
+<script>
+  function log(msg) {
+    const el = document.getElementById("mobileConsole");
+    el.innerHTML += msg + "<br>";
+    el.scrollTop = el.scrollHeight;
+  }
+  console.log = log;
+  console.error = log;
+  console.warn = log;
+</script>
+
+</body>
+</html>
