@@ -6,99 +6,154 @@
 
   <style>
     body {
-      font-family: 'Comic Sans MS', cursive, sans-serif;
       margin: 0;
       padding: 0;
-      overflow-x: hidden;
-
-      /* Fond pastel pelote */
-      background: repeating-linear-gradient(
-        45deg,
-        #ffe9f1 0px,
-        #ffe9f1 20px,
-        #fff3fa 20px,
-        #fff3fa 40px
-      );
-      background-blend-mode: soft-light;
+      font-family: 'Comic Sans MS', cursive;
+      display: flex;
+      flex-direction: column;
+      height: 100vh;
+      overflow: hidden;
+      background: white;
     }
 
     header {
       background: #b84c6f;
       color: white;
-      padding: 20px;
+      padding: 18px;
       text-align: center;
-      font-size: 24px;
-      border-bottom-left-radius: 30px;
-      border-bottom-right-radius: 30px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.15);
-    }
-
-    h2 {
-      text-align: center;
-      color: #b84c6f;
-      margin-top: 25px;
-      margin-bottom: 5px;
       font-size: 22px;
+      border-bottom-left-radius: 25px;
+      border-bottom-right-radius: 25px;
+      box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+      flex-shrink: 0;
     }
 
-    /* Carrousel horizontal */
+    /* Zone centrale → carrousel centré VERTICALEMENT */
+    .center-zone {
+      flex: 1;
+      display: flex;
+      align-items: center;          /* centrage vertical */
+      justify-content: center;      /* centrage horizontal */
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* Carrousel */
     #visitor-list {
       display: flex;
       gap: 40px;
       overflow-x: auto;
-      padding: 40px 20px;
       scroll-behavior: smooth;
+      padding: 20px;
       align-items: center;
     }
 
-    #visitor-list::-webkit-scrollbar {
-      height: 8px;
-    }
+    #visitor-list::-webkit-scrollbar { height: 8px; }
     #visitor-list::-webkit-scrollbar-thumb {
       background: #b84c6f66;
       border-radius: 20px;
     }
 
-    /* Élément d’image */
+    /* Image card */
     .visitor-item {
       flex: 0 0 auto;
-      transition: transform 0.3s ease;
       text-align: center;
+      transition: transform 0.3s ease;
     }
 
     .visitor-item img {
       width: 260px;
       height: 260px;
-      object-fit: contain; /* Aucune coupe */
-      background: white;   /* adoucit l’espace vide */
+      object-fit: contain; /* aucune coupe */
+      background: white;
       border-radius: 30px;
       padding: 10px;
       box-shadow: 0 4px 12px rgba(184,76,111,0.25);
-      transition: transform 0.35s ease, box-shadow 0.35s ease;
+      transition: transform 0.35s ease;
     }
 
-    /* Nom */
-    .visitor-item p {
-      margin-top: 12px;
-      color: #b84c6f;
-      font-size: 18px;
-      font-weight: bold;
-    }
-
-    /* Zoom automatique sur l’image centrée */
+    /* Zoom automatique image centrée */
     .active img {
       transform: scale(1.25);
       box-shadow: 0 8px 20px rgba(184,76,111,0.35);
     }
+
+    .visitor-item p {
+      margin-top: 10px;
+      font-size: 18px;
+      color: #b84c6f;
+      font-weight: bold;
+    }
+
+    /* -------------------------------------------------- */
+    /* HERBE + CHAT EN BAS */
+    /* -------------------------------------------------- */
+
+    .ground {
+      height: 120px;
+      background: linear-gradient(#87d46b, #6bb752);
+      border-top-left-radius: 40px;
+      border-top-right-radius: 40px;
+      position: relative;
+      flex-shrink: 0;
+      box-shadow: 0 -4px 12px rgba(0,0,0,0.1);
+    }
+
+    .cat {
+      position: absolute;
+      top: -60px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 80px;
+      height: 80px;
+    }
+
+    /* Petit chat dessiné en CSS */
+    .cat::before, .cat::after {
+      content: "";
+      position: absolute;
+      background: #f3b6c4;
+      border-radius: 50%;
+    }
+
+    /* Tête */
+    .cat::before {
+      width: 80px;
+      height: 80px;
+      top: 0;
+      left: 0;
+      box-shadow:
+        -20px 5px 0 -25px #0004 inset,
+        20px 5px 0 -25px #0004 inset;
+    }
+
+    /* Oreilles */
+    .cat::after {
+      width: 20px;
+      height: 20px;
+      top: -10px;
+      left: 10px;
+      box-shadow:
+        40px 0 0 0 #f3b6c4,
+        10px 5px 0 0 #d88ca2 inset,
+        50px 5px 0 0 #d88ca2 inset;
+      border-radius: 3px;
+    }
+
   </style>
 
 </head>
 <body>
 
 <header>Galerie des créations</header>
-<h2>Vos créations</h2>
 
-<div id="visitor-list"></div>
+<div class="center-zone">
+  <div id="visitor-list"></div>
+</div>
+
+<div class="ground">
+  <div class="cat"></div>
+</div>
 
 <script>
   const list = document.getElementById("visitor-list");
@@ -119,16 +174,16 @@
 
   renderVisitor();
 
-  /* 🎯 Effet dock : zoom automatique de l’image au centre */
-  function updateCenterZoom() {
+  /* Zoom auto sur l'image au centre */
+  function updateCenter() {
     const items = document.querySelectorAll(".visitor-item");
-    let centerX = window.innerWidth / 2;
+    const center = window.innerWidth / 2;
 
     items.forEach(item => {
       const rect = item.getBoundingClientRect();
-      const itemCenter = rect.left + rect.width / 2;
+      const centerItem = rect.left + rect.width / 2;
 
-      if (Math.abs(itemCenter - centerX) < 150) {
+      if (Math.abs(centerItem - center) < 180) {
         item.classList.add("active");
       } else {
         item.classList.remove("active");
@@ -136,9 +191,9 @@
     });
   }
 
-  updateCenterZoom();
-  list.addEventListener("scroll", updateCenterZoom);
-  window.addEventListener("resize", updateCenterZoom);
+  updateCenter();
+  list.addEventListener("scroll", updateCenter);
+  window.addEventListener("resize", updateCenter);
 </script>
 
 </body>
