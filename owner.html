@@ -2,33 +2,126 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Owner - Test Ajouter</title>
+  <title>Owner - Mes créations</title>
   <style>
-    body { font-family: sans-serif; padding: 20px; background: #fff0f5; }
-    .owner-box { margin-bottom: 20px; }
-    input, button { padding: 10px; margin: 5px; border-radius: 8px; border: 1px solid #ccc; }
-    button { background-color: #ffb6c1; cursor: pointer; }
-    #owner-list { display: flex; flex-wrap: wrap; gap: 10px; }
-    .owner-item { background: #fff; padding: 10px; border-radius: 10px; box-shadow: 0 0 5px #ccc; }
-    .owner-item img { max-width: 100px; border-radius: 8px; display: block; }
+    body {
+      font-family: 'Comic Sans MS', cursive, sans-serif;
+      background: #ffe6f0; /* rose pastel */
+      margin: 0;
+      padding: 20px;
+    }
+
+    h1 {
+      text-align: center;
+      color: #b84c6f; /* bordeaux léger */
+      margin-bottom: 20px;
+    }
+
+    .owner-box {
+      display: flex;
+      gap: 10px;
+      justify-content: center;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+
+    input[type="text"], input[type="file"] {
+      padding: 10px;
+      border-radius: 25px;
+      border: 1px solid #ccc;
+      outline: none;
+      font-size: 14px;
+      flex: 1;
+      min-width: 150px;
+    }
+
+    input[type="file"] {
+      padding: 6px 10px;
+    }
+
+    button {
+      padding: 10px 20px;
+      border: none;
+      border-radius: 25px;
+      background: #ffb6c1;
+      color: #fff;
+      cursor: pointer;
+      font-weight: bold;
+      transition: all 0.3s;
+    }
+
+    button:hover {
+      background: #ff66a3;
+    }
+
+    #owner-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 15px;
+      justify-content: center;
+    }
+
+    .owner-item {
+      position: relative;
+      background: #fff0f5;
+      padding: 10px;
+      border-radius: 15px;
+      box-shadow: 0 3px 8px rgba(184,76,111,0.2);
+      text-align: center;
+      max-width: 120px;
+    }
+
+    .owner-item img {
+      max-width: 100px;
+      border-radius: 10px;
+      display: block;
+      margin: 0 auto 5px auto;
+    }
+
+    .owner-item p {
+      color: #b84c6f;
+      font-size: 14px;
+      margin: 0;
+      word-break: break-word;
+    }
+
+    .delete-btn {
+      position: absolute;
+      top: -8px;
+      right: -8px;
+      background: #ff66a3;
+      color: #fff;
+      border: none;
+      border-radius: 50%;
+      width: 22px;
+      height: 22px;
+      cursor: pointer;
+      font-weight: bold;
+      font-size: 14px;
+      line-height: 18px;
+      text-align: center;
+      transition: all 0.3s;
+    }
+
+    .delete-btn:hover {
+      background: #b84c6f;
+    }
+
   </style>
 </head>
 <body>
 
-<h1>Ajouter une création</h1>
+<h1>Mes créations</h1>
 
 <div class="owner-box">
-  <input id="name" placeholder="Nom de la création">
+  <input id="name" type="text" placeholder="Nom de la création">
   <input id="photo" type="file" accept="image/*">
   <button id="add">Ajouter</button>
 </div>
 
-<h2>Liste des créations</h2>
 <div id="owner-list"></div>
 
-<!-- CDN Supabase + script owner.js -->
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="owner.js"></script>
+<script src="owner.js" type="module"></script>
 
 </body>
 </html>
