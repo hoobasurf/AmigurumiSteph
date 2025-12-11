@@ -6,7 +6,7 @@ const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZ
 
 // ⚠️ CORRECTION ICI
 const client = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-https://bkkxdsjvjtxijoaarozo.supabase.co
+
 // =======================
 // 2. Champs HTML
 // =======================
