@@ -7,63 +7,69 @@
   <style>
     body {
       font-family: 'Comic Sans MS', cursive, sans-serif;
-      background: #fff5f8;
+      background: linear-gradient(135deg, #ffe3ec, #fff7fa);
       margin: 0;
       padding: 0;
     }
 
     header {
-      background: #b84c6f;     /* bordeaux léger */
+      background: #b84c6f;
       color: white;
-      padding: 18px;
+      padding: 22px;
       text-align: center;
-      font-size: 22px;
-      border-bottom-left-radius: 25px;
-      border-bottom-right-radius: 25px;
-      box-shadow: 0 3px 6px rgba(0,0,0,0.1);
+      font-size: 24px;
+      border-bottom-left-radius: 30px;
+      border-bottom-right-radius: 30px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+      letter-spacing: 1px;
     }
 
     h2 {
       text-align: center;
       color: #b84c6f;
-      margin-top: 20px;
-      margin-bottom: 10px;
-      font-size: 20px;
+      margin-top: 25px;
+      margin-bottom: 15px;
+      font-size: 22px;
     }
 
     #visitor-list {
       display: flex;
       flex-wrap: wrap;
-      gap: 15px;
+      gap: 22px;
       justify-content: center;
-      padding: 20px;
+      padding: 20px 25px 40px;
     }
 
     .visitor-item {
-      background: white;
-      border-radius: 20px;
-      box-shadow: 0 4px 10px rgba(184,76,111,0.15);
-      padding: 12px;
-      width: 130px;
+      background: rgba(255,255,255,0.65);
+      backdrop-filter: blur(8px);
+      border-radius: 18px;
+      border: 2px solid rgba(184,76,111,0.3);
+      box-shadow: 0 4px 12px rgba(184,76,111,0.18);
+      padding: 15px;
+      width: 150px;
       text-align: center;
-      transition: transform 0.2s ease;
+      transition: transform 0.25s ease, box-shadow 0.25s ease;
     }
 
     .visitor-item:hover {
-      transform: scale(1.04);
+      transform: scale(1.07);
+      box-shadow: 0 6px 16px rgba(184,76,111,0.28);
     }
 
     .visitor-item img {
       width: 100%;
-      border-radius: 12px;
-      margin-bottom: 8px;
+      border-radius: 14px;
+      margin-bottom: 10px;
+      box-shadow: 0 3px 8px rgba(0,0,0,0.1);
     }
 
     .visitor-item p {
       color: #b84c6f;
-      font-size: 14px;
+      font-size: 15px;
       margin: 0;
       font-weight: bold;
+      text-shadow: 0 1px 1px rgba(255,255,255,0.6);
     }
   </style>
 
@@ -78,7 +84,30 @@
 
 <div id="visitor-list"></div>
 
-<script src="visitor.js"></script>
+<script>
+  const list = document.getElementById("visitor-list");
+
+  // Charger les créations depuis localStorage (même stockage que owner)
+  const creations = JSON.parse(localStorage.getItem("creations") || "[]");
+
+  function renderVisitor() {
+    list.innerHTML = "";
+
+    creations.forEach(item => {
+      const div = document.createElement("div");
+      div.className = "visitor-item";
+
+      div.innerHTML = `
+        <img src="${item.imgUrl}">
+        <p>${item.name}</p>
+      `;
+
+      list.appendChild(div);
+    });
+  }
+
+  renderVisitor();
+</script>
 
 </body>
 </html>
