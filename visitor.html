@@ -11,7 +11,7 @@
       padding: 0;
       overflow-x: hidden;
 
-      /* 🎨 Fond pelote pastel dessiné style enfant */
+      /* Fond pastel pelote */
       background: repeating-linear-gradient(
         45deg,
         #ffe9f1 0px,
@@ -37,17 +37,18 @@
       text-align: center;
       color: #b84c6f;
       margin-top: 25px;
-      margin-bottom: 15px;
+      margin-bottom: 5px;
       font-size: 22px;
     }
 
-    /* 🎠 Carrousel horizontal façon dock */
+    /* Carrousel horizontal */
     #visitor-list {
       display: flex;
-      gap: 25px;
+      gap: 40px;
       overflow-x: auto;
-      padding: 30px;
+      padding: 40px 20px;
       scroll-behavior: smooth;
+      align-items: center;
     }
 
     #visitor-list::-webkit-scrollbar {
@@ -58,44 +59,43 @@
       border-radius: 20px;
     }
 
-    /* 🌸 Pastille photo */
+    /* Élément d’image */
     .visitor-item {
       flex: 0 0 auto;
+      transition: transform 0.3s ease;
       text-align: center;
-      transition: transform 0.25s ease;
     }
 
     .visitor-item img {
-      width: 130px;
-      height: 130px;
-      object-fit: cover;
-      border-radius: 20px;
-      box-shadow: 0 4px 10px rgba(184,76,111,0.25);
-      transition: transform 0.25s ease, box-shadow 0.25s ease;
+      width: 260px;
+      height: 260px;
+      object-fit: contain; /* Aucune coupe */
+      background: white;   /* adoucit l’espace vide */
+      border-radius: 30px;
+      padding: 10px;
+      box-shadow: 0 4px 12px rgba(184,76,111,0.25);
+      transition: transform 0.35s ease, box-shadow 0.35s ease;
     }
 
-    /* Effet Dock : zoom quand on survole */
-    .visitor-item:hover img {
-      transform: scale(1.25);
-      box-shadow: 0 6px 16px rgba(184,76,111,0.35);
-    }
-
+    /* Nom */
     .visitor-item p {
-      margin-top: 10px;
+      margin-top: 12px;
       color: #b84c6f;
-      font-size: 16px;
+      font-size: 18px;
       font-weight: bold;
-      text-shadow: 0 1px 1px rgba(255,255,255,0.7);
+    }
+
+    /* Zoom automatique sur l’image centrée */
+    .active img {
+      transform: scale(1.25);
+      box-shadow: 0 8px 20px rgba(184,76,111,0.35);
     }
   </style>
 
 </head>
 <body>
 
-<header>
-  Galerie des créations
-</header>
-
+<header>Galerie des créations</header>
 <h2>Vos créations</h2>
 
 <div id="visitor-list"></div>
@@ -106,21 +106,39 @@
 
   function renderVisitor() {
     list.innerHTML = "";
-
     creations.forEach(item => {
       const div = document.createElement("div");
       div.className = "visitor-item";
-
       div.innerHTML = `
         <img src="${item.imgUrl}">
         <p>${item.name}</p>
       `;
-
       list.appendChild(div);
     });
   }
 
   renderVisitor();
+
+  /* 🎯 Effet dock : zoom automatique de l’image au centre */
+  function updateCenterZoom() {
+    const items = document.querySelectorAll(".visitor-item");
+    let centerX = window.innerWidth / 2;
+
+    items.forEach(item => {
+      const rect = item.getBoundingClientRect();
+      const itemCenter = rect.left + rect.width / 2;
+
+      if (Math.abs(itemCenter - centerX) < 150) {
+        item.classList.add("active");
+      } else {
+        item.classList.remove("active");
+      }
+    });
+  }
+
+  updateCenterZoom();
+  list.addEventListener("scroll", updateCenterZoom);
+  window.addEventListener("resize", updateCenterZoom);
 </script>
 
 </body>
