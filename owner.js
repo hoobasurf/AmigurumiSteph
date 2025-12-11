@@ -43,10 +43,21 @@ async function uploadToSupabase(name, file) {
     .from("creations")
     .getPublicUrl(filePath);
 
-  if (urlError) {
-    console.error("❌ Erreur génération URL publique :", urlError.message);
-    return null;
-  }
+  if (error) {
+  alert("❌ Erreur upload Supabase : " + JSON.stringify(error));
+
+  // Affichage sur la page (sans console)
+  const errorBox = document.createElement("div");
+  errorBox.style.background = "#ffdddd";
+  errorBox.style.border = "1px solid red";
+  errorBox.style.color = "black";
+  errorBox.style.padding = "10px";
+  errorBox.style.margin = "10px 0";
+  errorBox.innerText = "Erreur Supabase : " + JSON.stringify(error, null, 2);
+  document.body.appendChild(errorBox);
+
+  return null;
+}
 
   return publicUrl;
 }
