@@ -14,43 +14,43 @@
   h1 {
     text-align: center;
     color: #b84c6f; /* bordeaux léger */
-    margin-bottom: 30px;
+    margin-bottom: 20px;
   }
 
   #gallery {
     display: flex;
     flex-wrap: wrap;
     justify-content: center;
-    gap: 20px;
+    gap: 15px;
   }
 
   .item {
+    position: relative;
     background: #fff0f5;
+    padding: 10px;
     border-radius: 15px;
-    padding: 15px;
+    box-shadow: 0 3px 8px rgba(184,76,111,0.2);
     text-align: center;
-    box-shadow: 0 4px 12px rgba(184,76,111,0.2);
-    transition: transform 0.3s;
-    flex: 0 0 150px;
+    max-width: 120px;
+    transition: transform 0.2s;
+  }
+
+  .item:hover {
+    transform: scale(1.05);
   }
 
   .item img {
-    max-width: 100%;
-    border-radius: 12px;
+    max-width: 100px;
+    border-radius: 10px;
     display: block;
-    margin: 0 auto 10px;
-    transition: transform 0.3s;
-  }
-
-  .item img:hover {
-    transform: scale(1.05); /* léger zoom au survol */
+    margin: 0 auto 5px auto;
   }
 
   .item p {
     color: #b84c6f;
-    font-weight: bold;
-    margin: 0;
     font-size: 14px;
+    margin: 0;
+    word-break: break-word;
   }
 
   /* Console mobile debug */
@@ -72,7 +72,7 @@
 </head>
 <body>
 
-<h1>Galerie Amigurumi</h1>
+<h1>Les créations</h1>
 
 <div id="gallery"></div>
 <div id="mobileConsole"></div>
