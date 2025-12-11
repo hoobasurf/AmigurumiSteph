@@ -4,7 +4,8 @@
 const SUPABASE_URL = "https://bkkxdsjvjtxijoaarozo.supabase.co";
 const SUPABASE_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJra3hkc2p2anR4aWpvYWFyb3pvIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mzg5MDQ3NDYsImV4cCI6MjA1NDQ4MDc0Nn0.bgPgL82VCPKsJBfqt-F8AdmcuxIV3qsPp3KFUvkgwzg";
 
-const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+// ⚠️ CORRECTION ICI
+const client = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
 // =======================
 // 2. Champs HTML
@@ -22,7 +23,7 @@ async function uploadToSupabase(name, file) {
 
   console.log("📤 Upload vers Supabase :", filePath);
 
-  const { data, error } = await supabase
+  const { data, error } = await client   // ⚠️ CORRECTION
     .storage
     .from("creations")
     .upload(filePath, file, {
