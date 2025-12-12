@@ -6,7 +6,7 @@ const list = document.getElementById('owner-list');
 // On charge ce qui existe déjà
 let creations = JSON.parse(localStorage.getItem("creations") || "[]");
 
-// 🔥 Augmenter la taille possible du localStorage (compression)
+// Compression pour stocker plus d’images
 function compressImage(file, maxWidth = 900, quality = 0.8) {
   return new Promise((resolve) => {
     const reader = new FileReader();
@@ -29,8 +29,7 @@ function compressImage(file, maxWidth = 900, quality = 0.8) {
         const ctx = canvas.getContext("2d");
         ctx.drawImage(img, 0, 0, w, h);
 
-        const compressed = canvas.toDataURL("image/jpeg", quality);
-        resolve(compressed);
+        resolve(canvas.toDataURL("image/jpeg", quality));
       };
       img.src = e.target.result;
     };
@@ -48,13 +47,81 @@ function renderCreations() {
     div.className = "owner-item";
 
     div.innerHTML = `
-      <button class="delete-btn" data-index="${index}">&times;</button>
+      <div class="delete-btn" data-index="${index}">×</div>
       <img src="${item.imgUrl}" alt="">
       <p>${item.name}</p>
     `;
 
     list.appendChild(div);
   });
+}
+
+
+// --------- SUPPRESSION (fenêtre rose pastel) ----------
+function showDeletePopup(index) {
+  const overlay = document.createElement("div");
+  overlay.style = `
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.15);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 99999;
+  `;
+
+  const box = document.createElement("div");
+  box.style = `
+    background: #ffe4ec;
+    border: 3px solid #b84c6f;
+    padding: 20px;
+    border-radius: 15px;
+    width: 260px;
+    text-align: center;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+  `;
+
+  box.innerHTML = `
+    <p style="color:#b84c6f; font-weight:600; font-size:16px; margin-bottom:15px;">
+      Supprimer cette création ?
+    </p>
+
+    <div style="display:flex; gap:10px; justify-content:center;">
+      <button id="delYes" style="
+        padding: 8px 14px;
+        border-radius: 10px;
+        border: none;
+        background: #ffb6c1;
+        color: #8b3a3a;
+        font-weight: bold;
+        cursor: pointer;">
+        Oui
+      </button>
+
+      <button id="delNo" style="
+        padding: 8px 14px;
+        border-radius: 10px;
+        border: none;
+        background: #ddd;
+        cursor: pointer;">
+        Non
+      </button>
+    </div>
+  `;
+
+  overlay.appendChild(box);
+  document.body.appendChild(overlay);
+
+  // OK suppression
+  box.querySelector("#delYes").onclick = () => {
+    creations.splice(index, 1);
+    localStorage.setItem("creations", JSON.stringify(creations));
+    renderCreations();
+    overlay.remove();
+  };
+
+  // Annuler
+  box.querySelector("#delNo").onclick = () => overlay.remove();
 }
 
 
@@ -68,13 +135,10 @@ addBtn.onclick = async () => {
     return;
   }
 
-  // 🔥 compression pour stocker beaucoup plus (100+ images)
-  const imgUrl = await compressImage(file, 900, 0.7);
-
+  const imgUrl = await compressImage(file);
   creations.unshift({ name, imgUrl });
 
   localStorage.setItem("creations", JSON.stringify(creations));
-
   renderCreations();
 
   nameInput.value = "";
@@ -82,19 +146,14 @@ addBtn.onclick = async () => {
 };
 
 
-// --------- SUPPRESSION ----------
-list.addEventListener("click", (event) => {
-  if (event.target.classList.contains("delete-btn")) {
-    const index = event.target.dataset.index;
-
-    if (confirm("Supprimer cette création ?")) {
-      creations.splice(index, 1);
-      localStorage.setItem("creations", JSON.stringify(creations));
-      renderCreations();
-    }
+// --------- CLIC SUR LA CROIX ----------
+list.addEventListener("click", (e) => {
+  if (e.target.classList.contains("delete-btn")) {
+    const index = e.target.dataset.index;
+    showDeletePopup(index);
   }
 });
 
 
-// --------- INITIALISATION ----------
+// INIT
 renderCreations();
