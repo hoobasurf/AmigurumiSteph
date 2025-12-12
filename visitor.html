@@ -37,8 +37,8 @@
     }
 
     header img {
-      width: 60px;
-      height: 60px;
+      width: 98px;  /* Logo agrandi */
+      height: 98px; /* Logo agrandi */
       display: block;
       margin: 0 auto 12px;
     }
@@ -66,9 +66,7 @@
       opacity: 0.85;
     }
 
-    /* =========================
-       VIEW SELECTOR
-       ========================= */
+    /* VIEW SELECTOR */
     #viewSelector {
       display: flex;
       justify-content: center;
@@ -96,9 +94,7 @@
 
     #viewSelector button:hover { transform: translateY(-2px); }
 
-    /* =========================
-       CENTER ZONE & LIST STYLES
-       ========================= */
+    /* CENTER ZONE & LIST STYLES */
     .center-zone {
       flex: 1;
       display: flex;
@@ -221,6 +217,7 @@
       .carousel-view .visitor-item img { width:200px; height:200px; }
       .modal-main-img { max-height:360px; }
       .thumbs img { width:88px; height:88px; }
+      header img { width:80px; height:80px; } /* logo responsive */
     }
   </style>
 </head>
@@ -232,19 +229,16 @@
   <div class="title-thread" aria-hidden="true"></div>
 </header>
 
-<!-- VIEW SELECTOR -->
 <div id="viewSelector" aria-hidden="false">
   <button id="btnCarousel">Carrousel</button>
   <button id="btnGrid">Grille</button>
   <button id="btnList">Liste</button>
 </div>
 
-<!-- CENTER ZONE -->
 <div class="center-zone">
   <div id="visitor-list" role="list"></div>
 </div>
 
-<!-- MODAL -->
 <div class="modal-bg click-close" id="modal" onclick="backgroundClose(event)">
   <div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="modalTitle" onclick="event.stopPropagation()">
     <div class="close-modal" onclick="closeModal()">×</div>
@@ -264,7 +258,6 @@
   </div>
 </div>
 
-<!-- COMMENT FORM -->
 <div class="comment-form-bg" id="commentFormBg" onclick="closeCommentForm(event)">
   <div class="comment-form" onclick="event.stopPropagation()">
     <h3 style="margin-top:0;color:#b84c6f">Laisser un commentaire</h3>
@@ -275,7 +268,6 @@
 </div>
 
 <script>
-  // Le script JS complet pour carrousel, modal, like, commentaires
   const list = document.getElementById('visitor-list');
   const modal = document.getElementById('modal');
   const modalMain = document.getElementById('modalMain');
@@ -283,7 +275,6 @@
   const likeName = document.getElementById('likeName');
   const commentCount = document.getElementById('commentCount');
   const commentsList = document.getElementById('commentsList');
-
   const commentFormBg = document.getElementById('commentFormBg');
   const commentName = document.getElementById('commentName');
   const commentText = document.getElementById('commentText');
@@ -307,7 +298,6 @@
     if(currentView==='carousel') list.className='carousel-view';
     if(currentView==='grid') list.className='grid-view';
     if(currentView==='list') list.className='list-view';
-
     creations.forEach((item,i)=>{
       const div=document.createElement('div');
       div.className='visitor-item';
@@ -318,13 +308,11 @@
     });
     updateCenter();
   }
-
   renderVisitor();
 
   const btnCarousel = document.getElementById('btnCarousel');
   const btnGrid = document.getElementById('btnGrid');
   const btnList = document.getElementById('btnList');
-
   function setView(mode){
     currentView=mode;
     btnCarousel.classList.toggle('active',mode==='carousel');
@@ -338,81 +326,27 @@
   setView(currentView);
 
   function updateCenter(){
-    if(currentView!=='carousel'){
-      document.querySelectorAll('.visitor-item').forEach(it=>it.classList.remove('active'));
-      return;
-    }
+    if(currentView!=='carousel'){document.querySelectorAll('.visitor-item').forEach(it=>it.classList.remove('active')); return;}
     const items=document.querySelectorAll('.visitor-item');
     const center=window.innerWidth/2;
     items.forEach(item=>{
       const rect=item.getBoundingClientRect();
       const itemCenter=rect.left+rect.width/2;
-      if(Math.abs(itemCenter-center)<170) item.classList.add('active');
-      else item.classList.remove('active');
+      if(Math.abs(itemCenter-center)<170) item.classList.add('active'); else item.classList.remove('active');
     });
   }
   list.addEventListener('scroll',updateCenter);
   window.addEventListener('resize',updateCenter);
 
-  function openModal(i){
-    currentIndex=i;
-    const proj=creations[i];
-    modalMain.src=proj.imgUrl;
-    likeName.textContent=proj.name||'';
-    loadLike();
-    loadComments();
-    thumbs.innerHTML='';
-    if(Array.isArray(proj.images)&&proj.images.length>0){
-      proj.images.forEach(src=>{
-        const t=document.createElement('img');
-        t.src=src;
-        t.alt='miniature';
-        t.addEventListener('click',()=>{ modalMain.src=src; });
-        thumbs.appendChild(t);
-      });
-    }
-    modal.style.display='flex';
-  }
-
+  function openModal(i){ currentIndex=i; const proj=creations[i]; modalMain.src=proj.imgUrl; likeName.textContent=proj.name||''; loadLike(); loadComments(); thumbs.innerHTML=''; if(Array.isArray(proj.images)&&proj.images.length>0){proj.images.forEach(src=>{const t=document.createElement('img'); t.src=src; t.alt='miniature'; t.addEventListener('click',()=>{ modalMain.src=src; }); thumbs.appendChild(t);});} modal.style.display='flex';}
   function closeModal(){ modal.style.display='none'; renderVisitor(); }
   function backgroundClose(e){ if(e.target===modal) closeModal(); }
-
-  function toggleLike(){
-    if(currentIndex===null) return;
-    const key='like_'+currentIndex;
-    const cur=localStorage.getItem(key)==='1';
-    localStorage.setItem(key,cur?'0':'1');
-    loadLike();
-  }
-  function loadLike(){
-    if(currentIndex===null) return;
-    const key='like_'+currentIndex;
-    const liked=localStorage.getItem(key)==='1';
-    const heart=document.getElementById('heart');
-    if(liked){ heart.classList.add('liked'); heart.textContent='❤️'; }
-    else{ heart.classList.remove('liked'); heart.textContent='♡'; }
-  }
-
-  function loadComments(){
-    if(currentIndex===null) return;
-    const key='comments_'+currentIndex;
-    const comments=JSON.parse(localStorage.getItem(key)||'[]');
-    commentCount.textContent=comments.length||0;
-    commentsList.innerHTML=comments.map(c=>`<div class="comment"><strong>${escapeHtml(c.name)}</strong><br>${escapeHtml(c.text)}</div>`).join('');
-  }
+  function toggleLike(){ if(currentIndex===null) return; const key='like_'+currentIndex; const cur=localStorage.getItem(key)==='1'; localStorage.setItem(key,cur?'0':'1'); loadLike();}
+  function loadLike(){ if(currentIndex===null) return; const key='like_'+currentIndex; const liked=localStorage.getItem(key)==='1'; const heart=document.getElementById('heart'); if(liked){ heart.classList.add('liked'); heart.textContent='❤️'; } else{ heart.classList.remove('liked'); heart.textContent='♡'; } }
+  function loadComments(){ if(currentIndex===null) return; const key='comments_'+currentIndex; const comments=JSON.parse(localStorage.getItem(key)||'[]'); commentCount.textContent=comments.length||0; commentsList.innerHTML=comments.map(c=>`<div class="comment"><strong>${escapeHtml(c.name)}</strong><br>${escapeHtml(c.text)}</div>`).join('');}
   function openCommentForm(){ commentFormBg.style.display='flex'; }
   function closeCommentForm(e){ if(e&&e.target===commentFormBg) commentFormBg.style.display='none'; }
-  function submitComment(){
-    const name=(commentName.value||'').trim();
-    const text=(commentText.value||'').trim();
-    if(!name||!text) return;
-    const key='comments_'+currentIndex;
-    const comments=JSON.parse(localStorage.getItem(key)||'[]');
-    comments.push({name,text,at:Date.now()});
-    localStorage.setItem(key,JSON.stringify(comments));
-    commentName.value=''; commentText.value=''; commentFormBg.style.display='none';
-    loadComments();
-  }
+  function submitComment(){ const name=(commentName.value||'').trim(); const text=(commentText.value||'').trim(); if(!name||!text) return; const key='comments_'+currentIndex; const comments=JSON.parse(localStorage.getItem(key)||'[]'); comments.push({name,text,at:Date.now()}); localStorage.setItem(key,JSON.stringify(comments)); commentName.value=''; commentText.value=''; commentFormBg.style.display='none'; loadComments();}
   function scrollToComments(){ if(!commentsList) return; commentsList.scrollIntoView({behavior:'smooth',block:'start'}); }
 
   document.addEventListener('keydown',(e)=>{
