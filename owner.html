@@ -82,11 +82,22 @@
   font-weight: bold;
 }
 
-/* Classe pour sidebar ouverte */
+/* Cache toutes les sections par défaut */
+.section.hidden {
+  display: none;
+}
+
+/* Sidebar fermée */
+.sidebar-closed {
+  left: -200px;
+}
+
+/* Sidebar ouverte */
 .sidebar-open {
   left: 0;
+  transition: left 0.3s;
 }
-  
+    
   </style>
 </head>
 <body>
@@ -164,12 +175,21 @@
 
 <!-- JS pour la sidebar coulissante -->
 <script>
+// Sidebar coulissante
 const sidebar = document.getElementById('sidebar');
 const toggle = document.getElementById('toggleSidebar');
 
 toggle.onclick = () => {
   sidebar.classList.toggle('sidebar-open');
-};
+  sidebar.classList.toggle('sidebar-closed');
+}
+
+// Fonction pour afficher uniquement la section demandée
+function showSection(id) {
+  document.querySelectorAll('.section').forEach(s => s.classList.add('hidden'));
+  const section = document.getElementById(id);
+  if(section) section.classList.remove('hidden');
+}
 </script>
 
 <!-- JS existant pour les créations -->
