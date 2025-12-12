@@ -1,5 +1,6 @@
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
 
+// ⚡ Remplace par tes infos Supabase
 const supabaseUrl = 'VOTRE_SUPABASE_URL';
 const supabaseKey = 'VOTRE_SUPABASE_ANON_KEY';
 const supabase = createClient(supabaseUrl, supabaseKey);
@@ -16,10 +17,10 @@ const addVideoBtn = document.getElementById('addVideo');
 const videoList = document.getElementById('video-list');
 
 addVideoBtn.onclick = async () => {
-  const url = document.getElementById('video-url').value;
-  const title = document.getElementById('video-title').value;
-  const transcription = document.getElementById('video-transcription').value;
-  const progress = document.getElementById('video-progress').value;
+  const url = document.getElementById('video-url').value.trim();
+  const title = document.getElementById('video-title').value.trim();
+  const transcription = document.getElementById('video-transcription').value.trim();
+  const progress = document.getElementById('video-progress').value.trim();
   if(!url) return alert("URL obligatoire");
 
   await supabase.from('videos').insert([{ url, title, transcription, progress }]);
@@ -77,9 +78,9 @@ const peloteList = document.getElementById('pelote-list');
 
 addPeloteBtn.onclick = async () => {
   const file = document.getElementById('pelote-photo').files[0];
-  const name = document.getElementById('pelote-name').value;
-  const marque = document.getElementById('pelote-marque').value;
-  const ref = document.getElementById('pelote-ref').value;
+  const name = document.getElementById('pelote-name').value.trim();
+  const marque = document.getElementById('pelote-marque').value.trim();
+  const ref = document.getElementById('pelote-ref').value.trim();
   const qty = parseInt(document.getElementById('pelote-qty').value)||0;
   if(!file || !name) return alert('Nom et photo obligatoires');
 
@@ -126,8 +127,8 @@ const noteList = document.getElementById('note-list');
 
 addNoteBtn.onclick = async () => {
   const file = document.getElementById('note-photo').files[0];
-  const title = document.getElementById('note-title').value;
-  const content = document.getElementById('note-content').value;
+  const title = document.getElementById('note-title').value.trim();
+  const content = document.getElementById('note-content').value.trim();
   if(!title) return alert('Titre obligatoire');
 
   let photoUrl = null;
