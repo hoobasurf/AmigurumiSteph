@@ -4,21 +4,22 @@
   <meta charset="UTF-8">
   <title>Owner - Test Ajouter</title>
   <style>
-    body { font-family: sans-serif; padding: 20px; background: #fff0f5; margin: 0; }
+    body { font-family: sans-serif; padding: 0; margin: 0; background: #fff0f5; }
+
+    /* Contenu principal */
+    #main-content { 
+      transition: margin-left 0.3s; 
+      padding: 20px; 
+      margin-left: 0; 
+    }
+
+    /* Créations */
     .owner-box { margin-bottom: 20px; }
     input, button { padding: 10px; margin: 5px; border-radius: 8px; border: 1px solid #ccc; }
     button { background-color: #ffb6c1; cursor: pointer; }
     #owner-list { display: flex; flex-wrap: wrap; gap: 10px; }
-    .owner-item { background: #fff; padding: 10px; border-radius: 10px; box-shadow: 0 0 5px #ccc; position: relative; }
+    .owner-item { background: #ffe6f0; border: 2px solid #b67385; padding: 10px; border-radius: 15px; box-shadow: 0 4px 10px rgba(182, 115, 133, 0.15); position: relative; }
     .owner-item img { max-width: 100px; border-radius: 8px; display: block; }
-
-    .owner-item {
-      background: #ffe6f0;
-      border: 2px solid #b67385;
-      padding: 10px;
-      border-radius: 15px;
-      box-shadow: 0 4px 10px rgba(182, 115, 133, 0.15);
-    }
 
     /* Petite croix */
     .delete-btn {
@@ -39,15 +40,6 @@
       font-size: 14px;
     }
 
-    #main-content {
-  margin-left: 0;
-  transition: margin-left 0.3s;
-}
-
-#sidebar.sidebar-open + #main-content {
-  margin-left: 200px; /* largeur de la sidebar */
-}
-
     /* Sidebar */
     #sidebar {
       position: fixed;
@@ -62,7 +54,7 @@
       gap: 10px;
       box-shadow: 2px 0 5px rgba(0,0,0,0.1);
       transition: left 0.3s;
-      z-index: 9999;
+      z-index: 1000;
     }
 
     #sidebar button {
@@ -75,7 +67,9 @@
       font-weight: bold;
     }
 
-    /* Encoche toujours visible */
+    #sidebar.sidebar-open { left: 0; }
+
+    /* Encoche */
     #toggleSidebar {
       position: fixed;
       top: 50%;
@@ -90,19 +84,19 @@
       border-radius: 0 10px 10px 0;
       cursor: pointer;
       font-weight: bold;
-      z-index: 10000;
+      z-index: 1100;
     }
 
     /* Toutes les sections cachées par défaut */
     .section { display: none; }
 
-    /* Conteneur principal */
-    #main-content { margin-left: 0; transition: margin-left 0.3s; }
+    /* Inputs et textareas larges */
+    .section input, .section textarea { width: 100%; box-sizing: border-box; margin-bottom: 10px; }
   </style>
 </head>
 <body>
 
-<!-- Encoche toujours visible -->
+<!-- Encoche -->
 <div id="toggleSidebar">☰</div>
 
 <!-- Sidebar -->
@@ -126,7 +120,7 @@
   <h2>Liste des créations</h2>
   <div id="owner-list"></div>
 
-  <!-- ================= NOUVELLES SECTIONS ================= -->
+  <!-- Sections supplémentaires -->
   <div class="section" id="videos">
     <h1>Vidéos / Tutoriels</h1>
     <input id="video-url" placeholder="URL YouTube">
@@ -174,32 +168,24 @@
   </div>
 </div>
 
-<!-- JS sidebar et sections -->
-<script>
-const sidebar = document.getElementById('sidebar');
-const toggle = document.getElementById('toggleSidebar');
-const mainContent = document.getElementById('main-content');
-
-toggle.onclick = () => {
-  sidebar.classList.toggle('sidebar-open');
-
-  // Décaler le contenu principal
-  if(sidebar.classList.contains('sidebar-open')) {
-    mainContent.style.marginLeft = '200px';
-  } else {
-    mainContent.style.marginLeft = '0';
-  }
-}
-
-function showSection(id) {
-  document.querySelectorAll('.section').forEach(s => s.style.display = 'none');
-  const section = document.getElementById(id);
-  if(section) section.style.display = 'block';
-}
-</script>
-
-<!-- JS existant pour les créations -->
+<!-- JS -->
 <script type="module" src="owner.js"></script>
+<script>
+  const sidebar = document.getElementById('sidebar');
+  const toggle = document.getElementById('toggleSidebar');
+  const mainContent = document.getElementById('main-content');
+
+  toggle.onclick = () => {
+    sidebar.classList.toggle('sidebar-open');
+    mainContent.style.marginLeft = sidebar.classList.contains('sidebar-open') ? '200px' : '0';
+  }
+
+  function showSection(id) {
+    document.querySelectorAll('.section').forEach(s => s.style.display = 'none');
+    const section = document.getElementById(id);
+    if(section) section.style.display = 'block';
+  }
+</script>
 
 </body>
 </html>
