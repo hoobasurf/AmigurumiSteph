@@ -22,6 +22,7 @@
       display: flex;
       flex-direction: column;
       gap: 12px;
+      box-sizing: border-box;
     }
 
     .owner-box input[type="text"] {
@@ -30,6 +31,7 @@
       border-radius: 10px;
       border: 1px solid #b67385;  /* bordeaux pastel */
       font-size:16px;
+      box-sizing: border-box;
     }
 
     .owner-box input[type="file"] {
@@ -65,9 +67,10 @@
       position:relative;
       width:140px;
       text-align:center;
+      box-sizing: border-box;
     }
     .owner-item img { width:100px; height:100px; object-fit:cover; border-radius:10px; margin-bottom:6px; }
-    .owner-name { margin-top:5px; font-size:14px; color:#8b3a3a; font-weight:bold; }
+    .owner-name { margin-top:5px; font-size:14px; color:#8b3a3a; font-weight:bold; word-wrap: break-word; }
     .delete-btn {
       position:absolute; top:5px; right:5px;
       background:rgba(255,192,203,0.85); border:1px solid #8b3a3a;
@@ -109,21 +112,22 @@
       box-shadow:2px 2px 6px rgba(0,0,0,0.2);
     }
 
-    .sidebar-open { left:0 !important; }
+    /* SECTIONS */
+    .section { display:none; padding:20px; max-width:700px; margin:0 auto; }
+    .section.active { display:block; }
+    .section button.back { margin-bottom:20px; background:#ffb6c1; color:#8b3a3a; border:none; padding:10px 15px; border-radius:10px; cursor:pointer; font-weight:bold; box-shadow:0 4px 8px rgba(182,115,133,0.3); }
 
-    /* SECTIONS CACHÉES */
-    .section.hidden { display:none; }
   </style>
 </head>
 <body>
 
 <!-- SIDEBAR -->
 <div id="sidebar">
-  <button onclick="showSection('videos')">Vidéos / Tutoriels</button>
-  <button onclick="showSection('mailles')">Compteur de mailles</button>
-  <button onclick="showSection('pelotes')">Pelotes & Couleurs</button>
-  <button onclick="showSection('notes')">Notes / Inspirations</button>
-  <button onclick="showSection('settings')">Paramètres / Sauvegarde</button>
+  <button onclick="openSection('videos')">Vidéos / Tutoriels</button>
+  <button onclick="openSection('mailles')">Compteur de mailles</button>
+  <button onclick="openSection('pelotes')">Pelotes & Couleurs</button>
+  <button onclick="openSection('notes')">Notes / Inspirations</button>
+  <button onclick="openSection('settings')">Paramètres / Sauvegarde</button>
 </div>
 <div id="toggleSidebar">☰</div>
 
@@ -149,57 +153,79 @@
 </div>
 
 <!-- SECTIONS -->
-<div class="section hidden" id="videos"><h2>Vidéos</h2></div>
-<div class="section hidden" id="mailles"><h2>Mailles</h2></div>
-<div class="section hidden" id="pelotes"><h2>Pelotes</h2></div>
-<div class="section hidden" id="notes"><h2>Notes</h2></div>
-<div class="section hidden" id="settings"><h2>Paramètres</h2></div>
+<div class="section" id="videos">
+  <button class="back" onclick="closeSection()">← Mes Créations</button>
+  <h2>Vidéos / Tutoriels</h2>
+</div>
+<div class="section" id="mailles">
+  <button class="back" onclick="closeSection()">← Mes Créations</button>
+  <h2>Compteur de mailles</h2>
+</div>
+<div class="section" id="pelotes">
+  <button class="back" onclick="closeSection()">← Mes Créations</button>
+  <h2>Pelotes & Couleurs</h2>
+</div>
+<div class="section" id="notes">
+  <button class="back" onclick="closeSection()">← Mes Créations</button>
+  <h2>Notes / Inspirations</h2>
+</div>
+<div class="section" id="settings">
+  <button class="back" onclick="closeSection()">← Mes Créations</button>
+  <h2>Paramètres / Sauvegarde</h2>
+</div>
 
 <!-- JS -->
 <script type="module" src="owner.js"></script>
 <script>
-/* SIDEBAR */
-const sidebar = document.getElementById("sidebar");
-const toggle = document.getElementById("toggleSidebar");
-toggle.onclick = () => sidebar.classList.toggle("sidebar-open");
+  // SIDEBAR
+  const sidebar = document.getElementById("sidebar");
+  const toggle = document.getElementById("toggleSidebar");
+  toggle.onclick = ()=> sidebar.classList.toggle("sidebar-open");
 
-/* SECTIONS */
-function showSection(id){
-  document.querySelectorAll(".section").forEach(s=>s.classList.add("hidden"));
-  document.getElementById(id).classList.remove("hidden");
-}
+  // MODES AFFICHAGE
+  function setMode(mode){
+    const list = document.getElementById("owner-list");
+    list.className = mode;
+  }
 
-/* MODES AFFICHAGE */
-function setMode(mode){
-  const list = document.getElementById("owner-list");
-  list.className = mode;
-}
+  // AJOUT CREATIONS
+  const ownerList = document.getElementById("owner-list");
+  document.getElementById("add").onclick = ()=>{
+    const name = document.getElementById("name").value.trim();
+    const file = document.getElementById("photo").files[0];
+    if(!name||!file) return;
+    const imgUrl = URL.createObjectURL(file);
 
-/* AJOUT CREATIONS */
-const ownerList = document.getElementById("owner-list");
-document.getElementById("add").onclick = async ()=>{
-  const name = document.getElementById("name").value.trim();
-  const file = document.getElementById("photo").files[0];
-  if(!name||!file) return;
+    const div = document.createElement("div");
+    div.className = "owner-item";
 
-  const imgUrl = URL.createObjectURL(file);
+    const img = document.createElement("img"); img.src = imgUrl; div.appendChild(img);
 
-  const div = document.createElement("div");
-  div.className = "owner-item";
+    const nameEl = document.createElement("div");
+    nameEl.className="owner-name"; nameEl.textContent=name; div.appendChild(nameEl);
 
-  const img = document.createElement("img"); img.src = imgUrl; div.appendChild(img);
+    const del = document.createElement("div"); del.className="delete-btn"; del.textContent="×";
+    del.onclick=()=>div.remove(); div.appendChild(del);
 
-  const nameEl = document.createElement("div");
-  nameEl.className="owner-name"; nameEl.textContent=name; div.appendChild(nameEl);
+    ownerList.appendChild(div);
 
-  const del = document.createElement("div"); del.className="delete-btn"; del.textContent="×";
-  del.onclick=()=>div.remove(); div.appendChild(del);
+    document.getElementById("name").value="";
+    document.getElementById("photo").value="";
+  };
 
-  ownerList.appendChild(div);
+  // OUVRIR SECTION
+  function openSection(id){
+    document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+    document.querySelectorAll('.owner-box, #owner-list').forEach(e=>e.style.display='none');
+    document.getElementById(id).classList.add('active');
+  }
 
-  document.getElementById("name").value="";
-  document.getElementById("photo").value="";
-};
+  // FERMER SECTION
+  function closeSection(){
+    document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+    document.querySelectorAll('.owner-box, #owner-list').forEach(e=>e.style.display='flex');
+    ownerList.style.display='flex';
+  }
 </script>
 </body>
 </html>
