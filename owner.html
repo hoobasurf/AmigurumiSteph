@@ -19,7 +19,7 @@
       font-size: 36px;
       font-weight: 700;
       color: #8b3a3a;        
-      margin-bottom: 40px;
+      margin-bottom: 20px;
     }
 
     /* Ajouter une création */
@@ -70,29 +70,15 @@
       box-shadow: 0 6px 16px rgba(182, 115, 133, 0.35);
     }
 
-<div id="view-switcher" style="text-align:center; margin-bottom:20px;">
-  <label>Afficher en :</label>
-  <select id="viewMode">
-    <option value="carousel">Carrousel</option>
-    <option value="grid">Grille</option>
-    <option value="list">Liste</option>
-  </select>
-</div>
-    
+    /* Switcher mode */
+    #view-switcher { text-align: center; margin-bottom: 20px; }
+    #view-switcher select { padding: 6px 10px; border-radius: 8px; border: 2px solid #b67385; }
+
     /* Liste des créations */
-    #owner-list {
-      display: flex;
-      flex-wrap: nowrap;
-      overflow-x: auto;
-      gap: 10px;
-      padding-bottom: 10px;
-      margin-top: 20px;
-    }
+    #owner-list { gap: 10px; padding-bottom: 10px; margin-top: 20px; }
     #owner-list::-webkit-scrollbar { height: 8px; }
-    #owner-list::-webkit-scrollbar-thumb {
-      background-color: #b67385;
-      border-radius: 4px;
-    }
+    #owner-list::-webkit-scrollbar-thumb { background-color: #b67385; border-radius: 4px; }
+
     .owner-item { 
       background: #ffe6f0; 
       border: 2px solid #b67385; 
@@ -100,6 +86,7 @@
       border-radius: 15px; 
       box-shadow: 0 4px 10px rgba(182, 115, 133, 0.15); 
       position: relative; 
+      min-width: 120px;
     }
     .owner-item img { max-width: 100px; border-radius: 8px; display: block; }
     .delete-btn {
@@ -120,26 +107,11 @@
       font-size: 14px;
     }
 
-/* Modes d'affichage des créations */
-#owner-list.carousel {
-  display: flex;
-  flex-wrap: nowrap;
-  overflow-x: auto;
-  gap: 10px;
-}
+    /* Modes d'affichage */
+    #owner-list.carousel { display: flex; flex-wrap: nowrap; overflow-x: auto; }
+    #owner-list.grid { display: grid; grid-template-columns: repeat(auto-fill,minmax(150px,1fr)); }
+    #owner-list.list { display: flex; flex-direction: column; }
 
-#owner-list.grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-  gap: 15px;
-}
-
-#owner-list.list {
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
-}
-    
     /* Sidebar */
     #sidebar {
       position: fixed;
@@ -188,10 +160,9 @@
       z-index: 1100;
     }
 
-    /* Sections cachées */
+    /* Sections */
     .section { display: none; }
     .section input, .section textarea { width: 100%; box-sizing: border-box; margin-bottom: 10px; padding: 8px; border-radius: 8px; border: 1px solid #ccc; }
-
   </style>
 </head>
 <body>
@@ -217,8 +188,16 @@
     <button id="add">Ajouter</button>
   </div>
 
-  <h2>Liste des créations</h2>
-  <div id="owner-list"></div>
+  <div id="view-switcher">
+    <label>Afficher en :</label>
+    <select id="viewMode">
+      <option value="carousel">Carrousel</option>
+      <option value="grid">Grille</option>
+      <option value="list">Liste</option>
+    </select>
+  </div>
+
+  <div id="owner-list" class="carousel"></div>
 
   <!-- Sections supplémentaires -->
   <div class="section" id="videos">
@@ -274,29 +253,27 @@
   const sidebar = document.getElementById('sidebar');
   const toggle = document.getElementById('toggleSidebar');
   const mainContent = document.getElementById('main-content');
+  const viewSelect = document.getElementById('viewMode');
+  const ownerList = document.getElementById('owner-list');
 
+  // Sidebar coulissante
   toggle.onclick = () => {
     sidebar.classList.toggle('sidebar-open');
-    if(sidebar.classList.contains('sidebar-open')){
-      mainContent.style.transform = 'translateX(200px)';
-    } else {
-      mainContent.style.transform = 'translateX(0)';
-    }
+    mainContent.style.transform = sidebar.classList.contains('sidebar-open') ? 'translateX(200px)' : 'translateX(0)';
   }
 
+  // Afficher sections
   function showSection(id) {
     document.querySelectorAll('.section').forEach(s => s.style.display = 'none');
     const section = document.getElementById(id);
     if(section) section.style.display = 'block';
   }
 
-  const viewSelect = document.getElementById('viewMode');
-const ownerList = document.getElementById('owner-list');
-
-viewSelect.addEventListener('change', () => {
-  ownerList.classList.remove('carousel','grid','list');
-  ownerList.classList.add(viewSelect.value);
-});
+  // Changement mode affichage
+  viewSelect.addEventListener('change', () => {
+    ownerList.classList.remove('carousel','grid','list');
+    ownerList.classList.add(viewSelect.value);
+  });
 </script>
 
 </body>
