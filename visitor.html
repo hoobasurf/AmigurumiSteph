@@ -46,10 +46,6 @@
     .visitor-item:hover img { box-shadow: 0 8px 20px rgba(184,76,111,0.3); transform: scale(1.03); }
     .visitor-item p { margin:12px 0 0; font-size:20px; color:#b84c6f; font-weight:bold; line-height:1.1; }
 
-    /* Actions bar */
-    .actions-bar { margin-top:8px; display:flex; justify-content:center; gap:20px; font-size:16px; color:#b84c6f; align-items:center; }
-    .actions-bar div { cursor:pointer; display:flex; align-items:center; gap:6px; }
-
     /* CARROUSEL */
     .carousel-view { display:flex; gap:40px; overflow-x:auto; scroll-behavior:smooth; padding:10px; align-items:center; }
     .carousel-view::-webkit-scrollbar { height:8px; }
@@ -78,6 +74,12 @@
     .thumbs { margin-top:16px; display:flex; gap:12px; justify-content:center; flex-wrap:wrap; }
     .thumbs img { width:110px; height:110px; object-fit:contain; border:4px solid #b67385; background:transparent; cursor:pointer; transition: transform 0.2s ease, box-shadow 0.2s ease; }
     .thumbs img:hover { transform:scale(1.06); box-shadow:0 6px 14px rgba(184,76,111,0.3); }
+
+    .icon-bar { margin-top:12px; display:flex; justify-content:center; gap:36px; align-items:center; }
+    .icon-btn { display:flex; gap:6px; align-items:center; cursor:pointer; color:#b84c6f; font-size:18px; }
+    .heart { font-size:26px; transition: color .18s; }
+    .heart.liked { color:#ff4b82; }
+    .likeInfo { font-size:14px; color:#7a2b45; }
 
     .comment-section { margin-top:14px; text-align:left; }
     .comment { background:#fff0f7; border:1px solid rgba(184,76,111,0.12); padding:10px; border-radius:10px; margin-bottom:10px; }
@@ -119,11 +121,11 @@
   <div class="modal-box" role="dialog" aria-modal="true" onclick="event.stopPropagation()">
     <div class="close-modal" onclick="closeModal()">×</div>
     <img id="modalMain" class="modal-main-img" alt="Image agrandie">
-    <div class="thumbs" id="thumbsContainer"></div>
+    <div id="thumbsContainer" class="thumbs"></div>
     <div class="icon-bar">
       <div class="icon-btn" onclick="toggleLike()">
         <span id="heart" class="heart">♡</span>
-        <span id="likeInfo" style="font-size:14px;color:#7a2b45;"></span>
+        <span id="likeInfo" class="likeInfo">0</span>
       </div>
       <div class="icon-btn" onclick="scrollToComments()">
         💬 <span id="commentCount" class="likeInfo">0</span>
@@ -145,7 +147,6 @@
 </div>
 
 <script>
-// Éléments
 const list=document.getElementById('visitor-list');
 const modal=document.getElementById('modal');
 const modalMain=document.getElementById('modalMain');
@@ -172,7 +173,6 @@ let currentView='carousel';
 
 function escapeHtml(s){ return s?String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'):''; }
 
-// Affichage liste
 function renderVisitor(){
   list.innerHTML='';
   list.className=currentView+'-view';
@@ -186,7 +186,6 @@ function renderVisitor(){
   });
 }
 
-// Vues
 function setView(mode){
   currentView=mode;
   document.getElementById('btnCarousel').classList.toggle('active', mode==='carousel');
@@ -200,7 +199,6 @@ document.getElementById('btnGrid').addEventListener('click',()=>setView('grid'))
 document.getElementById('btnList').addEventListener('click',()=>setView('list'));
 setView(currentView);
 
-// Modal
 function openModal(i){
   currentIndex=i;
   const proj=creations[i];
@@ -220,7 +218,6 @@ function openModal(i){
 function closeModal(){ modal.style.display='none'; renderVisitor(); }
 function backgroundClose(e){ if(e.target===modal) closeModal(); }
 
-// Like
 function toggleLike(){
   if(currentIndex===null) return;
   const name=prompt("Ton prénom pour liker cette image:")||"Anonyme";
@@ -240,7 +237,6 @@ function loadLike(){
   likeInfo.textContent = likes.length + (likes.length>0?": "+likes.join(", "):"");
 }
 
-// Commentaires
 function openCommentForm(){ commentFormBg.style.display='flex'; }
 function closeCommentForm(e){ if(e && e.target===commentFormBg) commentFormBg.style.display='none'; }
 function submitComment(){
@@ -261,7 +257,6 @@ function loadComments(){
   commentsList.innerHTML=comments.map(c=>`<div class="comment"><strong>${escapeHtml(c.name)}</strong><br>${escapeHtml(c.text)}</div>`).join('');
 }
 
-// Évènements clavier
 document.addEventListener('keydown',e=>{
   if(e.key==='Escape'){
     if(commentFormBg.style.display==='flex') commentFormBg.style.display='none';
@@ -269,11 +264,9 @@ document.addEventListener('keydown',e=>{
   }
 });
 
-// Observer
 const observer=new MutationObserver(()=>renderVisitor());
 observer.observe(list,{childList:true,subtree:true});
 
-// Initial
 setTimeout(renderVisitor,200);
 </script>
 </body>
