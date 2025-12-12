@@ -55,5 +55,52 @@
 
 <script type="module" src="owner.js"></script>
 
+  <!-- ================= NOUVELLES SECTIONS ================= -->
+<div class="section hidden" id="videos">
+  <h1>Vidéos / Tutoriels</h1>
+  <input id="video-url" placeholder="URL YouTube">
+  <input id="video-title" placeholder="Titre (facultatif)">
+  <textarea id="video-transcription" placeholder="Transcription"></textarea>
+  <input id="video-progress" placeholder="Position (ex: 5:32)">
+  <button id="addVideo">Ajouter</button>
+  <div id="video-list"></div>
+</div>
+
+<div class="section hidden" id="mailles">
+  <h1>Compteur de mailles</h1>
+  <input id="maille-name" placeholder="Nom du motif">
+  <input id="maille-count" type="number" value="0">
+  <button id="increment-maille">+1</button>
+  <button id="decrement-maille">-1</button>
+  <button id="reset-maille">Reset</button>
+</div>
+
+<div class="section hidden" id="pelotes">
+  <h1>Pelotes & Couleurs</h1>
+  <input id="pelote-name" placeholder="Nom">
+  <input id="pelote-marque" placeholder="Marque">
+  <input id="pelote-ref" placeholder="Référence couleur">
+  <input id="pelote-qty" type="number" placeholder="Quantité">
+  <input id="pelote-photo" type="file" accept="image/*">
+  <button id="addPelote">Ajouter</button>
+  <div id="pelote-list"></div>
+</div>
+
+<div class="section hidden" id="notes">
+  <h1>Notes / Inspirations</h1>
+  <input id="note-title" placeholder="Titre">
+  <textarea id="note-content" placeholder="Contenu"></textarea>
+  <input id="note-photo" type="file" accept="image/*">
+  <button id="addNote">Ajouter</button>
+  <div id="note-list"></div>
+</div>
+
+<div class="section hidden" id="settings">
+  <h1>Paramètres / Sauvegarde</h1>
+  <button id="exportData">Exporter les données</button>
+  <input type="file" id="importFile">
+  <button id="importData">Importer les données</button>
+</div>
+  
 </body>
 </html>
