@@ -1,10 +1,15 @@
+// --- INITIALISATION SUPABASE ---
+const supabaseUrl = 'https://xxxx.supabase.co'; // Remplace par ton URL Supabase
+const supabaseKey = 'PUBLIC_ANON_KEY';          // Remplace par ta clé publique
+const supabase = supabase.createClient(supabaseUrl, supabaseKey);
+
 const nameInput = document.getElementById('name');
 const photoInput = document.getElementById('photo');
 const addBtn = document.getElementById('add');
 const list = document.getElementById('owner-list');
 
-// --- CHARGEMENT EXISTANT DE localStorage ---
-let creations = JSON.parse(localStorage.getItem("creations") || "[]");
+// --- TABLEAU DES CRÉATIONS ---
+let creations = [];
 
 // --- FONCTION AFFICHAGE ---
 function renderCreations() {
@@ -18,10 +23,15 @@ function renderCreations() {
       <button class="delete-btn">&times;</button>
     `;
     // Suppression avec confirmation
-    div.querySelector(".delete-btn").onclick = () => {
+    div.querySelector(".delete-btn").onclick = async () => {
       if(confirm(`Supprimer "${item.name}" ?`)) {
-        creations.splice(index,1);
-        localStorage.setItem("creations", JSON.stringify(creations));
+        try {
+          const fileName = item.imgUrl.split('/').pop().split('?')[0];
+          await supabase.storage.from('creations').remove([fileName]);
+        } catch(e) {
+          console.error("Erreur suppression Supabase :", e);
+        }
+        creations.splice(index, 1);
         renderCreations();
       }
     };
@@ -30,7 +40,7 @@ function renderCreations() {
 }
 
 // --- BOUTON AJOUT ---
-addBtn.onclick = () => {
+addBtn.onclick = async () => {
   const name = nameInput.value.trim();
   const file = photoInput.files[0];
 
@@ -39,20 +49,50 @@ addBtn.onclick = () => {
     return;
   }
 
-  // Lecture locale de l'image pour affichage immédiat
-  const reader = new FileReader();
-  reader.onload = e => {
-    const imgUrl = e.target.result;
-    creations.unshift({ name, imgUrl });
-    localStorage.setItem("creations", JSON.stringify(creations));
-    renderCreations();
+  const fileName = `${Date.now()}_${file.name}`;
 
-    // Reset champs
-    nameInput.value = "";
-    photoInput.value = "";
-  };
-  reader.readAsDataURL(file);
+  // Upload sur Supabase
+  const { data, error } = await supabase
+    .storage
+    .from('creations') // Nom du bucket
+    .upload(fileName, file);
+
+  if(error) {
+    console.error(error);
+    alert("Erreur lors de l'upload !");
+    return;
+  }
+
+  // Récupérer l'URL publique
+  const { publicUrl } = supabase
+    .storage
+    .from('creations')
+    .getPublicUrl(fileName);
+
+  creations.unshift({ name, imgUrl: publicUrl });
+  renderCreations();
+
+  // Reset
+  nameInput.value = "";
+  photoInput.value = "";
 };
 
+// --- CHARGEMENT INITIAL DES IMAGES SUPABASE ---
+async function loadCreationsFromSupabase() {
+  const { data, error } = await supabase.storage.from('creations').list('', { limit: 1000 }); 
+  // '' = dossier racine, limit = max 1000 fichiers à récupérer
+  if(error) {
+    console.error("Erreur chargement images :", error);
+    return;
+  }
+
+  creations = data.map(file => ({
+    name: file.name.split('_').slice(1).join('_'), // retire le timestamp ajouté
+    imgUrl: supabase.storage.from('creations').getPublicUrl(file.name).publicUrl
+  }));
+
+  renderCreations();
+}
+
 // --- INITIALISATION ---
-renderCreations();
+loadCreationsFromSupabase();
