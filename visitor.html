@@ -11,11 +11,28 @@
     * { box-sizing: border-box; margin:0; padding:0; }
     html, body { height:100%; font-family: 'Comic Sans MS', cursive; }
     body {
-      display:flex; flex-direction:column;
-      -webkit-font-smoothing: antialiased;
-      -moz-osx-font-smoothing: grayscale;
-      background: linear-gradient(to bottom, #fff0f5, #fff5f8);
-    }
+  margin: 0;
+  padding: 0;
+  font-family: 'Comic Sans MS', cursive;
+
+  /* Fond simple */
+  background-color: #fff0f5;
+
+  /* Ton image en bas */
+  background-image: url('Photoroom_20251212_143703.png');
+  background-repeat: no-repeat;
+  background-position: bottom center;
+  background-size: contain;
+
+  /* Structure existante */
+  display:flex;
+  flex-direction:column;
+  height:100vh;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+
+  position: relative;
+}
 
     /* =========================
        HEADER
