@@ -112,23 +112,48 @@
     #owner-list.grid { display: grid; grid-template-columns: repeat(auto-fill,minmax(150px,1fr)); }
     #owner-list.list { display: flex; flex-direction: column; }
 
-    /* Sidebar */
-    #sidebar {
-      position: fixed;
-      top: 0;
-      left: -200px;
-      width: 200px;
-      height: 100vh;
-      background: #ffe6f0;
-      border-right: 2px solid #b67385;  
-      padding: 20px;
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      box-shadow: 2px 0 5px rgba(0,0,0,0.1);
-      transition: left 0.3s;
-      z-index: 1000;
-    }
+   /* Sidebar totalement cachée */
+#sidebar {
+  position: fixed;
+  top: 0;
+  left: -220px; /* plus loin pour être invisible */
+  width: 200px;
+  height: 100vh;
+  background: #ffe6f0;
+  border-right: 2px solid #b67385;
+  padding: 20px;
+  box-shadow: 2px 0 10px rgba(0,0,0,0.15);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  transition: left 0.35s ease;
+  z-index: 9999;
+}
+
+/* Encoche flottante SEULE visible */
+#toggleSidebar {
+  position: fixed;
+  top: 50%;
+  left: 0;
+  width: 32px;
+  height: 60px;
+  background: #ffb6c1;
+  color: #8b3a3a;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 0 10px 10px 0;
+  cursor: pointer;
+  font-size: 22px;
+  font-weight: bold;
+  z-index: 10000;
+  box-shadow: 2px 2px 6px rgba(0,0,0,0.2);
+}
+
+/* Sidebar ouverte */
+.sidebar-open {
+  left: 0 !important;
+}
     #sidebar button {
       background: #ffb6c1;
       color: #8b3a3a;
@@ -141,24 +166,6 @@
     }
     #sidebar button:hover { background: #ff90b0; }
     #sidebar.sidebar-open { left: 0; }
-
-    /* Encoche */
-    #toggleSidebar {
-      position: fixed;
-      top: 50%;
-      left: 0;
-      width: 30px;
-      height: 60px;
-      background: #ffb6c1;
-      color: #8b3a3a;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      border-radius: 0 10px 10px 0;
-      cursor: pointer;
-      font-weight: bold;
-      z-index: 1100;
-    }
 
     /* Sections */
     .section { display: none; }
@@ -250,15 +257,16 @@
 
 <script type="module" src="owner.js"></script>
 <script>
-  const sidebar = document.getElementById('sidebar');
-  const toggle = document.getElementById('toggleSidebar');
+  const sidebar = document.getElementById("sidebar");
+const toggle = document.getElementById("toggleSidebar");
   const mainContent = document.getElementById('main-content');
   const viewSelect = document.getElementById('viewMode');
   const ownerList = document.getElementById('owner-list');
 
   // Sidebar coulissante
   toggle.onclick = () => {
-    sidebar.classList.toggle('sidebar-open');
+  sidebar.classList.toggle("sidebar-open");
+};
     mainContent.style.transform = sidebar.classList.contains('sidebar-open') ? 'translateX(200px)' : 'translateX(0)';
   }
 
