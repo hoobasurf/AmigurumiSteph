@@ -401,4 +401,40 @@
     commentsList.innerHTML=comments.map(c=>`<div class="comment"><strong>${escapeHtml(c.name)}</strong><br>${escapeHtml(c.text)}</div>`).join('');
   }
   function openCommentForm(){ commentFormBg.style.display='flex'; }
-  function closeCommentForm(e){ if(e&&e.target===commentFormBg) comment
+  function closeCommentForm(e){ if(e&&e.target===commentFormBg) commentFormBg.style.display='none'; }
+  function submitComment(){
+    const name=(commentName.value||'').trim();
+    const text=(commentText.value||'').trim();
+    if(!name||!text) return;
+    const key='comments_'+currentIndex;
+    const comments=JSON.parse(localStorage.getItem(key)||'[]');
+    comments.push({name,text,at:Date.now()});
+    localStorage.setItem(key,JSON.stringify(comments));
+    commentName.value=''; commentText.value=''; commentFormBg.style.display='none';
+    loadComments();
+  }
+  function scrollToComments(){ if(!commentsList) return; commentsList.scrollIntoView({behavior:'smooth',block:'start'}); }
+
+  document.addEventListener('keydown',(e)=>{
+    if(e.key==='Escape'){
+      if(commentFormBg.style.display==='flex') commentFormBg.style.display='none';
+      else if(modal.style.display==='flex') closeModal();
+    }
+  });
+
+  const observer=new MutationObserver(()=>updateCenter());
+  observer.observe(list,{childList:true,subtree:true});
+  setTimeout(updateCenter,200);
+
+  window.openModal=openModal;
+  window.closeModal=closeModal;
+  window.backgroundClose=backgroundClose;
+  window.toggleLike=toggleLike;
+  window.openCommentForm=openCommentForm;
+  window.closeCommentForm=closeCommentForm;
+  window.submitComment=submitComment;
+  window.scrollToComments=scrollToComments;
+</script>
+
+</body>
+</html>
