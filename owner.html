@@ -112,7 +112,7 @@
 <div id="owner-list"></div>
 
 <script type="module" src="owner.js"></script>
-
+  
   <!-- ================= NOUVELLES SECTIONS ================= -->
 <div class="section hidden" id="videos">
   <h1>Vidéos / Tutoriels</h1>
@@ -160,5 +160,20 @@
   <button id="importData">Importer les données</button>
 </div>
   
+<!-- TON HTML EXISTANT POUR LES CREATIONS ET LES NOUVELLES SECTIONS -->
+
+<!-- JS pour la sidebar coulissante -->
+<script>
+const sidebar = document.getElementById('sidebar');
+const toggle = document.getElementById('toggleSidebar');
+
+toggle.onclick = () => {
+  sidebar.classList.toggle('sidebar-open');
+};
+</script>
+
+<!-- JS existant pour les créations -->
+<script type="module" src="owner.js"></script>
+
 </body>
 </html>
