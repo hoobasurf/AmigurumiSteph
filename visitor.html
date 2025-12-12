@@ -3,7 +3,6 @@
 <head>
   <meta charset="UTF-8" />
   <title>Galerie - Mes créations</title>
-
   <style>
     * { box-sizing: border-box; margin:0; padding:0; }
     html, body { height:100%; font-family: 'Comic Sans MS', cursive; }
@@ -23,40 +22,17 @@
       touch-action: pan-x;
     }
 
-    header img {
-      width: 98px; height: 98px;
-      display:block; margin:0 auto 12px;
-      border-radius:20%;
-    }
+    header img { width: 98px; height: 98px; display:block; margin:0 auto 12px; border-radius:20%; }
+    .title { font-size:42px; color:#b84c6f; font-weight:bold; letter-spacing:1px; display:inline-block; }
+    .title-thread { position:absolute; left:50%; transform:translateX(-50%); bottom:14px; width:240px; height:6px; background:#b84c6f; border-radius:20px; opacity:0.85; }
 
-    .title {
-      font-size:42px; color:#b84c6f; font-weight:bold;
-      letter-spacing:1px;
-      display:inline-block;
-    }
-
-    .title-thread {
-      position:absolute; left:50%; transform:translateX(-50%);
-      bottom:14px; width:240px; height:6px; background:#b84c6f;
-      border-radius:20px; opacity:0.85;
-    }
-
-    #viewSelector {
-      display:flex; justify-content:center; gap:12px; margin:14px 12px;
-    }
+    #viewSelector { display:flex; justify-content:center; gap:12px; margin:14px 12px; }
     #viewSelector button {
-      background:#fff0f7;
-      border:2px solid #b84c6f;
-      color:#b84c6f;
-      padding:8px 16px; border-radius:24px;
-      font-size:15px; cursor:pointer;
+      background:#fff0f7; border:2px solid #b84c6f; color:#b84c6f;
+      padding:8px 16px; border-radius:24px; font-size:15px; cursor:pointer;
       transition: all 0.18s ease;
     }
-    #viewSelector button.active {
-      background: linear-gradient(90deg, #ffeaf2, #fff5f8);
-      color:#7a2b45;
-      transform:translateY(-2px);
-    }
+    #viewSelector button.active { background: linear-gradient(90deg,#ffeaf2,#fff5f8); color:#7a2b45; transform:translateY(-2px); }
     #viewSelector button:hover { transform:translateY(-2px); }
 
     .center-zone { flex:1; display:flex; align-items:center; justify-content:center; padding:8px; transform:translateY(-40px); }
@@ -64,21 +40,12 @@
 
     .visitor-item { text-align:center; cursor:pointer; user-select:none; }
     .visitor-item img {
-      display:block;
-      margin:0 auto;
-      object-fit:contain;
-      border:4px solid #b67385; /* contour bordeaux pastel */
-      background: transparent;
+      display:block; margin:0 auto; object-fit:contain;
+      border:4px solid #b67385; background: transparent;
       transition: box-shadow 0.3s ease, transform 0.3s ease;
     }
-    .visitor-item:hover img {
-      box-shadow: 0 8px 20px rgba(184,76,111,0.3); /* ombre sur survol */
-      transform: scale(1.03);
-    }
-
-    .visitor-item p {
-      margin:12px 0 0; font-size:20px; color:#b84c6f; font-weight:bold; line-height:1.1;
-    }
+    .visitor-item:hover img { box-shadow: 0 8px 20px rgba(184,76,111,0.3); transform: scale(1.03); }
+    .visitor-item p { margin:12px 0 0; font-size:20px; color:#b84c6f; font-weight:bold; line-height:1.1; }
 
     /* CARROUSEL */
     .carousel-view { display:flex; gap:40px; overflow-x:auto; scroll-behavior:smooth; padding:10px; align-items:center; }
@@ -106,20 +73,15 @@
     .modal-main-img { width:100%; max-height:520px; object-fit:contain; border:4px solid #b67385; background:white; }
 
     .thumbs { margin-top:16px; display:flex; gap:12px; justify-content:center; flex-wrap:wrap; }
-    .thumbs img {
-      width:110px; height:110px; object-fit:contain;
-      border:4px solid #b67385;
-      background:transparent;
-      cursor:pointer;
-      transition: transform 0.2s ease, box-shadow 0.2s ease;
-    }
+    .thumbs img { width:110px; height:110px; object-fit:contain; border:4px solid #b67385; background:transparent; cursor:pointer; transition: transform 0.2s ease, box-shadow 0.2s ease; }
     .thumbs img:hover { transform:scale(1.06); box-shadow:0 6px 14px rgba(184,76,111,0.3); }
 
     .icon-bar { margin-top:12px; display:flex; justify-content:center; gap:36px; align-items:center; }
     .icon-btn { display:flex; gap:8px; align-items:center; cursor:pointer; color:#b84c6f; font-size:18px; }
     .heart { font-size:26px; transition: color .18s; }
     .heart.liked { color:#ff4b82; }
-    .comment-number { background:#b84c6f; color:white; padding:2px 8px; border-radius:12px; font-size:13px; }
+
+    .like-info { font-size:14px; color:#7a2b45; margin-left:8px; }
 
     .comment-section { margin-top:14px; text-align:left; }
     .comment { background:#fff0f7; border:1px solid rgba(184,76,111,0.12); padding:10px; border-radius:10px; margin-bottom:10px; }
@@ -140,7 +102,6 @@
   </style>
 </head>
 <body>
-
 <header>
   <img src="favicon.png" alt="Logo">
   <h1 class="title">Mes créations</h1>
@@ -165,10 +126,7 @@
     <div class="icon-bar">
       <div class="icon-btn" onclick="toggleLike()">
         <span id="heart" class="heart">♡</span>
-        <span id="likeName" style="font-weight:600;color:#7a2b45;"></span>
-      </div>
-      <div class="icon-btn" onclick="scrollToComments()">
-        💬 <span id="commentCount" class="comment-number">0</span>
+        <span id="likeCount" class="like-info">0</span>
       </div>
     </div>
     <div id="thumbsContainer" class="thumbs"></div>
@@ -188,39 +146,39 @@
 </div>
 
 <script>
-const list = document.getElementById('visitor-list');
-const modal = document.getElementById('modal');
-const modalMain = document.getElementById('modalMain');
-const thumbs = document.getElementById('thumbsContainer');
-const likeName = document.getElementById('likeName');
-const commentCount = document.getElementById('commentCount');
-const commentsList = document.getElementById('commentsList');
-const commentFormBg = document.getElementById('commentFormBg');
-const commentName = document.getElementById('commentName');
-const commentText = document.getElementById('commentText');
+const list=document.getElementById('visitor-list');
+const modal=document.getElementById('modal');
+const modalMain=document.getElementById('modalMain');
+const thumbs=document.getElementById('thumbsContainer');
+const heart=document.getElementById('heart');
+const likeCount=document.getElementById('likeCount');
+const commentList=document.getElementById('commentsList');
+const commentFormBg=document.getElementById('commentFormBg');
+const commentName=document.getElementById('commentName');
+const commentText=document.getElementById('commentText');
 
-let creations = JSON.parse(localStorage.getItem('creations') || '[]');
-if (!creations || creations.length === 0) {
-  creations = [
-    { name: "Projet A", imgUrl: "https://placekitten.com/800/800", images: ["https://placekitten.com/800/800","https://placekitten.com/801/800"] },
-    { name: "Projet B", imgUrl: "https://placebear.com/800/800", images: ["https://placebear.com/800/800","https://placebear.com/801/800"] },
-    { name: "Projet C", imgUrl: "https://picsum.photos/seed/p/800/800" }
+let creations=JSON.parse(localStorage.getItem('creations')||'[]');
+if(!creations||creations.length===0){
+  creations=[
+    {name:"Projet A", imgUrl:"https://placekitten.com/800/800", images:["https://placekitten.com/800/800","https://placekitten.com/801/800"]},
+    {name:"Projet B", imgUrl:"https://placebear.com/800/800", images:["https://placebear.com/800/800","https://placebear.com/801/800"]},
+    {name:"Projet C", imgUrl:"https://picsum.photos/seed/p/800/800"}
   ];
 }
 
-let currentIndex = null;
-let currentView = 'carousel';
+let currentIndex=null;
+let currentView='carousel';
 
-function escapeHtml(s) { return s ? String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;') : ''; }
+function escapeHtml(s){ return s?String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'):''; }
 
-function renderVisitor() {
-  list.innerHTML = '';
-  list.className = currentView+'-view';
+function renderVisitor(){
+  list.innerHTML='';
+  list.className=currentView+'-view';
   creations.forEach((item,i)=>{
-    const div = document.createElement('div');
+    const div=document.createElement('div');
     div.className='visitor-item';
     div.setAttribute('data-index',i);
-    div.innerHTML = `<img src="${item.imgUrl}" alt="${escapeHtml(item.name)}"><p>${escapeHtml(item.name)}</p>`;
+    div.innerHTML=`<img src="${item.imgUrl}" alt="${escapeHtml(item.name)}"><p>${escapeHtml(item.name)}</p>`;
     div.addEventListener('click',()=>openModal(i));
     list.appendChild(div);
   });
@@ -235,35 +193,26 @@ function setView(mode){
   renderVisitor();
 }
 
-document.getElementById('btnCarousel').addEventListener('click', ()=>setView('carousel'));
-document.getElementById('btnGrid').addEventListener('click', ()=>setView('grid'));
-document.getElementById('btnList').addEventListener('click', ()=>setView('list'));
+document.getElementById('btnCarousel').addEventListener('click',()=>setView('carousel'));
+document.getElementById('btnGrid').addEventListener('click',()=>setView('grid'));
+document.getElementById('btnList').addEventListener('click',()=>setView('list'));
 setView(currentView);
 
 function updateCenter(){
-  if(currentView!=='carousel'){
-    document.querySelectorAll('.visitor-item').forEach(it=>it.classList.remove('active'));
-    return;
-  }
+  if(currentView!=='carousel'){ document.querySelectorAll('.visitor-item').forEach(it=>it.classList.remove('active')); return; }
   const items=document.querySelectorAll('.visitor-item');
   const center=window.innerWidth/2;
-  items.forEach(item=>{
-    const rect=item.getBoundingClientRect();
-    const itemCenter=rect.left+rect.width/2;
-    if(Math.abs(itemCenter-center)<170) item.classList.add('active');
-    else item.classList.remove('active');
-  });
+  items.forEach(item=>{ const rect=item.getBoundingClientRect(); const itemCenter=rect.left+rect.width/2; if(Math.abs(itemCenter-center)<170)item.classList.add('active'); else item.classList.remove('active'); });
 }
 
-list.addEventListener('scroll', updateCenter);
-window.addEventListener('resize', updateCenter);
+list.addEventListener('scroll',updateCenter);
+window.addEventListener('resize',updateCenter);
 
 function openModal(i){
   currentIndex=i;
   const proj=creations[i];
   modalMain.src=proj.imgUrl;
-  likeName.textContent=proj.name||'';
-  loadLike(); loadComments();
+  loadLikes();
   thumbs.innerHTML='';
   if(Array.isArray(proj.images)&&proj.images.length>0){
     proj.images.forEach(src=>{
@@ -281,55 +230,50 @@ function backgroundClose(e){ if(e.target===modal) closeModal(); }
 
 function toggleLike(){
   if(currentIndex===null) return;
-  const key='like_'+currentIndex;
-  const cur=localStorage.getItem(key)==='1';
-  localStorage.setItem(key, cur?'0':'1');
-  loadLike();
+  const name=prompt("Ton prénom pour liker cette image:")||"Anonyme";
+  const key='likes_'+currentIndex;
+  let likes=JSON.parse(localStorage.getItem(key)||'[]');
+  if(likes.includes(name)) likes=likes.filter(n=>n!==name);
+  else likes.push(name);
+  localStorage.setItem(key,JSON.stringify(likes));
+  loadLikes();
 }
 
-function loadLike(){
+function loadLikes(){
   if(currentIndex===null) return;
-  const key='like_'+currentIndex;
-  const liked=localStorage.getItem(key)==='1';
-  const heart=document.getElementById('heart');
-  if(liked){ heart.classList.add('liked'); heart.textContent='❤️'; }
+  const key='likes_'+currentIndex;
+  const likes=JSON.parse(localStorage.getItem(key)||'[]');
+  if(likes.length>0){ heart.classList.add('liked'); heart.textContent='❤️'; }
   else{ heart.classList.remove('liked'); heart.textContent='♡'; }
-}
-
-function loadComments(){
-  if(currentIndex===null) return;
-  const key='comments_'+currentIndex;
-  const comments=JSON.parse(localStorage.getItem(key)||'[]');
-  commentCount.textContent=comments.length||0;
-  commentsList.innerHTML=comments.map(c=>`<div class="comment"><strong>${escapeHtml(c.name)}</strong><br>${escapeHtml(c.text)}</div>`).join('');
+  likeCount.textContent=likes.length + (likes.length>0?": "+likes.join(", "):"");
 }
 
 function openCommentForm(){ commentFormBg.style.display='flex'; }
 function closeCommentForm(e){ if(e && e.target===commentFormBg) commentFormBg.style.display='none'; }
 function submitComment(){
-  const name=(commentName.value||'').trim();
-  const text=(commentText.value||'').trim();
+  const name=(commentName.value||'').trim(); const text=(commentText.value||'').trim();
   if(!name||!text) return;
-  const key='comments_'+currentIndex;
-  const comments=JSON.parse(localStorage.getItem(key)||'[]');
+  const key='comments_'+currentIndex; const comments=JSON.parse(localStorage.getItem(key)||'[]');
   comments.push({name,text,at:Date.now()});
   localStorage.setItem(key,JSON.stringify(comments));
   commentName.value=''; commentText.value=''; commentFormBg.style.display='none';
   loadComments();
 }
 
-function scrollToComments(){ if(!commentsList) return; commentsList.scrollIntoView({behavior:'smooth', block:'start'}); }
+function loadComments(){
+  if(currentIndex===null) return;
+  const key='comments_'+currentIndex;
+  const comments=JSON.parse(localStorage.getItem(key)||'[]');
+  commentList.innerHTML=comments.map(c=>`<div class="comment"><strong>${escapeHtml(c.name)}</strong><br>${escapeHtml(c.text)}</div>`).join('');
+}
 
-document.addEventListener('keydown',(e)=>{
-  if(e.key==='Escape'){
-    if(commentFormBg.style.display==='flex') commentFormBg.style.display='none';
-    else if(modal.style.display==='flex') closeModal();
-  }
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'){ if(commentFormBg.style.display==='flex') commentFormBg.style.display='none'; else if(modal.style.display==='flex') closeModal(); }
 });
 
 const observer=new MutationObserver(()=>updateCenter());
-observer.observe(list,{childList:true, subtree:true});
-setTimeout(updateCenter, 200);
+observer.observe(list,{childList:true,subtree:true});
+setTimeout(updateCenter,200);
 </script>
 </body>
 </html>
