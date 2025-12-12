@@ -1,198 +1,159 @@
-import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
+const nameInput = document.getElementById('name');
+const photoInput = document.getElementById('photo');
+const addBtn = document.getElementById('add');
+const list = document.getElementById('owner-list');
 
-// ⚡ Remplace par tes infos Supabase
-const supabaseUrl = 'VOTRE_SUPABASE_URL';
-const supabaseKey = 'VOTRE_SUPABASE_ANON_KEY';
-const supabase = createClient(supabaseUrl, supabaseKey);
+// On charge ce qui existe déjà
+let creations = JSON.parse(localStorage.getItem("creations") || "[]");
 
-// ---------------- SIDEBAR ----------------
-function showSection(id) {
-  document.querySelectorAll('.section').forEach(s => s.classList.add('hidden'));
-  document.getElementById(id).classList.remove('hidden');
+// Compression pour stocker plus d’images
+function compressImage(file, maxWidth = 900, quality = 0.8) {
+  return new Promise((resolve) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement("canvas");
+
+        let w = img.width;
+        let h = img.height;
+
+        if (w > maxWidth) {
+          h *= maxWidth / w;
+          w = maxWidth;
+        }
+
+        canvas.width = w;
+        canvas.height = h;
+
+        const ctx = canvas.getContext("2d");
+        ctx.drawImage(img, 0, 0, w, h);
+
+        resolve(canvas.toDataURL("image/jpeg", quality));
+      };
+      img.src = e.target.result;
+    };
+    reader.readAsDataURL(file);
+  });
 }
-window.showSection = showSection;
 
-// ---------------- VIDEOS ----------------
-const addVideoBtn = document.getElementById('addVideo');
-const videoList = document.getElementById('video-list');
 
-addVideoBtn.onclick = async () => {
-  const url = document.getElementById('video-url').value.trim();
-  const title = document.getElementById('video-title').value.trim();
-  const transcription = document.getElementById('video-transcription').value.trim();
-  const progress = document.getElementById('video-progress').value.trim();
-  if(!url) return alert("URL obligatoire");
+// --------- AFFICHAGE ----------
+function renderCreations() {
+  list.innerHTML = "";
 
-  await supabase.from('videos').insert([{ url, title, transcription, progress }]);
-  document.getElementById('video-url').value = '';
-  document.getElementById('video-title').value = '';
-  document.getElementById('video-transcription').value = '';
-  document.getElementById('video-progress').value = '';
-  renderVideos();
-};
+  creations.forEach((item, index) => {
+    const div = document.createElement("div");
+    div.className = "owner-item";
 
-async function renderVideos() {
-  const { data } = await supabase.from('videos').select('*').order('created_at', { ascending: false });
-  videoList.innerHTML = '';
-  data.forEach(v => {
-    const div = document.createElement('div');
-    div.className = 'video-item';
     div.innerHTML = `
-      <div class="delete-btn" data-id="${v.id}">×</div>
-      <iframe width="200" height="113" src="https://www.youtube.com/embed/${getYoutubeId(v.url)}" frameborder="0" allowfullscreen></iframe>
-      <p><b>${v.title}</b></p>
-      <p>${v.transcription}</p>
-      <p>Progression: ${v.progress}</p>
+      <div class="delete-btn" data-index="${index}">×</div>
+      <img src="${item.imgUrl}" alt="">
+      <p>${item.name}</p>
     `;
-    videoList.appendChild(div);
-  });
-}
-function getYoutubeId(url) {
-  const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
-  const match = url.match(regExp);
-  return (match && match[2].length==11) ? match[2] : null;
-}
-videoList.addEventListener("click", async (e)=>{
-  if(e.target.classList.contains("delete-btn")){
-    const id = e.target.dataset.id;
-    await supabase.from('videos').delete().eq('id',id);
-    renderVideos();
-  }
-});
-renderVideos();
 
-// ---------------- MAILLES ----------------
-const mailleName = document.getElementById('maille-name');
-const mailleCount = document.getElementById('maille-count');
-const incrementBtn = document.getElementById('increment-maille');
-const decrementBtn = document.getElementById('decrement-maille');
-const resetBtn = document.getElementById('reset-maille');
-
-incrementBtn.onclick = () => mailleCount.value = parseInt(mailleCount.value)+1;
-decrementBtn.onclick = () => mailleCount.value = Math.max(0, parseInt(mailleCount.value)-1);
-resetBtn.onclick = () => mailleCount.value = 0;
-
-// ---------------- PELOTES ----------------
-const addPeloteBtn = document.getElementById('addPelote');
-const peloteList = document.getElementById('pelote-list');
-
-addPeloteBtn.onclick = async () => {
-  const file = document.getElementById('pelote-photo').files[0];
-  const name = document.getElementById('pelote-name').value.trim();
-  const marque = document.getElementById('pelote-marque').value.trim();
-  const ref = document.getElementById('pelote-ref').value.trim();
-  const qty = parseInt(document.getElementById('pelote-qty').value)||0;
-  if(!file || !name) return alert('Nom et photo obligatoires');
-
-  const { data: uploadData } = await supabase.storage.from('pelotes').upload(`${Date.now()}_${file.name}`, file);
-  const photoUrl = supabase.storage.from('pelotes').getPublicUrl(uploadData.path).publicUrl;
-
-  await supabase.from('pelotes').insert([{ name, marque, ref_couleur: ref, quantite: qty, photo_url: photoUrl }]);
-  document.getElementById('pelote-name').value = '';
-  document.getElementById('pelote-marque').value = '';
-  document.getElementById('pelote-ref').value = '';
-  document.getElementById('pelote-qty').value = '';
-  document.getElementById('pelote-photo').value = '';
-  renderPelotes();
-};
-
-async function renderPelotes() {
-  const { data } = await supabase.from('pelotes').select('*').order('created_at', { ascending: false });
-  peloteList.innerHTML='';
-  data.forEach(p=>{
-    const div = document.createElement('div');
-    div.className='pelote-item';
-    div.innerHTML=`
-      <div class="delete-btn" data-id="${p.id}">×</div>
-      <img src="${p.photo_url}" alt="">
-      <p><b>${p.name}</b></p>
-      <p>${p.marque} / ${p.ref_couleur}</p>
-      <p>Quantité: ${p.quantite}</p>
-    `;
-    peloteList.appendChild(div);
-  });
-}
-peloteList.addEventListener("click", async (e)=>{
-  if(e.target.classList.contains("delete-btn")){
-    const id = e.target.dataset.id;
-    await supabase.from('pelotes').delete().eq('id',id);
-    renderPelotes();
-  }
-});
-renderPelotes();
-
-// ---------------- NOTES ----------------
-const addNoteBtn = document.getElementById('addNote');
-const noteList = document.getElementById('note-list');
-
-addNoteBtn.onclick = async () => {
-  const file = document.getElementById('note-photo').files[0];
-  const title = document.getElementById('note-title').value.trim();
-  const content = document.getElementById('note-content').value.trim();
-  if(!title) return alert('Titre obligatoire');
-
-  let photoUrl = null;
-  if(file){
-    const { data: uploadData } = await supabase.storage.from('notes').upload(`${Date.now()}_${file.name}`, file);
-    photoUrl = supabase.storage.from('notes').getPublicUrl(uploadData.path).publicUrl;
-  }
-
-  await supabase.from('notes').insert([{ title, content, image_url: photoUrl }]);
-  document.getElementById('note-title').value = '';
-  document.getElementById('note-content').value = '';
-  document.getElementById('note-photo').value = '';
-  renderNotes();
-};
-
-async function renderNotes() {
-  const { data } = await supabase.from('notes').select('*').order('created_at', { ascending:false });
-  noteList.innerHTML='';
-  data.forEach(n=>{
-    const div = document.createElement('div');
-    div.className='note-item';
-    div.innerHTML=`
-      <div class="delete-btn" data-id="${n.id}">×</div>
-      ${n.image_url?`<img src="${n.image_url}" alt="">`:''}
-      <p><b>${n.title}</b></p>
-      <p>${n.content}</p>
-    `;
-    noteList.appendChild(div);
+    list.appendChild(div);
   });
 }
 
-noteList.addEventListener("click", async (e)=>{
-  if(e.target.classList.contains("delete-btn")){
-    const id = e.target.dataset.id;
-    await supabase.from('notes').delete().eq('id', id);
-    renderNotes();
-  }
-});
-renderNotes();
 
-// ---------------- PARAMETRES / SAUVEGARDE ----------------
-document.getElementById('exportData').onclick = () => {
-  const dataStr = JSON.stringify({
-    creations: JSON.parse(localStorage.getItem("creations") || "[]")
-  }, null, 2);
-  const blob = new Blob([dataStr], { type: "application/json" });
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url;
-  a.download = "crochet_data.json";
-  a.click();
-};
+// --------- SUPPRESSION (fenêtre rose pastel) ----------
+function showDeletePopup(index) {
+  const overlay = document.createElement("div");
+  overlay.style = `
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.15);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 99999;
+  `;
 
-document.getElementById('importData').onclick = () => {
-  const file = document.getElementById('importFile').files[0];
-  if(!file) return alert("Choisir un fichier à importer");
-  const reader = new FileReader();
-  reader.onload = (e) => {
-    const data = JSON.parse(e.target.result);
-    if(data.creations) {
-      localStorage.setItem("creations", JSON.stringify(data.creations));
-      window.dispatchEvent(new Event('storage')); // pour re-render si besoin
-    }
-    alert("Import terminé !");
+  const box = document.createElement("div");
+  box.style = `
+    background: #ffe4ec;
+    border: 3px solid #b84c6f;
+    padding: 20px;
+    border-radius: 15px;
+    width: 260px;
+    text-align: center;
+    box-shadow: 0 8px 25px rgba(0,0,0,0.2);
+  `;
+
+  box.innerHTML = `
+    <p style="color:#b84c6f; font-weight:600; font-size:16px; margin-bottom:15px;">
+      Supprimer cette création ?
+    </p>
+
+    <div style="display:flex; gap:10px; justify-content:center;">
+      <button id="delYes" style="
+        padding: 8px 14px;
+        border-radius: 10px;
+        border: none;
+        background: #ffb6c1;
+        color: #8b3a3a;
+        font-weight: bold;
+        cursor: pointer;">
+        Oui
+      </button>
+
+      <button id="delNo" style="
+        padding: 8px 14px;
+        border-radius: 10px;
+        border: none;
+        background: #ddd;
+        cursor: pointer;">
+        Non
+      </button>
+    </div>
+  `;
+
+  overlay.appendChild(box);
+  document.body.appendChild(overlay);
+
+  // OK suppression
+  box.querySelector("#delYes").onclick = () => {
+    creations.splice(index, 1);
+    localStorage.setItem("creations", JSON.stringify(creations));
+    renderCreations();
+    overlay.remove();
   };
-  reader.readAsText(file);
+
+  // Annuler
+  box.querySelector("#delNo").onclick = () => overlay.remove();
+}
+
+
+// --------- AJOUT ----------
+addBtn.onclick = async () => {
+  const name = nameInput.value.trim();
+  const file = photoInput.files[0];
+
+  if (!name || !file) {
+    alert("Merci de remplir le nom et choisir une photo !");
+    return;
+  }
+
+  const imgUrl = await compressImage(file);
+  creations.unshift({ name, imgUrl });
+
+  localStorage.setItem("creations", JSON.stringify(creations));
+  renderCreations();
+
+  nameInput.value = "";
+  photoInput.value = "";
 };
+
+
+// --------- CLIC SUR LA CROIX ----------
+list.addEventListener("click", (e) => {
+  if (e.target.classList.contains("delete-btn")) {
+    const index = e.target.dataset.index;
+    showDeletePopup(index);
+  }
+});
+
+
+// INIT
+renderCreations();
