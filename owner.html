@@ -1,233 +1,179 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <title>Mes Créations</title>
-  <style>
-    body { font-family: sans-serif; padding: 0; margin: 0; background: #fff0f5; overflow-x: hidden; }
+<meta charset="UTF-8">
+<title>Mes Créations - Crochet</title>
+<style>
+  body { font-family: sans-serif; background: #fff0f5; margin:0; padding:0; }
+  h1 { text-align:center; color:#b84c6f; font-family: 'Segoe UI', sans-serif; }
+  
+  /* ---------------- CREATION ---------------- */
+  .creation-box {
+    max-width: 500px; margin:20px auto; padding:20px;
+    border: 2px solid #b67385; border-radius:15px;
+    background:#ffe6f0; box-shadow:0 4px 15px rgba(182,115,133,0.2);
+  }
+  .creation-box input[type="text"], .creation-box input[type="file"] {
+    width: calc(100% - 24px); padding:10px; margin:5px 0;
+    border-radius:10px; border:1px solid #b67385;
+  }
+  .creation-box button {
+    width:100%; padding:12px; margin-top:10px;
+    background:#ffb6c1; border:none; border-radius:10px;
+    cursor:pointer; font-weight:bold; color:#8b3a3a;
+    box-shadow:0 4px 8px rgba(0,0,0,0.2);
+    transition:0.3s;
+  }
+  .creation-box button:hover { background:#ff9fc1; }
 
-    /* TITRE */
-    h1 { text-align:center; font-size:32px; color:#8b3a3a; font-family:"Georgia", serif; margin:25px 0; }
+  /* ---------------- SIDEBAR ---------------- */
+  #sidebar {
+    position:fixed; top:0; left:-220px; width:220px; height:100vh;
+    background:#ffe6f0; padding:20px; box-shadow:2px 0 5px rgba(0,0,0,0.1);
+    display:flex; flex-direction:column; gap:10px; transition:left 0.3s; z-index:9999;
+    border-right:1px solid #b67385;
+  }
+  #sidebar button {
+    background:#ffb6c1; color:#8b3a3a; border:none; border-radius:10px;
+    padding:10px; cursor:pointer; font-weight:bold;
+  }
+  #toggleSidebar {
+    position:absolute; top:50%; right:-30px; width:30px; height:60px;
+    background:#ffb6c1; color:#8b3a3a; display:flex;
+    justify-content:center; align-items:center; border-radius:0 10px 10px 0;
+    cursor:pointer; font-weight:bold;
+  }
+  .sidebar-open { left:0; }
 
-    /* ENCADRÉ AJOUT CREATION */
-    .owner-box {
-      margin: 0 auto 25px;
-      background: #ffe6f0;       /* rose pastel */
-      border: 2px solid #b67385; /* bordeaux pastel */
-      padding: 25px 20px;
-      width: 90%;
-      max-width: 450px;
-      border-radius: 15px;
-      box-shadow: 0 4px 15px rgba(182,115,133,0.25);
-      display: flex;
-      flex-direction: column;
-      gap: 12px;
-      box-sizing: border-box;
-    }
+  /* ---------------- SECTIONS ---------------- */
+  .section { display:none; padding:20px; max-width:900px; margin:20px auto; }
+  .section.active { display:block; }
 
-    .owner-box input[type="text"] {
-      width: 100%;
-      padding: 12px;
-      border-radius: 10px;
-      border: 1px solid #b67385;  /* bordeaux pastel */
-      font-size:16px;
-      box-sizing: border-box;
-    }
+  /* ---------------- CREATION LIST ---------------- */
+  #display-modes { text-align:center; margin:15px 0; }
+  #display-modes button {
+    padding:8px 12px; margin:0 5px; border:none; border-radius:8px;
+    cursor:pointer; background:#ffb6c1; color:#8b3a3a; font-weight:bold;
+  }
+  #owner-list { display:flex; flex-wrap:wrap; gap:10px; justify-content:center; }
+  .owner-item {
+    position:relative; background:#ffe6f0; border:2px solid #b67385;
+    border-radius:12px; padding:5px; text-align:center; width:120px;
+  }
+  .owner-item img { width:100px; height:100px; object-fit:cover; display:block; margin:0 auto; }
+  .owner-item .owner-name { margin-top:5px; font-weight:bold; color:#8b3a3a; }
+  .owner-item .delete-btn {
+    position:absolute; top:5px; right:5px; width:22px; height:22px;
+    background:rgba(255,192,203,0.85); border:1px solid #8b3a3a;
+    border-radius:50%; display:flex; justify-content:center;
+    align-items:center; font-weight:bold; cursor:pointer; font-size:14px;
+  }
 
-    .owner-box input[type="file"] {
-      padding: 10px;
-      border-radius:10px;
-      border:1px solid #b67385;
-      background:#ffb6c1;
-      color:#8b3a3a;
-      font-size:16px;
-    }
+  /* ---------------- MODES AFFICHAGE ---------------- */
+  #owner-list.carousel { display:flex; overflow-x:auto; }
+  #owner-list.grid { display:flex; flex-wrap:wrap; justify-content:center; }
+  #owner-list.list { display:flex; flex-direction:column; align-items:center; }
 
-    .owner-box button {
-      width:100%;
-      padding:12px;
-      background:#ffb6c1;        /* bouton rose */
-      color:#8b3a3a;             /* texte bordeaux */
-      border:none;
-      border-radius:12px;
-      font-size:17px;
-      box-shadow:0 4px 8px rgba(182,115,133,0.4);
-      cursor:pointer;
-      font-weight:bold;
-    }
-
-    /* LISTE CREATIONS */
-    #owner-list { display:flex; gap:12px; flex-wrap:wrap; justify-content:center; margin-top:20px; }
-    .owner-item {
-      background:#ffe6f0;           /* rose pastel */
-      border:2px solid #b67385;     /* bordeaux pastel */
-      border-radius:12px;
-      padding:10px;
-      box-shadow:0 4px 10px rgba(182,115,133,0.15);
-      position:relative;
-      width:140px;
-      text-align:center;
-      box-sizing: border-box;
-    }
-    .owner-item img { width:100px; height:100px; object-fit:cover; border-radius:10px; margin-bottom:6px; }
-    .owner-name { margin-top:5px; font-size:14px; color:#8b3a3a; font-weight:bold; word-wrap: break-word; }
-    .delete-btn {
-      position:absolute; top:5px; right:5px;
-      background:rgba(255,192,203,0.85); border:1px solid #8b3a3a;
-      color:#8b3a3a; border-radius:50%; width:22px; height:22px;
-      display:flex; justify-content:center; align-items:center; font-weight:bold; cursor:pointer;
-    }
-
-    /* MODES AFFICHAGE */
-    #owner-list.carousel { display:flex; flex-wrap:nowrap; overflow-x:auto; padding-bottom:10px; }
-    #owner-list.grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(140px,1fr)); }
-    #owner-list.list { display:flex; flex-direction:column; align-items:center; }
-    #owner-list.list .owner-item { width:100%; max-width:500px; display:flex; align-items:center; gap:15px; }
-    #owner-list.list img { width:70px; height:70px; }
-
-    /* SIDEBAR */
-    #sidebar {
-      position:fixed;
-      top:0;
-      left:-220px;
-      width:200px;
-      height:100vh;
-      background:#ffe6f0;
-      border-right:2px solid #b67385;
-      padding:20px;
-      box-shadow:2px 0 10px rgba(0,0,0,0.15);
-      display:flex; flex-direction:column; gap:10px;
-      transition:left 0.35s ease;
-      z-index:9999;
-    }
-    #sidebar.sidebar-open { left:0; }
-
-    #sidebar button { background:#ffb6c1; color:#8b3a3a; border:none; border-radius:10px; padding:10px; cursor:pointer; font-weight:bold; }
-
-    #toggleSidebar {
-      position:fixed; top:50%; left:0;
-      width:32px; height:60px;
-      background:#ffb6c1; color:#8b3a3a;
-      display:flex; justify-content:center; align-items:center;
-      border-radius:0 10px 10px 0; cursor:pointer;
-      font-size:22px; font-weight:bold; z-index:10000;
-      box-shadow:2px 2px 6px rgba(0,0,0,0.2);
-    }
-
-    /* SECTIONS */
-    .section { display:none; padding:20px; max-width:700px; margin:0 auto; }
-    .section.active { display:block; }
-    .section button.back { margin-bottom:20px; background:#ffb6c1; color:#8b3a3a; border:none; padding:10px 15px; border-radius:10px; cursor:pointer; font-weight:bold; box-shadow:0 4px 8px rgba(182,115,133,0.3); }
-
-  </style>
+</style>
 </head>
 <body>
 
 <!-- SIDEBAR -->
 <div id="sidebar">
+  <div id="toggleSidebar">☰</div>
   <button onclick="openSection('videos')">Vidéos / Tutoriels</button>
   <button onclick="openSection('mailles')">Compteur de mailles</button>
   <button onclick="openSection('pelotes')">Pelotes & Couleurs</button>
   <button onclick="openSection('notes')">Notes / Inspirations</button>
   <button onclick="openSection('settings')">Paramètres / Sauvegarde</button>
 </div>
-<div id="toggleSidebar">☰</div>
 
+<!-- MES CREATIONS -->
 <h1>Mes Créations</h1>
-
-<!-- AJOUT CREATION -->
-<div class="owner-box">
-  <input id="name" type="text" placeholder="Nom de la création">
+<div class="creation-box owner-box">
+  <input id="name" placeholder="Nom de la création">
   <input id="photo" type="file" accept="image/*">
   <button id="add">Ajouter</button>
 </div>
 
 <!-- MODES AFFICHAGE -->
-<div style="text-align:center; margin-bottom: 20px;">
+<div id="display-modes">
   <button onclick="setMode('carousel')">Carrousel</button>
   <button onclick="setMode('grid')">Grille</button>
   <button onclick="setMode('list')">Liste</button>
 </div>
 
 <!-- LISTE CREATIONS -->
-<div id="owner-list" class="grid">
-  <!-- Tes photos existantes ici -->
+<div id="owner-list" class="grid"></div>
+
+<!-- ================= SECTIONS ================= -->
+<div class="section" id="videos">
+  <button onclick="closeSection()">← Retour Mes Créations</button>
+  <h1>Vidéos / Tutoriels</h1>
 </div>
 
-<!-- SECTIONS -->
-<div class="section" id="videos">
-  <button class="back" onclick="closeSection()">← Mes Créations</button>
-  <h2>Vidéos / Tutoriels</h2>
-</div>
 <div class="section" id="mailles">
-  <button class="back" onclick="closeSection()">← Mes Créations</button>
-  <h2>Compteur de mailles</h2>
+  <button onclick="closeSection()">← Retour Mes Créations</button>
+  <h1>Compteur de mailles</h1>
 </div>
+
 <div class="section" id="pelotes">
-  <button class="back" onclick="closeSection()">← Mes Créations</button>
-  <h2>Pelotes & Couleurs</h2>
+  <button onclick="closeSection()">← Retour Mes Créations</button>
+  <h1>Pelotes & Couleurs</h1>
 </div>
+
 <div class="section" id="notes">
-  <button class="back" onclick="closeSection()">← Mes Créations</button>
-  <h2>Notes / Inspirations</h2>
+  <button onclick="closeSection()">← Retour Mes Créations</button>
+  <h1>Notes / Inspirations</h1>
 </div>
+
 <div class="section" id="settings">
-  <button class="back" onclick="closeSection()">← Mes Créations</button>
-  <h2>Paramètres / Sauvegarde</h2>
+  <button onclick="closeSection()">← Retour Mes Créations</button>
+  <h1>Paramètres / Sauvegarde</h1>
 </div>
 
 <!-- JS -->
-<script type="module" src="owner.js"></script>
 <script>
-  // SIDEBAR
-  const sidebar = document.getElementById("sidebar");
-  const toggle = document.getElementById("toggleSidebar");
-  toggle.onclick = () => sidebar.classList.toggle("sidebar-open");
+const sidebar = document.getElementById("sidebar");
+const toggle = document.getElementById("toggleSidebar");
+toggle.onclick = () => sidebar.classList.toggle("sidebar-open");
 
-  // MODES AFFICHAGE
-  function setMode(mode){
-    const list = document.getElementById("owner-list");
-    list.className = mode;
-  }
+// MES CREATIONS - AJOUT ET AFFICHAGE
+const ownerList = document.getElementById("owner-list");
+document.getElementById("add").onclick = ()=>{
+  const name = document.getElementById("name").value.trim();
+  const file = document.getElementById("photo").files[0];
+  if(!name||!file) return;
 
-  // AJOUT CREATIONS
-  const ownerList = document.getElementById("owner-list");
-  document.getElementById("add").onclick = ()=>{
-    const name = document.getElementById("name").value.trim();
-    const file = document.getElementById("photo").files[0];
-    if(!name||!file) return;
-    const imgUrl = URL.createObjectURL(file);
+  const imgUrl = URL.createObjectURL(file);
+  const div = document.createElement("div"); div.className="owner-item";
+  const img = document.createElement("img"); img.src=imgUrl; div.appendChild(img);
+  const nameEl = document.createElement("div"); nameEl.className="owner-name"; nameEl.textContent=name; div.appendChild(nameEl);
+  const del = document.createElement("div"); del.className="delete-btn"; del.textContent="×";
+  del.onclick=()=>div.remove(); div.appendChild(del);
+  ownerList.appendChild(div);
 
-    const div = document.createElement("div");
-    div.className = "owner-item";
+  document.getElementById("name").value=""; document.getElementById("photo").value="";
+};
 
-    const img = document.createElement("img"); img.src = imgUrl; div.appendChild(img);
+// CARROUSEL / GRILLE / LISTE
+function setMode(mode){ ownerList.className = mode; }
 
-    const nameEl = document.createElement("div");
-    nameEl.className="owner-name"; nameEl.textContent=name; div.appendChild(nameEl);
+// OUVRIR SECTION
+function openSection(id){
+  sidebar.classList.remove('sidebar-open');
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.owner-box, #owner-list, #display-modes').forEach(e=>e.style.display='none');
+  const section = document.getElementById(id);
+  if(section) section.classList.add('active');
+}
 
-    const del = document.createElement("div"); del.className="delete-btn"; del.textContent="×";
-    del.onclick=()=>div.remove(); div.appendChild(del);
-
-    ownerList.appendChild(div);
-
-    document.getElementById("name").value="";
-    document.getElementById("photo").value="";
-  };
-
-  // OUVRIR SECTION
-  function openSection(id){
-    document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
-    document.querySelectorAll('.owner-box, #owner-list').forEach(e=>e.style.display='none');
-    document.getElementById(id).classList.add('active');
-  }
-
-  // FERMER SECTION
-  function closeSection(){
-    document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
-    document.querySelectorAll('.owner-box, #owner-list').forEach(e=>e.style.display='flex');
-    ownerList.style.display='flex';
-  }
+// RETOUR MES CREATIONS
+function closeSection(){
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.owner-box, #owner-list, #display-modes').forEach(e=>e.style.display='flex');
+}
 </script>
+
 </body>
 </html>
