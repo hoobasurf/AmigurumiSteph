@@ -1,55 +1,53 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <title>Owner - Crochet</title>
-  <style>
-    body { font-family: sans-serif; padding: 20px; background: #fff0f5; margin:0; }
-    .sidebar {
-      position: fixed;
-      top:0; left:0; width:220px; height:100vh;
-      background:#ffe6f0; padding:20px;
-      box-shadow:2px 0 5px rgba(0,0,0,0.1);
-    }
-    .sidebar h2 { color:#b84c6f; }
-    .sidebar button { display:block; margin:10px 0; padding:10px; border:none; border-radius:10px; background:#ffb6c1; cursor:pointer; color:#8b3a3a; font-weight:bold; }
-    .main { margin-left:240px; padding:20px; }
+<meta charset="UTF-8">
+<title>Owner - Crochet</title>
+<style>
+  body { font-family: sans-serif; padding: 20px; background: #fff0f5; margin:0; }
+  .sidebar {
+    position: fixed; top:0; left:0; width:220px; height:100vh;
+    background:#ffe6f0; padding:20px; box-shadow:2px 0 5px rgba(0,0,0,0.1);
+  }
+  .sidebar h2 { color:#b84c6f; }
+  .sidebar button { display:block; margin:10px 0; padding:10px; border:none; border-radius:10px; background:#ffb6c1; cursor:pointer; color:#8b3a3a; font-weight:bold; }
+  .main { margin-left:240px; padding:20px; }
 
-    /* Ton style existant pour les créations */
-    .owner-box { margin-bottom: 20px; }
-    input, button, textarea { padding: 10px; margin: 5px; border-radius: 8px; border: 1px solid #ccc; }
-    button { background-color: #ffb6c1; cursor: pointer; }
-    #owner-list { display: flex; flex-wrap: wrap; gap: 10px; }
-    .owner-item, .pelote-item, .video-item, .note-item { 
-      background: #ffe6f0;                 
-      border: 2px solid #b67385;           
-      padding: 10px;
-      border-radius: 15px;                 
-      box-shadow: 0 4px 10px rgba(182, 115, 133, 0.15); 
-      position: relative;
-    }
-    .owner-item img, .pelote-item img, .video-item img, .note-item img { max-width:100px; border-radius:8px; display:block; margin-bottom:5px; }
-    .delete-btn {
-      position: absolute;
-      top: 5px;
-      right: 5px;
-      background: rgba(255, 192, 203, 0.85);
-      border: 1px solid #8b3a3a;
-      color: #8b3a3a;
-      border-radius: 50%;
-      width: 22px;
-      height: 22px;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      font-weight: bold;
-      cursor: pointer;
-      font-size: 14px;
-    }
+  /* Ton style existant pour les créations */
+  .owner-box { margin-bottom: 20px; }
+  input, button, textarea { padding: 10px; margin: 5px; border-radius: 8px; border: 1px solid #ccc; }
+  button { background-color: #ffb6c1; cursor: pointer; }
+  #owner-list { display: flex; flex-wrap: wrap; gap: 10px; }
+  .owner-item, .pelote-item, .video-item, .note-item { 
+    background: #ffe6f0;                 
+    border: 2px solid #b67385;           
+    padding: 10px;
+    border-radius: 15px;                 
+    box-shadow: 0 4px 10px rgba(182, 115, 133, 0.15); 
+    position: relative;
+  }
+  .owner-item img, .pelote-item img, .video-item img, .note-item img { max-width:100px; border-radius:8px; display:block; margin-bottom:5px; }
+  .delete-btn {
+    position: absolute;
+    top: 5px;
+    right: 5px;
+    background: rgba(255, 192, 203, 0.85);
+    border: 1px solid #8b3a3a;
+    color: #8b3a3a;
+    border-radius: 50%;
+    width: 22px;
+    height: 22px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-weight: bold;
+    cursor: pointer;
+    font-size: 14px;
+  }
 
-    .section { display:block; }
-    .hidden { display:none; }
-  </style>
+  .section { display:block; }
+  .hidden { display:none; }
+</style>
 </head>
 <body>
 
@@ -64,7 +62,7 @@
 
 <div class="main">
 
-  <!-- ================= CREATIONS (TON CODE EXISTANT) ================= -->
+  <!-- ================= CREATIONS (TON CODE EXACT) ================= -->
   <div id="creations" class="section">
     <h1>Ajouter une création</h1>
     <div class="owner-box">
@@ -123,7 +121,7 @@
 
 </div>
 
-<script type="module" src="owner.js"></script>
-<script type="module" src="app.js"></script>
+<script type="module" src="owner.js"></script> <!-- TON CODE EXACT INTACT -->
+<script type="module" src="app.js"></script>   <!-- NOUVELLE LOGIQUE SUPABASE POUR AUTRES SECTIONS -->
 </body>
 </html>
