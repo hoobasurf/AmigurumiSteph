@@ -4,192 +4,181 @@
   <meta charset="UTF-8">
   <title>Owner - Test Ajouter</title>
   <style>
-    body { font-family: sans-serif; padding: 20px; background: #fff0f5; }
+    body { font-family: sans-serif; padding: 20px; background: #fff0f5; margin: 0; }
     .owner-box { margin-bottom: 20px; }
     input, button { padding: 10px; margin: 5px; border-radius: 8px; border: 1px solid #ccc; }
     button { background-color: #ffb6c1; cursor: pointer; }
     #owner-list { display: flex; flex-wrap: wrap; gap: 10px; }
-    .owner-item { background: #fff; padding: 10px; border-radius: 10px; box-shadow: 0 0 5px #ccc; }
+    .owner-item { background: #fff; padding: 10px; border-radius: 10px; box-shadow: 0 0 5px #ccc; position: relative; }
     .owner-item img { max-width: 100px; border-radius: 8px; display: block; }
- .owner-item {
-  background: #ffe6f0;                 /* rose pastel */
-  border: 2px solid #b67385;           /* contour bordeaux pastel */
-  padding: 10px;
-  border-radius: 15px;                 /* plus doux */
-  box-shadow: 0 4px 10px rgba(182, 115, 133, 0.15); /* ombre pastel légère */
-}
 
-/* Petite croix */
-.delete-btn {
-  position: absolute;
-  top: 5px;
-  right: 5px;
-  background: rgba(255, 192, 203, 0.85); /* rose pastel */
-  border: 1px solid #8b3a3a; /* bordeaux léger */
-  color: #8b3a3a;
-  border-radius: 50%;
-  width: 22px;
-  height: 22px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font-weight: bold;
-  cursor: pointer;
-  font-size: 14px;
-}
+    .owner-item {
+      background: #ffe6f0;
+      border: 2px solid #b67385;
+      padding: 10px;
+      border-radius: 15px;
+      box-shadow: 0 4px 10px rgba(182, 115, 133, 0.15);
+    }
 
-    /* Sidebar cachée par défaut */
-#sidebar {
-  position: fixed;
-  top: 0;
-  left: -200px; /* cachée à gauche */
-  width: 200px;
-  height: 100vh;
-  background: #ffe6f0;
-  padding: 20px;
-  box-shadow: 2px 0 5px rgba(0,0,0,0.1);
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  transition: left 0.3s;
-  z-index: 9999;
-}
+    /* Petite croix */
+    .delete-btn {
+      position: absolute;
+      top: 5px;
+      right: 5px;
+      background: rgba(255, 192, 203, 0.85);
+      border: 1px solid #8b3a3a;
+      color: #8b3a3a;
+      border-radius: 50%;
+      width: 22px;
+      height: 22px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-weight: bold;
+      cursor: pointer;
+      font-size: 14px;
+    }
 
-#sidebar button {
-  background: #ffb6c1;
-  color: #8b3a3a;
-  border: none;
-  border-radius: 10px;
-  padding: 10px;
-  cursor: pointer;
-  font-weight: bold;
-}
+    /* Sidebar */
+    #sidebar {
+      position: fixed;
+      top: 0;
+      left: -200px;
+      width: 200px;
+      height: 100vh;
+      background: #ffe6f0;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+      transition: left 0.3s;
+      z-index: 9999;
+    }
 
-/* Encoche visible pour ouvrir la sidebar */
-#toggleSidebar {
-  position: absolute;
-  top: 50%;
-  right: -30px;
-  width: 30px;
-  height: 60px;
-  background: #ffb6c1;
-  color: #8b3a3a;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  border-radius: 0 10px 10px 0;
-  cursor: pointer;
-  font-weight: bold;
-}
+    #sidebar button {
+      background: #ffb6c1;
+      color: #8b3a3a;
+      border: none;
+      border-radius: 10px;
+      padding: 10px;
+      cursor: pointer;
+      font-weight: bold;
+    }
 
-/* Cache toutes les sections par défaut */
-.section.hidden {
-  display: none;
-}
+    /* Encoche toujours visible */
+    #toggleSidebar {
+      position: fixed;
+      top: 50%;
+      left: 0;
+      width: 30px;
+      height: 60px;
+      background: #ffb6c1;
+      color: #8b3a3a;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      border-radius: 0 10px 10px 0;
+      cursor: pointer;
+      font-weight: bold;
+      z-index: 10000;
+    }
 
-/* Sidebar fermée */
-.sidebar-closed {
-  left: -200px;
-}
+    /* Toutes les sections cachées par défaut */
+    .section { display: none; }
 
-/* Sidebar ouverte */
-.sidebar-open {
-  left: 0;
-  transition: left 0.3s;
-}
-    
+    /* Conteneur principal */
+    #main-content { margin-left: 0; transition: margin-left 0.3s; }
   </style>
 </head>
 <body>
 
-<div id="sidebar" class="sidebar-closed">
-  <div id="toggleSidebar" class="sidebar-tab">☰</div>
+<!-- Encoche toujours visible -->
+<div id="toggleSidebar">☰</div>
+
+<!-- Sidebar -->
+<div id="sidebar">
   <button onclick="showSection('videos')">Vidéos / Tutoriels</button>
   <button onclick="showSection('mailles')">Compteur de mailles</button>
   <button onclick="showSection('pelotes')">Pelotes & Couleurs</button>
   <button onclick="showSection('notes')">Notes / Inspirations</button>
   <button onclick="showSection('settings')">Paramètres / Sauvegarde</button>
 </div>
-  
-<h1>Ajouter une création</h1>
 
-<div class="owner-box">
-  <input id="name" placeholder="Nom de la création">
-  <input id="photo" type="file" accept="image/*">
-  <button id="add">Ajouter</button>
-</div>
+<!-- Contenu principal -->
+<div id="main-content">
+  <h1>Ajouter une création</h1>
+  <div class="owner-box">
+    <input id="name" placeholder="Nom de la création">
+    <input id="photo" type="file" accept="image/*">
+    <button id="add">Ajouter</button>
+  </div>
 
-<h2>Liste des créations</h2>
-<div id="owner-list"></div>
+  <h2>Liste des créations</h2>
+  <div id="owner-list"></div>
 
-<script type="module" src="owner.js"></script>
-  
   <!-- ================= NOUVELLES SECTIONS ================= -->
-<div class="section hidden" id="videos">
-  <h1>Vidéos / Tutoriels</h1>
-  <input id="video-url" placeholder="URL YouTube">
-  <input id="video-title" placeholder="Titre (facultatif)">
-  <textarea id="video-transcription" placeholder="Transcription"></textarea>
-  <input id="video-progress" placeholder="Position (ex: 5:32)">
-  <button id="addVideo">Ajouter</button>
-  <div id="video-list"></div>
+  <div class="section" id="videos">
+    <h1>Vidéos / Tutoriels</h1>
+    <input id="video-url" placeholder="URL YouTube">
+    <input id="video-title" placeholder="Titre (facultatif)">
+    <textarea id="video-transcription" placeholder="Transcription"></textarea>
+    <input id="video-progress" placeholder="Position (ex: 5:32)">
+    <button id="addVideo">Ajouter</button>
+    <div id="video-list"></div>
+  </div>
+
+  <div class="section" id="mailles">
+    <h1>Compteur de mailles</h1>
+    <input id="maille-name" placeholder="Nom du motif">
+    <input id="maille-count" type="number" value="0">
+    <button id="increment-maille">+1</button>
+    <button id="decrement-maille">-1</button>
+    <button id="reset-maille">Reset</button>
+  </div>
+
+  <div class="section" id="pelotes">
+    <h1>Pelotes & Couleurs</h1>
+    <input id="pelote-name" placeholder="Nom">
+    <input id="pelote-marque" placeholder="Marque">
+    <input id="pelote-ref" placeholder="Référence couleur">
+    <input id="pelote-qty" type="number" placeholder="Quantité">
+    <input id="pelote-photo" type="file" accept="image/*">
+    <button id="addPelote">Ajouter</button>
+    <div id="pelote-list"></div>
+  </div>
+
+  <div class="section" id="notes">
+    <h1>Notes / Inspirations</h1>
+    <input id="note-title" placeholder="Titre">
+    <textarea id="note-content" placeholder="Contenu"></textarea>
+    <input id="note-photo" type="file" accept="image/*">
+    <button id="addNote">Ajouter</button>
+    <div id="note-list"></div>
+  </div>
+
+  <div class="section" id="settings">
+    <h1>Paramètres / Sauvegarde</h1>
+    <button id="exportData">Exporter les données</button>
+    <input type="file" id="importFile">
+    <button id="importData">Importer les données</button>
+  </div>
 </div>
 
-<div class="section hidden" id="mailles">
-  <h1>Compteur de mailles</h1>
-  <input id="maille-name" placeholder="Nom du motif">
-  <input id="maille-count" type="number" value="0">
-  <button id="increment-maille">+1</button>
-  <button id="decrement-maille">-1</button>
-  <button id="reset-maille">Reset</button>
-</div>
-
-<div class="section hidden" id="pelotes">
-  <h1>Pelotes & Couleurs</h1>
-  <input id="pelote-name" placeholder="Nom">
-  <input id="pelote-marque" placeholder="Marque">
-  <input id="pelote-ref" placeholder="Référence couleur">
-  <input id="pelote-qty" type="number" placeholder="Quantité">
-  <input id="pelote-photo" type="file" accept="image/*">
-  <button id="addPelote">Ajouter</button>
-  <div id="pelote-list"></div>
-</div>
-
-<div class="section hidden" id="notes">
-  <h1>Notes / Inspirations</h1>
-  <input id="note-title" placeholder="Titre">
-  <textarea id="note-content" placeholder="Contenu"></textarea>
-  <input id="note-photo" type="file" accept="image/*">
-  <button id="addNote">Ajouter</button>
-  <div id="note-list"></div>
-</div>
-
-<div class="section hidden" id="settings">
-  <h1>Paramètres / Sauvegarde</h1>
-  <button id="exportData">Exporter les données</button>
-  <input type="file" id="importFile">
-  <button id="importData">Importer les données</button>
-</div>
-  
-<!-- TON HTML EXISTANT POUR LES CREATIONS ET LES NOUVELLES SECTIONS -->
-
-<!-- JS pour la sidebar coulissante -->
+<!-- JS sidebar et sections -->
 <script>
-// Sidebar coulissante
-const sidebar = document.getElementById('sidebar');
-const toggle = document.getElementById('toggleSidebar');
+  const sidebar = document.getElementById('sidebar');
+  const toggle = document.getElementById('toggleSidebar');
 
-toggle.onclick = () => {
-  sidebar.classList.toggle('sidebar-open');
-  sidebar.classList.toggle('sidebar-closed');
-}
+  toggle.onclick = () => {
+    sidebar.classList.toggle('sidebar-open');
+  }
 
-// Fonction pour afficher uniquement la section demandée
-function showSection(id) {
-  document.querySelectorAll('.section').forEach(s => s.classList.add('hidden'));
-  const section = document.getElementById(id);
-  if(section) section.classList.remove('hidden');
-}
+  function showSection(id) {
+    document.querySelectorAll('.section').forEach(s => s.style.display = 'none');
+    const section = document.getElementById(id);
+    if(section) section.style.display = 'block';
+  }
 </script>
 
 <!-- JS existant pour les créations -->
