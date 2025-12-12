@@ -4,24 +4,31 @@ const supabaseUrl = 'VOTRE_SUPABASE_URL';
 const supabaseKey = 'VOTRE_SUPABASE_ANON_KEY';
 const supabase = createClient(supabaseUrl, supabaseKey);
 
-// ================= SIDEBAR =================
+// ---------------- SIDEBAR ----------------
 function showSection(id) {
   document.querySelectorAll('.section').forEach(s => s.classList.add('hidden'));
   document.getElementById(id).classList.remove('hidden');
 }
 window.showSection = showSection;
 
-// ================= CREATIONS (TON CODE EXISTANT) =================
-// Récupération et gestion locale existante reste inchangée
-// (owner.js est déjà inclus et contient ton code actuel)
-
-// ================= VIDEOS =================
-const videoUrl = document.getElementById('video-url');
-const videoTitle = document.getElementById('video-title');
-const videoTranscription = document.getElementById('video-transcription');
-const videoProgress = document.getElementById('video-progress');
+// ---------------- VIDEOS ----------------
 const addVideoBtn = document.getElementById('addVideo');
 const videoList = document.getElementById('video-list');
+
+addVideoBtn.onclick = async () => {
+  const url = document.getElementById('video-url').value;
+  const title = document.getElementById('video-title').value;
+  const transcription = document.getElementById('video-transcription').value;
+  const progress = document.getElementById('video-progress').value;
+  if(!url) return alert("URL obligatoire");
+
+  await supabase.from('videos').insert([{ url, title, transcription, progress }]);
+  document.getElementById('video-url').value = '';
+  document.getElementById('video-title').value = '';
+  document.getElementById('video-transcription').value = '';
+  document.getElementById('video-progress').value = '';
+  renderVideos();
+};
 
 async function renderVideos() {
   const { data } = await supabase.from('videos').select('*').order('created_at', { ascending: false });
@@ -30,7 +37,7 @@ async function renderVideos() {
     const div = document.createElement('div');
     div.className = 'video-item';
     div.innerHTML = `
-      <div class="delete-btn" onclick="deleteVideo('${v.id}')">×</div>
+      <div class="delete-btn" data-id="${v.id}">×</div>
       <iframe width="200" height="113" src="https://www.youtube.com/embed/${getYoutubeId(v.url)}" frameborder="0" allowfullscreen></iframe>
       <p><b>${v.title}</b></p>
       <p>${v.transcription}</p>
@@ -39,33 +46,21 @@ async function renderVideos() {
     videoList.appendChild(div);
   });
 }
-
 function getYoutubeId(url) {
   const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
   const match = url.match(regExp);
   return (match && match[2].length==11) ? match[2] : null;
 }
-
-window.deleteVideo = async (id) => {
-  await supabase.from('videos').delete().eq('id', id);
-  renderVideos();
-};
-
-addVideoBtn.onclick = async () => {
-  if(!videoUrl.value) return alert('URL obligatoire');
-  await supabase.from('videos').insert([{
-    url: videoUrl.value,
-    title: videoTitle.value,
-    transcription: videoTranscription.value,
-    progress: videoProgress.value
-  }]);
-  videoUrl.value = videoTitle.value = videoTranscription.value = videoProgress.value = '';
-  renderVideos();
-};
-
+videoList.addEventListener("click", async (e)=>{
+  if(e.target.classList.contains("delete-btn")){
+    const id = e.target.dataset.id;
+    await supabase.from('videos').delete().eq('id',id);
+    renderVideos();
+  }
+});
 renderVideos();
 
-// ================= PELOTES =================
+// ---------------- PELOTES ----------------
 const addPeloteBtn = document.getElementById('addPelote');
 const peloteList = document.getElementById('pelote-list');
 
@@ -90,11 +85,11 @@ addPeloteBtn.onclick = async () => {
 async function renderPelotes() {
   const { data } = await supabase.from('pelotes').select('*').order('created_at', { ascending: false });
   peloteList.innerHTML='';
-  data.forEach(p => {
+  data.forEach(p=>{
     const div = document.createElement('div');
     div.className='pelote-item';
-    div.innerHTML = `
-      <div class="delete-btn" onclick="deletePelote('${p.id}')">×</div>
+    div.innerHTML=`
+      <div class="delete-btn" data-id="${p.id}">×</div>
       <img src="${p.photo_url}" alt="">
       <p><b>${p.name}</b></p>
       <p>${p.marque} / ${p.ref_couleur}</p>
@@ -103,10 +98,16 @@ async function renderPelotes() {
     peloteList.appendChild(div);
   });
 }
-window.deletePelote = async (id) => { await supabase.from('pelotes').delete().eq('id',id); renderPelotes(); }
+peloteList.addEventListener("click", async (e)=>{
+  if(e.target.classList.contains("delete-btn")){
+    const id = e.target.dataset.id;
+    await supabase.from('pelotes').delete().eq('id',id);
+    renderPelotes();
+  }
+});
 renderPelotes();
 
-// ================= MAILLES =================
+// ---------------- MAILLES ----------------
 const mailleName = document.getElementById('maille-name');
 const mailleCount = document.getElementById('maille-count');
 const incrementBtn = document.getElementById('increment-maille');
@@ -117,7 +118,7 @@ incrementBtn.onclick = () => mailleCount.value = parseInt(mailleCount.value)+1;
 decrementBtn.onclick = () => mailleCount.value = Math.max(0, parseInt(mailleCount.value)-1);
 resetBtn.onclick = () => mailleCount.value = 0;
 
-// ================= NOTES =================
+// ---------------- NOTES ----------------
 const addNoteBtn = document.getElementById('addNote');
 const noteList = document.getElementById('note-list');
 
@@ -134,7 +135,8 @@ addNoteBtn.onclick = async () => {
   }
 
   await supabase.from('notes').insert([{ title, content, image_url: photoUrl }]);
-  document.getElementById('note-title').value = document.getElementById('note-content').value = '';
+  document.getElementById('note-title').value = '';
+  document.getElementById('note-content').value = '';
   document.getElementById('note-photo').value = '';
   renderNotes();
 };
@@ -146,7 +148,7 @@ async function renderNotes() {
     const div = document.createElement('div');
     div.className='note-item';
     div.innerHTML=`
-      <div class="delete-btn" onclick="deleteNote('${n.id}')">×</div>
+      <div class="delete-btn" data-id="${n.id}">×</div>
       ${n.image_url?`<img src="${n.image_url}" alt="">`:''}
       <p><b>${n.title}</b></p>
       <p>${n.content}</p>
@@ -154,5 +156,12 @@ async function renderNotes() {
     noteList.appendChild(div);
   });
 }
-window.deleteNote = async id=>{await supabase.from('notes').delete().eq('id',id); renderNotes();}
+
+noteList.addEventListener("click", async (e)=>{
+  if(e.target.classList.contains("delete-btn")){
+    const id = e.target.dataset.id;
+    await supabase.from('notes').delete().eq('id', id);
+    renderNotes();
+  }
+});
 renderNotes();
