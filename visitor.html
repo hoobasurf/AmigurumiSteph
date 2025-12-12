@@ -6,7 +6,7 @@
   <style>
     * { box-sizing: border-box; margin:0; padding:0; }
     html, body { height:100%; font-family: 'Comic Sans MS', cursive; }
-    
+
     body {
       background-image: url('Photoroom_20251212_143703.png');
       background-size: contain;
@@ -14,7 +14,6 @@
       background-repeat: no-repeat;
       background-attachment: fixed;
       background-color: #fff0f5;
-
       display: flex;
       flex-direction: column;
       min-height: 100vh;
@@ -47,6 +46,10 @@
     .visitor-item:hover img { box-shadow: 0 8px 20px rgba(184,76,111,0.3); transform: scale(1.03); }
     .visitor-item p { margin:12px 0 0; font-size:20px; color:#b84c6f; font-weight:bold; line-height:1.1; }
 
+    /* Actions bar */
+    .actions-bar { margin-top:8px; display:flex; justify-content:center; gap:20px; font-size:16px; color:#b84c6f; align-items:center; }
+    .actions-bar div { cursor:pointer; display:flex; align-items:center; gap:6px; }
+
     /* CARROUSEL */
     .carousel-view { display:flex; gap:40px; overflow-x:auto; scroll-behavior:smooth; padding:10px; align-items:center; }
     .carousel-view::-webkit-scrollbar { height:8px; }
@@ -75,13 +78,6 @@
     .thumbs { margin-top:16px; display:flex; gap:12px; justify-content:center; flex-wrap:wrap; }
     .thumbs img { width:110px; height:110px; object-fit:contain; border:4px solid #b67385; background:transparent; cursor:pointer; transition: transform 0.2s ease, box-shadow 0.2s ease; }
     .thumbs img:hover { transform:scale(1.06); box-shadow:0 6px 14px rgba(184,76,111,0.3); }
-
-    .icon-bar { margin-top:12px; display:flex; justify-content:center; gap:36px; align-items:center; }
-    .icon-btn { display:flex; gap:8px; align-items:center; cursor:pointer; color:#b84c6f; font-size:18px; }
-    .heart { font-size:26px; transition: color .18s; }
-    .heart.liked { color:#ff4b82; }
-
-    .like-info { font-size:14px; color:#7a2b45; margin-left:8px; }
 
     .comment-section { margin-top:14px; text-align:left; }
     .comment { background:#fff0f7; border:1px solid rgba(184,76,111,0.12); padding:10px; border-radius:10px; margin-bottom:10px; }
@@ -123,13 +119,16 @@
   <div class="modal-box" role="dialog" aria-modal="true" onclick="event.stopPropagation()">
     <div class="close-modal" onclick="closeModal()">×</div>
     <img id="modalMain" class="modal-main-img" alt="Image agrandie">
+    <div class="thumbs" id="thumbsContainer"></div>
     <div class="icon-bar">
       <div class="icon-btn" onclick="toggleLike()">
         <span id="heart" class="heart">♡</span>
-        <span id="likeCount" class="like-info">0</span>
+        <span id="likeInfo" style="font-size:14px;color:#7a2b45;"></span>
+      </div>
+      <div class="icon-btn" onclick="scrollToComments()">
+        💬 <span id="commentCount" class="likeInfo">0</span>
       </div>
     </div>
-    <div id="thumbsContainer" class="thumbs"></div>
     <button class="add-comment-btn" onclick="openCommentForm()">Ajouter un commentaire</button>
     <div id="commentsList" class="comment-section"></div>
   </div>
@@ -146,13 +145,15 @@
 </div>
 
 <script>
+// Éléments
 const list=document.getElementById('visitor-list');
 const modal=document.getElementById('modal');
 const modalMain=document.getElementById('modalMain');
 const thumbs=document.getElementById('thumbsContainer');
 const heart=document.getElementById('heart');
-const likeCount=document.getElementById('likeCount');
-const commentList=document.getElementById('commentsList');
+const likeInfo=document.getElementById('likeInfo');
+const commentCount=document.getElementById('commentCount');
+const commentsList=document.getElementById('commentsList');
 const commentFormBg=document.getElementById('commentFormBg');
 const commentName=document.getElementById('commentName');
 const commentText=document.getElementById('commentText');
@@ -160,9 +161,9 @@ const commentText=document.getElementById('commentText');
 let creations=JSON.parse(localStorage.getItem('creations')||'[]');
 if(!creations||creations.length===0){
   creations=[
-    {name:"Projet A", imgUrl:"https://placekitten.com/800/800", images:["https://placekitten.com/800/800","https://placekitten.com/801/800"]},
-    {name:"Projet B", imgUrl:"https://placebear.com/800/800", images:["https://placebear.com/800/800","https://placebear.com/801/800"]},
-    {name:"Projet C", imgUrl:"https://picsum.photos/seed/p/800/800"}
+    {name:"Projet A", imgUrl:"https://placekitten.com/800/800", images:["https://placekitten.com/800/800"]},
+    {name:"Projet B", imgUrl:"https://placebear.com/800/800", images:["https://placebear.com/800/800"]},
+    {name:"Projet C", imgUrl:"https://picsum.photos/seed/p/800/800", images:["https://picsum.photos/seed/p/800/800"]}
   ];
 }
 
@@ -171,6 +172,7 @@ let currentView='carousel';
 
 function escapeHtml(s){ return s?String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'):''; }
 
+// Affichage liste
 function renderVisitor(){
   list.innerHTML='';
   list.className=currentView+'-view';
@@ -182,9 +184,9 @@ function renderVisitor(){
     div.addEventListener('click',()=>openModal(i));
     list.appendChild(div);
   });
-  updateCenter();
 }
 
+// Vues
 function setView(mode){
   currentView=mode;
   document.getElementById('btnCarousel').classList.toggle('active', mode==='carousel');
@@ -198,23 +200,14 @@ document.getElementById('btnGrid').addEventListener('click',()=>setView('grid'))
 document.getElementById('btnList').addEventListener('click',()=>setView('list'));
 setView(currentView);
 
-function updateCenter(){
-  if(currentView!=='carousel'){ document.querySelectorAll('.visitor-item').forEach(it=>it.classList.remove('active')); return; }
-  const items=document.querySelectorAll('.visitor-item');
-  const center=window.innerWidth/2;
-  items.forEach(item=>{ const rect=item.getBoundingClientRect(); const itemCenter=rect.left+rect.width/2; if(Math.abs(itemCenter-center)<170)item.classList.add('active'); else item.classList.remove('active'); });
-}
-
-list.addEventListener('scroll',updateCenter);
-window.addEventListener('resize',updateCenter);
-
+// Modal
 function openModal(i){
   currentIndex=i;
   const proj=creations[i];
   modalMain.src=proj.imgUrl;
-  loadLikes();
+  loadLike(); loadComments();
   thumbs.innerHTML='';
-  if(Array.isArray(proj.images)&&proj.images.length>0){
+  if(Array.isArray(proj.images)){
     proj.images.forEach(src=>{
       const t=document.createElement('img');
       t.src=src; t.alt='miniature';
@@ -224,10 +217,10 @@ function openModal(i){
   }
   modal.style.display='flex';
 }
-
 function closeModal(){ modal.style.display='none'; renderVisitor(); }
 function backgroundClose(e){ if(e.target===modal) closeModal(); }
 
+// Like
 function toggleLike(){
   if(currentIndex===null) return;
   const name=prompt("Ton prénom pour liker cette image:")||"Anonyme";
@@ -236,44 +229,52 @@ function toggleLike(){
   if(likes.includes(name)) likes=likes.filter(n=>n!==name);
   else likes.push(name);
   localStorage.setItem(key,JSON.stringify(likes));
-  loadLikes();
+  loadLike();
 }
-
-function loadLikes(){
+function loadLike(){
   if(currentIndex===null) return;
   const key='likes_'+currentIndex;
   const likes=JSON.parse(localStorage.getItem(key)||'[]');
   if(likes.length>0){ heart.classList.add('liked'); heart.textContent='❤️'; }
   else{ heart.classList.remove('liked'); heart.textContent='♡'; }
-  likeCount.textContent=likes.length + (likes.length>0?": "+likes.join(", "):"");
+  likeInfo.textContent = likes.length + (likes.length>0?": "+likes.join(", "):"");
 }
 
+// Commentaires
 function openCommentForm(){ commentFormBg.style.display='flex'; }
 function closeCommentForm(e){ if(e && e.target===commentFormBg) commentFormBg.style.display='none'; }
 function submitComment(){
   const name=(commentName.value||'').trim(); const text=(commentText.value||'').trim();
   if(!name||!text) return;
-  const key='comments_'+currentIndex; const comments=JSON.parse(localStorage.getItem(key)||'[]');
+  const key='comments_'+currentIndex;
+  let comments=JSON.parse(localStorage.getItem(key)||'[]');
   comments.push({name,text,at:Date.now()});
   localStorage.setItem(key,JSON.stringify(comments));
   commentName.value=''; commentText.value=''; commentFormBg.style.display='none';
   loadComments();
 }
-
 function loadComments(){
   if(currentIndex===null) return;
   const key='comments_'+currentIndex;
   const comments=JSON.parse(localStorage.getItem(key)||'[]');
-  commentList.innerHTML=comments.map(c=>`<div class="comment"><strong>${escapeHtml(c.name)}</strong><br>${escapeHtml(c.text)}</div>`).join('');
+  commentCount.textContent = comments.length;
+  commentsList.innerHTML=comments.map(c=>`<div class="comment"><strong>${escapeHtml(c.name)}</strong><br>${escapeHtml(c.text)}</div>`).join('');
 }
 
+// Évènements clavier
 document.addEventListener('keydown',e=>{
-  if(e.key==='Escape'){ if(commentFormBg.style.display==='flex') commentFormBg.style.display='none'; else if(modal.style.display==='flex') closeModal(); }
+  if(e.key==='Escape'){
+    if(commentFormBg.style.display==='flex') commentFormBg.style.display='none';
+    else if(modal.style.display==='flex') closeModal();
+  }
 });
 
-const observer=new MutationObserver(()=>updateCenter());
+// Observer
+const observer=new MutationObserver(()=>renderVisitor());
 observer.observe(list,{childList:true,subtree:true});
-setTimeout(updateCenter,200);
+
+// Initial
+setTimeout(renderVisitor,200);
 </script>
 </body>
 </html>
