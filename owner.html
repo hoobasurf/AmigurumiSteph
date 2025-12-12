@@ -2,28 +2,57 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Owner - Test Ajouter</title>
+  <title>Mes Créations</title>
   <style>
-    body { font-family: sans-serif; padding: 20px; background: #fff0f5; margin:0; overflow-x:hidden; }
+    body { font-family: sans-serif; padding: 0; margin: 0; background: #fff0f5; overflow-x: hidden; }
 
     /* TITRE */
-    h1 { text-align:center; font-size:28px; color:#8b3a3a; font-family:"Georgia", serif; letter-spacing:1px; margin-bottom:25px; }
+    h1 { text-align:center; font-size:32px; color:#8b3a3a; font-family:"Georgia", serif; letter-spacing:1px; margin:25px 0; }
 
-    /* AJOUT CREATION */
+    /* ENCADRÉ AJOUT CREATION */
     .owner-box {
       margin: 0 auto 25px;
       background: #ffe6f0;
       border: 2px solid #b67385;
-      padding: 20px;
+      padding: 25px 20px;
       width: 90%;
       max-width: 450px;
       border-radius: 15px;
       box-shadow: 0 4px 15px rgba(182,115,133,0.25);
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
     }
 
-    .owner-box input[type="text"] { width:100%; padding:12px; border-radius:10px; border:1px solid #b67385; margin-bottom:10px; font-size:16px; }
-    .owner-box input[type="file"] { width:100%; padding:12px; border-radius:10px; border:1px solid #b67385; background:#ffb6c1; margin-bottom:10px; }
-    .owner-box button { width:100%; padding:12px; background:#ff7f9f; color:white; border:none; border-radius:12px; font-size:17px; box-shadow:0 4px 8px rgba(182,115,133,0.4); cursor:pointer; }
+    .owner-box input[type="text"] {
+      width: 100%;
+      padding: 12px;
+      border-radius: 10px;
+      border: 1px solid #b67385;
+      font-size:16px;
+    }
+
+    .owner-box input[type="file"] {
+      padding: 10px;
+      border-radius:10px;
+      border:1px solid #b67385;
+      background:#ffb6c1;
+      color:#8b3a3a;
+      font-size:16px;
+    }
+
+    .owner-box button {
+      width:100%;
+      padding:12px;
+      background:#ff7f9f;
+      color:white;
+      border:none;
+      border-radius:12px;
+      font-size:17px;
+      box-shadow:0 4px 8px rgba(182,115,133,0.4);
+      cursor:pointer;
+      font-weight:bold;
+    }
 
     /* LISTE CREATIONS */
     #owner-list { display:flex; gap:12px; flex-wrap:wrap; justify-content:center; margin-top:20px; }
@@ -116,15 +145,7 @@
 
 <!-- LISTE CREATIONS -->
 <div id="owner-list" class="grid">
-  <!-- Tes photos existantes doivent être ici en HTML si tu veux les conserver -->
-  <!-- Exemple : -->
-  <!--
-  <div class="owner-item">
-    <img src="photo1.jpg" alt="">
-    <div class="owner-name">Nom création 1</div>
-    <div class="delete-btn">×</div>
-  </div>
-  -->
+  <!-- Tes photos existantes ici -->
 </div>
 
 <!-- SECTIONS -->
