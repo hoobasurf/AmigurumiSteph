@@ -88,19 +88,20 @@
     #visitor-list { width:calc(100% - 40px); max-width:1200px; margin:0 auto; transition:all 0.2s ease; }
 
     .visitor-item { text-align:center; cursor:pointer; user-select:none; }
+    none; }
     .visitor-item img {
   display:block;
   margin:0 auto;
   object-fit:contain;
 
-  background: transparent;                     /* ❌ plus de blanc, transparent */
+  background: transparent !important;     /* 0% blanc */
   border-radius:28px;
 
-  padding:10px;
+  padding:10px;                           /* tu peux baisser si tu veux */
 
-  border:4px dashed #b67385;                   /* 🎀 contour maille bordeaux pastel */
+  border:4px dashed #b67385;              /* bordeaux pastel, style maille */
 
-  box-shadow:0 6px 14px rgba(182, 115, 133, 0.18);  /* ombre douce pastel */
+  box-shadow:0 6px 14px rgba(182, 115, 133, 0.18); /* ombre pastel rosée */
   transition: transform 0.28s ease, box-shadow 0.28s ease;
 }
     .visitor-item:hover img {
@@ -155,12 +156,12 @@
   height:110px;
   object-fit:contain;
 
-  background: transparent;             /* pas de blanc */
-  border-radius:14px;
+  background: transparent !important;      /* plus de blanc */
+  border-radius:12px;
 
-  border:3px dashed #b67385;           /* contour maille pastel */
-
+  border:3px dashed #b67385;               /* bordeaux pastel */
   cursor:pointer;
+
   transition: transform .16s;
 }
     .thumbs img:hover { transform:scale(1.06); border-color:#b84c6f; }
