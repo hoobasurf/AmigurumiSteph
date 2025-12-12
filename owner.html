@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Owner - Test Ajouter</title>
+  <title>Mes créations - Crochet</title>
   <style>
     body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 0; background: #fff0f5; }
 
@@ -13,26 +13,32 @@
       margin-left: 0;
     }
 
-    /* Zone Ajouter une création stylée */
+    /* Titre principal */
+    #page-title {
+      text-align: center;
+      font-size: 36px;
+      font-weight: 700;
+      color: #8b3a3a;        
+      margin-bottom: 40px;
+    }
+
+    /* Ajouter une création */
     #add-creation-container {
-      background: #fff0f5;          /* rose pastel clair */
-      border: 2px solid #b67385;    /* contour bordeaux */
+      background: #fff0f5;
+      border: 2px solid #b67385;
       border-radius: 15px;
       padding: 20px;
-      max-width: 320px;
+      max-width: 400px;
+      margin: 0 auto 40px auto;
       box-shadow: 0 8px 20px rgba(182, 115, 133, 0.2);
       display: flex;
       flex-direction: column;
       gap: 15px;
-      font-size: 14px;
     }
-
     #add-creation-container label {
       font-weight: bold;
       color: #8b3a3a;
-      margin-bottom: 5px;
     }
-
     #add-creation-container input[type="text"],
     #add-creation-container input[type="file"] {
       padding: 10px;
@@ -42,13 +48,11 @@
       outline: none;
       transition: border 0.2s, box-shadow 0.2s;
     }
-
     #add-creation-container input[type="text"]:focus,
     #add-creation-container input[type="file"]:focus {
       border-color: #ffb6c1;
       box-shadow: 0 0 5px #ffb6c1;
     }
-
     #add-creation-container button {
       background: #ffb6c1;
       color: #8b3a3a;
@@ -61,13 +65,12 @@
       box-shadow: 0 4px 12px rgba(182, 115, 133, 0.25);
       transition: transform 0.1s, box-shadow 0.2s;
     }
-
     #add-creation-container button:hover {
       transform: translateY(-2px);
       box-shadow: 0 6px 16px rgba(182, 115, 133, 0.35);
     }
 
-    /* Liste des créations scrollable */
+    /* Liste des créations */
     #owner-list {
       display: flex;
       flex-wrap: nowrap;
@@ -81,7 +84,6 @@
       background-color: #b67385;
       border-radius: 4px;
     }
-
     .owner-item { 
       background: #ffe6f0; 
       border: 2px solid #b67385; 
@@ -91,7 +93,6 @@
       position: relative; 
     }
     .owner-item img { max-width: 100px; border-radius: 8px; display: block; }
-
     .delete-btn {
       position: absolute;
       top: 5px;
@@ -118,6 +119,7 @@
       width: 200px;
       height: 100vh;
       background: #ffe6f0;
+      border-right: 2px solid #b67385;  
       padding: 20px;
       display: flex;
       flex-direction: column;
@@ -165,10 +167,8 @@
 </head>
 <body>
 
-<!-- Encoche -->
 <div id="toggleSidebar">☰</div>
 
-<!-- Sidebar -->
 <div id="sidebar">
   <button onclick="showSection('videos')">Vidéos / Tutoriels</button>
   <button onclick="showSection('mailles')">Compteur de mailles</button>
@@ -177,22 +177,17 @@
   <button onclick="showSection('settings')">Paramètres / Sauvegarde</button>
 </div>
 
-<!-- Contenu principal -->
 <div id="main-content">
-  <h1>Mes créations</h1>
+  <h1 id="page-title">Mes créations</h1>
 
-  <!-- Zone Ajouter création stylée -->
   <div id="add-creation-container">
     <label for="name">Nom de la création</label>
     <input id="name" placeholder="Ex : Napperon Crochet">
-    
     <label for="photo">Choisir une photo</label>
     <input id="photo" type="file" accept="image/*">
-    
     <button id="add">Ajouter</button>
   </div>
 
-  <!-- Liste des créations -->
   <h2>Liste des créations</h2>
   <div id="owner-list"></div>
 
@@ -245,22 +240,18 @@
 
 </div>
 
-<!-- JS -->
 <script type="module" src="owner.js"></script>
 <script>
   const sidebar = document.getElementById('sidebar');
   const toggle = document.getElementById('toggleSidebar');
   const mainContent = document.getElementById('main-content');
-  const addContainer = document.getElementById('add-creation-container');
 
   toggle.onclick = () => {
     sidebar.classList.toggle('sidebar-open');
     if(sidebar.classList.contains('sidebar-open')){
       mainContent.style.transform = 'translateX(200px)';
-      addContainer.style.left = '200px';
     } else {
       mainContent.style.transform = 'translateX(0)';
-      addContainer.style.left = '0';
     }
   }
 
