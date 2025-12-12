@@ -2,577 +2,362 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
   <title>Galerie - Mes créations</title>
+
   <style>
-    /* ----- BODY AVEC TON FOND ----- */
+    /* =========================
+       RESET / GLOBAL
+       ========================= */
+    * { box-sizing: border-box; margin:0; padding:0; }
+    html, body { height:100%; font-family: 'Comic Sans MS', cursive; }
     body {
-      margin: 0;
-      padding: 0;
-      font-family: 'Comic Sans MS', cursive;
-
-      /* FOND AVEC TON IMAGE */
-      background: url('Photoroom_20251212_143703.png') no-repeat bottom center;
-
-      /* Pour que le fond prenne bien la largeur mais respecte les proportions */
-      background-size: contain;
-
-      /* Couleur pastel crochet derrière l’image */
-      background-color: #fff0f5;
-
-      /* Structure existante (ne pas enlever) */
-      display: flex;
-      flex-direction: column;
-      height: 100vh;
+      display:flex; flex-direction:column;
       -webkit-font-smoothing: antialiased;
       -moz-osx-font-smoothing: grayscale;
+      background: linear-gradient(to bottom, #fff0f5, #fff5f8);
     }
 
-    /* RESET / GLOBAL */
-    * { box-sizing: border-box; }
-    html, body { height: 100%; }
-
-    /* HEADER (logo au-dessus du titre) */
+    /* =========================
+       HEADER
+       ========================= */
     header {
       position: relative;
-      background: #fff5f8;
-      padding: 28px 20px 36px;
+      background: #fbeaf0;
+      padding: 50px 20px 60px;
       text-align: center;
-      border-bottom-left-radius: 20px;
-      border-bottom-right-radius: 20px;
-      box-shadow: 0 3px 8px rgba(184,76,111,0.08);
-      flex-shrink: 0;
+      border-bottom-left-radius: 25px;
+      border-bottom-right-radius: 25px;
+      box-shadow: 0 4px 12px rgba(184,76,111,0.15);
+      flex-shrink:0;
     }
 
     header img {
-      width: 98px;
-      height: 98px;
-      display: block;
-      margin: 0 auto 10px;
-      border-radius: 12px;
-      box-shadow: 0 4px 10px rgba(184,76,111,0.12);
+      width: 98px; height: 98px;
+      display:block; margin:0 auto 12px;
+      border-radius:20%; box-shadow:0 4px 12px rgba(184,76,111,0.18);
     }
 
-    h1.title {
-      margin: 0;
-      font-size: 34px;
-      color: #b84c6f;
-      font-weight: bold;
-      letter-spacing: 1px;
+    .title {
+      font-size:42px; color:#b84c6f; font-weight:bold;
+      letter-spacing:1px; text-shadow:0 2px 4px rgba(184,76,111,0.15);
+      display:inline-block;
     }
 
     .title-thread {
-      position: absolute;
-      left: 50%;
-      transform: translateX(-50%);
-      bottom: 8px;
-      width: 200px;
-      height: 6px;
-      background: #b84c6f;
-      border-radius: 20px;
-      opacity: 0.85;
-      box-shadow: 0 3px 6px rgba(184,76,111,0.06);
+      position:absolute; left:50%; transform:translateX(-50%);
+      bottom:14px; width:240px; height:6px; background:#b84c6f;
+      border-radius:20px; box-shadow:0 3px 6px rgba(184,76,111,0.08); opacity:0.85;
     }
 
-    /* VIEW SELECTOR (Carrousel / Grille / Liste) */
+    /* =========================
+       VIEW SELECTOR
+       ========================= */
     #viewSelector {
-      display: flex;
-      justify-content: center;
-      gap: 12px;
-      margin: 12px;
+      display:flex; justify-content:center; gap:12px; margin:14px 12px;
     }
-
     #viewSelector button {
-      background: #fff;
-      border: 2px solid #b84c6f;
-      color: #b84c6f;
-      padding: 8px 14px;
-      border-radius: 22px;
-      cursor: pointer;
-      font-size: 15px;
-      transition: all 0.16s ease;
-    }
-
-    #viewSelector button.active {
-      background: linear-gradient(90deg,#ffeaf2,#fff5f8);
-      color: #7a2b45;
-      box-shadow: 0 6px 12px rgba(184,76,111,0.10);
-      transform: translateY(-2px);
-    }
-
-    #viewSelector button:hover { transform: translateY(-2px); }
-
-    /* CENTER ZONE */
-    .center-zone {
-      flex: 1;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 8px;
-      transform: translateY(-28px); /* légèrement remonté */
-    }
-
-    /* VISITOR LIST container - classes toggled by JS */
-    #visitor-list {
-      width: calc(100% - 40px);
-      max-width: 1200px;
-      margin: 0 auto;
+      background:#fff0f7;
+      border:2px solid #b84c6f;
+      color:#b84c6f;
+      padding:8px 16px; border-radius:24px;
+      font-size:15px; cursor:pointer;
       transition: all 0.18s ease;
     }
-
-    /* COMMON ITEM STYLES */
-    .visitor-item {
-      text-align: center;
-      cursor: pointer;
-      user-select: none;
+    #viewSelector button.active {
+      background: linear-gradient(90deg, #ffeaf2, #fff5f8);
+      color:#7a2b45;
+      box-shadow:0 6px 14px rgba(184,76,111,0.12);
+      transform:translateY(-2px);
     }
+    #viewSelector button:hover { transform:translateY(-2px); }
 
+    /* =========================
+       CENTER ZONE & COMMON LIST STYLES
+       ========================= */
+    .center-zone { flex:1; display:flex; align-items:center; justify-content:center; padding:8px; transform:translateY(-40px); }
+    #visitor-list { width:calc(100% - 40px); max-width:1200px; margin:0 auto; transition:all 0.2s ease; }
+
+    .visitor-item { text-align:center; cursor:pointer; user-select:none; }
     .visitor-item img {
-      display: block;
-      margin: 0 auto;
-      object-fit: contain;
-      background: #fffaf5;
-      border-radius: 20px;
-      padding: 12px;
-      border: 4px solid rgba(184,76,111,0.18);
-      box-shadow: 0 6px 14px rgba(184,76,111,0.12);
+      display:block; margin:0 auto;
+      object-fit:contain; background:#fffaf5;
+      border-radius:28px; padding:12px; border:4px solid rgba(248,205,227,0.5);
+      box-shadow:0 6px 14px rgba(184,76,111,0.15);
       transition: transform 0.28s ease, box-shadow 0.28s ease;
+    }
+    .visitor-item:hover img {
+      transform: scale(1.05);
+      box-shadow:0 10px 22px rgba(184,76,111,0.25);
     }
 
     .visitor-item p {
-      margin: 10px 0 0;
-      font-size: 18px;
-      color: #b84c6f;
-      font-weight: bold;
+      margin:12px 0 0; font-size:20px; color:#b84c6f; font-weight:bold; line-height:1.1;
     }
 
-    /* CAROUSEL MODE */
-    .carousel-view {
-      display: flex;
-      gap: 36px;
-      overflow-x: auto;
-      scroll-behavior: smooth;
-      padding: 16px;
-      align-items: center;
-    }
-    .carousel-view::-webkit-scrollbar { height: 8px; }
-    .carousel-view::-webkit-scrollbar-thumb { background: #b84c6f66; border-radius: 20px; }
-    .carousel-view .visitor-item img { width: 260px; height: 260px; }
-    .visitor-item.active img { transform: scale(1.18); box-shadow: 0 12px 26px rgba(184,76,111,0.22); z-index: 5; }
+    /* =========================
+       CARROUSEL
+       ========================= */
+    .carousel-view { display:flex; gap:40px; overflow-x:auto; scroll-behavior:smooth; padding:10px; align-items:center; }
+    .carousel-view::-webkit-scrollbar { height:8px; }
+    .carousel-view::-webkit-scrollbar-thumb { background:#b84c6f66; border-radius:20px; }
+    .visitor-item.active img { transform:scale(1.16); box-shadow:0 10px 22px rgba(184,76,111,0.30); }
+    .carousel-view .visitor-item img { width:260px; height:260px; }
 
-    /* GRID MODE */
-    .grid-view {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-      gap: 24px;
-      padding: 18px;
-      align-items: start;
-      max-height: 70vh;
-      overflow-y: auto;
-    }
-    .grid-view .visitor-item img { width: 100%; height: 200px; border-radius: 14px; }
+    /* =========================
+       GRID
+       ========================= */
+    .grid-view { display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:24px; padding:16px; align-items:start; max-height:68vh; overflow-y:auto; }
+    .grid-view .visitor-item img { width:100%; height:200px; border-radius:18px; }
 
-    /* LIST MODE */
-    .list-view {
-      display: flex;
-      flex-direction: column;
-      gap: 16px;
-      padding: 18px;
-      max-height: 70vh;
-      overflow-y: auto;
+    /* =========================
+       LIST
+       ========================= */
+    .list-view { display:flex; flex-direction:column; gap:18px; padding:16px; max-height:68vh; overflow-y:auto; }
+    .list-view .visitor-item { display:flex; gap:18px; align-items:center; padding:8px; border-radius:12px;
+      background: linear-gradient(180deg, rgba(255,235,243,0.6), rgba(255,245,248,0.6));
+      border:1px solid rgba(184,76,111,0.06);
     }
-    .list-view .visitor-item { display:flex; gap:14px; align-items:center; padding:8px; border-radius:12px; background: linear-gradient(180deg, rgba(255,235,243,0.6), rgba(255,245,248,0.6)); border:1px solid rgba(184,76,111,0.06); }
-    .list-view .visitor-item img { width: 140px; height: 140px; border-radius: 12px; }
-    .list-view .visitor-item p { margin: 0; font-size: 16px; text-align:left; }
+    .list-view .visitor-item img { width:140px; height:140px; border-radius:12px; }
+    .list-view .visitor-item p { margin:0; font-size:18px; text-align:left; }
 
-    /* MODAL */
-    .modal-bg {
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.6);
-      display: none;
-      justify-content: center;
-      align-items: center;
-      z-index: 2000;
-      padding: 20px;
-    }
-    .modal-box {
-      background: #fff5f8;
-      border-radius: 14px;
-      padding: 18px;
-      max-width: 960px;
-      width: 94%;
-      max-height: 90vh;
-      overflow-y: auto;
-      box-shadow: 0 12px 40px rgba(184,76,111,0.18);
-      position: relative;
-      text-align: center;
-    }
-    .close-modal {
-      position: absolute;
-      top: 10px;
-      right: 12px;
-      font-size: 26px;
-      cursor: pointer;
-      color: #b84c6f;
-      font-weight: bold;
-    }
+    /* =========================
+       MODAL
+       ========================= */
+    .modal-bg { position:fixed; inset:0; background: rgba(0,0,0,0.65); display:none; justify-content:center; align-items:center; z-index:1000; padding:20px; }
+    .modal-bg.click-close { cursor:pointer; }
+    .modal-box { background:#fff5f8; border-radius:16px; padding:18px; max-width:980px; width:94%; max-height:90vh; overflow-y:auto; box-shadow:0 8px 30px rgba(184,76,111,0.25); text-align:center; position:relative; cursor:default; }
 
-    .modal-main-img {
-      width: 100%;
-      max-height: 520px;
-      object-fit: contain;
-      border-radius: 12px;
-      border: 4px solid rgba(248,205,227,0.45);
-      background: white;
-    }
+    .close-modal { position:absolute; top:10px; right:12px; font-size:28px; cursor:pointer; color:#b84c6f; font-weight:bold; }
 
-    .thumbs {
-      margin-top: 14px;
-      display:flex;
-      gap:12px;
-      justify-content:center;
-      flex-wrap:wrap;
-    }
-    .thumbs img {
-      width: 110px;
-      height: 110px;
-      object-fit: contain;
-      border-radius: 10px;
-      border: 3px solid rgba(248,205,227,0.45);
-      background: white;
-      cursor: pointer;
-      transition: transform 0.14s;
-    }
-    .thumbs img:hover { transform: scale(1.06); border-color:#b84c6f; }
+    .modal-main-img { width:100%; max-height:520px; object-fit:contain; border-radius:12px; border:4px solid rgba(248,205,227,0.5); background:white; }
 
-    /* ICON BAR */
+    .thumbs { margin-top:16px; display:flex; gap:12px; justify-content:center; flex-wrap:wrap; }
+    .thumbs img { width:110px; height:110px; object-fit:contain; border-radius:10px; border:3px solid rgba(248,205,227,0.5); background:white; cursor:pointer; transition: transform .16s; }
+    .thumbs img:hover { transform:scale(1.06); border-color:#b84c6f; }
+
     .icon-bar { margin-top:12px; display:flex; justify-content:center; gap:36px; align-items:center; }
     .icon-btn { display:flex; gap:8px; align-items:center; cursor:pointer; color:#b84c6f; font-size:18px; }
-    .heart { font-size:28px; transition: color .18s; }
+    .heart { font-size:26px; transition: color .18s; }
     .heart.liked { color:#ff4b82; }
     .comment-number { background:#b84c6f; color:white; padding:2px 8px; border-radius:12px; font-size:13px; }
 
-    /* COMMENTS */
     .comment-section { margin-top:14px; text-align:left; }
     .comment { background:#fff0f7; border:1px solid rgba(184,76,111,0.12); padding:10px; border-radius:10px; margin-bottom:10px; }
 
-    .add-comment-btn { margin-top:12px; padding:10px 20px; background:#b84c6f; color:white; border-radius:26px; font-size:16px; border:none; cursor:pointer; }
+    .add-comment-btn { margin-top:12px; padding:10px 20px; background:#b84c6f; color:#fff; border-radius:26px; font-size:16px; border:none; cursor:pointer; }
 
-    .comment-form-bg { position: fixed; inset:0; background: rgba(0,0,0,0.6); display:none; justify-content:center; align-items:center; z-index:3000; }
-    .comment-form { background:white; padding:18px; border-radius:12px; width:360px; max-width:92%; box-shadow:0 8px 20px rgba(0,0,0,0.18); text-align:center; }
+    .comment-form-bg { position: fixed; inset:0; background: rgba(0,0,0,0.6); display:none; justify-content:center; align-items:center; z-index:2000; }
+    .comment-form { background:white; padding:18px; border-radius:12px; width:340px; box-shadow:0 8px 20px rgba(0,0,0,0.25); text-align:center; }
     .comment-form input, .comment-form textarea { width:100%; padding:10px; border-radius:8px; border:2px solid rgba(184,76,111,0.12); margin-bottom:10px; font-size:15px; }
 
-    /* SIDE BRAIDS (subtle vertical stitch borders left & right) */
-    .side-braid-left,
-    .side-braid-right {
-      position: fixed;
-      top: 0;
-      bottom: 0;
-      width: 56px;
-      pointer-events: none;
-      display: block;
-      z-index: 0;
-      opacity: 0.25;
+    @media (max-width:720px){
+      .title { font-size:30px; }
+      .carousel-view .visitor-item img { width:200px; height:200px; }
+      .modal-main-img { max-height:360px; }
+      .thumbs img { width:88px; height:88px; }
+      header img { width:80px; height:80px; }
     }
-    .side-braid-left { left: 0; background-image: linear-gradient(#0000, #0000); /* placeholder */ }
-    .side-braid-right { right: 0; background-image: linear-gradient(#0000, #0000); }
-
-    /* We'll draw the braids using an inline SVG background for crispness */
-    .side-braid-left {
-      background-image: url('data:image/svg+xml;utf8,\
-        <svg xmlns=\"http://www.w3.org/2000/svg\" width=\"56\" height=\"200\" viewBox=\"0 0 56 200\">\
-          <defs><linearGradient id=\"g\" x1=\"0\" x2=\"0\" y1=\"0\" y2=\"1\"><stop offset=\"0%\" stop-color=\"%23b84c6f\" stop-opacity=\"0.12\"/><stop offset=\"100%\" stop-color=\"%23b84c6f\" stop-opacity=\"0.08\"/></linearGradient></defs>\
-          <g fill=\"none\" stroke=\"url(%23g)\" stroke-width=\"6\" stroke-linecap=\"round\" stroke-linejoin=\"round\">\
-            <path d=\"M28 10 C14 30,14 60,28 80 C42 100,42 130,28 150 C14 170,14 190,28 210\"/>\
-            <path d=\"M28 40 C14 60,14 90,28 110 C42 130,42 160,28 180\"/>\
-          </g>\
-        </svg>');\
-      background-repeat: repeat-y;
-      background-position: center;
-      background-size: 56px 200px;
-    }
-    .side-braid-right {
-      background-image: url('data:image/svg+xml;utf8,\
-        <svg xmlns=\"http://www.w3.org/2000/svg\" width=\"56\" height=\"200\" viewBox=\"0 0 56 200\">\
-          <defs><linearGradient id=\"g2\" x1=\"0\" x2=\"0\" y1=\"0\" y2=\"1\"><stop offset=\"0%\" stop-color=\"%23b84c6f\" stop-opacity=\"0.12\"/><stop offset=\"100%\" stop-color=\"%23b84c6f\" stop-opacity=\"0.08\"/></linearGradient></defs>\
-          <g fill=\"none\" stroke=\"url(%23g2)\" stroke-width=\"6\" stroke-linecap=\"round\" stroke-linejoin=\"round\">\
-            <path d=\"M28 10 C42 30,42 60,28 80 C14 100,14 130,28 150 C42 170,42 190,28 210\"/>\
-            <path d=\"M28 40 C42 60,42 90,28 110 C14 130,14 160,28 180\"/>\
-          </g>\
-        </svg>');\
-      background-repeat: repeat-y;
-      background-position: center;
-      background-size: 56px 200px;
-    }
-
-    /* Responsive tweaks */
-    @media (max-width: 720px) {
-      .carousel-view .visitor-item img { width: 200px; height: 200px; }
-      .modal-main-img { max-height: 360px; }
-      .thumbs img { width: 88px; height: 88px; }
-      header img { width: 80px; height: 80px; }
-      h1.title { font-size: 26px; }
-      .side-braid-left, .side-braid-right { width: 40px; background-size: 40px 150px; opacity: 0.18; }
-    }
-
   </style>
 </head>
 <body>
 
-  <!-- Side braid decorations (purely visual, won't interfere with layout) -->
-  <div class="side-braid-left" aria-hidden="true"></div>
-  <div class="side-braid-right" aria-hidden="true"></div>
+<header>
+  <img src="favicon.png" alt="Logo">
+  <h1 class="title">Mes créations</h1>
+  <div class="title-thread" aria-hidden="true"></div>
+</header>
 
-  <!-- Header with logo above title -->
-  <header>
-    <img src="favicon.png" alt="Logo">
-    <h1 class="title">Mes créations</h1>
-    <div class="title-thread" aria-hidden="true"></div>
-  </header>
+<div id="viewSelector">
+  <button id="btnCarousel">Carrousel</button>
+  <button id="btnGrid">Grille</button>
+  <button id="btnList">Liste</button>
+</div>
 
-  <!-- View selector -->
-  <div id="viewSelector" aria-hidden="false">
-    <button id="btnCarousel">Carrousel</button>
-    <button id="btnGrid">Grille</button>
-    <button id="btnList">Liste</button>
-  </div>
+<div class="center-zone">
+  <div id="visitor-list" role="list"></div>
+</div>
 
-  <!-- Center zone -->
-  <div class="center-zone">
-    <div id="visitor-list" role="list"></div>
-  </div>
-
-  <!-- Modal -->
-  <div class="modal-bg" id="modalBg" onclick="backgroundClose(event)">
-    <div class="modal-box" id="modalBox" onclick="event.stopPropagation()">
-      <div class="close-modal" onclick="closeModal()">×</div>
-      <img id="modalMain" class="modal-main-img" alt="Grande image">
-      <div class="icon-bar">
-        <div class="icon-btn" onclick="toggleLike()" title="J'aime">
-          <span id="heart" class="heart">♡</span>
-          <span id="likeName" style="font-weight:600;color:#7a2b45;margin-left:6px;"></span>
-        </div>
-        <div class="icon-btn" onclick="scrollToComments()" title="Voir les commentaires">
-          💬 <span id="commentCount" class="comment-number">0</span>
-        </div>
+<!-- MODAL -->
+<div class="modal-bg click-close" id="modal" onclick="backgroundClose(event)">
+  <div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="modalTitle" onclick="event.stopPropagation()">
+    <div class="close-modal" onclick="closeModal()">×</div>
+    <img id="modalMain" class="modal-main-img" alt="Image agrandie">
+    <div class="icon-bar">
+      <div class="icon-btn" onclick="toggleLike()">
+        <span id="heart" class="heart">♡</span>
+        <span id="likeName" style="font-weight:600;color:#7a2b45;"></span>
       </div>
-
-      <div id="thumbsContainer" class="thumbs" aria-hidden="false"></div>
-
-      <button class="add-comment-btn" onclick="openCommentForm()">Ajouter un commentaire</button>
-
-      <div id="commentsList" class="comment-section" aria-live="polite"></div>
+      <div class="icon-btn" onclick="scrollToComments()">
+        💬 <span id="commentCount" class="comment-number">0</span>
+      </div>
     </div>
+    <div id="thumbsContainer" class="thumbs"></div>
+    <button class="add-comment-btn" onclick="openCommentForm()">Ajouter un commentaire</button>
+    <div id="commentsList" class="comment-section"></div>
   </div>
+</div>
 
-  <!-- Comment form -->
-  <div class="comment-form-bg" id="commentFormBg" onclick="closeCommentForm(event)">
-    <div class="comment-form" onclick="event.stopPropagation()">
-      <h3 style="margin-top:0;color:#b84c6f">Laisser un commentaire</h3>
-      <input id="commentName" placeholder="Prénom">
-      <textarea id="commentText" rows="4" placeholder="Votre commentaire..."></textarea>
-      <button onclick="submitComment()">Envoyer</button>
-    </div>
+<!-- COMMENT FORM -->
+<div class="comment-form-bg" id="commentFormBg" onclick="closeCommentForm(event)">
+  <div class="comment-form" onclick="event.stopPropagation()">
+    <h3 style="margin-top:0;color:#b84c6f">Laisser un commentaire</h3>
+    <input id="commentName" placeholder="Prénom" />
+    <textarea id="commentText" rows="4" placeholder="Votre commentaire..."></textarea>
+    <button onclick="submitComment()">Envoyer</button>
   </div>
+</div>
 
-  <script>
-    /* =========================
-       JS : carrousel / modal / likes / comments
-       (Comportement intact — ne pas supprimer)
-       ========================= */
+<script>
+/* =========================
+   JS inchangé, carrousel, modal, like, commentaires
+   ========================= */
+const list = document.getElementById('visitor-list');
+const modal = document.getElementById('modal');
+const modalMain = document.getElementById('modalMain');
+const thumbs = document.getElementById('thumbsContainer');
+const likeName = document.getElementById('likeName');
+const commentCount = document.getElementById('commentCount');
+const commentsList = document.getElementById('commentsList');
+const commentFormBg = document.getElementById('commentFormBg');
+const commentName = document.getElementById('commentName');
+const commentText = document.getElementById('commentText');
 
-    const list = document.getElementById('visitor-list');
-    const modalBg = document.getElementById('modalBg');
-    const modalBox = document.getElementById('modalBox');
-    const modalMain = document.getElementById('modalMain');
-    const thumbs = document.getElementById('thumbsContainer');
-    const likeName = document.getElementById('likeName');
-    const commentCount = document.getElementById('commentCount');
-    const commentsList = document.getElementById('commentsList');
+let creations = JSON.parse(localStorage.getItem('creations') || '[]');
+if (!creations || creations.length === 0) {
+  creations = [
+    { name: "Projet A", imgUrl: "https://placekitten.com/800/800", images: ["https://placekitten.com/800/800","https://placekitten.com/801/800"] },
+    { name: "Projet B", imgUrl: "https://placebear.com/800/800", images: ["https://placebear.com/800/800","https://placebear.com/801/800"] },
+    { name: "Projet C", imgUrl: "https://picsum.photos/seed/p/800/800" }
+  ];
+}
 
-    const commentFormBg = document.getElementById('commentFormBg');
-    const commentName = document.getElementById('commentName');
-    const commentText = document.getElementById('commentText');
+let currentIndex = null;
+let currentView = 'carousel';
 
-    // load creations from localStorage or fallback examples
-    let creations = JSON.parse(localStorage.getItem('creations') || '[]');
-    if (!creations || creations.length === 0) {
-      creations = [
-        { name: "Projet A", imgUrl: "https://placekitten.com/800/800", images: ["https://placekitten.com/800/800","https://placekitten.com/801/800"] },
-        { name: "Projet B", imgUrl: "https://placebear.com/800/800", images: ["https://placebear.com/800/800","https://placebear.com/801/800"] },
-        { name: "Projet C", imgUrl: "https://picsum.photos/seed/p/800/800" }
-      ];
-    }
+function escapeHtml(s) {
+  return s ? String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;') : '';
+}
 
-    let currentIndex = null;
-    let currentView = 'carousel'; // 'carousel' | 'grid' | 'list'
+function renderVisitor() {
+  list.innerHTML = '';
+  if (currentView === 'carousel') list.className = 'carousel-view';
+  if (currentView === 'grid') list.className = 'grid-view';
+  if (currentView === 'list') list.className = 'list-view';
 
-    function escapeHtml(s) { return s ? String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;') : ''; }
+  creations.forEach((item, i) => {
+    const div = document.createElement('div');
+    div.className = 'visitor-item';
+    div.setAttribute('data-index', i);
+    div.innerHTML = `<img src="${item.imgUrl}" alt="${escapeHtml(item.name)}"><p>${escapeHtml(item.name)}</p>`;
+    div.addEventListener('click', () => openModal(i));
+    list.appendChild(div);
+  });
+  updateCenter();
+}
 
-    function renderVisitor() {
-      list.innerHTML = '';
-      if (currentView === 'carousel') list.className = 'carousel-view';
-      if (currentView === 'grid') list.className = 'grid-view';
-      if (currentView === 'list') list.className = 'list-view';
+function setView(mode) {
+  currentView = mode;
+  document.getElementById('btnCarousel').classList.toggle('active', mode==='carousel');
+  document.getElementById('btnGrid').classList.toggle('active', mode==='grid');
+  document.getElementById('btnList').classList.toggle('active', mode==='list');
+  renderVisitor();
+}
 
-      creations.forEach((item, i) => {
-        const div = document.createElement('div');
-        div.className = 'visitor-item';
-        div.setAttribute('data-index', i);
-        div.innerHTML = `<img src="${item.imgUrl}" alt="${escapeHtml(item.name)}"><p>${escapeHtml(item.name)}</p>`;
-        div.addEventListener('click', () => openModal(i));
-        list.appendChild(div);
-      });
+document.getElementById('btnCarousel').addEventListener('click', ()=>setView('carousel'));
+document.getElementById('btnGrid').addEventListener('click', ()=>setView('grid'));
+document.getElementById('btnList').addEventListener('click', ()=>setView('list'));
+setView(currentView);
 
-      // update center zoom for carousel mode
-      updateCenter();
-    }
+function updateCenter() {
+  if(currentView!=='carousel'){
+    document.querySelectorAll('.visitor-item').forEach(it=>it.classList.remove('active'));
+    return;
+  }
+  const items = document.querySelectorAll('.visitor-item');
+  const center = window.innerWidth/2;
+  items.forEach(item=>{
+    const rect = item.getBoundingClientRect();
+    const itemCenter = rect.left + rect.width/2;
+    if(Math.abs(itemCenter-center)<170) item.classList.add('active');
+    else item.classList.remove('active');
+  });
+}
 
-    // initial render
-    renderVisitor();
+list.addEventListener('scroll', updateCenter);
+window.addEventListener('resize', updateCenter);
 
-    // view selector buttons
-    const btnCarousel = document.getElementById('btnCarousel');
-    const btnGrid = document.getElementById('btnGrid');
-    const btnList = document.getElementById('btnList');
-
-    function setView(mode) {
-      currentView = mode;
-      btnCarousel.classList.toggle('active', mode === 'carousel');
-      btnGrid.classList.toggle('active', mode === 'grid');
-      btnList.classList.toggle('active', mode === 'list');
-      renderVisitor();
-    }
-
-    btnCarousel.addEventListener('click', () => setView('carousel'));
-    btnGrid.addEventListener('click', () => setView('grid'));
-    btnList.addEventListener('click', () => setView('list'));
-
-    // set initial active
-    setView(currentView);
-
-    // carousel center zoom
-    function updateCenter() {
-      if (currentView !== 'carousel') {
-        document.querySelectorAll('.visitor-item').forEach(it => it.classList.remove('active'));
-        return;
-      }
-      const items = document.querySelectorAll('.visitor-item');
-      const center = window.innerWidth / 2;
-      items.forEach(item => {
-        const rect = item.getBoundingClientRect();
-        const itemCenter = rect.left + rect.width / 2;
-        if (Math.abs(itemCenter - center) < 170) item.classList.add('active'); else item.classList.remove('active');
-      });
-    }
-
-    list.addEventListener('scroll', updateCenter);
-    window.addEventListener('resize', updateCenter);
-
-    // modal open/close
-    function openModal(i) {
-      currentIndex = i;
-      const proj = creations[i];
-      modalMain.src = proj.imgUrl;
-      likeName.textContent = proj.name || '';
-
-      loadLike();
-      loadComments();
-
-      // thumbnails
-      thumbs.innerHTML = '';
-      if (Array.isArray(proj.images) && proj.images.length > 0) {
-        proj.images.forEach(src => {
-          const t = document.createElement('img');
-          t.src = src; t.alt = 'miniature';
-          t.addEventListener('click', () => { modalMain.src = src; });
-          thumbs.appendChild(t);
-        });
-      }
-
-      modalBg.style.display = 'flex';
-    }
-
-    function closeModal() {
-      modalBg.style.display = 'none';
-      // carousel image remains unchanged
-      renderVisitor();
-    }
-
-    function backgroundClose(e) {
-      if (e.target === modalBg) closeModal();
-    }
-
-    // likes (persist in localStorage)
-    function toggleLike() {
-      if (currentIndex === null) return;
-      const key = 'like_' + currentIndex;
-      const cur = localStorage.getItem(key) === '1';
-      localStorage.setItem(key, cur ? '0' : '1');
-      loadLike();
-    }
-
-    function loadLike() {
-      if (currentIndex === null) return;
-      const key = 'like_' + currentIndex;
-      const liked = localStorage.getItem(key) === '1';
-      const heart = document.getElementById('heart');
-      if (liked) { heart.classList.add('liked'); heart.textContent = '❤️'; } else { heart.classList.remove('liked'); heart.textContent = '♡'; }
-    }
-
-    // comments
-    function loadComments() {
-      if (currentIndex === null) return;
-      const key = 'comments_' + currentIndex;
-      const comments = JSON.parse(localStorage.getItem(key) || '[]');
-      commentCount.textContent = comments.length || 0;
-      commentsList.innerHTML = comments.map(c => `<div class="comment"><strong>${escapeHtml(c.name)}</strong><br>${escapeHtml(c.text)}</div>`).join('');
-    }
-
-    function openCommentForm() { commentFormBg.style.display = 'flex'; }
-    function closeCommentForm(e) { if (e && e.target === commentFormBg) commentFormBg.style.display = 'none'; }
-
-    function submitComment() {
-      const name = (commentName.value || '').trim();
-      const text = (commentText.value || '').trim();
-      if (!name || !text) return;
-      const key = 'comments_' + currentIndex;
-      const comments = JSON.parse(localStorage.getItem(key) || '[]');
-      comments.push({ name, text, at: Date.now() });
-      localStorage.setItem(key, JSON.stringify(comments));
-      commentName.value = ''; commentText.value = ''; commentFormBg.style.display = 'none';
-      loadComments();
-    }
-
-    function scrollToComments() {
-      if (!commentsList) return;
-      commentsList.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    }
-
-    // keyboard escape to close modal or comment form
-    document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape') {
-        if (commentFormBg.style.display === 'flex') commentFormBg.style.display = 'none';
-        else if (modalBg.style.display === 'flex') closeModal();
-      }
+function openModal(i){
+  currentIndex = i;
+  const proj = creations[i];
+  modalMain.src = proj.imgUrl;
+  likeName.textContent = proj.name||'';
+  loadLike(); loadComments();
+  thumbs.innerHTML='';
+  if(Array.isArray(proj.images) && proj.images.length>0){
+    proj.images.forEach(src=>{
+      const t = document.createElement('img');
+      t.src=src; t.alt='miniature';
+      t.addEventListener('click', ()=>{ modalMain.src=src; });
+      thumbs.appendChild(t);
     });
+  }
+  modal.style.display='flex';
+}
 
-    // observe changes to recalc center zoom
-    const observer = new MutationObserver(() => updateCenter());
-    observer.observe(list, { childList: true, subtree: true });
-    setTimeout(updateCenter, 200);
+function closeModal(){ modal.style.display='none'; renderVisitor(); }
+function backgroundClose(e){ if(e.target===modal) closeModal(); }
 
-    // expose functions if needed
-    window.openModal = openModal;
-    window.closeModal = closeModal;
-    window.backgroundClose = backgroundClose;
-    window.toggleLike = toggleLike;
-    window.openCommentForm = openCommentForm;
-    window.closeCommentForm = closeCommentForm;
-    window.submitComment = submitComment;
-    window.scrollToComments = scrollToComments;
+function toggleLike(){
+  if(currentIndex===null) return;
+  const key='like_'+currentIndex;
+  const cur = localStorage.getItem(key)==='1';
+  localStorage.setItem(key, cur?'0':'1');
+  loadLike();
+}
 
-  </script>
+function loadLike(){
+  if(currentIndex===null) return;
+  const key='like_'+currentIndex;
+  const liked = localStorage.getItem(key)==='1';
+  const heart = document.getElementById('heart');
+  if(liked){ heart.classList.add('liked'); heart.textContent='❤️'; }
+  else{ heart.classList.remove('liked'); heart.textContent='♡'; }
+}
+
+function loadComments(){
+  if(currentIndex===null) return;
+  const key='comments_'+currentIndex;
+  const comments=JSON.parse(localStorage.getItem(key)||'[]');
+  commentCount.textContent = comments.length||0;
+  commentsList.innerHTML = comments.map(c=>`<div class="comment"><strong>${escapeHtml(c.name)}</strong><br>${escapeHtml(c.text)}</div>`).join('');
+}
+
+function openCommentForm(){ commentFormBg.style.display='flex'; }
+function closeCommentForm(e){ if(e && e.target===commentFormBg) commentFormBg.style.display='none'; }
+function submitComment(){
+  const name=(commentName.value||'').trim();
+  const text=(commentText.value||'').trim();
+  if(!name||!text) return;
+  const key='comments_'+currentIndex;
+  const comments=JSON.parse(localStorage.getItem(key)||'[]');
+  comments.push({name,text,at:Date.now()});
+  localStorage.setItem(key,JSON.stringify(comments));
+  commentName.value=''; commentText.value=''; commentFormBg.style.display='none';
+  loadComments();
+}
+
+function scrollToComments(){ if(!commentsList) return; commentsList.scrollIntoView({behavior:'smooth', block:'start'}); }
+
+document.addEventListener('keydown',(e)=>{
+  if(e.key==='Escape'){
+    if(commentFormBg.style.display==='flex') commentFormBg.style.display='none';
+    else if(modal.style.display==='flex') closeModal();
+  }
+});
+
+const observer = new MutationObserver(()=>updateCenter());
+observer.observe(list,{childList:true, subtree:true});
+setTimeout(updateCenter, 200);
+</script>
 </body>
 </html>
