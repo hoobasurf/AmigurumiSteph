@@ -15,25 +15,19 @@
   padding: 0;
   font-family: 'Comic Sans MS', cursive;
 
-  /* Fond simple */
-  background-color: #fff0f5;
-
-  /* Ton image en bas */
   background-image: url('Photoroom_20251212_143703.png');
-  background-repeat: no-repeat;
-  background-position: bottom center;
-  background-size: contain;
+  background-size: cover;          /* PREND TOUT L'ÉCRAN */
+  background-position: center;     /* CENTRE L'IMAGE */
+  background-repeat: no-repeat;    /* PAS DE RÉPÉTITION */
 
-  /* Structure existante */
+  background-color: #fff0f5;       /* couleur pastel derrière si l’image ne charge pas */
+
   display:flex;
   flex-direction:column;
   height:100vh;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-
-  position: relative;
 }
-
     /* =========================
        HEADER
        ========================= */
