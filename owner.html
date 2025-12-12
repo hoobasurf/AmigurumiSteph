@@ -4,21 +4,51 @@
   <meta charset="UTF-8">
   <title>Owner - Test Ajouter</title>
   <style>
-    body { font-family: sans-serif; padding: 0; margin: 0; background: #fff0f5; }
+    body { font-family: sans-serif; margin: 0; padding: 0; background: #fff0f5; }
 
     /* Contenu principal */
     #main-content { 
-      transition: margin-left 0.3s; 
+      transition: transform 0.3s; 
       padding: 20px; 
-      margin-left: 0; 
+      margin-left: 0;
     }
 
     /* Créations */
-    .owner-box { margin-bottom: 20px; }
-    input, button { padding: 10px; margin: 5px; border-radius: 8px; border: 1px solid #ccc; }
-    button { background-color: #ffb6c1; cursor: pointer; }
-    #owner-list { display: flex; flex-wrap: wrap; gap: 10px; }
-    .owner-item { background: #ffe6f0; border: 2px solid #b67385; padding: 10px; border-radius: 15px; box-shadow: 0 4px 10px rgba(182, 115, 133, 0.15); position: relative; }
+    #add-creation-container {
+      display: flex;
+      flex-direction: column;
+      position: relative;
+      top: 0;
+      left: 0;
+      max-width: 300px;
+      padding: 10px;
+      background: #fff0f5;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(182, 115, 133, 0.1);
+      transition: left 0.3s;
+    }
+
+    #owner-list {
+      display: flex;
+      flex-wrap: nowrap;
+      overflow-x: auto;
+      gap: 10px;
+      padding-bottom: 10px;
+    }
+    #owner-list::-webkit-scrollbar { height: 8px; }
+    #owner-list::-webkit-scrollbar-thumb {
+      background-color: #b67385;
+      border-radius: 4px;
+    }
+
+    .owner-item { 
+      background: #ffe6f0; 
+      border: 2px solid #b67385; 
+      padding: 10px; 
+      border-radius: 15px; 
+      box-shadow: 0 4px 10px rgba(182, 115, 133, 0.15); 
+      position: relative; 
+    }
     .owner-item img { max-width: 100px; border-radius: 8px; display: block; }
 
     /* Petite croix */
@@ -56,7 +86,6 @@
       transition: left 0.3s;
       z-index: 1000;
     }
-
     #sidebar button {
       background: #ffb6c1;
       color: #8b3a3a;
@@ -66,7 +95,6 @@
       cursor: pointer;
       font-weight: bold;
     }
-
     #sidebar.sidebar-open { left: 0; }
 
     /* Encoche */
@@ -87,29 +115,9 @@
       z-index: 1100;
     }
 
-    /* Toutes les sections cachées par défaut */
+    /* Sections cachées */
     .section { display: none; }
-
-    /* Inputs et textareas larges */
     .section input, .section textarea { width: 100%; box-sizing: border-box; margin-bottom: 10px; }
-  
-  #owner-list {
-  display: flex;
-  flex-wrap: nowrap; /* empêche les items de passer à la ligne */
-  overflow-x: auto; /* active le scroll horizontal */
-  gap: 10px;
-  padding-bottom: 10px; /* un peu de marge */
-}
-
-#owner-list::-webkit-scrollbar {
-  height: 8px; /* taille du scroll */
-}
-
-#owner-list::-webkit-scrollbar-thumb {
-  background-color: #b67385;
-  border-radius: 4px;
-}
-  
   </style>
 </head>
 <body>
@@ -128,8 +136,9 @@
 
 <!-- Contenu principal -->
 <div id="main-content">
-  <h1>Ajouter une création</h1>
-  <div class="owner-box">
+  <h1>Mes créations</h1>
+
+  <div id="add-creation-container">
     <input id="name" placeholder="Nom de la création">
     <input id="photo" type="file" accept="image/*">
     <button id="add">Ajouter</button>
@@ -184,6 +193,7 @@
     <input type="file" id="importFile">
     <button id="importData">Importer les données</button>
   </div>
+
 </div>
 
 <!-- JS -->
@@ -192,10 +202,17 @@
   const sidebar = document.getElementById('sidebar');
   const toggle = document.getElementById('toggleSidebar');
   const mainContent = document.getElementById('main-content');
+  const addContainer = document.getElementById('add-creation-container');
 
   toggle.onclick = () => {
     sidebar.classList.toggle('sidebar-open');
-    mainContent.style.marginLeft = sidebar.classList.contains('sidebar-open') ? '200px' : '0';
+    if(sidebar.classList.contains('sidebar-open')){
+      mainContent.style.transform = 'translateX(200px)';
+      addContainer.style.left = '200px';
+    } else {
+      mainContent.style.transform = 'translateX(0)';
+      addContainer.style.left = '0';
+    }
   }
 
   function showSection(id) {
