@@ -5,18 +5,15 @@
   <title>Galerie - Mes créations</title>
 
   <style>
-    /* =========================
-       RESET / GLOBAL
-       ========================= */
     * { box-sizing: border-box; margin:0; padding:0; }
     html, body { height:100%; font-family: 'Comic Sans MS', cursive; }
     
     body {
       background-image: url('Photoroom_20251212_143703.png');
-      background-size: contain;       /* fond visible entièrement */
-      background-position: center;    
-      background-repeat: no-repeat;   
-      background-attachment: fixed;   
+      background-size: contain;
+      background-position: center;
+      background-repeat: no-repeat;
+      background-attachment: fixed;
       background-color: #fff0f5;
 
       display: flex;
@@ -44,9 +41,6 @@
       border-radius:20px; opacity:0.85;
     }
 
-    /* =========================
-       VIEW SELECTOR
-       ========================= */
     #viewSelector {
       display:flex; justify-content:center; gap:12px; margin:14px 12px;
     }
@@ -65,9 +59,6 @@
     }
     #viewSelector button:hover { transform:translateY(-2px); }
 
-    /* =========================
-       CENTER ZONE & COMMON LIST STYLES
-       ========================= */
     .center-zone { flex:1; display:flex; align-items:center; justify-content:center; padding:8px; transform:translateY(-40px); }
     #visitor-list { width:calc(100% - 40px); max-width:1200px; margin:0 auto; transition:all 0.2s ease; }
 
@@ -75,50 +66,54 @@
     .visitor-item img {
       display:block;
       margin:0 auto;
-      object-fit:contain;   /* image entière */
-      border:none;
-      box-shadow:none;
-      background:transparent;
+      object-fit:contain;
+      border:4px solid #b67385; /* contour bordeaux pastel */
+      background: transparent;
+      transition: box-shadow 0.3s ease, transform 0.3s ease;
     }
+    .visitor-item:hover img {
+      box-shadow: 0 8px 20px rgba(184,76,111,0.3); /* ombre sur survol */
+      transform: scale(1.03);
+    }
+
     .visitor-item p {
       margin:12px 0 0; font-size:20px; color:#b84c6f; font-weight:bold; line-height:1.1;
     }
 
-    /* =========================
-       CARROUSEL
-       ========================= */
+    /* CARROUSEL */
     .carousel-view { display:flex; gap:40px; overflow-x:auto; scroll-behavior:smooth; padding:10px; align-items:center; }
     .carousel-view::-webkit-scrollbar { height:8px; }
     .carousel-view::-webkit-scrollbar-thumb { background:#b84c6f66; border-radius:20px; }
     .carousel-view .visitor-item img { width:260px; height:260px; }
 
-    /* =========================
-       GRID
-       ========================= */
+    /* GRID */
     .grid-view { display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:24px; padding:16px; align-items:start; max-height:68vh; overflow-y:auto; }
     .grid-view .visitor-item img { width:100%; height:200px; }
 
-    /* =========================
-       LIST
-       ========================= */
+    /* LIST */
     .list-view { display:flex; flex-direction:column; gap:18px; padding:16px; max-height:68vh; overflow-y:auto; }
     .list-view .visitor-item { display:flex; gap:18px; align-items:center; padding:8px; }
     .list-view .visitor-item img { width:140px; height:140px; }
     .list-view .visitor-item p { margin:0; font-size:18px; text-align:left; }
 
-    /* =========================
-       MODAL
-       ========================= */
+    /* MODAL */
     .modal-bg { position:fixed; inset:0; background: rgba(0,0,0,0.65); display:none; justify-content:center; align-items:center; z-index:1000; padding:20px; }
     .modal-bg.click-close { cursor:pointer; }
     .modal-box { background:#fff5f8; border-radius:16px; padding:18px; max-width:980px; width:94%; max-height:90vh; overflow-y:auto; box-shadow:0 8px 30px rgba(184,76,111,0.25); text-align:center; position:relative; cursor:default; }
 
     .close-modal { position:absolute; top:10px; right:12px; font-size:28px; cursor:pointer; color:#b84c6f; font-weight:bold; }
 
-    .modal-main-img { width:100%; max-height:520px; object-fit:contain; border-radius:12px; }
+    .modal-main-img { width:100%; max-height:520px; object-fit:contain; border:4px solid #b67385; background:white; }
 
     .thumbs { margin-top:16px; display:flex; gap:12px; justify-content:center; flex-wrap:wrap; }
-    .thumbs img { width:110px; height:110px; object-fit:contain; cursor:pointer; }
+    .thumbs img {
+      width:110px; height:110px; object-fit:contain;
+      border:4px solid #b67385;
+      background:transparent;
+      cursor:pointer;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .thumbs img:hover { transform:scale(1.06); box-shadow:0 6px 14px rgba(184,76,111,0.3); }
 
     .icon-bar { margin-top:12px; display:flex; justify-content:center; gap:36px; align-items:center; }
     .icon-btn { display:flex; gap:8px; align-items:center; cursor:pointer; color:#b84c6f; font-size:18px; }
@@ -164,7 +159,7 @@
 
 <!-- MODAL -->
 <div class="modal-bg click-close" id="modal" onclick="backgroundClose(event)">
-  <div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="modalTitle" onclick="event.stopPropagation()">
+  <div class="modal-box" role="dialog" aria-modal="true" onclick="event.stopPropagation()">
     <div class="close-modal" onclick="closeModal()">×</div>
     <img id="modalMain" class="modal-main-img" alt="Image agrandie">
     <div class="icon-bar">
@@ -220,23 +215,20 @@ function escapeHtml(s) { return s ? String(s).replace(/&/g,'&amp;').replace(/</g
 
 function renderVisitor() {
   list.innerHTML = '';
-  if (currentView === 'carousel') list.className = 'carousel-view';
-  if (currentView === 'grid') list.className = 'grid-view';
-  if (currentView === 'list') list.className = 'list-view';
-
-  creations.forEach((item, i) => {
+  list.className = currentView+'-view';
+  creations.forEach((item,i)=>{
     const div = document.createElement('div');
-    div.className = 'visitor-item';
-    div.setAttribute('data-index', i);
+    div.className='visitor-item';
+    div.setAttribute('data-index',i);
     div.innerHTML = `<img src="${item.imgUrl}" alt="${escapeHtml(item.name)}"><p>${escapeHtml(item.name)}</p>`;
-    div.addEventListener('click', () => openModal(i));
+    div.addEventListener('click',()=>openModal(i));
     list.appendChild(div);
   });
   updateCenter();
 }
 
-function setView(mode) {
-  currentView = mode;
+function setView(mode){
+  currentView=mode;
   document.getElementById('btnCarousel').classList.toggle('active', mode==='carousel');
   document.getElementById('btnGrid').classList.toggle('active', mode==='grid');
   document.getElementById('btnList').classList.toggle('active', mode==='list');
@@ -248,16 +240,16 @@ document.getElementById('btnGrid').addEventListener('click', ()=>setView('grid')
 document.getElementById('btnList').addEventListener('click', ()=>setView('list'));
 setView(currentView);
 
-function updateCenter() {
+function updateCenter(){
   if(currentView!=='carousel'){
     document.querySelectorAll('.visitor-item').forEach(it=>it.classList.remove('active'));
     return;
   }
-  const items = document.querySelectorAll('.visitor-item');
-  const center = window.innerWidth/2;
+  const items=document.querySelectorAll('.visitor-item');
+  const center=window.innerWidth/2;
   items.forEach(item=>{
-    const rect = item.getBoundingClientRect();
-    const itemCenter = rect.left + rect.width/2;
+    const rect=item.getBoundingClientRect();
+    const itemCenter=rect.left+rect.width/2;
     if(Math.abs(itemCenter-center)<170) item.classList.add('active');
     else item.classList.remove('active');
   });
@@ -267,17 +259,17 @@ list.addEventListener('scroll', updateCenter);
 window.addEventListener('resize', updateCenter);
 
 function openModal(i){
-  currentIndex = i;
-  const proj = creations[i];
-  modalMain.src = proj.imgUrl;
-  likeName.textContent = proj.name||'';
+  currentIndex=i;
+  const proj=creations[i];
+  modalMain.src=proj.imgUrl;
+  likeName.textContent=proj.name||'';
   loadLike(); loadComments();
   thumbs.innerHTML='';
-  if(Array.isArray(proj.images) && proj.images.length>0){
+  if(Array.isArray(proj.images)&&proj.images.length>0){
     proj.images.forEach(src=>{
-      const t = document.createElement('img');
+      const t=document.createElement('img');
       t.src=src; t.alt='miniature';
-      t.addEventListener('click', ()=>{ modalMain.src=src; });
+      t.addEventListener('click',()=>{ modalMain.src=src; });
       thumbs.appendChild(t);
     });
   }
@@ -290,7 +282,7 @@ function backgroundClose(e){ if(e.target===modal) closeModal(); }
 function toggleLike(){
   if(currentIndex===null) return;
   const key='like_'+currentIndex;
-  const cur = localStorage.getItem(key)==='1';
+  const cur=localStorage.getItem(key)==='1';
   localStorage.setItem(key, cur?'0':'1');
   loadLike();
 }
@@ -298,8 +290,8 @@ function toggleLike(){
 function loadLike(){
   if(currentIndex===null) return;
   const key='like_'+currentIndex;
-  const liked = localStorage.getItem(key)==='1';
-  const heart = document.getElementById('heart');
+  const liked=localStorage.getItem(key)==='1';
+  const heart=document.getElementById('heart');
   if(liked){ heart.classList.add('liked'); heart.textContent='❤️'; }
   else{ heart.classList.remove('liked'); heart.textContent='♡'; }
 }
@@ -308,8 +300,8 @@ function loadComments(){
   if(currentIndex===null) return;
   const key='comments_'+currentIndex;
   const comments=JSON.parse(localStorage.getItem(key)||'[]');
-  commentCount.textContent = comments.length||0;
-  commentsList.innerHTML = comments.map(c=>`<div class="comment"><strong>${escapeHtml(c.name)}</strong><br>${escapeHtml(c.text)}</div>`).join('');
+  commentCount.textContent=comments.length||0;
+  commentsList.innerHTML=comments.map(c=>`<div class="comment"><strong>${escapeHtml(c.name)}</strong><br>${escapeHtml(c.text)}</div>`).join('');
 }
 
 function openCommentForm(){ commentFormBg.style.display='flex'; }
@@ -335,7 +327,7 @@ document.addEventListener('keydown',(e)=>{
   }
 });
 
-const observer = new MutationObserver(()=>updateCenter());
+const observer=new MutationObserver(()=>updateCenter());
 observer.observe(list,{childList:true, subtree:true});
 setTimeout(updateCenter, 200);
 </script>
