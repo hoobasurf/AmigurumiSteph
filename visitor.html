@@ -150,7 +150,19 @@
     .modal-main-img { width:100%; max-height:520px; object-fit:contain; border-radius:12px; border:4px solid rgba(248,205,227,0.5); background:white; }
 
     .thumbs { margin-top:16px; display:flex; gap:12px; justify-content:center; flex-wrap:wrap; }
-    .thumbs img { width:110px; height:110px; object-fit:contain; border-radius:10px; border:3px solid rgba(248,205,227,0.5); background:white; cursor:pointer; transition: transform .16s; }
+    .thumbs img {
+  width:110px;
+  height:110px;
+  object-fit:contain;
+
+  background: transparent;             /* pas de blanc */
+  border-radius:14px;
+
+  border:3px dashed #b67385;           /* contour maille pastel */
+
+  cursor:pointer;
+  transition: transform .16s;
+}
     .thumbs img:hover { transform:scale(1.06); border-color:#b84c6f; }
 
     .icon-bar { margin-top:12px; display:flex; justify-content:center; gap:36px; align-items:center; }
