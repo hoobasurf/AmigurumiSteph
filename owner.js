@@ -154,6 +154,34 @@ list.addEventListener("click", (e) => {
   }
 });
 
-
-// INIT
+// --------- INIT ----------
 renderCreations();
+
+
+// ====================== NOUVEAU POUR SIDEBAR & AFFICHAGE ======================
+
+const sidebar = document.getElementById("sidebar");
+const toggle = document.getElementById("toggleSidebar");
+const displayModes = document.getElementById("display-modes");
+
+toggle.onclick = () => sidebar.classList.toggle("sidebar-open");
+
+// Modes d’affichage uniquement pour Mes Créations
+function setMode(mode){
+  list.className = mode;
+}
+
+// OUVRIR SECTION SIDEBAR
+function openSection(id){
+  sidebar.classList.remove('sidebar-open'); // ferme sidebar automatiquement
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.owner-box, #owner-list, #display-modes').forEach(e=>e.style.display='none');
+  document.getElementById(id).classList.add('active');
+}
+
+// FERMER SECTION / RETOUR MES CREATIONS
+function closeSection(){
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.owner-box, #owner-list, #display-modes').forEach(e=>e.style.display='flex');
+  list.style.display='flex';
+}
