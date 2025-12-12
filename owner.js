@@ -60,6 +60,17 @@ videoList.addEventListener("click", async (e)=>{
 });
 renderVideos();
 
+// ---------------- MAILLES ----------------
+const mailleName = document.getElementById('maille-name');
+const mailleCount = document.getElementById('maille-count');
+const incrementBtn = document.getElementById('increment-maille');
+const decrementBtn = document.getElementById('decrement-maille');
+const resetBtn = document.getElementById('reset-maille');
+
+incrementBtn.onclick = () => mailleCount.value = parseInt(mailleCount.value)+1;
+decrementBtn.onclick = () => mailleCount.value = Math.max(0, parseInt(mailleCount.value)-1);
+resetBtn.onclick = () => mailleCount.value = 0;
+
 // ---------------- PELOTES ----------------
 const addPeloteBtn = document.getElementById('addPelote');
 const peloteList = document.getElementById('pelote-list');
@@ -76,8 +87,10 @@ addPeloteBtn.onclick = async () => {
   const photoUrl = supabase.storage.from('pelotes').getPublicUrl(uploadData.path).publicUrl;
 
   await supabase.from('pelotes').insert([{ name, marque, ref_couleur: ref, quantite: qty, photo_url: photoUrl }]);
-  document.getElementById('pelote-name').value = document.getElementById('pelote-marque').value = '';
-  document.getElementById('pelote-ref').value = document.getElementById('pelote-qty').value = '';
+  document.getElementById('pelote-name').value = '';
+  document.getElementById('pelote-marque').value = '';
+  document.getElementById('pelote-ref').value = '';
+  document.getElementById('pelote-qty').value = '';
   document.getElementById('pelote-photo').value = '';
   renderPelotes();
 };
@@ -106,17 +119,6 @@ peloteList.addEventListener("click", async (e)=>{
   }
 });
 renderPelotes();
-
-// ---------------- MAILLES ----------------
-const mailleName = document.getElementById('maille-name');
-const mailleCount = document.getElementById('maille-count');
-const incrementBtn = document.getElementById('increment-maille');
-const decrementBtn = document.getElementById('decrement-maille');
-const resetBtn = document.getElementById('reset-maille');
-
-incrementBtn.onclick = () => mailleCount.value = parseInt(mailleCount.value)+1;
-decrementBtn.onclick = () => mailleCount.value = Math.max(0, parseInt(mailleCount.value)-1);
-resetBtn.onclick = () => mailleCount.value = 0;
 
 // ---------------- NOTES ----------------
 const addNoteBtn = document.getElementById('addNote');
@@ -165,3 +167,31 @@ noteList.addEventListener("click", async (e)=>{
   }
 });
 renderNotes();
+
+// ---------------- PARAMETRES / SAUVEGARDE ----------------
+document.getElementById('exportData').onclick = () => {
+  const dataStr = JSON.stringify({
+    creations: JSON.parse(localStorage.getItem("creations") || "[]")
+  }, null, 2);
+  const blob = new Blob([dataStr], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = "crochet_data.json";
+  a.click();
+};
+
+document.getElementById('importData').onclick = () => {
+  const file = document.getElementById('importFile').files[0];
+  if(!file) return alert("Choisir un fichier à importer");
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    const data = JSON.parse(e.target.result);
+    if(data.creations) {
+      localStorage.setItem("creations", JSON.stringify(data.creations));
+      window.dispatchEvent(new Event('storage')); // pour re-render si besoin
+    }
+    alert("Import terminé !");
+  };
+  reader.readAsText(file);
+};
