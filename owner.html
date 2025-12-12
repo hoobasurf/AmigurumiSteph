@@ -2,158 +2,93 @@
 <html lang="fr">
 <head>
   <meta charset="UTF-8">
-  <title>Mes Créations</title>
-
+  <title>Mes créations - Crochet</title>
   <style>
-    body {
-      font-family: sans-serif;
-      padding: 20px;
-      background: #fff0f5;
-      margin: 0;
-      overflow-x: hidden;
+    body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; margin: 0; padding: 0; background: #fff0f5; }
+
+    /* Contenu principal */
+    #main-content { 
+      transition: transform 0.3s; 
+      padding: 20px; 
+      margin-left: 0;
     }
 
-    /* ===== TITRE ===== */
-    h1 {
+    /* Titre principal */
+    #page-title {
       text-align: center;
-      font-size: 30px;
-      color: #8b3a3a;
+      font-size: 36px;
+      font-weight: 700;
+      color: #8b3a3a;        
       margin-bottom: 20px;
-      font-family: "Georgia", serif;
-      letter-spacing: 1px;
     }
 
-    /* ===== CADRE AJOUT CREATION ===== */
-    .owner-box {
-      margin: 0 auto 25px;
-      background: #ffe6f0;
+    /* Ajouter une création */
+    #add-creation-container {
+      background: #fff0f5;
       border: 2px solid #b67385;
-      padding: 20px;
-      width: 90%;
-      max-width: 450px;
       border-radius: 15px;
-      box-shadow: 0 4px 15px rgba(182, 115, 133, 0.25);
-    }
-
-    .owner-box input[type="text"] {
-      width: 100%;
-      padding: 12px;
-      border-radius: 10px;
-      border: 1px solid #b67385;
-      margin-bottom: 10px;
-    }
-
-    .owner-box input[type="file"] {
-      width: 100%;
-      padding: 12px;
-      background: #ffb6c1;
-      border-radius: 10px;
-      border: 1px solid #b67385;
-      margin-bottom: 10px;
-    }
-
-    .owner-box button {
-      width: 100%;
-      padding: 12px;
-      background: #ff7f9f;
-      color: white;
-      border: none;
-      border-radius: 12px;
-      font-size: 17px;
-      box-shadow: 0 4px 8px rgba(182, 115, 133, 0.4);
-      cursor: pointer;
-    }
-
-    /* ===== SIDEBAR ===== */
-    #sidebar {
-      position: fixed;
-      top: 0;
-      left: -200px;
-      width: 200px;
-      height: 100vh;
-      background: #ffe6f0;
-      border-right: 2px solid #b67385;
       padding: 20px;
-      box-shadow: 2px 0 10px rgba(0,0,0,0.15);
+      max-width: 400px;
+      margin: 0 auto 40px auto;
+      box-shadow: 0 8px 20px rgba(182, 115, 133, 0.2);
       display: flex;
       flex-direction: column;
-      gap: 10px;
-      transition: left 0.3s;
-      z-index: 9999;
+      gap: 15px;
     }
-
-    #toggleSidebar {
-      position: absolute;
-      top: 50%;
-      right: -30px;
-      width: 30px;
-      height: 60px;
-      background: #ffb6c1;
-      color: #8b3a3a;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      border-radius: 0 10px 10px 0;
-      cursor: pointer;
+    #add-creation-container label {
       font-weight: bold;
-    }
-
-    #sidebar button {
-      background: #ffb6c1;
       color: #8b3a3a;
-      border: none;
-      border-radius: 10px;
+    }
+    #add-creation-container input[type="text"],
+    #add-creation-container input[type="file"] {
       padding: 10px;
-      cursor: pointer;
-      font-weight: bold;
-    }
-
-    /* Sidebar ouverte */
-    .sidebar-open {
-      left: 0;
-    }
-
-    /* ===== SECTIONS ===== */
-    .section.hidden {
-      display: none;
-    }
-
-    /* ===== CREATIONS ===== */
-
-    #owner-list {
-      display: flex;
-      gap: 12px;
-      flex-wrap: wrap;
-      justify-content: center;
-      margin-top: 20px;
-    }
-
-    .owner-item {
-      background: #ffe6f0;
       border: 2px solid #b67385;
+      border-radius: 10px;
+      font-size: 14px;
+      outline: none;
+      transition: border 0.2s, box-shadow 0.2s;
+    }
+    #add-creation-container input[type="text"]:focus,
+    #add-creation-container input[type="file"]:focus {
+      border-color: #ffb6c1;
+      box-shadow: 0 0 5px #ffb6c1;
+    }
+    #add-creation-container button {
+      background: #ffb6c1;
+      color: #8b3a3a;
+      font-weight: bold;
+      border: none;
       border-radius: 12px;
       padding: 10px;
-      box-shadow: 0 4px 10px rgba(182, 115, 133, 0.15);
-      position: relative;
-      width: 140px;
-      text-align: center;
+      font-size: 16px;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(182, 115, 133, 0.25);
+      transition: transform 0.1s, box-shadow 0.2s;
+    }
+    #add-creation-container button:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(182, 115, 133, 0.35);
     }
 
-    .owner-item img {
-      width: 100px;
-      height: 100px;
-      object-fit: cover;
-      border-radius: 10px;
-      margin-bottom: 6px;
-    }
+    /* Switcher mode */
+    #view-switcher { text-align: center; margin-bottom: 20px; }
+    #view-switcher select { padding: 6px 10px; border-radius: 8px; border: 2px solid #b67385; }
 
-    .owner-name {
-      margin-top: 5px;
-      font-size: 14px;
-      color: #8b3a3a;
-      font-weight: bold;
-    }
+    /* Liste des créations */
+    #owner-list { gap: 10px; padding-bottom: 10px; margin-top: 20px; }
+    #owner-list::-webkit-scrollbar { height: 8px; }
+    #owner-list::-webkit-scrollbar-thumb { background-color: #b67385; border-radius: 4px; }
 
+    .owner-item { 
+      background: #ffe6f0; 
+      border: 2px solid #b67385; 
+      padding: 10px; 
+      border-radius: 15px; 
+      box-shadow: 0 4px 10px rgba(182, 115, 133, 0.15); 
+      position: relative; 
+      min-width: 120px;
+    }
+    .owner-item img { max-width: 100px; border-radius: 8px; display: block; }
     .delete-btn {
       position: absolute;
       top: 5px;
@@ -169,49 +104,72 @@
       align-items: center;
       font-weight: bold;
       cursor: pointer;
+      font-size: 14px;
     }
 
-    /* MODES AFFICHAGE */
-    #owner-list.carousel {
-      display: flex;
-      flex-wrap: nowrap;
-      overflow-x: auto;
-      padding-bottom: 10px;
-    }
+    /* Modes d'affichage */
+    #owner-list.carousel { display: flex; flex-wrap: nowrap; overflow-x: auto; }
+    #owner-list.grid { display: grid; grid-template-columns: repeat(auto-fill,minmax(150px,1fr)); }
+    #owner-list.list { display: flex; flex-direction: column; }
 
-    #owner-list.grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
-    }
-
-    #owner-list.list {
+    /* Sidebar */
+    #sidebar {
+      position: fixed;
+      top: 0;
+      left: -200px;
+      width: 200px;
+      height: 100vh;
+      background: #ffe6f0;
+      border-right: 2px solid #b67385;  
+      padding: 20px;
       display: flex;
       flex-direction: column;
-      align-items: center;
+      gap: 10px;
+      box-shadow: 2px 0 5px rgba(0,0,0,0.1);
+      transition: left 0.3s;
+      z-index: 1000;
     }
+    #sidebar button {
+      background: #ffb6c1;
+      color: #8b3a3a;
+      border: none;
+      border-radius: 10px;
+      padding: 10px;
+      cursor: pointer;
+      font-weight: bold;
+      transition: background 0.2s;
+    }
+    #sidebar button:hover { background: #ff90b0; }
+    #sidebar.sidebar-open { left: 0; }
 
-    #owner-list.list .owner-item {
-      width: 100%;
-      max-width: 500px;
+    /* Encoche */
+    #toggleSidebar {
+      position: fixed;
+      top: 50%;
+      left: 0;
+      width: 30px;
+      height: 60px;
+      background: #ffb6c1;
+      color: #8b3a3a;
       display: flex;
+      justify-content: center;
       align-items: center;
-      gap: 15px;
+      border-radius: 0 10px 10px 0;
+      cursor: pointer;
+      font-weight: bold;
+      z-index: 1100;
     }
 
-    #owner-list.list img {
-      width: 70px;
-      height: 70px;
-    }
-
+    /* Sections */
+    .section { display: none; }
+    .section input, .section textarea { width: 100%; box-sizing: border-box; margin-bottom: 10px; padding: 8px; border-radius: 8px; border: 1px solid #ccc; }
   </style>
-
 </head>
 <body>
 
-<!-- ===== SIDEBAR ===== -->
-<div id="sidebar">
-  <div id="toggleSidebar">☰</div>
+<div id="toggleSidebar">☰</div>
 
+<div id="sidebar">
   <button onclick="showSection('videos')">Vidéos / Tutoriels</button>
   <button onclick="showSection('mailles')">Compteur de mailles</button>
   <button onclick="showSection('pelotes')">Pelotes & Couleurs</button>
@@ -219,98 +177,103 @@
   <button onclick="showSection('settings')">Paramètres / Sauvegarde</button>
 </div>
 
-<h1>Mes Créations</h1>
+<div id="main-content">
+  <h1 id="page-title">Mes créations</h1>
 
-<!-- ===== AJOUT CREATION ===== -->
-<div class="owner-box">
-  <input id="name" type="text" placeholder="Nom de la création">
-  <input id="photo" type="file" accept="image/*">
-  <button id="add">Ajouter</button>
+  <div id="add-creation-container">
+    <label for="name">Nom de la création</label>
+    <input id="name" placeholder="Ex : Napperon Crochet">
+    <label for="photo">Choisir une photo</label>
+    <input id="photo" type="file" accept="image/*">
+    <button id="add">Ajouter</button>
+  </div>
+
+  <div id="view-switcher">
+    <label>Afficher en :</label>
+    <select id="viewMode">
+      <option value="carousel">Carrousel</option>
+      <option value="grid">Grille</option>
+      <option value="list">Liste</option>
+    </select>
+  </div>
+
+  <div id="owner-list" class="carousel"></div>
+
+  <!-- Sections supplémentaires -->
+  <div class="section" id="videos">
+    <h1>Vidéos / Tutoriels</h1>
+    <input id="video-url" placeholder="URL YouTube">
+    <input id="video-title" placeholder="Titre (facultatif)">
+    <textarea id="video-transcription" placeholder="Transcription"></textarea>
+    <input id="video-progress" placeholder="Position (ex: 5:32)">
+    <button id="addVideo">Ajouter</button>
+    <div id="video-list"></div>
+  </div>
+
+  <div class="section" id="mailles">
+    <h1>Compteur de mailles</h1>
+    <input id="maille-name" placeholder="Nom du motif">
+    <input id="maille-count" type="number" value="0">
+    <button id="increment-maille">+1</button>
+    <button id="decrement-maille">-1</button>
+    <button id="reset-maille">Reset</button>
+  </div>
+
+  <div class="section" id="pelotes">
+    <h1>Pelotes & Couleurs</h1>
+    <input id="pelote-name" placeholder="Nom">
+    <input id="pelote-marque" placeholder="Marque">
+    <input id="pelote-ref" placeholder="Référence couleur">
+    <input id="pelote-qty" type="number" placeholder="Quantité">
+    <input id="pelote-photo" type="file" accept="image/*">
+    <button id="addPelote">Ajouter</button>
+    <div id="pelote-list"></div>
+  </div>
+
+  <div class="section" id="notes">
+    <h1>Notes / Inspirations</h1>
+    <input id="note-title" placeholder="Titre">
+    <textarea id="note-content" placeholder="Contenu"></textarea>
+    <input id="note-photo" type="file" accept="image/*">
+    <button id="addNote">Ajouter</button>
+    <div id="note-list"></div>
+  </div>
+
+  <div class="section" id="settings">
+    <h1>Paramètres / Sauvegarde</h1>
+    <button id="exportData">Exporter les données</button>
+    <input type="file" id="importFile">
+    <button id="importData">Importer les données</button>
+  </div>
+
 </div>
 
-<!-- ===== MODES ===== -->
-<div style="text-align:center; margin-bottom: 20px;">
-  <button onclick="setMode('carousel')">Carrousel</button>
-  <button onclick="setMode('grid')">Grille</button>
-  <button onclick="setMode('list')">Liste</button>
-</div>
-
-<!-- ===== LISTE ===== -->
-<div id="owner-list" class="grid"></div>
-
-<!-- ===== SECTIONS ===== -->
-<div class="section hidden" id="videos">
-  <h2>Vidéos</h2>
-</div>
-
-<div class="section hidden" id="mailles">
-  <h2>Mailles</h2>
-</div>
-
-<div class="section hidden" id="pelotes">
-  <h2>Pelotes</h2>
-</div>
-
-<div class="section hidden" id="notes">
-  <h2>Notes</h2>
-</div>
-
-<div class="section hidden" id="settings">
-  <h2>Paramètres</h2>
-</div>
-
-
+<script type="module" src="owner.js"></script>
 <script>
-/* ===== SIDEBAR ===== */
-const sidebar = document.getElementById("sidebar");
-const toggle = document.getElementById("toggleSidebar");
+  const sidebar = document.getElementById('sidebar');
+  const toggle = document.getElementById('toggleSidebar');
+  const mainContent = document.getElementById('main-content');
+  const viewSelect = document.getElementById('viewMode');
+  const ownerList = document.getElementById('owner-list');
 
-toggle.onclick = () => {
-  sidebar.classList.toggle("sidebar-open");
-};
+  // Sidebar coulissante
+  toggle.onclick = () => {
+    sidebar.classList.toggle('sidebar-open');
+    mainContent.style.transform = sidebar.classList.contains('sidebar-open') ? 'translateX(200px)' : 'translateX(0)';
+  }
 
-/* ===== SECTIONS ===== */
-function showSection(id) {
-  document.querySelectorAll(".section").forEach(sec => sec.classList.add("hidden"));
-  document.getElementById(id).classList.remove("hidden");
-}
+  // Afficher sections
+  function showSection(id) {
+    document.querySelectorAll('.section').forEach(s => s.style.display = 'none');
+    const section = document.getElementById(id);
+    if(section) section.style.display = 'block';
+  }
 
-/* ===== MODES D'AFFICHAGE ===== */
-function setMode(mode) {
-  const list = document.getElementById("owner-list");
-  list.className = mode;
-}
-
-/* ===== CREATIONS ===== */
-const ownerList = document.getElementById("owner-list");
-
-document.getElementById("add").onclick = async () => {
-  const name = document.getElementById("name").value;
-  const file = document.getElementById("photo").files[0];
-  if (!name || !file) return;
-
-  const imgUrl = URL.createObjectURL(file);
-
-  const div = document.createElement("div");
-  div.className = "owner-item";
-
-  const img = document.createElement("img");
-  img.src = imgUrl;
-  div.appendChild(img);
-
-  const nameEl = document.createElement("div");
-  nameEl.className = "owner-name";
-  nameEl.textContent = name;
-  div.appendChild(nameEl);
-
-  const del = document.createElement("div");
-  del.className = "delete-btn";
-  del.textContent = "×";
-  del.onclick = () => div.remove();
-  div.appendChild(del);
-
-  ownerList.appendChild(div);
-};
+  // Changement mode affichage
+  viewSelect.addEventListener('change', () => {
+    ownerList.classList.remove('carousel','grid','list');
+    ownerList.classList.add(viewSelect.value);
+  });
 </script>
 
 </body>
