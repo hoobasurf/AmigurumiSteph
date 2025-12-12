@@ -1,63 +1,64 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="UTF-8">
-<title>Owner - Crochet</title>
-<style>
-  body { font-family: sans-serif; padding: 20px; background: #fff0f5; margin:0; }
-  .sidebar {
-    position: fixed; top:0; left:0; width:220px; height:100vh;
-    background:#ffe6f0; padding:20px; box-shadow:2px 0 5px rgba(0,0,0,0.1);
-  }
-  .sidebar h2 { color:#b84c6f; }
-  .sidebar button { display:block; margin:10px 0; padding:10px; border:none; border-radius:10px; background:#ffb6c1; cursor:pointer; color:#8b3a3a; font-weight:bold; }
-  .main { margin-left:240px; padding:20px; }
+  <meta charset="UTF-8">
+  <title>Owner - Crochet</title>
+  <style>
+    body { font-family: sans-serif; padding: 20px; background: #fff0f5; margin:0; }
+    .sidebar {
+      position: fixed; top:0; left:0; width:220px; height:100vh;
+      background:#ffe6f0; padding:20px; box-shadow:2px 0 5px rgba(0,0,0,0.1);
+    }
+    .sidebar h2 { color:#b84c6f; }
+    .sidebar button { display:block; margin:10px 0; padding:10px; border:none; border-radius:10px; background:#ffb6c1; cursor:pointer; color:#8b3a3a; font-weight:bold; }
+    .main { margin-left:240px; padding:20px; }
 
-  /* Ton style existant pour les créations */
-  .owner-box { margin-bottom: 20px; }
-  input, button, textarea { padding: 10px; margin: 5px; border-radius: 8px; border: 1px solid #ccc; }
-  button { background-color: #ffb6c1; cursor: pointer; }
-  #owner-list { display: flex; flex-wrap: wrap; gap: 10px; }
-  .owner-item, .pelote-item, .video-item, .note-item { 
-    background: #ffe6f0;                 
-    border: 2px solid #b67385;           
-    padding: 10px;
-    border-radius: 15px;                 
-    box-shadow: 0 4px 10px rgba(182, 115, 133, 0.15); 
-    position: relative;
-  }
-  .owner-item img, .pelote-item img, .video-item img, .note-item img { max-width:100px; border-radius:8px; display:block; margin-bottom:5px; }
-  .delete-btn {
-    position: absolute;
-    top: 5px;
-    right: 5px;
-    background: rgba(255, 192, 203, 0.85);
-    border: 1px solid #8b3a3a;
-    color: #8b3a3a;
-    border-radius: 50%;
-    width: 22px;
-    height: 22px;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    font-weight: bold;
-    cursor: pointer;
-    font-size: 14px;
-  }
+    /* TON STYLE EXISTANT POUR CREATIONS */
+    .owner-box { margin-bottom: 20px; }
+    input, button, textarea { padding: 10px; margin: 5px; border-radius: 8px; border: 1px solid #ccc; }
+    button { background-color: #ffb6c1; cursor: pointer; }
+    #owner-list { display: flex; flex-wrap: wrap; gap: 10px; }
+    .owner-item, .pelote-item, .video-item, .note-item, .maille-item { 
+      background: #ffe6f0;                 
+      border: 2px solid #b67385;           
+      padding: 10px;
+      border-radius: 15px;                 
+      box-shadow: 0 4px 10px rgba(182, 115, 133, 0.15); 
+      position: relative;
+    }
+    .owner-item img, .pelote-item img, .video-item img, .note-item img { max-width:100px; border-radius:8px; display:block; margin-bottom:5px; }
+    .delete-btn {
+      position: absolute;
+      top: 5px;
+      right: 5px;
+      background: rgba(255, 192, 203, 0.85);
+      border: 1px solid #8b3a3a;
+      color: #8b3a3a;
+      border-radius: 50%;
+      width: 22px;
+      height: 22px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-weight: bold;
+      cursor: pointer;
+      font-size: 14px;
+    }
 
-  .section { display:block; }
-  .hidden { display:none; }
-</style>
+    .section { display:block; }
+    .hidden { display:none; }
+  </style>
 </head>
 <body>
 
 <div class="sidebar">
   <h2>Mon Crochet</h2>
-  <button onclick="showSection('creations')">Créations</button>
-  <button onclick="showSection('videos')">Vidéos</button>
-  <button onclick="showSection('pelotes')">Pelotes</button>
-  <button onclick="showSection('mailles')">Mailles</button>
-  <button onclick="showSection('notes')">Notes</button>
+  <button onclick="showSection('creations')">Mes créations</button>
+  <button onclick="showSection('videos')">Vidéos / Tutoriels</button>
+  <button onclick="showSection('mailles')">Compteur de mailles</button>
+  <button onclick="showSection('pelotes')">Pelotes & Couleurs</button>
+  <button onclick="showSection('notes')">Notes / Inspirations</button>
+  <button onclick="showSection('settings')">Paramètres / Sauvegarde</button>
 </div>
 
 <div class="main">
@@ -70,7 +71,6 @@
       <input id="photo" type="file" accept="image/*">
       <button id="add">Ajouter</button>
     </div>
-
     <h2>Liste des créations</h2>
     <div id="owner-list"></div>
   </div>
@@ -86,18 +86,6 @@
     <div id="video-list"></div>
   </div>
 
-  <!-- ================= PELOTES ================= -->
-  <div id="pelotes" class="section hidden">
-    <h1>Mes Pelotes</h1>
-    <input id="pelote-name" placeholder="Nom">
-    <input id="pelote-marque" placeholder="Marque">
-    <input id="pelote-ref" placeholder="Référence couleur">
-    <input id="pelote-qty" type="number" placeholder="Quantité">
-    <input id="pelote-photo" type="file" accept="image/*">
-    <button id="addPelote">Ajouter</button>
-    <div id="pelote-list"></div>
-  </div>
-
   <!-- ================= MAILLES ================= -->
   <div id="mailles" class="section hidden">
     <h1>Compteur de mailles</h1>
@@ -107,6 +95,18 @@
     <button id="decrement-maille">-1</button>
     <button id="reset-maille">Reset</button>
     <div id="maille-list"></div>
+  </div>
+
+  <!-- ================= PELOTES ================= -->
+  <div id="pelotes" class="section hidden">
+    <h1>Pelotes & Couleurs</h1>
+    <input id="pelote-name" placeholder="Nom">
+    <input id="pelote-marque" placeholder="Marque">
+    <input id="pelote-ref" placeholder="Référence couleur">
+    <input id="pelote-qty" type="number" placeholder="Quantité">
+    <input id="pelote-photo" type="file" accept="image/*">
+    <button id="addPelote">Ajouter</button>
+    <div id="pelote-list"></div>
   </div>
 
   <!-- ================= NOTES ================= -->
@@ -119,9 +119,19 @@
     <div id="note-list"></div>
   </div>
 
+  <!-- ================= PARAMETRES / SAUVEGARDE ================= -->
+  <div id="settings" class="section hidden">
+    <h1>Paramètres / Sauvegarde</h1>
+    <button id="exportData">Exporter les données</button>
+    <input type="file" id="importFile">
+    <button id="importData">Importer les données</button>
+    <p>Exporter / importer vos créations et notes.</p>
+  </div>
+
 </div>
 
-<script type="module" src="owner.js"></script> <!-- TON CODE EXACT INTACT -->
-<script type="module" src="app.js"></script>   <!-- NOUVELLE LOGIQUE SUPABASE POUR AUTRES SECTIONS -->
+<script type="module" src="owner.js"></script>
+<script type="module" src="app.js"></script>
+
 </body>
 </html>
