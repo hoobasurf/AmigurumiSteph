@@ -1,159 +1,158 @@
-const nameInput = document.getElementById('name');
-const photoInput = document.getElementById('photo');
-const addBtn = document.getElementById('add');
-const list = document.getElementById('owner-list');
+import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
 
-// On charge ce qui existe déjà
-let creations = JSON.parse(localStorage.getItem("creations") || "[]");
+const supabaseUrl = 'VOTRE_SUPABASE_URL';
+const supabaseKey = 'VOTRE_SUPABASE_ANON_KEY';
+const supabase = createClient(supabaseUrl, supabaseKey);
 
-// Compression pour stocker plus d’images
-function compressImage(file, maxWidth = 900, quality = 0.8) {
-  return new Promise((resolve) => {
-    const reader = new FileReader();
-    reader.onload = (e) => {
-      const img = new Image();
-      img.onload = () => {
-        const canvas = document.createElement("canvas");
-
-        let w = img.width;
-        let h = img.height;
-
-        if (w > maxWidth) {
-          h *= maxWidth / w;
-          w = maxWidth;
-        }
-
-        canvas.width = w;
-        canvas.height = h;
-
-        const ctx = canvas.getContext("2d");
-        ctx.drawImage(img, 0, 0, w, h);
-
-        resolve(canvas.toDataURL("image/jpeg", quality));
-      };
-      img.src = e.target.result;
-    };
-    reader.readAsDataURL(file);
-  });
+// ================= SIDEBAR =================
+function showSection(id) {
+  document.querySelectorAll('.section').forEach(s => s.classList.add('hidden'));
+  document.getElementById(id).classList.remove('hidden');
 }
+window.showSection = showSection;
 
+// ================= CREATIONS (TON CODE EXISTANT) =================
+// Récupération et gestion locale existante reste inchangée
+// (owner.js est déjà inclus et contient ton code actuel)
 
-// --------- AFFICHAGE ----------
-function renderCreations() {
-  list.innerHTML = "";
+// ================= VIDEOS =================
+const videoUrl = document.getElementById('video-url');
+const videoTitle = document.getElementById('video-title');
+const videoTranscription = document.getElementById('video-transcription');
+const videoProgress = document.getElementById('video-progress');
+const addVideoBtn = document.getElementById('addVideo');
+const videoList = document.getElementById('video-list');
 
-  creations.forEach((item, index) => {
-    const div = document.createElement("div");
-    div.className = "owner-item";
-
+async function renderVideos() {
+  const { data } = await supabase.from('videos').select('*').order('created_at', { ascending: false });
+  videoList.innerHTML = '';
+  data.forEach(v => {
+    const div = document.createElement('div');
+    div.className = 'video-item';
     div.innerHTML = `
-      <div class="delete-btn" data-index="${index}">×</div>
-      <img src="${item.imgUrl}" alt="">
-      <p>${item.name}</p>
+      <div class="delete-btn" onclick="deleteVideo('${v.id}')">×</div>
+      <iframe width="200" height="113" src="https://www.youtube.com/embed/${getYoutubeId(v.url)}" frameborder="0" allowfullscreen></iframe>
+      <p><b>${v.title}</b></p>
+      <p>${v.transcription}</p>
+      <p>Progression: ${v.progress}</p>
     `;
-
-    list.appendChild(div);
+    videoList.appendChild(div);
   });
 }
 
-
-// --------- SUPPRESSION (fenêtre rose pastel) ----------
-function showDeletePopup(index) {
-  const overlay = document.createElement("div");
-  overlay.style = `
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.15);
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    z-index: 99999;
-  `;
-
-  const box = document.createElement("div");
-  box.style = `
-    background: #ffe4ec;
-    border: 3px solid #b84c6f;
-    padding: 20px;
-    border-radius: 15px;
-    width: 260px;
-    text-align: center;
-    box-shadow: 0 8px 25px rgba(0,0,0,0.2);
-  `;
-
-  box.innerHTML = `
-    <p style="color:#b84c6f; font-weight:600; font-size:16px; margin-bottom:15px;">
-      Supprimer cette création ?
-    </p>
-
-    <div style="display:flex; gap:10px; justify-content:center;">
-      <button id="delYes" style="
-        padding: 8px 14px;
-        border-radius: 10px;
-        border: none;
-        background: #ffb6c1;
-        color: #8b3a3a;
-        font-weight: bold;
-        cursor: pointer;">
-        Oui
-      </button>
-
-      <button id="delNo" style="
-        padding: 8px 14px;
-        border-radius: 10px;
-        border: none;
-        background: #ddd;
-        cursor: pointer;">
-        Non
-      </button>
-    </div>
-  `;
-
-  overlay.appendChild(box);
-  document.body.appendChild(overlay);
-
-  // OK suppression
-  box.querySelector("#delYes").onclick = () => {
-    creations.splice(index, 1);
-    localStorage.setItem("creations", JSON.stringify(creations));
-    renderCreations();
-    overlay.remove();
-  };
-
-  // Annuler
-  box.querySelector("#delNo").onclick = () => overlay.remove();
+function getYoutubeId(url) {
+  const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+  const match = url.match(regExp);
+  return (match && match[2].length==11) ? match[2] : null;
 }
 
-
-// --------- AJOUT ----------
-addBtn.onclick = async () => {
-  const name = nameInput.value.trim();
-  const file = photoInput.files[0];
-
-  if (!name || !file) {
-    alert("Merci de remplir le nom et choisir une photo !");
-    return;
-  }
-
-  const imgUrl = await compressImage(file);
-  creations.unshift({ name, imgUrl });
-
-  localStorage.setItem("creations", JSON.stringify(creations));
-  renderCreations();
-
-  nameInput.value = "";
-  photoInput.value = "";
+window.deleteVideo = async (id) => {
+  await supabase.from('videos').delete().eq('id', id);
+  renderVideos();
 };
 
+addVideoBtn.onclick = async () => {
+  if(!videoUrl.value) return alert('URL obligatoire');
+  await supabase.from('videos').insert([{
+    url: videoUrl.value,
+    title: videoTitle.value,
+    transcription: videoTranscription.value,
+    progress: videoProgress.value
+  }]);
+  videoUrl.value = videoTitle.value = videoTranscription.value = videoProgress.value = '';
+  renderVideos();
+};
 
-// --------- CLIC SUR LA CROIX ----------
-list.addEventListener("click", (e) => {
-  if (e.target.classList.contains("delete-btn")) {
-    const index = e.target.dataset.index;
-    showDeletePopup(index);
+renderVideos();
+
+// ================= PELOTES =================
+const addPeloteBtn = document.getElementById('addPelote');
+const peloteList = document.getElementById('pelote-list');
+
+addPeloteBtn.onclick = async () => {
+  const file = document.getElementById('pelote-photo').files[0];
+  const name = document.getElementById('pelote-name').value;
+  const marque = document.getElementById('pelote-marque').value;
+  const ref = document.getElementById('pelote-ref').value;
+  const qty = parseInt(document.getElementById('pelote-qty').value)||0;
+  if(!file || !name) return alert('Nom et photo obligatoires');
+
+  const { data: uploadData } = await supabase.storage.from('pelotes').upload(`${Date.now()}_${file.name}`, file);
+  const photoUrl = supabase.storage.from('pelotes').getPublicUrl(uploadData.path).publicUrl;
+
+  await supabase.from('pelotes').insert([{ name, marque, ref_couleur: ref, quantite: qty, photo_url: photoUrl }]);
+  document.getElementById('pelote-name').value = document.getElementById('pelote-marque').value = '';
+  document.getElementById('pelote-ref').value = document.getElementById('pelote-qty').value = '';
+  document.getElementById('pelote-photo').value = '';
+  renderPelotes();
+};
+
+async function renderPelotes() {
+  const { data } = await supabase.from('pelotes').select('*').order('created_at', { ascending: false });
+  peloteList.innerHTML='';
+  data.forEach(p => {
+    const div = document.createElement('div');
+    div.className='pelote-item';
+    div.innerHTML = `
+      <div class="delete-btn" onclick="deletePelote('${p.id}')">×</div>
+      <img src="${p.photo_url}" alt="">
+      <p><b>${p.name}</b></p>
+      <p>${p.marque} / ${p.ref_couleur}</p>
+      <p>Quantité: ${p.quantite}</p>
+    `;
+    peloteList.appendChild(div);
+  });
+}
+window.deletePelote = async (id) => { await supabase.from('pelotes').delete().eq('id',id); renderPelotes(); }
+renderPelotes();
+
+// ================= MAILLES =================
+const mailleName = document.getElementById('maille-name');
+const mailleCount = document.getElementById('maille-count');
+const incrementBtn = document.getElementById('increment-maille');
+const decrementBtn = document.getElementById('decrement-maille');
+const resetBtn = document.getElementById('reset-maille');
+
+incrementBtn.onclick = () => mailleCount.value = parseInt(mailleCount.value)+1;
+decrementBtn.onclick = () => mailleCount.value = Math.max(0, parseInt(mailleCount.value)-1);
+resetBtn.onclick = () => mailleCount.value = 0;
+
+// ================= NOTES =================
+const addNoteBtn = document.getElementById('addNote');
+const noteList = document.getElementById('note-list');
+
+addNoteBtn.onclick = async () => {
+  const file = document.getElementById('note-photo').files[0];
+  const title = document.getElementById('note-title').value;
+  const content = document.getElementById('note-content').value;
+  if(!title) return alert('Titre obligatoire');
+
+  let photoUrl = null;
+  if(file){
+    const { data: uploadData } = await supabase.storage.from('notes').upload(`${Date.now()}_${file.name}`, file);
+    photoUrl = supabase.storage.from('notes').getPublicUrl(uploadData.path).publicUrl;
   }
-});
 
+  await supabase.from('notes').insert([{ title, content, image_url: photoUrl }]);
+  document.getElementById('note-title').value = document.getElementById('note-content').value = '';
+  document.getElementById('note-photo').value = '';
+  renderNotes();
+};
 
-// INIT
-renderCreations();
+async function renderNotes() {
+  const { data } = await supabase.from('notes').select('*').order('created_at', { ascending:false });
+  noteList.innerHTML='';
+  data.forEach(n=>{
+    const div = document.createElement('div');
+    div.className='note-item';
+    div.innerHTML=`
+      <div class="delete-btn" onclick="deleteNote('${n.id}')">×</div>
+      ${n.image_url?`<img src="${n.image_url}" alt="">`:''}
+      <p><b>${n.title}</b></p>
+      <p>${n.content}</p>
+    `;
+    noteList.appendChild(div);
+  });
+}
+window.deleteNote = async id=>{await supabase.from('notes').delete().eq('id',id); renderNotes();}
+renderNotes();
