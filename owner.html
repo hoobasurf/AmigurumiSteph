@@ -92,6 +92,24 @@
 
     /* Inputs et textareas larges */
     .section input, .section textarea { width: 100%; box-sizing: border-box; margin-bottom: 10px; }
+  
+  #owner-list {
+  display: flex;
+  flex-wrap: nowrap; /* empêche les items de passer à la ligne */
+  overflow-x: auto; /* active le scroll horizontal */
+  gap: 10px;
+  padding-bottom: 10px; /* un peu de marge */
+}
+
+#owner-list::-webkit-scrollbar {
+  height: 8px; /* taille du scroll */
+}
+
+#owner-list::-webkit-scrollbar-thumb {
+  background-color: #b67385;
+  border-radius: 4px;
+}
+  
   </style>
 </head>
 <body>
