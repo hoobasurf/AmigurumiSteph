@@ -13,10 +13,10 @@ html, body { height:100%; font-family: 'Comic Sans MS', cursive; }
 
 body {
   background-image: url('Photoroom_20251212_143703.png');
-  background-size: contain; /* fond visible entièrement */
-  background-position: center center;
-  background-repeat: no-repeat;
-  background-attachment: fixed;
+  background-size: contain;       /* fond visible entièrement */
+  background-position: center;    
+  background-repeat: no-repeat;   
+  background-attachment: fixed;   
   background-color: #fff0f5;
 
   display: flex;
@@ -26,18 +26,40 @@ body {
   touch-action: pan-x;
 }
 
-/* Images des différentes vues */
-.carousel-view .visitor-item img { width: 200px; height: 200px; }
-.grid-view .visitor-item img { height: 160px; width:auto; }
-.list-view .visitor-item img { width: 120px; height: 120px; }
-  display: flex;
-  flex-direction: column;
-  height: 100vh;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+/* =========================
+   CARROUSEL
+   ========================= */
+.carousel-view .visitor-item img {
+  width: 260px;   /* taille entière comme avant */
+  height: 260px;
+  border: none;           /* aucun contour */
+  box-shadow: none;       /* pas d’ombre */
+  background: transparent;/* pas de fond derrière */
+  object-fit: contain;    /* image entière visible */
+}
 
-  overflow-y: hidden;   /* bloque scroll vertical du body */
-  touch-action: pan-x;  /* autorise scroll horizontal sur carrousel tactile */
+/* =========================
+   GRID
+   ========================= */
+.grid-view .visitor-item img {
+  width: 100%;
+  height: 200px;
+  border: none;
+  box-shadow: none;
+  background: transparent;
+  object-fit: contain;
+}
+
+/* =========================
+   LISTE
+   ========================= */
+.list-view .visitor-item img {
+  width: 140px;
+  height: 140px;
+  border: none;
+  box-shadow: none;
+  background: transparent;
+  object-fit: contain;
 }
 
 /* =========================
