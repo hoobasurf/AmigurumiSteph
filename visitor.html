@@ -1,117 +1,186 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="UTF-8" />
-<title>Galerie - Mes créations</title>
+  <meta charset="UTF-8" />
+  <title>Galerie - Mes créations</title>
 
-<style>
-  /* =========================
-     RESET / GLOBAL
-     ========================= */
-  * { box-sizing: border-box; margin:0; padding:0; }
-  html, body {
-    height: 100%;
-    font-family: 'Comic Sans MS', cursive;
-    overflow-y: hidden;           /* Bloque scroll vertical */
-    touch-action: pan-x;          /* Autorise glissement horizontal */
-  }
+  <style>
+    /* =========================
+       RESET / GLOBAL
+       ========================= */
+    * { box-sizing: border-box; margin:0; padding:0; }
+    html, body { height:100%; font-family: 'Comic Sans MS', cursive; }
+    
+    body {
+  margin: 0;
+  padding: 0;
+  font-family: 'Comic Sans MS', cursive;
 
-  body {
-    margin: 0;
-    padding: 0;
-    background-image: url('Photoroom_20251212_143703.png');
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-    background-attachment: fixed;  /* Fond fixe */
-    background-color: #fff0f5;     /* pastel derrière si image non chargée */
-    display: flex;
-    flex-direction: column;
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
-  }
+  background-image: url('Photoroom_20251212_143703.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;   /* <-- Fond fixe */
+  background-color: #fff0f5;
 
-  /* =========================
-     HEADER
-     ========================= */
-  header {
-    position: relative;
-    background: transparent;
-    padding: 40px 20px 20px;
-    text-align: center;
-    border-radius: 0;
-    box-shadow: none;
-    flex-shrink: 0;
-  }
-  header img {
-    width: 98px; height: 98px;
-    display:block; margin:0 auto 12px;
-    border-radius:20%; box-shadow:0 4px 12px rgba(184,76,111,0.18);
-  }
-  .title {
-    font-size:42px; color:#b84c6f; font-weight:bold;
-    letter-spacing:1px; text-shadow:0 2px 4px rgba(184,76,111,0.15);
-    display:inline-block;
-  }
-  .title-thread {
-    position:absolute; left:50%; transform:translateX(-50%);
-    bottom:14px; width:240px; height:6px; background:#b84c6f;
-    border-radius:20px; box-shadow:0 3px 6px rgba(184,76,111,0.08); opacity:0.85;
-  }
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 
-  /* =========================
-     VIEW SELECTOR
-     ========================= */
-  #viewSelector {
-    display:flex; justify-content:center; gap:12px; margin:14px 12px;
-  }
-  #viewSelector button {
-    background:#fff0f7;
-    border:2px solid #b84c6f;
-    color:#b84c6f;
-    padding:8px 16px; border-radius:24px;
-    font-size:15px; cursor:pointer;
-    transition: all 0.18s ease;
-  }
-  #viewSelector button.active {
-    background: linear-gradient(90deg, #ffeaf2, #fff5f8);
-    color:#7a2b45;
-    box-shadow:0 6px 14px rgba(184,76,111,0.12);
-    transform:translateY(-2px);
-  }
-  #viewSelector button:hover { transform:translateY(-2px); }
+  overflow-y: hidden;   /* <-- bloque scroll vertical */
+  touch-action: pan-x;  /* <-- autorise scroll horizontal sur carrousel tactile */
+}
 
-  /* =========================
-     CENTER ZONE & CAROUSEL
-     ========================= */
-  .center-zone { flex:1; display:flex; align-items:center; justify-content:center; padding:8px; transform:translateY(-40px); }
-  #visitor-list { width:calc(100% - 40px); max-width:1200px; margin:0 auto; transition:all 0.2s ease; }
+    header img {
+      width: 98px; height: 98px;
+      display:block; margin:0 auto 12px;
+      border-radius:20%; box-shadow:0 4px 12px rgba(184,76,111,0.18);
+    }
 
-  .carousel-view { display:flex; gap:40px; overflow-x:auto; scroll-behavior:smooth; align-items:center; padding:10px; }
-  .carousel-view::-webkit-scrollbar { height:8px; }
-  .carousel-view::-webkit-scrollbar-thumb { background:#b84c6f66; border-radius:20px; }
-  .visitor-item.active img { transform:scale(1.16); box-shadow:0 10px 22px rgba(184,76,111,0.30); }
-  .carousel-view .visitor-item img { width:260px; height:260px; border-radius:28px; border:4px solid rgba(184,76,111,0.25); background:transparent; }
+    .title {
+      font-size:42px; color:#b84c6f; font-weight:bold;
+      letter-spacing:1px; text-shadow:0 2px 4px rgba(184,76,111,0.15);
+      display:inline-block;
+    }
 
-  .visitor-item { text-align:center; cursor:pointer; user-select:none; }
-  .visitor-item img {
-    display:block;
-    margin:0 auto;
-    object-fit:contain;
-    transition: transform 0.28s ease, box-shadow 0.28s ease;
-  }
-  .visitor-item:hover img {
-    transform: scale(1.05);
-    box-shadow:0 10px 22px rgba(184,76,111,0.25);
-  }
-  .visitor-item p {
-    margin:12px 0 0; font-size:20px; color:#b84c6f; font-weight:bold; line-height:1.1;
-  }
+    .title-thread {
+      position:absolute; left:50%; transform:translateX(-50%);
+      bottom:14px; width:240px; height:6px; background:#b84c6f;
+      border-radius:20px; box-shadow:0 3px 6px rgba(184,76,111,0.08); opacity:0.85;
+    }
 
-  @media (max-width:720px){
-    .carousel-view .visitor-item img { width:200px; height:200px; }
-  }
-</style>
+    /* =========================
+       VIEW SELECTOR
+       ========================= */
+    #viewSelector {
+      display:flex; justify-content:center; gap:12px; margin:14px 12px;
+    }
+    #viewSelector button {
+      background:#fff0f7;
+      border:2px solid #b84c6f;
+      color:#b84c6f;
+      padding:8px 16px; border-radius:24px;
+      font-size:15px; cursor:pointer;
+      transition: all 0.18s ease;
+    }
+    #viewSelector button.active {
+      background: linear-gradient(90deg, #ffeaf2, #fff5f8);
+      color:#7a2b45;
+      box-shadow:0 6px 14px rgba(184,76,111,0.12);
+      transform:translateY(-2px);
+    }
+    #viewSelector button:hover { transform:translateY(-2px); }
+
+    /* =========================
+       CENTER ZONE & COMMON LIST STYLES
+       ========================= */
+    .center-zone { flex:1; display:flex; align-items:center; justify-content:center; padding:8px; transform:translateY(-40px); }
+    #visitor-list { width:calc(100% - 40px); max-width:1200px; margin:0 auto; transition:all 0.2s ease; }
+
+    .visitor-item { text-align:center; cursor:pointer; user-select:none; }
+    none; }
+    .visitor-item img {
+  display:block;
+  margin:0 auto;
+  object-fit:contain;
+
+  background: transparent !important;     /* 0% blanc */
+  border-radius:28px;
+
+  padding:10px;                           /* tu peux baisser si tu veux */
+
+  border:4px dashed #b67385;              /* bordeaux pastel, style maille */
+
+  box-shadow:0 6px 14px rgba(182, 115, 133, 0.18); /* ombre pastel rosée */
+  transition: transform 0.28s ease, box-shadow 0.28s ease;
+}
+    .visitor-item:hover img {
+      transform: scale(1.05);
+      box-shadow:0 10px 22px rgba(184,76,111,0.25);
+    }
+
+    .visitor-item p {
+      margin:12px 0 0; font-size:20px; color:#b84c6f; font-weight:bold; line-height:1.1;
+    }
+
+    /* =========================
+       CARROUSEL
+       ========================= */
+    .carousel-view { display:flex; gap:40px; overflow-x:auto; scroll-behavior:smooth; padding:10px; align-items:center; }
+    .carousel-view::-webkit-scrollbar { height:8px; }
+    .carousel-view::-webkit-scrollbar-thumb { background:#b84c6f66; border-radius:20px; }
+    .visitor-item.active img { transform:scale(1.16); box-shadow:0 10px 22px rgba(184,76,111,0.30); }
+    .carousel-view .visitor-item img { width:260px; height:260px; }
+
+    /* =========================
+       GRID
+       ========================= */
+    .grid-view { display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:24px; padding:16px; align-items:start; max-height:68vh; overflow-y:auto; }
+    .grid-view .visitor-item img { width:100%; height:200px; border-radius:18px; }
+
+    /* =========================
+       LIST
+       ========================= */
+    .list-view { display:flex; flex-direction:column; gap:18px; padding:16px; max-height:68vh; overflow-y:auto; }
+    .list-view .visitor-item { display:flex; gap:18px; align-items:center; padding:8px; border-radius:12px;
+      background: linear-gradient(180deg, rgba(255,235,243,0.6), rgba(255,245,248,0.6));
+      border:1px solid rgba(184,76,111,0.06);
+    }
+    .list-view .visitor-item img { width:140px; height:140px; border-radius:12px; }
+    .list-view .visitor-item p { margin:0; font-size:18px; text-align:left; }
+
+    /* =========================
+       MODAL
+       ========================= */
+    .modal-bg { position:fixed; inset:0; background: rgba(0,0,0,0.65); display:none; justify-content:center; align-items:center; z-index:1000; padding:20px; }
+    .modal-bg.click-close { cursor:pointer; }
+    .modal-box { background:#fff5f8; border-radius:16px; padding:18px; max-width:980px; width:94%; max-height:90vh; overflow-y:auto; box-shadow:0 8px 30px rgba(184,76,111,0.25); text-align:center; position:relative; cursor:default; }
+
+    .close-modal { position:absolute; top:10px; right:12px; font-size:28px; cursor:pointer; color:#b84c6f; font-weight:bold; }
+
+    .modal-main-img { width:100%; max-height:520px; object-fit:contain; border-radius:12px; border:4px solid rgba(248,205,227,0.5); background:white; }
+
+    .thumbs { margin-top:16px; display:flex; gap:12px; justify-content:center; flex-wrap:wrap; }
+    .thumbs img {
+  width:110px;
+  height:110px;
+  object-fit:contain;
+
+  background: transparent !important;      /* plus de blanc */
+  border-radius:12px;
+
+  border:3px dashed #b67385;               /* bordeaux pastel */
+  cursor:pointer;
+
+  transition: transform .16s;
+}
+    .thumbs img:hover { transform:scale(1.06); border-color:#b84c6f; }
+
+    .icon-bar { margin-top:12px; display:flex; justify-content:center; gap:36px; align-items:center; }
+    .icon-btn { display:flex; gap:8px; align-items:center; cursor:pointer; color:#b84c6f; font-size:18px; }
+    .heart { font-size:26px; transition: color .18s; }
+    .heart.liked { color:#ff4b82; }
+    .comment-number { background:#b84c6f; color:white; padding:2px 8px; border-radius:12px; font-size:13px; }
+
+    .comment-section { margin-top:14px; text-align:left; }
+    .comment { background:#fff0f7; border:1px solid rgba(184,76,111,0.12); padding:10px; border-radius:10px; margin-bottom:10px; }
+
+    .add-comment-btn { margin-top:12px; padding:10px 20px; background:#b84c6f; color:#fff; border-radius:26px; font-size:16px; border:none; cursor:pointer; }
+
+    .comment-form-bg { position: fixed; inset:0; background: rgba(0,0,0,0.6); display:none; justify-content:center; align-items:center; z-index:2000; }
+    .comment-form { background:white; padding:18px; border-radius:12px; width:340px; box-shadow:0 8px 20px rgba(0,0,0,0.25); text-align:center; }
+    .comment-form input, .comment-form textarea { width:100%; padding:10px; border-radius:8px; border:2px solid rgba(184,76,111,0.12); margin-bottom:10px; font-size:15px; }
+
+    @media (max-width:720px){
+      .title { font-size:30px; }
+      .carousel-view .visitor-item img { width:200px; height:200px; }
+      .modal-main-img { max-height:360px; }
+      .thumbs img { width:88px; height:88px; }
+      header img { width:80px; height:80px; }
+    }
+  </style>
 </head>
 <body>
 
@@ -131,66 +200,187 @@
   <div id="visitor-list" role="list"></div>
 </div>
 
+<!-- MODAL -->
+<div class="modal-bg click-close" id="modal" onclick="backgroundClose(event)">
+  <div class="modal-box" role="dialog" aria-modal="true" aria-labelledby="modalTitle" onclick="event.stopPropagation()">
+    <div class="close-modal" onclick="closeModal()">×</div>
+    <img id="modalMain" class="modal-main-img" alt="Image agrandie">
+    <div class="icon-bar">
+      <div class="icon-btn" onclick="toggleLike()">
+        <span id="heart" class="heart">♡</span>
+        <span id="likeName" style="font-weight:600;color:#7a2b45;"></span>
+      </div>
+      <div class="icon-btn" onclick="scrollToComments()">
+        💬 <span id="commentCount" class="comment-number">0</span>
+      </div>
+    </div>
+    <div id="thumbsContainer" class="thumbs"></div>
+    <button class="add-comment-btn" onclick="openCommentForm()">Ajouter un commentaire</button>
+    <div id="commentsList" class="comment-section"></div>
+  </div>
+</div>
+
+<!-- COMMENT FORM -->
+<div class="comment-form-bg" id="commentFormBg" onclick="closeCommentForm(event)">
+  <div class="comment-form" onclick="event.stopPropagation()">
+    <h3 style="margin-top:0;color:#b84c6f">Laisser un commentaire</h3>
+    <input id="commentName" placeholder="Prénom" />
+    <textarea id="commentText" rows="4" placeholder="Votre commentaire..."></textarea>
+    <button onclick="submitComment()">Envoyer</button>
+  </div>
+</div>
+
 <script>
+/* =========================
+   JS inchangé, carrousel, modal, like, commentaires
+   ========================= */
 const list = document.getElementById('visitor-list');
+const modal = document.getElementById('modal');
+const modalMain = document.getElementById('modalMain');
+const thumbs = document.getElementById('thumbsContainer');
+const likeName = document.getElementById('likeName');
+const commentCount = document.getElementById('commentCount');
+const commentsList = document.getElementById('commentsList');
+const commentFormBg = document.getElementById('commentFormBg');
+const commentName = document.getElementById('commentName');
+const commentText = document.getElementById('commentText');
 
 let creations = JSON.parse(localStorage.getItem('creations') || '[]');
+if (!creations || creations.length === 0) {
+  creations = [
+    { name: "Projet A", imgUrl: "https://placekitten.com/800/800", images: ["https://placekitten.com/800/800","https://placekitten.com/801/800"] },
+    { name: "Projet B", imgUrl: "https://placebear.com/800/800", images: ["https://placebear.com/800/800","https://placebear.com/801/800"] },
+    { name: "Projet C", imgUrl: "https://picsum.photos/seed/p/800/800" }
+  ];
+}
 
 let currentIndex = null;
 let currentView = 'carousel';
 
-function escapeHtml(s){ return s?String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'):''; }
+function escapeHtml(s) {
+  return s ? String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;') : '';
+}
 
-function renderVisitor(){
+function renderVisitor() {
   list.innerHTML = '';
-  list.className = currentView==='carousel'? 'carousel-view' : currentView==='grid'? 'grid-view' : 'list-view';
-  creations.forEach((item,i)=>{
-    const div=document.createElement('div');
-    div.className='visitor-item';
-    div.setAttribute('data-index',i);
-    div.innerHTML=`<img src="${item.imgUrl}" alt="${escapeHtml(item.name)}"><p>${escapeHtml(item.name)}</p>`;
-    div.addEventListener('click',()=>openModal(i));
+  if (currentView === 'carousel') list.className = 'carousel-view';
+  if (currentView === 'grid') list.className = 'grid-view';
+  if (currentView === 'list') list.className = 'list-view';
+
+  creations.forEach((item, i) => {
+    const div = document.createElement('div');
+    div.className = 'visitor-item';
+    div.setAttribute('data-index', i);
+    div.innerHTML = `<img src="${item.imgUrl}" alt="${escapeHtml(item.name)}"><p>${escapeHtml(item.name)}</p>`;
+    div.addEventListener('click', () => openModal(i));
     list.appendChild(div);
   });
   updateCenter();
 }
 
-function setView(mode){
-  currentView=mode;
-  document.getElementById('btnCarousel').classList.toggle('active',mode==='carousel');
-  document.getElementById('btnGrid').classList.toggle('active',mode==='grid');
-  document.getElementById('btnList').classList.toggle('active',mode==='list');
+function setView(mode) {
+  currentView = mode;
+  document.getElementById('btnCarousel').classList.toggle('active', mode==='carousel');
+  document.getElementById('btnGrid').classList.toggle('active', mode==='grid');
+  document.getElementById('btnList').classList.toggle('active', mode==='list');
   renderVisitor();
 }
 
-document.getElementById('btnCarousel').addEventListener('click',()=>setView('carousel'));
-document.getElementById('btnGrid').addEventListener('click',()=>setView('grid'));
-document.getElementById('btnList').addEventListener('click',()=>setView('list'));
+document.getElementById('btnCarousel').addEventListener('click', ()=>setView('carousel'));
+document.getElementById('btnGrid').addEventListener('click', ()=>setView('grid'));
+document.getElementById('btnList').addEventListener('click', ()=>setView('list'));
 setView(currentView);
 
-function updateCenter(){
-  if(currentView!=='carousel'){ document.querySelectorAll('.visitor-item').forEach(it=>it.classList.remove('active')); return; }
-  const items=document.querySelectorAll('.visitor-item');
-  const center=window.innerWidth/2;
+function updateCenter() {
+  if(currentView!=='carousel'){
+    document.querySelectorAll('.visitor-item').forEach(it=>it.classList.remove('active'));
+    return;
+  }
+  const items = document.querySelectorAll('.visitor-item');
+  const center = window.innerWidth/2;
   items.forEach(item=>{
-    const rect=item.getBoundingClientRect();
-    const itemCenter=rect.left+rect.width/2;
+    const rect = item.getBoundingClientRect();
+    const itemCenter = rect.left + rect.width/2;
     if(Math.abs(itemCenter-center)<170) item.classList.add('active');
     else item.classList.remove('active');
   });
 }
 
-list.addEventListener('scroll',updateCenter);
-window.addEventListener('resize',updateCenter);
+list.addEventListener('scroll', updateCenter);
+window.addEventListener('resize', updateCenter);
 
-function openModal(i){ /* modal inchangé */ }
-function closeModal(){ /* modal inchangé */ }
-function backgroundClose(e){ /* modal inchangé */ }
+function openModal(i){
+  currentIndex = i;
+  const proj = creations[i];
+  modalMain.src = proj.imgUrl;
+  likeName.textContent = proj.name||'';
+  loadLike(); loadComments();
+  thumbs.innerHTML='';
+  if(Array.isArray(proj.images) && proj.images.length>0){
+    proj.images.forEach(src=>{
+      const t = document.createElement('img');
+      t.src=src; t.alt='miniature';
+      t.addEventListener('click', ()=>{ modalMain.src=src; });
+      thumbs.appendChild(t);
+    });
+  }
+  modal.style.display='flex';
+}
+
+function closeModal(){ modal.style.display='none'; renderVisitor(); }
+function backgroundClose(e){ if(e.target===modal) closeModal(); }
+
+function toggleLike(){
+  if(currentIndex===null) return;
+  const key='like_'+currentIndex;
+  const cur = localStorage.getItem(key)==='1';
+  localStorage.setItem(key, cur?'0':'1');
+  loadLike();
+}
+
+function loadLike(){
+  if(currentIndex===null) return;
+  const key='like_'+currentIndex;
+  const liked = localStorage.getItem(key)==='1';
+  const heart = document.getElementById('heart');
+  if(liked){ heart.classList.add('liked'); heart.textContent='❤️'; }
+  else{ heart.classList.remove('liked'); heart.textContent='♡'; }
+}
+
+function loadComments(){
+  if(currentIndex===null) return;
+  const key='comments_'+currentIndex;
+  const comments=JSON.parse(localStorage.getItem(key)||'[]');
+  commentCount.textContent = comments.length||0;
+  commentsList.innerHTML = comments.map(c=>`<div class="comment"><strong>${escapeHtml(c.name)}</strong><br>${escapeHtml(c.text)}</div>`).join('');
+}
+
+function openCommentForm(){ commentFormBg.style.display='flex'; }
+function closeCommentForm(e){ if(e && e.target===commentFormBg) commentFormBg.style.display='none'; }
+function submitComment(){
+  const name=(commentName.value||'').trim();
+  const text=(commentText.value||'').trim();
+  if(!name||!text) return;
+  const key='comments_'+currentIndex;
+  const comments=JSON.parse(localStorage.getItem(key)||'[]');
+  comments.push({name,text,at:Date.now()});
+  localStorage.setItem(key,JSON.stringify(comments));
+  commentName.value=''; commentText.value=''; commentFormBg.style.display='none';
+  loadComments();
+}
+
+function scrollToComments(){ if(!commentsList) return; commentsList.scrollIntoView({behavior:'smooth', block:'start'}); }
+
+document.addEventListener('keydown',(e)=>{
+  if(e.key==='Escape'){
+    if(commentFormBg.style.display==='flex') commentFormBg.style.display='none';
+    else if(modal.style.display==='flex') closeModal();
+  }
+});
 
 const observer = new MutationObserver(()=>updateCenter());
-observer.observe(list,{childList:true,subtree:true});
-setTimeout(updateCenter,200);
+observer.observe(list,{childList:true, subtree:true});
+setTimeout(updateCenter, 200);
 </script>
-
 </body>
 </html>
