@@ -233,7 +233,6 @@ h1{
 <div id="intro-video">
   <video autoplay muted playsinline preload="auto">
     <source src="chat.mp4" type="video/mp4">
-    Votre navigateur ne supporte pas la vidéo.
   </video>
 </div>
 
@@ -255,7 +254,7 @@ h1{
   <button id="add">Ajouter</button>
 </div>
 
-<!-- MODES (SEULEMENT MES CRÉATIONS) -->
+<!-- MODES (UNIQUEMENT SUR MES CRÉATIONS) -->
 <div id="display-modes">
   <button onclick="setMode('carousel')">Carrousel</button>
   <button onclick="setMode('grid')">Grille</button>
@@ -271,7 +270,7 @@ h1{
 <div id="notes" class="section"><button onclick="closeSection()">← Retour</button></div>
 <div id="settings" class="section"><button onclick="closeSection()">← Retour</button></div>
 
-<!-- JS ORIGINAL OWNER.JS -->
+<!-- JS OWNER -->
 <script type="module" src="owner.js"></script>
 
 <script>
@@ -302,14 +301,13 @@ function closeSection(){
   document.getElementById("display-modes").style.display="block";
 }
 
-/* INTRO VIDEO AUTOMATIQUE */
+/* INTRO VIDEO */
 const intro=document.getElementById("intro-video");
 const video=intro.querySelector("video");
 
-// force lecture automatique
-video.play().catch(()=>{console.log("Autoplay bloqué")});
+// Forcer lecture autoplay sans bouton
+video.play().catch(e=>console.log("Autoplay bloqué :", e));
 
-// disparition fondu après fin + 3 secondes
 video.onended=()=>{
   setTimeout(()=>{
     intro.classList.add("fade-out");
