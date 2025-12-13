@@ -9,14 +9,13 @@ body{
   font-family:sans-serif;
   background:#fff0f5;
   overflow-x:hidden;
-  padding-left:35px; /* espace pour l’encoche */
+  padding-left:35px;
 }
 
 /* ================= INTRO VIDEO ================= */
 #intro-video{
   position: fixed;
   inset: 0;
-  background: #000;
   z-index: 100000;
   display: flex;
   justify-content: center;
@@ -39,15 +38,21 @@ body{
 /* Bouton Bienvenue */
 #welcomeBtn{
   position: absolute;
-  bottom: 50px;
-  padding: 12px 20px;
-  background: rgba(255,182,193,0.9);
-  color: #8b3a3a;
-  border: none;
-  border-radius: 12px;
+  padding: 16px 32px;
+  background: #ffb6c1; /* rose pastel */
+  color: #8b3a3a;      /* bordeaux */
   font-weight: bold;
+  border: 2px solid #b67385;
+  border-radius: 12px;
   cursor: pointer;
-  font-size: 18px;
+  font-size: 22px;
+  z-index: 100001;
+  transition: transform .2s, background .2s;
+}
+
+#welcomeBtn:hover{
+  transform: scale(1.05);
+  background: #ffc0d0;
 }
 
 /* ================= SIDEBAR ================= */
@@ -305,6 +310,11 @@ function closeSection(){
 const intro = document.getElementById("intro-video");
 const video = intro.querySelector("video");
 const welcome = document.getElementById("welcomeBtn");
+
+// Centrage bouton
+welcome.style.left = "50%";
+welcome.style.top = "50%";
+welcome.style.transform = "translate(-50%, -50%)";
 
 // Au clic sur le bouton "Bienvenue"
 welcome.onclick = () => {
