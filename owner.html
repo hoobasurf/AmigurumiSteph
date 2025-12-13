@@ -5,18 +5,50 @@
 <title>Mes Créations</title>
 
 <style>
+/* ================= BASE ================= */
 body{
   margin:0;
   font-family:sans-serif;
   background:#fff0f5;
   overflow-x:hidden;
+  padding-left:35px; /* espace pour l'encoche */
+}
+
+/* ================= INTRO VIDEO ================= */
+#intro-video{
+  position:fixed;
+  inset:0;
+  background:#000;
+  z-index:100000;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+}
+
+#intro-video video{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+}
+
+#skipIntro{
+  position:absolute;
+  bottom:30px;
+  right:30px;
+  padding:10px 16px;
+  border-radius:12px;
+  border:none;
+  background:rgba(255,182,193,.9);
+  color:#8b3a3a;
+  font-weight:bold;
+  cursor:pointer;
 }
 
 /* ================= SIDEBAR ================= */
 #sidebar{
   position:fixed;
   top:0;
-  left:-220px;                /* CACHÉE */
+  left:-220px;
   width:220px;
   height:100vh;
   background:#ffe6f0;
@@ -30,7 +62,7 @@ body{
   left:0;
 }
 
-/* ENCÔCHE TOUJOURS VISIBLE */
+/* Encoche */
 #toggleSidebar{
   position:absolute;
   top:50%;
@@ -48,7 +80,6 @@ body{
   font-weight:bold;
 }
 
-/* BOUTONS SIDEBAR */
 #sidebar button{
   width:100%;
   margin-bottom:10px;
@@ -126,12 +157,12 @@ h1{
   margin-bottom:40px;
 }
 
-/* GRILLE */
+/* Grille */
 #owner-list.grid .owner-item{
   width:140px;
 }
 
-/* LISTE */
+/* Liste */
 #owner-list.list{
   flex-direction:column;
   align-items:center;
@@ -140,18 +171,17 @@ h1{
 #owner-list.list .owner-item{
   display:flex;
   align-items:center;
-  width:90%;
   gap:10px;
+  width:90%;
 }
 
-/* CARROUSEL */
+/* Carrousel */
 #owner-list.carousel{
   flex-wrap:nowrap;
   overflow-x:auto;
-  padding-bottom:10px;
 }
 
-/* ITEM */
+/* Item */
 .owner-item{
   position:relative;
   background:#ffe6f0;
@@ -174,7 +204,7 @@ h1{
   font-weight:bold;
 }
 
-/* CROIX */
+/* Croix */
 .delete-btn{
   position:absolute;
   top:5px;
@@ -201,48 +231,12 @@ h1{
 .section.active{
   display:block;
 }
-
-  /* Décale le contenu pour éviter l'encoche de la sidebar */
-body {
-  padding-left: 35px;
-}
-
-/* INTRO VIDEO */
-#intro-video {
-  position: fixed;
-  inset: 0;
-  background: #000;
-  z-index: 100000;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-}
-
-#intro-video video {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-#skipIntro {
-  position: absolute;
-  bottom: 30px;
-  right: 30px;
-  padding: 10px 16px;
-  border-radius: 12px;
-  border: none;
-  background: rgba(255,182,193,0.9);
-  color: #8b3a3a;
-  font-weight: bold;
-  cursor: pointer;
-}
-  
 </style>
 </head>
 
 <body>
 
-  <!-- INTRO VIDEO -->
+<!-- INTRO VIDEO -->
 <div id="intro-video">
   <video autoplay muted playsinline>
     <source src="chat.mp4" type="video/mp4">
@@ -269,7 +263,6 @@ body {
   <button id="add">Ajouter</button>
 </div>
 
-<!-- MODES (UNIQUEMENT ICI) -->
 <div id="display-modes">
   <button onclick="setMode('carousel')">Carrousel</button>
   <button onclick="setMode('grid')">Grille</button>
@@ -285,14 +278,12 @@ body {
 <div id="notes" class="section"><button onclick="closeSection()">← Retour</button></div>
 <div id="settings" class="section"><button onclick="closeSection()">← Retour</button></div>
 
-<!-- 🔴 TON JS ORIGINAL — INCHANGÉ -->
+<!-- TON JS EXISTANT -->
 <script type="module" src="owner.js"></script>
 
-<!-- SIDEBAR + NAV -->
 <script>
 const sidebar=document.getElementById("sidebar");
 const toggle=document.getElementById("toggleSidebar");
-
 toggle.onclick=()=>sidebar.classList.toggle("sidebar-open");
 
 function setMode(mode){
@@ -314,19 +305,14 @@ function closeSection(){
   document.getElementById("owner-list").style.display="flex";
   document.getElementById("display-modes").style.display="block";
 }
+
+/* Intro */
+const intro=document.getElementById("intro-video");
+const video=intro.querySelector("video");
+const skip=document.getElementById("skipIntro");
+video.onended=()=>intro.remove();
+skip.onclick=()=>intro.remove();
 </script>
 
-<script>
-const intro = document.getElementById("intro-video");
-const video = intro.querySelector("video");
-const skip = document.getElementById("skipIntro");
-
-// Fin automatique
-video.onended = () => intro.remove();
-
-// Bouton passer
-skip.onclick = () => intro.remove();
-</script>
-  
 </body>
 </html>
