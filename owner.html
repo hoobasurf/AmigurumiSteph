@@ -5,156 +5,200 @@
 <title>Mes Créations</title>
 
 <style>
-body {
-  font-family: sans-serif;
-  background:#fff0f5;
+body{
   margin:0;
+  font-family:sans-serif;
+  background:#fff0f5;
   overflow-x:hidden;
 }
 
 /* ================= SIDEBAR ================= */
-#sidebar {
-  position: fixed;
-  top: 0;
-  left: -200px;               /* SIDEBAR CACHÉE */
-  width: 200px;
-  height: 100vh;
-  background: #ffe6f0;
-  padding: 20px;
-  box-shadow: 2px 0 5px rgba(0,0,0,0.1);
-  transition: left 0.3s;
-  z-index: 9999;
+#sidebar{
+  position:fixed;
+  top:0;
+  left:-220px;                /* CACHÉE */
+  width:220px;
+  height:100vh;
+  background:#ffe6f0;
   border-right:2px solid #b67385;
+  padding:20px;
+  transition:left .3s ease;
+  z-index:10000;
 }
 
-/* SIDEBAR OUVERTE */
-#sidebar.sidebar-open {
-  left: 0;
+#sidebar.sidebar-open{
+  left:0;
 }
 
 /* ENCÔCHE TOUJOURS VISIBLE */
-#toggleSidebar {
-  position: absolute;
-  top: 50%;
-  right: -30px;
-  width: 30px;
-  height: 60px;
-  background: #ffb6c1;
-  color: #8b3a3a;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  border-radius: 0 10px 10px 0;
-  cursor: pointer;
-  font-weight: bold;
+#toggleSidebar{
+  position:absolute;
+  top:50%;
+  right:-30px;
+  width:30px;
+  height:60px;
+  background:#ffb6c1;
+  color:#8b3a3a;
+  border-radius:0 12px 12px 0;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  cursor:pointer;
   border:1px solid #b67385;
+  font-weight:bold;
 }
 
 /* BOUTONS SIDEBAR */
-#sidebar button {
-  background: #ffb6c1;
-  color: #8b3a3a;
-  border: none;
-  border-radius: 10px;
-  padding: 10px;
-  cursor: pointer;
-  font-weight: bold;
-  margin-bottom:8px;
+#sidebar button{
+  width:100%;
+  margin-bottom:10px;
+  padding:10px;
+  border:none;
+  border-radius:12px;
+  background:#ffb6c1;
+  color:#8b3a3a;
+  font-weight:bold;
+  cursor:pointer;
 }
 
-/* ================= PAGE CREATIONS ================= */
-h1 {
+/* ================= TITRE ================= */
+h1{
   text-align:center;
   color:#b84c6f;
+  margin-top:20px;
 }
 
-.owner-box {
-  max-width: 450px;
-  margin: 20px auto;
-  background: #ffe6f0;
-  border: 2px solid #b67385;
-  border-radius: 15px;
-  padding: 20px;
-  box-shadow: 0 4px 15px rgba(182,115,133,0.2);
+/* ================= AJOUT CREATION ================= */
+.owner-box{
+  max-width:420px;
+  margin:20px auto;
+  background:#ffe6f0;
+  border:2px solid #b67385;
+  border-radius:18px;
+  padding:20px;
+  box-shadow:0 6px 20px rgba(182,115,133,.25);
 }
 
 .owner-box input,
-.owner-box button {
-  width: 100%;
-  padding: 10px;
-  margin-top: 10px;
-  border-radius: 10px;
+.owner-box button{
+  width:100%;
+  margin-top:10px;
+  padding:10px;
+  border-radius:12px;
 }
 
-.owner-box input {
-  border: 1px solid #b67385;
+.owner-box input{
+  border:1px solid #b67385;
 }
 
-.owner-box button {
-  background: #ffb6c1;
-  border: none;
-  color: #8b3a3a;
-  font-weight: bold;
-  cursor: pointer;
+.owner-box button{
+  background:#ffb6c1;
+  border:none;
+  color:#8b3a3a;
+  font-weight:bold;
+  cursor:pointer;
+  box-shadow:0 4px 10px rgba(0,0,0,.15);
 }
 
-/* ================= LISTE ================= */
-#owner-list {
+/* ================= MODES ================= */
+#display-modes{
+  text-align:center;
+  margin:15px 0;
+}
+
+#display-modes button{
+  margin:0 5px;
+  padding:8px 12px;
+  border-radius:12px;
+  border:1px solid #b67385;
+  background:#ffe6f0;
+  color:#8b3a3a;
+  font-weight:bold;
+  cursor:pointer;
+}
+
+/* ================= LISTE CREATIONS ================= */
+#owner-list{
   display:flex;
   flex-wrap:wrap;
   justify-content:center;
   gap:15px;
-  margin:20px;
+  margin-bottom:40px;
 }
 
-.owner-item {
-  position: relative;
-  background: #ffe6f0;
-  border: 2px solid #b67385;
-  padding: 10px;
-  border-radius: 15px;
-  width: 140px;
-  text-align: center;
+/* GRILLE */
+#owner-list.grid .owner-item{
+  width:140px;
 }
 
-.owner-item img {
-  width: 120px;
-  height: 120px;
-  object-fit: cover;
-  border-radius: 10px;
+/* LISTE */
+#owner-list.list{
+  flex-direction:column;
+  align-items:center;
 }
 
-.owner-item p {
-  margin: 5px 0 0;
+#owner-list.list .owner-item{
+  display:flex;
+  align-items:center;
+  width:90%;
+  gap:10px;
+}
+
+/* CARROUSEL */
+#owner-list.carousel{
+  flex-wrap:nowrap;
+  overflow-x:auto;
+  padding-bottom:10px;
+}
+
+/* ITEM */
+.owner-item{
+  position:relative;
+  background:#ffe6f0;
+  border:2px solid #b67385;
+  border-radius:16px;
+  padding:10px;
+  text-align:center;
+}
+
+.owner-item img{
+  width:110px;
+  height:110px;
+  object-fit:cover;
+  border-radius:10px;
+}
+
+.owner-item p{
+  margin:5px 0 0;
   color:#8b3a3a;
   font-weight:bold;
 }
 
-/* CROIX SUPPRESSION */
-.delete-btn {
-  position: absolute;
-  top: 5px;
-  right: 5px;
-  background: rgba(255,192,203,0.85);
-  border: 1px solid #8b3a3a;
-  color: #8b3a3a;
-  border-radius: 50%;
-  width: 22px;
-  height: 22px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font-weight: bold;
-  cursor: pointer;
+/* CROIX */
+.delete-btn{
+  position:absolute;
+  top:5px;
+  right:5px;
+  width:22px;
+  height:22px;
+  border-radius:50%;
+  background:rgba(255,192,203,.9);
+  border:1px solid #8b3a3a;
+  color:#8b3a3a;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  cursor:pointer;
+  font-weight:bold;
 }
 
 /* ================= SECTIONS ================= */
-.section {
+.section{
   display:none;
   padding:20px;
 }
 
-.section.active {
+.section.active{
   display:block;
 }
 </style>
@@ -165,10 +209,10 @@ h1 {
 <!-- SIDEBAR -->
 <div id="sidebar">
   <div id="toggleSidebar">☰</div>
-  <button onclick="openSection('videos')">Vidéos</button>
-  <button onclick="openSection('mailles')">Mailles</button>
-  <button onclick="openSection('pelotes')">Pelotes</button>
-  <button onclick="openSection('notes')">Notes</button>
+  <button onclick="openSection('videos')">Vidéos / Tutoriels</button>
+  <button onclick="openSection('mailles')">Compteur de mailles</button>
+  <button onclick="openSection('pelotes')">Pelotes & Couleurs</button>
+  <button onclick="openSection('notes')">Notes / Inspirations</button>
   <button onclick="openSection('settings')">Paramètres</button>
 </div>
 
@@ -180,32 +224,42 @@ h1 {
   <button id="add">Ajouter</button>
 </div>
 
-<div id="owner-list"></div>
+<!-- MODES (UNIQUEMENT ICI) -->
+<div id="display-modes">
+  <button onclick="setMode('carousel')">Carrousel</button>
+  <button onclick="setMode('grid')">Grille</button>
+  <button onclick="setMode('list')">Liste</button>
+</div>
+
+<div id="owner-list" class="grid"></div>
 
 <!-- SECTIONS -->
-<div class="section" id="videos"><button onclick="closeSection()">← Retour</button></div>
-<div class="section" id="mailles"><button onclick="closeSection()">← Retour</button></div>
-<div class="section" id="pelotes"><button onclick="closeSection()">← Retour</button></div>
-<div class="section" id="notes"><button onclick="closeSection()">← Retour</button></div>
-<div class="section" id="settings"><button onclick="closeSection()">← Retour</button></div>
+<div id="videos" class="section"><button onclick="closeSection()">← Retour</button></div>
+<div id="mailles" class="section"><button onclick="closeSection()">← Retour</button></div>
+<div id="pelotes" class="section"><button onclick="closeSection()">← Retour</button></div>
+<div id="notes" class="section"><button onclick="closeSection()">← Retour</button></div>
+<div id="settings" class="section"><button onclick="closeSection()">← Retour</button></div>
 
-<!-- ================= TON JS ORIGINAL (INCHANGÉ) ================= -->
+<!-- 🔴 TON JS ORIGINAL — INCHANGÉ -->
 <script type="module" src="owner.js"></script>
 
-<!-- ================= JS SIDEBAR UNIQUEMENT ================= -->
+<!-- SIDEBAR + NAV -->
 <script>
-const sidebar = document.getElementById("sidebar");
-const toggle = document.getElementById("toggleSidebar");
+const sidebar=document.getElementById("sidebar");
+const toggle=document.getElementById("toggleSidebar");
 
-toggle.onclick = () => {
-  sidebar.classList.toggle("sidebar-open");
-};
+toggle.onclick=()=>sidebar.classList.toggle("sidebar-open");
+
+function setMode(mode){
+  document.getElementById("owner-list").className=mode;
+}
 
 function openSection(id){
-  sidebar.classList.remove("sidebar-open"); // FERMETURE AUTO
+  sidebar.classList.remove("sidebar-open");
   document.querySelectorAll(".section").forEach(s=>s.classList.remove("active"));
   document.querySelector(".owner-box").style.display="none";
   document.getElementById("owner-list").style.display="none";
+  document.getElementById("display-modes").style.display="none";
   document.getElementById(id).classList.add("active");
 }
 
@@ -213,6 +267,7 @@ function closeSection(){
   document.querySelectorAll(".section").forEach(s=>s.classList.remove("active"));
   document.querySelector(".owner-box").style.display="block";
   document.getElementById("owner-list").style.display="flex";
+  document.getElementById("display-modes").style.display="block";
 }
 </script>
 
