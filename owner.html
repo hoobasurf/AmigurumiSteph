@@ -2,7 +2,9 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Mes Créations</title>
+
 <style>
 body{
   margin:0;
@@ -14,14 +16,13 @@ body{
 
 /* ================= INTRO GIF ================= */
 #intro-gif{
+  display:none;
   position:fixed;
   inset:0;
   background:#000;
   z-index:100000;
-  display:flex;
   justify-content:center;
   align-items:center;
-  opacity:1;
   transition:opacity 1.2s ease;
 }
 
@@ -250,6 +251,7 @@ h1{
   <button id="add">Ajouter</button>
 </div>
 
+<!-- MODES (Carrousel / Grille / Liste uniquement ici) -->
 <div id="display-modes">
   <button onclick="setMode('carousel')">Carrousel</button>
   <button onclick="setMode('grid')">Grille</button>
@@ -265,20 +267,22 @@ h1{
 <div id="notes" class="section"><button onclick="closeSection()">← Retour</button></div>
 <div id="settings" class="section"><button onclick="closeSection()">← Retour</button></div>
 
+<!-- JS ORIGINAL -->
 <script type="module" src="owner.js"></script>
 
+<!-- NAV + GIF -->
 <script>
-/* SIDEBAR */
-const sidebar=document.getElementById("sidebar");
-const toggle=document.getElementById("toggleSidebar");
-toggle.onclick=()=>sidebar.classList.toggle("sidebar-open");
+// Sidebar toggle
+const sidebar = document.getElementById("sidebar");
+const toggle = document.getElementById("toggleSidebar");
+toggle.onclick = ()=> sidebar.classList.toggle("sidebar-open");
 
-/* MODES */
+// Modes affichage
 function setMode(mode){
-  document.getElementById("owner-list").className=mode;
+  document.getElementById("owner-list").className = mode;
 }
 
-/* NAV SECTIONS */
+// Navigation sections
 function openSection(id){
   sidebar.classList.remove("sidebar-open");
   document.querySelectorAll(".section").forEach(s=>s.classList.remove("active"));
@@ -295,12 +299,17 @@ function closeSection(){
   document.getElementById("display-modes").style.display="block";
 }
 
-/* INTRO GIF */
-const intro=document.getElementById("intro-gif");
-setTimeout(()=>{
-  intro.classList.add("fade-out");
-  setTimeout(()=>intro.remove(),1200);
-},3000); // GIF visible 3 secondes avant disparition
+// GIF intro
+const intro = document.getElementById("intro-gif");
+const gifImg = intro.querySelector("img");
+
+gifImg.onload = ()=>{
+  intro.style.display = "flex"; // Affiche le GIF quand chargé
+  setTimeout(()=>{
+    intro.classList.add("fade-out");
+    setTimeout(()=>intro.remove(), 1200);
+  }, 4000); // durée GIF 4s
+};
 </script>
 
 </body>
