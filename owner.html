@@ -34,7 +34,7 @@ body{
   width:100%;
   height:100%;
   object-fit:cover;
-  pointer-events:none;
+  pointer-events:none; /* empêche interaction et bouton lecture */
 }
 
 /* ================= SIDEBAR ================= */
@@ -300,9 +300,7 @@ function closeSection(){
 /* INTRO VIDEO */
 const intro=document.getElementById("intro-video");
 const video=intro.querySelector("video");
-
-// Forcer autoplay sans bouton lecture
-video.muted = true;
+video.muted=true;
 video.play().catch(()=>{console.log("Lecture automatique impossible");});
 
 // Après fin de vidéo, rester 3s puis fondu
