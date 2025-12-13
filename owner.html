@@ -4,56 +4,48 @@
 <meta charset="UTF-8">
 <title>Mes Créations</title>
 <style>
-body {
-  margin:0;
-  font-family:sans-serif;
+html, body {
+  height: 100%;
+  margin: 0;
+  font-family: sans-serif;
+  overflow-x: hidden;
   background: url('Photoroom_20251213_123235.png') center/cover no-repeat;
-  overflow-x:hidden;
 }
 
-/* ================= WELCOME BUTTON ================= */
-#welcome-overlay{
-  position:fixed;
-  inset:0;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  z-index:10000;
+/* ================= INTRO VIDEO + BOUTON ================= */
+#intro-overlay {
+  position: fixed;
+  inset: 0;
+  background: transparent; /* Pas de fond noir */
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  z-index: 100000;
 }
 
-#welcome-btn{
-  padding:16px 32px;
-  background:#ffb6c1;
-  color:#8b3a3a;
-  font-weight:bold;
-  font-size:24px;
-  border:none;
-  border-radius:12px;
-  cursor:pointer;
-  box-shadow:0 4px 12px rgba(0,0,0,0.2);
+#intro-overlay video {
+  display: none; /* vidéo cachée au départ */
 }
 
-/* ================= VIDEO ================= */
-#intro-video{
-  position:fixed;
-  inset:0;
-  width:100%;
-  height:100%;
-  object-fit:cover;
-  display:none;
-  z-index:9999;
-  opacity:1;
-  transition:opacity 1.2s ease;
+#startBtn {
+  padding: 16px 28px;
+  border-radius: 12px;
+  border: none;
+  background: #ffb6c1;
+  color: #8b3a3a;
+  font-size: 22px;
+  font-weight: bold;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
 }
-
-/* ================= APP ================= */
-#app{
-  display:none;
+#startBtn:hover {
+  background: #ff9fc1;
 }
 
 /* ================= SIDEBAR ================= */
-#sidebar{
-  position:fixed;
+#sidebar {
+  position: fixed;
   top:0;
   left:-220px;
   width:220px;
@@ -62,12 +54,11 @@ body {
   border-right:2px solid #b67385;
   padding:20px;
   transition:left .3s ease;
-  z-index:1000;
+  z-index:10000;
 }
+#sidebar.sidebar-open { left:0; }
 
-#sidebar.sidebar-open{ left:0; }
-
-#toggleSidebar{
+#toggleSidebar {
   position:absolute;
   top:50%;
   right:-30px;
@@ -97,7 +88,7 @@ body {
 }
 
 /* ================= TITRE ================= */
-h1{
+h1 {
   text-align:center;
   color:#b84c6f;
   margin-top:20px;
@@ -158,6 +149,22 @@ h1{
   gap:15px;
   margin-bottom:40px;
 }
+#owner-list.grid .owner-item{ width:140px; }
+#owner-list.list{
+  flex-direction:column;
+  align-items:center;
+}
+#owner-list.list .owner-item{
+  display:flex;
+  align-items:center;
+  width:90%;
+  gap:10px;
+}
+#owner-list.carousel{
+  flex-wrap:nowrap;
+  overflow-x:auto;
+  padding-bottom:10px;
+}
 
 .owner-item{
   position:relative;
@@ -167,20 +174,17 @@ h1{
   padding:10px;
   text-align:center;
 }
-
 .owner-item img{
   width:110px;
   height:110px;
   object-fit:cover;
   border-radius:10px;
 }
-
 .owner-item p{
   margin:5px 0 0;
   color:#8b3a3a;
   font-weight:bold;
 }
-
 .delete-btn{
   position:absolute;
   top:5px;
@@ -198,85 +202,61 @@ h1{
   font-weight:bold;
 }
 
+/* ================= SECTIONS ================= */
 .section{
   display:none;
   padding:20px;
 }
-
 .section.active{ display:block; }
+
 </style>
 </head>
-
 <body>
 
-<!-- BOUTON BIENVENUE -->
-<div id="welcome-overlay">
-  <button id="welcome-btn">Bienvenue</button>
+<!-- INTRO VIDEO + BOUTON BIENVENUE -->
+<div id="intro-overlay">
+  <button id="startBtn">Bienvenue</button>
+  <video id="intro-video" preload="auto">
+    <source src="chat.mp4" type="video/mp4">
+  </video>
 </div>
 
-<!-- VIDEO -->
-<video id="intro-video" playsinline webkit-playsinline preload="auto">
-  <source src="chat.webm" type="video/webm">
-</video>
-
-<!-- APP -->
-<div id="app">
-  <div id="sidebar">
-    <div id="toggleSidebar">☰</div>
-    <button onclick="openSection('videos')">Vidéos</button>
-    <button onclick="openSection('mailles')">Mailles</button>
-    <button onclick="openSection('pelotes')">Pelotes</button>
-    <button onclick="openSection('notes')">Notes</button>
-    <button onclick="openSection('settings')">Paramètres</button>
-  </div>
-
-  <h1>Mes Créations</h1>
-
-  <div class="owner-box">
-    <input id="name" placeholder="Nom de la création">
-    <input id="photo" type="file" accept="image/*">
-    <button id="add">Ajouter</button>
-  </div>
-
-  <div id="display-modes">
-    <button onclick="setMode('carousel')">Carrousel</button>
-    <button onclick="setMode('grid')">Grille</button>
-    <button onclick="setMode('list')">Liste</button>
-  </div>
-
-  <div id="owner-list" class="grid"></div>
-
-  <div id="videos" class="section"><button onclick="closeSection()">← Retour</button></div>
-  <div id="mailles" class="section"><button onclick="closeSection()">← Retour</button></div>
-  <div id="pelotes" class="section"><button onclick="closeSection()">← Retour</button></div>
-  <div id="notes" class="section"><button onclick="closeSection()">← Retour</button></div>
-  <div id="settings" class="section"><button onclick="closeSection()">← Retour</button></div>
+<!-- SIDEBAR -->
+<div id="sidebar">
+  <div id="toggleSidebar">☰</div>
+  <button onclick="openSection('videos')">Vidéos</button>
+  <button onclick="openSection('mailles')">Mailles</button>
+  <button onclick="openSection('pelotes')">Pelotes</button>
+  <button onclick="openSection('notes')">Notes</button>
+  <button onclick="openSection('settings')">Paramètres</button>
 </div>
+
+<h1>Mes Créations</h1>
+
+<div class="owner-box">
+  <input id="name" placeholder="Nom de la création">
+  <input id="photo" type="file" accept="image/*">
+  <button id="add">Ajouter</button>
+</div>
+
+<div id="display-modes">
+  <button onclick="setMode('carousel')">Carrousel</button>
+  <button onclick="setMode('grid')">Grille</button>
+  <button onclick="setMode('list')">Liste</button>
+</div>
+
+<div id="owner-list" class="grid"></div>
+
+<!-- SECTIONS -->
+<div id="videos" class="section"><button onclick="closeSection()">← Retour</button></div>
+<div id="mailles" class="section"><button onclick="closeSection()">← Retour</button></div>
+<div id="pelotes" class="section"><button onclick="closeSection()">← Retour</button></div>
+<div id="notes" class="section"><button onclick="closeSection()">← Retour</button></div>
+<div id="settings" class="section"><button onclick="closeSection()">← Retour</button></div>
 
 <script type="module" src="owner.js"></script>
 
 <script>
-const welcomeBtn = document.getElementById("welcome-btn");
-const welcomeOverlay = document.getElementById("welcome-overlay");
-const video = document.getElementById("intro-video");
-const app = document.getElementById("app");
-
-/* BOUTON BIENVENUE */
-welcomeBtn.onclick = () => {
-  welcomeOverlay.style.display = "none";
-  video.style.display = "block";
-  video.play().catch(e => console.log("Autoplay bloqué :", e));
-
-  video.onended = () => {
-    video.style.transition = "opacity 1.2s";
-    video.style.opacity = 0;
-    setTimeout(() => {
-      video.remove();
-      app.style.display = "block"; // affiche l'appli après vidéo
-    }, 1200);
-  };
-};
-
 /* SIDEBAR */
 const sidebar=document.getElementById("sidebar");
 const toggle=document.getElementById("toggleSidebar");
@@ -296,13 +276,14 @@ function openSection(id){
   document.getElementById("display-modes").style.display="none";
   document.getElementById(id).classList.add("active");
 }
-
 function closeSection(){
   document.querySelectorAll(".section").forEach(s=>s.classList.remove("active"));
   document.querySelector(".owner-box").style.display="block";
   document.getElementById("owner-list").style.display="flex";
   document.getElementById("display-modes").style.display="block";
 }
-</script>
-</body>
-</html>
+
+/* BOUTON BIENVENUE + VIDEO */
+const startBtn = document.getElementById("startBtn");
+const introVideo = document.getElementById("intro-video");
+const introOverlay = document.getElementById
