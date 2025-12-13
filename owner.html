@@ -9,7 +9,7 @@ body{
   font-family:sans-serif;
   background:#fff0f5;
   overflow-x:hidden;
-  padding-left:35px;
+  padding-left:35px; /* place pour l’encoche */
 }
 
 /* ================= INTRO VIDEO ================= */
@@ -23,6 +23,7 @@ body{
   align-items:center;
   opacity:1;
   transition:opacity 1.2s ease;
+  pointer-events:none;
 }
 
 #intro-video.fade-out{
@@ -34,7 +35,6 @@ body{
   width:100%;
   height:100%;
   object-fit:cover;
-  pointer-events:none; /* empêche interaction et bouton lecture */
 }
 
 /* ================= SIDEBAR ================= */
@@ -225,12 +225,13 @@ h1{
 }
 </style>
 </head>
+
 <body>
 
 <!-- INTRO VIDEO -->
 <div id="intro-video">
-  <video autoplay muted playsinline preload="auto">
-    <source src="chat.webm" type="video/webm">
+  <video autoplay muted playsinline webkit-playsinline preload="auto">
+    <source src="chat.mp4" type="video/mp4">
   </video>
 </div>
 
@@ -271,45 +272,45 @@ h1{
 
 <script>
 /* SIDEBAR */
-const sidebar=document.getElementById("sidebar");
-const toggle=document.getElementById("toggleSidebar");
-toggle.onclick=()=>sidebar.classList.toggle("sidebar-open");
+const sidebar = document.getElementById("sidebar");
+const toggle = document.getElementById("toggleSidebar");
+toggle.onclick = () => sidebar.classList.toggle("sidebar-open");
 
 /* MODES */
 function setMode(mode){
-  document.getElementById("owner-list").className=mode;
+  document.getElementById("owner-list").className = mode;
 }
 
 /* NAV SECTIONS */
 function openSection(id){
   sidebar.classList.remove("sidebar-open");
-  document.querySelectorAll(".section").forEach(s=>s.classList.remove("active"));
-  document.querySelector(".owner-box").style.display="none";
-  document.getElementById("owner-list").style.display="none";
-  document.getElementById("display-modes").style.display="none";
+  document.querySelectorAll(".section").forEach(s => s.classList.remove("active"));
+  document.querySelector(".owner-box").style.display = "none";
+  document.getElementById("owner-list").style.display = "none";
+  document.getElementById("display-modes").style.display = "none";
   document.getElementById(id).classList.add("active");
 }
 
 function closeSection(){
-  document.querySelectorAll(".section").forEach(s=>s.classList.remove("active"));
-  document.querySelector(".owner-box").style.display="block";
-  document.getElementById("owner-list").style.display="flex";
-  document.getElementById("display-modes").style.display="block";
+  document.querySelectorAll(".section").forEach(s => s.classList.remove("active"));
+  document.querySelector(".owner-box").style.display = "block";
+  document.getElementById("owner-list").style.display = "flex";
+  document.getElementById("display-modes").style.display = "block";
 }
 
 /* INTRO VIDEO */
-const intro=document.getElementById("intro-video");
-const video=intro.querySelector("video");
-video.muted=true;
-video.play().catch(()=>{console.log("Lecture automatique impossible");});
+const intro = document.getElementById("intro-video");
+const video = intro.querySelector("video");
 
-// Après fin de vidéo, rester 3s puis fondu
-video.onended=()=>{
-  setTimeout(()=>{
+// Forcer autoplay et disparition après 3 secondes
+video.play().catch(e => console.log("Autoplay bloqué :", e));
+video.onended = () => {
+  setTimeout(() => {
     intro.classList.add("fade-out");
-    setTimeout(()=>intro.remove(),1200);
-  },3000);
+    setTimeout(() => intro.remove(), 1200);
+  }, 3000); // reste 3 secondes après la fin
 };
 </script>
+
 </body>
 </html>
