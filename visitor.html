@@ -4,122 +4,88 @@
 <meta charset="UTF-8">
 <title>Galerie – Visitor</title>
 <style>
-/* ================= RESET & BASE ================= */
-* { box-sizing:border-box; margin:0; padding:0; }
-html, body { height:100%; font-family:sans-serif; overflow-x:hidden; }
-body { background:#fff0f5; }
+  html, body { margin:0; padding:0; height:100%; font-family:sans-serif; overflow-x:hidden; }
+  /* ========== FOND D'ACCUEIL ========== */
+  #intro-background{
+    position:fixed; inset:0;
+    background:url('Photoroom_20251213_123235.png') center/cover no-repeat;
+    display:flex; justify-content:center; align-items:center; z-index:100000;
+  }
+  #startBtn{
+    padding:20px 40px; font-size:24px; border-radius:16px; border:none;
+    background:#ffb6c1; color:#8b3a3a; font-weight:bold; cursor:pointer;
+    box-shadow:0 6px 15px rgba(182,115,133,.3);
+  }
+  #startBtn:hover { background:#ff9fc1; }
 
-/* ================= FOND ACCUEIL ================= */
-#intro-background{
-  position:fixed;
-  inset:0;
-  background:url('Photoroom_20251213_123235.png') center/cover no-repeat;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  z-index:100000;
-  flex-direction:column;
-}
+  /* ========== INTRO VIDEO ========== */
+  #intro-video{
+    position:fixed; inset:0; display:flex; justify-content:center; align-items:center;
+    z-index:100001; opacity:0; pointer-events:none; transition:opacity 0.8s ease;
+  }
+  #intro-video video{ width:100%; height:100%; object-fit:cover; }
 
-/* ================= BOUTON BIENVENUE ================= */
-#startBtn{
-  padding:20px 40px;
-  font-size:24px;
-  border-radius:16px;
-  border:none;
-  background:#ffb6c1;
-  color:#8b3a3a;
-  font-weight:bold;
-  cursor:pointer;
-  box-shadow:0 6px 15px rgba(182,115,133,.3);
-  margin-top:20px;
-}
-#startBtn:hover { background:#ff9fc1; }
+  /* ========== GALERIE ========== */
+  body { background:#fff0f5; }
+  header { text-align:center; padding:12px 0; }
+  header img { width:98px; height:98px; border-radius:20%; display:block; margin:0 auto; }
+  .title { font-size:42px; color:#b84c6f; font-weight:bold; letter-spacing:1px; margin-bottom:12px; }
 
-/* ================= INTRO VIDEO ================= */
-#intro-video{
-  position:fixed;
-  inset:0;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  z-index:100001;
-  opacity:0;
-  pointer-events:none;
-  transition:opacity 1s ease;
-}
+  #viewSelector { display:flex; justify-content:center; gap:12px; margin-bottom:14px; }
+  #viewSelector button {
+    background:#fff0f7; border:2px solid #b84c6f; color:#b84c6f;
+    padding:8px 16px; border-radius:24px; cursor:pointer; font-size:15px;
+    transition: all 0.18s ease;
+  }
+  #viewSelector button.active { background:linear-gradient(90deg,#ffeaf2,#fff5f8); color:#7a2b45; transform:translateY(-2px); }
+  #viewSelector button:hover { transform:translateY(-2px); }
 
-#intro-video video{
-  width:100%;
-  height:100%;
-  object-fit:cover;
-}
+  .center-zone { flex:1; display:flex; align-items:center; justify-content:center; padding:8px; }
+  #visitor-list { width:calc(100% - 40px); max-width:1200px; margin:0 auto; transition:all 0.2s ease; }
 
-/* ================= GALERIE ================= */
-header { text-align:center; padding:12px 0; }
-header img { width:98px; height:98px; border-radius:20%; display:block; margin:0 auto; }
-h1 { text-align:center; font-size:42px; color:#b84c6f; margin-bottom:12px; }
-#viewSelector { display:flex; justify-content:center; gap:12px; margin-bottom:14px; }
-#viewSelector button {
-  background:#fff0f7; border:2px solid #b84c6f; color:#b84c6f; padding:8px 16px; border-radius:24px; cursor:pointer;
-  font-size:15px; transition: all 0.18s ease;
-}
-#viewSelector button.active { background:linear-gradient(90deg,#ffeaf2,#fff5f8); color:#7a2b45; transform:translateY(-2px); }
-#viewSelector button:hover { transform:translateY(-2px); }
+  .visitor-item { text-align:center; cursor:pointer; user-select:none; }
+  .visitor-item img { display:block; margin:0 auto; object-fit:contain; border:4px solid #b67385; background:transparent; transition: box-shadow 0.3s ease, transform 0.3s ease; }
+  .visitor-item:hover img { box-shadow: 0 8px 20px rgba(184,76,111,0.3); transform: scale(1.03); }
+  .visitor-item p { margin:8px 0 0; font-size:20px; color:#b84c6f; font-weight:bold; line-height:1.1; }
 
-.center-zone { display:flex; justify-content:center; padding:8px; }
-#visitor-list { width:calc(100% - 40px); max-width:1200px; margin:0 auto; transition:all 0.2s ease; }
-.visitor-item { text-align:center; cursor:pointer; user-select:none; }
-.visitor-item img { display:block; margin:0 auto; object-fit:contain; border:4px solid #b67385; background:transparent; transition: box-shadow 0.3s ease, transform 0.3s ease; }
-.visitor-item:hover img { box-shadow:0 8px 20px rgba(184,76,111,0.3); transform: scale(1.03); }
-.visitor-item p { margin:8px 0 0; font-size:20px; color:#b84c6f; font-weight:bold; line-height:1.1; }
+  .carousel-view { display:flex; gap:40px; overflow-x:auto; scroll-behavior:smooth; padding:10px; align-items:center; }
+  .carousel-view::-webkit-scrollbar { height:8px; }
+  .carousel-view::-webkit-scrollbar-thumb { background:#b84c6f66; border-radius:20px; }
+  .carousel-view .visitor-item img { width:260px; height:260px; }
 
-/* VUES */
-.carousel-view { display:flex; gap:40px; overflow-x:auto; scroll-behavior:smooth; padding:10px; align-items:center; }
-.carousel-view::-webkit-scrollbar { height:8px; }
-.carousel-view::-webkit-scrollbar-thumb { background:#b84c6f66; border-radius:20px; }
-.carousel-view .visitor-item img { width:260px; height:260px; }
+  .grid-view { display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:24px; padding:16px; max-height:68vh; overflow-y:auto; }
+  .grid-view .visitor-item img { width:100%; height:200px; }
 
-.grid-view { display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:24px; padding:16px; max-height:68vh; overflow-y:auto; }
-.grid-view .visitor-item img { width:100%; height:200px; }
+  .list-view { display:flex; flex-direction:column; gap:18px; padding:16px; max-height:68vh; overflow-y:auto; }
+  .list-view .visitor-item { display:flex; gap:18px; align-items:center; padding:8px; }
+  .list-view .visitor-item img { width:140px; height:140px; }
+  .list-view .visitor-item p { margin:0; font-size:18px; text-align:left; }
 
-.list-view { display:flex; flex-direction:column; gap:18px; padding:16px; max-height:68vh; overflow-y:auto; }
-.list-view .visitor-item { display:flex; gap:18px; align-items:center; padding:8px; }
-.list-view .visitor-item img { width:140px; height:140px; }
-.list-view .visitor-item p { margin:0; font-size:18px; text-align:left; }
+  /* Modal & commentaires */
+  .modal-bg { position:fixed; inset:0; background: rgba(0,0,0,0.65); display:none; justify-content:center; align-items:center; z-index:1000; padding:20px; }
+  .modal-box { background:#fff5f8; border-radius:16px; padding:18px; max-width:980px; width:94%; max-height:90vh; overflow-y:auto; box-shadow:0 8px 30px rgba(184,76,111,0.25); text-align:center; position:relative; cursor:default; }
+  .close-modal { position:absolute; top:10px; right:12px; font-size:28px; cursor:pointer; color:#b84c6f; font-weight:bold; }
+  .modal-main-img { width:100%; max-height:520px; object-fit:contain; border:4px solid #b67385; background:white; }
 
-/* ================= MODAL & COMMENTAIRES ================= */
-.modal-bg { position:fixed; inset:0; background: rgba(0,0,0,0.65); display:none; justify-content:center; align-items:center; z-index:1000; padding:20px; }
-.modal-box { background:#fff5f8; border-radius:16px; padding:18px; max-width:980px; width:94%; max-height:90vh; overflow-y:auto; box-shadow:0 8px 30px rgba(184,76,111,0.25); text-align:center; position:relative; cursor:default; }
-.close-modal { position:absolute; top:10px; right:12px; font-size:28px; cursor:pointer; color:#b84c6f; font-weight:bold; }
-.modal-main-img { width:100%; max-height:520px; object-fit:contain; border:4px solid #b67385; background:white; }
-.thumbs { margin-top:16px; display:flex; gap:12px; justify-content:center; flex-wrap:wrap; }
-.thumbs img { width:110px; height:110px; object-fit:contain; border:4px solid #b67385; background:transparent; cursor:pointer; transition: transform 0.2s ease, box-shadow 0.2s ease; }
-.thumbs img:hover { transform:scale(1.06); box-shadow:0 6px 14px rgba(184,76,111,0.3); }
+  .thumbs { margin-top:16px; display:flex; gap:12px; justify-content:center; flex-wrap:wrap; }
+  .thumbs img { width:110px; height:110px; object-fit:contain; border:4px solid #b67385; background:transparent; cursor:pointer; transition: transform 0.2s ease, box-shadow 0.2s ease; }
+  .thumbs img:hover { transform:scale(1.06); box-shadow:0 6px 14px rgba(184,76,111,0.3); }
 
-.icon-bar { margin-top:12px; display:flex; justify-content:center; gap:36px; align-items:center; }
-.icon-btn { display:flex; gap:8px; align-items:center; cursor:pointer; color:#b84c6f; font-size:18px; }
-.heart { font-size:26px; transition: color .18s; }
-.heart.liked { color:#ff4b82; }
-.like-info { font-size:14px; color:#7a2b45; margin-left:6px; }
-.comment-info { font-size:14px; color:#7a2b45; margin-left:6px; }
-
-.comment-section { margin-top:14px; text-align:left; }
-.comment { background:#fff0f7; border:1px solid rgba(184,76,111,0.12); padding:10px; border-radius:10px; margin-bottom:10px; }
-.add-comment-btn { margin-top:12px; padding:10px 20px; background:#b84c6f; color:#fff; border-radius:26px; font-size:16px; border:none; cursor:pointer; }
-.comment-form-bg { position: fixed; inset:0; background: rgba(0,0,0,0.6); display:none; justify-content:center; align-items:center; z-index:2000; }
-.comment-form { background:white; padding:18px; border-radius:12px; width:340px; box-shadow:0 8px 20px rgba(0,0,0,0.25); text-align:center; }
-.comment-form input, .comment-form textarea { width:100%; padding:10px; border-radius:8px; border:2px solid rgba(184,76,111,0.12); margin-bottom:10px; font-size:15px; }
+  .icon-bar { margin-top:12px; display:flex; justify-content:center; gap:36px; align-items:center; }
+  .icon-btn { display:flex; gap:8px; align-items:center; cursor:pointer; color:#b84c6f; font-size:18px; }
+  .heart { font-size:26px; transition: color .18s; }
+  .heart.liked { color:#ff4b82; }
+  .like-info, .comment-info { font-size:14px; color:#7a2b45; margin-left:6px; }
 </style>
 </head>
 <body>
 
-<!-- FOND & BOUTON BIENVENUE -->
+<!-- FOND + BOUTON BIENVENUE -->
 <div id="intro-background">
   <button id="startBtn">Bienvenue</button>
 </div>
 
-<!-- VIDEO MP4 -->
+<!-- VIDEO -->
 <div id="intro-video">
   <video id="welcome-video" playsinline webkit-playsinline preload="auto">
     <source src="chat.mp4" type="video/mp4">
@@ -155,17 +121,6 @@ h1 { text-align:center; font-size:42px; color:#b84c6f; margin-bottom:12px; }
       </div>
     </div>
     <div id="thumbsContainer" class="thumbs"></div>
-    <button class="add-comment-btn" onclick="openCommentForm()">Ajouter un commentaire</button>
-    <div id="commentsList" class="comment-section"></div>
-  </div>
-</div>
-
-<div class="comment-form-bg" id="commentFormBg" onclick="if(event.target===this) closeCommentForm()">
-  <div class="comment-form">
-    <h3 style="margin-top:0;color:#b84c6f">Laisser un commentaire</h3>
-    <input id="commentName" placeholder="Prénom" />
-    <textarea id="commentText" rows="4" placeholder="Votre commentaire..."></textarea>
-    <button onclick="submitComment()">Envoyer</button>
   </div>
 </div>
 
@@ -175,37 +130,41 @@ const SUPABASE_URL = "https://iubbxvipgofxasatmvzg.supabase.co";
 const SUPABASE_ANON_KEY = "sb_publishable_GDoZmwIdoP28XOdrfYYVNw_E_HiCQB1";
 const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-/* ================= VARIABLES ================= */
-const introBg = document.getElementById('intro-background');
 const startBtn = document.getElementById('startBtn');
+const introBg = document.getElementById('intro-background');
 const videoDiv = document.getElementById('intro-video');
 const videoEl = document.getElementById('welcome-video');
 const list = document.getElementById('visitor-list');
+const btnCarousel = document.getElementById('btnCarousel');
+const btnGrid = document.getElementById('btnGrid');
+const btnList = document.getElementById('btnList');
+const modal = document.getElementById('modal');
+const modalMain = document.getElementById('modalMain');
+const thumbs = document.getElementById('thumbsContainer');
+const heart = document.getElementById('heart');
+const likeCount = document.getElementById('likeCount');
+const commentCountSpan = document.getElementById('commentCount');
 
-/* ================= CREATIONS ================= */
 let creations = [];
 let currentIndex = null;
 let currentView = 'carousel';
 
-/* ================= FONCTION BOUTON BIENVENUE ================= */
-startBtn.onclick = async () => {
-  startBtn.style.display = 'none';
-  introBg.style.transition = 'opacity 0.8s';
+startBtn.onclick = () => {
+  introBg.style.transition='opacity 0.8s';
   introBg.style.opacity = 0;
-  setTimeout(() => introBg.remove(), 800);
+  setTimeout(()=>introBg.remove(),800);
 
   videoDiv.style.opacity = 1;
-  videoEl.play().catch(e => console.log('Autoplay bloqué :', e));
+  videoEl.play().catch(e=>console.log("Autoplay bloqué :",e));
 
   videoEl.onended = () => {
-    videoDiv.style.transition = 'opacity 1s';
-    videoDiv.style.opacity = 0;
-    setTimeout(() => videoDiv.remove(), 1000);
-    renderVisitor();
+    videoDiv.style.transition='opacity 1s';
+    videoDiv.style.opacity=0;
+    setTimeout(()=>videoDiv.remove(),1000);
   };
 };
 
-/* ================= SUPABASE ================= */
+// Supabase load
 async function loadCreations(){
   const { data, error } = await supabase.storage.from('owners').list();
   if(error){ console.error(error); return; }
@@ -213,103 +172,45 @@ async function loadCreations(){
     name: item.name,
     imgUrl: supabase.storage.from('owners').getPublicUrl(item.name).publicURL
   }));
+  renderVisitor();
 }
 
-/* ================= RENDER ================= */
 function renderVisitor(){
   list.innerHTML='';
-  list.className = currentView + '-view';
+  list.className=currentView+'-view';
   creations.forEach((item,i)=>{
-    const div = document.createElement('div');
-    div.className = 'visitor-item';
-    div.setAttribute('data-index', i);
-    div.innerHTML = `<img src="${item.imgUrl}" alt="${item.name}"><p>${item.name}</p>`;
-    div.addEventListener('click', ()=> openModal(i));
+    const div=document.createElement('div');
+    div.className='visitor-item';
+    div.setAttribute('data-index',i);
+    div.innerHTML=`<img src="${item.imgUrl}" alt="${item.name}"><p>${item.name}</p>`;
+    div.addEventListener('click',()=>openModal(i));
     list.appendChild(div);
   });
 }
 
-/* ================= VUE ================= */
 function setView(mode){
-  currentView = mode;
-  document.getElementById('btnCarousel').classList.toggle('active', mode==='carousel');
-  document.getElementById('btnGrid').classList.toggle('active', mode==='grid');
-  document.getElementById('btnList').classList.toggle('active', mode==='list');
+  currentView=mode;
+  btnCarousel.classList.toggle('active', mode==='carousel');
+  btnGrid.classList.toggle('active', mode==='grid');
+  btnList.classList.toggle('active', mode==='list');
   renderVisitor();
 }
-document.getElementById('btnCarousel').addEventListener('click',()=>setView('carousel'));
-document.getElementById('btnGrid').addEventListener('click',()=>setView('grid'));
-document.getElementById('btnList').addEventListener('click',()=>setView('list'));
 
-/* ================= MODAL & LIKES ================= */
-const modal = document.getElementById('modal');
-const modalMain = document.getElementById('modalMain');
-const thumbs = document.getElementById('thumbsContainer');
-const heart = document.getElementById('heart');
-const likeCount = document.getElementById('likeCount');
-const commentCountSpan = document.getElementById('commentCount');
-const commentList = document.getElementById('commentsList');
+btnCarousel.addEventListener('click',()=>setView('carousel'));
+btnGrid.addEventListener('click',()=>setView('grid'));
+btnList.addEventListener('click',()=>setView('list'));
 
+// Modal
 function openModal(i){
   currentIndex = i;
   const proj = creations[i];
   modalMain.src = proj.imgUrl;
-  thumbs.innerHTML = '';
+  thumbs.innerHTML='';
   thumbs.appendChild(modalMain.cloneNode());
   modal.style.display='flex';
 }
 function closeModal(){ modal.style.display='none'; }
 
-async function toggleLike(){
-  if(currentIndex===null) return;
-  const name = prompt("Ton prénom pour liker cette image:") || "Anonyme";
-  const key = `likes_${currentIndex}`;
-  let likes = JSON.parse(localStorage.getItem(key)||'[]');
-  if(likes.includes(name)) likes = likes.filter(n=>n!==name);
-  else likes.push(name);
-  localStorage.setItem(key, JSON.stringify(likes));
-  loadLikes();
-}
-
-function loadLikes(){
-  if(currentIndex===null) return;
-  const key = `likes_${currentIndex}`;
-  const likes = JSON.parse(localStorage.getItem(key)||'[]');
-  heart.textContent = likes.length>0?'❤️':'♡';
-  heart.classList.toggle('liked', likes.length>0);
-  likeCount.textContent = likes.length>0 ? ` ${likes.join(', ')}` : '';
-}
-
-/* ================= COMMENTAIRES ================= */
-const commentFormBg = document.getElementById('commentFormBg');
-const commentName = document.getElementById('commentName');
-const commentText = document.getElementById('commentText');
-
-function openCommentForm(){ commentFormBg.style.display='flex'; }
-function closeCommentForm(){ commentFormBg.style.display='none'; }
-function submitComment(){
-  const name = commentName.value.trim();
-  const text = commentText.value.trim();
-  if(!name || !text) return;
-  const key = `comments_${currentIndex}`;
-  let comments = JSON.parse(localStorage.getItem(key)||'[]');
-  comments.push({name,text,at:Date.now()});
-  localStorage.setItem(key, JSON.stringify(comments));
-  commentName.value=''; commentText.value=''; closeCommentForm();
-  loadComments();
-}
-
-function loadComments(){
-  if(currentIndex===null) return;
-  const key = `comments_${currentIndex}`;
-  const comments = JSON.parse(localStorage.getItem(key)||'[]');
-  commentList.innerHTML = comments.map(c=>`<div class="comment"><strong>${c.name}</strong><br>${c.text}</div>`).join('');
-  commentCountSpan.textContent = comments.length;
-}
-
-function scrollToComments(){ commentList.scrollIntoView({behavior:'smooth', block:'start'}); }
-
-/* ================= INITIAL LOAD ================= */
 loadCreations();
 </script>
 </body>
