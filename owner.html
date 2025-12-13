@@ -9,32 +9,45 @@ body{
   font-family:sans-serif;
   background:#fff0f5;
   overflow-x:hidden;
-  padding-left:35px; /* place pour l’encoche */
+  padding-left:35px; /* espace pour l’encoche */
 }
 
 /* ================= INTRO VIDEO ================= */
 #intro-video{
-  position:fixed;
-  inset:0;
-  background:#000;
-  z-index:100000;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  opacity:1;
-  transition:opacity 1.2s ease;
-  pointer-events:none;
+  position: fixed;
+  inset: 0;
+  background: #000;
+  z-index: 100000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  opacity: 1;
+  transition: opacity 1.2s ease;
 }
 
 #intro-video.fade-out{
-  opacity:0;
-  pointer-events:none;
+  opacity: 0;
+  pointer-events: none;
 }
 
 #intro-video video{
-  width:100%;
-  height:100%;
-  object-fit:cover;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Bouton Bienvenue */
+#welcomeBtn{
+  position: absolute;
+  bottom: 50px;
+  padding: 12px 20px;
+  background: rgba(255,182,193,0.9);
+  color: #8b3a3a;
+  border: none;
+  border-radius: 12px;
+  font-weight: bold;
+  cursor: pointer;
+  font-size: 18px;
 }
 
 /* ================= SIDEBAR ================= */
@@ -55,7 +68,6 @@ body{
   left:0;
 }
 
-/* ENCÔCHE */
 #toggleSidebar{
   position:absolute;
   top:50%;
@@ -73,7 +85,6 @@ body{
   font-weight:bold;
 }
 
-/* BOUTONS SIDEBAR */
 #sidebar button{
   width:100%;
   margin-bottom:10px;
@@ -151,10 +162,8 @@ h1{
   margin-bottom:40px;
 }
 
-/* GRILLE */
 #owner-list.grid .owner-item{ width:140px; }
 
-/* LISTE */
 #owner-list.list{
   flex-direction:column;
   align-items:center;
@@ -166,14 +175,12 @@ h1{
   gap:10px;
 }
 
-/* CARROUSEL */
 #owner-list.carousel{
   flex-wrap:nowrap;
   overflow-x:auto;
   padding-bottom:10px;
 }
 
-/* ITEM */
 .owner-item{
   position:relative;
   background:#ffe6f0;
@@ -196,7 +203,6 @@ h1{
   font-weight:bold;
 }
 
-/* CROIX */
 .delete-btn{
   position:absolute;
   top:5px;
@@ -214,7 +220,6 @@ h1{
   font-weight:bold;
 }
 
-/* ================= SECTIONS ================= */
 .section{
   display:none;
   padding:20px;
@@ -230,9 +235,10 @@ h1{
 
 <!-- INTRO VIDEO -->
 <div id="intro-video">
-  <video autoplay muted playsinline webkit-playsinline preload="auto">
+  <video muted playsinline preload="auto">
     <source src="chat.mp4" type="video/mp4">
   </video>
+  <button id="welcomeBtn">Bienvenue</button>
 </div>
 
 <!-- SIDEBAR -->
@@ -271,44 +277,46 @@ h1{
 <script type="module" src="owner.js"></script>
 
 <script>
-/* SIDEBAR */
-const sidebar = document.getElementById("sidebar");
-const toggle = document.getElementById("toggleSidebar");
-toggle.onclick = () => sidebar.classList.toggle("sidebar-open");
+const sidebar=document.getElementById("sidebar");
+const toggle=document.getElementById("toggleSidebar");
+toggle.onclick=()=>sidebar.classList.toggle("sidebar-open");
 
-/* MODES */
 function setMode(mode){
-  document.getElementById("owner-list").className = mode;
+  document.getElementById("owner-list").className=mode;
 }
 
-/* NAV SECTIONS */
 function openSection(id){
   sidebar.classList.remove("sidebar-open");
-  document.querySelectorAll(".section").forEach(s => s.classList.remove("active"));
-  document.querySelector(".owner-box").style.display = "none";
-  document.getElementById("owner-list").style.display = "none";
-  document.getElementById("display-modes").style.display = "none";
+  document.querySelectorAll(".section").forEach(s=>s.classList.remove("active"));
+  document.querySelector(".owner-box").style.display="none";
+  document.getElementById("owner-list").style.display="none";
+  document.getElementById("display-modes").style.display="none";
   document.getElementById(id).classList.add("active");
 }
 
 function closeSection(){
-  document.querySelectorAll(".section").forEach(s => s.classList.remove("active"));
-  document.querySelector(".owner-box").style.display = "block";
-  document.getElementById("owner-list").style.display = "flex";
-  document.getElementById("display-modes").style.display = "block";
+  document.querySelectorAll(".section").forEach(s=>s.classList.remove("active"));
+  document.querySelector(".owner-box").style.display="block";
+  document.getElementById("owner-list").style.display="flex";
+  document.getElementById("display-modes").style.display="block";
 }
 
 /* INTRO VIDEO */
 const intro = document.getElementById("intro-video");
 const video = intro.querySelector("video");
+const welcome = document.getElementById("welcomeBtn");
 
-// Forcer autoplay et disparition après 3 secondes
-video.play().catch(e => console.log("Autoplay bloqué :", e));
-video.onended = () => {
-  setTimeout(() => {
-    intro.classList.add("fade-out");
-    setTimeout(() => intro.remove(), 1200);
-  }, 3000); // reste 3 secondes après la fin
+// Au clic sur le bouton "Bienvenue"
+welcome.onclick = () => {
+  video.play().catch(e => console.log("Autoplay bloqué :", e));
+  welcome.style.display = "none";
+
+  video.onended = () => {
+    setTimeout(()=>{
+      intro.classList.add("fade-out");
+      setTimeout(()=>intro.remove(), 1200);
+    }, 3000); // 3 secondes après la fin
+  };
 };
 </script>
 
