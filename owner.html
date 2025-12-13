@@ -10,7 +10,7 @@ body{
   font-family:sans-serif;
   background:#fff0f5;
   overflow-x:hidden;
-  padding-left:35px; /* place pour l’encoche */
+  padding-left:35px; /* espace pour l'encoche de la sidebar */
 }
 
 /* ================= INTRO VIDEO ================= */
@@ -37,7 +37,7 @@ body{
   object-fit:cover;
   pointer-events:none; /* empêche clic / bouton lecture */
 }
-  
+
 /* ================= SIDEBAR ================= */
 #sidebar{
   position:fixed;
@@ -231,13 +231,7 @@ h1{
 
 <!-- INTRO VIDEO -->
 <div id="intro-video">
-  <video
-    autoplay
-    muted
-    playsinline
-    webkit-playsinline
-    preload="auto"
-  >
+  <video autoplay muted playsinline preload="auto">
     <source src="chat.mp4" type="video/mp4">
   </video>
 </div>
@@ -275,51 +269,50 @@ h1{
 <div id="notes" class="section"><button onclick="closeSection()">← Retour</button></div>
 <div id="settings" class="section"><button onclick="closeSection()">← Retour</button></div>
 
-<!-- 🔴 TON JS ORIGINAL -->
+<!-- JS pour owner -->
 <script type="module" src="owner.js"></script>
 
-<!-- SIDEBAR + NAV + VIDEO -->
 <script>
 /* SIDEBAR */
-const sidebar=document.getElementById("sidebar");
-const toggle=document.getElementById("toggleSidebar");
-toggle.onclick=()=>sidebar.classList.toggle("sidebar-open");
+const sidebar = document.getElementById("sidebar");
+const toggle = document.getElementById("toggleSidebar");
+toggle.onclick = () => sidebar.classList.toggle("sidebar-open");
 
 /* MODES */
 function setMode(mode){
-  document.getElementById("owner-list").className=mode;
+  document.getElementById("owner-list").className = mode;
 }
 
 /* NAV SECTIONS */
 function openSection(id){
   sidebar.classList.remove("sidebar-open");
   document.querySelectorAll(".section").forEach(s=>s.classList.remove("active"));
-  document.querySelector(".owner-box").style.display="none";
-  document.getElementById("owner-list").style.display="none";
-  document.getElementById("display-modes").style.display="none";
+  document.querySelector(".owner-box").style.display = "none";
+  document.getElementById("owner-list").style.display = "none";
+  document.getElementById("display-modes").style.display = "none";
   document.getElementById(id).classList.add("active");
 }
 
 function closeSection(){
   document.querySelectorAll(".section").forEach(s=>s.classList.remove("active"));
-  document.querySelector(".owner-box").style.display="block";
-  document.getElementById("owner-list").style.display="flex";
-  document.getElementById("display-modes").style.display="block";
+  document.querySelector(".owner-box").style.display = "block";
+  document.getElementById("owner-list").style.display = "flex";
+  document.getElementById("display-modes").style.display = "block";
 }
 
 /* INTRO VIDEO */
-const intro=document.getElementById("intro-video");
-const video=intro.querySelector("video");
+const intro = document.getElementById("intro-video");
+const video = intro.querySelector("video");
 
-// Lecture auto, disparition 3s puis fade-out
-video.addEventListener("timeupdate", () => {
-  if (video.duration - video.currentTime < 0.1) {
-    video.loop = false; // arrêter boucle
-    setTimeout(()=>{
-      intro.classList.add("fade-out");
-      setTimeout(()=>intro.remove(),1200);
-    },3000);
-  }
+// Forcer lecture automatique si navigateur bloque autoplay
+video.play().catch(()=>{});
+
+// Quand la vidéo se termine
+video.addEventListener("ended", () => {
+  setTimeout(()=>{
+    intro.classList.add("fade-out");
+    setTimeout(()=>intro.remove(), 1200);
+  }, 3000); // reste 3 secondes
 });
 </script>
 
