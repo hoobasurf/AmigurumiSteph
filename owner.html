@@ -4,44 +4,56 @@
 <meta charset="UTF-8">
 <title>Mes Créations</title>
 <style>
-html, body {
+/* ================= RESET ================= */
+body{
   margin:0;
-  padding:0;
-  width:100%;
-  height:100%;
   font-family:sans-serif;
-  overflow-x:hidden;
   background:#fff0f5;
+  overflow-x:hidden;
+  padding-left:35px; /* place pour l’encoche */
 }
 
-/* ================= INTRO VIDEO ================= */
-#intro-wrapper {
+/* ================= FOND D'OUVERTURE ================= */
+#welcome-screen{
   position:fixed;
   inset:0;
+  background: url('Photoroom_20251213_123235.png') center/cover no-repeat;
   display:flex;
   justify-content:center;
   align-items:center;
-  background:url('Photoroom_20251213_123235.png') no-repeat center center/cover;
   z-index:100000;
   flex-direction:column;
-  transition:opacity 1s ease;
 }
 
-#intro-wrapper.fade-out {
-  opacity:0;
-  pointer-events:none;
-}
-
-#welcomeBtn {
-  padding:15px 30px;
-  font-size:24px;
-  font-weight:bold;
+/* BOUTON BIENVENUE */
+#welcome-btn{
+  padding:20px 40px;
+  border-radius:12px;
   border:none;
-  border-radius:15px;
   background:#ffb6c1;
   color:#8b3a3a;
+  font-weight:bold;
+  font-size:24px;
   cursor:pointer;
-  box-shadow:0 4px 12px rgba(0,0,0,0.2);
+  box-shadow:0 4px 15px rgba(0,0,0,0.2);
+}
+
+/* VIDEO */
+#intro-video{
+  position:fixed;
+  inset:0;
+  background:#000;
+  z-index:100000;
+  display:none;
+  justify-content:center;
+  align-items:center;
+  opacity:1;
+  transition:opacity 1.2s ease;
+}
+
+#intro-video.fade-out{
+  opacity:0;
+  pointer-events:none;
 }
 
 /* ================= SIDEBAR ================= */
@@ -58,10 +70,7 @@ html, body {
   z-index:10000;
 }
 
-#sidebar.sidebar-open{
-  left:0;
-}
-
+#sidebar.sidebar-open{ left:0; }
 #toggleSidebar{
   position:absolute;
   top:50%;
@@ -78,7 +87,6 @@ html, body {
   border:1px solid #b67385;
   font-weight:bold;
 }
-
 #sidebar button{
   width:100%;
   margin-bottom:10px;
@@ -108,7 +116,6 @@ h1{
   padding:20px;
   box-shadow:0 6px 20px rgba(182,115,133,.25);
 }
-
 .owner-box input,
 .owner-box button{
   width:100%;
@@ -116,11 +123,7 @@ h1{
   padding:10px;
   border-radius:12px;
 }
-
-.owner-box input{
-  border:1px solid #b67385;
-}
-
+.owner-box input{ border:1px solid #b67385; }
 .owner-box button{
   background:#ffb6c1;
   border:none;
@@ -135,7 +138,6 @@ h1{
   text-align:center;
   margin:15px 0;
 }
-
 #display-modes button{
   margin:0 5px;
   padding:8px 12px;
@@ -155,7 +157,6 @@ h1{
   gap:15px;
   margin-bottom:40px;
 }
-
 #owner-list.grid .owner-item{ width:140px; }
 #owner-list.list{
   flex-direction:column;
@@ -172,8 +173,6 @@ h1{
   overflow-x:auto;
   padding-bottom:10px;
 }
-
-/* ITEM */
 .owner-item{
   position:relative;
   background:#ffe6f0;
@@ -182,20 +181,17 @@ h1{
   padding:10px;
   text-align:center;
 }
-
 .owner-item img{
   width:110px;
   height:110px;
   object-fit:cover;
   border-radius:10px;
 }
-
 .owner-item p{
   margin:5px 0 0;
   color:#8b3a3a;
   font-weight:bold;
 }
-
 .delete-btn{
   position:absolute;
   top:5px;
@@ -212,22 +208,24 @@ h1{
   cursor:pointer;
   font-weight:bold;
 }
+.section{ display:none; padding:20px; }
+.section.active{ display:block; }
 
-.section{
-  display:none;
-  padding:20px;
-}
-.section.active{
-  display:block;
-}
 </style>
 </head>
+
 <body>
 
-<!-- INTRO -->
-<div id="intro-wrapper">
-  <video id="intro-video" src="chat.mp4" type="video/mp4" style="width:100%; max-height:90%;" muted playsinline></video>
-  <button id="welcomeBtn">Bienvenue</button>
+<!-- ECRAN BIENVENUE -->
+<div id="welcome-screen">
+  <button id="welcome-btn">Bienvenue</button>
+</div>
+
+<!-- VIDEO -->
+<div id="intro-video">
+  <video muted playsinline preload="auto">
+    <source src="chat.webm" type="video/webm">
+  </video>
 </div>
 
 <!-- SIDEBAR -->
@@ -241,21 +239,19 @@ h1{
 </div>
 
 <h1>Mes Créations</h1>
-
 <div class="owner-box">
   <input id="name" placeholder="Nom de la création">
   <input id="photo" type="file" accept="image/*">
   <button id="add">Ajouter</button>
 </div>
-
 <div id="display-modes">
   <button onclick="setMode('carousel')">Carrousel</button>
   <button onclick="setMode('grid')">Grille</button>
   <button onclick="setMode('list')">Liste</button>
 </div>
-
 <div id="owner-list" class="grid"></div>
 
+<!-- SECTIONS -->
 <div id="videos" class="section"><button onclick="closeSection()">← Retour</button></div>
 <div id="mailles" class="section"><button onclick="closeSection()">← Retour</button></div>
 <div id="pelotes" class="section"><button onclick="closeSection()">← Retour</button></div>
@@ -266,9 +262,9 @@ h1{
 
 <script>
 /* SIDEBAR */
-const sidebar = document.getElementById("sidebar");
-const toggle = document.getElementById("toggleSidebar");
-toggle.onclick = () => sidebar.classList.toggle("sidebar-open");
+const sidebar=document.getElementById("sidebar");
+const toggle=document.getElementById("toggleSidebar");
+toggle.onclick=()=>sidebar.classList.toggle("sidebar-open");
 
 /* MODES */
 function setMode(mode){
@@ -291,21 +287,24 @@ function closeSection(){
   document.getElementById("display-modes").style.display="block";
 }
 
-/* INTRO VIDEO */
-const introWrapper = document.getElementById("intro-wrapper");
-const video = document.getElementById("intro-video");
-const welcomeBtn = document.getElementById("welcomeBtn");
+/* BIENVENUE + VIDEO */
+const welcomeScreen = document.getElementById("welcome-screen");
+const welcomeBtn = document.getElementById("welcome-btn");
+const intro = document.getElementById("intro-video");
+const video = intro.querySelector("video");
 
-welcomeBtn.onclick = () => {
-  // cacher le bouton après clic
-  welcomeBtn.style.display="none";
-  // démarrer vidéo
+welcomeBtn.onclick = ()=>{
+  // cache écran bienvenue
+  welcomeScreen.style.display='none';
+  // affiche vidéo et la joue
+  intro.style.display='flex';
   video.play().catch(e=>console.log("Autoplay bloqué :", e));
-  video.onended = () => {
+  // fin vidéo après durée + fondu
+  video.onended = ()=>{
     setTimeout(()=>{
-      introWrapper.classList.add("fade-out");
-      setTimeout(()=>introWrapper.remove(),1000);
-    },2000); // 2 secondes après la fin
+      intro.classList.add("fade-out");
+      setTimeout(()=>intro.remove(),1200);
+    },2000); // 2 secondes visibles après fin
   };
 };
 </script>
