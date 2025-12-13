@@ -23,18 +23,18 @@ body{
   align-items:center;
   opacity:1;
   transition:opacity 1.2s ease;
-  pointer-events:none; /* empêche tout clic sur la vidéo */
 }
 
 #intro-video.fade-out{
   opacity:0;
+  pointer-events:none;
 }
 
 #intro-video video{
   width:100%;
   height:100%;
   object-fit:cover;
-  pointer-events:none; /* pas de bouton lecture */
+  pointer-events:none; /* empêche clic / lecture */
 }
 
 /* ================= SIDEBAR ================= */
@@ -228,7 +228,7 @@ h1{
 
 <body>
 
-<!-- INTRO VIDEO WEBM -->
+<!-- INTRO VIDEO -->
 <div id="intro-video">
   <video autoplay muted playsinline preload="auto">
     <source src="chat.webm" type="video/webm">
@@ -300,10 +300,14 @@ function closeSection(){
 
 /* INTRO VIDEO */
 const intro=document.getElementById("intro-video");
-setTimeout(()=>{
-  intro.classList.add("fade-out");
-  setTimeout(()=>intro.remove(),1200);
-},7000); // La vidéo WebM dure 4 secondes, reste 3 secondes, puis disparition
+const video=intro.querySelector("video");
+
+video.onended=()=>{
+  setTimeout(()=>{
+    intro.classList.add("fade-out");
+    setTimeout(()=>intro.remove(),1200);
+  },3000); // reste 3 secondes
+};
 </script>
 
 </body>
