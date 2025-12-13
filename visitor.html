@@ -2,88 +2,93 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Galerie Projets – Visitor</title>
 <style>
-body {
-  margin:0;
-  font-family:sans-serif;
-  background:#fff0f5;
-  overflow-x:hidden;
-  padding-left:35px; /* pour l'encoche */
-}
+  body {
+    margin:0;
+    font-family:sans-serif;
+    background:#fff0f5;
+    overflow-x:hidden;
+  }
 
-/* ================= INTRO + BOUTON ================= */
-#intro-container{
-  position:fixed;
-  inset:0;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  z-index:100000;
-  background: url('Photoroom_20251213_123235.png') center center / cover no-repeat;
-}
+  /* ================= INTRO VIDEO + FOND ================= */
+  #intro-container{
+    position:fixed;
+    inset:0;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    z-index:100000;
+    background: url('Photoroom_20251213_123235.png') center center / cover no-repeat;
+    flex-direction: column;
+  }
 
-#intro-video {
-  width:80%;
-  max-width:800px;
-  border-radius:16px;
-  pointer-events:none;
-}
+  #intro-video {
+    width: 600px;
+    max-width:90%;
+    border-radius:16px;
+    pointer-events:none; /* empêche clic sur la vidéo */
+    display:block;
+    margin-bottom: 20px;
+  }
 
-#welcome-btn {
-  position:absolute;
-  z-index:100001;
-  padding:14px 28px;
-  background:#ffb6c1;
-  color:#8b3a3a;
-  font-weight:bold;
-  font-size:18px;
-  border:none;
-  border-radius:12px;
-  cursor:pointer;
-  box-shadow:0 4px 12px rgba(0,0,0,0.2);
-}
-#welcome-btn:hover {
-  background:#ff9fc1;
-}
+  #welcome-btn {
+    padding:14px 28px;
+    background:#ffb6c1;
+    color:#8b3a3a;
+    font-weight:bold;
+    font-size:18px;
+    border:none;
+    border-radius:12px;
+    cursor:pointer;
+    box-shadow:0 4px 12px rgba(0,0,0,0.2);
+  }
+  #welcome-btn:hover {
+    background:#ff9fc1;
+  }
 
-/* ================= GALERIE ================= */
-h1 {
-  text-align:center;
-  color:#b84c6f;
-  margin-top:20px;
-}
+  #intro-container.fade-out {
+    opacity:0;
+    transition: opacity 1.2s;
+    pointer-events:none;
+  }
 
-#visitor-list {
-  display:flex;
-  flex-wrap:wrap;
-  justify-content:center;
-  gap:15px;
-  margin:20px;
-}
+  /* ================= GALERIE ================= */
+  h1 {
+    text-align:center;
+    color:#b84c6f;
+    margin-top:20px;
+  }
 
-.visitor-item {
-  background:#ffe6f0;
-  border:2px solid #b67385;
-  border-radius:16px;
-  padding:10px;
-  text-align:center;
-}
+  #visitor-list {
+    display:flex;
+    flex-wrap:wrap;
+    justify-content:center;
+    gap:15px;
+    margin:20px;
+  }
 
-.visitor-item img {
-  width:110px;
-  height:110px;
-  object-fit:cover;
-  border-radius:10px;
-}
+  .visitor-item {
+    width:140px;
+    text-align:center;
+  }
 
-.visitor-item p {
-  margin:5px 0 0;
-  color:#8b3a3a;
-  font-weight:bold;
-}
+  .visitor-item img {
+    width:140px;
+    height:140px;
+    object-fit:cover;
+    border-radius:10px;
+  }
+
+  .visitor-item p {
+    margin:5px 0 0;
+    color:#8b3a3a;
+    font-weight:bold;
+  }
 </style>
 </head>
+
 <body>
 
 <!-- INTRO VIDEO + BOUTON -->
@@ -97,55 +102,45 @@ h1 {
 <h1>✨ Projets réalisés</h1>
 <div id="visitor-list"></div>
 
-<script type="module">
-import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
+<script type="module" src="visitor.js"></script>
 
-const supabaseUrl = 'https://xxxx.supabase.co';
-const supabaseKey = 'PUBLIC_ANON_KEY';
-const supabase = createClient(supabaseUrl, supabaseKey);
+<script>
+  // Gestion du bouton Bienvenue et disparition de la vidéo
+  const introContainer = document.getElementById('intro-container');
+  const video = document.getElementById('intro-video');
+  const welcomeBtn = document.getElementById('welcome-btn');
 
-const visitorList = document.getElementById("visitor-list");
-const introContainer = document.getElementById('intro-container');
-const video = document.getElementById('intro-video');
-const welcomeBtn = document.getElementById('welcome-btn');
+  welcomeBtn.onclick = () => {
+    video.play().catch(e => console.log("Autoplay bloqué :", e));
+    welcomeBtn.style.display = 'none';
 
-// Clique sur le bouton "Bienvenue" pour lancer la vidéo
-welcomeBtn.onclick = () => {
-  video.play().catch(e => console.log("Autoplay bloqué :", e));
-  welcomeBtn.style.display = 'none';
-
-  video.onended = () => {
-    introContainer.style.transition = "opacity 1.2s";
-    introContainer.style.opacity = 0;
-    setTimeout(() => introContainer.remove(), 2000); // reste 2 secondes
+    // À la fin de la vidéo, fade-out 2 secondes
+    video.onended = () => {
+      setTimeout(()=>{
+        introContainer.classList.add('fade-out');
+        setTimeout(()=>introContainer.remove(), 1200);
+      }, 2000);
+    };
   };
-};
 
-// Charger les créations depuis le bucket Supabase
-async function renderVisitor() {
-  visitorList.innerHTML = "";
-  const { data, error } = await supabase.storage
-    .from('creations')
-    .list('', { limit: 100 });
+  // Récupération des créations depuis localStorage
+  const list = document.getElementById("visitor-list");
+  const creations = JSON.parse(localStorage.getItem("creations") || "[]");
 
-  if (error) return console.error(error);
-
-  for (let file of data) {
-    const { publicURL } = supabase.storage
-      .from('creations')
-      .getPublicUrl(file.name);
-
-    const div = document.createElement("div");
-    div.className = "visitor-item";
-    div.innerHTML = `
-      <img src="${publicURL}">
-      <p>${file.name}</p>
-    `;
-    visitorList.appendChild(div);
+  function renderVisitor() {
+    list.innerHTML = "";
+    creations.forEach(item => {
+      const div = document.createElement("div");
+      div.className = "visitor-item";
+      div.innerHTML = `
+        <img src="${item.imgUrl}">
+        <p>${item.name}</p>
+      `;
+      list.appendChild(div);
+    });
   }
-}
 
-renderVisitor();
+  renderVisitor();
 </script>
 
 </body>
