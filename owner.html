@@ -5,16 +5,16 @@
 <title>Mes Créations</title>
 
 <style>
-body{
+body {
   margin:0;
   font-family:sans-serif;
   background:#fff0f5;
   overflow-x:hidden;
-  padding-left:35px; /* place pour l’encoche */
+  padding-left:35px; /* espace pour encoche sidebar */
 }
 
-/* ================= INTRO VIDEO ================= */
-#intro-video{
+/* ================= INTRO GIF ================= */
+#intro-video {
   position:fixed;
   inset:0;
   background:#000;
@@ -26,20 +26,19 @@ body{
   transition:opacity 1.2s ease;
 }
 
-#intro-video.fade-out{
+#intro-video.fade-out {
   opacity:0;
   pointer-events:none;
 }
 
-#intro-video video{
+#intro-video img {
   width:100%;
   height:100%;
   object-fit:cover;
-  pointer-events: none; /* empêche clic / bouton lecture */
 }
 
 /* ================= SIDEBAR ================= */
-#sidebar{
+#sidebar {
   position:fixed;
   top:0;
   left:-220px;
@@ -52,12 +51,10 @@ body{
   z-index:10000;
 }
 
-#sidebar.sidebar-open{
-  left:0;
-}
+#sidebar.sidebar-open { left:0; }
 
 /* ENCÔCHE */
-#toggleSidebar{
+#toggleSidebar {
   position:absolute;
   top:50%;
   right:-30px;
@@ -75,7 +72,7 @@ body{
 }
 
 /* BOUTONS SIDEBAR */
-#sidebar button{
+#sidebar button {
   width:100%;
   margin-bottom:10px;
   padding:10px;
@@ -88,14 +85,14 @@ body{
 }
 
 /* ================= TITRE ================= */
-h1{
+h1 {
   text-align:center;
   color:#b84c6f;
   margin-top:20px;
 }
 
 /* ================= AJOUT CREATION ================= */
-.owner-box{
+.owner-box {
   max-width:420px;
   margin:20px auto;
   background:#ffe6f0;
@@ -106,18 +103,16 @@ h1{
 }
 
 .owner-box input,
-.owner-box button{
+.owner-box button {
   width:100%;
   margin-top:10px;
   padding:10px;
   border-radius:12px;
 }
 
-.owner-box input{
-  border:1px solid #b67385;
-}
+.owner-box input { border:1px solid #b67385; }
 
-.owner-box button{
+.owner-box button {
   background:#ffb6c1;
   border:none;
   color:#8b3a3a;
@@ -127,12 +122,12 @@ h1{
 }
 
 /* ================= MODES ================= */
-#display-modes{
+#display-modes {
   text-align:center;
   margin:15px 0;
 }
 
-#display-modes button{
+#display-modes button {
   margin:0 5px;
   padding:8px 12px;
   border-radius:12px;
@@ -144,7 +139,7 @@ h1{
 }
 
 /* ================= LISTE CREATIONS ================= */
-#owner-list{
+#owner-list {
   display:flex;
   flex-wrap:wrap;
   justify-content:center;
@@ -152,30 +147,27 @@ h1{
   margin-bottom:40px;
 }
 
-/* GRILLE */
-#owner-list.grid .owner-item{ width:140px; }
+#owner-list.grid .owner-item { width:140px; }
 
-/* LISTE */
-#owner-list.list{
+#owner-list.list {
   flex-direction:column;
   align-items:center;
 }
-#owner-list.list .owner-item{
+#owner-list.list .owner-item {
   display:flex;
   align-items:center;
   width:90%;
   gap:10px;
 }
 
-/* CARROUSEL */
-#owner-list.carousel{
+#owner-list.carousel {
   flex-wrap:nowrap;
   overflow-x:auto;
   padding-bottom:10px;
 }
 
 /* ITEM */
-.owner-item{
+.owner-item {
   position:relative;
   background:#ffe6f0;
   border:2px solid #b67385;
@@ -184,21 +176,21 @@ h1{
   text-align:center;
 }
 
-.owner-item img{
+.owner-item img {
   width:110px;
   height:110px;
   object-fit:cover;
   border-radius:10px;
 }
 
-.owner-item p{
+.owner-item p {
   margin:5px 0 0;
   color:#8b3a3a;
   font-weight:bold;
 }
 
 /* CROIX */
-.delete-btn{
+.delete-btn {
   position:absolute;
   top:5px;
   right:5px;
@@ -216,12 +208,12 @@ h1{
 }
 
 /* ================= SECTIONS ================= */
-.section{
+.section {
   display:none;
   padding:20px;
 }
 
-.section.active{
+.section.active {
   display:block;
 }
 </style>
@@ -229,11 +221,9 @@ h1{
 
 <body>
 
-<!-- INTRO VIDEO -->
+<!-- INTRO GIF -->
 <div id="intro-video">
-  <video autoplay muted playsinline preload="auto">
-    <source src="chat.mp4" type="video/mp4">
-  </video>
+  <img src="https://raw.githubusercontent.com/tonusername/tonrepo/main/chat.gif" alt="Intro">
 </div>
 
 <!-- SIDEBAR -->
@@ -254,7 +244,6 @@ h1{
   <button id="add">Ajouter</button>
 </div>
 
-<!-- MODES (UNIQUEMENT ICI) -->
 <div id="display-modes">
   <button onclick="setMode('carousel')">Carrousel</button>
   <button onclick="setMode('grid')">Grille</button>
@@ -270,10 +259,9 @@ h1{
 <div id="notes" class="section"><button onclick="closeSection()">← Retour</button></div>
 <div id="settings" class="section"><button onclick="closeSection()">← Retour</button></div>
 
-<!-- JS CREATIONS -->
+<!-- JS -->
 <script type="module" src="owner.js"></script>
 
-<!-- NAV + VIDEO -->
 <script>
 /* SIDEBAR */
 const sidebar=document.getElementById("sidebar");
@@ -302,27 +290,12 @@ function closeSection(){
   document.getElementById("display-modes").style.display="block";
 }
 
-/* INTRO VIDEO */
-const intro=document.getElementById("intro-video");
-const video=intro.querySelector("video");
-
-function tryPlayVideo(){
-  video.muted=true;
-  video.play().catch(()=>{
-    document.body.addEventListener("click",()=>video.play(),{once:true});
-  });
-}
-
-video.addEventListener("loadedmetadata", tryPlayVideo);
-video.addEventListener("canplaythrough", tryPlayVideo);
-
-// À la fin, fade out après 3s
-video.addEventListener("ended",()=>{
-  setTimeout(()=>{
-    intro.classList.add("fade-out");
-    setTimeout(()=>intro.remove(),1200);
-  },3000);
-});
+/* INTRO GIF fade-out */
+const intro = document.getElementById("intro-video");
+setTimeout(() => {
+  intro.classList.add("fade-out");
+  setTimeout(()=>intro.remove(), 1200);
+}, 3000);
 </script>
 
 </body>
