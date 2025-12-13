@@ -9,10 +9,10 @@ body {
   font-family:sans-serif;
   background:#fff0f5;
   overflow-x:hidden;
-  padding-left:35px; /* pour l’encoche */
+  padding-left:35px; /* pour l'encoche */
 }
 
-/* ================= INTRO VIDEO + FOND ================= */
+/* ================= INTRO + BOUTON ================= */
 #intro-container{
   position:fixed;
   inset:0;
@@ -23,11 +23,11 @@ body {
   background: url('Photoroom_20251213_123235.png') center center / cover no-repeat;
 }
 
-#intro-video video {
+#intro-video {
   width:80%;
   max-width:800px;
   border-radius:16px;
-  pointer-events:none; /* empêche le clic sur la vidéo */
+  pointer-events:none;
 }
 
 #welcome-btn {
@@ -53,39 +53,34 @@ h1 {
   color:#b84c6f;
   margin-top:20px;
 }
-.gallery-scroll {
+
+#visitor-list {
   display:flex;
-  gap:20px;
-  overflow-x:auto;
-  padding:20px;
-  scroll-snap-type:x mandatory;
-}
-.gallery-scroll img {
-  height:240px;
-  border-radius:12px;
-  scroll-snap-align:start;
-  cursor:pointer;
-  box-shadow:0 4px 15px rgba(0,0,0,0.25);
-  transition:transform .2s;
-}
-.gallery-scroll img:hover {
-  transform:scale(1.05);
+  flex-wrap:wrap;
+  justify-content:center;
+  gap:15px;
+  margin:20px;
 }
 
-/* Modal zoom */
-#imageModal {
-  display:none;
-  position:fixed;
-  inset:0;
-  background:rgba(0,0,0,0.8);
-  justify-content:center;
-  align-items:center;
-  z-index:2000;
+.visitor-item {
+  background:#ffe6f0;
+  border:2px solid #b67385;
+  border-radius:16px;
+  padding:10px;
+  text-align:center;
 }
-#imageModal img {
-  width:90%;
-  max-width:600px;
-  border-radius:12px;
+
+.visitor-item img {
+  width:110px;
+  height:110px;
+  object-fit:cover;
+  border-radius:10px;
+}
+
+.visitor-item p {
+  margin:5px 0 0;
+  color:#8b3a3a;
+  font-weight:bold;
 }
 </style>
 </head>
@@ -100,32 +95,57 @@ h1 {
 </div>
 
 <h1>✨ Projets réalisés</h1>
-<div id="gallery" class="gallery-scroll"></div>
+<div id="visitor-list"></div>
 
-<!-- Modal zoom -->
-<div id="imageModal" onclick="this.style.display='none'">
-  <img id="modalImg" src="">
-</div>
+<script type="module">
+import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
 
-<script type="module" src="visitor.js"></script>
+const supabaseUrl = 'https://xxxx.supabase.co';
+const supabaseKey = 'PUBLIC_ANON_KEY';
+const supabase = createClient(supabaseUrl, supabaseKey);
 
-<script>
-// BOUTON WELCOME pour lancer la vidéo
+const visitorList = document.getElementById("visitor-list");
 const introContainer = document.getElementById('intro-container');
 const video = document.getElementById('intro-video');
 const welcomeBtn = document.getElementById('welcome-btn');
 
+// Clique sur le bouton "Bienvenue" pour lancer la vidéo
 welcomeBtn.onclick = () => {
   video.play().catch(e => console.log("Autoplay bloqué :", e));
   welcomeBtn.style.display = 'none';
 
-  // À la fin de la vidéo, fade-out
   video.onended = () => {
     introContainer.style.transition = "opacity 1.2s";
     introContainer.style.opacity = 0;
-    setTimeout(() => introContainer.remove(), 1200);
+    setTimeout(() => introContainer.remove(), 2000); // reste 2 secondes
   };
 };
+
+// Charger les créations depuis le bucket Supabase
+async function renderVisitor() {
+  visitorList.innerHTML = "";
+  const { data, error } = await supabase.storage
+    .from('creations')
+    .list('', { limit: 100 });
+
+  if (error) return console.error(error);
+
+  for (let file of data) {
+    const { publicURL } = supabase.storage
+      .from('creations')
+      .getPublicUrl(file.name);
+
+    const div = document.createElement("div");
+    div.className = "visitor-item";
+    div.innerHTML = `
+      <img src="${publicURL}">
+      <p>${file.name}</p>
+    `;
+    visitorList.appendChild(div);
+  }
+}
+
+renderVisitor();
 </script>
 
 </body>
