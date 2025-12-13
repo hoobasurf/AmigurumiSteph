@@ -2,21 +2,14 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Galerie – Visitor</title>
-
-<!-- ================= STYLE INTRO ================= -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Galerie - Visitor</title>
 <style>
-html,body{
-  margin:0;
-  padding:0;
-  width:100%;
-  height:100%;
-  font-family:'Comic Sans MS', cursive;
-  -webkit-text-size-adjust:100%;
-}
+/* ================= RESET ================= */
+* { box-sizing:border-box; margin:0; padding:0; }
+html, body { width:100%; height:100%; font-family:'Comic Sans MS', cursive; overflow-x:hidden; }
 
-/* ===== ACCUEIL ===== */
+/* ================= FOND D'ACCUEIL ================= */
 #intro-background{
   position:fixed;
   inset:0;
@@ -27,6 +20,7 @@ html,body{
   z-index:100000;
 }
 
+/* BOUTON BIENVENUE */
 #startBtn{
   padding:20px 40px;
   font-size:24px;
@@ -39,7 +33,7 @@ html,body{
   box-shadow:0 6px 15px rgba(182,115,133,.3);
 }
 
-/* ===== VIDEO ===== */
+/* ================= INTRO VIDEO ================= */
 #intro-video{
   position:fixed;
   inset:0;
@@ -52,82 +46,150 @@ html,body{
   pointer-events:none;
   transition:opacity 1s ease;
 }
-
+#intro-video.active{
+  opacity:1;
+  pointer-events:auto;
+}
 #intro-video video{
   width:100%;
   height:100%;
-  object-fit:contain; /* PAS DE ZOOM */
-  pointer-events:none;
+  object-fit:cover;
 }
+
+/* ================= APPLI ================= */
+body { background:#fff0f5; }
+header { text-align:center; padding:12px 0; }
+header img { width:98px; height:98px; border-radius:20%; display:block; margin:0 auto; }
+.title { font-size:42px; color:#b84c6f; font-weight:bold; letter-spacing:1px; margin-bottom:12px; }
+#viewSelector { display:flex; justify-content:center; gap:12px; margin-bottom:14px; }
+#viewSelector button {
+  background:#fff0f7; border:2px solid #b84c6f; color:#b84c6f;
+  padding:8px 16px; border-radius:24px; cursor:pointer; font-size:15px;
+  transition: all 0.18s ease;
+}
+#viewSelector button.active { background:linear-gradient(90deg,#ffeaf2,#fff5f8); color:#7a2b45; transform:translateY(-2px); }
+#viewSelector button:hover { transform:translateY(-2px); }
+
+.center-zone { flex:1; display:flex; align-items:center; justify-content:center; padding:8px; }
+#visitor-list { width:calc(100% - 40px); max-width:1200px; margin:0 auto; transition:all 0.2s ease; }
+
+.visitor-item { text-align:center; cursor:pointer; user-select:none; }
+.visitor-item img { display:block; margin:0 auto; object-fit:contain; border:4px solid #b67385; transition: box-shadow 0.3s ease, transform 0.3s ease; }
+.visitor-item:hover img { box-shadow: 0 8px 20px rgba(184,76,111,0.3); transform: scale(1.03); }
+.visitor-item p { margin:8px 0 0; font-size:20px; color:#b84c6f; font-weight:bold; line-height:1.1; }
+
+.carousel-view { display:flex; gap:40px; overflow-x:auto; scroll-behavior:smooth; padding:10px; align-items:center; }
+.carousel-view::-webkit-scrollbar { height:8px; }
+.carousel-view::-webkit-scrollbar-thumb { background:#b84c6f66; border-radius:20px; }
+.carousel-view .visitor-item img { width:260px; height:260px; }
+
+.grid-view { display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:24px; padding:16px; max-height:68vh; overflow-y:auto; }
+.grid-view .visitor-item img { width:100%; height:200px; }
+
+.list-view { display:flex; flex-direction:column; gap:18px; padding:16px; max-height:68vh; overflow-y:auto; }
+.list-view .visitor-item { display:flex; gap:18px; align-items:center; padding:8px; }
+.list-view .visitor-item img { width:140px; height:140px; }
+.list-view .visitor-item p { margin:0; font-size:18px; text-align:left; }
 </style>
-
-<!-- ================= TON STYLE APPLI (INCHANGÉ) ================= -->
-<!-- ⚠️ J’AI VOLONTAIREMENT RIEN SUPPRIMÉ -->
-<link rel="stylesheet" href="visitor.css">
-
 </head>
 <body>
 
-<!-- ===== ACCUEIL ===== -->
+<!-- INTRO -->
 <div id="intro-background">
   <button id="startBtn">Bienvenue</button>
 </div>
-
-<!-- ===== VIDEO ===== -->
 <div id="intro-video">
-  <video id="introVid" playsinline webkit-playsinline preload="auto">
+  <video id="video" muted playsinline preload="auto">
     <source src="chat.webm" type="video/webm">
   </video>
 </div>
 
-<!-- ===== APPLI ===== -->
-<div id="app">
-  <!-- TON HTML COMPLET D’APPLI -->
-  <!-- boutons carrousel / grid / list -->
-  <!-- galerie -->
-  <!-- modale -->
+<!-- HEADER + SELECTEUR VUE -->
+<header>
+  <img src="favicon.png" alt="Logo">
+  <h1 class="title">Mes créations</h1>
+</header>
+<div id="viewSelector">
+  <button id="btnCarousel">Carrousel</button>
+  <button id="btnGrid">Grille</button>
+  <button id="btnList">Liste</button>
 </div>
 
-<!-- ================= INTRO LOGIQUE ================= -->
-<script>
-const introBg = document.getElementById("intro-background");
-const introVideo = document.getElementById("intro-video");
-const video = document.getElementById("introVid");
-const startBtn = document.getElementById("startBtn");
+<div class="center-zone">
+  <div id="visitor-list" role="list"></div>
+</div>
 
-/* pas de retour accueil */
-if(sessionStorage.getItem("introPlayed")){
-  introBg.remove();
-  introVideo.remove();
-}
-
-startBtn.onclick = ()=>{
-  sessionStorage.setItem("introPlayed","true");
-  introBg.style.display="none";
-  introVideo.style.opacity="1";
-  introVideo.style.pointerEvents="auto";
-  video.play().catch(()=>{});
-};
-
-video.onended = ()=>{
-  setTimeout(()=>{
-    introVideo.style.opacity="0";
-    setTimeout(()=>introVideo.remove(),1000);
-  },2000);
-};
-</script>
-
-<!-- ================= SUPABASE ================= -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
 <script>
-const supabase = supabase.createClient(
-  "https://iubbxvipgofxasatmvzg.supabase.co",
-  "sb_publishable_GDoZmwIdoP28XOdrfYYVNw_E_HiCQB1"
-);
+const SUPABASE_URL = "https://iubbxvipgofxasatmvzg.supabase.co";
+const SUPABASE_ANON_KEY = "sb_publishable_GDoZmwIdoP28XOdrfYYVNw_E_HiCQB1";
+const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+const startBtn = document.getElementById("startBtn");
+const introBg = document.getElementById("intro-background");
+const introVideo = document.getElementById("intro-video");
+const video = document.getElementById("video");
+
+const list = document.getElementById('visitor-list');
+const btnCarousel = document.getElementById('btnCarousel');
+const btnGrid = document.getElementById('btnGrid');
+const btnList = document.getElementById('btnList');
+
+let creations = [];
+let currentView = 'carousel';
+
+// ================= VIDEO BIENVENUE =================
+startBtn.onclick = () => {
+  introVideo.classList.add("active");
+  video.play();
+  startBtn.style.display = 'none';
+  video.onended = () => {
+    setTimeout(()=>{
+      introVideo.style.opacity=0;
+      introBg.remove();
+      introVideo.remove();
+    },2000); // 2 secondes à la fin
+  };
+};
+
+// ================= VUE CREATIONS =================
+btnCarousel.onclick = () => setView('carousel');
+btnGrid.onclick = () => setView('grid');
+btnList.onclick = () => setView('list');
+
+function setView(view){
+  currentView = view;
+  btnCarousel.classList.toggle('active', view==='carousel');
+  btnGrid.classList.toggle('active', view==='grid');
+  btnList.classList.toggle('active', view==='list');
+  renderVisitor();
+}
+
+// ================= CHARGEMENT CREATIONS SUPABASE =================
+async function loadCreations(){
+  const { data, error } = await supabase.storage.from('owners').list();
+  if(error){ console.error(error); return; }
+  creations = data.map(item => ({
+    name: item.name,
+    imgUrl: supabase.storage.from('owners').getPublicUrl(item.name).publicURL
+  }));
+  renderVisitor();
+}
+
+function renderVisitor(){
+  list.innerHTML='';
+  list.className = currentView+'-view';
+  creations.forEach((item,i)=>{
+    const div = document.createElement('div');
+    div.className='visitor-item';
+    div.innerHTML = `<img src="${item.imgUrl}" alt="${item.name}"><p>${item.name}</p>`;
+    list.appendChild(div);
+  });
+}
+
+// ================= LANCER =================
+loadCreations();
+setView('carousel');
 </script>
-
-<!-- ================= TON JS VISITOR ================= -->
-<script type="module" src="visitor.js"></script>
-
 </body>
 </html>
