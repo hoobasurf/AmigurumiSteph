@@ -4,43 +4,51 @@
 <meta charset="UTF-8">
 <title>Mes Créations</title>
 <style>
-body{
+body {
   margin:0;
   font-family:sans-serif;
-  background:#fff0f5;
+  background: url('Photoroom_20251213_123235.png') center/cover no-repeat;
   overflow-x:hidden;
-  padding-left:35px; /* place pour l’encoche */
 }
 
-/* ================= INTRO VIDEO + BOUTON ================= */
-#intro-container{
+/* ================= WELCOME BUTTON ================= */
+#welcome-overlay{
   position:fixed;
   inset:0;
   display:flex;
   justify-content:center;
   align-items:center;
-  z-index:100000;
-  background: url('Photoroom_20251213_123235.png') center center / cover no-repeat;
+  z-index:10000;
 }
 
+#welcome-btn{
+  padding:16px 32px;
+  background:#ffb6c1;
+  color:#8b3a3a;
+  font-weight:bold;
+  font-size:24px;
+  border:none;
+  border-radius:12px;
+  cursor:pointer;
+  box-shadow:0 4px 12px rgba(0,0,0,0.2);
+}
+
+/* ================= VIDEO ================= */
 #intro-video{
+  position:fixed;
+  inset:0;
   width:100%;
   height:100%;
   object-fit:cover;
   display:none;
+  z-index:9999;
+  opacity:1;
+  transition:opacity 1.2s ease;
 }
 
-#welcome-btn{
-  position:absolute;
-  padding:16px 30px;
-  border:none;
-  border-radius:12px;
-  background:#ffb6c1;
-  color:#8b3a3a;
-  font-size:20px;
-  font-weight:bold;
-  cursor:pointer;
-  box-shadow:0 4px 12px rgba(0,0,0,0.15);
+/* ================= APP ================= */
+#app{
+  display:none;
 }
 
 /* ================= SIDEBAR ================= */
@@ -54,12 +62,10 @@ body{
   border-right:2px solid #b67385;
   padding:20px;
   transition:left .3s ease;
-  z-index:10000;
+  z-index:1000;
 }
 
-#sidebar.sidebar-open{
-  left:0;
-}
+#sidebar.sidebar-open{ left:0; }
 
 #toggleSidebar{
   position:absolute;
@@ -116,9 +122,7 @@ h1{
   border-radius:12px;
 }
 
-.owner-box input{
-  border:1px solid #b67385;
-}
+.owner-box input{ border:1px solid #b67385; }
 
 .owner-box button{
   background:#ffb6c1;
@@ -155,29 +159,6 @@ h1{
   margin-bottom:40px;
 }
 
-/* GRILLE */
-#owner-list.grid .owner-item{ width:140px; }
-
-/* LISTE */
-#owner-list.list{
-  flex-direction:column;
-  align-items:center;
-}
-#owner-list.list .owner-item{
-  display:flex;
-  align-items:center;
-  width:90%;
-  gap:10px;
-}
-
-/* CARROUSEL */
-#owner-list.carousel{
-  flex-wrap:nowrap;
-  overflow-x:auto;
-  padding-bottom:10px;
-}
-
-/* ITEM */
 .owner-item{
   position:relative;
   background:#ffe6f0;
@@ -200,7 +181,6 @@ h1{
   font-weight:bold;
 }
 
-/* CROIX */
 .delete-btn{
   position:absolute;
   top:5px;
@@ -218,64 +198,85 @@ h1{
   font-weight:bold;
 }
 
-/* ================= SECTIONS ================= */
 .section{
   display:none;
   padding:20px;
 }
 
-.section.active{
-  display:block;
-}
+.section.active{ display:block; }
 </style>
 </head>
 
 <body>
 
-<!-- INTRO VIDEO + BOUTON -->
-<div id="intro-container">
-  <video id="intro-video" muted playsinline webkit-playsinline preload="auto">
-    <source src="chat.mp4" type="video/mp4">
-  </video>
+<!-- BOUTON BIENVENUE -->
+<div id="welcome-overlay">
   <button id="welcome-btn">Bienvenue</button>
 </div>
 
-<!-- SIDEBAR -->
-<div id="sidebar">
-  <div id="toggleSidebar">☰</div>
-  <button onclick="openSection('videos')">Vidéos</button>
-  <button onclick="openSection('mailles')">Mailles</button>
-  <button onclick="openSection('pelotes')">Pelotes</button>
-  <button onclick="openSection('notes')">Notes</button>
-  <button onclick="openSection('settings')">Paramètres</button>
+<!-- VIDEO -->
+<video id="intro-video" playsinline webkit-playsinline preload="auto">
+  <source src="chat.webm" type="video/webm">
+</video>
+
+<!-- APP -->
+<div id="app">
+  <div id="sidebar">
+    <div id="toggleSidebar">☰</div>
+    <button onclick="openSection('videos')">Vidéos</button>
+    <button onclick="openSection('mailles')">Mailles</button>
+    <button onclick="openSection('pelotes')">Pelotes</button>
+    <button onclick="openSection('notes')">Notes</button>
+    <button onclick="openSection('settings')">Paramètres</button>
+  </div>
+
+  <h1>Mes Créations</h1>
+
+  <div class="owner-box">
+    <input id="name" placeholder="Nom de la création">
+    <input id="photo" type="file" accept="image/*">
+    <button id="add">Ajouter</button>
+  </div>
+
+  <div id="display-modes">
+    <button onclick="setMode('carousel')">Carrousel</button>
+    <button onclick="setMode('grid')">Grille</button>
+    <button onclick="setMode('list')">Liste</button>
+  </div>
+
+  <div id="owner-list" class="grid"></div>
+
+  <div id="videos" class="section"><button onclick="closeSection()">← Retour</button></div>
+  <div id="mailles" class="section"><button onclick="closeSection()">← Retour</button></div>
+  <div id="pelotes" class="section"><button onclick="closeSection()">← Retour</button></div>
+  <div id="notes" class="section"><button onclick="closeSection()">← Retour</button></div>
+  <div id="settings" class="section"><button onclick="closeSection()">← Retour</button></div>
 </div>
-
-<h1>Mes Créations</h1>
-
-<div class="owner-box">
-  <input id="name" placeholder="Nom de la création">
-  <input id="photo" type="file" accept="image/*">
-  <button id="add">Ajouter</button>
-</div>
-
-<div id="display-modes">
-  <button onclick="setMode('carousel')">Carrousel</button>
-  <button onclick="setMode('grid')">Grille</button>
-  <button onclick="setMode('list')">Liste</button>
-</div>
-
-<div id="owner-list" class="grid"></div>
-
-<!-- SECTIONS -->
-<div id="videos" class="section"><button onclick="closeSection()">← Retour</button></div>
-<div id="mailles" class="section"><button onclick="closeSection()">← Retour</button></div>
-<div id="pelotes" class="section"><button onclick="closeSection()">← Retour</button></div>
-<div id="notes" class="section"><button onclick="closeSection()">← Retour</button></div>
-<div id="settings" class="section"><button onclick="closeSection()">← Retour</button></div>
 
 <script type="module" src="owner.js"></script>
 
 <script>
+const welcomeBtn = document.getElementById("welcome-btn");
+const welcomeOverlay = document.getElementById("welcome-overlay");
+const video = document.getElementById("intro-video");
+const app = document.getElementById("app");
+
+/* BOUTON BIENVENUE */
+welcomeBtn.onclick = () => {
+  welcomeOverlay.style.display = "none";
+  video.style.display = "block";
+  video.play().catch(e => console.log("Autoplay bloqué :", e));
+
+  video.onended = () => {
+    video.style.transition = "opacity 1.2s";
+    video.style.opacity = 0;
+    setTimeout(() => {
+      video.remove();
+      app.style.display = "block"; // affiche l'appli après vidéo
+    }, 1200);
+  };
+};
+
 /* SIDEBAR */
 const sidebar=document.getElementById("sidebar");
 const toggle=document.getElementById("toggleSidebar");
@@ -302,25 +303,6 @@ function closeSection(){
   document.getElementById("owner-list").style.display="flex";
   document.getElementById("display-modes").style.display="block";
 }
-
-/* INTRO VIDEO + BOUTON */
-const introContainer = document.getElementById("intro-container");
-const introVideo = document.getElementById("intro-video");
-const welcomeBtn = document.getElementById("welcome-btn");
-
-welcomeBtn.onclick = () => {
-  welcomeBtn.style.display = "none";
-  introVideo.style.display = "block";
-  introVideo.play().catch(e => console.log("Autoplay bloqué :", e));
-  introVideo.onended = () => {
-    setTimeout(()=>{
-      introContainer.style.transition = "opacity 1.2s";
-      introContainer.style.opacity = 0;
-      setTimeout(()=>introContainer.remove(),1200);
-    },3000); // garde 3s à la fin
-  };
-};
 </script>
-
 </body>
 </html>
