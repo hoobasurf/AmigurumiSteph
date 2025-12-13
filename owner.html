@@ -56,6 +56,12 @@ body{
   object-fit:cover;
 }
 
+/* ================= CONTENU APP (CACHÉ AU DÉBUT) ================= */
+#app-content{
+  opacity:0;
+  transition:opacity 1s ease;
+}
+
 /* ================= SIDEBAR ================= */
 #sidebar{
   position:fixed;
@@ -67,7 +73,7 @@ body{
   border-right:2px solid #b67385;
   padding:20px;
   transition:left .3s ease;
-  z-index:1000;
+  z-index:10;
 }
 
 #sidebar.sidebar-open{ left:0; }
@@ -237,38 +243,41 @@ h1{ text-align:center; color:#b84c6f; margin-top:20px; }
   </video>
 </div>
 
-<!-- SIDEBAR -->
-<div id="sidebar">
-  <div id="toggleSidebar">☰</div>
-  <button onclick="openSection('videos')">Vidéos</button>
-  <button onclick="openSection('mailles')">Mailles</button>
-  <button onclick="openSection('pelotes')">Pelotes</button>
-  <button onclick="openSection('notes')">Notes</button>
-  <button onclick="openSection('settings')">Paramètres</button>
+<!-- CONTENU DE L'APP -->
+<div id="app-content">
+  <!-- SIDEBAR -->
+  <div id="sidebar">
+    <div id="toggleSidebar">☰</div>
+    <button onclick="openSection('videos')">Vidéos</button>
+    <button onclick="openSection('mailles')">Mailles</button>
+    <button onclick="openSection('pelotes')">Pelotes</button>
+    <button onclick="openSection('notes')">Notes</button>
+    <button onclick="openSection('settings')">Paramètres</button>
+  </div>
+
+  <h1>Mes Créations</h1>
+
+  <div class="owner-box">
+    <input id="name" placeholder="Nom de la création">
+    <input id="photo" type="file" accept="image/*">
+    <button id="add">Ajouter</button>
+  </div>
+
+  <div id="display-modes">
+    <button onclick="setMode('carousel')">Carrousel</button>
+    <button onclick="setMode('grid')">Grille</button>
+    <button onclick="setMode('list')">Liste</button>
+  </div>
+
+  <div id="owner-list" class="grid"></div>
+
+  <!-- SECTIONS -->
+  <div id="videos" class="section"><button onclick="closeSection()">← Retour</button></div>
+  <div id="mailles" class="section"><button onclick="closeSection()">← Retour</button></div>
+  <div id="pelotes" class="section"><button onclick="closeSection()">← Retour</button></div>
+  <div id="notes" class="section"><button onclick="closeSection()">← Retour</button></div>
+  <div id="settings" class="section"><button onclick="closeSection()">← Retour</button></div>
 </div>
-
-<h1>Mes Créations</h1>
-
-<div class="owner-box">
-  <input id="name" placeholder="Nom de la création">
-  <input id="photo" type="file" accept="image/*">
-  <button id="add">Ajouter</button>
-</div>
-
-<div id="display-modes">
-  <button onclick="setMode('carousel')">Carrousel</button>
-  <button onclick="setMode('grid')">Grille</button>
-  <button onclick="setMode('list')">Liste</button>
-</div>
-
-<div id="owner-list" class="grid"></div>
-
-<!-- SECTIONS -->
-<div id="videos" class="section"><button onclick="closeSection()">← Retour</button></div>
-<div id="mailles" class="section"><button onclick="closeSection()">← Retour</button></div>
-<div id="pelotes" class="section"><button onclick="closeSection()">← Retour</button></div>
-<div id="notes" class="section"><button onclick="closeSection()">← Retour</button></div>
-<div id="settings" class="section"><button onclick="closeSection()">← Retour</button></div>
 
 <script type="module" src="owner.js"></script>
 
@@ -277,6 +286,7 @@ const startBtn = document.getElementById("startBtn");
 const introBg = document.getElementById("intro-background");
 const introVideoDiv = document.getElementById("intro-video");
 const video = introVideoDiv.querySelector("video");
+const appContent = document.getElementById("app-content");
 
 /* BOUTON BIENVENUE */
 startBtn.onclick = () => {
@@ -286,11 +296,11 @@ startBtn.onclick = () => {
   video.play().catch(e=>console.log("Lecture bloquée:", e));
 };
 
-/* FIN DE LA VIDEO -> disparition en fondu */
+/* FIN DE LA VIDEO -> afficher l'appli avec fondu */
 video.onended = () => {
-  introVideoDiv.style.transition = "opacity 1s ease";
   introVideoDiv.style.opacity = 0;
   setTimeout(()=>introVideoDiv.remove(), 1000);
+  appContent.style.opacity = 1;
 };
 
 /* SIDEBAR */
