@@ -4,16 +4,16 @@
 <meta charset="UTF-8">
 <title>Mes Créations</title>
 <style>
-body {
+body{
   margin:0;
   font-family:sans-serif;
   background:#fff0f5;
   overflow-x:hidden;
-  padding-left:35px;
+  padding-left:35px; /* place pour l’encoche */
 }
 
 /* ================= INTRO VIDEO ================= */
-#intro-video {
+#intro-video{
   position:fixed;
   inset:0;
   background:#000;
@@ -23,18 +23,18 @@ body {
   align-items:center;
   opacity:1;
   transition:opacity 1.2s ease;
+  pointer-events:none; /* empêche tout clic sur la vidéo */
 }
 
-#intro-video.fade-out {
+#intro-video.fade-out{
   opacity:0;
-  pointer-events:none;
 }
 
-#intro-video video {
+#intro-video video{
   width:100%;
   height:100%;
   object-fit:cover;
-  pointer-events:none;
+  pointer-events:none; /* pas de bouton lecture */
 }
 
 /* ================= SIDEBAR ================= */
@@ -51,8 +51,11 @@ body {
   z-index:10000;
 }
 
-#sidebar.sidebar-open{ left:0; }
+#sidebar.sidebar-open{
+  left:0;
+}
 
+/* ENCÔCHE */
 #toggleSidebar{
   position:absolute;
   top:50%;
@@ -70,6 +73,7 @@ body {
   font-weight:bold;
 }
 
+/* BOUTONS SIDEBAR */
 #sidebar button{
   width:100%;
   margin-bottom:10px;
@@ -108,7 +112,9 @@ h1{
   border-radius:12px;
 }
 
-.owner-box input{ border:1px solid #b67385; }
+.owner-box input{
+  border:1px solid #b67385;
+}
 
 .owner-box button{
   background:#ffb6c1;
@@ -145,7 +151,10 @@ h1{
   margin-bottom:40px;
 }
 
+/* GRILLE */
 #owner-list.grid .owner-item{ width:140px; }
+
+/* LISTE */
 #owner-list.list{
   flex-direction:column;
   align-items:center;
@@ -156,12 +165,15 @@ h1{
   width:90%;
   gap:10px;
 }
+
+/* CARROUSEL */
 #owner-list.carousel{
   flex-wrap:nowrap;
   overflow-x:auto;
   padding-bottom:10px;
 }
 
+/* ITEM */
 .owner-item{
   position:relative;
   background:#ffe6f0;
@@ -184,6 +196,7 @@ h1{
   font-weight:bold;
 }
 
+/* CROIX */
 .delete-btn{
   position:absolute;
   top:5px;
@@ -206,16 +219,19 @@ h1{
   display:none;
   padding:20px;
 }
-.section.active{ display:block; }
+
+.section.active{
+  display:block;
+}
 </style>
 </head>
 
 <body>
 
-<!-- INTRO VIDEO -->
+<!-- INTRO VIDEO WEBM -->
 <div id="intro-video">
   <video autoplay muted playsinline preload="auto">
-    <source src="chat.mp4" type="video/mp4">
+    <source src="chat.webm" type="video/webm">
   </video>
 </div>
 
@@ -283,15 +299,11 @@ function closeSection(){
 }
 
 /* INTRO VIDEO */
-const intro = document.getElementById("intro-video");
-const video = intro.querySelector("video");
-
-video.onended = () => {
-  setTimeout(() => {
-    intro.classList.add("fade-out");
-    setTimeout(() => intro.remove(), 1200);
-  }, 3000); // reste 3 secondes
-};
+const intro=document.getElementById("intro-video");
+setTimeout(()=>{
+  intro.classList.add("fade-out");
+  setTimeout(()=>intro.remove(),1200);
+},7000); // La vidéo WebM dure 4 secondes, reste 3 secondes, puis disparition
 </script>
 
 </body>
