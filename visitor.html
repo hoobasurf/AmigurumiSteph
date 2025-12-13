@@ -1,62 +1,70 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="UTF-8" />
+<meta charset="UTF-8">
 <title>Galerie - Mes créations</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js/dist/umd/supabase.min.js"></script>
 <style>
   * { box-sizing:border-box; margin:0; padding:0; }
   html, body { height:100%; font-family:'Comic Sans MS', cursive; }
   body {
     background-image: url('Photoroom_20251212_143703.png');
-    background-size: cover;
-    background-position: center;
+    background-size: cover; 
+    background-position: center top;
     background-repeat: no-repeat;
     background-attachment: fixed;
-    background-color:#fff0f5;
     display:flex;
     flex-direction:column;
     min-height:100vh;
     overflow-x:hidden;
-    touch-action: pan-x;
   }
-  header img { width:98px; height:98px; display:block; margin:0 auto 12px; border-radius:20%; }
-  .title { font-size:42px; color:#b84c6f; font-weight:bold; text-align:center; margin-bottom:12px; }
-  #viewSelector { display:flex; justify-content:center; gap:12px; margin:12px; }
-  #viewSelector button { background:#fff0f7; border:2px solid #b84c6f; color:#b84c6f; padding:8px 16px; border-radius:24px; font-size:15px; cursor:pointer; transition:all 0.18s ease; }
-  #viewSelector button.active { background: linear-gradient(90deg,#ffeaf2,#fff5f8); color:#7a2b45; transform:translateY(-2px); }
+  header { text-align:center; padding:12px 0; }
+  header img { width:98px; height:98px; border-radius:20%; display:block; margin:0 auto; }
+  .title { font-size:42px; color:#b84c6f; font-weight:bold; letter-spacing:1px; margin-bottom:12px; }
+  #viewSelector { display:flex; justify-content:center; gap:12px; margin-bottom:14px; }
+  #viewSelector button {
+    background:#fff0f7; border:2px solid #b84c6f; color:#b84c6f; padding:8px 16px; border-radius:24px; cursor:pointer;
+    font-size:15px; transition: all 0.18s ease;
+  }
+  #viewSelector button.active { background:linear-gradient(90deg,#ffeaf2,#fff5f8); color:#7a2b45; transform:translateY(-2px); }
   #viewSelector button:hover { transform:translateY(-2px); }
+
   .center-zone { flex:1; display:flex; align-items:center; justify-content:center; padding:8px; }
   #visitor-list { width:calc(100% - 40px); max-width:1200px; margin:0 auto; transition:all 0.2s ease; }
+
   .visitor-item { text-align:center; cursor:pointer; user-select:none; }
-  .visitor-item img { display:block; margin:0 auto; object-fit:contain; border:4px solid #b67385; transition: box-shadow 0.3s ease, transform 0.3s ease; }
-  .visitor-item:hover img { box-shadow:0 8px 20px rgba(184,76,111,0.3); transform: scale(1.03); }
+  .visitor-item img { display:block; margin:0 auto; object-fit:contain; border:4px solid #b67385; background:transparent; transition: box-shadow 0.3s ease, transform 0.3s ease; }
+  .visitor-item:hover img { box-shadow: 0 8px 20px rgba(184,76,111,0.3); transform: scale(1.03); }
   .visitor-item p { margin:8px 0 0; font-size:20px; color:#b84c6f; font-weight:bold; line-height:1.1; }
-  .carousel-view { display:flex; gap:40px; overflow-x:auto; scroll-behavior:smooth; align-items:center; padding:10px; }
+
+  .carousel-view { display:flex; gap:40px; overflow-x:auto; scroll-behavior:smooth; padding:10px; align-items:center; }
   .carousel-view::-webkit-scrollbar { height:8px; }
   .carousel-view::-webkit-scrollbar-thumb { background:#b84c6f66; border-radius:20px; }
   .carousel-view .visitor-item img { width:260px; height:260px; }
-  .grid-view { display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:24px; padding:16px; align-items:start; max-height:68vh; overflow-y:auto; }
+
+  .grid-view { display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:24px; padding:16px; max-height:68vh; overflow-y:auto; }
   .grid-view .visitor-item img { width:100%; height:200px; }
+
   .list-view { display:flex; flex-direction:column; gap:18px; padding:16px; max-height:68vh; overflow-y:auto; }
   .list-view .visitor-item { display:flex; gap:18px; align-items:center; padding:8px; }
   .list-view .visitor-item img { width:140px; height:140px; }
   .list-view .visitor-item p { margin:0; font-size:18px; text-align:left; }
+
   .modal-bg { position:fixed; inset:0; background: rgba(0,0,0,0.65); display:none; justify-content:center; align-items:center; z-index:1000; padding:20px; }
-  .modal-bg.click-close { cursor:pointer; }
   .modal-box { background:#fff5f8; border-radius:16px; padding:18px; max-width:980px; width:94%; max-height:90vh; overflow-y:auto; box-shadow:0 8px 30px rgba(184,76,111,0.25); text-align:center; position:relative; cursor:default; }
   .close-modal { position:absolute; top:10px; right:12px; font-size:28px; cursor:pointer; color:#b84c6f; font-weight:bold; }
   .modal-main-img { width:100%; max-height:520px; object-fit:contain; border:4px solid #b67385; background:white; }
+
   .thumbs { margin-top:16px; display:flex; gap:12px; justify-content:center; flex-wrap:wrap; }
   .thumbs img { width:110px; height:110px; object-fit:contain; border:4px solid #b67385; background:transparent; cursor:pointer; transition: transform 0.2s ease, box-shadow 0.2s ease; }
   .thumbs img:hover { transform:scale(1.06); box-shadow:0 6px 14px rgba(184,76,111,0.3); }
+
   .icon-bar { margin-top:12px; display:flex; justify-content:center; gap:36px; align-items:center; }
   .icon-btn { display:flex; gap:8px; align-items:center; cursor:pointer; color:#b84c6f; font-size:18px; }
   .heart { font-size:26px; transition: color .18s; }
   .heart.liked { color:#ff4b82; }
-  .like-info { font-size:14px; color:#7a2b45; margin-left:8px; }
-  .comment-number { background:#b84c6f; color:white; padding:2px 8px; border-radius:12px; font-size:13px; }
+  .like-info { font-size:14px; color:#7a2b45; margin-left:6px; }
+  .comment-info { font-size:14px; color:#7a2b45; margin-left:6px; }
+
   .comment-section { margin-top:14px; text-align:left; }
   .comment { background:#fff0f7; border:1px solid rgba(184,76,111,0.12); padding:10px; border-radius:10px; margin-bottom:10px; }
   .add-comment-btn { margin-top:12px; padding:10px 20px; background:#b84c6f; color:#fff; border-radius:26px; font-size:16px; border:none; cursor:pointer; }
@@ -81,8 +89,8 @@
   <div id="visitor-list" role="list"></div>
 </div>
 
-<div class="modal-bg click-close" id="modal" onclick="backgroundClose(event)">
-  <div class="modal-box" role="dialog" aria-modal="true" onclick="event.stopPropagation()">
+<div class="modal-bg" id="modal" onclick="if(event.target===this) closeModal()">
+  <div class="modal-box">
     <div class="close-modal" onclick="closeModal()">×</div>
     <img id="modalMain" class="modal-main-img" alt="Image agrandie">
     <div class="icon-bar">
@@ -90,8 +98,8 @@
         <span id="heart" class="heart">♡</span>
         <span id="likeCount" class="like-info">0</span>
       </div>
-      <div class="icon-btn">
-        💬 <span id="commentCount" class="comment-number">0</span>
+      <div class="icon-btn" onclick="scrollToComments()">
+        💬 <span id="commentCount" class="comment-info">0</span>
       </div>
     </div>
     <div id="thumbsContainer" class="thumbs"></div>
@@ -100,8 +108,8 @@
   </div>
 </div>
 
-<div class="comment-form-bg" id="commentFormBg" onclick="closeCommentForm(event)">
-  <div class="comment-form" onclick="event.stopPropagation()">
+<div class="comment-form-bg" id="commentFormBg" onclick="if(event.target===this) closeCommentForm()">
+  <div class="comment-form">
     <h3 style="margin-top:0;color:#b84c6f">Laisser un commentaire</h3>
     <input id="commentName" placeholder="Prénom" />
     <textarea id="commentText" rows="4" placeholder="Votre commentaire..."></textarea>
@@ -109,48 +117,49 @@
   </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
 <script>
-const SUPABASE_URL = "https://iubbxvipgofxasatmvzg.supabase.co";
-const SUPABASE_ANON_KEY = "sb_publishable_GDoZmwIdoP28XOdrfYYVNw_E_HiCQB1";
-const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+const SUPABASE_URL = "https://YOUR_PROJECT.supabase.co";
+const SUPABASE_ANON_KEY = "YOUR_PUBLIC_ANON_KEY";
+const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-const list = document.getElementById('visitor-list');
-const modal = document.getElementById('modal');
-const modalMain = document.getElementById('modalMain');
-const thumbs = document.getElementById('thumbsContainer');
-const heart = document.getElementById('heart');
-const likeCount = document.getElementById('likeCount');
-const commentCount = document.getElementById('commentCount');
-const commentsList = document.getElementById('commentsList');
-const commentFormBg = document.getElementById('commentFormBg');
-const commentName = document.getElementById('commentName');
-const commentText = document.getElementById('commentText');
+const list=document.getElementById('visitor-list');
+const modal=document.getElementById('modal');
+const modalMain=document.getElementById('modalMain');
+const thumbs=document.getElementById('thumbsContainer');
+const heart=document.getElementById('heart');
+const likeCount=document.getElementById('likeCount');
+const commentCountSpan=document.getElementById('commentCount');
+const commentList=document.getElementById('commentsList');
+const commentFormBg=document.getElementById('commentFormBg');
+const commentName=document.getElementById('commentName');
+const commentText=document.getElementById('commentText');
 
 let creations = [];
 let currentIndex = null;
 let currentView = 'carousel';
 
-// Charger créations Supabase
 async function loadCreations(){
-  const { data, error } = await supabaseClient.from('creations').select('*').order('id',{ascending:true});
+  const { data, error } = await supabase.storage.from('owners').list();
   if(error){ console.error(error); return; }
-  creations = data;
+  creations = data.map((item, i)=>({
+    name: item.name,
+    imgUrl: supabase.storage.from('owners').getPublicUrl(item.name).publicURL
+  }));
   renderVisitor();
 }
 
-function escapeHtml(s){ return s?String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'):''; }
 function renderVisitor(){
   list.innerHTML='';
-  list.className = currentView+'-view';
+  list.className=currentView+'-view';
   creations.forEach((item,i)=>{
     const div=document.createElement('div');
     div.className='visitor-item';
     div.setAttribute('data-index',i);
-    div.innerHTML=`<img src="${item.imgUrl}" alt="${escapeHtml(item.name)}"><p>${escapeHtml(item.name)}</p>`;
+    div.innerHTML=`<img src="${item.imgUrl}" alt="${item.name}"><p>${item.name}</p>`;
     div.addEventListener('click',()=>openModal(i));
     list.appendChild(div);
   });
-  updateCenter();
 }
 
 function setView(mode){
@@ -160,91 +169,68 @@ function setView(mode){
   document.getElementById('btnList').classList.toggle('active', mode==='list');
   renderVisitor();
 }
+
 document.getElementById('btnCarousel').addEventListener('click',()=>setView('carousel'));
 document.getElementById('btnGrid').addEventListener('click',()=>setView('grid'));
 document.getElementById('btnList').addEventListener('click',()=>setView('list'));
 
-function updateCenter(){
-  if(currentView!=='carousel'){ document.querySelectorAll('.visitor-item').forEach(it=>it.classList.remove('active')); return; }
-  const items=document.querySelectorAll('.visitor-item');
-  const center=window.innerWidth/2;
-  items.forEach(item=>{ const rect=item.getBoundingClientRect(); const itemCenter=rect.left+rect.width/2; if(Math.abs(itemCenter-center)<170)item.classList.add('active'); else item.classList.remove('active'); });
-}
-
-list.addEventListener('scroll',updateCenter);
-window.addEventListener('resize',updateCenter);
-
-// Modal
 function openModal(i){
-  currentIndex=i;
-  const proj=creations[i];
-  modalMain.src=proj.imgUrl;
-  thumbs.innerHTML='';
-  if(Array.isArray(proj.images)&&proj.images.length>0){
-    proj.images.forEach(src=>{
-      const t=document.createElement('img');
-      t.src=src; t.alt='miniature';
-      t.addEventListener('click',()=>{ modalMain.src=src; });
-      thumbs.appendChild(t);
-    });
-  }
+  currentIndex = i;
+  const proj = creations[i];
+  modalMain.src = proj.imgUrl;
   loadLikes();
   loadComments();
+  thumbs.innerHTML='';
+  thumbs.appendChild(modalMain.cloneNode());
   modal.style.display='flex';
 }
-function closeModal(){ modal.style.display='none'; renderVisitor(); }
-function backgroundClose(e){ if(e.target===modal) closeModal(); }
 
-// Likes
+function closeModal(){ modal.style.display='none'; }
+
 async function toggleLike(){
   if(currentIndex===null) return;
-  const name = prompt("Ton prénom pour liker cette image:")||"Anonyme";
-  const id = creations[currentIndex].id;
-  const { data } = await supabaseClient.from('likes').select('*').eq('creation_id', id);
-  const exists = (data||[]).find(l=>l.user===name);
-  if(exists){ await supabaseClient.from('likes').delete().eq('id', exists.id); } 
-  else { await supabaseClient.from('likes').insert({creation_id:id,user:name}); }
+  const name = prompt("Ton prénom pour liker cette image:") || "Anonyme";
+  const key = `likes_${currentIndex}`;
+  let likes = JSON.parse(localStorage.getItem(key)||'[]');
+  if(likes.includes(name)) likes = likes.filter(n=>n!==name);
+  else likes.push(name);
+  localStorage.setItem(key, JSON.stringify(likes));
   loadLikes();
 }
 
-async function loadLikes(){
+function loadLikes(){
   if(currentIndex===null) return;
-  const id = creations[currentIndex].id;
-  const { data } = await supabaseClient.from('likes').select('*').eq('creation_id', id);
-  const likes = data||[];
-  if(likes.length>0){ heart.classList.add('liked'); heart.textContent='❤️'; } else { heart.classList.remove('liked'); heart.textContent='♡'; }
-  likeCount.textContent = likes.length>0 ? likes.length + ": " + likes.map(l=>l.user).join(", ") : "0";
+  const key = `likes_${currentIndex}`;
+  const likes = JSON.parse(localStorage.getItem(key)||'[]');
+  heart.textContent = likes.length>0?'❤️':'♡';
+  heart.classList.toggle('liked', likes.length>0);
+  likeCount.textContent = likes.length>0 ? ` ${likes.join(', ')}` : '';
 }
 
-// Comments
 function openCommentForm(){ commentFormBg.style.display='flex'; }
-function closeCommentForm(e){ if(e && e.target===commentFormBg) commentFormBg.style.display='none'; }
-async function submitComment(){
-  const name = (commentName.value||'').trim();
-  const text = (commentText.value||'').trim();
-  if(!name||!text) return;
-  const id = creations[currentIndex].id;
-  await supabaseClient.from('comments').insert({creation_id:id,name,text});
-  commentName.value=''; commentText.value=''; commentFormBg.style.display='none';
+function closeCommentForm(){ commentFormBg.style.display='none'; }
+function submitComment(){
+  const name = commentName.value.trim();
+  const text = commentText.value.trim();
+  if(!name || !text) return;
+  const key = `comments_${currentIndex}`;
+  let comments = JSON.parse(localStorage.getItem(key)||'[]');
+  comments.push({name,text,at:Date.now()});
+  localStorage.setItem(key, JSON.stringify(comments));
+  commentName.value=''; commentText.value=''; closeCommentForm();
   loadComments();
 }
-async function loadComments(){
+
+function loadComments(){
   if(currentIndex===null) return;
-  const id = creations[currentIndex].id;
-  const { data } = await supabaseClient.from('comments').select('*').eq('creation_id', id);
-  commentsList.innerHTML = (data||[]).map(c=>`<div class="comment"><strong>${escapeHtml(c.name)}</strong><br>${escapeHtml(c.text)}</div>`).join('');
-  commentCount.textContent = (data||[]).length;
+  const key = `comments_${currentIndex}`;
+  const comments = JSON.parse(localStorage.getItem(key)||'[]');
+  commentList.innerHTML = comments.map(c=>`<div class="comment"><strong>${c.name}</strong><br>${c.text}</div>`).join('');
+  commentCountSpan.textContent = comments.length;
 }
 
-document.addEventListener('keydown',e=>{
-  if(e.key==='Escape'){ if(commentFormBg.style.display==='flex') commentFormBg.style.display='none'; else if(modal.style.display==='flex') closeModal(); }
-});
+function scrollToComments(){ commentList.scrollIntoView({behavior:'smooth', block:'start'}); }
 
-const observer=new MutationObserver(()=>updateCenter());
-observer.observe(list,{childList:true,subtree:true});
-setTimeout(updateCenter,200);
-
-// Initialisation
 loadCreations();
 </script>
 </body>
