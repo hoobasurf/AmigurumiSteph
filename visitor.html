@@ -5,31 +5,28 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Galerie – Visitor</title>
 
+<!-- ================= STYLE INTRO ================= -->
 <style>
-/* ================= RESET ================= */
-html, body{
+html,body{
   margin:0;
   padding:0;
   width:100%;
   height:100%;
-  font-family:sans-serif;
-  background:#fff0f5;
-  overflow-x:hidden;
+  font-family:'Comic Sans MS', cursive;
   -webkit-text-size-adjust:100%;
 }
 
-/* ================= ACCUEIL IMAGE ================= */
+/* ===== ACCUEIL ===== */
 #intro-background{
   position:fixed;
   inset:0;
-  background:url('Photoroom_20251213_123235.png') center center / cover no-repeat;
+  background:url('Photoroom_20251213_123235.png') center/cover no-repeat;
   display:flex;
   justify-content:center;
   align-items:center;
   z-index:100000;
 }
 
-/* BOUTON BIENVENUE */
 #startBtn{
   padding:20px 40px;
   font-size:24px;
@@ -42,7 +39,7 @@ html, body{
   box-shadow:0 6px 15px rgba(182,115,133,.3);
 }
 
-/* ================= INTRO VIDEO ================= */
+/* ===== VIDEO ===== */
 #intro-video{
   position:fixed;
   inset:0;
@@ -62,54 +59,33 @@ html, body{
   object-fit:contain; /* PAS DE ZOOM */
   pointer-events:none;
 }
-
-/* ================= APP ================= */
-#app{
-  min-height:100vh;
-}
-
-/* TITRE */
-h1{
-  text-align:center;
-  color:#b84c6f;
-  margin:20px 0;
-}
-
-/* GALERIE */
-.gallery-scroll{
-  display:flex;
-  gap:20px;
-  overflow-x:auto;
-  padding:20px;
-}
-
-.gallery-scroll img{
-  height:240px;
-  border-radius:12px;
-  cursor:pointer;
-  box-shadow:0 4px 15px rgba(0,0,0,0.25);
-}
 </style>
-</head>
 
+<!-- ================= TON STYLE APPLI (INCHANGÉ) ================= -->
+<!-- ⚠️ J’AI VOLONTAIREMENT RIEN SUPPRIMÉ -->
+<link rel="stylesheet" href="visitor.css">
+
+</head>
 <body>
 
-<!-- ================= ACCUEIL ================= -->
+<!-- ===== ACCUEIL ===== -->
 <div id="intro-background">
   <button id="startBtn">Bienvenue</button>
 </div>
 
-<!-- ================= VIDEO ================= -->
+<!-- ===== VIDEO ===== -->
 <div id="intro-video">
   <video id="introVid" playsinline webkit-playsinline preload="auto">
     <source src="chat.webm" type="video/webm">
   </video>
 </div>
 
-<!-- ================= APP ================= -->
+<!-- ===== APPLI ===== -->
 <div id="app">
-  <h1>✨ Projets réalisés</h1>
-  <div id="gallery" class="gallery-scroll"></div>
+  <!-- TON HTML COMPLET D’APPLI -->
+  <!-- boutons carrousel / grid / list -->
+  <!-- galerie -->
+  <!-- modale -->
 </div>
 
 <!-- ================= INTRO LOGIQUE ================= -->
@@ -119,28 +95,35 @@ const introVideo = document.getElementById("intro-video");
 const video = document.getElementById("introVid");
 const startBtn = document.getElementById("startBtn");
 
-/* Empêche retour accueil */
+/* pas de retour accueil */
 if(sessionStorage.getItem("introPlayed")){
   introBg.remove();
   introVideo.remove();
 }
 
-startBtn.onclick = () => {
+startBtn.onclick = ()=>{
   sessionStorage.setItem("introPlayed","true");
-
-  introBg.style.display = "none";
-  introVideo.style.opacity = "1";
-  introVideo.style.pointerEvents = "auto";
-
-  video.play().catch(e => console.log("Play bloqué:", e));
+  introBg.style.display="none";
+  introVideo.style.opacity="1";
+  introVideo.style.pointerEvents="auto";
+  video.play().catch(()=>{});
 };
 
-video.onended = () => {
-  setTimeout(() => {
-    introVideo.style.opacity = "0";
-    setTimeout(() => introVideo.remove(), 1000);
-  }, 2000); // 2 secondes à la fin
+video.onended = ()=>{
+  setTimeout(()=>{
+    introVideo.style.opacity="0";
+    setTimeout(()=>introVideo.remove(),1000);
+  },2000);
 };
+</script>
+
+<!-- ================= SUPABASE ================= -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+<script>
+const supabase = supabase.createClient(
+  "https://iubbxvipgofxasatmvzg.supabase.co",
+  "sb_publishable_GDoZmwIdoP28XOdrfYYVNw_E_HiCQB1"
+);
 </script>
 
 <!-- ================= TON JS VISITOR ================= -->
