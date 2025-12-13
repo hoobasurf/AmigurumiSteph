@@ -3,14 +3,13 @@
 <head>
 <meta charset="UTF-8">
 <title>Mes Créations</title>
-
 <style>
 body{
   margin:0;
   font-family:sans-serif;
   background:#fff0f5;
   overflow-x:hidden;
-  padding-left:35px; /* place pour l’encoche */
+  padding-left:35px; /* espace pour l’encoche */
 }
 
 /* ================= INTRO VIDEO ================= */
@@ -35,7 +34,7 @@ body{
   width:100%;
   height:100%;
   object-fit:cover;
-  pointer-events:none; /* empêche clic / lecture */
+  pointer-events:none; /* empêche le bouton lecture */
 }
 
 /* ================= SIDEBAR ================= */
@@ -231,7 +230,7 @@ h1{
 
 <!-- INTRO VIDEO -->
 <div id="intro-video">
-  <video autoplay muted playsinline preload="auto">
+  <video autoplay muted playsinline>
     <source src="chat.mp4" type="video/mp4">
   </video>
 </div>
@@ -254,7 +253,6 @@ h1{
   <button id="add">Ajouter</button>
 </div>
 
-<!-- MODES (UNIQUEMENT SUR MES CRÉATIONS) -->
 <div id="display-modes">
   <button onclick="setMode('carousel')">Carrousel</button>
   <button onclick="setMode('grid')">Grille</button>
@@ -270,7 +268,7 @@ h1{
 <div id="notes" class="section"><button onclick="closeSection()">← Retour</button></div>
 <div id="settings" class="section"><button onclick="closeSection()">← Retour</button></div>
 
-<!-- JS OWNER -->
+<!-- JS ORIGINAL -->
 <script type="module" src="owner.js"></script>
 
 <script>
@@ -279,12 +277,12 @@ const sidebar=document.getElementById("sidebar");
 const toggle=document.getElementById("toggleSidebar");
 toggle.onclick=()=>sidebar.classList.toggle("sidebar-open");
 
-/* MODES */
+/* MODES AFFICHAGE */
 function setMode(mode){
   document.getElementById("owner-list").className=mode;
 }
 
-/* NAV SECTIONS */
+/* NAVIGATION SECTIONS */
 function openSection(id){
   sidebar.classList.remove("sidebar-open");
   document.querySelectorAll(".section").forEach(s=>s.classList.remove("active"));
@@ -301,12 +299,11 @@ function closeSection(){
   document.getElementById("display-modes").style.display="block";
 }
 
-/* INTRO VIDEO */
+/* INTRO VIDEO AUTOMATIQUE + FONDU 3s */
 const intro=document.getElementById("intro-video");
 const video=intro.querySelector("video");
 
-// Forcer lecture autoplay sans bouton
-video.play().catch(e=>console.log("Autoplay bloqué :", e));
+video.play().catch(()=>{}); // forcer lecture automatique
 
 video.onended=()=>{
   setTimeout(()=>{
