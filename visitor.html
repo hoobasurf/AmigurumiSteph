@@ -4,76 +4,108 @@
 <meta charset="UTF-8">
 <title>Galerie - Mes créations</title>
 <style>
-  * { box-sizing:border-box; margin:0; padding:0; }
-  html, body { height:100%; font-family:'Comic Sans MS', cursive; }
-  body {
-    background-image: url('Photoroom_20251212_143703.png');
-    background-size: cover; 
-    background-position: center top;
-    background-repeat: no-repeat;
-    background-attachment: fixed;
-    display:flex;
-    flex-direction:column;
-    min-height:100vh;
-    overflow-x:hidden;
-  }
-  header { text-align:center; padding:12px 0; }
-  header img { width:98px; height:98px; border-radius:20%; display:block; margin:0 auto; }
-  .title { font-size:42px; color:#b84c6f; font-weight:bold; letter-spacing:1px; margin-bottom:12px; }
-  #viewSelector { display:flex; justify-content:center; gap:12px; margin-bottom:14px; }
+  * { box-sizing: border-box; margin:0; padding:0; }
+  html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  font-family: 'Comic Sans MS', cursive;
+  overflow-x: hidden;
+}
+
+body {
+  background-image: url('Photoroom_20251212_143703.png');
+  background-size: 100% 100%;       /* <-- Remplit exactement tout l’écran */
+  background-position: top center;  /* <-- Aligné en haut */
+  background-repeat: no-repeat;
+  background-attachment: fixed;     /* <-- Fond immobile au scroll */
+  background-color: #fff0f5;
+
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
+
+  header { text-align: center; margin-top: 12px; }
+  header img { width: 98px; height: 98px; display:inline-block; }
+  .title { font-size:42px; color:#b84c6f; font-weight:bold; letter-spacing:1px; display:block; margin:12px 0; }
+
+  #viewSelector { display:flex; justify-content:center; gap:12px; margin:14px 12px; }
   #viewSelector button {
-    background:#fff0f7; border:2px solid #b84c6f; color:#b84c6f; padding:8px 16px; border-radius:24px; cursor:pointer;
-    font-size:15px; transition: all 0.18s ease;
+    background:#fff0f7; border:2px solid #b84c6f; color:#b84c6f;
+    padding:8px 16px; border-radius:24px; font-size:15px; cursor:pointer;
+    transition: all 0.18s ease;
   }
-  #viewSelector button.active { background:linear-gradient(90deg,#ffeaf2,#fff5f8); color:#7a2b45; transform:translateY(-2px); }
+  #viewSelector button.active { background: linear-gradient(90deg,#ffeaf2,#fff5f8); color:#7a2b45; transform:translateY(-2px); }
   #viewSelector button:hover { transform:translateY(-2px); }
 
   .center-zone { flex:1; display:flex; align-items:center; justify-content:center; padding:8px; }
-  #visitor-list { width:calc(100% - 40px); max-width:1200px; margin:0 auto; transition:all 0.2s ease; }
+
+  #visitor-list { width:calc(100% - 40px); max-width:1200px; margin:0 auto; }
 
   .visitor-item { text-align:center; cursor:pointer; user-select:none; }
-  .visitor-item img { display:block; margin:0 auto; object-fit:contain; border:4px solid #b67385; background:transparent; transition: box-shadow 0.3s ease, transform 0.3s ease; }
+  .visitor-item img {
+    display:block; margin:0 auto; object-fit:contain;
+    border:4px solid #b67385; background: transparent;
+    transition: box-shadow 0.3s ease, transform 0.3s ease;
+  }
   .visitor-item:hover img { box-shadow: 0 8px 20px rgba(184,76,111,0.3); transform: scale(1.03); }
-  .visitor-item p { margin:8px 0 0; font-size:20px; color:#b84c6f; font-weight:bold; line-height:1.1; }
+  .visitor-item p { margin:12px 0 0; font-size:20px; color:#b84c6f; font-weight:bold; line-height:1.1; }
 
-  .carousel-view { display:flex; gap:40px; overflow-x:auto; scroll-behavior:smooth; padding:10px; align-items:center; }
+  /* CARROUSEL */
+  .carousel-view { display:flex; gap:40px; overflow-x:auto; scroll-behavior:smooth; padding:10px; align-items:center; height:100%; }
   .carousel-view::-webkit-scrollbar { height:8px; }
   .carousel-view::-webkit-scrollbar-thumb { background:#b84c6f66; border-radius:20px; }
   .carousel-view .visitor-item img { width:260px; height:260px; }
 
-  .grid-view { display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:24px; padding:16px; max-height:68vh; overflow-y:auto; }
-  .grid-view .visitor-item img { width:100%; height:200px; }
+  /* GRID */
+  .grid-view { display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:24px; padding:16px; align-items:start; overflow-y:auto; flex:1; }
+  .grid-view .visitor-item img { width:100%; height:auto; }
 
-  .list-view { display:flex; flex-direction:column; gap:18px; padding:16px; max-height:68vh; overflow-y:auto; }
+  /* LIST */
+  .list-view { display:flex; flex-direction:column; gap:18px; padding:16px; overflow-y:auto; flex:1; }
   .list-view .visitor-item { display:flex; gap:18px; align-items:center; padding:8px; }
-  .list-view .visitor-item img { width:140px; height:140px; }
+  .list-view .visitor-item img { width:140px; height:auto; }
   .list-view .visitor-item p { margin:0; font-size:18px; text-align:left; }
 
+  /* MODAL */
   .modal-bg { position:fixed; inset:0; background: rgba(0,0,0,0.65); display:none; justify-content:center; align-items:center; z-index:1000; padding:20px; }
+  .modal-bg.click-close { cursor:pointer; }
   .modal-box { background:#fff5f8; border-radius:16px; padding:18px; max-width:980px; width:94%; max-height:90vh; overflow-y:auto; box-shadow:0 8px 30px rgba(184,76,111,0.25); text-align:center; position:relative; cursor:default; }
   .close-modal { position:absolute; top:10px; right:12px; font-size:28px; cursor:pointer; color:#b84c6f; font-weight:bold; }
-  .modal-main-img { width:100%; max-height:520px; object-fit:contain; border:4px solid #b67385; background:white; }
+  .modal-main-img { width:100%; height:auto; max-height:520px; object-fit:contain; border:4px solid #b67385; background:white; }
 
   .thumbs { margin-top:16px; display:flex; gap:12px; justify-content:center; flex-wrap:wrap; }
-  .thumbs img { width:110px; height:110px; object-fit:contain; border:4px solid #b67385; background:transparent; cursor:pointer; transition: transform 0.2s ease, box-shadow 0.2s ease; }
+  .thumbs img { width:110px; height:auto; object-fit:contain; border:4px solid #b67385; background:transparent; cursor:pointer; transition: transform 0.2s ease, box-shadow 0.2s ease; }
   .thumbs img:hover { transform:scale(1.06); box-shadow:0 6px 14px rgba(184,76,111,0.3); }
 
   .icon-bar { margin-top:12px; display:flex; justify-content:center; gap:36px; align-items:center; }
   .icon-btn { display:flex; gap:8px; align-items:center; cursor:pointer; color:#b84c6f; font-size:18px; }
   .heart { font-size:26px; transition: color .18s; }
   .heart.liked { color:#ff4b82; }
-  .like-info { font-size:14px; color:#7a2b45; margin-left:6px; }
-  .comment-info { font-size:14px; color:#7a2b45; margin-left:6px; }
+  .like-info { font-size:14px; color:#7a2b45; margin-left:8px; }
+  .comment-count { font-size:14px; color:#7a2b45; margin-left:4px; }
 
   .comment-section { margin-top:14px; text-align:left; }
   .comment { background:#fff0f7; border:1px solid rgba(184,76,111,0.12); padding:10px; border-radius:10px; margin-bottom:10px; }
+
   .add-comment-btn { margin-top:12px; padding:10px 20px; background:#b84c6f; color:#fff; border-radius:26px; font-size:16px; border:none; cursor:pointer; }
+
   .comment-form-bg { position: fixed; inset:0; background: rgba(0,0,0,0.6); display:none; justify-content:center; align-items:center; z-index:2000; }
   .comment-form { background:white; padding:18px; border-radius:12px; width:340px; box-shadow:0 8px 20px rgba(0,0,0,0.25); text-align:center; }
   .comment-form input, .comment-form textarea { width:100%; padding:10px; border-radius:8px; border:2px solid rgba(184,76,111,0.12); margin-bottom:10px; font-size:15px; }
+
+  @media (max-width:720px){
+    .title { font-size:30px; }
+    .carousel-view .visitor-item img { width:200px; height:200px; }
+    .modal-main-img { max-height:360px; }
+    .thumbs img { width:88px; height:auto; }
+    header img { width:80px; height:80px; }
+  }
 </style>
 </head>
 <body>
+
 <header>
   <img src="favicon.png" alt="Logo">
   <h1 class="title">Mes créations</h1>
@@ -89,8 +121,9 @@
   <div id="visitor-list" role="list"></div>
 </div>
 
-<div class="modal-bg" id="modal" onclick="if(event.target===this) closeModal()">
-  <div class="modal-box">
+<!-- MODAL -->
+<div class="modal-bg click-close" id="modal" onclick="backgroundClose(event)">
+  <div class="modal-box" role="dialog" aria-modal="true" onclick="event.stopPropagation()">
     <div class="close-modal" onclick="closeModal()">×</div>
     <img id="modalMain" class="modal-main-img" alt="Image agrandie">
     <div class="icon-bar">
@@ -99,7 +132,7 @@
         <span id="likeCount" class="like-info">0</span>
       </div>
       <div class="icon-btn" onclick="scrollToComments()">
-        💬 <span id="commentCount" class="comment-info">0</span>
+        💬 <span id="commentCount" class="comment-count">0</span>
       </div>
     </div>
     <div id="thumbsContainer" class="thumbs"></div>
@@ -108,8 +141,9 @@
   </div>
 </div>
 
-<div class="comment-form-bg" id="commentFormBg" onclick="if(event.target===this) closeCommentForm()">
-  <div class="comment-form">
+<!-- COMMENT FORM -->
+<div class="comment-form-bg" id="commentFormBg" onclick="closeCommentForm(event)">
+  <div class="comment-form" onclick="event.stopPropagation()">
     <h3 style="margin-top:0;color:#b84c6f">Laisser un commentaire</h3>
     <input id="commentName" placeholder="Prénom" />
     <textarea id="commentText" rows="4" placeholder="Votre commentaire..."></textarea>
@@ -117,38 +151,32 @@
   </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
 <script>
-
-const SUPABASE_URL = "https://iubbxvipgofxasatmvzg.supabase.co";
-const SUPABASE_ANON_KEY = "sb_publishable_GDoZmwIdoP28XOdrfYYVNw_E_HiCQB1";
-const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
 const list=document.getElementById('visitor-list');
 const modal=document.getElementById('modal');
 const modalMain=document.getElementById('modalMain');
 const thumbs=document.getElementById('thumbsContainer');
 const heart=document.getElementById('heart');
 const likeCount=document.getElementById('likeCount');
-const commentCountSpan=document.getElementById('commentCount');
-const commentList=document.getElementById('commentsList');
+const commentCount=document.getElementById('commentCount');
+const commentsList=document.getElementById('commentsList');
 const commentFormBg=document.getElementById('commentFormBg');
 const commentName=document.getElementById('commentName');
 const commentText=document.getElementById('commentText');
 
-let creations = [];
-let currentIndex = null;
-let currentView = 'carousel';
-
-async function loadCreations(){
-  const { data, error } = await supabase.storage.from('owners').list();
-  if(error){ console.error(error); return; }
-  creations = data.map((item, i)=>({
-    name: item.name,
-    imgUrl: supabase.storage.from('owners').getPublicUrl(item.name).publicURL
-  }));
-  renderVisitor();
+let creations=JSON.parse(localStorage.getItem('creations')||'[]');
+if(!creations||creations.length===0){
+  creations=[
+    {name:"Projet A", imgUrl:"https://placekitten.com/800/800", images:["https://placekitten.com/800/800","https://placekitten.com/801/800"]},
+    {name:"Projet B", imgUrl:"https://placebear.com/800/800", images:["https://placebear.com/800/800","https://placebear.com/801/800"]},
+    {name:"Projet C", imgUrl:"https://picsum.photos/seed/p/800/800"}
+  ];
 }
+
+let currentIndex=null;
+let currentView='carousel';
+
+function escapeHtml(s){ return s?String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'):''; }
 
 function renderVisitor(){
   list.innerHTML='';
@@ -157,7 +185,7 @@ function renderVisitor(){
     const div=document.createElement('div');
     div.className='visitor-item';
     div.setAttribute('data-index',i);
-    div.innerHTML=`<img src="${item.imgUrl}" alt="${item.name}"><p>${item.name}</p>`;
+    div.innerHTML=`<img src="${item.imgUrl}" alt="${escapeHtml(item.name)}"><p>${escapeHtml(item.name)}</p>`;
     div.addEventListener('click',()=>openModal(i));
     list.appendChild(div);
   });
@@ -174,65 +202,78 @@ function setView(mode){
 document.getElementById('btnCarousel').addEventListener('click',()=>setView('carousel'));
 document.getElementById('btnGrid').addEventListener('click',()=>setView('grid'));
 document.getElementById('btnList').addEventListener('click',()=>setView('list'));
+setView(currentView);
 
 function openModal(i){
-  currentIndex = i;
-  const proj = creations[i];
-  modalMain.src = proj.imgUrl;
+  currentIndex=i;
+  const proj=creations[i];
+  modalMain.src=proj.imgUrl;
+  thumbs.innerHTML='';
+  if(Array.isArray(proj.images)&&proj.images.length>0){
+    proj.images.forEach(src=>{
+      const t=document.createElement('img');
+      t.src=src; t.alt='miniature';
+      t.addEventListener('click',()=>{ modalMain.src=src; });
+      thumbs.appendChild(t);
+    });
+  }
   loadLikes();
   loadComments();
-  thumbs.innerHTML='';
-  thumbs.appendChild(modalMain.cloneNode());
   modal.style.display='flex';
 }
 
-function closeModal(){ modal.style.display='none'; }
+function closeModal(){ modal.style.display='none'; renderVisitor(); }
+function backgroundClose(e){ if(e.target===modal) closeModal(); }
 
-async function toggleLike(){
+function toggleLike(){
   if(currentIndex===null) return;
-  const name = prompt("Ton prénom pour liker cette image:") || "Anonyme";
-  const key = `likes_${currentIndex}`;
-  let likes = JSON.parse(localStorage.getItem(key)||'[]');
-  if(likes.includes(name)) likes = likes.filter(n=>n!==name);
+  const name=prompt("Ton prénom pour liker cette image:")||"Anonyme";
+  const key='likes_'+currentIndex;
+  let likes=JSON.parse(localStorage.getItem(key)||'[]');
+  if(likes.includes(name)) likes=likes.filter(n=>n!==name);
   else likes.push(name);
-  localStorage.setItem(key, JSON.stringify(likes));
+  localStorage.setItem(key,JSON.stringify(likes));
   loadLikes();
 }
 
 function loadLikes(){
   if(currentIndex===null) return;
-  const key = `likes_${currentIndex}`;
-  const likes = JSON.parse(localStorage.getItem(key)||'[]');
+  const key='likes_'+currentIndex;
+  const likes=JSON.parse(localStorage.getItem(key)||'[]');
   heart.textContent = likes.length>0?'❤️':'♡';
   heart.classList.toggle('liked', likes.length>0);
-  likeCount.textContent = likes.length>0 ? ` ${likes.join(', ')}` : '';
+  likeCount.textContent = likes.length + (likes.length>0?": "+likes.join(", "):"");
 }
 
 function openCommentForm(){ commentFormBg.style.display='flex'; }
-function closeCommentForm(){ commentFormBg.style.display='none'; }
+function closeCommentForm(e){ if(e && e.target===commentFormBg) commentFormBg.style.display='none'; }
 function submitComment(){
-  const name = commentName.value.trim();
-  const text = commentText.value.trim();
-  if(!name || !text) return;
-  const key = `comments_${currentIndex}`;
-  let comments = JSON.parse(localStorage.getItem(key)||'[]');
+  const name=(commentName.value||'').trim(); const text=(commentText.value||'').trim();
+  if(!name||!text) return;
+  const key='comments_'+currentIndex;
+  const comments=JSON.parse(localStorage.getItem(key)||'[]');
   comments.push({name,text,at:Date.now()});
-  localStorage.setItem(key, JSON.stringify(comments));
-  commentName.value=''; commentText.value=''; closeCommentForm();
+  localStorage.setItem(key,JSON.stringify(comments));
+  commentName.value=''; commentText.value=''; commentFormBg.style.display='none';
   loadComments();
 }
 
 function loadComments(){
   if(currentIndex===null) return;
-  const key = `comments_${currentIndex}`;
-  const comments = JSON.parse(localStorage.getItem(key)||'[]');
-  commentList.innerHTML = comments.map(c=>`<div class="comment"><strong>${c.name}</strong><br>${c.text}</div>`).join('');
-  commentCountSpan.textContent = comments.length;
+  const key='comments_'+currentIndex;
+  const comments=JSON.parse(localStorage.getItem(key)||'[]');
+  commentsList.innerHTML = comments.map(c=>`<div class="comment"><strong>${escapeHtml(c.name)}</strong><br>${escapeHtml(c.text)}</div>`).join('');
+  commentCount.textContent = comments.length;
 }
 
-function scrollToComments(){ commentList.scrollIntoView({behavior:'smooth', block:'start'}); }
+function scrollToComments(){ if(commentsList) commentsList.scrollIntoView({behavior:'smooth', block:'start'}); }
 
-loadCreations();
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'){ 
+    if(commentFormBg.style.display==='flex') commentFormBg.style.display='none';
+    else if(modal.style.display==='flex') closeModal();
+  }
+});
 </script>
 </body>
 </html>
