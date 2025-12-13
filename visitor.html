@@ -2,358 +2,266 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<title>Mes créations</title>
-
+<title>Galerie - Mes créations</title>
 <style>
-/* ================= RESET ================= */
-*{box-sizing:border-box;margin:0;padding:0}
-html,body{height:100%;font-family:'Comic Sans MS',cursive}
+  * { box-sizing: border-box; margin:0; padding:0; }
+  html, body { height:100%; font-family: 'Comic Sans MS', cursive; overflow: hidden; }
 
-/* ================= BODY / FOND ================= */
-body {
-  background: url('Photoroom_20251212_143703.png') center top/cover no-repeat fixed;
-  background-color: #fff0f5;
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh;
-  margin: 0;           /* <-- Supprime tout décalage */
-  padding: 0;          /* <-- Supprime tout padding */
-  overflow: hidden;
-}
+  body {
+    background: url('Photoroom_20251212_143703.png') center top/contain no-repeat fixed;
+    background-color: #fff0f5;
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+  }
 
-/* ================= HEADER ================= */
-header{
-  text-align:center;
-  padding:18px 0 8px;
-  background:transparent;
-}
+  header { text-align: center; margin-top: 12px; }
+  header img { width: 98px; height: 98px; display:inline-block; }
+  .title { font-size:42px; color:#b84c6f; font-weight:bold; letter-spacing:1px; display:block; margin:12px 0; }
 
-header img{
-  width:90px;
-  height:90px;
-  margin-bottom:8px;
-}
+  #viewSelector { display:flex; justify-content:center; gap:12px; margin:14px 12px; }
+  #viewSelector button {
+    background:#fff0f7; border:2px solid #b84c6f; color:#b84c6f;
+    padding:8px 16px; border-radius:24px; font-size:15px; cursor:pointer;
+    transition: all 0.18s ease;
+  }
+  #viewSelector button.active { background: linear-gradient(90deg,#ffeaf2,#fff5f8); color:#7a2b45; transform:translateY(-2px); }
+  #viewSelector button:hover { transform:translateY(-2px); }
 
-h1{
-  font-size:38px;
-  color:#b84c6f;
-  font-weight:bold;
-}
+  .center-zone { flex:1; display:flex; align-items:center; justify-content:center; padding:8px; }
+  #visitor-list { width:calc(100% - 40px); max-width:1200px; margin:0 auto; transition:all 0.2s ease; }
 
-/* ================= VIEW BUTTONS ================= */
-#viewSelector{
-  display:flex;
-  justify-content:center;
-  gap:12px;
-  margin:10px 0;
-}
+  .visitor-item { text-align:center; cursor:pointer; user-select:none; }
+  .visitor-item img {
+    display:block; margin:0 auto; object-fit:contain;
+    border:4px solid #b67385; background: transparent;
+    transition: box-shadow 0.3s ease, transform 0.3s ease;
+  }
+  .visitor-item:hover img { box-shadow: 0 8px 20px rgba(184,76,111,0.3); transform: scale(1.03); }
+  .visitor-item p { margin:12px 0 0; font-size:20px; color:#b84c6f; font-weight:bold; line-height:1.1; }
 
-#viewSelector button{
-  padding:8px 18px;
-  border-radius:30px;
-  border:2px solid #b84c6f;
-  background:#ffeaf2;
-  color:#b84c6f;
-  cursor:pointer;
-}
+  /* CARROUSEL */
+  .carousel-view { display:flex; gap:40px; overflow-x:auto; scroll-behavior:smooth; padding:10px; align-items:center; height:100%; }
+  .carousel-view::-webkit-scrollbar { height:8px; }
+  .carousel-view::-webkit-scrollbar-thumb { background:#b84c6f66; border-radius:20px; }
+  .carousel-view .visitor-item img { width:260px; height:260px; }
 
-#viewSelector button.active{
-  background:#b84c6f;
-  color:#fff;
-}
+  /* GRID */
+  .grid-view { display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:24px; padding:16px; align-items:start; overflow-y:auto; max-height:calc(100vh - 150px); }
+  .grid-view .visitor-item img { width:100%; height:200px; }
 
-/* ================= ZONE CENTRALE ================= */
-.center-zone{
-  flex:1;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-}
+  /* LIST */
+  .list-view { display:flex; flex-direction:column; gap:18px; padding:16px; overflow-y:auto; max-height:calc(100vh - 150px); }
+  .list-view .visitor-item { display:flex; gap:18px; align-items:center; padding:8px; }
+  .list-view .visitor-item img { width:140px; height:140px; }
+  .list-view .visitor-item p { margin:0; font-size:18px; text-align:left; }
 
-/* ================= VISITOR LIST ================= */
-#visitor-list{
-  width:100%;
-  max-width:1200px;
-}
+  /* MODAL */
+  .modal-bg { position:fixed; inset:0; background: rgba(0,0,0,0.65); display:none; justify-content:center; align-items:center; z-index:1000; padding:20px; }
+  .modal-bg.click-close { cursor:pointer; }
+  .modal-box { background:#fff5f8; border-radius:16px; padding:18px; max-width:980px; width:94%; max-height:90vh; overflow-y:auto; box-shadow:0 8px 30px rgba(184,76,111,0.25); text-align:center; position:relative; cursor:default; }
+  .close-modal { position:absolute; top:10px; right:12px; font-size:28px; cursor:pointer; color:#b84c6f; font-weight:bold; }
+  .modal-main-img { width:100%; max-height:520px; object-fit:contain; border:4px solid #b67385; background:white; }
 
-/* ================= ITEMS ================= */
-.visitor-item{
-  text-align:center;
-  cursor:pointer;
-}
+  .thumbs { margin-top:16px; display:flex; gap:12px; justify-content:center; flex-wrap:wrap; }
+  .thumbs img { width:110px; height:110px; object-fit:contain; border:4px solid #b67385; background:transparent; cursor:pointer; transition: transform 0.2s ease, box-shadow 0.2s ease; }
+  .thumbs img:hover { transform:scale(1.06); box-shadow:0 6px 14px rgba(184,76,111,0.3); }
 
-.visitor-item img{
-  display:block;
-  object-fit:contain;
-  border:4px solid #b67385;
-  transition:transform .3s, box-shadow .3s;
-}
+  .icon-bar { margin-top:12px; display:flex; justify-content:center; gap:36px; align-items:center; }
+  .icon-btn { display:flex; gap:8px; align-items:center; cursor:pointer; color:#b84c6f; font-size:18px; }
+  .heart { font-size:26px; transition: color .18s; }
+  .heart.liked { color:#ff4b82; }
+  .like-info { font-size:14px; color:#7a2b45; margin-left:8px; }
+  .comment-count { font-size:14px; color:#7a2b45; margin-left:4px; }
 
-.visitor-item:hover img{
-  transform:scale(1.05);
-  box-shadow:0 10px 25px rgba(184,76,111,.35);
-}
+  .comment-section { margin-top:14px; text-align:left; }
+  .comment { background:#fff0f7; border:1px solid rgba(184,76,111,0.12); padding:10px; border-radius:10px; margin-bottom:10px; }
 
-.visitor-item p{
-  margin-top:10px;
-  font-size:18px;
-  color:#b84c6f;
-  font-weight:bold;
-}
+  .add-comment-btn { margin-top:12px; padding:10px 20px; background:#b84c6f; color:#fff; border-radius:26px; font-size:16px; border:none; cursor:pointer; }
 
-/* ================= CAROUSEL ================= */
-.carousel-view{
-  display:flex;
-  gap:40px;
-  overflow-x:auto;
-  padding:20px;
-  align-items:center;
-}
+  .comment-form-bg { position: fixed; inset:0; background: rgba(0,0,0,0.6); display:none; justify-content:center; align-items:center; z-index:2000; }
+  .comment-form { background:white; padding:18px; border-radius:12px; width:340px; box-shadow:0 8px 20px rgba(0,0,0,0.25); text-align:center; }
+  .comment-form input, .comment-form textarea { width:100%; padding:10px; border-radius:8px; border:2px solid rgba(184,76,111,0.12); margin-bottom:10px; font-size:15px; }
 
-.carousel-view .visitor-item img{
-  width:260px;
-  height:260px;
-}
-
-/* ================= GRID ================= */
-.grid-view{
-  display:grid;
-  grid-template-columns:repeat(auto-fill,minmax(220px,1fr));
-  gap:24px;
-  padding:20px;
-  overflow-y:auto;
-  max-height:100%;
-}
-
-.grid-view img{
-  width:100%;
-  height:200px;
-}
-
-/* ================= LIST ================= */
-.list-view{
-  display:flex;
-  flex-direction:column;
-  gap:18px;
-  padding:20px;
-  overflow-y:auto;
-}
-
-.list-view .visitor-item{
-  display:flex;
-  gap:18px;
-  align-items:center;
-}
-
-.list-view img{
-  width:130px;
-  height:130px;
-}
-
-/* ================= MODAL ================= */
-.modal-bg{
-  position:fixed;
-  inset:0;
-  background:rgba(0,0,0,.65);
-  display:none;
-  justify-content:center;
-  align-items:center;
-  z-index:1000;
-}
-
-.modal-box{
-  background:#fff0f7;
-  padding:18px;
-  border-radius:18px;
-  max-width:900px;
-  width:92%;
-  max-height:90vh;
-  overflow-y:auto;
-  position:relative;
-}
-
-.close-modal{
-  position:absolute;
-  top:10px;
-  right:14px;
-  font-size:26px;
-  cursor:pointer;
-  color:#b84c6f;
-}
-
-.modal-main-img{
-  width:100%;
-  max-height:420px;
-  object-fit:contain;
-  border:4px solid #b67385;
-}
-
-/* ================= ICON BAR ================= */
-.icon-bar{
-  display:flex;
-  justify-content:center;
-  gap:28px;
-  margin-top:12px;
-  align-items:center;
-}
-
-.icon-btn{
-  cursor:pointer;
-  color:#b84c6f;
-  font-size:18px;
-  display:flex;
-  gap:6px;
-  align-items:center;
-}
-
-.heart{font-size:26px}
-.heart.liked{color:#ff4b82}
-
-.bubble{
-  background:#b84c6f;
-  color:white;
-  border-radius:14px;
-  padding:2px 8px;
-  font-size:14px;
-}
-
-/* ================= COMMENTS ================= */
-.comment{
-  background:#ffeaf2;
-  padding:8px;
-  border-radius:10px;
-  margin:8px 0;
-}
-
-.add-comment-btn{
-  margin-top:12px;
-  padding:10px 18px;
-  border:none;
-  border-radius:30px;
-  background:#b84c6f;
-  color:#fff;
-  cursor:pointer;
-}
+  @media (max-width:720px){
+    .title { font-size:30px; }
+    .carousel-view .visitor-item img { width:200px; height:200px; }
+    .modal-main-img { max-height:360px; }
+    .thumbs img { width:88px; height:88px; }
+    header img { width:80px; height:80px; }
+  }
 </style>
 </head>
-
 <body>
 
 <header>
-  <img src="favicon.png" alt="logo">
-  <h1>Mes créations</h1>
+  <img src="favicon.png" alt="Logo">
+  <h1 class="title">Mes créations</h1>
 </header>
 
 <div id="viewSelector">
-  <button id="btnCarousel" class="active">Carrousel</button>
+  <button id="btnCarousel">Carrousel</button>
   <button id="btnGrid">Grille</button>
   <button id="btnList">Liste</button>
 </div>
 
 <div class="center-zone">
-  <div id="visitor-list" class="carousel-view"></div>
+  <div id="visitor-list" role="list"></div>
 </div>
 
 <!-- MODAL -->
-<div class="modal-bg" id="modal">
-  <div class="modal-box">
+<div class="modal-bg click-close" id="modal" onclick="backgroundClose(event)">
+  <div class="modal-box" role="dialog" aria-modal="true" onclick="event.stopPropagation()">
     <div class="close-modal" onclick="closeModal()">×</div>
-    <img id="modalMain" class="modal-main-img">
-
+    <img id="modalMain" class="modal-main-img" alt="Image agrandie">
     <div class="icon-bar">
       <div class="icon-btn" onclick="toggleLike()">
         <span id="heart" class="heart">♡</span>
-        <span id="likeBubble" class="bubble">0</span>
+        <span id="likeCount" class="like-info">0</span>
       </div>
-      <div class="icon-btn">
-        💬 <span id="commentBubble" class="bubble">0</span>
+      <div class="icon-btn" onclick="scrollToComments()">
+        💬 <span id="commentCount" class="comment-count">0</span>
       </div>
     </div>
+    <div id="thumbsContainer" class="thumbs"></div>
+    <button class="add-comment-btn" onclick="openCommentForm()">Ajouter un commentaire</button>
+    <div id="commentsList" class="comment-section"></div>
+  </div>
+</div>
 
-    <button class="add-comment-btn" onclick="addComment()">Ajouter un commentaire</button>
-    <div id="comments"></div>
+<!-- COMMENT FORM -->
+<div class="comment-form-bg" id="commentFormBg" onclick="closeCommentForm(event)">
+  <div class="comment-form" onclick="event.stopPropagation()">
+    <h3 style="margin-top:0;color:#b84c6f">Laisser un commentaire</h3>
+    <input id="commentName" placeholder="Prénom" />
+    <textarea id="commentText" rows="4" placeholder="Votre commentaire..."></textarea>
+    <button onclick="submitComment()">Envoyer</button>
   </div>
 </div>
 
 <script>
-const list=document.getElementById("visitor-list");
-const modal=document.getElementById("modal");
-const modalMain=document.getElementById("modalMain");
-const heart=document.getElementById("heart");
-const likeBubble=document.getElementById("likeBubble");
-const commentBubble=document.getElementById("commentBubble");
-const commentsBox=document.getElementById("comments");
+const list=document.getElementById('visitor-list');
+const modal=document.getElementById('modal');
+const modalMain=document.getElementById('modalMain');
+const thumbs=document.getElementById('thumbsContainer');
+const heart=document.getElementById('heart');
+const likeCount=document.getElementById('likeCount');
+const commentCount=document.getElementById('commentCount');
+const commentsList=document.getElementById('commentsList');
+const commentFormBg=document.getElementById('commentFormBg');
+const commentName=document.getElementById('commentName');
+const commentText=document.getElementById('commentText');
 
-let creations=JSON.parse(localStorage.getItem("creations")||"[]");
+let creations=JSON.parse(localStorage.getItem('creations')||'[]');
+if(!creations||creations.length===0){
+  creations=[
+    {name:"Projet A", imgUrl:"https://placekitten.com/800/800", images:["https://placekitten.com/800/800","https://placekitten.com/801/800"]},
+    {name:"Projet B", imgUrl:"https://placebear.com/800/800", images:["https://placebear.com/800/800","https://placebear.com/801/800"]},
+    {name:"Projet C", imgUrl:"https://picsum.photos/seed/p/800/800"}
+  ];
+}
+
 let currentIndex=null;
-let view="carousel";
+let currentView='carousel';
 
-function render(){
-  list.className=view+"-view";
-  list.innerHTML="";
-  creations.forEach((c,i)=>{
-    const d=document.createElement("div");
-    d.className="visitor-item";
-    d.innerHTML=`<img src="${c.imgUrl}"><p>${c.name}</p>`;
-    d.onclick=()=>openModal(i);
-    list.appendChild(d);
+function escapeHtml(s){ return s?String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'):''; }
+
+function renderVisitor(){
+  list.innerHTML='';
+  list.className=currentView+'-view';
+  creations.forEach((item,i)=>{
+    const div=document.createElement('div');
+    div.className='visitor-item';
+    div.setAttribute('data-index',i);
+    div.innerHTML=`<img src="${item.imgUrl}" alt="${escapeHtml(item.name)}"><p>${escapeHtml(item.name)}</p>`;
+    div.addEventListener('click',()=>openModal(i));
+    list.appendChild(div);
   });
 }
 
-function setView(v){
-  view=v;
-  document.querySelectorAll("#viewSelector button").forEach(b=>b.classList.remove("active"));
-  document.getElementById("btn"+v.charAt(0).toUpperCase()+v.slice(1)).classList.add("active");
-  render();
+function setView(mode){
+  currentView=mode;
+  document.getElementById('btnCarousel').classList.toggle('active', mode==='carousel');
+  document.getElementById('btnGrid').classList.toggle('active', mode==='grid');
+  document.getElementById('btnList').classList.toggle('active', mode==='list');
+  renderVisitor();
 }
 
-btnCarousel.onclick=()=>setView("carousel");
-btnGrid.onclick=()=>setView("grid");
-btnList.onclick=()=>setView("list");
+document.getElementById('btnCarousel').addEventListener('click',()=>setView('carousel'));
+document.getElementById('btnGrid').addEventListener('click',()=>setView('grid'));
+document.getElementById('btnList').addEventListener('click',()=>setView('list'));
+setView(currentView);
 
 function openModal(i){
   currentIndex=i;
-  modalMain.src=creations[i].imgUrl;
+  const proj=creations[i];
+  modalMain.src=proj.imgUrl;
+  thumbs.innerHTML='';
+  if(Array.isArray(proj.images)&&proj.images.length>0){
+    proj.images.forEach(src=>{
+      const t=document.createElement('img');
+      t.src=src; t.alt='miniature';
+      t.addEventListener('click',()=>{ modalMain.src=src; });
+      thumbs.appendChild(t);
+    });
+  }
   loadLikes();
   loadComments();
-  modal.style.display="flex";
+  modal.style.display='flex';
 }
 
-function closeModal(){modal.style.display="none"}
+function closeModal(){ modal.style.display='none'; renderVisitor(); }
+function backgroundClose(e){ if(e.target===modal) closeModal(); }
 
 function toggleLike(){
-  const key="likes_"+currentIndex;
-  let likes=JSON.parse(localStorage.getItem(key)||"[]");
-  if(likes.includes("user")) likes=[];
-  else likes=["user"];
+  if(currentIndex===null) return;
+  const name=prompt("Ton prénom pour liker cette image:")||"Anonyme";
+  const key='likes_'+currentIndex;
+  let likes=JSON.parse(localStorage.getItem(key)||'[]');
+  if(likes.includes(name)) likes=likes.filter(n=>n!==name);
+  else likes.push(name);
   localStorage.setItem(key,JSON.stringify(likes));
   loadLikes();
 }
 
 function loadLikes(){
-  const likes=JSON.parse(localStorage.getItem("likes_"+currentIndex)||"[]");
-  heart.classList.toggle("liked",likes.length>0);
-  heart.textContent=likes.length>0?"❤️":"♡";
-  likeBubble.textContent=likes.length;
+  if(currentIndex===null) return;
+  const key='likes_'+currentIndex;
+  const likes=JSON.parse(localStorage.getItem(key)||'[]');
+  heart.textContent = likes.length>0?'❤️':'♡';
+  heart.classList.toggle('liked', likes.length>0);
+  likeCount.textContent = likes.length + (likes.length>0?": "+likes.join(", "):"");
 }
 
-function addComment(){
-  const txt=prompt("Ton commentaire");
-  if(!txt) return;
-  const key="comments_"+currentIndex;
-  let c=JSON.parse(localStorage.getItem(key)||"[]");
-  c.push(txt);
-  localStorage.setItem(key,JSON.stringify(c));
+function openCommentForm(){ commentFormBg.style.display='flex'; }
+function closeCommentForm(e){ if(e && e.target===commentFormBg) commentFormBg.style.display='none'; }
+function submitComment(){
+  const name=(commentName.value||'').trim(); const text=(commentText.value||'').trim();
+  if(!name||!text) return;
+  const key='comments_'+currentIndex;
+  const comments=JSON.parse(localStorage.getItem(key)||'[]');
+  comments.push({name,text,at:Date.now()});
+  localStorage.setItem(key,JSON.stringify(comments));
+  commentName.value=''; commentText.value=''; commentFormBg.style.display='none';
   loadComments();
 }
 
 function loadComments(){
-  const c=JSON.parse(localStorage.getItem("comments_"+currentIndex)||"[]");
-  commentBubble.textContent=c.length;
-  commentsBox.innerHTML=c.map(t=>`<div class="comment">${t}</div>`).join("");
+  if(currentIndex===null) return;
+  const key='comments_'+currentIndex;
+  const comments=JSON.parse(localStorage.getItem(key)||'[]');
+  commentsList.innerHTML = comments.map(c=>`<div class="comment"><strong>${escapeHtml(c.name)}</strong><br>${escapeHtml(c.text)}</div>`).join('');
+  document.getElementById('commentCount').textContent = comments.length;
 }
 
-render();
+function scrollToComments(){ if(commentsList) commentsList.scrollIntoView({behavior:'smooth', block:'start'}); }
+
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'){ 
+    if(commentFormBg.style.display==='flex') commentFormBg.style.display='none';
+    else if(modal.style.display==='flex') closeModal();
+  }
+});
 </script>
 </body>
 </html>
