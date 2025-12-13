@@ -9,7 +9,7 @@ body{
   font-family:sans-serif;
   background:#fff0f5;
   overflow-x:hidden;
-  padding-left:35px; /* place pour l’encoche */
+  padding-left:35px;
 }
 
 /* ================= INTRO VIDEO ================= */
@@ -34,7 +34,7 @@ body{
   width:100%;
   height:100%;
   object-fit:cover;
-  pointer-events:none; /* empêche clic / lecture */
+  pointer-events:none;
 }
 
 /* ================= SIDEBAR ================= */
@@ -225,7 +225,6 @@ h1{
 }
 </style>
 </head>
-
 <body>
 
 <!-- INTRO VIDEO -->
@@ -302,13 +301,17 @@ function closeSection(){
 const intro=document.getElementById("intro-video");
 const video=intro.querySelector("video");
 
+// Forcer autoplay sans bouton lecture
+video.muted = true;
+video.play().catch(()=>{console.log("Lecture automatique impossible");});
+
+// Après fin de vidéo, rester 3s puis fondu
 video.onended=()=>{
   setTimeout(()=>{
     intro.classList.add("fade-out");
     setTimeout(()=>intro.remove(),1200);
-  },3000); // reste 3 secondes
+  },3000);
 };
 </script>
-
 </body>
 </html>
