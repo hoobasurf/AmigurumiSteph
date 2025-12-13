@@ -5,16 +5,26 @@
 <title>Galerie - Mes créations</title>
 <style>
   * { box-sizing: border-box; margin:0; padding:0; }
-  html, body { height:100%; font-family: 'Comic Sans MS', cursive; overflow-x: hidden; }
+  html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  font-family: 'Comic Sans MS', cursive;
+  overflow-x: hidden;
+}
 
-  body {
-    background: url('Photoroom_20251212_143703.png') center top/cover no-repeat fixed;
-    background-color: #fff0f5;
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh;
-  }
+body {
+  background-image: url('Photoroom_20251212_143703.png');
+  background-size: 100% 100%;       /* <-- Remplit exactement tout l’écran */
+  background-position: top center;  /* <-- Aligné en haut */
+  background-repeat: no-repeat;
+  background-attachment: fixed;     /* <-- Fond immobile au scroll */
+  background-color: #fff0f5;
 
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+}
   header { text-align: center; margin-top: 12px; }
   header img { width: 98px; height: 98px; display:inline-block; }
   .title { font-size:42px; color:#b84c6f; font-weight:bold; letter-spacing:1px; display:block; margin:12px 0; }
