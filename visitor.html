@@ -2,194 +2,131 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<title>Galerie - Visitor</title>
+<title>Galerie Projets – Visitor</title>
 <style>
-  * { box-sizing:border-box; margin:0; padding:0; }
-  html, body { height:100%; font-family:'Comic Sans MS', cursive; }
-  body { background:#fff0f5; overflow-x:hidden; }
+body {
+  margin:0;
+  font-family:sans-serif;
+  background:#fff0f5;
+  overflow-x:hidden;
+  padding-left:35px; /* pour l’encoche */
+}
 
-  /* ================= FOND D'ACCUEIL ================= */
-  #intro-background {
-    position:fixed; inset:0;
-    background:url('Photoroom_20251213_123235.png') center/cover no-repeat;
-    display:flex; justify-content:center; align-items:center;
-    z-index:100000;
-  }
+/* ================= INTRO VIDEO + FOND ================= */
+#intro-container{
+  position:fixed;
+  inset:0;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  z-index:100000;
+  background: url('Photoroom_20251213_123235.png') center center / cover no-repeat;
+}
 
-  /* BOUTON BIENVENUE */
-  #startBtn {
-    padding:20px 40px;
-    font-size:24px;
-    border-radius:16px;
-    border:none;
-    background:#ffb6c1;
-    color:#8b3a3a;
-    font-weight:bold;
-    cursor:pointer;
-    box-shadow:0 6px 15px rgba(182,115,133,.3);
-  }
+#intro-video video {
+  width:80%;
+  max-width:800px;
+  border-radius:16px;
+  pointer-events:none; /* empêche le clic sur la vidéo */
+}
 
-  /* ================= INTRO VIDEO ================= */
-  #intro-video {
-    position:fixed; inset:0;
-    display:flex; justify-content:center; align-items:center;
-    z-index:100001; opacity:0; pointer-events:none;
-    transition:opacity 1s ease;
-  }
-  #intro-video video {
-    width:100%; height:100%; object-fit:cover;
-  }
+#welcome-btn {
+  position:absolute;
+  z-index:100001;
+  padding:14px 28px;
+  background:#ffb6c1;
+  color:#8b3a3a;
+  font-weight:bold;
+  font-size:18px;
+  border:none;
+  border-radius:12px;
+  cursor:pointer;
+  box-shadow:0 4px 12px rgba(0,0,0,0.2);
+}
+#welcome-btn:hover {
+  background:#ff9fc1;
+}
 
-  /* ================= GALERIE ================= */
-  header { text-align:center; padding:12px 0; }
-  header img { width:98px; height:98px; border-radius:20%; display:block; margin:0 auto; }
-  .title { font-size:42px; color:#b84c6f; font-weight:bold; margin-bottom:12px; }
+/* ================= GALERIE ================= */
+h1 {
+  text-align:center;
+  color:#b84c6f;
+  margin-top:20px;
+}
+.gallery-scroll {
+  display:flex;
+  gap:20px;
+  overflow-x:auto;
+  padding:20px;
+  scroll-snap-type:x mandatory;
+}
+.gallery-scroll img {
+  height:240px;
+  border-radius:12px;
+  scroll-snap-align:start;
+  cursor:pointer;
+  box-shadow:0 4px 15px rgba(0,0,0,0.25);
+  transition:transform .2s;
+}
+.gallery-scroll img:hover {
+  transform:scale(1.05);
+}
 
-  #viewSelector { display:flex; justify-content:center; gap:12px; margin-bottom:14px; }
-  #viewSelector button {
-    background:#fff0f7; border:2px solid #b84c6f; color:#b84c6f; padding:8px 16px; border-radius:24px; cursor:pointer;
-    font-size:15px; transition: all 0.18s ease;
-  }
-  #viewSelector button.active { background:linear-gradient(90deg,#ffeaf2,#fff5f8); color:#7a2b45; transform:translateY(-2px); }
-
-  .center-zone { flex:1; display:flex; align-items:center; justify-content:center; padding:8px; }
-  #visitor-list { width:calc(100% - 40px); max-width:1200px; margin:0 auto; }
-
-  .visitor-item { text-align:center; cursor:pointer; user-select:none; }
-  .visitor-item img { display:block; margin:0 auto; object-fit:contain; border:4px solid #b67385; transition: box-shadow 0.3s ease, transform 0.3s ease; }
-  .visitor-item:hover img { box-shadow:0 8px 20px rgba(184,76,111,0.3); transform:scale(1.03); }
-  .visitor-item p { margin:8px 0 0; font-size:20px; color:#b84c6f; font-weight:bold; }
-
-  .carousel-view { display:flex; gap:40px; overflow-x:auto; scroll-behavior:smooth; padding:10px; align-items:center; }
-  .carousel-view::-webkit-scrollbar { height:8px; }
-  .carousel-view::-webkit-scrollbar-thumb { background:#b84c6f66; border-radius:20px; }
-  .carousel-view .visitor-item img { width:260px; height:260px; }
-
-  .grid-view { display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:24px; padding:16px; max-height:68vh; overflow-y:auto; }
-  .grid-view .visitor-item img { width:100%; height:200px; }
-
-  .list-view { display:flex; flex-direction:column; gap:18px; padding:16px; max-height:68vh; overflow-y:auto; }
-  .list-view .visitor-item { display:flex; gap:18px; align-items:center; padding:8px; }
-  .list-view .visitor-item img { width:140px; height:140px; }
-  .list-view .visitor-item p { margin:0; font-size:18px; text-align:left; }
-
-  /* Modal zoom */
-  .modal-bg { position:fixed; inset:0; background: rgba(0,0,0,0.65); display:none; justify-content:center; align-items:center; z-index:1000; padding:20px; }
-  .modal-box { background:#fff5f8; border-radius:16px; padding:18px; max-width:980px; width:94%; max-height:90vh; overflow-y:auto; box-shadow:0 8px 30px rgba(184,76,111,0.25); text-align:center; position:relative; cursor:default; }
-  .close-modal { position:absolute; top:10px; right:12px; font-size:28px; cursor:pointer; color:#b84c6f; font-weight:bold; }
-  .modal-main-img { width:100%; max-height:520px; object-fit:contain; border:4px solid #b67385; background:white; }
-
-  .thumbs { margin-top:16px; display:flex; gap:12px; justify-content:center; flex-wrap:wrap; }
-  .thumbs img { width:110px; height:110px; object-fit:contain; border:4px solid #b67385; background:transparent; cursor:pointer; transition: transform 0.2s ease, box-shadow 0.2s ease; }
-  .thumbs img:hover { transform:scale(1.06); box-shadow:0 6px 14px rgba(184,76,111,0.3); }
+/* Modal zoom */
+#imageModal {
+  display:none;
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,0.8);
+  justify-content:center;
+  align-items:center;
+  z-index:2000;
+}
+#imageModal img {
+  width:90%;
+  max-width:600px;
+  border-radius:12px;
+}
 </style>
 </head>
 <body>
 
-<!-- FOND + BOUTON BIENVENUE -->
-<div id="intro-background">
-  <button id="startBtn">Bienvenue</button>
-</div>
-
-<!-- VIDEO -->
-<div id="intro-video">
-  <video id="welcome-video" playsinline webkit-playsinline preload="auto">
-    <source src="chat.mp4" type="video/mp4">
+<!-- INTRO VIDEO + BOUTON -->
+<div id="intro-container">
+  <video id="intro-video" playsinline webkit-playsinline preload="auto">
+    <source src="chat.webm" type="video/webm">
   </video>
+  <button id="welcome-btn">Bienvenue</button>
 </div>
 
-<!-- HEADER + GALERIE -->
-<header>
-  <img src="favicon.png" alt="Logo">
-  <h1 class="title">Mes créations</h1>
-</header>
+<h1>✨ Projets réalisés</h1>
+<div id="gallery" class="gallery-scroll"></div>
 
-<div id="viewSelector">
-  <button id="btnCarousel">Carrousel</button>
-  <button id="btnGrid">Grille</button>
-  <button id="btnList">Liste</button>
+<!-- Modal zoom -->
+<div id="imageModal" onclick="this.style.display='none'">
+  <img id="modalImg" src="">
 </div>
 
-<div class="center-zone">
-  <div id="visitor-list" role="list"></div>
-</div>
+<script type="module" src="visitor.js"></script>
 
-<!-- Modal -->
-<div class="modal-bg" id="modal" onclick="if(event.target===this) closeModal()">
-  <div class="modal-box">
-    <div class="close-modal" onclick="closeModal()">×</div>
-    <img id="modalMain" class="modal-main-img" alt="Image agrandie">
-    <div id="thumbsContainer" class="thumbs"></div>
-  </div>
-</div>
-
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
 <script>
-const SUPABASE_URL = "https://iubbxvipgofxasatmvzg.supabase.co";
-const SUPABASE_ANON_KEY = "sb_publishable_GDoZmwIdoP28XOdrfYYVNw_E_HiCQB1";
-const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+// BOUTON WELCOME pour lancer la vidéo
+const introContainer = document.getElementById('intro-container');
+const video = document.getElementById('intro-video');
+const welcomeBtn = document.getElementById('welcome-btn');
 
-const introBg = document.getElementById('intro-background');
-const startBtn = document.getElementById('startBtn');
-const videoDiv = document.getElementById('intro-video');
-const videoEl = document.getElementById('welcome-video');
+welcomeBtn.onclick = () => {
+  video.play().catch(e => console.log("Autoplay bloqué :", e));
+  welcomeBtn.style.display = 'none';
 
-startBtn.onclick = () => {
-  // Masque le bouton et le fond
-  introBg.style.transition='opacity 0.8s';
-  introBg.style.opacity = 0;
-  setTimeout(()=>introBg.remove(),800);
-
-  // Affiche et lance la vidéo
-  videoDiv.style.opacity = 1;
-  videoEl.play().catch(e=>console.log("Autoplay bloqué :",e));
-
-  videoEl.onended = () => {
-    videoDiv.style.transition='opacity 1s';
-    videoDiv.style.opacity=0;
-    setTimeout(()=>videoDiv.remove(),1000);
+  // À la fin de la vidéo, fade-out
+  video.onended = () => {
+    introContainer.style.transition = "opacity 1.2s";
+    introContainer.style.opacity = 0;
+    setTimeout(() => introContainer.remove(), 1200);
   };
 };
-
-// ================= VISITOR GALERIE =================
-const list=document.getElementById('visitor-list');
-let creations=[], currentView='carousel';
-
-async function loadCreations(){
-  const { data, error } = await supabase.storage.from('owners').list();
-  if(error){ console.error(error); return; }
-  creations = data.map(item=>({
-    name:item.name,
-    imgUrl: supabase.storage.from('owners').getPublicUrl(item.name).publicURL
-  }));
-  renderVisitor();
-}
-
-function renderVisitor(){
-  list.innerHTML='';
-  list.className=currentView+'-view';
-  creations.forEach((item,i)=>{
-    const div=document.createElement('div');
-    div.className='visitor-item';
-    div.setAttribute('data-index',i);
-    div.innerHTML=`<img src="${item.imgUrl}" alt="${item.name}"><p>${item.name}</p>`;
-    list.appendChild(div);
-  });
-}
-
-function setView(mode){
-  currentView=mode;
-  document.getElementById('btnCarousel').classList.toggle('active', mode==='carousel');
-  document.getElementById('btnGrid').classList.toggle('active', mode==='grid');
-  document.getElementById('btnList').classList.toggle('active', mode==='list');
-  renderVisitor();
-}
-
-document.getElementById('btnCarousel').addEventListener('click',()=>setView('carousel'));
-document.getElementById('btnGrid').addEventListener('click',()=>setView('grid'));
-document.getElementById('btnList').addEventListener('click',()=>setView('list'));
-
-loadCreations();
 </script>
+
 </body>
 </html>
