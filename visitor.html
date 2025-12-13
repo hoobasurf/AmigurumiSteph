@@ -2,229 +2,149 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-
-<!-- ⚠️ VIEWPORT PROPRE (ANTI ZOOM) -->
 <meta name="viewport" content="width=device-width, initial-scale=1">
-
-<title>Galerie – Mes créations</title>
+<title>Galerie – Visitor</title>
 
 <style>
-*{box-sizing:border-box;margin:0;padding:0;}
-
-html,body{
+/* ================= RESET ================= */
+html, body{
+  margin:0;
+  padding:0;
   width:100%;
   height:100%;
-  font-family:'Comic Sans MS', cursive;
+  font-family:sans-serif;
+  background:#fff0f5;
   overflow-x:hidden;
+  -webkit-text-size-adjust:100%;
 }
 
-/* ================= INTRO ================= */
-#intro-overlay{
+/* ================= ACCUEIL IMAGE ================= */
+#intro-background{
   position:fixed;
   inset:0;
-  z-index:100000;
+  background:url('Photoroom_20251213_123235.png') center center / cover no-repeat;
   display:flex;
   justify-content:center;
   align-items:center;
-  background:url('Photoroom_20251213_123235.png') center center / cover no-repeat;
+  z-index:100000;
 }
 
-#intro-video{
-  position:fixed;
-  inset:0;
-  width:100vw;
-  height:100vh;
-  object-fit:cover;
-  display:none;
-  z-index:100001;
-}
-
-#welcome-btn{
-  padding:16px 34px;
+/* BOUTON BIENVENUE */
+#startBtn{
+  padding:20px 40px;
+  font-size:24px;
+  border-radius:16px;
+  border:none;
   background:#ffb6c1;
   color:#8b3a3a;
   font-weight:bold;
-  font-size:20px;
-  border:none;
-  border-radius:16px;
   cursor:pointer;
-  box-shadow:0 6px 18px rgba(0,0,0,.25);
+  box-shadow:0 6px 15px rgba(182,115,133,.3);
 }
 
-#welcome-btn:hover{ background:#ff9fb8; }
-
-/* ================= APP ================= */
-body{
-  background-image:url('Photoroom_20251212_143703.png');
-  background-size:cover;
-  background-position:center top;
-  background-repeat:no-repeat;
-}
-
-/* HEADER */
-header{text-align:center;padding:14px 0;}
-header img{width:96px;height:96px;border-radius:20%;}
-.title{font-size:42px;color:#b84c6f;font-weight:bold;margin:12px 0;}
-
-/* VIEWS */
-#viewSelector{
+/* ================= INTRO VIDEO ================= */
+#intro-video{
+  position:fixed;
+  inset:0;
+  background:#000;
   display:flex;
   justify-content:center;
-  gap:12px;
-  margin-bottom:14px;
-}
-#viewSelector button{
-  background:#fff0f7;
-  border:2px solid #b84c6f;
-  color:#b84c6f;
-  padding:8px 18px;
-  border-radius:24px;
-  cursor:pointer;
-}
-#viewSelector button.active{
-  background:#ffeaf2;
-  transform:translateY(-2px);
-}
-
-/* LIST */
-.center-zone{display:flex;justify-content:center;}
-#visitor-list{
-  width:100%;
-  max-width:1200px;
-  margin:0 auto;
-}
-
-/* ITEMS */
-.visitor-item{text-align:center;cursor:pointer;}
-.visitor-item img{
-  border:4px solid #b67385;
-  background:#fff;
-  object-fit:contain;
-}
-
-/* MODES */
-.carousel-view{display:flex;gap:40px;overflow-x:auto;padding:16px;}
-.carousel-view img{width:260px;height:260px;}
-
-.grid-view{
-  display:grid;
-  grid-template-columns:repeat(auto-fill,minmax(220px,1fr));
-  gap:24px;
-  padding:16px;
-}
-.grid-view img{width:100%;height:200px;}
-
-.list-view{
-  display:flex;
-  flex-direction:column;
-  gap:18px;
-  padding:16px;
-}
-.list-view .visitor-item{
-  display:flex;
-  gap:18px;
   align-items:center;
+  z-index:100001;
+  opacity:0;
+  pointer-events:none;
+  transition:opacity 1s ease;
 }
-.list-view img{width:140px;height:140px;}
+
+#intro-video video{
+  width:100%;
+  height:100%;
+  object-fit:contain; /* PAS DE ZOOM */
+  pointer-events:none;
+}
+
+/* ================= APP ================= */
+#app{
+  min-height:100vh;
+}
+
+/* TITRE */
+h1{
+  text-align:center;
+  color:#b84c6f;
+  margin:20px 0;
+}
+
+/* GALERIE */
+.gallery-scroll{
+  display:flex;
+  gap:20px;
+  overflow-x:auto;
+  padding:20px;
+}
+
+.gallery-scroll img{
+  height:240px;
+  border-radius:12px;
+  cursor:pointer;
+  box-shadow:0 4px 15px rgba(0,0,0,0.25);
+}
 </style>
 </head>
 
 <body>
 
-<!-- INTRO -->
-<div id="intro-overlay">
-  <button id="welcome-btn">Bienvenue</button>
+<!-- ================= ACCUEIL ================= -->
+<div id="intro-background">
+  <button id="startBtn">Bienvenue</button>
 </div>
 
-<video id="intro-video" muted playsinline preload="auto">
-  <source src="chat.webm" type="video/webm">
-</video>
-
-<!-- APP -->
-<header>
-  <img src="favicon.png">
-  <h1 class="title">Mes créations</h1>
-</header>
-
-<div id="viewSelector">
-  <button id="btnCarousel" class="active">Carrousel</button>
-  <button id="btnGrid">Grille</button>
-  <button id="btnList">Liste</button>
+<!-- ================= VIDEO ================= -->
+<div id="intro-video">
+  <video id="introVid" playsinline webkit-playsinline preload="auto">
+    <source src="chat.webm" type="video/webm">
+  </video>
 </div>
 
-<div class="center-zone">
-  <div id="visitor-list"></div>
+<!-- ================= APP ================= -->
+<div id="app">
+  <h1>✨ Projets réalisés</h1>
+  <div id="gallery" class="gallery-scroll"></div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+<!-- ================= INTRO LOGIQUE ================= -->
 <script>
-/* ===== INTRO LOGIC ===== */
-const overlay=document.getElementById('intro-overlay');
-const video=document.getElementById('intro-video');
-const btn=document.getElementById('welcome-btn');
+const introBg = document.getElementById("intro-background");
+const introVideo = document.getElementById("intro-video");
+const video = document.getElementById("introVid");
+const startBtn = document.getElementById("startBtn");
 
-btn.onclick=()=>{
-  btn.remove();
-  video.style.display='block';
-  video.play();
+/* Empêche retour accueil */
+if(sessionStorage.getItem("introPlayed")){
+  introBg.remove();
+  introVideo.remove();
+}
 
-  video.onended=()=>{
-    setTimeout(()=>{
-      overlay.style.transition='opacity 1.2s';
-      overlay.style.opacity=0;
-      video.style.opacity=0;
-      setTimeout(()=>{
-        overlay.remove();
-        video.remove();
-      },1200);
-    },2000);
-  };
+startBtn.onclick = () => {
+  sessionStorage.setItem("introPlayed","true");
+
+  introBg.style.display = "none";
+  introVideo.style.opacity = "1";
+  introVideo.style.pointerEvents = "auto";
+
+  video.play().catch(e => console.log("Play bloqué:", e));
 };
 
-/* ===== SUPABASE ===== */
-const supabase = window.supabase.createClient(
-  "https://iubbxvipgofxasatmvzg.supabase.co",
-  "sb_publishable_GDoZmwIdoP28XOdrfYYVNw_E_HiCQB1"
-);
-
-const list=document.getElementById('visitor-list');
-let creations=[];
-let view='carousel';
-
-async function loadCreations(){
-  const {data,error}=await supabase.storage.from('owners').list();
-  if(error)return;
-  creations=data.map(f=>({
-    name:f.name,
-    img:supabase.storage.from('owners').getPublicUrl(f.name).publicURL
-  }));
-  render();
-}
-
-function render(){
-  list.className=view+'-view';
-  list.innerHTML='';
-  creations.forEach(c=>{
-    const d=document.createElement('div');
-    d.className='visitor-item';
-    d.innerHTML=`<img src="${c.img}"><p>${c.name}</p>`;
-    list.appendChild(d);
-  });
-}
-
-document.getElementById('btnCarousel').onclick=()=>setView('carousel');
-document.getElementById('btnGrid').onclick=()=>setView('grid');
-document.getElementById('btnList').onclick=()=>setView('list');
-
-function setView(v){
-  view=v;
-  document.querySelectorAll('#viewSelector button').forEach(b=>b.classList.remove('active'));
-  document.getElementById('btn'+v.charAt(0).toUpperCase()+v.slice(1)).classList.add('active');
-  render();
-}
-
-loadCreations();
+video.onended = () => {
+  setTimeout(() => {
+    introVideo.style.opacity = "0";
+    setTimeout(() => introVideo.remove(), 1000);
+  }, 2000); // 2 secondes à la fin
+};
 </script>
+
+<!-- ================= TON JS VISITOR ================= -->
+<script type="module" src="visitor.js"></script>
 
 </body>
 </html>
