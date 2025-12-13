@@ -5,13 +5,12 @@
 <title>Mes Créations</title>
 
 <style>
-/* ================= BASE ================= */
 body{
   margin:0;
   font-family:sans-serif;
   background:#fff0f5;
   overflow-x:hidden;
-  padding-left:35px; /* espace pour l'encoche */
+  padding-left:35px; /* place pour l’encoche */
 }
 
 /* ================= INTRO VIDEO ================= */
@@ -23,25 +22,19 @@ body{
   display:flex;
   justify-content:center;
   align-items:center;
+  opacity:1;
+  transition:opacity 1.2s ease;
+}
+
+#intro-video.fade-out{
+  opacity:0;
+  pointer-events:none;
 }
 
 #intro-video video{
   width:100%;
   height:100%;
   object-fit:cover;
-}
-
-#skipIntro{
-  position:absolute;
-  bottom:30px;
-  right:30px;
-  padding:10px 16px;
-  border-radius:12px;
-  border:none;
-  background:rgba(255,182,193,.9);
-  color:#8b3a3a;
-  font-weight:bold;
-  cursor:pointer;
 }
 
 /* ================= SIDEBAR ================= */
@@ -62,7 +55,7 @@ body{
   left:0;
 }
 
-/* Encoche */
+/* ENCÔCHE */
 #toggleSidebar{
   position:absolute;
   top:50%;
@@ -80,6 +73,7 @@ body{
   font-weight:bold;
 }
 
+/* BOUTONS SIDEBAR */
 #sidebar button{
   width:100%;
   margin-bottom:10px;
@@ -157,31 +151,29 @@ h1{
   margin-bottom:40px;
 }
 
-/* Grille */
-#owner-list.grid .owner-item{
-  width:140px;
-}
+/* GRILLE */
+#owner-list.grid .owner-item{ width:140px; }
 
-/* Liste */
+/* LISTE */
 #owner-list.list{
   flex-direction:column;
   align-items:center;
 }
-
 #owner-list.list .owner-item{
   display:flex;
   align-items:center;
-  gap:10px;
   width:90%;
+  gap:10px;
 }
 
-/* Carrousel */
+/* CARROUSEL */
 #owner-list.carousel{
   flex-wrap:nowrap;
   overflow-x:auto;
+  padding-bottom:10px;
 }
 
-/* Item */
+/* ITEM */
 .owner-item{
   position:relative;
   background:#ffe6f0;
@@ -204,7 +196,7 @@ h1{
   font-weight:bold;
 }
 
-/* Croix */
+/* CROIX */
 .delete-btn{
   position:absolute;
   top:5px;
@@ -240,18 +232,16 @@ h1{
 <div id="intro-video">
   <video autoplay muted playsinline>
     <source src="chat.mp4" type="video/mp4">
-    Ton navigateur ne supporte pas la vidéo.
   </video>
-  <button id="skipIntro">Passer</button>
 </div>
 
 <!-- SIDEBAR -->
 <div id="sidebar">
   <div id="toggleSidebar">☰</div>
-  <button onclick="openSection('videos')">Vidéos / Tutoriels</button>
-  <button onclick="openSection('mailles')">Compteur de mailles</button>
-  <button onclick="openSection('pelotes')">Pelotes & Couleurs</button>
-  <button onclick="openSection('notes')">Notes / Inspirations</button>
+  <button onclick="openSection('videos')">Vidéos</button>
+  <button onclick="openSection('mailles')">Mailles</button>
+  <button onclick="openSection('pelotes')">Pelotes</button>
+  <button onclick="openSection('notes')">Notes</button>
   <button onclick="openSection('settings')">Paramètres</button>
 </div>
 
@@ -278,18 +268,22 @@ h1{
 <div id="notes" class="section"><button onclick="closeSection()">← Retour</button></div>
 <div id="settings" class="section"><button onclick="closeSection()">← Retour</button></div>
 
-<!-- TON JS EXISTANT -->
+<!-- 🔴 TON JS ORIGINAL -->
 <script type="module" src="owner.js"></script>
 
+<!-- NAV + VIDEO -->
 <script>
+/* SIDEBAR */
 const sidebar=document.getElementById("sidebar");
 const toggle=document.getElementById("toggleSidebar");
 toggle.onclick=()=>sidebar.classList.toggle("sidebar-open");
 
+/* MODES */
 function setMode(mode){
   document.getElementById("owner-list").className=mode;
 }
 
+/* NAV SECTIONS */
 function openSection(id){
   sidebar.classList.remove("sidebar-open");
   document.querySelectorAll(".section").forEach(s=>s.classList.remove("active"));
@@ -306,12 +300,16 @@ function closeSection(){
   document.getElementById("display-modes").style.display="block";
 }
 
-/* Intro */
+/* INTRO VIDEO */
 const intro=document.getElementById("intro-video");
 const video=intro.querySelector("video");
-const skip=document.getElementById("skipIntro");
-video.onended=()=>intro.remove();
-skip.onclick=()=>intro.remove();
+
+video.onended=()=>{
+  setTimeout(()=>{
+    intro.classList.add("fade-out");
+    setTimeout(()=>intro.remove(),1200);
+  },3000);
+};
 </script>
 
 </body>
