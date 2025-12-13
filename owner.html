@@ -4,48 +4,61 @@
 <meta charset="UTF-8">
 <title>Mes Créations</title>
 <style>
-html, body {
-  height: 100%;
-  margin: 0;
-  font-family: sans-serif;
-  overflow-x: hidden;
-  background: url('Photoroom_20251213_123235.png') center/cover no-repeat;
+body{
+  margin:0;
+  font-family:sans-serif;
+  background:#fff0f5;
+  overflow-x:hidden;
+  padding-left:35px;
 }
 
-/* ================= INTRO VIDEO + BOUTON ================= */
-#intro-overlay {
-  position: fixed;
-  inset: 0;
-  background: transparent; /* Pas de fond noir */
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-direction: column;
-  z-index: 100000;
+/* ================= FOND D'ACCUEIL ================= */
+#intro-background{
+  position:fixed;
+  inset:0;
+  background:url('Photoroom_20251213_123235.png') center/cover no-repeat;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  z-index:100000;
 }
 
-#intro-overlay video {
-  display: none; /* vidéo cachée au départ */
+/* BOUTON BIENVENUE */
+#startBtn{
+  padding:20px 40px;
+  font-size:24px;
+  border-radius:16px;
+  border:none;
+  background:#ffb6c1;
+  color:#8b3a3a;
+  font-weight:bold;
+  cursor:pointer;
+  box-shadow:0 6px 15px rgba(182,115,133,.3);
 }
 
-#startBtn {
-  padding: 16px 28px;
-  border-radius: 12px;
-  border: none;
-  background: #ffb6c1;
-  color: #8b3a3a;
-  font-size: 22px;
-  font-weight: bold;
-  cursor: pointer;
-  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+/* ================= INTRO VIDEO ================= */
+#intro-video{
+  position:fixed;
+  inset:0;
+  background:#000;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  z-index:100001;
+  opacity:0;
+  pointer-events:none;
+  transition:opacity 1s ease;
 }
-#startBtn:hover {
-  background: #ff9fc1;
+
+#intro-video video{
+  width:100%;
+  height:100%;
+  object-fit:cover;
 }
 
 /* ================= SIDEBAR ================= */
-#sidebar {
-  position: fixed;
+#sidebar{
+  position:fixed;
   top:0;
   left:-220px;
   width:220px;
@@ -54,11 +67,12 @@ html, body {
   border-right:2px solid #b67385;
   padding:20px;
   transition:left .3s ease;
-  z-index:10000;
+  z-index:1000;
 }
-#sidebar.sidebar-open { left:0; }
 
-#toggleSidebar {
+#sidebar.sidebar-open{ left:0; }
+
+#toggleSidebar{
   position:absolute;
   top:50%;
   right:-30px;
@@ -88,11 +102,7 @@ html, body {
 }
 
 /* ================= TITRE ================= */
-h1 {
-  text-align:center;
-  color:#b84c6f;
-  margin-top:20px;
-}
+h1{ text-align:center; color:#b84c6f; margin-top:20px; }
 
 /* ================= AJOUT CREATION ================= */
 .owner-box{
@@ -149,7 +159,9 @@ h1 {
   gap:15px;
   margin-bottom:40px;
 }
+
 #owner-list.grid .owner-item{ width:140px; }
+
 #owner-list.list{
   flex-direction:column;
   align-items:center;
@@ -160,6 +172,7 @@ h1 {
   width:90%;
   gap:10px;
 }
+
 #owner-list.carousel{
   flex-wrap:nowrap;
   overflow-x:auto;
@@ -174,17 +187,20 @@ h1 {
   padding:10px;
   text-align:center;
 }
+
 .owner-item img{
   width:110px;
   height:110px;
   object-fit:cover;
   border-radius:10px;
 }
+
 .owner-item p{
   margin:5px 0 0;
   color:#8b3a3a;
   font-weight:bold;
 }
+
 .delete-btn{
   position:absolute;
   top:5px;
@@ -202,21 +218,21 @@ h1 {
   font-weight:bold;
 }
 
-/* ================= SECTIONS ================= */
-.section{
-  display:none;
-  padding:20px;
-}
+.section{ display:none; padding:20px; }
 .section.active{ display:block; }
 
 </style>
 </head>
 <body>
 
-<!-- INTRO VIDEO + BOUTON BIENVENUE -->
-<div id="intro-overlay">
+<!-- FOND + BOUTON -->
+<div id="intro-background">
   <button id="startBtn">Bienvenue</button>
-  <video id="intro-video" preload="auto">
+</div>
+
+<!-- VIDÉO -->
+<div id="intro-video">
+  <video muted playsinline preload="auto">
     <source src="chat.mp4" type="video/mp4">
   </video>
 </div>
@@ -257,6 +273,26 @@ h1 {
 <script type="module" src="owner.js"></script>
 
 <script>
+const startBtn = document.getElementById("startBtn");
+const introBg = document.getElementById("intro-background");
+const introVideoDiv = document.getElementById("intro-video");
+const video = introVideoDiv.querySelector("video");
+
+/* BOUTON BIENVENUE */
+startBtn.onclick = () => {
+  introBg.style.display = "none";
+  introVideoDiv.style.opacity = "1";
+  introVideoDiv.style.pointerEvents = "auto";
+  video.play().catch(e=>console.log("Lecture bloquée:", e));
+};
+
+/* FIN DE LA VIDEO -> disparition en fondu */
+video.onended = () => {
+  introVideoDiv.style.transition = "opacity 1s ease";
+  introVideoDiv.style.opacity = 0;
+  setTimeout(()=>introVideoDiv.remove(), 1000);
+};
+
 /* SIDEBAR */
 const sidebar=document.getElementById("sidebar");
 const toggle=document.getElementById("toggleSidebar");
@@ -276,14 +312,14 @@ function openSection(id){
   document.getElementById("display-modes").style.display="none";
   document.getElementById(id).classList.add("active");
 }
+
 function closeSection(){
   document.querySelectorAll(".section").forEach(s=>s.classList.remove("active"));
   document.querySelector(".owner-box").style.display="block";
   document.getElementById("owner-list").style.display="flex";
   document.getElementById("display-modes").style.display="block";
 }
+</script>
 
-/* BOUTON BIENVENUE + VIDEO */
-const startBtn = document.getElementById("startBtn");
-const introVideo = document.getElementById("intro-video");
-const introOverlay = document.getElementById
+</body>
+</html>
