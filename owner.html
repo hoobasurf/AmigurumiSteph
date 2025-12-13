@@ -2,11 +2,9 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Mes Créations</title>
-
 <style>
-body{
+body {
   margin:0;
   font-family:sans-serif;
   background:#fff0f5;
@@ -14,7 +12,7 @@ body{
 }
 
 /* ================= INTRO GIF ================= */
-#intro-gif{
+#intro-gif {
   position:fixed;
   inset:0;
   background:#000;
@@ -23,23 +21,22 @@ body{
   justify-content:center;
   align-items:center;
   opacity:1;
-  transition:opacity 1.2s ease;
+  transition:opacity 1s ease;
 }
 
-#intro-gif.fade-out{
+#intro-gif.fade-out {
   opacity:0;
   pointer-events:none;
 }
 
-#intro-gif img{
+#intro-gif img {
   max-width:100%;
   max-height:100%;
-  object-fit:contain;
-  display:block;
+  object-fit:contain; /* respect ratio */
 }
 
 /* ================= SIDEBAR ================= */
-#sidebar{
+#sidebar {
   position:fixed;
   top:0;
   left:-220px;
@@ -52,12 +49,10 @@ body{
   z-index:10000;
 }
 
-#sidebar.sidebar-open{
-  left:0;
-}
+#sidebar.sidebar-open { left:0; }
 
 /* ENCÔCHE */
-#toggleSidebar{
+#toggleSidebar {
   position:absolute;
   top:50%;
   right:-30px;
@@ -75,7 +70,7 @@ body{
 }
 
 /* BOUTONS SIDEBAR */
-#sidebar button{
+#sidebar button {
   width:100%;
   margin-bottom:10px;
   padding:10px;
@@ -88,16 +83,15 @@ body{
 }
 
 /* ================= TITRE ================= */
-h1{
+h1 {
   text-align:center;
   color:#b84c6f;
-  margin:20px 0;
-  font-size:28px;
+  margin-top:20px;
 }
 
 /* ================= AJOUT CREATION ================= */
-.owner-box{
-  max-width:400px;
+.owner-box {
+  max-width:420px;
   margin:20px auto;
   background:#ffe6f0;
   border:2px solid #b67385;
@@ -107,19 +101,18 @@ h1{
 }
 
 .owner-box input,
-.owner-box button{
+.owner-box button {
   width:100%;
   margin-top:10px;
   padding:10px;
   border-radius:12px;
-  font-size:16px;
 }
 
-.owner-box input{
+.owner-box input {
   border:1px solid #b67385;
 }
 
-.owner-box button{
+.owner-box button {
   background:#ffb6c1;
   border:none;
   color:#8b3a3a;
@@ -129,12 +122,12 @@ h1{
 }
 
 /* ================= MODES ================= */
-#display-modes{
+#display-modes {
   text-align:center;
   margin:15px 0;
 }
 
-#display-modes button{
+#display-modes button {
   margin:0 5px;
   padding:8px 12px;
   border-radius:12px;
@@ -146,7 +139,7 @@ h1{
 }
 
 /* ================= LISTE CREATIONS ================= */
-#owner-list{
+#owner-list {
   display:flex;
   flex-wrap:wrap;
   justify-content:center;
@@ -155,14 +148,14 @@ h1{
 }
 
 /* GRILLE */
-#owner-list.grid .owner-item{ width:140px; }
+#owner-list.grid .owner-item { width:140px; }
 
 /* LISTE */
-#owner-list.list{
+#owner-list.list {
   flex-direction:column;
   align-items:center;
 }
-#owner-list.list .owner-item{
+#owner-list.list .owner-item {
   display:flex;
   align-items:center;
   width:90%;
@@ -170,14 +163,14 @@ h1{
 }
 
 /* CARROUSEL */
-#owner-list.carousel{
+#owner-list.carousel {
   flex-wrap:nowrap;
   overflow-x:auto;
   padding-bottom:10px;
 }
 
 /* ITEM */
-.owner-item{
+.owner-item {
   position:relative;
   background:#ffe6f0;
   border:2px solid #b67385;
@@ -186,21 +179,21 @@ h1{
   text-align:center;
 }
 
-.owner-item img{
+.owner-item img {
   width:110px;
   height:110px;
   object-fit:cover;
   border-radius:10px;
 }
 
-.owner-item p{
+.owner-item p {
   margin:5px 0 0;
   color:#8b3a3a;
   font-weight:bold;
 }
 
 /* CROIX */
-.delete-btn{
+.delete-btn {
   position:absolute;
   top:5px;
   right:5px;
@@ -218,17 +211,15 @@ h1{
 }
 
 /* ================= SECTIONS ================= */
-.section{
+.section {
   display:none;
   padding:20px;
 }
 
-.section.active{
-  display:block;
-}
+.section.active { display:block; }
+
 </style>
 </head>
-
 <body>
 
 <!-- INTRO GIF -->
@@ -272,17 +263,17 @@ h1{
 <script type="module" src="owner.js"></script>
 
 <script>
-// Sidebar toggle
-const sidebar = document.getElementById("sidebar");
-const toggle = document.getElementById("toggleSidebar");
-toggle.onclick = ()=> sidebar.classList.toggle("sidebar-open");
+/* SIDEBAR */
+const sidebar=document.getElementById("sidebar");
+const toggle=document.getElementById("toggleSidebar");
+toggle.onclick=()=>sidebar.classList.toggle("sidebar-open");
 
-// Modes affichage
+/* MODES */
 function setMode(mode){
-  document.getElementById("owner-list").className = mode;
+  document.getElementById("owner-list").className=mode;
 }
 
-// Navigation sections
+/* NAV SECTIONS */
 function openSection(id){
   sidebar.classList.remove("sidebar-open");
   document.querySelectorAll(".section").forEach(s=>s.classList.remove("active"));
@@ -299,17 +290,12 @@ function closeSection(){
   document.getElementById("display-modes").style.display="block";
 }
 
-// GIF intro
-const intro = document.getElementById("intro-gif");
-const gif = intro.querySelector("img");
-
-gif.onload = () => {
-  intro.style.display = "flex";
-  setTimeout(()=>{
-    intro.classList.add("fade-out");
-    setTimeout(()=>intro.remove(),1200);
-  },4000); // 4s GIF
-};
+/* INTRO GIF */
+const intro=document.getElementById("intro-gif");
+setTimeout(()=>{
+  intro.classList.add("fade-out");
+  setTimeout(()=>intro.remove(),1000);
+},4000); // GIF visible 4 secondes
 </script>
 
 </body>
