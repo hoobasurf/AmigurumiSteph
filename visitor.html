@@ -5,10 +5,10 @@
 <title>Galerie - Mes créations</title>
 <style>
   * { box-sizing: border-box; margin:0; padding:0; }
-  html, body { height:100%; font-family: 'Comic Sans MS', cursive; overflow: hidden; }
+  html, body { height:100%; font-family: 'Comic Sans MS', cursive; overflow-x: hidden; }
 
   body {
-    background: url('Photoroom_20251212_143703.png') center top/contain no-repeat fixed;
+    background: url('Photoroom_20251212_143703.png') center top/cover no-repeat fixed;
     background-color: #fff0f5;
     display: flex;
     flex-direction: column;
@@ -29,7 +29,8 @@
   #viewSelector button:hover { transform:translateY(-2px); }
 
   .center-zone { flex:1; display:flex; align-items:center; justify-content:center; padding:8px; }
-  #visitor-list { width:calc(100% - 40px); max-width:1200px; margin:0 auto; transition:all 0.2s ease; }
+
+  #visitor-list { width:calc(100% - 40px); max-width:1200px; margin:0 auto; }
 
   .visitor-item { text-align:center; cursor:pointer; user-select:none; }
   .visitor-item img {
@@ -47,13 +48,13 @@
   .carousel-view .visitor-item img { width:260px; height:260px; }
 
   /* GRID */
-  .grid-view { display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:24px; padding:16px; align-items:start; overflow-y:auto; max-height:calc(100vh - 150px); }
-  .grid-view .visitor-item img { width:100%; height:200px; }
+  .grid-view { display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:24px; padding:16px; align-items:start; overflow-y:auto; flex:1; }
+  .grid-view .visitor-item img { width:100%; height:auto; }
 
   /* LIST */
-  .list-view { display:flex; flex-direction:column; gap:18px; padding:16px; overflow-y:auto; max-height:calc(100vh - 150px); }
+  .list-view { display:flex; flex-direction:column; gap:18px; padding:16px; overflow-y:auto; flex:1; }
   .list-view .visitor-item { display:flex; gap:18px; align-items:center; padding:8px; }
-  .list-view .visitor-item img { width:140px; height:140px; }
+  .list-view .visitor-item img { width:140px; height:auto; }
   .list-view .visitor-item p { margin:0; font-size:18px; text-align:left; }
 
   /* MODAL */
@@ -61,10 +62,10 @@
   .modal-bg.click-close { cursor:pointer; }
   .modal-box { background:#fff5f8; border-radius:16px; padding:18px; max-width:980px; width:94%; max-height:90vh; overflow-y:auto; box-shadow:0 8px 30px rgba(184,76,111,0.25); text-align:center; position:relative; cursor:default; }
   .close-modal { position:absolute; top:10px; right:12px; font-size:28px; cursor:pointer; color:#b84c6f; font-weight:bold; }
-  .modal-main-img { width:100%; max-height:520px; object-fit:contain; border:4px solid #b67385; background:white; }
+  .modal-main-img { width:100%; height:auto; max-height:520px; object-fit:contain; border:4px solid #b67385; background:white; }
 
   .thumbs { margin-top:16px; display:flex; gap:12px; justify-content:center; flex-wrap:wrap; }
-  .thumbs img { width:110px; height:110px; object-fit:contain; border:4px solid #b67385; background:transparent; cursor:pointer; transition: transform 0.2s ease, box-shadow 0.2s ease; }
+  .thumbs img { width:110px; height:auto; object-fit:contain; border:4px solid #b67385; background:transparent; cursor:pointer; transition: transform 0.2s ease, box-shadow 0.2s ease; }
   .thumbs img:hover { transform:scale(1.06); box-shadow:0 6px 14px rgba(184,76,111,0.3); }
 
   .icon-bar { margin-top:12px; display:flex; justify-content:center; gap:36px; align-items:center; }
@@ -87,7 +88,7 @@
     .title { font-size:30px; }
     .carousel-view .visitor-item img { width:200px; height:200px; }
     .modal-main-img { max-height:360px; }
-    .thumbs img { width:88px; height:88px; }
+    .thumbs img { width:88px; height:auto; }
     header img { width:80px; height:80px; }
   }
 </style>
@@ -251,7 +252,7 @@ function loadComments(){
   const key='comments_'+currentIndex;
   const comments=JSON.parse(localStorage.getItem(key)||'[]');
   commentsList.innerHTML = comments.map(c=>`<div class="comment"><strong>${escapeHtml(c.name)}</strong><br>${escapeHtml(c.text)}</div>`).join('');
-  document.getElementById('commentCount').textContent = comments.length;
+  commentCount.textContent = comments.length;
 }
 
 function scrollToComments(){ if(commentsList) commentsList.scrollIntoView({behavior:'smooth', block:'start'}); }
