@@ -9,50 +9,37 @@ body{
   font-family:sans-serif;
   background:#fff0f5;
   overflow-x:hidden;
-  padding-left:35px;
+  padding-left:35px; /* place pour l’encoche */
 }
 
-/* ================= INTRO VIDEO ================= */
+/* ================= INTRO VIDEO + BOUTON ================= */
+#intro-container{
+  position:fixed;
+  inset:0;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  z-index:100000;
+}
+
 #intro-video{
-  position: fixed;
-  inset: 0;
-  z-index: 100000;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  opacity: 1;
-  transition: opacity 1.2s ease;
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  display:none;
 }
 
-#intro-video.fade-out{
-  opacity: 0;
-  pointer-events: none;
-}
-
-#intro-video video{
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-/* Bouton Bienvenue */
-#welcomeBtn{
-  position: absolute;
-  padding: 16px 32px;
-  background: #ffb6c1; /* rose pastel */
-  color: #8b3a3a;      /* bordeaux */
-  font-weight: bold;
-  border: 2px solid #b67385;
-  border-radius: 12px;
-  cursor: pointer;
-  font-size: 22px;
-  z-index: 100001;
-  transition: transform .2s, background .2s;
-}
-
-#welcomeBtn:hover{
-  transform: scale(1.05);
-  background: #ffc0d0;
+#welcome-btn{
+  position:absolute;
+  padding:16px 30px;
+  border:none;
+  border-radius:12px;
+  background:#ffb6c1;
+  color:#8b3a3a;
+  font-size:20px;
+  font-weight:bold;
+  cursor:pointer;
+  box-shadow:0 4px 12px rgba(0,0,0,0.15);
 }
 
 /* ================= SIDEBAR ================= */
@@ -167,8 +154,10 @@ h1{
   margin-bottom:40px;
 }
 
+/* GRILLE */
 #owner-list.grid .owner-item{ width:140px; }
 
+/* LISTE */
 #owner-list.list{
   flex-direction:column;
   align-items:center;
@@ -180,12 +169,14 @@ h1{
   gap:10px;
 }
 
+/* CARROUSEL */
 #owner-list.carousel{
   flex-wrap:nowrap;
   overflow-x:auto;
   padding-bottom:10px;
 }
 
+/* ITEM */
 .owner-item{
   position:relative;
   background:#ffe6f0;
@@ -208,6 +199,7 @@ h1{
   font-weight:bold;
 }
 
+/* CROIX */
 .delete-btn{
   position:absolute;
   top:5px;
@@ -225,6 +217,7 @@ h1{
   font-weight:bold;
 }
 
+/* ================= SECTIONS ================= */
 .section{
   display:none;
   padding:20px;
@@ -238,12 +231,12 @@ h1{
 
 <body>
 
-<!-- INTRO VIDEO -->
-<div id="intro-video">
-  <video muted playsinline preload="auto">
+<!-- INTRO VIDEO + BOUTON -->
+<div id="intro-container">
+  <video id="intro-video" muted playsinline webkit-playsinline preload="auto">
     <source src="chat.mp4" type="video/mp4">
   </video>
-  <button id="welcomeBtn">Bienvenue</button>
+  <button id="welcome-btn">Bienvenue</button>
 </div>
 
 <!-- SIDEBAR -->
@@ -282,14 +275,17 @@ h1{
 <script type="module" src="owner.js"></script>
 
 <script>
+/* SIDEBAR */
 const sidebar=document.getElementById("sidebar");
 const toggle=document.getElementById("toggleSidebar");
 toggle.onclick=()=>sidebar.classList.toggle("sidebar-open");
 
+/* MODES */
 function setMode(mode){
   document.getElementById("owner-list").className=mode;
 }
 
+/* NAV SECTIONS */
 function openSection(id){
   sidebar.classList.remove("sidebar-open");
   document.querySelectorAll(".section").forEach(s=>s.classList.remove("active"));
@@ -306,26 +302,21 @@ function closeSection(){
   document.getElementById("display-modes").style.display="block";
 }
 
-/* INTRO VIDEO */
-const intro = document.getElementById("intro-video");
-const video = intro.querySelector("video");
-const welcome = document.getElementById("welcomeBtn");
+/* INTRO VIDEO + BOUTON */
+const introContainer = document.getElementById("intro-container");
+const introVideo = document.getElementById("intro-video");
+const welcomeBtn = document.getElementById("welcome-btn");
 
-// Centrage bouton
-welcome.style.left = "50%";
-welcome.style.top = "50%";
-welcome.style.transform = "translate(-50%, -50%)";
-
-// Au clic sur le bouton "Bienvenue"
-welcome.onclick = () => {
-  video.play().catch(e => console.log("Autoplay bloqué :", e));
-  welcome.style.display = "none";
-
-  video.onended = () => {
+welcomeBtn.onclick = () => {
+  welcomeBtn.style.display = "none";
+  introVideo.style.display = "block";
+  introVideo.play().catch(e => console.log("Autoplay bloqué :", e));
+  introVideo.onended = () => {
     setTimeout(()=>{
-      intro.classList.add("fade-out");
-      setTimeout(()=>intro.remove(), 1200);
-    }, 3000); // 3 secondes après la fin
+      introContainer.style.transition = "opacity 1.2s";
+      introContainer.style.opacity = 0;
+      setTimeout(()=>introContainer.remove(),1200);
+    },3000); // garde 3s à la fin
   };
 };
 </script>
