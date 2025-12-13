@@ -297,10 +297,13 @@ startBtn.onclick = () => {
 };
 
 /* FIN DE LA VIDEO -> afficher l'appli avec fondu */
+/* FIN DE LA VIDEO -> afficher l'appli avec fondu */
 video.onended = () => {
-  introVideoDiv.style.opacity = 0;
-  setTimeout(()=>introVideoDiv.remove(), 1000);
-  appContent.style.opacity = 1;
+  setTimeout(() => {
+    introVideoDiv.style.opacity = 0;
+    setTimeout(() => introVideoDiv.remove(), 1000); // fondu de 1s
+    appContent.style.opacity = 1;
+  }, 1200); // attend 2 secondes après la fin de la vidéo
 };
 
 /* SIDEBAR */
