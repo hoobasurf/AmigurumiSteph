@@ -10,7 +10,7 @@ body{
   font-family:sans-serif;
   background:#fff0f5;
   overflow-x:hidden;
-  padding-left:35px; /* espace pour l'encoche de la sidebar */
+  padding-left:35px; /* place pour l’encoche */
 }
 
 /* ================= INTRO VIDEO ================= */
@@ -35,7 +35,7 @@ body{
   width:100%;
   height:100%;
   object-fit:cover;
-  pointer-events:none; /* empêche clic / bouton lecture */
+  pointer-events:none; /* empêche clic / lecture */
 }
 
 /* ================= SIDEBAR ================= */
@@ -233,6 +233,7 @@ h1{
 <div id="intro-video">
   <video autoplay muted playsinline preload="auto">
     <source src="chat.mp4" type="video/mp4">
+    Votre navigateur ne supporte pas la vidéo.
   </video>
 </div>
 
@@ -254,6 +255,7 @@ h1{
   <button id="add">Ajouter</button>
 </div>
 
+<!-- MODES (SEULEMENT MES CRÉATIONS) -->
 <div id="display-modes">
   <button onclick="setMode('carousel')">Carrousel</button>
   <button onclick="setMode('grid')">Grille</button>
@@ -269,51 +271,51 @@ h1{
 <div id="notes" class="section"><button onclick="closeSection()">← Retour</button></div>
 <div id="settings" class="section"><button onclick="closeSection()">← Retour</button></div>
 
-<!-- JS pour owner -->
+<!-- JS ORIGINAL OWNER.JS -->
 <script type="module" src="owner.js"></script>
 
 <script>
 /* SIDEBAR */
-const sidebar = document.getElementById("sidebar");
-const toggle = document.getElementById("toggleSidebar");
-toggle.onclick = () => sidebar.classList.toggle("sidebar-open");
+const sidebar=document.getElementById("sidebar");
+const toggle=document.getElementById("toggleSidebar");
+toggle.onclick=()=>sidebar.classList.toggle("sidebar-open");
 
 /* MODES */
 function setMode(mode){
-  document.getElementById("owner-list").className = mode;
+  document.getElementById("owner-list").className=mode;
 }
 
 /* NAV SECTIONS */
 function openSection(id){
   sidebar.classList.remove("sidebar-open");
   document.querySelectorAll(".section").forEach(s=>s.classList.remove("active"));
-  document.querySelector(".owner-box").style.display = "none";
-  document.getElementById("owner-list").style.display = "none";
-  document.getElementById("display-modes").style.display = "none";
+  document.querySelector(".owner-box").style.display="none";
+  document.getElementById("owner-list").style.display="none";
+  document.getElementById("display-modes").style.display="none";
   document.getElementById(id).classList.add("active");
 }
 
 function closeSection(){
   document.querySelectorAll(".section").forEach(s=>s.classList.remove("active"));
-  document.querySelector(".owner-box").style.display = "block";
-  document.getElementById("owner-list").style.display = "flex";
-  document.getElementById("display-modes").style.display = "block";
+  document.querySelector(".owner-box").style.display="block";
+  document.getElementById("owner-list").style.display="flex";
+  document.getElementById("display-modes").style.display="block";
 }
 
-/* INTRO VIDEO */
-const intro = document.getElementById("intro-video");
-const video = intro.querySelector("video");
+/* INTRO VIDEO AUTOMATIQUE */
+const intro=document.getElementById("intro-video");
+const video=intro.querySelector("video");
 
-// Forcer lecture automatique si navigateur bloque autoplay
-video.play().catch(()=>{});
+// force lecture automatique
+video.play().catch(()=>{console.log("Autoplay bloqué")});
 
-// Quand la vidéo se termine
-video.addEventListener("ended", () => {
+// disparition fondu après fin + 3 secondes
+video.onended=()=>{
   setTimeout(()=>{
     intro.classList.add("fade-out");
-    setTimeout(()=>intro.remove(), 1200);
-  }, 3000); // reste 3 secondes
-});
+    setTimeout(()=>intro.remove(),1200);
+  },3000);
+};
 </script>
 
 </body>
