@@ -14,7 +14,7 @@ html, body {
   background:#fff0f5;
 }
 
-/* ================= INTRO WRAPPER ================= */
+/* ================= INTRO VIDEO ================= */
 #intro-wrapper {
   position:fixed;
   inset:0;
@@ -32,7 +32,6 @@ html, body {
   pointer-events:none;
 }
 
-/* Bouton Bienvenue */
 #welcomeBtn {
   padding:15px 30px;
   font-size:24px;
@@ -43,7 +42,6 @@ html, body {
   color:#8b3a3a;
   cursor:pointer;
   box-shadow:0 4px 12px rgba(0,0,0,0.2);
-  margin-top:20px;
 }
 
 /* ================= SIDEBAR ================= */
@@ -64,7 +62,6 @@ html, body {
   left:0;
 }
 
-/* ENCÔCHE */
 #toggleSidebar{
   position:absolute;
   top:50%;
@@ -82,7 +79,6 @@ html, body {
   font-weight:bold;
 }
 
-/* BOUTONS SIDEBAR */
 #sidebar button{
   width:100%;
   margin-bottom:10px;
@@ -160,10 +156,7 @@ h1{
   margin-bottom:40px;
 }
 
-/* GRILLE */
 #owner-list.grid .owner-item{ width:140px; }
-
-/* LISTE */
 #owner-list.list{
   flex-direction:column;
   align-items:center;
@@ -174,8 +167,6 @@ h1{
   width:90%;
   gap:10px;
 }
-
-/* CARROUSEL */
 #owner-list.carousel{
   flex-wrap:nowrap;
   overflow-x:auto;
@@ -205,7 +196,6 @@ h1{
   font-weight:bold;
 }
 
-/* CROIX */
 .delete-btn{
   position:absolute;
   top:5px;
@@ -223,12 +213,10 @@ h1{
   font-weight:bold;
 }
 
-/* ================= SECTIONS ================= */
 .section{
   display:none;
   padding:20px;
 }
-
 .section.active{
   display:block;
 }
@@ -238,7 +226,7 @@ h1{
 
 <!-- INTRO -->
 <div id="intro-wrapper">
-  <video id="intro-video" src="chat.mp4" type="video/mp4" style="width:100%; height:auto; max-height:90%;" muted playsinline></video>
+  <video id="intro-video" src="chat.mp4" type="video/mp4" style="width:100%; max-height:90%;" muted playsinline></video>
   <button id="welcomeBtn">Bienvenue</button>
 </div>
 
@@ -268,7 +256,6 @@ h1{
 
 <div id="owner-list" class="grid"></div>
 
-<!-- SECTIONS -->
 <div id="videos" class="section"><button onclick="closeSection()">← Retour</button></div>
 <div id="mailles" class="section"><button onclick="closeSection()">← Retour</button></div>
 <div id="pelotes" class="section"><button onclick="closeSection()">← Retour</button></div>
@@ -310,12 +297,15 @@ const video = document.getElementById("intro-video");
 const welcomeBtn = document.getElementById("welcomeBtn");
 
 welcomeBtn.onclick = () => {
+  // cacher le bouton après clic
+  welcomeBtn.style.display="none";
+  // démarrer vidéo
   video.play().catch(e=>console.log("Autoplay bloqué :", e));
   video.onended = () => {
-    setTimeout(() => {
+    setTimeout(()=>{
       introWrapper.classList.add("fade-out");
-      setTimeout(()=>introWrapper.remove(), 1000);
-    }, 2000); // 2 secondes à la fin
+      setTimeout(()=>introWrapper.remove(),1000);
+    },2000); // 2 secondes après la fin
   };
 };
 </script>
