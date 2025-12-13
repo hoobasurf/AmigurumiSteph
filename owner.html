@@ -4,62 +4,46 @@
 <meta charset="UTF-8">
 <title>Mes Créations</title>
 <style>
-body{
+html, body {
   margin:0;
-  font-family:sans-serif;
-  background:#fff0f5;
-  overflow-x:hidden;
-  padding-left:35px;
-}
-
-/* ================= FOND D'ACCUEIL ================= */
-#intro-background{
-  position:fixed;
-  inset:0;
-  background:url('Photoroom_20251213_123235.png') center/cover no-repeat;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  z-index:100000;
-}
-
-/* BOUTON BIENVENUE */
-#startBtn{
-  padding:20px 40px;
-  font-size:24px;
-  border-radius:16px;
-  border:none;
-  background:#ffb6c1;
-  color:#8b3a3a;
-  font-weight:bold;
-  cursor:pointer;
-  box-shadow:0 6px 15px rgba(182,115,133,.3);
-}
-
-/* ================= INTRO VIDEO ================= */
-#intro-video{
-  position:fixed;
-  inset:0;
-  background:#000;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  z-index:100001;
-  opacity:0;
-  pointer-events:none;
-  transition:opacity 1s ease;
-}
-
-#intro-video video{
+  padding:0;
   width:100%;
   height:100%;
-  object-fit:cover;
+  font-family:sans-serif;
+  overflow-x:hidden;
+  background:#fff0f5;
 }
 
-/* ================= CONTENU APP (CACHÉ AU DÉBUT) ================= */
-#app-content{
-  opacity:0;
+/* ================= INTRO WRAPPER ================= */
+#intro-wrapper {
+  position:fixed;
+  inset:0;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  background:url('Photoroom_20251213_123235.png') no-repeat center center/cover;
+  z-index:100000;
+  flex-direction:column;
   transition:opacity 1s ease;
+}
+
+#intro-wrapper.fade-out {
+  opacity:0;
+  pointer-events:none;
+}
+
+/* Bouton Bienvenue */
+#welcomeBtn {
+  padding:15px 30px;
+  font-size:24px;
+  font-weight:bold;
+  border:none;
+  border-radius:15px;
+  background:#ffb6c1;
+  color:#8b3a3a;
+  cursor:pointer;
+  box-shadow:0 4px 12px rgba(0,0,0,0.2);
+  margin-top:20px;
 }
 
 /* ================= SIDEBAR ================= */
@@ -73,11 +57,14 @@ body{
   border-right:2px solid #b67385;
   padding:20px;
   transition:left .3s ease;
-  z-index:10;
+  z-index:10000;
 }
 
-#sidebar.sidebar-open{ left:0; }
+#sidebar.sidebar-open{
+  left:0;
+}
 
+/* ENCÔCHE */
 #toggleSidebar{
   position:absolute;
   top:50%;
@@ -95,6 +82,7 @@ body{
   font-weight:bold;
 }
 
+/* BOUTONS SIDEBAR */
 #sidebar button{
   width:100%;
   margin-bottom:10px;
@@ -108,7 +96,11 @@ body{
 }
 
 /* ================= TITRE ================= */
-h1{ text-align:center; color:#b84c6f; margin-top:20px; }
+h1{
+  text-align:center;
+  color:#b84c6f;
+  margin-top:20px;
+}
 
 /* ================= AJOUT CREATION ================= */
 .owner-box{
@@ -129,7 +121,9 @@ h1{ text-align:center; color:#b84c6f; margin-top:20px; }
   border-radius:12px;
 }
 
-.owner-box input{ border:1px solid #b67385; }
+.owner-box input{
+  border:1px solid #b67385;
+}
 
 .owner-box button{
   background:#ffb6c1;
@@ -166,8 +160,10 @@ h1{ text-align:center; color:#b84c6f; margin-top:20px; }
   margin-bottom:40px;
 }
 
+/* GRILLE */
 #owner-list.grid .owner-item{ width:140px; }
 
+/* LISTE */
 #owner-list.list{
   flex-direction:column;
   align-items:center;
@@ -179,12 +175,14 @@ h1{ text-align:center; color:#b84c6f; margin-top:20px; }
   gap:10px;
 }
 
+/* CARROUSEL */
 #owner-list.carousel{
   flex-wrap:nowrap;
   overflow-x:auto;
   padding-bottom:10px;
 }
 
+/* ITEM */
 .owner-item{
   position:relative;
   background:#ffe6f0;
@@ -207,6 +205,7 @@ h1{ text-align:center; color:#b84c6f; margin-top:20px; }
   font-weight:bold;
 }
 
+/* CROIX */
 .delete-btn{
   position:absolute;
   top:5px;
@@ -224,92 +223,65 @@ h1{ text-align:center; color:#b84c6f; margin-top:20px; }
   font-weight:bold;
 }
 
-.section{ display:none; padding:20px; }
-.section.active{ display:block; }
+/* ================= SECTIONS ================= */
+.section{
+  display:none;
+  padding:20px;
+}
 
+.section.active{
+  display:block;
+}
 </style>
 </head>
 <body>
 
-<!-- FOND + BOUTON -->
-<div id="intro-background">
-  <button id="startBtn">Bienvenue</button>
+<!-- INTRO -->
+<div id="intro-wrapper">
+  <video id="intro-video" src="chat.mp4" type="video/mp4" style="width:100%; height:auto; max-height:90%;" muted playsinline></video>
+  <button id="welcomeBtn">Bienvenue</button>
 </div>
 
-<!-- VIDÉO -->
-<div id="intro-video">
-  <video muted playsinline preload="auto">
-    <source src="chat.mp4" type="video/mp4">
-  </video>
+<!-- SIDEBAR -->
+<div id="sidebar">
+  <div id="toggleSidebar">☰</div>
+  <button onclick="openSection('videos')">Vidéos</button>
+  <button onclick="openSection('mailles')">Mailles</button>
+  <button onclick="openSection('pelotes')">Pelotes</button>
+  <button onclick="openSection('notes')">Notes</button>
+  <button onclick="openSection('settings')">Paramètres</button>
 </div>
 
-<!-- CONTENU DE L'APP -->
-<div id="app-content">
-  <!-- SIDEBAR -->
-  <div id="sidebar">
-    <div id="toggleSidebar">☰</div>
-    <button onclick="openSection('videos')">Vidéos</button>
-    <button onclick="openSection('mailles')">Mailles</button>
-    <button onclick="openSection('pelotes')">Pelotes</button>
-    <button onclick="openSection('notes')">Notes</button>
-    <button onclick="openSection('settings')">Paramètres</button>
-  </div>
+<h1>Mes Créations</h1>
 
-  <h1>Mes Créations</h1>
-
-  <div class="owner-box">
-    <input id="name" placeholder="Nom de la création">
-    <input id="photo" type="file" accept="image/*">
-    <button id="add">Ajouter</button>
-  </div>
-
-  <div id="display-modes">
-    <button onclick="setMode('carousel')">Carrousel</button>
-    <button onclick="setMode('grid')">Grille</button>
-    <button onclick="setMode('list')">Liste</button>
-  </div>
-
-  <div id="owner-list" class="grid"></div>
-
-  <!-- SECTIONS -->
-  <div id="videos" class="section"><button onclick="closeSection()">← Retour</button></div>
-  <div id="mailles" class="section"><button onclick="closeSection()">← Retour</button></div>
-  <div id="pelotes" class="section"><button onclick="closeSection()">← Retour</button></div>
-  <div id="notes" class="section"><button onclick="closeSection()">← Retour</button></div>
-  <div id="settings" class="section"><button onclick="closeSection()">← Retour</button></div>
+<div class="owner-box">
+  <input id="name" placeholder="Nom de la création">
+  <input id="photo" type="file" accept="image/*">
+  <button id="add">Ajouter</button>
 </div>
+
+<div id="display-modes">
+  <button onclick="setMode('carousel')">Carrousel</button>
+  <button onclick="setMode('grid')">Grille</button>
+  <button onclick="setMode('list')">Liste</button>
+</div>
+
+<div id="owner-list" class="grid"></div>
+
+<!-- SECTIONS -->
+<div id="videos" class="section"><button onclick="closeSection()">← Retour</button></div>
+<div id="mailles" class="section"><button onclick="closeSection()">← Retour</button></div>
+<div id="pelotes" class="section"><button onclick="closeSection()">← Retour</button></div>
+<div id="notes" class="section"><button onclick="closeSection()">← Retour</button></div>
+<div id="settings" class="section"><button onclick="closeSection()">← Retour</button></div>
 
 <script type="module" src="owner.js"></script>
 
 <script>
-const startBtn = document.getElementById("startBtn");
-const introBg = document.getElementById("intro-background");
-const introVideoDiv = document.getElementById("intro-video");
-const video = introVideoDiv.querySelector("video");
-const appContent = document.getElementById("app-content");
-
-/* BOUTON BIENVENUE */
-startBtn.onclick = () => {
-  introBg.style.display = "none";
-  introVideoDiv.style.opacity = "1";
-  introVideoDiv.style.pointerEvents = "auto";
-  video.play().catch(e=>console.log("Lecture bloquée:", e));
-};
-
-/* FIN DE LA VIDEO -> afficher l'appli avec fondu */
-/* FIN DE LA VIDEO -> afficher l'appli avec fondu */
-video.onended = () => {
-  setTimeout(() => {
-    introVideoDiv.style.opacity = 0;
-    setTimeout(() => introVideoDiv.remove(), 1000); // fondu de 1s
-    appContent.style.opacity = 1;
-  }, 2000); // attend 2 secondes après la fin de la vidéo
-};
-
 /* SIDEBAR */
-const sidebar=document.getElementById("sidebar");
-const toggle=document.getElementById("toggleSidebar");
-toggle.onclick=()=>sidebar.classList.toggle("sidebar-open");
+const sidebar = document.getElementById("sidebar");
+const toggle = document.getElementById("toggleSidebar");
+toggle.onclick = () => sidebar.classList.toggle("sidebar-open");
 
 /* MODES */
 function setMode(mode){
@@ -325,13 +297,27 @@ function openSection(id){
   document.getElementById("display-modes").style.display="none";
   document.getElementById(id).classList.add("active");
 }
-
 function closeSection(){
   document.querySelectorAll(".section").forEach(s=>s.classList.remove("active"));
   document.querySelector(".owner-box").style.display="block";
   document.getElementById("owner-list").style.display="flex";
   document.getElementById("display-modes").style.display="block";
 }
+
+/* INTRO VIDEO */
+const introWrapper = document.getElementById("intro-wrapper");
+const video = document.getElementById("intro-video");
+const welcomeBtn = document.getElementById("welcomeBtn");
+
+welcomeBtn.onclick = () => {
+  video.play().catch(e=>console.log("Autoplay bloqué :", e));
+  video.onended = () => {
+    setTimeout(() => {
+      introWrapper.classList.add("fade-out");
+      setTimeout(()=>introWrapper.remove(), 1000);
+    }, 2000); // 2 secondes à la fin
+  };
+};
 </script>
 
 </body>
