@@ -74,10 +74,50 @@
       max-width: 600px;
       border-radius: 12px;
     }
+
+    #intro-video{
+  position:fixed;
+  inset:0;
+  background:#000;
+  z-index:100000;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+}
+
+#intro-video video{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+}
+
+#skipIntro{
+  position:absolute;
+  bottom:30px;
+  right:30px;
+  padding:10px 16px;
+  border-radius:12px;
+  border:none;
+  background:rgba(255,182,193,0.9);
+  color:#8b3a3a;
+  font-weight:bold;
+  cursor:pointer;
+}
+    
   </style>
 </head>
 
 <body>
+
+  <!-- INTRO VIDEO -->
+<div id="intro-video">
+  <video autoplay muted playsinline>
+    <source src="chat.mp4" type="video/mp4">
+    Ton navigateur ne supporte pas la vidéo.
+  </video>
+
+  <button id="skipIntro">Passer</button>
+</div>
 
   <!-- Bouton Owner -->
   <button id="ownerBtn" onclick="location.href='owner.html'">👑 Owner</button>
@@ -93,6 +133,21 @@
   </div>
 
   <script type="module" src="visitor.js"></script>
+<script>
+const intro = document.getElementById("intro-video");
+const video = intro.querySelector("video");
+const skip = document.getElementById("skipIntro");
 
+// fin automatique
+video.onended = () => intro.remove();
+
+// bouton passer
+skip.onclick = () => intro.remove();
+
+// sécurité si autoplay bloqué
+setTimeout(()=>{
+  if(intro) intro.remove();
+}, 8000);
+</script>
 </body>
 </html>
