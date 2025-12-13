@@ -5,78 +5,25 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>Galerie - Visitor</title>
 <style>
-/* ================= RESET ================= */
-* { box-sizing:border-box; margin:0; padding:0; }
-html, body { width:100%; height:100%; font-family:'Comic Sans MS', cursive; overflow-x:hidden; }
+html, body { margin:0; padding:0; height:100%; font-family:'Comic Sans MS', cursive; overflow-x:hidden; }
+body { background:#fff0f5; display:flex; flex-direction:column; }
 
-/* ================= FOND D'ACCUEIL ================= */
-#intro-background{
-  position:fixed;
-  inset:0;
-  background:url('Photoroom_20251213_123235.png') center/cover no-repeat;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  z-index:100000;
-}
-
-/* BOUTON BIENVENUE */
-#startBtn{
-  padding:20px 40px;
-  font-size:24px;
-  border-radius:16px;
-  border:none;
-  background:#ffb6c1;
-  color:#8b3a3a;
-  font-weight:bold;
-  cursor:pointer;
-  box-shadow:0 6px 15px rgba(182,115,133,.3);
-}
-
-/* ================= INTRO VIDEO ================= */
-#intro-video{
-  position:fixed;
-  inset:0;
-  background:#000;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  z-index:100001;
-  opacity:0;
-  pointer-events:none;
-  transition:opacity 1s ease;
-}
-#intro-video.active{
-  opacity:1;
-  pointer-events:auto;
-}
-#intro-video video{
-  width:100%;
-  height:100%;
-  object-fit:cover;
-}
-
-/* ================= APPLI ================= */
-body { background:#fff0f5; }
-header { text-align:center; padding:12px 0; }
+header { text-align:center; padding:12px 0; z-index:1; }
 header img { width:98px; height:98px; border-radius:20%; display:block; margin:0 auto; }
-.title { font-size:42px; color:#b84c6f; font-weight:bold; letter-spacing:1px; margin-bottom:12px; }
-#viewSelector { display:flex; justify-content:center; gap:12px; margin-bottom:14px; }
-#viewSelector button {
-  background:#fff0f7; border:2px solid #b84c6f; color:#b84c6f;
-  padding:8px 16px; border-radius:24px; cursor:pointer; font-size:15px;
-  transition: all 0.18s ease;
-}
+.title { font-size:42px; color:#b84c6f; font-weight:bold; margin-bottom:12px; }
+
+#viewSelector { display:flex; justify-content:center; gap:12px; margin-bottom:14px; z-index:1; position:relative; }
+#viewSelector button { background:#fff0f7; border:2px solid #b84c6f; color:#b84c6f; padding:8px 16px; border-radius:24px; cursor:pointer; font-size:15px; transition:all .18s ease; }
 #viewSelector button.active { background:linear-gradient(90deg,#ffeaf2,#fff5f8); color:#7a2b45; transform:translateY(-2px); }
 #viewSelector button:hover { transform:translateY(-2px); }
 
-.center-zone { flex:1; display:flex; align-items:center; justify-content:center; padding:8px; }
+.center-zone { flex:1; display:flex; align-items:center; justify-content:center; padding:8px; position:relative; z-index:1; }
 #visitor-list { width:calc(100% - 40px); max-width:1200px; margin:0 auto; transition:all 0.2s ease; }
 
 .visitor-item { text-align:center; cursor:pointer; user-select:none; }
 .visitor-item img { display:block; margin:0 auto; object-fit:contain; border:4px solid #b67385; transition: box-shadow 0.3s ease, transform 0.3s ease; }
 .visitor-item:hover img { box-shadow: 0 8px 20px rgba(184,76,111,0.3); transform: scale(1.03); }
-.visitor-item p { margin:8px 0 0; font-size:20px; color:#b84c6f; font-weight:bold; line-height:1.1; }
+.visitor-item p { margin:8px 0 0; font-size:20px; color:#b84c6f; font-weight:bold; }
 
 .carousel-view { display:flex; gap:40px; overflow-x:auto; scroll-behavior:smooth; padding:10px; align-items:center; }
 .carousel-view::-webkit-scrollbar { height:8px; }
@@ -90,11 +37,38 @@ header img { width:98px; height:98px; border-radius:20%; display:block; margin:0
 .list-view .visitor-item { display:flex; gap:18px; align-items:center; padding:8px; }
 .list-view .visitor-item img { width:140px; height:140px; }
 .list-view .visitor-item p { margin:0; font-size:18px; text-align:left; }
+
+/* ================= FOND ACCUEIL + BOUTON ================= */
+#intro-background {
+  position:fixed;
+  inset:0;
+  background:url('Photoroom_20251213_123235.png') center/cover no-repeat;
+  display:flex; justify-content:center; align-items:center; z-index:9999;
+}
+#startBtn {
+  padding:20px 40px;
+  font-size:24px;
+  border-radius:16px;
+  border:none;
+  background:#ffb6c1;
+  color:#8b3a3a;
+  font-weight:bold;
+  cursor:pointer;
+  box-shadow:0 6px 15px rgba(182,115,133,.3);
+}
+
+/* ================= VIDEO ================= */
+#intro-video {
+  position:fixed; inset:0; display:flex; justify-content:center; align-items:center;
+  z-index:10000; opacity:0; pointer-events:none; transition:opacity 1s ease;
+}
+#intro-video.active { opacity:1; pointer-events:auto; }
+#intro-video video { width:100%; height:100%; object-fit:cover; }
 </style>
 </head>
 <body>
 
-<!-- INTRO -->
+<!-- ACCUEIL -->
 <div id="intro-background">
   <button id="startBtn">Bienvenue</button>
 </div>
@@ -104,11 +78,11 @@ header img { width:98px; height:98px; border-radius:20%; display:block; margin:0
   </video>
 </div>
 
-<!-- HEADER + SELECTEUR VUE -->
 <header>
   <img src="favicon.png" alt="Logo">
   <h1 class="title">Mes créations</h1>
 </header>
+
 <div id="viewSelector">
   <button id="btnCarousel">Carrousel</button>
   <button id="btnGrid">Grille</button>
@@ -138,34 +112,34 @@ const btnList = document.getElementById('btnList');
 let creations = [];
 let currentView = 'carousel';
 
-// ================= VIDEO BIENVENUE =================
+// BOUTON BIENVENUE
 startBtn.onclick = () => {
   introVideo.classList.add("active");
-  video.play();
-  startBtn.style.display = 'none';
+  video.play().catch(e=>console.log("Autoplay bloqué:",e));
+  startBtn.style.display='none';
   video.onended = () => {
-    setTimeout(()=>{
+    setTimeout(() => {
       introVideo.style.opacity=0;
       introBg.remove();
       introVideo.remove();
-    },2000); // 2 secondes à la fin
+    },2000);
   };
 };
 
-// ================= VUE CREATIONS =================
+// VUE CREATIONS
 btnCarousel.onclick = () => setView('carousel');
 btnGrid.onclick = () => setView('grid');
 btnList.onclick = () => setView('list');
 
 function setView(view){
-  currentView = view;
+  currentView=view;
   btnCarousel.classList.toggle('active', view==='carousel');
   btnGrid.classList.toggle('active', view==='grid');
   btnList.classList.toggle('active', view==='list');
   renderVisitor();
 }
 
-// ================= CHARGEMENT CREATIONS SUPABASE =================
+// CHARGEMENT CREATIONS SUPABASE
 async function loadCreations(){
   const { data, error } = await supabase.storage.from('owners').list();
   if(error){ console.error(error); return; }
@@ -187,7 +161,6 @@ function renderVisitor(){
   });
 }
 
-// ================= LANCER =================
 loadCreations();
 setView('carousel');
 </script>
