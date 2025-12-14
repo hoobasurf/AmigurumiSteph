@@ -5,25 +5,29 @@
 <title>Galerie - Mes créations</title>
 
 <style>
-* { box-sizing:border-box; margin:0; padding:0; }
+* { box-sizing: border-box; margin:0; padding:0; }
 html, body { height:100%; font-family:'Comic Sans MS', cursive; }
+
 body {
   background-image: url('Photoroom_20251212_143703.PNG');
-  background-size: cover;
+  background-size: contain;
   background-position: center top;
   background-repeat: no-repeat;
   background-attachment: fixed;
-  margin:0;
-  padding:0;
-  overflow:hidden;
+  background-color: #fff0f5;
   display:flex;
   flex-direction:column;
+  min-height:100vh;
+  /* Bloquer le scroll sur le body */
+  overflow:hidden;
 }
 
+/* HEADER */
 header { text-align:center; padding:12px 0; }
 header img { width:98px; height:98px; border-radius:20%; display:block; margin:0 auto; }
 .title { font-size:42px; color:#b84c6f; font-weight:bold; text-align:center; margin-bottom:8px; }
 
+/* VIEW SELECTOR */
 #viewSelector { display:flex; justify-content:center; gap:12px; margin:14px; }
 #viewSelector button {
   background:#fff0f7;
@@ -35,24 +39,29 @@ header img { width:98px; height:98px; border-radius:20%; display:block; margin:0
 }
 #viewSelector button.active { background:#ffeaf2; }
 
+/* ZONE */
 .center-zone { flex:1; display:flex; justify-content:center; }
 #visitor-list { width:100%; max-width:1200px; }
 
+/* ITEMS */
 .visitor-item { text-align:center; cursor:pointer; user-select:none; }
 .visitor-item img { width:220px; height:220px; object-fit:contain; border:4px solid #b67385; transition: transform 0.2s ease; }
 .visitor-item:hover img { transform: scale(1.02); }
 .visitor-item p { margin-top:8px; font-size:20px; color:#b84c6f; font-weight:bold; }
 
+/* CAROUSEL */
 .carousel-view { display:flex; gap:40px; overflow-x:auto; padding:20px; scroll-behavior:smooth; }
 .carousel-view::-webkit-scrollbar { height:8px; }
 .carousel-view::-webkit-scrollbar-thumb { background:#b84c6f88; border-radius:20px; }
 
-.grid-view, .list-view { overflow-y:auto; -webkit-overflow-scrolling: touch; max-height: calc(100vh - 260px); overscroll-behavior: contain; }
+/* GRID & LIST */
+.grid-view, .list-view { overflow-y:scroll; -webkit-overflow-scrolling: touch; max-height: calc(100vh - 260px); overscroll-behavior: none; }
 .grid-view { display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:24px; padding:20px; }
 .list-view { display:flex; flex-direction:column; gap:18px; padding:20px; }
 .list-view .visitor-item { display:flex; align-items:center; gap:18px; }
 .list-view .visitor-item img { width:140px; height:140px; }
 
+/* MODAL */
 .modal-bg {
   position:fixed; inset:0; background:rgba(0,0,0,0.65);
   display:none; justify-content:center; align-items:center; z-index:1000;
@@ -65,12 +74,14 @@ header img { width:98px; height:98px; border-radius:20%; display:block; margin:0
   padding:18px;
   max-width:900px; width:95%;
   max-height:80vh;
-  overflow-y:auto;
+  overflow-y:scroll;
   position:relative;
 }
 .close-modal {
   position:absolute; top:12px; right:16px;
-  font-size:30px; cursor:pointer; color:#b84c6f;
+  font-size:30px; cursor:pointer; color:#fff;
+  background:linear-gradient(90deg,#ff8ebf,#b84c6f);
+  border-radius:12px; padding:2px 8px;
 }
 .modal-main-img { width:100%; max-height:500px; object-fit:contain; border:4px solid #b67385; }
 
@@ -81,13 +92,12 @@ header img { width:98px; height:98px; border-radius:20%; display:block; margin:0
 .comment-icon { font-size:22px; }
 .like-info { font-size:14px; }
 
+/* COMMENTS */
 .comment-section { margin-top:16px; }
 .comment { background:#fff0f7; padding:10px; border-radius:10px; margin-bottom:10px; }
 
-.comment-form-bg {
-  position:fixed; inset:0; background:rgba(0,0,0,.6);
-  display:none; justify-content:center; align-items:center; z-index:2000;
-}
+/* COMMENT FORM */
+.comment-form-bg { position:fixed; inset:0; background:rgba(0,0,0,.6); display:none; justify-content:center; align-items:center; z-index:2000; }
 .comment-form { background:white; padding:18px; border-radius:14px; width:340px; }
 .comment-form input, .comment-form textarea { width:100%; margin-bottom:10px; padding:10px; border-radius:8px; }
 
@@ -113,7 +123,7 @@ header img { width:98px; height:98px; border-radius:20%; display:block; margin:0
 <!-- MODAL -->
 <div class="modal-bg" id="modal" onclick="closeModal()">
   <div class="modal-box" onclick="event.stopPropagation()">
-    <div class="close-modal" onclick="closeModal(); event.stopPropagation()">×</div>
+    <div class="close-modal" onclick="closeModal(); event.stopPropagation()">Retour</div>
     <img id="modalMain" class="modal-main-img">
 
     <div class="icon-bar">
