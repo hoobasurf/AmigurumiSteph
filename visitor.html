@@ -1,225 +1,317 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="UTF-8">
-<title>Créations</title>
+<meta charset="UTF-8" />
+<title>Galerie - Mes créations</title>
 
 <style>
-body{
-  font-family: Arial, sans-serif;
-  background:#ffe6f0;
-  padding:20px;
+* { box-sizing: border-box; margin:0; padding:0; }
+html, body { height:100%; font-family: 'Comic Sans MS', cursive; }
+
+body {
+  background-image: url('Photoroom_20251212_143703.png');
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  background-color: #fff0f5;
+
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+
+  overflow: hidden;
+  touch-action: pan-x;
 }
 
-h1{
-  text-align:center;
-  color:#8b3a3a;
-  background:#fff0f5;
-  border:2px solid #c07a8a;
-  border-radius:20px;
-  padding:10px;
-  margin-bottom:20px;
-}
+/* HEADER */
+header img { width: 98px; height: 98px; display:block; margin:0 auto 12px; border-radius:20%; }
+.title { font-size:42px; color:#b84c6f; font-weight:bold; text-align:center; }
+.title-thread { margin:10px auto 0; width:240px; height:6px; background:#b84c6f; border-radius:20px; }
 
-.gallery{
-  display:flex;
-  flex-wrap:wrap;
-  gap:15px;
-  justify-content:center;
-}
-
-.card{
-  background:#fff0f5;
-  border-radius:15px;
-  padding:10px;
-  width:140px;
-  text-align:center;
+/* VIEW SELECTOR */
+#viewSelector { display:flex; justify-content:center; gap:12px; margin:14px; }
+#viewSelector button {
+  background:#fff0f7;
+  border:2px solid #b84c6f;
+  color:#b84c6f;
+  padding:8px 16px;
+  border-radius:24px;
   cursor:pointer;
-  box-shadow:0 4px 10px rgba(150,60,80,.25);
+}
+#viewSelector button.active { background:#ffeaf2; }
+
+/* ZONE */
+.center-zone { flex:1; display:flex; justify-content:center; }
+#visitor-list { width:100%; max-width:1200px; }
+
+/* ITEMS */
+.visitor-item img {
+  will-change: transform;
+  transform-origin: center center;
+}
+.visitor-item:hover img {
+  transform: scale(1.02);
 }
 
-.card img{
-  width:100%;
-  border-radius:10px;
+/* CAROUSEL */
+.carousel-view {
+  display:flex;
+  gap:40px;
+  overflow-x:auto;
+  padding:20px;
+  scroll-behavior:smooth;
+}
+.carousel-view::-webkit-scrollbar { height:8px; }
+.carousel-view::-webkit-scrollbar-thumb {
+  background:#b84c6f88;
+  border-radius:20px;
 }
 
-.card p{
-  margin:6px 0 0;
-  color:#8b3a3a;
-  font-size:14px;
+/* GRID */
+.grid-view {
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(220px,1fr));
+  gap:24px;
+  padding:20px;
+  overflow-y:auto;
+  max-height: calc(100vh - 260px);
+  overscroll-behavior: contain;
 }
 
-.modal{
+/* LIST */
+.list-view {
+  display:flex;
+  flex-direction:column;
+  gap:18px;
+  padding:20px;
+  overflow-y:auto;
+  max-height: calc(100vh - 260px);
+  overscroll-behavior: contain;
+}
+
+/* MODAL */
+.modal-bg {
   position:fixed;
   inset:0;
-  background:rgba(0,0,0,.45);
+  background:rgba(0,0,0,.65);
   display:none;
-  align-items:center;
   justify-content:center;
-  z-index:9999;
+  align-items:center;
+  z-index:1000;
 }
-
-.modal-content{
-  background:#fff;
-  border-radius:20px;
-  padding:15px;
-  max-width:340px;
-  width:100%;
+.modal-box {
+  background:#fff5f8;
+  border-radius:18px;
+  padding:18px;
+  max-width:900px;
+  width:95%;
+  box-shadow:0 8px 30px rgba(184,76,111,.3);
+  position:relative;
 }
+.modal-box * { pointer-events:auto; }
 
-.modal-content img{
-  width:100%;
-  border-radius:15px;
-}
-
-.like{
-  margin-top:10px;
-  font-weight:bold;
-  color:#8b3a3a;
-}
-
-button{
-  background:#8b3a3a;
-  color:white;
-  border:none;
-  padding:6px 14px;
-  border-radius:16px;
+.close-modal {
+  position:absolute;
+  top:12px;
+  right:16px;
+  font-size:30px;
   cursor:pointer;
-  margin-top:6px;
+  color:#b84c6f;
 }
 
-input, textarea{
+.modal-main-img {
   width:100%;
-  padding:6px;
-  border-radius:12px;
-  border:1px solid #ccc;
-  margin-top:6px;
+  max-height:500px;
+  object-fit:contain;
+  border:4px solid #b67385;
 }
 
-.comment{
-  background:#fff0f5;
-  border-radius:12px;
-  padding:6px;
-  margin-top:6px;
-  font-size:13px;
+/* ICON BAR */
+.icon-bar {
+  display:flex;
+  justify-content:center;
+  gap:30px;
+  margin-top:12px;
+}
+.icon-btn {
+  display:flex;
+  align-items:center;
+  gap:8px;
+  cursor:pointer;
+  color:#b84c6f;
+}
+.heart { font-size:26px; }
+.heart.liked { color:#ff4b82; }
+.comment-icon { font-size:22px; }
+.like-info { font-size:14px; }
+
+/* COMMENTS */
+.comment-section { margin-top:16px; }
+.comment {
+  background:#fff0f7;
+  padding:10px;
+  border-radius:10px;
+  margin-bottom:10px;
+}
+
+/* COMMENT FORM */
+.comment-form-bg {
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.6);
+  display:none;
+  justify-content:center;
+  align-items:center;
+  z-index:2000;
+}
+.comment-form {
+  background:white;
+  padding:18px;
+  border-radius:14px;
+  width:340px;
+}
+.comment-form input,
+.comment-form textarea {
+  width:100%;
+  margin-bottom:10px;
+  padding:10px;
+  border-radius:8px;
 }
 </style>
 </head>
 
 <body>
 
-<h1>Créations</h1>
-<div class="gallery" id="gallery"></div>
+<header>
+  <img src="favicon.png">
+  <h1 class="title">Mes créations</h1>
+  <div class="title-thread"></div>
+</header>
 
-<div class="modal" id="modal">
-  <div class="modal-content" id="modalContent"></div>
+<div id="viewSelector">
+  <button id="btnCarousel">Carrousel</button>
+  <button id="btnGrid">Grille</button>
+  <button id="btnList">Liste</button>
+</div>
+
+<div class="center-zone">
+  <div id="visitor-list"></div>
+</div>
+
+<!-- MODAL -->
+<div class="modal-bg" id="modal" onclick="closeModal()">
+  <div class="modal-box" onclick="event.stopPropagation()">
+    <div class="close-modal" onclick="closeModal();event.stopPropagation()">×</div>
+    <img id="modalMain" class="modal-main-img">
+
+    <div class="icon-bar">
+      <div class="icon-btn" onclick="toggleLike();event.stopPropagation()">
+        <span id="heart" class="heart">♡</span>
+        <span id="likeCount" class="like-info">0</span>
+      </div>
+
+      <div class="icon-btn" onclick="openCommentForm();event.stopPropagation()">
+        <span class="comment-icon">💬</span>
+        <span id="commentCount" class="like-info">0</span>
+      </div>
+    </div>
+
+    <div id="commentsList" class="comment-section"></div>
+  </div>
+</div>
+
+<!-- COMMENT FORM -->
+<div class="comment-form-bg" id="commentFormBg" onclick="closeCommentForm(event)">
+  <div class="comment-form" onclick="event.stopPropagation()">
+    <input id="commentName" placeholder="Prénom">
+    <textarea id="commentText" rows="4" placeholder="Commentaire"></textarea>
+    <button onclick="submitComment()">Envoyer</button>
+  </div>
 </div>
 
 <script>
-// --------------------
-// CHARGEMENT DONNÉES
-// --------------------
-let creations = [];
-try {
-  creations = JSON.parse(localStorage.getItem("creations") || "[]");
-} catch {
-  creations = [];
-}
+const list = document.getElementById('visitor-list');
+const modal = document.getElementById('modal');
+const modalMain = document.getElementById('modalMain');
+const heart = document.getElementById('heart');
+const likeCount = document.getElementById('likeCount');
+const commentCount = document.getElementById('commentCount');
+const commentList = document.getElementById('commentsList');
+const commentFormBg = document.getElementById('commentFormBg');
 
-// si anciennes créations sans likes/commentaires
-creations.forEach(c => {
-  if (!c.likes) c.likes = 0;
-  if (!c.comments) c.comments = [];
-});
+let creations = JSON.parse(localStorage.getItem('creations') || '[]');
+let currentIndex = null;
+let currentView = 'carousel';
 
-const gallery = document.getElementById("gallery");
-const modal = document.getElementById("modal");
-const modalContent = document.getElementById("modalContent");
-
-// --------------------
-// AFFICHAGE GALERIE
-// --------------------
-function renderGallery(){
-  gallery.innerHTML = "";
-  creations.forEach((c, index) => {
-    const div = document.createElement("div");
-    div.className = "card";
-    div.innerHTML = `
-      <img src="${c.imgUrl}">
-      <p>${c.name}</p>
-    `;
-    div.onclick = () => openModal(index);
-    gallery.appendChild(div);
+function render() {
+  list.innerHTML='';
+  list.className = currentView+'-view';
+  creations.forEach((c,i)=>{
+    const d=document.createElement('div');
+    d.className='visitor-item';
+    d.innerHTML=`<img src="${c.imgUrl}"><p>${c.name}</p>`;
+    d.onclick=()=>openModal(i);
+    list.appendChild(d);
   });
 }
 
-// --------------------
-// MODAL PROJET
-// --------------------
+function setView(v){
+  currentView=v;
+  render();
+}
+btnCarousel.onclick=()=>setView('carousel');
+btnGrid.onclick=()=>setView('grid');
+btnList.onclick=()=>setView('list');
+
 function openModal(i){
-  const c = creations[i];
-
-  modalContent.innerHTML = `
-    <img src="${c.imgUrl}">
-    <div class="like">
-      ❤️ ${c.likes} likes
-    </div>
-    <button id="likeBtn">J’aime</button>
-
-    <h3>Commentaires</h3>
-    <div id="comments"></div>
-
-    <input id="author" placeholder="Prénom">
-    <textarea id="message" placeholder="Commentaire"></textarea>
-    <button id="send">Envoyer</button>
-  `;
-
-  document.getElementById("likeBtn").onclick = () => {
-    c.likes++;
-    save();
-    openModal(i);
-  };
-
-  const commentsBox = document.getElementById("comments");
-  commentsBox.innerHTML = "";
-  c.comments.forEach(cm => {
-    const d = document.createElement("div");
-    d.className = "comment";
-    d.innerHTML = `<b>${cm.author}</b><br>${cm.text}`;
-    commentsBox.appendChild(d);
-  });
-
-  document.getElementById("send").onclick = () => {
-    const author = document.getElementById("author").value.trim();
-    const text = document.getElementById("message").value.trim();
-    if(!author || !text) return;
-    c.comments.push({author, text});
-    save();
-    openModal(i);
-  };
-
-  modal.style.display = "flex";
+  currentIndex=i;
+  modalMain.src=creations[i].imgUrl;
+  modal.style.display='flex';
+  loadLikes();
+  loadComments();
 }
 
-// --------------------
-// SAUVEGARDE
-// --------------------
-function save(){
-  localStorage.setItem("creations", JSON.stringify(creations));
-  renderGallery();
+function closeModal(){ modal.style.display='none'; }
+
+function toggleLike(){
+  const key='likes_'+currentIndex;
+  let likes=JSON.parse(localStorage.getItem(key)||'[]');
+  likes = likes.length ? [] : ['like'];
+  localStorage.setItem(key,JSON.stringify(likes));
+  loadLikes();
 }
 
-// --------------------
-// FERMER MODAL
-// --------------------
-modal.onclick = e => {
-  if(e.target === modal){
-    modal.style.display = "none";
-  }
-};
+function loadLikes(){
+  const likes=JSON.parse(localStorage.getItem('likes_'+currentIndex)||'[]');
+  heart.classList.toggle('liked',likes.length>0);
+  heart.textContent=likes.length?'❤️':'♡';
+  likeCount.textContent=likes.length;
+}
 
-// --------------------
-renderGallery();
+function openCommentForm(){ commentFormBg.style.display='flex'; }
+function closeCommentForm(e){ if(e.target===commentFormBg) commentFormBg.style.display='none'; }
+
+function submitComment(){
+  const n=commentName.value.trim();
+  const t=commentText.value.trim();
+  if(!n||!t)return;
+  const key='comments_'+currentIndex;
+  const c=JSON.parse(localStorage.getItem(key)||'[]');
+  c.push({n,t});
+  localStorage.setItem(key,JSON.stringify(c));
+  commentName.value=''; commentText.value='';
+  commentFormBg.style.display='none';
+  loadComments();
+}
+
+function loadComments(){
+  const c=JSON.parse(localStorage.getItem('comments_'+currentIndex)||'[]');
+  commentCount.textContent=c.length;
+  commentList.innerHTML=c.map(x=>`<div class="comment"><strong>${x.n}</strong><br>${x.t}</div>`).join('');
+}
+
+render();
 </script>
 
 </body>
