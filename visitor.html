@@ -2,25 +2,28 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
+<title>Galerie – Visitor</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Mes créations</title>
 
 <style>
-/* RESET ANTI-ZOOM */
-*{ box-sizing:border-box; }
-html, body{
-  margin:0;
-  padding:0;
-  width:100%;
-  height:100%;
+/* ================= RESET ================= */
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%}
+body{
   font-family:sans-serif;
   background:#fff0f5;
   overflow-x:hidden;
-  transform:none !important;
-  zoom:1 !important;
 }
 
-/* ================= INTRO BACKGROUND ================= */
+/* ================= CACHE L’APPLI AU DÉPART ================= */
+body.app{
+  visibility:hidden;
+}
+body.app.ready{
+  visibility:visible;
+}
+
+/* ================= FOND BIENVENUE ================= */
 #intro-background{
   position:fixed;
   inset:0;
@@ -28,13 +31,12 @@ html, body{
   display:flex;
   justify-content:center;
   align-items:center;
-  z-index:10000;
+  z-index:100000;
 }
 
-/* BOUTON BIENVENUE */
 #startBtn{
-  padding:18px 36px;
-  font-size:22px;
+  padding:20px 40px;
+  font-size:24px;
   border-radius:16px;
   border:none;
   background:#ffb6c1;
@@ -52,7 +54,7 @@ html, body{
   display:flex;
   justify-content:center;
   align-items:center;
-  z-index:10001;
+  z-index:100001;
   opacity:0;
   pointer-events:none;
   transition:opacity 1s ease;
@@ -61,80 +63,174 @@ html, body{
 #intro-video video{
   width:100%;
   height:100%;
-  object-fit:contain; /* PAS DE ZOOM */
+  object-fit:cover;
+  pointer-events:none;
 }
 
-/* ================= APP ================= */
-body.app{
-  background-image:url('Photoroom_20251212_143703.png');
-  background-size:cover;
-  background-position:center top;
-  background-repeat:no-repeat;
-  background-attachment:fixed;
-}
-
+/* ================= HEADER ================= */
 h1{
   text-align:center;
   color:#b84c6f;
   margin:20px 0;
 }
 
-/* GALERIE */
-.gallery-scroll{
+/* ================= MODES ================= */
+#viewSelector{
+  display:flex;
+  justify-content:center;
+  gap:10px;
+  margin-bottom:10px;
+}
+#viewSelector button{
+  padding:8px 16px;
+  border-radius:20px;
+  border:2px solid #b84c6f;
+  background:#fff0f7;
+  color:#b84c6f;
+  font-weight:bold;
+  cursor:pointer;
+}
+#viewSelector button.active{
+  background:#ffeaf2;
+}
+
+/* ================= LISTE ================= */
+#visitor-list{
+  width:100%;
+  max-width:1200px;
+  margin:0 auto;
+  padding:10px;
+}
+
+.carousel-view{
   display:flex;
   gap:20px;
   overflow-x:auto;
-  padding:20px;
 }
-.gallery-scroll img{
-  height:240px;
-  border-radius:12px;
+.grid-view{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(220px,1fr));
+  gap:20px;
+}
+.list-view{
+  display:flex;
+  flex-direction:column;
+  gap:20px;
+}
+
+.visitor-item{
+  text-align:center;
   cursor:pointer;
-  box-shadow:0 4px 15px rgba(0,0,0,.25);
+}
+.visitor-item img{
+  width:100%;
+  max-height:240px;
+  object-fit:contain;
+  border:4px solid #b67385;
+  border-radius:12px;
+}
+.visitor-item p{
+  margin-top:8px;
+  font-weight:bold;
+  color:#b84c6f;
 }
 </style>
 </head>
 
 <body class="app">
 
-<!-- INTRO FOND -->
+<!-- BIENVENUE -->
 <div id="intro-background">
   <button id="startBtn">Bienvenue</button>
 </div>
 
-<!-- INTRO VIDEO -->
+<!-- VIDEO -->
 <div id="intro-video">
-  <video id="video" playsinline webkit-playsinline preload="auto">
+  <video id="video" muted playsinline preload="auto">
     <source src="chat.mp4" type="video/mp4">
   </video>
 </div>
 
+<!-- APP -->
 <h1>✨ Projets réalisés</h1>
-<div id="gallery" class="gallery-scroll"></div>
 
-<script type="module" src="visitor.js"></script>
+<div id="viewSelector">
+  <button id="btnCarousel" class="active">Carrousel</button>
+  <button id="btnGrid">Grille</button>
+  <button id="btnList">Liste</button>
+</div>
+
+<div id="visitor-list"></div>
+
+<!-- SUPABASE -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
 
 <script>
-const startBtn = document.getElementById("startBtn");
-const introBg = document.getElementById("intro-background");
-const introVideo = document.getElementById("intro-video");
-const video = document.getElementById("video");
+/* ================= SUPABASE ================= */
+const SUPABASE_URL = "https://iubbxvipgofxasatmvzg.supabase.co";
+const SUPABASE_KEY = "sb_publishable_GDoZmwIdoP28XOdrfYYVNw_E_HiCQB1";
+const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-/* CLICK BIENVENUE */
-startBtn.onclick = () => {
-  introBg.style.display = "none";
-  introVideo.style.opacity = "1";
-  introVideo.style.pointerEvents = "auto";
+const list = document.getElementById("visitor-list");
+let creations = [];
+let view = "carousel";
 
-  video.play().catch(e => console.log("Autoplay bloqué", e));
+/* CHARGEMENT DES IMAGES */
+async function loadCreations(){
+  const { data, error } = await supabase.storage.from("owners").list();
+  if(error){ console.error(error); return; }
+
+  creations = data.map(f => ({
+    name: f.name,
+    url: supabase.storage.from("owners").getPublicUrl(f.name).publicURL
+  }));
+
+  render();
+}
+
+function render(){
+  list.className = view + "-view";
+  list.innerHTML = "";
+  creations.forEach(c=>{
+    const div = document.createElement("div");
+    div.className="visitor-item";
+    div.innerHTML = `<img src="${c.url}"><p>${c.name}</p>`;
+    list.appendChild(div);
+  });
+}
+
+/* MODES */
+btnCarousel.onclick=()=>{view="carousel";setActive(btnCarousel);render();}
+btnGrid.onclick=()=>{view="grid";setActive(btnGrid);render();}
+btnList.onclick=()=>{view="list";setActive(btnList);render();}
+
+function setActive(btn){
+  document.querySelectorAll("#viewSelector button").forEach(b=>b.classList.remove("active"));
+  btn.classList.add("active");
+}
+
+/* ================= INTRO LOGIQUE ================= */
+const startBtn=document.getElementById("startBtn");
+const introBg=document.getElementById("intro-background");
+const introVideo=document.getElementById("intro-video");
+const video=document.getElementById("video");
+
+startBtn.onclick=()=>{
+  introBg.style.display="none";
+  introVideo.style.opacity="1";
+  introVideo.style.pointerEvents="auto";
+  video.play();
 };
 
-/* FIN VIDEO */
-video.onended = () => {
+video.onended=()=>{
   setTimeout(()=>{
-    introVideo.style.opacity = "0";
-    setTimeout(()=> introVideo.remove(), 1000);
-  }, 2000); // 2 secondes à la fin
+    introVideo.style.opacity="0";
+    setTimeout(()=>{
+      introVideo.remove();
+      document.body.classList.add("ready");
+      loadCreations(); // 🔥 APPLI LANCÉE ICI
+    },1000);
+  },2000);
 };
 </script>
 
