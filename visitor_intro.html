@@ -2,9 +2,8 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<title>Visitor - Accueil</title>
+<title>Visitor Intro</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <style>
 *{margin:0;padding:0;box-sizing:border-box;}
 html,body{width:100%;height:100%;overflow:hidden;font-family:sans-serif;}
@@ -21,7 +20,7 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:sans-serif;}
   flex-direction:column;
 }
 
-/* vidéo plein écran SANS ZOOM */
+/* vidéo plein écran */
 #intro-video{
   position:absolute;
   inset:0;
@@ -60,11 +59,10 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:sans-serif;}
 </div>
 
 <script>
-const intro = document.getElementById('intro-container');
-const video = document.getElementById('intro-video');
 const btn = document.getElementById('welcome-btn');
+const video = document.getElementById('intro-video');
 
-/* CLICK BIENVENUE */
+/* Click Bienvenue */
 btn.addEventListener('click', () => {
   btn.style.transition = 'opacity 0.5s';
   btn.style.opacity = 0;
@@ -72,8 +70,8 @@ btn.addEventListener('click', () => {
   video.play();
 
   video.onended = () => {
-    // Redirige vers l'application après la vidéo
-    window.location.href = "visitor_app.html";
+    // redirection vers l'appli
+    window.location.href = "visitor.html";
   };
 });
 </script>
