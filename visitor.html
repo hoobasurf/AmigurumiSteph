@@ -6,7 +6,6 @@
 <style>
 * { box-sizing: border-box; margin:0; padding:0; }
 html, body { height:100%; font-family:'Comic Sans MS', cursive; }
-
 body {
   width: 100vw;
   height: 100vh;
@@ -81,6 +80,20 @@ header img { width:98px; height:98px; border-radius:20%; display:block; margin:0
   overflow-y:auto;
   position:relative;
 }
+/* BOUTON RETOUR DANS MODAL */
+.modal-back-btn {
+  display:block;
+  margin:0 auto 10px auto;
+  background: linear-gradient(90deg, #ffeaf2, #ffb6d2);
+  border:2px solid #b84c6f;
+  color:#b84c6f;
+  padding:8px 20px;
+  border-radius:26px;
+  font-weight:bold;
+  cursor:pointer;
+  text-align:center;
+  width:120px;
+}
 .close-modal {
   position:absolute; top:12px; right:16px;
   font-size:30px; cursor:pointer; color:#b84c6f;
@@ -106,28 +119,12 @@ header img { width:98px; height:98px; border-radius:20%; display:block; margin:0
 }
 .comment-form { background:white; padding:18px; border-radius:14px; width:340px; }
 .comment-form input, .comment-form textarea { width:100%; margin-bottom:10px; padding:10px; border-radius:8px; }
-
-/* BOUTON RETOUR */
-#btnBack {
-  position: fixed;
-  top:16px; left:16px;
-  background: linear-gradient(90deg,#ffeaf2,#fff0f7);
-  border: 2px solid #b84c6f;
-  border-radius:24px;
-  color:#b84c6f;
-  padding:8px 16px;
-  cursor:pointer;
-  z-index:1100;
-  font-weight:bold;
-}
 </style>
 </head>
 
 <body>
 
 <div class="bg-fixed"></div>
-
-<button id="btnBack" onclick="history.back()">← Retour</button>
 
 <header>
   <img src="favicon.png" alt="Logo">
@@ -147,6 +144,7 @@ header img { width:98px; height:98px; border-radius:20%; display:block; margin:0
 <!-- MODAL -->
 <div class="modal-bg" id="modal" onclick="closeModal()">
   <div class="modal-box" onclick="event.stopPropagation()">
+    <button class="modal-back-btn" onclick="closeModal(); event.stopPropagation()">Retour</button>
     <div class="close-modal" onclick="closeModal(); event.stopPropagation()">×</div>
     <img id="modalMain" class="modal-main-img">
 
