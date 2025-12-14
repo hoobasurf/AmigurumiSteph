@@ -234,34 +234,35 @@ function scrollToComments(){ commentList.scrollIntoView({behavior:'smooth', bloc
 loadCreations();
 
  <!-- ====================== SUPABASE CREATIONS ====================== -->
+<!-- ====================== SUPABASE CREATIONS ====================== -->
 <script>
 async function loadSupabaseCreations() {
   try {
-    // Récupère la liste des fichiers dans le bucket 'owners'
+    // Liste des fichiers dans le bucket 'owners'
     const { data, error } = await window.supabaseClient.storage.from('owners').list();
     if (error) {
       console.error("Erreur Supabase:", error);
       return;
     }
 
-    // Transforme chaque fichier en objet utilisable par renderCreations()
+    // On transforme chaque fichier en objet compatible avec renderCreations()
     const supaCreations = data.map(item => {
       const { publicURL } = window.supabaseClient.storage.from('owners').getPublicUrl(item.name);
       return { name: item.name, imgUrl: publicURL };
     });
 
-    // Remplace les créations locales par celles du bucket Supabase
-    creations = supaCreations;
+    // Ajoute ces créations aux créations locales existantes
+    creations = [...supaCreations, ...creations];
 
-    // Affiche-les avec la fonction existante
+    // Rafraîchit l'affichage avec ta fonction existante
     renderCreations();
   } catch (err) {
     console.error("Erreur chargement Supabase:", err);
   }
 }
 
-// Appelle la fonction après l'initialisation de supabaseClient
-loadSupabaseCreations();
+// Appel après que supabaseClient et renderCreations() soient initialisés
+window.addEventListener('DOMContentLoaded', loadSupabaseCreations);
 </script>
 </script>
 </body>
