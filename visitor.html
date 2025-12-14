@@ -6,51 +6,30 @@
 
 <style>
 * { box-sizing: border-box; margin:0; padding:0; }
-html, body { height:100%; font-family:'Comic Sans MS', cursive; }
+html, body { height:100%; font-family: 'Comic Sans MS', cursive; }
 
 body {
   background-image: url('Photoroom_20251212_143703.PNG');
   background-size: contain;
-  background-position: center;
+  background-position: center top;
   background-repeat: no-repeat;
   background-attachment: fixed;
   background-color: #fff0f5;
 
-  display:flex;
-  flex-direction:column;
-  min-height:100vh;
-  overflow:hidden;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  overflow: hidden; /* fond fixe */
+  touch-action: pan-x;
 }
 
 /* HEADER */
-header img {
-  width:98px;
-  height:98px;
-  display:block;
-  margin:0 auto 12px;
-  border-radius:20%;
-}
-.title {
-  font-size:42px;
-  color:#b84c6f;
-  font-weight:bold;
-  text-align:center;
-}
-.title-thread {
-  margin:10px auto 0;
-  width:240px;
-  height:6px;
-  background:#b84c6f;
-  border-radius:20px;
-}
+header { text-align:center; padding:12px 0; }
+header img { width:98px; height:98px; border-radius:20%; display:block; margin:0 auto; }
+.title { font-size:42px; color:#b84c6f; font-weight:bold; text-align:center; margin-bottom:12px; }
 
 /* VIEW SELECTOR */
-#viewSelector {
-  display:flex;
-  justify-content:center;
-  gap:12px;
-  margin:14px;
-}
+#viewSelector { display:flex; justify-content:center; gap:12px; margin:14px; }
 #viewSelector button {
   background:#fff0f7;
   border:2px solid #b84c6f;
@@ -58,53 +37,31 @@ header img {
   padding:8px 16px;
   border-radius:24px;
   cursor:pointer;
+  font-size:15px;
+  transition: all 0.18s ease;
 }
-#viewSelector button.active {
-  background:#ffeaf2;
-}
+#viewSelector button.active { background:#ffeaf2; }
 
 /* ZONE */
-.center-zone {
-  flex:1;
-  display:flex;
-  justify-content:center;
-}
-#visitor-list {
-  width:100%;
-  max-width:1200px;
-}
+.center-zone { flex:1; display:flex; justify-content:center; }
+#visitor-list { width:100%; max-width:1200px; }
 
 /* ITEMS */
-.visitor-item {
-  text-align:center;
-  cursor:pointer;
-}
 .visitor-item img {
-  display:block;
-  margin:0 auto;
-  object-fit:contain;
-  transition:transform .2s;
+  width: 220px;
+  height: 220px;
+  object-fit: contain;
+  border:4px solid #b67385;
+  background: transparent;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
-.visitor-item:hover img {
-  transform:scale(1.02);
-}
-.visitor-item p {
-  margin-top:8px;
-  color:#b84c6f;
-  font-weight:bold;
-}
+.visitor-item:hover img { transform: scale(1.02); box-shadow: 0 6px 16px rgba(184,76,111,0.3); }
+.visitor-item p { margin:8px 0 0; font-size:20px; color:#b84c6f; font-weight:bold; line-height:1.1; }
 
 /* CAROUSEL */
-.carousel-view {
-  display:flex;
-  gap:40px;
-  overflow-x:auto;
-  padding:20px;
-}
-.carousel-view img {
-  width:260px;
-  height:260px;
-}
+.carousel-view { display:flex; gap:40px; overflow-x:auto; padding:20px; scroll-behavior:smooth; }
+.carousel-view::-webkit-scrollbar { height:8px; }
+.carousel-view::-webkit-scrollbar-thumb { background:#b84c6f88; border-radius:20px; }
 
 /* GRID */
 .grid-view {
@@ -113,11 +70,8 @@ header img {
   gap:24px;
   padding:20px;
   overflow-y:auto;
-  max-height:calc(100vh - 260px);
-}
-.grid-view img {
-  width:100%;
-  height:200px;
+  max-height: calc(100vh - 260px);
+  -webkit-overflow-scrolling: touch;
 }
 
 /* LIST */
@@ -127,59 +81,52 @@ header img {
   gap:18px;
   padding:20px;
   overflow-y:auto;
-  max-height:calc(100vh - 260px);
-}
-.list-view img {
-  width:140px;
-  height:140px;
+  max-height: calc(100vh - 260px);
+  -webkit-overflow-scrolling: touch;
 }
 
-/* MODAL BG */
+/* MODAL */
 .modal-bg {
   position:fixed;
   inset:0;
-  background:rgba(0,0,0,.55);
+  background:rgba(0,0,0,.5);
   display:none;
   justify-content:center;
   align-items:center;
   z-index:1000;
 }
-
-/* MODAL BOX */
 .modal-box {
-  background:rgba(255,245,248,.92);
-  border-radius:20px;
+  background: rgba(255,245,248,0.95); /* semi-transparent */
+  border:4px solid #b67385;
+  border-radius:18px;
   padding:18px;
   max-width:900px;
   width:95%;
-  max-height:88vh;
+  max-height:80vh;
   overflow-y:auto;
-
-  border:2px solid rgba(184,76,111,.6);
-  box-shadow:
-    0 0 0 4px rgba(255,215,228,.35),
-    0 0 22px rgba(184,76,111,.45);
-
-  backdrop-filter:blur(6px);
+  box-shadow:0 0 30px rgba(184,76,111,0.4);
   position:relative;
 }
-
-/* CLOSE */
 .close-modal {
   position:absolute;
-  top:12px;
-  right:16px;
-  font-size:30px;
+  top:10px;
+  right:12px;
+  font-size:26px;
+  font-weight:bold;
+  color:#fff;
+  background: linear-gradient(135deg,#ffb3c6,#b84c6f);
+  border-radius:12px;
+  padding:4px 10px;
   cursor:pointer;
-  color:#b84c6f;
 }
 
-/* IMAGE */
+/* IMAGE MODAL */
 .modal-main-img {
   width:100%;
-  max-height:500px;
+  max-height:400px;
   object-fit:contain;
   border:4px solid #b67385;
+  margin-bottom:12px;
 }
 
 /* ICON BAR */
@@ -187,7 +134,7 @@ header img {
   display:flex;
   justify-content:center;
   gap:30px;
-  margin-top:12px;
+  margin-top:8px;
 }
 .icon-btn {
   display:flex;
@@ -195,48 +142,28 @@ header img {
   gap:8px;
   cursor:pointer;
   color:#b84c6f;
+  font-size:18px;
 }
-.heart {
-  font-size:26px;
-}
-.heart.liked {
-  color:#ff4b82;
-}
+.heart { font-size:26px; }
+.heart.liked { color:#ff4b82; }
+.comment-icon { font-size:22px; }
+.like-info { font-size:14px; }
+.comment-info { font-size:14px; }
 
 /* COMMENTS */
-.comment-section {
-  margin-top:16px;
-}
+.comment-section { margin-top:12px; }
 .comment {
   background:#fff0f7;
   padding:10px;
   border-radius:10px;
-  margin-bottom:10px;
-}
-
-/* BACK BUTTON */
-.modal-back-btn {
-  margin:18px auto 6px;
-  display:block;
-  background:linear-gradient(135deg,#ffb6cf,#b84c6f);
-  color:white;
-  border:none;
-  padding:10px 26px;
-  border-radius:30px;
-  font-size:16px;
-  font-weight:bold;
-  cursor:pointer;
-  box-shadow:0 6px 14px rgba(184,76,111,.35);
-}
-.modal-back-btn:hover {
-  transform:translateY(-2px);
+  margin-bottom:8px;
 }
 
 /* COMMENT FORM */
 .comment-form-bg {
   position:fixed;
   inset:0;
-  background:rgba(0,0,0,.6);
+  background: rgba(0,0,0,0.6);
   display:none;
   justify-content:center;
   align-items:center;
@@ -244,7 +171,7 @@ header img {
 }
 .comment-form {
   background:white;
-  padding:18px;
+  padding:16px;
   border-radius:14px;
   width:340px;
 }
@@ -255,26 +182,6 @@ header img {
   padding:10px;
   border-radius:8px;
 }
-
-/* MODAL BOX scrollable propre */
-.modal-box {
-  max-height: 88vh;
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch; /* ✅ rebond iOS corrigé */
-  /* reste inchangé */
-}
-
-/* GRID et LIST scroll vertical propre */
-.grid-view, .list-view {
-  overflow-y: auto;
-  -webkit-overflow-scrolling: touch; /* ✅ rebond iOS corrigé */
-}
-
-/* facultatif : ajoute un padding-bottom pour que le dernier élément soit visible */
-.grid-view, .list-view {
-  padding-bottom: 20px;
-}
-  
 </style>
 </head>
 
@@ -283,7 +190,6 @@ header img {
 <header>
   <img src="favicon.png">
   <h1 class="title">Mes créations</h1>
-  <div class="title-thread"></div>
 </header>
 
 <div id="viewSelector">
@@ -299,23 +205,19 @@ header img {
 <!-- MODAL -->
 <div class="modal-bg" id="modal" onclick="closeModal()">
   <div class="modal-box" onclick="event.stopPropagation()">
-    <div class="close-modal" onclick="closeModal()">×</div>
-
+    <div class="close-modal" onclick="closeModal();event.stopPropagation()">Retour</div>
     <img id="modalMain" class="modal-main-img">
-
     <div class="icon-bar">
-      <div class="icon-btn" onclick="toggleLike()">
+      <div class="icon-btn" onclick="toggleLike();event.stopPropagation()">
         <span id="heart" class="heart">♡</span>
-        <span id="likeCount">0</span>
+        <span id="likeCount" class="like-info">0</span>
       </div>
-      <div class="icon-btn" onclick="openCommentForm()">
-        💬 <span id="commentCount">0</span>
+      <div class="icon-btn" onclick="openCommentForm();event.stopPropagation()">
+        <span class="comment-icon">💬</span>
+        <span id="commentCount" class="comment-info">0</span>
       </div>
     </div>
-
     <div id="commentsList" class="comment-section"></div>
-
-    <button class="modal-back-btn" onclick="closeModal()">Retour</button>
   </div>
 </div>
 
@@ -342,9 +244,9 @@ let creations = JSON.parse(localStorage.getItem('creations') || '[]');
 let currentIndex = null;
 let currentView = 'carousel';
 
-function render(){
+function render() {
   list.innerHTML='';
-  list.className=currentView+'-view';
+  list.className = currentView+'-view';
   creations.forEach((c,i)=>{
     const d=document.createElement('div');
     d.className='visitor-item';
@@ -354,7 +256,10 @@ function render(){
   });
 }
 
-function setView(v){ currentView=v; render(); }
+function setView(v){
+  currentView=v;
+  render();
+}
 btnCarousel.onclick=()=>setView('carousel');
 btnGrid.onclick=()=>setView('grid');
 btnList.onclick=()=>setView('list');
@@ -366,38 +271,43 @@ function openModal(i){
   loadLikes();
   loadComments();
 }
+
 function closeModal(){ modal.style.display='none'; }
 
 function toggleLike(){
   const key='likes_'+currentIndex;
   let likes=JSON.parse(localStorage.getItem(key)||'[]');
-  if(likes.length){ likes=[] } else { likes=['like'] }
+  const name=prompt("Ton prénom pour liker:")||"Anonyme";
+  if(likes.includes(name)) likes=likes.filter(n=>n!==name);
+  else likes.push(name);
   localStorage.setItem(key,JSON.stringify(likes));
   loadLikes();
 }
+
 function loadLikes(){
   const likes=JSON.parse(localStorage.getItem('likes_'+currentIndex)||'[]');
-  heart.textContent=likes.length?'❤️':'♡';
   heart.classList.toggle('liked',likes.length>0);
-  likeCount.textContent=likes.length;
+  heart.textContent=likes.length?'❤️':'♡';
+  likeCount.textContent=likes.length>0 ? ` ${likes.join(', ')}` : '0';
 }
 
 function openCommentForm(){ commentFormBg.style.display='flex'; }
-function closeCommentForm(e){
-  if(e.target===commentFormBg) commentFormBg.style.display='none';
-}
+function closeCommentForm(e){ if(e.target===commentFormBg) commentFormBg.style.display='none'; }
+
 function submitComment(){
-  const n=commentName.value.trim();
-  const t=commentText.value.trim();
-  if(!n||!t)return;
+  const n=document.getElementById('commentName').value.trim();
+  const t=document.getElementById('commentText').value.trim();
+  if(!n||!t) return;
   const key='comments_'+currentIndex;
   const c=JSON.parse(localStorage.getItem(key)||'[]');
   c.push({n,t});
   localStorage.setItem(key,JSON.stringify(c));
-  commentName.value=''; commentText.value='';
+  document.getElementById('commentName').value='';
+  document.getElementById('commentText').value='';
   commentFormBg.style.display='none';
   loadComments();
 }
+
 function loadComments(){
   const c=JSON.parse(localStorage.getItem('comments_'+currentIndex)||'[]');
   commentCount.textContent=c.length;
