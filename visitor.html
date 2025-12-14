@@ -2,12 +2,24 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<title>Visitor</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Galerie – Visitor</title>
 
 <style>
-*{margin:0;padding:0;box-sizing:border-box;}
-html,body{width:100%;height:100%;font-family:sans-serif;}
+/* RESET */
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+}
+
+html, body{
+  width:100%;
+  height:100%;
+  font-family:sans-serif;
+  background:#fff0f5;
+  overflow-x:hidden;
+}
 
 /* ================= ACCUEIL ================= */
 #intro-container{
@@ -20,144 +32,113 @@ html,body{width:100%;height:100%;font-family:sans-serif;}
   z-index:9999;
 }
 
-#intro-video{
-  position:absolute;
-  inset:0;
-  width:100%;
-  height:100%;
-  object-fit:contain;
-}
-
+/* BOUTON BIENVENUE */
 #welcome-btn{
-  position:relative;
-  z-index:2;
-  padding:18px 36px;
+  padding:20px 40px;
   font-size:22px;
-  border-radius:14px;
+  border-radius:16px;
   border:none;
   background:#ffb6c1;
   color:#8b3a3a;
   font-weight:bold;
   cursor:pointer;
-  box-shadow:0 6px 15px rgba(0,0,0,.25);
+  box-shadow:0 6px 15px rgba(182,115,133,.35);
 }
-#welcome-btn:hover{background:#ff9fc1;}
 
-/* ================= APPLI ================= */
+/* ================= INTRO VIDEO ================= */
+#intro-video{
+  position:fixed;
+  inset:0;
+  background:black;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  opacity:0;
+  pointer-events:none;
+  transition:opacity 0.8s ease;
+  z-index:10000;
+}
+
+#intro-video video{
+  width:100vw;
+  height:100vh;
+  object-fit:contain; /* AUCUN ZOOM */
+  background:black;
+}
+
+/* ================= APP ================= */
 #app{
   display:none;
-  min-height:100vh;
-  background:#fff0f5;
-  overflow:auto;
 }
 
 h1{
   text-align:center;
-  margin:20px;
   color:#b84c6f;
+  margin:20px 0;
 }
 
-/* galerie */
-#gallery{
+.gallery-scroll{
   display:flex;
   gap:20px;
-  padding:20px;
   overflow-x:auto;
+  padding:20px;
 }
-.item{
-  text-align:center;
-}
-.item img{
-  height:220px;
-  border-radius:14px;
-  box-shadow:0 6px 15px rgba(0,0,0,.25);
-}
-.item p{
-  margin-top:8px;
-  font-weight:bold;
-  color:#b84c6f;
+
+.gallery-scroll img{
+  height:240px;
+  border-radius:12px;
+  box-shadow:0 4px 15px rgba(0,0,0,0.25);
 }
 </style>
 </head>
 
 <body>
 
-<!-- INTRO -->
+<!-- ACCUEIL -->
 <div id="intro-container">
-  <video id="intro-video" playsinline preload="auto">
-    <source src="chat.mp4" type="video/mp4">
-  </video>
   <button id="welcome-btn">Bienvenue</button>
 </div>
 
-<!-- APPLI -->
-<div id="app">
-  <h1>✨ Projets réalisés</h1>
-  <div id="gallery"></div>
+<!-- VIDEO -->
+<div id="intro-video">
+  <video id="video" playsinline muted preload="auto">
+    <source src="chat.webm" type="video/webm">
+    <source src="chat.mp4" type="video/mp4">
+  </video>
 </div>
 
-<!-- SUPABASE -->
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+<!-- APP -->
+<div id="app">
+  <h1>✨ Projets réalisés</h1>
+  <div class="gallery-scroll" id="gallery"></div>
+</div>
 
 <script>
-/* ===== INTRO ===== */
-const intro = document.getElementById('intro-container');
-const video = document.getElementById('intro-video');
-const btn = document.getElementById('welcome-btn');
-const app = document.getElementById('app');
+const welcomeBtn = document.getElementById("welcome-btn");
+const introContainer = document.getElementById("intro-container");
+const introVideo = document.getElementById("intro-video");
+const video = document.getElementById("video");
+const app = document.getElementById("app");
 
-btn.addEventListener('click', () => {
-  btn.style.display = 'none';
-  video.play();
+welcomeBtn.onclick = () => {
+  introContainer.style.display = "none";
+
+  introVideo.style.opacity = "1";
+  introVideo.style.pointerEvents = "auto";
+
+  video.currentTime = 0;
+  video.play().catch(e => console.log("Lecture bloquée :", e));
 
   video.onended = () => {
-    intro.style.transition = 'opacity 1s';
-    intro.style.opacity = 0;
-
     setTimeout(() => {
-      intro.remove();
-      app.style.display = 'block';
-      document.body.style.overflow = 'auto';
-      loadCreations(); // 👈 IMPORTANT
-    }, 1000);
+      introVideo.style.opacity = "0";
+      setTimeout(() => {
+        introVideo.remove();
+        app.style.display = "block";
+      }, 800);
+    }, 2000); // 2 secondes à la fin
   };
-});
-
-/* ===== SUPABASE ===== */
-const SUPABASE_URL = "https://iubbxvipgofxasatmvzg.supabase.co";
-const SUPABASE_KEY = "sb_publishable_GDoZmwIdoP28XOdrfYYVNw_E_HiCQB1";
-const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-
-const gallery = document.getElementById('gallery');
-
-async function loadCreations(){
-  const { data, error } = await supabase
-    .storage
-    .from('owners')
-    .list();
-
-  if(error){
-    console.error(error);
-    return;
-  }
-
-  gallery.innerHTML = '';
-
-  data.forEach(file => {
-    const url = supabase
-      .storage
-      .from('owners')
-      .getPublicUrl(file.name).publicURL;
-
-    const div = document.createElement('div');
-    div.className = 'item';
-    div.innerHTML = `
-      <img src="${url}">
-      <p>${file.name}</p>
-    `;
-    gallery.appendChild(div);
-  });
-}
+};
 </script>
 
 </body>
