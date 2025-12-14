@@ -232,6 +232,36 @@ function loadComments(){
 function scrollToComments(){ commentList.scrollIntoView({behavior:'smooth', block:'start'}); }
 
 loadCreations();
+
+ <script>
+async function loadOwnerCreations() {
+  try {
+    // Récupération de la liste des fichiers dans le bucket 'owners'
+    const { data, error } = await window.supabaseClient.storage.from('owners').list();
+    if (error) {
+      console.error('Erreur Supabase:', error);
+      return;
+    }
+
+    // Conversion en format compatible avec renderCreations()
+    const creationsFromSupabase = data.map(item => {
+      const { publicUrl } = window.supabaseClient.storage.from('owners').getPublicUrl(item.name);
+      return { name: item.name, imgUrl: publicUrl };
+    });
+
+    // Remplacer les créations locales uniquement si tu veux charger Supabase
+    creations = creationsFromSupabase;
+
+    // Appel de ta fonction existante pour afficher les créations
+    renderCreations();
+  } catch (err) {
+    console.error('Erreur lors du chargement des créations Supabase:', err);
+  }
+}
+
+// Lance la récupération après l’initialisation de Supabase
+loadOwnerCreations();
+</script>
 </script>
 </body>
 </html>
