@@ -4,16 +4,16 @@
 <meta charset="UTF-8">
 <title>Mes Créations</title>
 <style>
-body{
+body {
   margin:0;
   font-family:sans-serif;
   background:#fff0f5;
   overflow-x:hidden;
   padding-left:35px;
-  transition: background 0.5s;
+  transition: background 0.5s ease;
 }
 
-/* ================= FOND D'ACCUEIL ================= */
+/* ================= FOND INTRO ================= */
 #intro-background{
   position:fixed;
   inset:0;
@@ -24,7 +24,7 @@ body{
   z-index:100000;
 }
 
-/* BOUTON BIENVENUE */
+/* ================= BOUTON BIENVENUE ================= */
 #startBtn{
   padding:20px 40px;
   font-size:24px;
@@ -50,14 +50,13 @@ body{
   pointer-events:none;
   transition:opacity 1s ease;
 }
-
 #intro-video video{
   width:100%;
   height:100%;
   object-fit:cover;
 }
 
-/* ================= CONTENU APP (CACHÉ AU DÉBUT) ================= */
+/* ================= CONTENU APP ================= */
 #app-content{
   opacity:0;
   transition:opacity 1s ease;
@@ -70,15 +69,13 @@ body{
   left:-220px;
   width:220px;
   height:100vh;
-  background:#ffe6f0;
+  background:rgba(255,230,240,0.15); /* transparent léger */
   border-right:2px solid #b67385;
   padding:20px;
   transition:left .3s ease;
   z-index:10;
 }
-
 #sidebar.sidebar-open{ left:0; }
-
 #toggleSidebar{
   position:absolute;
   top:50%;
@@ -95,7 +92,6 @@ body{
   border:1px solid #b67385;
   font-weight:bold;
 }
-
 #sidebar button{
   width:100%;
   margin-bottom:10px;
@@ -106,18 +102,6 @@ body{
   color:#8b3a3a;
   font-weight:bold;
   cursor:pointer;
-}
-
-/* ================= BOUTON THEME ================= */
-#themeBtn{
-  background:#ffb6c1;
-  border:2px solid #b67385;
-  color:#8b3a3a;
-  font-weight:bold;
-  padding:10px;
-  border-radius:12px;
-  cursor:pointer;
-  margin-top:10px;
 }
 
 /* ================= TITRE ================= */
@@ -133,7 +117,6 @@ h1{ text-align:center; color:#b84c6f; margin-top:20px; }
   padding:20px;
   box-shadow:0 6px 20px rgba(182,115,133,.25);
 }
-
 .owner-box input,
 .owner-box button{
   width:100%;
@@ -141,9 +124,7 @@ h1{ text-align:center; color:#b84c6f; margin-top:20px; }
   padding:10px;
   border-radius:12px;
 }
-
 .owner-box input{ border:1px solid #b67385; }
-
 .owner-box button{
   background:#ffb6c1;
   border:none;
@@ -158,7 +139,6 @@ h1{ text-align:center; color:#b84c6f; margin-top:20px; }
   text-align:center;
   margin:15px 0;
 }
-
 #display-modes button{
   margin:0 5px;
   padding:8px 12px;
@@ -178,48 +158,35 @@ h1{ text-align:center; color:#b84c6f; margin-top:20px; }
   gap:15px;
   margin-bottom:40px;
 }
-
 #owner-list.grid .owner-item{ width:140px; }
-
-#owner-list.list{
-  flex-direction:column;
-  align-items:center;
-}
-#owner-list.list .owner-item{
-  display:flex;
-  align-items:center;
-  width:90%;
-  gap:10px;
-}
-
-#owner-list.carousel{
-  flex-wrap:nowrap;
-  overflow-x:auto;
-  padding-bottom:10px;
-}
+#owner-list.list{ flex-direction:column; align-items:center; }
+#owner-list.list .owner-item{ display:flex; align-items:center; width:90%; gap:10px; }
+#owner-list.carousel{ flex-wrap:nowrap; overflow-x:auto; padding-bottom:10px; }
 
 .owner-item{
   position:relative;
   background:#ffe6f0;
-  border:4px double red; /* bordure rayée rouge/blanc remplacée plus tard par sucre d’orge */
+  border:4px solid #b0003a; /* rouge bordeaux rayures */
+  border-image: repeating-linear-gradient(
+      45deg,
+      red 0 10px,
+      white 0 20px
+  ) 10;
   border-radius:16px;
   padding:10px;
   text-align:center;
 }
-
 .owner-item img{
   width:110px;
   height:110px;
   object-fit:cover;
   border-radius:10px;
 }
-
 .owner-item p{
   margin:5px 0 0;
   color:#8b3a3a;
   font-weight:bold;
 }
-
 .delete-btn{
   position:absolute;
   top:5px;
@@ -240,30 +207,28 @@ h1{ text-align:center; color:#b84c6f; margin-top:20px; }
 .section{ display:none; padding:20px; }
 .section.active{ display:block; }
 
-/* ================= THÈME NOËL ================= */
-.theme-noel {
-  background: url('noel.png') center/cover no-repeat fixed !important;
+/* ================= NEIGE ================= */
+#snow-container{
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  z-index:50;
+}
+.snowflake{
+  position:absolute;
+  top:-10px;
+  user-select:none;
+  color:white;
+  font-size:1em;
+  animation-name:fall;
+  animation-timing-function:linear;
+  animation-iteration-count:infinite;
+}
+@keyframes fall{
+  0%{ transform: translateY(0);}
+  100%{ transform: translateY(100vh);}
 }
 
-/* Flocons de neige */
-.snowflake {
-  position: fixed;
-  top: -10px;
-  z-index: 9999;
-  user-select: none;
-  pointer-events: none;
-  color: white;
-  font-size: 1em;
-  animation-name: fall;
-  animation-duration: 5s;
-  animation-timing-function: linear;
-  animation-iteration-count: infinite;
-}
-
-@keyframes fall {
-  0% { transform: translateY(0) rotate(0deg); }
-  100% { transform: translateY(100vh) rotate(360deg); }
-}
 </style>
 </head>
 <body>
@@ -290,7 +255,9 @@ h1{ text-align:center; color:#b84c6f; margin-top:20px; }
     <button onclick="openSection('pelotes')">Pelotes</button>
     <button onclick="openSection('notes')">Notes</button>
     <button onclick="openSection('settings')">Paramètres</button>
-    <button id="themeBtn">Thème Noël</button>
+    <hr>
+    <button id="themeChristmas">🎄 Noël</button>
+    <button id="themeDefault">⚪ Défault</button>
   </div>
 
   <h1>Mes Créations</h1>
@@ -317,6 +284,9 @@ h1{ text-align:center; color:#b84c6f; margin-top:20px; }
   <div id="settings" class="section"><button onclick="closeSection()">← Retour</button></div>
 </div>
 
+<!-- NEIGE -->
+<div id="snow-container"></div>
+
 <script type="module" src="owner.js"></script>
 
 <script>
@@ -333,8 +303,6 @@ startBtn.onclick = () => {
   introVideoDiv.style.pointerEvents = "auto";
   video.play().catch(e=>console.log("Lecture bloquée:", e));
 };
-
-/* FIN DE LA VIDEO -> afficher l'appli avec fondu */
 video.onended = () => {
   setTimeout(() => {
     introVideoDiv.style.opacity = 0;
@@ -362,7 +330,6 @@ function openSection(id){
   document.getElementById("display-modes").style.display="none";
   document.getElementById(id).classList.add("active");
 }
-
 function closeSection(){
   document.querySelectorAll(".section").forEach(s=>s.classList.remove("active"));
   document.querySelector(".owner-box").style.display="block";
@@ -370,22 +337,39 @@ function closeSection(){
   document.getElementById("display-modes").style.display="block";
 }
 
-/* THÈME NOËL */
-const themeBtn = document.getElementById('themeBtn');
-themeBtn.onclick = () => {
-  document.body.classList.add('theme-noel');
+/* ================= THEME NOEL ================= */
+const themeChristmas = document.getElementById('themeChristmas');
+const themeDefault = document.getElementById('themeDefault');
+const snowContainer = document.getElementById('snow-container');
 
-  for (let i = 0; i < 50; i++) {
-    let snow = document.createElement('div');
-    snow.className = 'snowflake';
-    snow.style.left = Math.random() * window.innerWidth + 'px';
-    snow.style.animationDuration = (3 + Math.random() * 5) + 's';
-    snow.style.fontSize = (10 + Math.random() * 20) + 'px';
-    snow.textContent = '❄';
-    document.body.appendChild(snow);
+themeChristmas.onclick = () => {
+  document.body.style.background = '#cceeff'; // bleu clair
+  snowContainer.innerHTML = '';
+  for(let i=0;i<50;i++){
+    const flake = document.createElement('div');
+    flake.className='snowflake';
+    flake.style.left=Math.random()*window.innerWidth+'px';
+    flake.style.animationDuration=(3+Math.random()*5)+'s';
+    flake.style.fontSize=(10+Math.random()*20)+'px';
+    flake.textContent='❄';
+    snowContainer.appendChild(flake);
   }
+  // contours sucre d'orge
+  document.querySelectorAll('.owner-item').forEach(item=>{
+    item.style.border='4px solid';
+    item.style.borderImage='repeating-linear-gradient(45deg, red 0 10px, white 0 20px) 10';
+  });
+};
+
+themeDefault.onclick = () => {
+  document.body.style.background = '#fff0f5';
+  snowContainer.innerHTML = '';
+  document.querySelectorAll('.owner-item').forEach(item=>{
+    item.style.border='2px solid #b67385';
+    item.style.borderImage='none';
+  });
 };
 </script>
 
 </body>
-  </html>
+</html>
