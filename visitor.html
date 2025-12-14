@@ -2,236 +2,218 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<title>Galerie – Visitor</title>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
+<title>Galerie Projets – Visitor</title>
 <style>
-/* ================= RESET ================= */
-*{box-sizing:border-box;margin:0;padding:0}
-html,body{height:100%}
-body{
-  font-family:sans-serif;
-  background:#fff0f5;
-  overflow-x:hidden;
-}
+  body {
+    margin:0;
+    font-family:sans-serif;
+    background:#fff0f5;
+    overflow-x:hidden;
+    padding-left:35px;
+  }
 
-/* ================= CACHE L’APPLI AU DÉPART ================= */
-body.app{
-  visibility:hidden;
-}
-body.app.ready{
-  visibility:visible;
-}
+  /* ================= FOND D'ACCUEIL ================= */
+  #intro-container{
+    position:fixed;
+    inset:0;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    background: url('Photoroom_20251213_123235.png') center/cover no-repeat;
+    z-index:100000;
+    flex-direction:column;
+  }
 
-/* ================= FOND BIENVENUE ================= */
-#intro-background{
-  position:fixed;
-  inset:0;
-  background:url('Photoroom_20251213_123235.png') center/cover no-repeat;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  z-index:100000;
-}
+  #startBtn{
+    padding:20px 40px;
+    font-size:24px;
+    border-radius:16px;
+    border:none;
+    background:#ffb6c1;
+    color:#8b3a3a;
+    font-weight:bold;
+    cursor:pointer;
+    box-shadow:0 6px 15px rgba(182,115,133,.3);
+    margin-top:20px;
+  }
+  #startBtn:hover { background:#ff9fc1; }
 
-#startBtn{
-  padding:20px 40px;
-  font-size:24px;
-  border-radius:16px;
-  border:none;
-  background:#ffb6c1;
-  color:#8b3a3a;
-  font-weight:bold;
-  cursor:pointer;
-  box-shadow:0 6px 15px rgba(182,115,133,.3);
-}
+  /* ================= INTRO VIDEO ================= */
+  #intro-video{
+    position:fixed;
+    inset:0;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    z-index:100001;
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    opacity:0;
+    pointer-events:none;
+    transition:opacity 1s ease;
+  }
 
-/* ================= INTRO VIDEO ================= */
-#intro-video{
-  position:fixed;
-  inset:0;
-  background:#000;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  z-index:100001;
-  opacity:0;
-  pointer-events:none;
-  transition:opacity 1s ease;
-}
+  #intro-video video{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+  }
 
-#intro-video video{
-  width:100%;
-  height:100%;
-  object-fit:cover;
-  pointer-events:none;
-}
+  /* ================= GALERIE ================= */
+  h1 {
+    text-align:center;
+    color:#b84c6f;
+    margin-top:20px;
+  }
+  #viewSelector {
+    display:flex;
+    justify-content:center;
+    gap:12px;
+    margin-bottom:14px;
+  }
+  #viewSelector button {
+    background:#fff0f7;
+    border:2px solid #b84c6f;
+    color:#b84c6f;
+    padding:8px 16px;
+    border-radius:24px;
+    cursor:pointer;
+    font-size:15px;
+    transition: all 0.18s ease;
+  }
+  #viewSelector button.active {
+    background:linear-gradient(90deg,#ffeaf2,#fff5f8);
+    color:#7a2b45;
+    transform:translateY(-2px);
+  }
+  #viewSelector button:hover { transform:translateY(-2px); }
 
-/* ================= HEADER ================= */
-h1{
-  text-align:center;
-  color:#b84c6f;
-  margin:20px 0;
-}
+  .gallery-scroll {
+    display:flex;
+    gap:20px;
+    overflow-x:auto;
+    padding:20px;
+    scroll-snap-type:x mandatory;
+  }
+  .gallery-scroll img {
+    height:240px;
+    border-radius:12px;
+    scroll-snap-align:start;
+    cursor:pointer;
+    box-shadow:0 4px 15px rgba(0,0,0,0.25);
+    transition:transform .2s;
+  }
+  .gallery-scroll img:hover { transform:scale(1.05); }
 
-/* ================= MODES ================= */
-#viewSelector{
-  display:flex;
-  justify-content:center;
-  gap:10px;
-  margin-bottom:10px;
-}
-#viewSelector button{
-  padding:8px 16px;
-  border-radius:20px;
-  border:2px solid #b84c6f;
-  background:#fff0f7;
-  color:#b84c6f;
-  font-weight:bold;
-  cursor:pointer;
-}
-#viewSelector button.active{
-  background:#ffeaf2;
-}
-
-/* ================= LISTE ================= */
-#visitor-list{
-  width:100%;
-  max-width:1200px;
-  margin:0 auto;
-  padding:10px;
-}
-
-.carousel-view{
-  display:flex;
-  gap:20px;
-  overflow-x:auto;
-}
-.grid-view{
-  display:grid;
-  grid-template-columns:repeat(auto-fill,minmax(220px,1fr));
-  gap:20px;
-}
-.list-view{
-  display:flex;
-  flex-direction:column;
-  gap:20px;
-}
-
-.visitor-item{
-  text-align:center;
-  cursor:pointer;
-}
-.visitor-item img{
-  width:100%;
-  max-height:240px;
-  object-fit:contain;
-  border:4px solid #b67385;
-  border-radius:12px;
-}
-.visitor-item p{
-  margin-top:8px;
-  font-weight:bold;
-  color:#b84c6f;
-}
+  /* Modal zoom */
+  #imageModal {
+    display:none;
+    position:fixed;
+    inset:0;
+    background:rgba(0,0,0,0.8);
+    justify-content:center;
+    align-items:center;
+    z-index:2000;
+  }
+  #imageModal img {
+    width:90%;
+    max-width:600px;
+    border-radius:12px;
+  }
 </style>
 </head>
+<body>
 
-<body class="app">
-
-<!-- BIENVENUE -->
-<div id="intro-background">
+<!-- FOND + BOUTON BIENVENUE -->
+<div id="intro-container">
+  <video id="intro-video" playsinline webkit-playsinline preload="auto">
+    <source src="chat.mp4" type="video/mp4">
+  </video>
   <button id="startBtn">Bienvenue</button>
 </div>
 
-<!-- VIDEO -->
-<div id="intro-video">
-  <video id="video" muted playsinline preload="auto">
-    <source src="chat.mp4" type="video/mp4">
-  </video>
-</div>
-
-<!-- APP -->
 <h1>✨ Projets réalisés</h1>
-
 <div id="viewSelector">
-  <button id="btnCarousel" class="active">Carrousel</button>
+  <button id="btnCarousel">Carrousel</button>
   <button id="btnGrid">Grille</button>
   <button id="btnList">Liste</button>
 </div>
+<div id="gallery" class="gallery-scroll"></div>
 
-<div id="visitor-list"></div>
+<!-- Modal zoom -->
+<div id="imageModal" onclick="this.style.display='none'">
+  <img id="modalImg" src="">
+</div>
 
-<!-- SUPABASE -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+<script type="module" src="visitor.js"></script>
 
 <script>
-/* ================= SUPABASE ================= */
-const SUPABASE_URL = "https://iubbxvipgofxasatmvzg.supabase.co";
-const SUPABASE_KEY = "sb_publishable_GDoZmwIdoP28XOdrfYYVNw_E_HiCQB1";
-const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+// ================= BOUTON BIENVENUE =================
+const introContainer = document.getElementById('intro-container');
+const video = document.getElementById('intro-video');
+const startBtn = document.getElementById('startBtn');
 
-const list = document.getElementById("visitor-list");
-let creations = [];
-let view = "carousel";
+startBtn.onclick = () => {
+  video.style.opacity = 1;
+  video.play().catch(e => console.log("Autoplay bloqué :", e));
+  startBtn.style.display = 'none';
 
-/* CHARGEMENT DES IMAGES */
-async function loadCreations(){
-  const { data, error } = await supabase.storage.from("owners").list();
-  if(error){ console.error(error); return; }
+  video.onended = () => {
+    setTimeout(() => {
+      introContainer.style.transition = "opacity 1.2s";
+      introContainer.style.opacity = 0;
+      setTimeout(() => introContainer.remove(), 1200);
+    }, 2000); // la vidéo reste 2 secondes avant disparition
+  };
+};
 
-  creations = data.map(f => ({
-    name: f.name,
-    url: supabase.storage.from("owners").getPublicUrl(f.name).publicURL
-  }));
+// ================= MODE GALERIE =================
+const viewSelector = document.getElementById('viewSelector');
+const gallery = document.getElementById('gallery');
 
-  render();
+let currentView = 'carousel';
+document.getElementById('btnCarousel').addEventListener('click', () => setView('carousel'));
+document.getElementById('btnGrid').addEventListener('click', () => setView('grid'));
+document.getElementById('btnList').addEventListener('click', () => setView('list'));
+
+function setView(mode){
+  currentView = mode;
+  document.getElementById('btnCarousel').classList.toggle('active', mode==='carousel');
+  document.getElementById('btnGrid').classList.toggle('active', mode==='grid');
+  document.getElementById('btnList').classList.toggle('active', mode==='list');
+  renderVisitor();
 }
 
-function render(){
-  list.className = view + "-view";
-  list.innerHTML = "";
-  creations.forEach(c=>{
-    const div = document.createElement("div");
-    div.className="visitor-item";
-    div.innerHTML = `<img src="${c.url}"><p>${c.name}</p>`;
-    list.appendChild(div);
+// ================= SUPABASE =================
+const SUPABASE_URL = "https://iubbxvipgofxasatmvzg.supabase.co";
+const SUPABASE_ANON_KEY = "sb_publishable_GDoZmwIdoP28XOdrfYYVNw_E_HiCQB1";
+const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+let creations = [];
+
+async function loadCreations(){
+  const { data, error } = await supabase.storage.from('owners').list();
+  if(error){ console.error(error); return; }
+  creations = data.map(item => ({
+    name: item.name,
+    imgUrl: supabase.storage.from('owners').getPublicUrl(item.name).publicURL
+  }));
+  renderVisitor();
+}
+
+function renderVisitor(){
+  gallery.innerHTML='';
+  creations.forEach(item=>{
+    const div = document.createElement('div');
+    div.className = 'visitor-item';
+    div.innerHTML = `<img src="${item.imgUrl}" alt="${item.name}"><p>${item.name}</p>`;
+    gallery.appendChild(div);
   });
 }
 
-/* MODES */
-btnCarousel.onclick=()=>{view="carousel";setActive(btnCarousel);render();}
-btnGrid.onclick=()=>{view="grid";setActive(btnGrid);render();}
-btnList.onclick=()=>{view="list";setActive(btnList);render();}
-
-function setActive(btn){
-  document.querySelectorAll("#viewSelector button").forEach(b=>b.classList.remove("active"));
-  btn.classList.add("active");
-}
-
-/* ================= INTRO LOGIQUE ================= */
-const startBtn=document.getElementById("startBtn");
-const introBg=document.getElementById("intro-background");
-const introVideo=document.getElementById("intro-video");
-const video=document.getElementById("video");
-
-startBtn.onclick=()=>{
-  introBg.style.display="none";
-  introVideo.style.opacity="1";
-  introVideo.style.pointerEvents="auto";
-  video.play();
-};
-
-video.onended=()=>{
-  setTimeout(()=>{
-    introVideo.style.opacity="0";
-    setTimeout(()=>{
-      introVideo.remove();
-      document.body.classList.add("ready");
-      loadCreations(); // 🔥 APPLI LANCÉE ICI
-    },1000);
-  },2000);
-};
+loadCreations();
 </script>
 
 </body>
