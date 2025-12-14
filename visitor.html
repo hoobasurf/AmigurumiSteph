@@ -233,34 +233,35 @@ function scrollToComments(){ commentList.scrollIntoView({behavior:'smooth', bloc
 
 loadCreations();
 
- <script>
-async function loadOwnerCreations() {
+ <!-- ====================== SUPABASE CREATIONS ====================== -->
+<script>
+async function loadSupabaseCreations() {
   try {
-    // Récupération de la liste des fichiers dans le bucket 'owners'
+    // Récupère la liste des fichiers dans le bucket 'owners'
     const { data, error } = await window.supabaseClient.storage.from('owners').list();
     if (error) {
-      console.error('Erreur Supabase:', error);
+      console.error("Erreur Supabase:", error);
       return;
     }
 
-    // Conversion en format compatible avec renderCreations()
-    const creationsFromSupabase = data.map(item => {
-      const { publicUrl } = window.supabaseClient.storage.from('owners').getPublicUrl(item.name);
-      return { name: item.name, imgUrl: publicUrl };
+    // Transforme chaque fichier en objet utilisable par renderCreations()
+    const supaCreations = data.map(item => {
+      const { publicURL } = window.supabaseClient.storage.from('owners').getPublicUrl(item.name);
+      return { name: item.name, imgUrl: publicURL };
     });
 
-    // Remplacer les créations locales uniquement si tu veux charger Supabase
-    creations = creationsFromSupabase;
+    // Remplace les créations locales par celles du bucket Supabase
+    creations = supaCreations;
 
-    // Appel de ta fonction existante pour afficher les créations
+    // Affiche-les avec la fonction existante
     renderCreations();
   } catch (err) {
-    console.error('Erreur lors du chargement des créations Supabase:', err);
+    console.error("Erreur chargement Supabase:", err);
   }
 }
 
-// Lance la récupération après l’initialisation de Supabase
-loadOwnerCreations();
+// Appelle la fonction après l'initialisation de supabaseClient
+loadSupabaseCreations();
 </script>
 </script>
 </body>
