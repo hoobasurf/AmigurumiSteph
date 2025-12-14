@@ -4,73 +4,73 @@
 <meta charset="UTF-8">
 <title>Galerie - Mes créations</title>
 <style>
-  * { box-sizing:border-box; margin:0; padding:0; }
-  html, body { height:100%; font-family:'Comic Sans MS', cursive; }
-  body {
-    background-image: url('Photoroom_20251212_143703.png');
-    background-size: cover; 
-    background-position: center top;
-    background-repeat: no-repeat;
-    background-attachment: fixed;
-    display:flex;
-    flex-direction:column;
-    min-height:100vh;
-    overflow-x:hidden;
-  }
-  header { text-align:center; padding:12px 0; }
-  header img { width:98px; height:98px; border-radius:20%; display:block; margin:0 auto; }
-  .title { font-size:42px; color:#b84c6f; font-weight:bold; letter-spacing:1px; margin-bottom:12px; }
-  #viewSelector { display:flex; justify-content:center; gap:12px; margin-bottom:14px; }
-  #viewSelector button {
-    background:#fff0f7; border:2px solid #b84c6f; color:#b84c6f; padding:8px 16px; border-radius:24px; cursor:pointer;
-    font-size:15px; transition: all 0.18s ease;
-  }
-  #viewSelector button.active { background:linear-gradient(90deg,#ffeaf2,#fff5f8); color:#7a2b45; transform:translateY(-2px); }
-  #viewSelector button:hover { transform:translateY(-2px); }
+* { box-sizing:border-box; margin:0; padding:0; }
+html, body { height:100%; font-family:'Comic Sans MS', cursive; }
+body {
+  background-image: url('Photoroom_20251212_143703.png');
+  background-size: cover;
+  background-position: center top;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  display:flex;
+  flex-direction:column;
+  min-height:100vh;
+  overflow-x:hidden;
+}
+header { text-align:center; padding:12px 0; }
+header img { width:98px; height:98px; border-radius:20%; display:block; margin:0 auto; }
+.title { font-size:42px; color:#b84c6f; font-weight:bold; letter-spacing:1px; margin-bottom:12px; }
+#viewSelector { display:flex; justify-content:center; gap:12px; margin-bottom:14px; }
+#viewSelector button {
+  background:#fff0f7; border:2px solid #b84c6f; color:#b84c6f; padding:8px 16px; border-radius:24px; cursor:pointer;
+  font-size:15px; transition: all 0.18s ease;
+}
+#viewSelector button.active { background:linear-gradient(90deg,#ffeaf2,#fff5f8); color:#7a2b45; transform:translateY(-2px); }
+#viewSelector button:hover { transform:translateY(-2px); }
 
-  .center-zone { flex:1; display:flex; align-items:center; justify-content:center; padding:8px; }
-  #visitor-list { width:calc(100% - 40px); max-width:1200px; margin:0 auto; transition:all 0.2s ease; }
+.center-zone { flex:1; display:flex; align-items:center; justify-content:center; padding:8px; }
+#visitor-list { width:calc(100% - 40px); max-width:1200px; margin:0 auto; transition:all 0.2s ease; }
 
-  .visitor-item { text-align:center; cursor:pointer; user-select:none; }
-  .visitor-item img { display:block; margin:0 auto; object-fit:contain; border:4px solid #b67385; background:transparent; transition: box-shadow 0.3s ease, transform 0.3s ease; }
-  .visitor-item:hover img { box-shadow: 0 8px 20px rgba(184,76,111,0.3); transform: scale(1.03); }
-  .visitor-item p { margin:8px 0 0; font-size:20px; color:#b84c6f; font-weight:bold; line-height:1.1; }
+.visitor-item { text-align:center; cursor:pointer; user-select:none; }
+.visitor-item img { display:block; margin:0 auto; object-fit:contain; border:4px solid #b67385; background:transparent; transition: box-shadow 0.3s ease, transform 0.3s ease; }
+.visitor-item:hover img { box-shadow: 0 8px 20px rgba(184,76,111,0.3); transform: scale(1.03); }
+.visitor-item p { margin:8px 0 0; font-size:20px; color:#b84c6f; font-weight:bold; line-height:1.1; }
 
-  .carousel-view { display:flex; gap:40px; overflow-x:auto; scroll-behavior:smooth; padding:10px; align-items:center; }
-  .carousel-view::-webkit-scrollbar { height:8px; }
-  .carousel-view::-webkit-scrollbar-thumb { background:#b84c6f66; border-radius:20px; }
-  .carousel-view .visitor-item img { width:260px; height:260px; }
+.carousel-view { display:flex; gap:40px; overflow-x:auto; scroll-behavior:smooth; padding:10px; align-items:center; }
+.carousel-view::-webkit-scrollbar { height:8px; }
+.carousel-view::-webkit-scrollbar-thumb { background:#b84c6f66; border-radius:20px; }
+.carousel-view .visitor-item img { width:260px; height:260px; }
 
-  .grid-view { display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:24px; padding:16px; max-height:68vh; overflow-y:auto; }
-  .grid-view .visitor-item img { width:100%; height:200px; }
+.grid-view { display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:24px; padding:16px; max-height:80vh; overflow-y:auto; }
+.grid-view .visitor-item img { width:100%; height:200px; }
 
-  .list-view { display:flex; flex-direction:column; gap:18px; padding:16px; max-height:68vh; overflow-y:auto; }
-  .list-view .visitor-item { display:flex; gap:18px; align-items:center; padding:8px; }
-  .list-view .visitor-item img { width:140px; height:140px; }
-  .list-view .visitor-item p { margin:0; font-size:18px; text-align:left; }
+.list-view { display:flex; flex-direction:column; gap:18px; padding:16px; max-height:80vh; overflow-y:auto; }
+.list-view .visitor-item { display:flex; gap:18px; align-items:center; padding:8px; }
+.list-view .visitor-item img { width:140px; height:140px; }
+.list-view .visitor-item p { margin:0; font-size:18px; text-align:left; }
 
-  .modal-bg { position:fixed; inset:0; background: rgba(0,0,0,0.65); display:none; justify-content:center; align-items:center; z-index:1000; padding:20px; }
-  .modal-box { background:#fff5f8; border-radius:16px; padding:18px; max-width:980px; width:94%; max-height:90vh; overflow-y:auto; box-shadow:0 8px 30px rgba(184,76,111,0.25); text-align:center; position:relative; cursor:default; }
-  .close-modal { position:absolute; top:10px; right:12px; font-size:28px; cursor:pointer; color:#b84c6f; font-weight:bold; }
-  .modal-main-img { width:100%; max-height:520px; object-fit:contain; border:4px solid #b67385; background:white; }
+.modal-bg { position:fixed; inset:0; background: rgba(0,0,0,0.65); display:none; justify-content:center; align-items:center; z-index:1000; padding:20px; }
+.modal-box { background:#fff5f8; border-radius:16px; padding:18px; max-width:980px; width:94%; max-height:90vh; overflow-y:auto; box-shadow:0 8px 30px rgba(184,76,111,0.25); text-align:center; position:relative; cursor:default; }
+.close-modal { position:absolute; top:10px; right:12px; font-size:28px; cursor:pointer; color:#b84c6f; font-weight:bold; }
+.modal-main-img { width:100%; max-height:520px; object-fit:contain; border:4px solid #b67385; background:white; }
 
-  .thumbs { margin-top:16px; display:flex; gap:12px; justify-content:center; flex-wrap:wrap; }
-  .thumbs img { width:110px; height:110px; object-fit:contain; border:4px solid #b67385; background:transparent; cursor:pointer; transition: transform 0.2s ease, box-shadow 0.2s ease; }
-  .thumbs img:hover { transform:scale(1.06); box-shadow:0 6px 14px rgba(184,76,111,0.3); }
+.thumbs { margin-top:16px; display:flex; gap:12px; justify-content:center; flex-wrap:wrap; }
+.thumbs img { width:110px; height:110px; object-fit:contain; border:4px solid #b67385; background:transparent; cursor:pointer; transition: transform 0.2s ease, box-shadow 0.2s ease; }
+.thumbs img:hover { transform:scale(1.06); box-shadow:0 6px 14px rgba(184,76,111,0.3); }
 
-  .icon-bar { margin-top:12px; display:flex; justify-content:center; gap:36px; align-items:center; }
-  .icon-btn { display:flex; gap:8px; align-items:center; cursor:pointer; color:#b84c6f; font-size:18px; }
-  .heart { font-size:26px; transition: color .18s; }
-  .heart.liked { color:#ff4b82; }
-  .like-info { font-size:14px; color:#7a2b45; margin-left:6px; }
-  .comment-info { font-size:14px; color:#7a2b45; margin-left:6px; }
+.icon-bar { margin-top:12px; display:flex; justify-content:center; gap:36px; align-items:center; }
+.icon-btn { display:flex; gap:8px; align-items:center; cursor:pointer; color:#b84c6f; font-size:18px; }
+.heart { font-size:26px; transition: color .18s; }
+.heart.liked { color:#ff4b82; }
+.like-info { font-size:14px; color:#7a2b45; margin-left:6px; }
+.comment-info { font-size:14px; color:#7a2b45; margin-left:6px; }
 
-  .comment-section { margin-top:14px; text-align:left; }
-  .comment { background:#fff0f7; border:1px solid rgba(184,76,111,0.12); padding:10px; border-radius:10px; margin-bottom:10px; }
-  .add-comment-btn { margin-top:12px; padding:10px 20px; background:#b84c6f; color:#fff; border-radius:26px; font-size:16px; border:none; cursor:pointer; }
-  .comment-form-bg { position: fixed; inset:0; background: rgba(0,0,0,0.6); display:none; justify-content:center; align-items:center; z-index:2000; }
-  .comment-form { background:white; padding:18px; border-radius:12px; width:340px; box-shadow:0 8px 20px rgba(0,0,0,0.25); text-align:center; }
-  .comment-form input, .comment-form textarea { width:100%; padding:10px; border-radius:8px; border:2px solid rgba(184,76,111,0.12); margin-bottom:10px; font-size:15px; }
+.comment-section { margin-top:14px; text-align:left; }
+.comment { background:#fff0f7; border:1px solid rgba(184,76,111,0.12); padding:10px; border-radius:10px; margin-bottom:10px; }
+.add-comment-btn { margin-top:12px; padding:10px 20px; background:#b84c6f; color:#fff; border-radius:26px; font-size:16px; border:none; cursor:pointer; }
+.comment-form-bg { position: fixed; inset:0; background: rgba(0,0,0,0.6); display:none; justify-content:center; align-items:center; z-index:2000; }
+.comment-form { background:white; padding:18px; border-radius:12px; width:340px; box-shadow:0 8px 20px rgba(0,0,0,0.25); text-align:center; }
+.comment-form input, .comment-form textarea { width:100%; padding:10px; border-radius:8px; border:2px solid rgba(184,76,111,0.12); margin-bottom:10px; font-size:15px; }
 </style>
 </head>
 <body>
@@ -123,29 +123,34 @@ const SUPABASE_URL = "https://iubbxvipgofxasatmvzg.supabase.co";
 const SUPABASE_ANON_KEY = "sb_publishable_GDoZmwIdoP28XOdrfYYVNw_E_HiCQB1";
 const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-const list=document.getElementById('visitor-list');
-const modal=document.getElementById('modal');
-const modalMain=document.getElementById('modalMain');
-const thumbs=document.getElementById('thumbsContainer');
-const heart=document.getElementById('heart');
-const likeCount=document.getElementById('likeCount');
-const commentCountSpan=document.getElementById('commentCount');
-const commentList=document.getElementById('commentsList');
-const commentFormBg=document.getElementById('commentFormBg');
-const commentName=document.getElementById('commentName');
-const commentText=document.getElementById('commentText');
+const list = document.getElementById('visitor-list');
+const modal = document.getElementById('modal');
+const modalMain = document.getElementById('modalMain');
+const thumbs = document.getElementById('thumbsContainer');
+const heart = document.getElementById('heart');
+const likeCount = document.getElementById('likeCount');
+const commentCountSpan = document.getElementById('commentCount');
+const commentList = document.getElementById('commentsList');
+const commentFormBg = document.getElementById('commentFormBg');
+const commentName = document.getElementById('commentName');
+const commentText = document.getElementById('commentText');
 
 let creations = [];
 let currentIndex = null;
 let currentView = 'carousel';
 
-async function loadCreations(){
+// Récupération des images du bucket Supabase avec signed URLs pour Safari
+async function loadCreations() {
   const { data, error } = await supabase.storage.from('owners').list();
   if(error){ console.error(error); return; }
-  creations = data.map((item, i)=>({
-    name: item.name,
-    imgUrl: supabase.storage.from('owners').getPublicUrl(item.name).publicURL
+
+  creations = await Promise.all(data.map(async item => {
+    const { data: urlData, error: urlError } = await supabase.storage.from('owners').createSignedUrl(item.name, 3600);
+    if(urlError){ console.error(urlError); return null; }
+    return { name: item.name, imgUrl: urlData.signedUrl };
   }));
+
+  creations = creations.filter(c => c !== null);
   renderVisitor();
 }
 
