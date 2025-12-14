@@ -21,7 +21,7 @@ body {
 }
 
 header { text-align:center; padding:12px 0; }
-header img { width:98px; height:98px; border-radius:20%; display:block; margin:0 auto; }
+header img { width:150px; height:150px; border-radius:20%; display:block; margin:0 auto; }
 .title { font-size:42px; color:#b84c6f; font-weight:bold; text-align:center; margin-bottom:8px; }
 
 #viewSelector { display:flex; justify-content:center; gap:12px; margin:14px; }
@@ -43,7 +43,14 @@ header img { width:98px; height:98px; border-radius:20%; display:block; margin:0
 .visitor-item:hover img { transform: scale(1.02); }
 .visitor-item p { margin-top:8px; font-size:20px; color:#b84c6f; font-weight:bold; }
 
-.carousel-view { display:flex; gap:40px; overflow-x:auto; padding:20px; scroll-behavior:smooth; }
+.carousel-view {
+  display:flex;
+  gap:40px;
+  overflow-x:auto;
+  padding:20px;
+  scroll-behavior:smooth;
+  margin-top:2cm; /* ✅ Descend le carrousel */
+}
 .carousel-view::-webkit-scrollbar { height:8px; }
 .carousel-view::-webkit-scrollbar-thumb { background:#b84c6f88; border-radius:20px; }
 
@@ -68,20 +75,6 @@ header img { width:98px; height:98px; border-radius:20%; display:block; margin:0
   overflow-y:auto;
   position:relative;
 }
-
-/* Bouton Retour */
-#modalBackBtn {
-  position:absolute;
-  top:12px; left:16px;
-  padding:6px 14px;
-  background: #ffafc6;
-  border: 2px solid #b84c6f;
-  border-radius:24px;
-  color:#7a2b45;
-  font-weight:bold;
-  cursor:pointer;
-}
-
 .close-modal {
   position:absolute; top:12px; right:16px;
   font-size:30px; cursor:pointer; color:#b84c6f;
@@ -99,15 +92,12 @@ header img { width:98px; height:98px; border-radius:20%; display:block; margin:0
 .comment { background:#fff0f7; padding:10px; border-radius:10px; margin-bottom:10px; }
 
 .comment-form-bg {
-  position:fixed; inset:0; background:rgba(255,175,198,0.3);
+  position:fixed; inset:0; background:rgba(0,0,0,.6);
   display:none; justify-content:center; align-items:center; z-index:2000;
 }
-.comment-form {
-  background:white; padding:18px; border-radius:14px; width:340px;
-}
-.comment-form input, .comment-form textarea {
-  width:100%; margin-bottom:10px; padding:10px; border-radius:8px; border:2px solid #b84c6f;
-}
+.comment-form { background:white; padding:18px; border-radius:14px; width:340px; }
+.comment-form input, .comment-form textarea { width:100%; margin-bottom:10px; padding:10px; border-radius:8px; }
+
 </style>
 </head>
 <body>
@@ -130,7 +120,6 @@ header img { width:98px; height:98px; border-radius:20%; display:block; margin:0
 <!-- MODAL -->
 <div class="modal-bg" id="modal" onclick="closeModal()">
   <div class="modal-box" onclick="event.stopPropagation()">
-    <button id="modalBackBtn">Retour</button>
     <div class="close-modal" onclick="closeModal(); event.stopPropagation()">×</div>
     <img id="modalMain" class="modal-main-img">
 
@@ -169,7 +158,6 @@ const commentList = document.getElementById('commentsList');
 const commentFormBg = document.getElementById('commentFormBg');
 const commentName = document.getElementById('commentName');
 const commentText = document.getElementById('commentText');
-const modalBackBtn = document.getElementById('modalBackBtn');
 
 let creations = JSON.parse(localStorage.getItem('creations') || '[]');
 let currentIndex = null;
@@ -240,10 +228,8 @@ function loadComments(){
   commentList.innerHTML=c.map(x=>`<div class="comment"><strong>${x.n}</strong><br>${x.t}</div>`).join('');
 }
 
-// Bouton Retour modal
-modalBackBtn.onclick = () => { modal.style.display = 'none'; };
-
 render();
 </script>
+
 </body>
 </html>
