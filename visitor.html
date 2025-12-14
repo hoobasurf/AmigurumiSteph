@@ -9,20 +9,21 @@
 html, body { height:100%; font-family:'Comic Sans MS', cursive; }
 body {
   background-image: url('Photoroom_20251212_143703.PNG');
-  background-size: contain;
+  background-size: cover;
   background-position: center top;
   background-repeat: no-repeat;
   background-attachment: fixed;
-  margin:0; padding:0; overflow:hidden;
-  display:flex; flex-direction:column;
+  margin:0;
+  padding:0;
+  overflow:hidden;
+  display:flex;
+  flex-direction:column;
 }
 
-/* HEADER */
 header { text-align:center; padding:12px 0; }
 header img { width:98px; height:98px; border-radius:20%; display:block; margin:0 auto; }
 .title { font-size:42px; color:#b84c6f; font-weight:bold; text-align:center; margin-bottom:8px; }
 
-/* VIEW SELECTOR */
 #viewSelector { display:flex; justify-content:center; gap:12px; margin:14px; }
 #viewSelector button {
   background:#fff0f7;
@@ -34,7 +35,6 @@ header img { width:98px; height:98px; border-radius:20%; display:block; margin:0
 }
 #viewSelector button.active { background:#ffeaf2; }
 
-/* CENTER ZONE */
 .center-zone { flex:1; display:flex; justify-content:center; }
 #visitor-list { width:100%; max-width:1200px; }
 
@@ -53,8 +53,10 @@ header img { width:98px; height:98px; border-radius:20%; display:block; margin:0
 .list-view .visitor-item { display:flex; align-items:center; gap:18px; }
 .list-view .visitor-item img { width:140px; height:140px; }
 
-/* MODAL */
-.modal-bg { position:fixed; inset:0; background:rgba(0,0,0,0.65); display:none; justify-content:center; align-items:center; z-index:1000; }
+.modal-bg {
+  position:fixed; inset:0; background:rgba(0,0,0,0.65);
+  display:none; justify-content:center; align-items:center; z-index:1000;
+}
 .modal-box {
   background: rgba(255,245,248,0.95);
   border: 4px solid #b67385;
@@ -86,16 +88,14 @@ header img { width:98px; height:98px; border-radius:20%; display:block; margin:0
 .comment-section { margin-top:16px; }
 .comment { background:#fff0f7; padding:10px; border-radius:10px; margin-bottom:10px; }
 
-/* COMMENT FORM */
-.comment-form-bg { position:fixed; inset:0; background:rgba(0,0,0,.6); display:none; justify-content:center; align-items:center; z-index:2000; }
-.comment-form {
-  background:#ffdae5; border:2px solid #b84c6f;
-  padding:18px; border-radius:14px; width:340px;
+.comment-form-bg {
+  position:fixed; inset:0; background:rgba(0,0,0,.6);
+  display:none; justify-content:center; align-items:center; z-index:2000;
 }
-.comment-form input, .comment-form textarea { width:100%; margin-bottom:10px; padding:10px; border-radius:8px; border:2px solid #b84c6f; }
+.comment-form { background:white; padding:18px; border-radius:14px; width:340px; }
+.comment-form input, .comment-form textarea { width:100%; margin-bottom:10px; padding:10px; border-radius:8px; }
 </style>
 </head>
-
 <body>
 
 <header>
@@ -191,7 +191,7 @@ function closeModal(){ modal.style.display='none'; }
 modalBackBtn.onclick = () => { modal.style.display='none'; };
 
 function toggleLike(){
-  if(currentIndex === null) return;
+  if(currentIndex===null) return;
   let name = prompt("Ton prénom pour liker cette image :") || "Anonyme";
   const key='likes_'+currentIndex;
   let likes=JSON.parse(localStorage.getItem(key)||'[]');
