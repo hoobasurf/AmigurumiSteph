@@ -2,121 +2,421 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<title>Mes créations</title>
-
+<title>Mes Créations</title>
 <style>
-body {
-  margin: 0;
-  font-family: 'Comic Sans MS', cursive;
+body{
+  margin:0;
+  font-family:sans-serif;
+  background:#fff0f5;
+  overflow-x:hidden;
+  padding-left:35px;
 }
 
-#visitor-list {
-  display: flex;
-  gap: 24px;
-  padding: 20px;
-  overflow-x: auto;
+/* ================= FOND D'ACCUEIL ================= */
+#intro-background{
+  position:fixed;
+  inset:0;
+  background:url('Photoroom_20251213_123235.png') center/cover no-repeat;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  z-index:100000;
 }
 
-.visitor-item {
-  text-align: center;
-  cursor: pointer;
+/* BOUTON BIENVENUE */
+#startBtn{
+  padding:20px 40px;
+  font-size:24px;
+  border-radius:16px;
+  border:none;
+  background:#ffb6c1;
+  color:#8b3a3a;
+  font-weight:bold;
+  cursor:pointer;
+  box-shadow:0 6px 15px rgba(182,115,133,.3);
 }
 
-.visitor-item img {
-  width: 240px;
-  height: 240px;
-  object-fit: contain;
-  display: block;
+/* ================= INTRO VIDEO ================= */
+#intro-video{
+  position:fixed;
+  inset:0;
+  background:#000;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  z-index:100001;
+  opacity:0;
+  pointer-events:none;
+  transition:opacity 1s ease;
 }
 
-.visitor-item p {
-  margin-top: 8px;
-  color: #b84c6f;
-  font-weight: bold;
+#intro-video video{
+  width:100%;
+  height:100%;
+  object-fit:cover;
 }
+
+/* ================= CONTENU APP (CACHÉ AU DÉBUT) ================= */
+#app-content{
+  opacity:0;
+  transition:opacity 1s ease;
+}
+
+/* ================= SIDEBAR ================= */
+#sidebar{
+  position:fixed;
+  top:0;
+  left:-220px;
+  width:220px;
+  height:100vh;
+  background:#ffe6f0;
+  border-right:2px solid #b67385;
+  padding:20px;
+  transition:left .3s ease;
+  z-index:10;
+}
+
+#sidebar.sidebar-open{ left:0; }
+
+#toggleSidebar{
+  position:absolute;
+  top:50%;
+  right:-30px;
+  width:30px;
+  height:60px;
+  background:#ffb6c1;
+  color:#8b3a3a;
+  border-radius:0 12px 12px 0;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  cursor:pointer;
+  border:1px solid #b67385;
+  font-weight:bold;
+}
+
+#sidebar button{
+  width:100%;
+  margin-bottom:10px;
+  padding:10px;
+  border:none;
+  border-radius:12px;
+  background:#ffb6c1;
+  color:#8b3a3a;
+  font-weight:bold;
+  cursor:pointer;
+}
+
+/* ================= TITRE ================= */
+h1{ text-align:center; color:#b84c6f; margin-top:20px; }
+
+/* ================= AJOUT CREATION ================= */
+.owner-box{
+  max-width:420px;
+  margin:20px auto;
+  background:#ffe6f0;
+  border:2px solid #b67385;
+  border-radius:18px;
+  padding:20px;
+  box-shadow:0 6px 20px rgba(182,115,133,.25);
+}
+
+.owner-box input,
+.owner-box button{
+  width:100%;
+  margin-top:10px;
+  padding:10px;
+  border-radius:12px;
+}
+
+.owner-box input{ border:1px solid #b67385; }
+
+.owner-box button{
+  background:#ffb6c1;
+  border:none;
+  color:#8b3a3a;
+  font-weight:bold;
+  cursor:pointer;
+  box-shadow:0 4px 10px rgba(0,0,0,.15);
+}
+
+/* ================= MODES ================= */
+#display-modes{
+  text-align:center;
+  margin:15px 0;
+}
+
+#display-modes button{
+  margin:0 5px;
+  padding:8px 12px;
+  border-radius:12px;
+  border:1px solid #b67385;
+  background:#ffe6f0;
+  color:#8b3a3a;
+  font-weight:bold;
+  cursor:pointer;
+}
+
+/* ================= LISTE CREATIONS ================= */
+#owner-list{
+  display:flex;
+  flex-wrap:wrap;
+  justify-content:center;
+  gap:15px;
+  margin-bottom:40px;
+}
+
+#owner-list.grid .owner-item{ width:140px; }
+
+#owner-list.list{
+  flex-direction:column;
+  align-items:center;
+}
+#owner-list.list .owner-item{
+  display:flex;
+  align-items:center;
+  width:90%;
+  gap:10px;
+}
+
+#owner-list.carousel{
+  flex-wrap:nowrap;
+  overflow-x:auto;
+  padding-bottom:10px;
+}
+
+.owner-item{
+  position:relative;
+  background:#ffe6f0;
+  border:2px solid #b67385;
+  border-radius:16px;
+  padding:10px;
+  text-align:center;
+}
+
+.owner-item img{
+  width:110px;
+  height:110px;
+  object-fit:cover;
+  border-radius:10px;
+}
+
+.owner-item p{
+  margin:5px 0 0;
+  color:#8b3a3a;
+  font-weight:bold;
+}
+
+.delete-btn{
+  position:absolute;
+  top:5px;
+  right:5px;
+  width:22px;
+  height:22px;
+  border-radius:50%;
+  background:rgba(255,192,203,.9);
+  border:1px solid #8b3a3a;
+  color:#8b3a3a;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  cursor:pointer;
+  font-weight:bold;
+}
+
+.section{ display:none; padding:20px; }
+.section.active{ display:block; }
 </style>
 </head>
-
 <body>
 
-<h1 style="text-align:center;color:#b84c6f;">Mes créations</h1>
-<div id="visitor-list"></div>
+<!-- FOND + BOUTON -->
+<div id="intro-background">
+  <button id="startBtn">Bienvenue</button>
+</div>
 
-<!-- SUPABASE -->
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<!-- VIDÉO -->
+<div id="intro-video">
+  <video muted playsinline preload="auto">
+    <source src="chat.mp4" type="video/mp4">
+  </video>
+</div>
+
+<!-- CONTENU DE L'APP -->
+<div id="app-content">
+  <!-- SIDEBAR -->
+  <div id="sidebar">
+    <div id="toggleSidebar">☰</div>
+    <button onclick="openSection('videos')">Vidéos</button>
+    <button onclick="openSection('mailles')">Mailles</button>
+    <button onclick="openSection('pelotes')">Pelotes</button>
+    <button onclick="openSection('notes')">Notes</button>
+    <button onclick="openSection('settings')">Paramètres</button>
+  </div>
+
+  <h1>Mes Créations</h1>
+
+  <div class="owner-box">
+    <input id="name" placeholder="Nom de la création">
+    <input id="photo" type="file" accept="image/*">
+    <button id="add">Ajouter</button>
+  </div>
+
+  <div id="display-modes">
+    <button onclick="setMode('carousel')">Carrousel</button>
+    <button onclick="setMode('grid')">Grille</button>
+    <button onclick="setMode('list')">Liste</button>
+  </div>
+
+  <div id="owner-list" class="grid"></div>
+
+  <!-- SECTIONS -->
+  <div id="videos" class="section"><button onclick="closeSection()">← Retour</button></div>
+  <div id="mailles" class="section"><button onclick="closeSection()">← Retour</button></div>
+  <div id="pelotes" class="section"><button onclick="closeSection()">← Retour</button></div>
+  <div id="notes" class="section"><button onclick="closeSection()">← Retour</button></div>
+  <div id="settings" class="section"><button onclick="closeSection()">← Retour</button></div>
+</div>
+
+<script type="module" src="owner.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
 
 <script>
-/* =============================
-   SUPABASE CONFIG
-============================= */
-const SUPABASE_URL = "https://iubbxvipgofxasatmvzg.supabase.co";
-const SUPABASE_ANON_KEY = "sb_publishable_GDoZmwIdoP28XOdrfYYVNw_E_HiCQB1";
+// ================= BOUTON BIENVENUE =================
+const startBtn = document.getElementById("startBtn");
+const introBg = document.getElementById("intro-background");
+const introVideoDiv = document.getElementById("intro-video");
+const video = introVideoDiv.querySelector("video");
+const appContent = document.getElementById("app-content");
 
-const supabase = window.supabase.createClient(
-  SUPABASE_URL,
-  SUPABASE_ANON_KEY
-);
+startBtn.onclick = () => {
+  introBg.style.display = "none";
+  introVideoDiv.style.opacity = "1";
+  introVideoDiv.style.pointerEvents = "auto";
+  video.play().catch(e=>console.log("Lecture bloquée:", e));
+};
 
-/* =============================
-   ELEMENTS
-============================= */
-const list = document.getElementById("visitor-list");
+video.onended = () => {
+  setTimeout(() => {
+    introVideoDiv.style.opacity = 0;
+    setTimeout(() => introVideoDiv.remove(), 1000);
+    appContent.style.opacity = 1;
+  }, 1200);
+};
 
-/* =============================
-   LOAD CREATIONS (SAFE)
-============================= */
-async function loadCreations() {
-  const { data, error } = await supabase
-    .storage
-    .from("owners")
-    .list("", {
-      limit: 200,
-      sortBy: { column: "name", order: "asc" }
-    });
+// ================= SIDEBAR =================
+const sidebar=document.getElementById("sidebar");
+const toggle=document.getElementById("toggleSidebar");
+toggle.onclick=()=>sidebar.classList.toggle("sidebar-open");
 
-  if (error) {
-    console.error("Erreur storage:", error);
-    return;
-  }
+// ================= CREATIONS =================
+const nameInput = document.getElementById('name');
+const photoInput = document.getElementById('photo');
+const addBtn = document.getElementById('add');
+const list = document.getElementById('owner-list');
 
-  const creations = data
-    .filter(file => file.name && !file.name.startsWith("."))
-    .map(file => ({
-      name: file.name,
-      url: supabase
-        .storage
-        .from("owners")
-        .getPublicUrl(file.name)
-        .data.publicUrl
-    }));
+// LocalStorage creations
+let creations = JSON.parse(localStorage.getItem("creations") || "[]");
 
-  render(creations);
+// Compression image
+function compressImage(file, maxWidth = 900, quality = 0.8) {
+  return new Promise((resolve) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      const img = new Image();
+      img.onload = () => {
+        const canvas = document.createElement("canvas");
+        let w = img.width; let h = img.height;
+        if (w > maxWidth) { h *= maxWidth/w; w = maxWidth; }
+        canvas.width=w; canvas.height=h;
+        const ctx = canvas.getContext("2d");
+        ctx.drawImage(img,0,0,w,h);
+        resolve(canvas.toDataURL("image/jpeg",quality));
+      };
+      img.src=e.target.result;
+    };
+    reader.readAsDataURL(file);
+  });
 }
 
-/* =============================
-   RENDER
-============================= */
-function render(creations) {
+// Affichage
+function renderCreations() {
   list.innerHTML = "";
-
-  creations.forEach(item => {
+  creations.forEach((item, index) => {
     const div = document.createElement("div");
-    div.className = "visitor-item";
-
+    div.className = "owner-item";
     div.innerHTML = `
-      <img src="${item.url}" alt="">
+      <div class="delete-btn" data-index="${index}">×</div>
+      <img src="${item.imgUrl}" alt="">
       <p>${item.name}</p>
     `;
-
     list.appendChild(div);
   });
 }
 
-/* =============================
-   INIT
-============================= */
-loadCreations();
-</script>
+// Ajout
+addBtn.onclick = async () => {
+  const name = nameInput.value.trim();
+  const file = photoInput.files[0];
+  if (!name || !file) { alert("Merci de remplir le nom et choisir une photo !"); return; }
+  const imgUrl = await compressImage(file);
+  creations.unshift({ name, imgUrl });
+  localStorage.setItem("creations", JSON.stringify(creations));
+  renderCreations();
+  nameInput.value = ""; photoInput.value = "";
+};
 
+// Suppression
+list.addEventListener("click", (e) => {
+  if (e.target.classList.contains("delete-btn")) {
+    const index = e.target.dataset.index;
+    const overlay = document.createElement("div");
+    overlay.style=`position:fixed; inset:0; background:rgba(0,0,0,0.15); display:flex; justify-content:center; align-items:center; z-index:99999;`;
+    const box=document.createElement("div");
+    box.style=`background:#ffe4ec;border:3px solid #b84c6f;padding:20px;border-radius:15px;width:260px;text-align:center;box-shadow:0 8px 25px rgba(0,0,0,0.2);`;
+    box.innerHTML=`<p style="color:#b84c6f;font-weight:600;font-size:16px;margin-bottom:15px;">Supprimer cette création ?</p>
+      <div style="display:flex; gap:10px; justify-content:center;">
+        <button id="delYes" style="padding:8px 14px;border-radius:10px;border:none;background:#ffb6c1;color:#8b3a3a;font-weight:bold;cursor:pointer;">Oui</button>
+        <button id="delNo" style="padding:8px 14px;border-radius:10px;border:none;background:#ddd;cursor:pointer;">Non</button>
+      </div>`;
+    overlay.appendChild(box); document.body.appendChild(overlay);
+    box.querySelector("#delYes").onclick=()=>{ creations.splice(index,1); localStorage.setItem("creations",JSON.stringify(creations)); renderCreations(); overlay.remove(); };
+    box.querySelector("#delNo").onclick=()=>overlay.remove();
+});
+
+// Sidebar & modes
+function setMode(mode){ list.className = mode; }
+function openSection(id){
+  sidebar.classList.remove('sidebar-open');
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.owner-box, #owner-list, #display-modes').forEach(e=>e.style.display='none');
+  document.getElementById(id).classList.add('active');
+}
+function closeSection(){
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  document.querySelectorAll('.owner-box, #owner-list, #display-modes').forEach(e=>e.style.display='flex');
+  list.style.display='flex';
+}
+
+// ================= SUPABASE =================
+const SUPABASE_URL = "https://iubbxvipgofxasatmvzg.supabase.co";
+const SUPABASE_ANON_KEY = "sb_publishable_GDoZmwIdoP28XOdrfYYVNw_E_HiCQB1";
+const supabase = window.supabase.createClient(SUPABASE_URL,SUPABASE_ANON_KEY);
+
+async function loadSupabaseCreations(){
+  try{
+    const { data, error } = await supabase.storage.from('owners').list();
+    if(error){ console.error(error); return; }
+    const supaCreations = data.map(item=>{
+      const { publicURL } = supabase.storage.from('owners').getPublicUrl(item.name);
+      return { name:item.name, imgUrl:publicURL };
+    });
+    creations = [...supaCreations, ...creations];
+    renderCreations();
+  } catch(err){ console.error("Erreur Supabase:", err); }
+}
+window.addEventListener('DOMContentLoaded', loadSupabaseCreations);
+renderCreations();
+</script>
 </body>
 </html>
