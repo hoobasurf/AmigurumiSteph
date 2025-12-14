@@ -9,11 +9,11 @@
 html, body { height:100%; font-family: 'Comic Sans MS', cursive; }
 
 body {
-  background-image: url('Photoroom_20251212_143703.png');
-  background-size: contain;
-  background-position: center;
+  background-image: url('Photoroom_20251212_143703.PNG'); /* ✅ MAJUSCULE */
+  background-size: contain;            /* ✅ comme TON code */
+  background-position: center top;     /* ✅ évite le zoom */
   background-repeat: no-repeat;
-  background-attachment: fixed;
+  background-attachment: scroll;       /* ❌ PAS fixed (cause du zoom) */
   background-color: #fff0f5;
 
   display: flex;
