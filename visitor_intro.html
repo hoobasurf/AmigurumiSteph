@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>Visitor - Accueil</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+html,body{width:100%;height:100%;overflow:hidden;font-family:sans-serif;}
+
+/* ================= ACCUEIL ================= */
+#intro-container{
+  position:fixed;
+  inset:0;
+  background:url('Photoroom_20251213_123235.png') center/cover no-repeat;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  z-index:9999;
+  flex-direction:column;
+}
+
+/* vidéo plein écran SANS ZOOM */
+#intro-video{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  z-index:1;
+}
+
+/* bouton bienvenue */
+#welcome-btn{
+  position:relative;
+  z-index:2;
+  padding:12px 24px;
+  font-size:18px;
+  border-radius:12px;
+  border:none;
+  background:#ffb6c1;
+  color:#8b3a3a;
+  font-weight:bold;
+  cursor:pointer;
+  box-shadow:0 4px 12px rgba(0,0,0,.25);
+}
+#welcome-btn:hover{
+  background:#ff9fc1;
+}
+</style>
+</head>
+<body>
+
+<div id="intro-container">
+  <video id="intro-video" playsinline preload="auto">
+    <source src="chat.mp4" type="video/mp4">
+  </video>
+  <button id="welcome-btn">Bienvenue</button>
+</div>
+
+<script>
+const intro = document.getElementById('intro-container');
+const video = document.getElementById('intro-video');
+const btn = document.getElementById('welcome-btn');
+
+/* CLICK BIENVENUE */
+btn.addEventListener('click', () => {
+  btn.style.transition = 'opacity 0.5s';
+  btn.style.opacity = 0;
+
+  video.play();
+
+  video.onended = () => {
+    // Redirige vers l'application après la vidéo
+    window.location.href = "visitor_app.html";
+  };
+});
+</script>
+
+</body>
+</html>
