@@ -107,6 +107,19 @@ body{
   cursor:pointer;
 }
 
+/* ================= BOUTON THEME ================= */
+#themeBtn{
+  width:100%;
+  margin-top:20px;
+  padding:12px;
+  background:#ffb6c1;
+  color:#8b3a3a;
+  font-weight:bold;
+  border:none;
+  border-radius:12px;
+  cursor:pointer;
+}
+
 /* ================= TITRE ================= */
 h1{ text-align:center; color:#b84c6f; margin-top:20px; }
 
@@ -227,6 +240,40 @@ h1{ text-align:center; color:#b84c6f; margin-top:20px; }
 .section{ display:none; padding:20px; }
 .section.active{ display:block; }
 
+/* ================= THEME NOEL ================= */
+.theme-christmas img {
+  border: 6px solid;
+  border-image: repeating-linear-gradient(
+    45deg,
+    red 0, red 5px,
+    white 5px, white 10px
+  ) 1;
+  border-radius:12px;
+}
+
+#visitor-list.christmas,
+#owner-list.christmas {
+  position: relative;
+  overflow: hidden;
+}
+
+.snowflake {
+  position: absolute;
+  top: -10px;
+  color: white;
+  font-size: 10px;
+  z-index: 10000;
+  pointer-events: none;
+  user-select: none;
+  animation-name: fall;
+  animation-timing-function: linear;
+  animation-iteration-count: infinite;
+}
+
+@keyframes fall {
+  0% { transform: translateY(0) rotate(0deg); }
+  100% { transform: translateY(100vh) rotate(360deg); }
+}
 </style>
 </head>
 <body>
@@ -253,6 +300,7 @@ h1{ text-align:center; color:#b84c6f; margin-top:20px; }
     <button onclick="openSection('pelotes')">Pelotes</button>
     <button onclick="openSection('notes')">Notes</button>
     <button onclick="openSection('settings')">Paramètres</button>
+    <button id="themeBtn">Thème</button>
   </div>
 
   <h1>Mes Créations</h1>
@@ -279,6 +327,17 @@ h1{ text-align:center; color:#b84c6f; margin-top:20px; }
   <div id="settings" class="section"><button onclick="closeSection()">← Retour</button></div>
 </div>
 
+<!-- MODAL THEME -->
+<div id="themeModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.65); justify-content:center; align-items:center; z-index:5000;">
+  <div style="background:#ffe6f0; padding:20px; border-radius:18px; max-width:400px; width:90%; text-align:center; position:relative;">
+    <div id="closeThemeModal" style="position:absolute; top:10px; right:12px; cursor:pointer; font-size:24px;">×</div>
+    <h2 style="color:#b84c6f;">Choisir un thème</h2>
+    <button id="christmasOwner">Noël Owner</button><br><br>
+    <button id="christmasVisitor">Noël Visitor</button><br><br>
+    <button id="christmasBoth">Noël les deux</button>
+  </div>
+</div>
+
 <script type="module" src="owner.js"></script>
 
 <script>
@@ -297,13 +356,12 @@ startBtn.onclick = () => {
 };
 
 /* FIN DE LA VIDEO -> afficher l'appli avec fondu */
-/* FIN DE LA VIDEO -> afficher l'appli avec fondu */
 video.onended = () => {
   setTimeout(() => {
     introVideoDiv.style.opacity = 0;
-    setTimeout(() => introVideoDiv.remove(), 1000); // fondu de 1s
+    setTimeout(() => introVideoDiv.remove(), 1000);
     appContent.style.opacity = 1;
-  }, 1200); // attend 2 secondes après la fin de la vidéo
+  }, 1200);
 };
 
 /* SIDEBAR */
@@ -332,6 +390,42 @@ function closeSection(){
   document.getElementById("owner-list").style.display="flex";
   document.getElementById("display-modes").style.display="block";
 }
+
+/* =================== THEME MODAL =================== */
+const themeBtn = document.getElementById('themeBtn');
+const themeModal = document.getElementById('themeModal');
+const closeThemeModal = document.getElementById('closeThemeModal');
+
+themeBtn.onclick = ()=> themeModal.style.display='flex';
+closeThemeModal.onclick = ()=> themeModal.style.display='none';
+
+function addSnow(containerId){
+  const container = document.getElementById(containerId);
+  container.classList.add('christmas');
+  container.querySelectorAll('.snowflake').forEach(f=>f.remove());
+
+  for(let i=0;i<50;i++){
+    const snow = document.createElement('div');
+    snow.className='snowflake';
+    snow.style.left=Math.random()*100+'%';
+    snow.style.animationDuration=(5+Math.random()*5)+'s';
+    snow.style.fontSize=(10+Math.random()*10)+'px';
+    snow.textContent='❄';
+    container.appendChild(snow);
+  }
+}
+
+// Boutons modal
+document.getElementById('christmasOwner').onclick = ()=>{
+  addSnow('owner-list');
+};
+document.getElementById('christmasVisitor').onclick = ()=>{
+  addSnow('visitor-list');
+};
+document.getElementById('christmasBoth').onclick = ()=>{
+  addSnow('owner-list');
+  addSnow('visitor-list');
+};
 </script>
 
 </body>
