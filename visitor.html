@@ -1,116 +1,60 @@
-
 <!DOCTYPE html>
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<title>Visitor</title>
+<title>Visitor App</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <style>
 *{margin:0;padding:0;box-sizing:border-box;}
-html,body{width:100%;height:100%;overflow:hidden;font-family:sans-serif;}
-
-/* ================= ACCUEIL ================= */
-#intro-container{
-  position:fixed;
-  inset:0;
-  background:url('Photoroom_20251213_123235.png') center/cover no-repeat;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  z-index:9999;
-  flex-direction:column;
-}
-
-/* vidéo plein écran SANS ZOOM */
-#intro-video{
-  position:absolute;
-  inset:0;
-  width:100%;
-  height:100%;
-  object-fit:cover; /* VIDEO couvre tout l'écran */
-  z-index:1;
-}
-
-/* bouton bienvenue */
-#welcome-btn{
-  position:relative;
-  z-index:2;
-  padding:12px 24px; /* réduit le bouton */
-  font-size:18px;    /* plus petit texte */
-  border-radius:12px;
-  border:none;
-  background:#ffb6c1;
-  color:#8b3a3a;
-  font-weight:bold;
-  cursor:pointer;
-  box-shadow:0 4px 12px rgba(0,0,0,.25);
-}
-#welcome-btn:hover{
-  background:#ff9fc1;
-}
-
-/* ================= APPLI ================= */
-#app{
-  display:none;
-  width:100%;
-  height:100%;
-  overflow:auto;
-  background:#fff0f5;
-}
+html,body{width:100%;height:100%;overflow:auto;font-family:sans-serif;}
+body{background:#fff0f5;}
 
 h1{
   text-align:center;
   margin:20px;
   color:#b84c6f;
 }
+
+/* CONTENEUR DES CRÉATIONS */
+#visitor-list{
+  display:flex;
+  flex-wrap:wrap;
+  justify-content:center;
+  gap:15px;
+  padding:20px;
+}
+
+.visitor-item{
+  text-align:center;
+  cursor:pointer;
+}
+
+.visitor-item img{
+  width:200px;
+  height:200px;
+  object-fit:cover;
+  border-radius:12px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.visitor-item img:hover{
+  transform:scale(1.03);
+  box-shadow:0 8px 20px rgba(184,76,111,0.3);
+}
+
+.visitor-item p{
+  margin-top:8px;
+  font-size:16px;
+  color:#b84c6f;
+}
 </style>
 </head>
-
 <body>
 
-<!-- INTRO -->
-<div id="intro-container">
-  <video id="intro-video" playsinline preload="auto">
-    <source src="chat.mp4" type="video/mp4">
-  </video>
-  <button id="welcome-btn">Bienvenue</button>
-</div>
+<h1>✨ Projets réalisés</h1>
+<div id="visitor-list"></div>
 
-<!-- APPLI -->
-<div id="app">
-  <h1>✨ Projets réalisés</h1>
-  <!-- ton contenu visitor / supabase ira ici -->
-</div>
-
-<script>
-const intro = document.getElementById('intro-container');
-const video = document.getElementById('intro-video');
-const btn = document.getElementById('welcome-btn');
-const app = document.getElementById('app');
-
-/* CLICK BIENVENUE - plus fluide */
-btn.addEventListener('click', () => {
-  // transition bouton
-  btn.style.transition = 'opacity 0.5s';
-  btn.style.opacity = 0;
-
-  // lecture vidéo
-  video.play();
-
-  // fade-out du conteneur après fin vidéo
-  video.onended = () => {
-    intro.style.transition = 'opacity 1s';
-    intro.style.opacity = 0;
-
-    setTimeout(() => {
-      intro.remove();
-      app.style.display = 'block';
-      document.body.style.overflow = 'auto';
-    }, 1000);
-  };
-});
-</script>
+<script type="module" src="visitor.js"></script>
 
 </body>
 </html>
