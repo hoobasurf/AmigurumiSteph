@@ -2,292 +2,106 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<title>Galerie Projets – Visitor</title>
+<title>Visitor</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <style>
-  * { box-sizing:border-box; margin:0; padding:0; }
-  html, body { height:100%; font-family:'Comic Sans MS', cursive; }
-  body {
-    background:#fff0f5;
-    overflow-x:hidden;
-    min-height:100vh;
-  }
+*{margin:0;padding:0;box-sizing:border-box;}
+html,body{width:100%;height:100%;overflow:hidden;font-family:sans-serif;}
 
-  /* ================= FOND + BIENVENUE ================= */
-  #intro-background {
-    position:fixed;
-    inset:0;
-    background:url('Photoroom_20251213_123235.png') center/cover no-repeat;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    z-index:100000;
-  }
+/* ================= ACCUEIL ================= */
+#intro-container{
+  position:fixed;
+  inset:0;
+  background:url('Photoroom_20251213_123235.png') center/cover no-repeat;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  z-index:9999;
+}
 
-  #startBtn {
-    padding:20px 40px;
-    font-size:24px;
-    border-radius:16px;
-    border:none;
-    background:#ffb6c1;
-    color:#8b3a3a;
-    font-weight:bold;
-    cursor:pointer;
-    box-shadow:0 6px 15px rgba(182,115,133,.3);
-    z-index:100001;
-  }
+/* vidéo plein écran SANS ZOOM */
+#intro-video{
+  position:absolute;
+  inset:0;
+  width:100%;
+  height:100%;
+  object-fit:contain; /* IMPORTANT : pas de zoom */
+}
 
-  #intro-video {
-    position:fixed;
-    inset:0;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    z-index:100002;
-    opacity:0;
-    pointer-events:none;
-    transition:opacity 1s ease;
-  }
+/* bouton */
+#welcome-btn{
+  position:relative;
+  z-index:2;
+  padding:18px 36px;
+  font-size:22px;
+  border-radius:14px;
+  border:none;
+  background:#ffb6c1;
+  color:#8b3a3a;
+  font-weight:bold;
+  cursor:pointer;
+  box-shadow:0 6px 15px rgba(0,0,0,.25);
+}
+#welcome-btn:hover{
+  background:#ff9fc1;
+}
 
-  #intro-video video {
-    width:100%;
-    height:100%;
-    object-fit:cover;
-  }
+/* ================= APPLI ================= */
+#app{
+  display:none;
+  width:100%;
+  height:100%;
+  overflow:auto;
+  background:#fff0f5;
+}
 
-  /* ================= GALERIE ================= */
-  header { text-align:center; padding:12px 0; }
-  .title { font-size:42px; color:#b84c6f; font-weight:bold; margin-bottom:12px; }
-  #viewSelector { display:flex; justify-content:center; gap:12px; margin-bottom:14px; }
-  #viewSelector button {
-    background:#fff0f7; border:2px solid #b84c6f; color:#b84c6f; padding:8px 16px; border-radius:24px; cursor:pointer;
-    font-size:15px; transition: all 0.18s ease;
-  }
-  #viewSelector button.active { background:linear-gradient(90deg,#ffeaf2,#fff5f8); color:#7a2b45; transform:translateY(-2px); }
-  #viewSelector button:hover { transform:translateY(-2px); }
-
-  .center-zone { display:flex; justify-content:center; padding:8px; }
-  #visitor-list { width:calc(100% - 40px); max-width:1200px; margin:0 auto; transition:all 0.2s ease; }
-
-  .visitor-item { text-align:center; cursor:pointer; user-select:none; }
-  .visitor-item img { display:block; margin:0 auto; object-fit:contain; border:4px solid #b67385; transition: box-shadow 0.3s ease, transform 0.3s ease; }
-  .visitor-item:hover img { box-shadow:0 8px 20px rgba(184,76,111,0.3); transform:scale(1.03); }
-  .visitor-item p { margin:8px 0 0; font-size:20px; color:#b84c6f; font-weight:bold; }
-
-  .carousel-view { display:flex; gap:40px; overflow-x:auto; scroll-behavior:smooth; padding:10px; align-items:center; }
-  .carousel-view::-webkit-scrollbar { height:8px; }
-  .carousel-view::-webkit-scrollbar-thumb { background:#b84c6f66; border-radius:20px; }
-  .carousel-view .visitor-item img { width:260px; height:260px; }
-
-  .grid-view { display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:24px; padding:16px; }
-  .grid-view .visitor-item img { width:100%; height:200px; }
-
-  .list-view { display:flex; flex-direction:column; gap:18px; padding:16px; }
-  .list-view .visitor-item { display:flex; gap:18px; align-items:center; padding:8px; }
-  .list-view .visitor-item img { width:140px; height:140px; }
-  .list-view .visitor-item p { margin:0; font-size:18px; text-align:left; }
-
-  /* Modal */
-  .modal-bg { position:fixed; inset:0; background: rgba(0,0,0,0.65); display:none; justify-content:center; align-items:center; z-index:1000; padding:20px; }
-  .modal-box { background:#fff5f8; border-radius:16px; padding:18px; max-width:980px; width:94%; max-height:90vh; overflow-y:auto; box-shadow:0 8px 30px rgba(184,76,111,0.25); text-align:center; position:relative; cursor:default; }
-  .close-modal { position:absolute; top:10px; right:12px; font-size:28px; cursor:pointer; color:#b84c6f; font-weight:bold; }
-  .modal-main-img { width:100%; max-height:520px; object-fit:contain; border:4px solid #b67385; background:white; }
-  .thumbs { margin-top:16px; display:flex; gap:12px; justify-content:center; flex-wrap:wrap; }
-  .thumbs img { width:110px; height:110px; object-fit:contain; border:4px solid #b67385; background:transparent; cursor:pointer; transition: transform 0.2s ease, box-shadow 0.2s ease; }
-  .thumbs img:hover { transform:scale(1.06); box-shadow:0 6px 14px rgba(184,76,111,0.3); }
-
-  .icon-bar { margin-top:12px; display:flex; justify-content:center; gap:36px; align-items:center; }
-  .icon-btn { display:flex; gap:8px; align-items:center; cursor:pointer; color:#b84c6f; font-size:18px; }
-  .heart { font-size:26px; transition: color .18s; }
-  .heart.liked { color:#ff4b82; }
-  .like-info { font-size:14px; color:#7a2b45; margin-left:6px; }
-  .comment-info { font-size:14px; color:#7a2b45; margin-left:6px; }
-
-  .comment-section { margin-top:14px; text-align:left; }
-  .comment { background:#fff0f7; border:1px solid rgba(184,76,111,0.12); padding:10px; border-radius:10px; margin-bottom:10px; }
-  .add-comment-btn { margin-top:12px; padding:10px 20px; background:#b84c6f; color:#fff; border-radius:26px; font-size:16px; border:none; cursor:pointer; }
-  .comment-form-bg { position: fixed; inset:0; background: rgba(0,0,0,0.6); display:none; justify-content:center; align-items:center; z-index:2000; }
-  .comment-form { background:white; padding:18px; border-radius:12px; width:340px; box-shadow:0 8px 20px rgba(0,0,0,0.25); text-align:center; }
-  .comment-form input, .comment-form textarea { width:100%; padding:10px; border-radius:8px; border:2px solid rgba(184,76,111,0.12); margin-bottom:10px; font-size:15px; }
+h1{
+  text-align:center;
+  margin:20px;
+  color:#b84c6f;
+}
 </style>
 </head>
+
 <body>
 
-<!-- FOND + BIENVENUE -->
-<div id="intro-background">
-  <video id="intro-video" playsinline webkit-playsinline preload="auto">
+<!-- INTRO -->
+<div id="intro-container">
+  <video id="intro-video" playsinline preload="auto">
     <source src="chat.mp4" type="video/mp4">
   </video>
-  <button id="startBtn">Bienvenue</button>
+  <button id="welcome-btn">Bienvenue</button>
 </div>
 
-<header>
-  <h1 class="title">Mes créations</h1>
-  <div id="viewSelector">
-    <button id="btnCarousel">Carrousel</button>
-    <button id="btnGrid">Grille</button>
-    <button id="btnList">Liste</button>
-  </div>
-</header>
-
-<div class="center-zone">
-  <div id="visitor-list" role="list"></div>
+<!-- APPLI -->
+<div id="app">
+  <h1>✨ Projets réalisés</h1>
+  <!-- ton contenu visitor / supabase ira ici -->
 </div>
 
-<!-- Modal -->
-<div class="modal-bg" id="modal" onclick="if(event.target===this) closeModal()">
-  <div class="modal-box">
-    <div class="close-modal" onclick="closeModal()">×</div>
-    <img id="modalMain" class="modal-main-img" alt="Image agrandie">
-    <div class="icon-bar">
-      <div class="icon-btn" onclick="toggleLike()">
-        <span id="heart" class="heart">♡</span>
-        <span id="likeCount" class="like-info">0</span>
-      </div>
-      <div class="icon-btn" onclick="scrollToComments()">
-        💬 <span id="commentCount" class="comment-info">0</span>
-      </div>
-    </div>
-    <div id="thumbsContainer" class="thumbs"></div>
-    <button class="add-comment-btn" onclick="openCommentForm()">Ajouter un commentaire</button>
-    <div id="commentsList" class="comment-section"></div>
-  </div>
-</div>
-
-<div class="comment-form-bg" id="commentFormBg" onclick="if(event.target===this) closeCommentForm()">
-  <div class="comment-form">
-    <h3 style="margin-top:0;color:#b84c6f">Laisser un commentaire</h3>
-    <input id="commentName" placeholder="Prénom" />
-    <textarea id="commentText" rows="4" placeholder="Votre commentaire..."></textarea>
-    <button onclick="submitComment()">Envoyer</button>
-  </div>
-</div>
-
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
-<script type="module">
-const SUPABASE_URL = "https://iubbxvipgofxasatmvzg.supabase.co";
-const SUPABASE_ANON_KEY = "sb_publishable_GDoZmwIdoP28XOdrfYYVNw_E_HiCQB1";
-const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-const visitorList = document.getElementById('visitor-list');
-const introBackground = document.getElementById('intro-background');
+<script>
+const intro = document.getElementById('intro-container');
 const video = document.getElementById('intro-video');
-const startBtn = document.getElementById('startBtn');
-let creations = [];
-let currentView = 'carousel';
-let currentIndex = null;
+const btn = document.getElementById('welcome-btn');
+const app = document.getElementById('app');
 
-async function loadCreations() {
-  const { data, error } = await supabase.storage.from('owners').list();
-  if(error){ console.error(error); return; }
-  creations = data.map(item => ({
-    name: item.name,
-    imgUrl: supabase.storage.from('owners').getPublicUrl(item.name).publicURL
-  }));
-  renderVisitor();
-}
+/* CLICK BIENVENUE */
+btn.addEventListener('click', () => {
+  btn.style.display = 'none';
+  video.play();
 
-function renderVisitor() {
-  visitorList.innerHTML='';
-  visitorList.className = currentView+'-view';
-  creations.forEach((item,i)=>{
-    const div = document.createElement('div');
-    div.className='visitor-item';
-    div.setAttribute('data-index',i);
-    div.innerHTML=`<img src="${item.imgUrl}" alt="${item.name}"><p>${item.name}</p>`;
-    div.addEventListener('click',()=>openModal(i));
-    visitorList.appendChild(div);
-  });
-}
-
-function setView(mode){
-  currentView = mode;
-  document.getElementById('btnCarousel').classList.toggle('active', mode==='carousel');
-  document.getElementById('btnGrid').classList.toggle('active', mode==='grid');
-  document.getElementById('btnList').classList.toggle('active', mode==='list');
-  renderVisitor();
-}
-
-document.getElementById('btnCarousel').addEventListener('click',()=>setView('carousel'));
-document.getElementById('btnGrid').addEventListener('click',()=>setView('grid'));
-document.getElementById('btnList').addEventListener('click',()=>setView('list'));
-
-startBtn.onclick = () => {
-  video.play().catch(e=>console.log("Autoplay bloqué :",e));
-  startBtn.style.display='none';
-  video.style.opacity=1;
   video.onended = () => {
-    introBackground.style.transition="opacity 1.2s";
-    introBackground.style.opacity=0;
-    setTimeout(()=>introBackground.remove(),1200);
+    intro.style.transition = 'opacity 1s';
+    intro.style.opacity = 0;
+
+    setTimeout(() => {
+      intro.remove();
+      app.style.display = 'block';
+      document.body.style.overflow = 'auto';
+    }, 1000);
   };
-};
-
-/* Modal & likes/comments */
-const modal = document.getElementById('modal');
-const modalMain = document.getElementById('modalMain');
-const thumbs = document.getElementById('thumbsContainer');
-const heart = document.getElementById('heart');
-const likeCount = document.getElementById('likeCount');
-const commentCountSpan = document.getElementById('commentCount');
-const commentList = document.getElementById('commentsList');
-const commentFormBg = document.getElementById('commentFormBg');
-const commentName = document.getElementById('commentName');
-const commentText = document.getElementById('commentText');
-
-function openModal(i){
-  currentIndex=i;
-  const proj=creations[i];
-  modalMain.src = proj.imgUrl;
-  thumbs.innerHTML='';
-  thumbs.appendChild(modalMain.cloneNode());
-  loadLikes();
-  loadComments();
-  modal.style.display='flex';
-}
-function closeModal(){ modal.style.display='none'; }
-
-async function toggleLike(){
-  if(currentIndex===null) return;
-  const name = prompt("Ton prénom pour liker cette image:")||"Anonyme";
-  const key = `likes_${currentIndex}`;
-  let likes = JSON.parse(localStorage.getItem(key)||'[]');
-  if(likes.includes(name)) likes = likes.filter(n=>n!==name);
-  else likes.push(name);
-  localStorage.setItem(key, JSON.stringify(likes));
-  loadLikes();
-}
-function loadLikes(){
-  if(currentIndex===null) return;
-  const key=`likes_${currentIndex}`;
-  const likes=JSON.parse(localStorage.getItem(key)||'[]');
-  heart.textContent = likes.length>0?'❤️':'♡';
-  heart.classList.toggle('liked', likes.length>0);
-  likeCount.textContent = likes.length>0 ? ` ${likes.join(', ')}` : '';
-}
-
-function openCommentForm(){ commentFormBg.style.display='flex'; }
-function closeCommentForm(){ commentFormBg.style.display='none'; }
-function submitComment(){
-  const name=commentName.value.trim();
-  const text=commentText.value.trim();
-  if(!name||!text) return;
-  const key=`comments_${currentIndex}`;
-  let comments = JSON.parse(localStorage.getItem(key)||'[]');
-  comments.push({name,text,at:Date.now()});
-  localStorage.setItem(key, JSON.stringify(comments));
-  commentName.value=''; commentText.value=''; closeCommentForm();
-  loadComments();
-}
-function loadComments(){
-  if(currentIndex===null) return;
-  const key=`comments_${currentIndex}`;
-  const comments = JSON.parse(localStorage.getItem(key)||'[]');
-  commentList.innerHTML = comments.map(c=>`<div class="comment"><strong>${c.name}</strong><br>${c.text}</div>`).join('');
-  commentCountSpan.textContent = comments.length;
-}
-function scrollToComments(){ commentList.scrollIntoView({behavior:'smooth', block:'start'}); }
-
-loadCreations();
+});
 </script>
 
 </body>
