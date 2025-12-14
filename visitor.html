@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -35,8 +36,8 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:sans-serif;}
 #welcome-btn{
   position:relative;
   z-index:2;
-  padding:12px 24px; 
-  font-size:18px;
+  padding:12px 24px; /* réduit le bouton */
+  font-size:18px;    /* plus petit texte */
   border-radius:12px;
   border:none;
   background:#ffb6c1;
@@ -56,15 +57,13 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:sans-serif;}
   height:100%;
   overflow:auto;
   background:#fff0f5;
-  padding:20px;
 }
 
-h1{text-align:center;margin:20px 0;color:#b84c6f;}
-#visitor-list{display:flex;flex-wrap:wrap;justify-content:center;gap:16px;}
-.visitor-item{text-align:center;cursor:pointer;}
-.visitor-item img{width:220px;height:220px;object-fit:cover;border-radius:12px;border:3px solid #b67385;transition: transform 0.2s, box-shadow 0.2s;}
-.visitor-item img:hover{transform:scale(1.03);box-shadow:0 6px 15px rgba(184,76,111,0.3);}
-.visitor-item p{margin-top:6px;font-weight:bold;color:#b84c6f;}
+h1{
+  text-align:center;
+  margin:20px;
+  color:#b84c6f;
+}
 </style>
 </head>
 
@@ -81,63 +80,36 @@ h1{text-align:center;margin:20px 0;color:#b84c6f;}
 <!-- APPLI -->
 <div id="app">
   <h1>✨ Projets réalisés</h1>
-  <div id="visitor-list"></div>
+  <!-- ton contenu visitor / supabase ira ici -->
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
 <script>
-const SUPABASE_URL = "https://iubbxvipgofxasatmvzg.supabase.co";
-const SUPABASE_ANON_KEY = "sb_publishable_GDoZmwIdoP28XOdrfYYVNw_E_HiCQB1";
-const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-
-const list = document.getElementById('visitor-list');
-
-/* ---------------------------- */
-/* NE PAS TOUCHER AU BOUTON BIENVENUE / VIDEO */
 const intro = document.getElementById('intro-container');
 const video = document.getElementById('intro-video');
 const btn = document.getElementById('welcome-btn');
 const app = document.getElementById('app');
 
+/* CLICK BIENVENUE - plus fluide */
 btn.addEventListener('click', () => {
+  // transition bouton
   btn.style.transition = 'opacity 0.5s';
   btn.style.opacity = 0;
+
+  // lecture vidéo
   video.play();
+
+  // fade-out du conteneur après fin vidéo
   video.onended = () => {
     intro.style.transition = 'opacity 1s';
     intro.style.opacity = 0;
+
     setTimeout(() => {
       intro.remove();
       app.style.display = 'block';
       document.body.style.overflow = 'auto';
-      /* Charger les créations SUPABASE après fin vidéo */
-      loadCreations();
     }, 1000);
   };
 });
-
-/* ---------------------------- */
-/* Supabase - galerie Visitor */
-let creations = [];
-async function loadCreations(){
-  const { data, error } = await supabase.storage.from('owners').list();
-  if(error){ console.error(error); return; }
-  creations = data.map(item => ({
-    name: item.name,
-    imgUrl: supabase.storage.from('owners').getPublicUrl(item.name).publicURL
-  }));
-  renderVisitor();
-}
-
-function renderVisitor(){
-  list.innerHTML = '';
-  creations.forEach((item)=>{
-    const div = document.createElement('div');
-    div.className = 'visitor-item';
-    div.innerHTML = `<img src="${item.imgUrl}" alt="${item.name}"><p>${item.name}</p>`;
-    list.appendChild(div);
-  });
-}
 </script>
 
 </body>
