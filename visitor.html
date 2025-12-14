@@ -24,18 +24,30 @@ header { text-align:center; padding:12px 0; }
 header img { width:400px; height:400px; border-radius:20%; display:block; margin:0 auto; }
 .title { font-size:42px; color:#b84c6f; font-weight:bold; text-align:center; margin-bottom:8px; }
 
-#viewSelector { display:flex; justify-content:center; gap:12px; margin:14px; }
+#viewSelector {
+  display:flex;
+  justify-content:center;
+  gap:12px;            /* petit espace entre les boutons */
+  margin-top: 12px;     /* espace entre favicon et les boutons */
+}
+
 #viewSelector button {
   background:#fff0f7;
   border:2px solid #b84c6f;
   color:#b84c6f;
-  padding:8px 16px;
+  padding:16px 32px;    /* 2× plus grand que précédent (8px 16px) */
+  font-size:30px;       /* 2× plus grand que précédent (15px) */
   border-radius:24px;
   cursor:pointer;
 }
 #viewSelector button.active { background:#ffeaf2; }
 
-.center-zone { flex:1; display:flex; justify-content:center; }
+.center-zone {
+  flex:1;
+  display:flex;
+  justify-content:center;
+  margin-top: 1cm; /* décale le carrousel / contenu de 1 cm vers le bas */
+}
 #visitor-list { width:100%; max-width:1200px; }
 
 .visitor-item { text-align:center; cursor:pointer; user-select:none; }
