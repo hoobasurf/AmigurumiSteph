@@ -119,8 +119,8 @@
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
 <script>
-const SUPABASE_URL = "https://iubbxvipgofxasatmvzg.supabase.co";
-const SUPABASE_ANON_KEY = "sb_publishable_GDoZmwIdoP28XOdrfYYVNw_E_HiCQB1";
+const SUPABASE_URL = "https://YOUR_PROJECT.supabase.co";
+const SUPABASE_ANON_KEY = "YOUR_PUBLIC_ANON_KEY";
 const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 const list=document.getElementById('visitor-list');
@@ -142,7 +142,7 @@ let currentView = 'carousel';
 async function loadCreations(){
   const { data, error } = await supabase.storage.from('owners').list();
   if(error){ console.error(error); return; }
-  creations = data.map(item => ({
+  creations = data.map((item, i)=>({
     name: item.name,
     imgUrl: supabase.storage.from('owners').getPublicUrl(item.name).publicURL
   }));
@@ -178,10 +178,10 @@ function openModal(i){
   currentIndex = i;
   const proj = creations[i];
   modalMain.src = proj.imgUrl;
-  thumbs.innerHTML='';
-  thumbs.appendChild(modalMain.cloneNode());
   loadLikes();
   loadComments();
+  thumbs.innerHTML='';
+  thumbs.appendChild(modalMain.cloneNode());
   modal.style.display='flex';
 }
 
@@ -232,38 +232,6 @@ function loadComments(){
 function scrollToComments(){ commentList.scrollIntoView({behavior:'smooth', block:'start'}); }
 
 loadCreations();
-
- <!-- ====================== SUPABASE CREATIONS ====================== -->
-<!-- ====================== SUPABASE CREATIONS ====================== -->
-<script>
-async function loadSupabaseCreations() {
-  try {
-    // Liste des fichiers dans le bucket 'owners'
-    const { data, error } = await window.supabaseClient.storage.from('owners').list();
-    if (error) {
-      console.error("Erreur Supabase:", error);
-      return;
-    }
-
-    // On transforme chaque fichier en objet compatible avec renderCreations()
-    const supaCreations = data.map(item => {
-      const { publicURL } = window.supabaseClient.storage.from('owners').getPublicUrl(item.name);
-      return { name: item.name, imgUrl: publicURL };
-    });
-
-    // Ajoute ces créations aux créations locales existantes
-    creations = [...supaCreations, ...creations];
-
-    // Rafraîchit l'affichage avec ta fonction existante
-    renderCreations();
-  } catch (err) {
-    console.error("Erreur chargement Supabase:", err);
-  }
-}
-
-// Appel après que supabaseClient et renderCreations() soient initialisés
-window.addEventListener('DOMContentLoaded', loadSupabaseCreations);
-</script>
 </script>
 </body>
 </html>
