@@ -255,6 +255,26 @@ header img {
   padding:10px;
   border-radius:8px;
 }
+
+/* MODAL BOX scrollable propre */
+.modal-box {
+  max-height: 88vh;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch; /* ✅ rebond iOS corrigé */
+  /* reste inchangé */
+}
+
+/* GRID et LIST scroll vertical propre */
+.grid-view, .list-view {
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch; /* ✅ rebond iOS corrigé */
+}
+
+/* facultatif : ajoute un padding-bottom pour que le dernier élément soit visible */
+.grid-view, .list-view {
+  padding-bottom: 20px;
+}
+  
 </style>
 </head>
 
