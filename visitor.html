@@ -113,12 +113,19 @@ header img { width:400px; height:400px; border-radius:20%; display:block; margin
 .comment-section { margin-top:16px; }
 .comment { background:#fff0f7; padding:10px; border-radius:10px; margin-bottom:10px; }
 
-.comment-form-bg {
+.comment-form-bg, #likeNameFormBg {
   position:fixed; inset:0; background:rgba(0,0,0,.6);
   display:none; justify-content:center; align-items:center; z-index:2000;
 }
-.comment-form { background:white; padding:18px; border-radius:14px; width:340px; }
-.comment-form input, .comment-form textarea { width:100%; margin-bottom:10px; padding:10px; border-radius:8px; }
+.comment-form, #likeNameForm {
+  background:#ffdde5;
+  border:2px solid #b84c6f;
+  padding:18px;
+  border-radius:14px;
+  width:340px;
+  text-align:center;
+}
+#likeNameForm input { width:100%; margin-bottom:10px; padding:10px; border-radius:8px; border:1px solid #b84c6f; }
 
 </style>
 </head>
@@ -170,6 +177,15 @@ header img { width:400px; height:400px; border-radius:20%; display:block; margin
   </div>
 </div>
 
+<!-- LIKE NAME FORM -->
+<div id="likeNameFormBg" onclick="if(event.target===this) likeNameFormBg.style.display='none'">
+  <div id="likeNameForm" onclick="event.stopPropagation()">
+    <p>Ton prénom pour liker :</p>
+    <input type="text" id="likeNameInput" placeholder="Prénom">
+    <button id="submitLikeName">Envoyer</button>
+  </div>
+</div>
+
 <script>
 const list = document.getElementById('visitor-list');
 const modal = document.getElementById('modal');
@@ -182,6 +198,10 @@ const commentFormBg = document.getElementById('commentFormBg');
 const commentName = document.getElementById('commentName');
 const commentText = document.getElementById('commentText');
 const modalBackBtn = document.getElementById('modalBackBtn');
+
+const likeNameFormBg = document.getElementById('likeNameFormBg');
+const likeNameInput = document.getElementById('likeNameInput');
+const submitLikeName = document.getElementById('submitLikeName');
 
 let creations = JSON.parse(localStorage.getItem('creations') || '[]');
 let currentIndex = null;
@@ -213,21 +233,23 @@ function openModal(i){
 }
 
 function closeModal(){ modal.style.display='none'; }
+modalBackBtn.onclick = () => { modal.style.display='none'; };
 
-modalBackBtn.onclick = () => {
-  modal.style.display = 'none';
-};
-
+// --- Like avec prénom ---
 function toggleLike(){
   if(currentIndex===null) return;
-  let name = prompt("Ton prénom pour liker cette image :") || "Anonyme";
+  likeNameInput.value='';
+  likeNameFormBg.style.display='flex';
+}
+submitLikeName.onclick = () => {
+  const name = likeNameInput.value.trim() || "Anonyme";
   const key='likes_'+currentIndex;
   let likes=JSON.parse(localStorage.getItem(key)||'[]');
-  if(likes.includes(name)) likes = likes.filter(n=>n!==name);
-  else likes.push(name);
+  if(!likes.includes(name)) likes.push(name);
   localStorage.setItem(key,JSON.stringify(likes));
+  likeNameFormBg.style.display='none';
   loadLikes();
-}
+};
 
 function loadLikes(){
   const likes=JSON.parse(localStorage.getItem('likes_'+currentIndex)||'[]');
