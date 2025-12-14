@@ -56,12 +56,48 @@ html,body{width:100%;height:100%;overflow:hidden;font-family:sans-serif;}
   height:100%;
   overflow:auto;
   background:#fff0f5;
+  padding:20px;
 }
 
 h1{
   text-align:center;
   margin:20px;
   color:#b84c6f;
+}
+
+/* ================= GALERIE VISITOR ================= */
+#visitor-list{
+  display:flex;
+  flex-wrap:wrap;
+  justify-content:center;
+  gap:20px;
+  margin-top:20px;
+}
+.visitor-item{
+  background:#ffe6f0;
+  border:2px solid #b67385;
+  border-radius:12px;
+  padding:10px;
+  text-align:center;
+  width:180px;
+  cursor:pointer;
+  transition:transform 0.2s ease, box-shadow 0.2s ease;
+}
+.visitor-item img{
+  width:100%;
+  height:140px;
+  object-fit:cover;
+  border-radius:8px;
+}
+.visitor-item:hover{
+  transform:scale(1.03);
+  box-shadow:0 6px 15px rgba(184,76,111,0.3);
+}
+.visitor-item p{
+  margin-top:8px;
+  color:#8b3a3a;
+  font-weight:bold;
+  font-size:16px;
 }
 </style>
 </head>
@@ -79,25 +115,29 @@ h1{
 <!-- APPLI -->
 <div id="app">
   <h1>✨ Projets réalisés</h1>
-  <!-- ton contenu visitor / supabase ira ici -->
+  <div id="visitor-list"></div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
 <script>
+const SUPABASE_URL = "https://iubbxvipgofxasatmvzg.supabase.co";
+const SUPABASE_ANON_KEY = "sb_publishable_GDoZmwIdoP28XOdrfYYVNw_E_HiCQB1";
+const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+/* Référence DOM */
 const intro = document.getElementById('intro-container');
 const video = document.getElementById('intro-video');
 const btn = document.getElementById('welcome-btn');
 const app = document.getElementById('app');
+const list = document.getElementById('visitor-list');
 
-/* CLICK BIENVENUE - plus fluide */
+/* CLICK BIENVENUE - version fluide */
 btn.addEventListener('click', () => {
-  // transition bouton
   btn.style.transition = 'opacity 0.5s';
   btn.style.opacity = 0;
 
-  // lecture vidéo
   video.play();
 
-  // fade-out du conteneur après fin vidéo
   video.onended = () => {
     intro.style.transition = 'opacity 1s';
     intro.style.opacity = 0;
@@ -106,9 +146,31 @@ btn.addEventListener('click', () => {
       intro.remove();
       app.style.display = 'block';
       document.body.style.overflow = 'auto';
+      loadCreations();
     }, 1000);
   };
 });
+
+/* ================= FONCTION CHARGEMENT CREATIONS ================= */
+async function loadCreations() {
+  try {
+    const { data, error } = await supabase.storage.from('owners').list();
+    if(error){ console.error(error); return; }
+
+    list.innerHTML = '';
+
+    data.forEach(item => {
+      const url = supabase.storage.from('owners').getPublicUrl(item.name).publicURL;
+      const div = document.createElement('div');
+      div.className = 'visitor-item';
+      div.innerHTML = `<img src="${url}" alt="${item.name}"><p>${item.name}</p>`;
+      list.appendChild(div);
+    });
+
+  } catch(err) {
+    console.error('Erreur chargement créations:', err);
+  }
+}
 </script>
 
 </body>
