@@ -2,94 +2,104 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<title>Visitor – Mes créations</title>
+<title>Visitor</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style>
-/* RESET ET BASE */
-* { margin:0; padding:0; box-sizing:border-box; }
-html, body { width:100%; height:100%; font-family:sans-serif; overflow-x:hidden; }
+*{margin:0;padding:0;box-sizing:border-box;}
+html,body{width:100%;height:100%;overflow:auto;font-family:sans-serif;background:#fff0f5;}
 
-/* FOND ET CONTENEUR PRINCIPAL */
-body { background:#fff0f5; display:flex; flex-direction:column; min-height:100vh; }
+/* ================= HEADER ================= */
+header { text-align:center; padding:12px 0; }
+header h1 { font-size:32px; color:#b84c6f; margin-bottom:12px; }
 
-/* HEADER */
-header { text-align:center; padding:12px; }
-header img { width:64px; height:64px; border-radius:20%; display:block; margin:0 auto; }
-.title { font-size:32px; color:#b84c6f; font-weight:bold; margin:8px 0; }
-
-/* VUES (carrousel / grille / liste) */
-#viewSelector { display:flex; justify-content:center; gap:8px; margin-bottom:12px; }
+/* ================= VIEWS ================= */
+#viewSelector {
+  display:flex;
+  justify-content:center;
+  gap:12px;
+  margin-bottom:14px;
+}
 #viewSelector button {
   background:#fff0f7;
   border:2px solid #b84c6f;
   color:#b84c6f;
-  padding:6px 12px;
-  border-radius:16px;
-  font-size:12px;
+  padding:6px 12px; /* réduit taille bouton */
+  border-radius:20px;
   cursor:pointer;
-  transition: all 0.2s ease;
+  font-size:14px;
+  transition: all 0.18s ease;
 }
-#viewSelector button.active { background:linear-gradient(90deg,#ffeaf2,#fff5f8); color:#7a2b45; }
+#viewSelector button.active {
+  background:linear-gradient(90deg,#ffeaf2,#fff5f8);
+  color:#7a2b45;
+}
 
-/* LISTE DES CREATIONS */
-.center-zone { flex:1; display:flex; justify-content:center; padding:8px; overflow:auto; }
-#visitor-list { display:flex; flex-wrap:wrap; justify-content:center; gap:12px; width:100%; }
+/* ================= GALERIE ================= */
+.center-zone { display:flex; justify-content:center; }
+#visitor-list { display:flex; flex-wrap:wrap; gap:12px; max-width:1200px; }
 
-/* ITEMS */
-.visitor-item { text-align:center; cursor:pointer; flex:0 0 auto; }
+/* MINIATURES */
+.visitor-item { text-align:center; cursor:pointer; }
 .visitor-item img {
-  width:100%;
-  max-width:180px;
-  height:auto;
-  border:3px solid #b67385;
-  border-radius:10px;
-  transition: transform 0.2s, box-shadow 0.2s;
+  width:100px;       /* largeur fixe pour miniatures */
+  height:100px;      /* hauteur fixe pour miniatures */
+  object-fit:cover;  /* pas de zoom, remplissage uniforme */
+  border:2px solid #b67385;
+  border-radius:8px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
-.visitor-item img:hover { transform:scale(1.03); box-shadow:0 6px 15px rgba(184,76,111,0.3); }
+.visitor-item img:hover { transform:scale(1.05); box-shadow:0 6px 14px rgba(184,76,111,0.3); }
 .visitor-item p { margin-top:6px; font-size:14px; color:#b84c6f; font-weight:bold; }
 
-/* MODES */
-.carousel-view { display:flex; overflow-x:auto; padding:6px; }
-.grid-view { display:grid; grid-template-columns:repeat(auto-fill,minmax(180px,1fr)); gap:12px; }
-.list-view { display:flex; flex-direction:column; gap:10px; }
+/* ================= MODAL / ZOOM ================= */
+.modal-bg {
+  display:none;
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,0.7);
+  justify-content:center;
+  align-items:center;
+  z-index:1000;
+}
+.modal-box {
+  background:#fff5f8;
+  border-radius:12px;
+  padding:12px;
+  max-width:90%;
+  max-height:90%;
+  text-align:center;
+  position:relative;
+}
+#modalMain {
+  width:100%;
+  max-height:500px;
+  object-fit:contain;
+}
+.close-modal {
+  position:absolute;
+  top:8px;
+  right:12px;
+  font-size:24px;
+  cursor:pointer;
+  color:#b84c6f;
+  font-weight:bold;
+}
 
-/* MODAL */
-.modal-bg { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.65); justify-content:center; align-items:center; z-index:1000; padding:10px; }
-.modal-box { background:#fff5f8; border-radius:12px; padding:12px; max-width:800px; width:95%; max-height:90vh; overflow-y:auto; position:relative; text-align:center; }
-.close-modal { position:absolute; top:8px; right:12px; font-size:20px; cursor:pointer; color:#b84c6f; font-weight:bold; }
-.modal-main-img { width:100%; max-height:400px; object-fit:contain; border:3px solid #b67385; border-radius:8px; }
+/* ================= COMMENTAIRES ================= */
+.comment-section { margin-top:12px; text-align:left; max-height:200px; overflow-y:auto; }
+.comment { background:#fff0f7; border:1px solid rgba(184,76,111,0.12); padding:6px; border-radius:8px; margin-bottom:6px; }
+.add-comment-btn { margin-top:8px; padding:6px 12px; background:#b84c6f; color:#fff; border-radius:16px; font-size:12px; border:none; cursor:pointer; }
 
-/* THUMBS */
-.thumbs { margin-top:10px; display:flex; gap:6px; justify-content:center; flex-wrap:wrap; }
-.thumbs img { width:70px; height:70px; object-fit:contain; border:2px solid #b67385; border-radius:6px; cursor:pointer; transition: transform 0.2s, box-shadow 0.2s; }
-.thumbs img:hover { transform:scale(1.05); box-shadow:0 4px 10px rgba(184,76,111,0.3); }
-
-/* ICONS LIKE / COMMENT */
-.icon-bar { margin-top:8px; display:flex; justify-content:center; gap:20px; font-size:14px; color:#b84c6f; }
-.heart { font-size:20px; transition: color 0.2s; }
-.heart.liked { color:#ff4b82; }
-
-/* COMMENTAIRES */
-.comment-section { margin-top:8px; text-align:left; font-size:12px; }
-.comment { background:#fff0f7; border:1px solid rgba(184,76,111,0.12); padding:6px; border-radius:6px; margin-bottom:6px; }
-
-/* FORMULAIRE COMMENTAIRE */
-.comment-form-bg { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.6); justify-content:center; align-items:center; z-index:2000; }
-.comment-form { background:white; padding:12px; border-radius:8px; width:280px; box-shadow:0 6px 15px rgba(0,0,0,0.2); text-align:center; }
-.comment-form input, .comment-form textarea { width:100%; padding:6px; margin-bottom:6px; font-size:12px; border-radius:6px; border:1px solid #b84c6f; }
-
-.add-comment-btn { margin-top:6px; padding:6px 12px; font-size:12px; border-radius:16px; background:#b84c6f; color:white; border:none; cursor:pointer; }
 </style>
 </head>
 <body>
 
 <header>
-  <img src="favicon.png" alt="Logo">
-  <h1 class="title">Mes créations</h1>
+  <h1>✨ Projets réalisés</h1>
 </header>
 
 <div id="viewSelector">
-  <button id="btnCarousel" class="active">Carrousel</button>
+  <button id="btnCarousel">Carrousel</button>
   <button id="btnGrid">Grille</button>
   <button id="btnList">Liste</button>
 </div>
@@ -98,31 +108,21 @@ header img { width:64px; height:64px; border-radius:20%; display:block; margin:0
   <div id="visitor-list" role="list"></div>
 </div>
 
-<!-- Modal zoom -->
+<!-- Modal Zoom -->
 <div class="modal-bg" id="modal" onclick="if(event.target===this) closeModal()">
   <div class="modal-box">
     <div class="close-modal" onclick="closeModal()">×</div>
-    <img id="modalMain" class="modal-main-img" alt="Image agrandie">
-    <div class="icon-bar">
-      <div class="icon-btn" onclick="toggleLike()">
-        <span id="heart" class="heart">♡</span>
-        <span id="likeCount">0</span>
-      </div>
-      <div class="icon-btn" onclick="scrollToComments()">
-        💬 <span id="commentCount">0</span>
-      </div>
-    </div>
-    <div id="thumbsContainer" class="thumbs"></div>
+    <img id="modalMain" alt="Image agrandie">
     <button class="add-comment-btn" onclick="openCommentForm()">Ajouter un commentaire</button>
     <div id="commentsList" class="comment-section"></div>
   </div>
 </div>
 
-<!-- Formulaire commentaire -->
 <div class="comment-form-bg" id="commentFormBg" onclick="if(event.target===this) closeCommentForm()">
   <div class="comment-form">
-    <input id="commentName" placeholder="Prénom">
-    <textarea id="commentText" rows="3" placeholder="Votre commentaire"></textarea>
+    <h3 style="margin-top:0;color:#b84c6f">Laisser un commentaire</h3>
+    <input id="commentName" placeholder="Prénom" />
+    <textarea id="commentText" rows="4" placeholder="Votre commentaire..."></textarea>
     <button onclick="submitComment()">Envoyer</button>
   </div>
 </div>
@@ -136,19 +136,16 @@ const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 const list = document.getElementById('visitor-list');
 const modal = document.getElementById('modal');
 const modalMain = document.getElementById('modalMain');
-const thumbs = document.getElementById('thumbsContainer');
-const heart = document.getElementById('heart');
-const likeCount = document.getElementById('likeCount');
-const commentCountSpan = document.getElementById('commentCount');
-const commentList = document.getElementById('commentsList');
 const commentFormBg = document.getElementById('commentFormBg');
 const commentName = document.getElementById('commentName');
 const commentText = document.getElementById('commentText');
+const commentsList = document.getElementById('commentsList');
 
 let creations = [];
 let currentIndex = null;
-let currentView = 'carousel';
+let currentView = 'grid';
 
+/* Chargement des créations depuis Supabase */
 async function loadCreations(){
   const { data, error } = await supabase.storage.from('owners').list();
   if(error){ console.error(error); return; }
@@ -160,63 +157,41 @@ async function loadCreations(){
 }
 
 function renderVisitor(){
-  list.innerHTML='';
-  list.className=currentView+'-view';
+  list.innerHTML = '';
+  list.className = currentView + '-view';
   creations.forEach((item,i)=>{
     const div = document.createElement('div');
-    div.className='visitor-item';
+    div.className = 'visitor-item';
     div.setAttribute('data-index',i);
-    div.innerHTML=`<img src="${item.imgUrl}" alt="${item.name}"><p>${item.name}</p>`;
-    div.addEventListener('click',()=>openModal(i));
+    div.innerHTML = `<img src="${item.imgUrl}" alt="${item.name}"><p>${item.name}</p>`;
+    div.addEventListener('click', ()=>openModal(i));
     list.appendChild(div);
   });
 }
 
+/* Vues */
 function setView(mode){
-  currentView=mode;
+  currentView = mode;
   document.getElementById('btnCarousel').classList.toggle('active', mode==='carousel');
   document.getElementById('btnGrid').classList.toggle('active', mode==='grid');
   document.getElementById('btnList').classList.toggle('active', mode==='list');
   renderVisitor();
 }
-
 document.getElementById('btnCarousel').addEventListener('click',()=>setView('carousel'));
 document.getElementById('btnGrid').addEventListener('click',()=>setView('grid'));
 document.getElementById('btnList').addEventListener('click',()=>setView('list'));
 
+/* Modal */
 function openModal(i){
   currentIndex = i;
-  const proj = creations[i];
-  modalMain.src = proj.imgUrl;
-  thumbs.innerHTML='';
-  thumbs.appendChild(modalMain.cloneNode());
-  loadLikes();
+  modalMain.src = creations[i].imgUrl;
+  commentsList.innerHTML = '';
   loadComments();
-  modal.style.display='flex';
+  modal.style.display = 'flex';
 }
-
 function closeModal(){ modal.style.display='none'; }
 
-async function toggleLike(){
-  if(currentIndex===null) return;
-  const name = prompt("Ton prénom pour liker cette image:") || "Anonyme";
-  const key = `likes_${currentIndex}`;
-  let likes = JSON.parse(localStorage.getItem(key)||'[]');
-  if(likes.includes(name)) likes = likes.filter(n=>n!==name);
-  else likes.push(name);
-  localStorage.setItem(key, JSON.stringify(likes));
-  loadLikes();
-}
-
-function loadLikes(){
-  if(currentIndex===null) return;
-  const key = `likes_${currentIndex}`;
-  const likes = JSON.parse(localStorage.getItem(key)||'[]');
-  heart.textContent = likes.length>0?'❤️':'♡';
-  heart.classList.toggle('liked', likes.length>0);
-  likeCount.textContent = likes.length>0 ? ` ${likes.join(', ')}` : '';
-}
-
+/* Commentaires */
 function openCommentForm(){ commentFormBg.style.display='flex'; }
 function closeCommentForm(){ commentFormBg.style.display='none'; }
 function submitComment(){
@@ -230,18 +205,16 @@ function submitComment(){
   commentName.value=''; commentText.value=''; closeCommentForm();
   loadComments();
 }
-
 function loadComments(){
   if(currentIndex===null) return;
   const key = `comments_${currentIndex}`;
   const comments = JSON.parse(localStorage.getItem(key)||'[]');
-  commentList.innerHTML = comments.map(c=>`<div class="comment"><strong>${c.name}</strong><br>${c.text}</div>`).join('');
-  commentCountSpan.textContent = comments.length;
+  commentsList.innerHTML = comments.map(c=>`<div class="comment"><strong>${c.name}</strong><br>${c.text}</div>`).join('');
 }
 
-function scrollToComments(){ commentList.scrollIntoView({behavior:'smooth', block:'start'}); }
-
+/* Initialisation */
 loadCreations();
+
 </script>
 </body>
 </html>
