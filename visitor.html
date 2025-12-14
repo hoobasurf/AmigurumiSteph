@@ -9,7 +9,7 @@
 html, body { height:100%; font-family:'Comic Sans MS', cursive; }
 body {
   background-image: url('Photoroom_20251212_143703.PNG');
-  background-size: auto calc(100% + 2cm);
+  background-size: cover;
   background-position: center top;
   background-repeat: no-repeat;
   background-attachment: fixed;
@@ -26,8 +26,12 @@ header img { width:98px; height:98px; border-radius:20%; display:block; margin:0
 
 #viewSelector { display:flex; justify-content:center; gap:12px; margin:14px; }
 #viewSelector button {
-  background:#fff0f7; border:2px solid #b84c6f; color:#b84c6f; padding:8px 16px;
-  border-radius:24px; cursor:pointer;
+  background:#fff0f7;
+  border:2px solid #b84c6f;
+  color:#b84c6f;
+  padding:8px 16px;
+  border-radius:24px;
+  cursor:pointer;
 }
 #viewSelector button.active { background:#ffeaf2; }
 
@@ -64,7 +68,24 @@ header img { width:98px; height:98px; border-radius:20%; display:block; margin:0
   overflow-y:auto;
   position:relative;
 }
-.close-modal { position:absolute; top:12px; right:16px; font-size:30px; cursor:pointer; color:#b84c6f; }
+
+/* Bouton Retour */
+#modalBackBtn {
+  position:absolute;
+  top:12px; left:16px;
+  padding:6px 14px;
+  background: #ffafc6;
+  border: 2px solid #b84c6f;
+  border-radius:24px;
+  color:#7a2b45;
+  font-weight:bold;
+  cursor:pointer;
+}
+
+.close-modal {
+  position:absolute; top:12px; right:16px;
+  font-size:30px; cursor:pointer; color:#b84c6f;
+}
 .modal-main-img { width:100%; max-height:500px; object-fit:contain; border:4px solid #b67385; }
 
 .icon-bar { display:flex; justify-content:center; gap:30px; margin-top:12px; }
@@ -78,57 +99,15 @@ header img { width:98px; height:98px; border-radius:20%; display:block; margin:0
 .comment { background:#fff0f7; padding:10px; border-radius:10px; margin-bottom:10px; }
 
 .comment-form-bg {
-  position:fixed; inset:0; background:rgba(0,0,0,.6);
+  position:fixed; inset:0; background:rgba(255,175,198,0.3);
   display:none; justify-content:center; align-items:center; z-index:2000;
 }
-.comment-form { background:white; padding:18px; border-radius:14px; width:340px; }
-.comment-form input, .comment-form textarea { width:100%; margin-bottom:10px; padding:10px; border-radius:8px; }
-
-/* MODAL LIKE NAME */
-.like-name-bg {
-  position: fixed; inset:0;
-  background: rgba(0,0,0,0.5);
-  display:none; justify-content:center; align-items:center; z-index:3000;
+.comment-form {
+  background:white; padding:18px; border-radius:14px; width:340px;
 }
-.like-name-form {
-  background: #ffeaf2;
-  border: 2px solid #b84c6f;
-  border-radius:14px;
-  padding:20px;
-  width:300px;
-  text-align:center;
+.comment-form input, .comment-form textarea {
+  width:100%; margin-bottom:10px; padding:10px; border-radius:8px; border:2px solid #b84c6f;
 }
-.like-name-form input {
-  width: 100%;
-  padding:10px;
-  border-radius:8px;
-  border:2px solid #b84c6f;
-  margin-bottom:12px;
-}
-.like-name-form button {
-  background: linear-gradient(90deg,#ffeaf2,#ffb6d2);
-  border:2px solid #b84c6f;
-  border-radius:26px;
-  padding:8px 20px;
-  font-weight:bold;
-  color:#b84c6f;
-  cursor:pointer;
-}
-
-<button id="modalBackBtn" style="
-    background: linear-gradient(90deg,#ffb6d2,#b84c6f);
-    color: white;
-    border:none;
-    border-radius:26px;
-    padding:10px 20px;
-    font-size:16px;
-    cursor:pointer;
-    margin-top:12px;
-    display:block;
-    margin-left:auto;
-    margin-right:auto;
-">Retour</button>
-  
 </style>
 </head>
 <body>
@@ -148,11 +127,13 @@ header img { width:98px; height:98px; border-radius:20%; display:block; margin:0
   <div id="visitor-list"></div>
 </div>
 
-<!-- MODAL IMAGE -->
+<!-- MODAL -->
 <div class="modal-bg" id="modal" onclick="closeModal()">
   <div class="modal-box" onclick="event.stopPropagation()">
+    <button id="modalBackBtn">Retour</button>
     <div class="close-modal" onclick="closeModal(); event.stopPropagation()">×</div>
     <img id="modalMain" class="modal-main-img">
+
     <div class="icon-bar">
       <div class="icon-btn" onclick="toggleLike(); event.stopPropagation()">
         <span id="heart" class="heart">♡</span>
@@ -163,6 +144,7 @@ header img { width:98px; height:98px; border-radius:20%; display:block; margin:0
         <span id="commentCount" class="like-info">0</span>
       </div>
     </div>
+
     <div id="commentsList" class="comment-section"></div>
   </div>
 </div>
@@ -173,15 +155,6 @@ header img { width:98px; height:98px; border-radius:20%; display:block; margin:0
     <input id="commentName" placeholder="Prénom">
     <textarea id="commentText" rows="4" placeholder="Commentaire"></textarea>
     <button onclick="submitComment()">Envoyer</button>
-  </div>
-</div>
-
-<!-- LIKE NAME FORM -->
-<div class="like-name-bg" id="likeNameBg" onclick="if(event.target===this) likeNameBg.style.display='none'">
-  <div class="like-name-form" onclick="event.stopPropagation()">
-    <h3 style="color:#b84c6f;margin-top:0;text-align:center;">Ton prénom pour liker</h3>
-    <input type="text" id="likeNameInput" placeholder="Prénom">
-    <button onclick="submitLikeName()">Valider</button>
   </div>
 </div>
 
@@ -196,9 +169,7 @@ const commentList = document.getElementById('commentsList');
 const commentFormBg = document.getElementById('commentFormBg');
 const commentName = document.getElementById('commentName');
 const commentText = document.getElementById('commentText');
-
-const likeNameBg = document.getElementById('likeNameBg');
-const likeNameInput = document.getElementById('likeNameInput');
+const modalBackBtn = document.getElementById('modalBackBtn');
 
 let creations = JSON.parse(localStorage.getItem('creations') || '[]');
 let currentIndex = null;
@@ -233,18 +204,12 @@ function closeModal(){ modal.style.display='none'; }
 
 function toggleLike(){
   if(currentIndex===null) return;
-  likeNameBg.style.display='flex';
-}
-
-function submitLikeName(){
-  const name = likeNameInput.value.trim() || "Anonyme";
+  let name = prompt("Ton prénom pour liker cette image :") || "Anonyme";
   const key='likes_'+currentIndex;
   let likes=JSON.parse(localStorage.getItem(key)||'[]');
   if(likes.includes(name)) likes = likes.filter(n=>n!==name);
   else likes.push(name);
   localStorage.setItem(key,JSON.stringify(likes));
-  likeNameInput.value='';
-  likeNameBg.style.display='none';
   loadLikes();
 }
 
@@ -256,7 +221,6 @@ function loadLikes(){
 }
 
 function openCommentForm(){ commentFormBg.style.display='flex'; }
-
 function submitComment(){
   const n=commentName.value.trim();
   const t=commentText.value.trim();
@@ -276,10 +240,9 @@ function loadComments(){
   commentList.innerHTML=c.map(x=>`<div class="comment"><strong>${x.n}</strong><br>${x.t}</div>`).join('');
 }
 
-document.getElementById('modalBackBtn').onclick = () => {
-    modal.style.display = 'none';
-};
-  
+// Bouton Retour modal
+modalBackBtn.onclick = () => { modal.style.display = 'none'; };
+
 render();
 </script>
 </body>
