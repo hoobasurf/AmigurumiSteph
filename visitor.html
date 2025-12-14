@@ -8,6 +8,7 @@
 * { box-sizing: border-box; margin:0; padding:0; }
 html, body { height:100%; font-family: 'Comic Sans MS', cursive; }
 
+/* ===== BLOQUE LE SCROLL DU FOND ===== */
 body {
   background-image: url('Photoroom_20251212_143703.png');
   background-size: contain;
@@ -20,9 +21,8 @@ body {
   flex-direction: column;
   min-height: 100vh;
 
-  /* ✅ Bloquer le scroll du body pour que fond ne bouge jamais */
   overflow: hidden;
-  touch-action: pan-x;
+  touch-action: none;
 }
 
 /* HEADER */
@@ -44,16 +44,31 @@ header img { width: 98px; height: 98px; display:block; margin:0 auto 12px; borde
 
 /* ZONE */
 .center-zone { flex:1; display:flex; justify-content:center; }
-#visitor-list { width:100%; max-width:1200px; }
+
+/* ===== ZONE SCROLLABLE ===== */
+#visitor-list {
+  width:100%;
+  max-width:1200px;
+  height: calc(100vh - 260px);
+}
 
 /* ITEMS */
+.visitor-item { text-align:center; cursor:pointer; }
 .visitor-item img {
-  will-change: transform;
-  transform-origin: center center;
+  display:block;
+  margin:auto;
+  width:260px;
+  height:260px;
+  object-fit:contain;
+  border:4px solid #b67385;
+  background:transparent;
+  transition:transform .3s, box-shadow .3s;
 }
 .visitor-item:hover img {
-  transform: scale(1.02);
+  transform:scale(1.03);
+  box-shadow:0 8px 20px rgba(184,76,111,.3);
 }
+.visitor-item p { margin-top:10px; font-size:20px; color:#b84c6f; }
 
 /* CAROUSEL */
 .carousel-view {
@@ -69,17 +84,20 @@ header img { width: 98px; height: 98px; display:block; margin:0 auto 12px; borde
   border-radius:20px;
 }
 
+/* ===== SCROLL VERTICAL INTERNE ===== */
+.grid-view,
+.list-view {
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  -webkit-overflow-scrolling: touch;
+}
+
 /* GRID */
 .grid-view {
   display:grid;
   grid-template-columns:repeat(auto-fill,minmax(220px,1fr));
   gap:24px;
   padding:20px;
-
-  /* ✅ Scroll vertical propre */
-  overflow-y: auto;
-  max-height: calc(100vh - 260px);
-  overscroll-behavior: contain;
 }
 
 /* LIST */
@@ -88,11 +106,6 @@ header img { width: 98px; height: 98px; display:block; margin:0 auto 12px; borde
   flex-direction:column;
   gap:18px;
   padding:20px;
-
-  /* ✅ Scroll vertical propre */
-  overflow-y: auto;
-  max-height: calc(100vh - 260px);
-  overscroll-behavior: contain;
 }
 
 /* MODAL */
@@ -113,8 +126,6 @@ header img { width: 98px; height: 98px; display:block; margin:0 auto 12px; borde
   width:95%;
   box-shadow:0 8px 30px rgba(184,76,111,.3);
 }
-.modal-box * { pointer-events:auto; }
-
 .close-modal {
   position:absolute;
   top:12px;
@@ -123,7 +134,6 @@ header img { width: 98px; height: 98px; display:block; margin:0 auto 12px; borde
   cursor:pointer;
   color:#b84c6f;
 }
-
 .modal-main-img {
   width:100%;
   max-height:500px;
@@ -147,8 +157,6 @@ header img { width: 98px; height: 98px; display:block; margin:0 auto 12px; borde
 }
 .heart { font-size:26px; }
 .heart.liked { color:#ff4b82; }
-.comment-icon { font-size:22px; }
-
 .like-info { font-size:14px; }
 
 /* COMMENTS */
@@ -204,59 +212,18 @@ header img { width: 98px; height: 98px; display:block; margin:0 auto 12px; borde
   <div id="visitor-list"></div>
 </div>
 
-<!-- MODAL -->
-<div class="modal-bg" id="modal" onclick="closeModal()">
-  <div class="modal-box" onclick="event.stopPropagation()">
-    <div class="close-modal" onclick="closeModal();event.stopPropagation()">×</div>
-    <img id="modalMain" class="modal-main-img">
-
-    <div class="icon-bar">
-      <div class="icon-btn" onclick="toggleLike();event.stopPropagation()">
-        <span id="heart" class="heart">♡</span>
-        <span id="likeCount" class="like-info">0</span>
-      </div>
-
-      <div class="icon-btn" onclick="openCommentForm();event.stopPropagation()">
-        <span class="comment-icon">💬</span>
-        <span id="commentCount" class="like-info">0</span>
-      </div>
-    </div>
-
-    <div id="commentsList" class="comment-section"></div>
-  </div>
-</div>
-
-<!-- COMMENT FORM -->
-<div class="comment-form-bg" id="commentFormBg" onclick="closeCommentForm(event)">
-  <div class="comment-form" onclick="event.stopPropagation()">
-    <input id="commentName" placeholder="Prénom">
-    <textarea id="commentText" rows="4" placeholder="Commentaire"></textarea>
-    <button onclick="submitComment()">Envoyer</button>
-  </div>
-</div>
-
 <script>
 const list = document.getElementById('visitor-list');
-const modal = document.getElementById('modal');
-const modalMain = document.getElementById('modalMain');
-const heart = document.getElementById('heart');
-const likeCount = document.getElementById('likeCount');
-const commentCount = document.getElementById('commentCount');
-const commentList = document.getElementById('commentsList');
-const commentFormBg = document.getElementById('commentFormBg');
-
 let creations = JSON.parse(localStorage.getItem('creations') || '[]');
-let currentIndex = null;
 let currentView = 'carousel';
 
 function render() {
   list.innerHTML='';
   list.className = currentView+'-view';
-  creations.forEach((c,i)=>{
+  creations.forEach(c=>{
     const d=document.createElement('div');
     d.className='visitor-item';
     d.innerHTML=`<img src="${c.imgUrl}"><p>${c.name}</p>`;
-    d.onclick=()=>openModal(i);
     list.appendChild(d);
   });
 }
@@ -265,56 +232,10 @@ function setView(v){
   currentView=v;
   render();
 }
+
 btnCarousel.onclick=()=>setView('carousel');
 btnGrid.onclick=()=>setView('grid');
 btnList.onclick=()=>setView('list');
-
-function openModal(i){
-  currentIndex=i;
-  modalMain.src=creations[i].imgUrl;
-  modal.style.display='flex';
-  loadLikes();
-  loadComments();
-}
-
-function closeModal(){ modal.style.display='none'; }
-
-function toggleLike(){
-  const key='likes_'+currentIndex;
-  let likes=JSON.parse(localStorage.getItem(key)||'[]');
-  if(likes.length){ likes=[] } else { likes=['like'] }
-  localStorage.setItem(key,JSON.stringify(likes));
-  loadLikes();
-}
-
-function loadLikes(){
-  const likes=JSON.parse(localStorage.getItem('likes_'+currentIndex)||'[]');
-  heart.classList.toggle('liked',likes.length>0);
-  heart.textContent=likes.length?'❤️':'♡';
-  likeCount.textContent=likes.length;
-}
-
-function openCommentForm(){ commentFormBg.style.display='flex'; }
-function closeCommentForm(e){ if(e.target===commentFormBg) commentFormBg.style.display='none'; }
-
-function submitComment(){
-  const n=commentName.value.trim();
-  const t=commentText.value.trim();
-  if(!n||!t)return;
-  const key='comments_'+currentIndex;
-  const c=JSON.parse(localStorage.getItem(key)||'[]');
-  c.push({n,t});
-  localStorage.setItem(key,JSON.stringify(c));
-  commentName.value=''; commentText.value='';
-  commentFormBg.style.display='none';
-  loadComments();
-}
-
-function loadComments(){
-  const c=JSON.parse(localStorage.getItem('comments_'+currentIndex)||'[]');
-  commentCount.textContent=c.length;
-  commentList.innerHTML=c.map(x=>`<div class="comment"><strong>${x.n}</strong><br>${x.t}</div>`).join('');
-}
 
 render();
 </script>
