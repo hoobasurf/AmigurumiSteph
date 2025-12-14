@@ -1,19 +1,19 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="UTF-8">
+<meta charset="UTF-8" />
 <title>Mes Créations</title>
 <style>
-body {
+body{
   margin:0;
   font-family:sans-serif;
-  background:#fff0f5; /* fond par défaut */
+  background:#fff0f5;
   overflow-x:hidden;
   padding-left:35px;
   transition: background 0.5s ease;
 }
 
-/* ================= FOND INTRO ================= */
+/* ================= FOND D'ACCUEIL ================= */
 #intro-background{
   position:fixed;
   inset:0;
@@ -24,7 +24,7 @@ body {
   z-index:100000;
 }
 
-/* ================= BOUTON BIENVENUE ================= */
+/* BOUTON BIENVENUE */
 #startBtn{
   padding:20px 40px;
   font-size:24px;
@@ -50,13 +50,14 @@ body {
   pointer-events:none;
   transition:opacity 1s ease;
 }
+
 #intro-video video{
   width:100%;
   height:100%;
   object-fit:cover;
 }
 
-/* ================= CONTENU APP ================= */
+/* ================= CONTENU APP (CACHÉ AU DÉBUT) ================= */
 #app-content{
   opacity:0;
   transition:opacity 1s ease;
@@ -69,13 +70,15 @@ body {
   left:-220px;
   width:220px;
   height:100vh;
-  background:rgba(255,230,240,0.15); /* transparent léger */
+  background:rgba(255,230,240,0.15); /* léger transparent */
   border-right:2px solid #b67385;
   padding:20px;
   transition:left .3s ease;
   z-index:10;
 }
+
 #sidebar.sidebar-open{ left:0; }
+
 #toggleSidebar{
   position:absolute;
   top:50%;
@@ -92,6 +95,7 @@ body {
   border:1px solid #b67385;
   font-weight:bold;
 }
+
 #sidebar button{
   width:100%;
   margin-bottom:10px;
@@ -112,11 +116,12 @@ h1{ text-align:center; color:#b84c6f; margin-top:20px; }
   max-width:420px;
   margin:20px auto;
   background:#ffe6f0;
-  border:2px solid #b67385; /* bordure par défaut */
+  border:2px solid #b67385;
   border-radius:18px;
   padding:20px;
   box-shadow:0 6px 20px rgba(182,115,133,.25);
 }
+
 .owner-box input,
 .owner-box button{
   width:100%;
@@ -124,7 +129,9 @@ h1{ text-align:center; color:#b84c6f; margin-top:20px; }
   padding:10px;
   border-radius:12px;
 }
+
 .owner-box input{ border:1px solid #b67385; }
+
 .owner-box button{
   background:#ffb6c1;
   border:none;
@@ -139,6 +146,7 @@ h1{ text-align:center; color:#b84c6f; margin-top:20px; }
   text-align:center;
   margin:15px 0;
 }
+
 #display-modes button{
   margin:0 5px;
   padding:8px 12px;
@@ -157,32 +165,54 @@ h1{ text-align:center; color:#b84c6f; margin-top:20px; }
   justify-content:center;
   gap:15px;
   margin-bottom:40px;
+  position:relative;
+  z-index:1; /* au-dessus de la neige */
 }
+
 #owner-list.grid .owner-item{ width:140px; }
-#owner-list.list{ flex-direction:column; align-items:center; }
-#owner-list.list .owner-item{ display:flex; align-items:center; width:90%; gap:10px; }
-#owner-list.carousel{ flex-wrap:nowrap; overflow-x:auto; padding-bottom:10px; }
+
+#owner-list.list{
+  flex-direction:column;
+  align-items:center;
+}
+#owner-list.list .owner-item{
+  display:flex;
+  align-items:center;
+  width:90%;
+  gap:10px;
+}
+
+#owner-list.carousel{
+  flex-wrap:nowrap;
+  overflow-x:auto;
+  padding-bottom:10px;
+}
 
 .owner-item{
   position:relative;
   background:#ffe6f0;
-  border:2px solid #b67385; /* par défaut */
+  border:6px solid;
+  border-image:repeating-linear-gradient(45deg, red 0 10px, white 0 10px) 10;
   border-radius:16px;
   padding:10px;
   text-align:center;
-  transition: border 0.5s ease;
+  cursor:pointer;
+  z-index:1;
 }
+
 .owner-item img{
   width:110px;
   height:110px;
   object-fit:cover;
   border-radius:10px;
 }
+
 .owner-item p{
   margin:5px 0 0;
   color:#8b3a3a;
   font-weight:bold;
 }
+
 .delete-btn{
   position:absolute;
   top:5px;
@@ -206,23 +236,26 @@ h1{ text-align:center; color:#b84c6f; margin-top:20px; }
 /* ================= NEIGE ================= */
 #snow-container{
   position:fixed;
-  inset:0;
-  pointer-events:none;
-  z-index:50;
+  top:0;
+  left:0;
+  width:100%;
+  height:100%;
+  pointer-events:none; /* ne bloque pas les clics */
+  z-index:0;
 }
 .snowflake{
   position:absolute;
-  top:-10px;
-  user-select:none;
+  top:-50px;
   color:white;
-  font-size:1em;
+  user-select:none;
+  pointer-events:none;
   animation-name:fall;
   animation-timing-function:linear;
   animation-iteration-count:infinite;
 }
 @keyframes fall{
-  0%{ transform: translateY(0);}
-  100%{ transform: translateY(100vh);}
+  0%{transform:translateY(0);}
+  100%{transform:translateY(100vh);}
 }
 </style>
 </head>
@@ -251,8 +284,8 @@ h1{ text-align:center; color:#b84c6f; margin-top:20px; }
     <button onclick="openSection('notes')">Notes</button>
     <button onclick="openSection('settings')">Paramètres</button>
     <hr>
-    <button id="themeChristmas">🎄 Noël</button>
-    <button id="themeDefault">⚪ Défault</button>
+    <button id="themeBtn">🎄 Thème Noël</button>
+    <button id="themeDefaultBtn">Défaut</button>
   </div>
 
   <h1>Mes Créations</h1>
@@ -277,13 +310,12 @@ h1{ text-align:center; color:#b84c6f; margin-top:20px; }
   <div id="pelotes" class="section"><button onclick="closeSection()">← Retour</button></div>
   <div id="notes" class="section"><button onclick="closeSection()">← Retour</button></div>
   <div id="settings" class="section"><button onclick="closeSection()">← Retour</button></div>
+
+  <!-- NEIGE -->
+  <div id="snow-container"></div>
 </div>
 
-<!-- NEIGE -->
-<div id="snow-container"></div>
-
 <script type="module" src="owner.js"></script>
-
 <script>
 const startBtn = document.getElementById("startBtn");
 const introBg = document.getElementById("intro-background");
@@ -298,6 +330,8 @@ startBtn.onclick = () => {
   introVideoDiv.style.pointerEvents = "auto";
   video.play().catch(e=>console.log("Lecture bloquée:", e));
 };
+
+/* FIN DE LA VIDEO -> afficher l'appli avec fondu */
 video.onended = () => {
   setTimeout(() => {
     introVideoDiv.style.opacity = 0;
@@ -325,6 +359,7 @@ function openSection(id){
   document.getElementById("display-modes").style.display="none";
   document.getElementById(id).classList.add("active");
 }
+
 function closeSection(){
   document.querySelectorAll(".section").forEach(s=>s.classList.remove("active"));
   document.querySelector(".owner-box").style.display="block";
@@ -332,15 +367,18 @@ function closeSection(){
   document.getElementById("display-modes").style.display="block";
 }
 
-/* ================= THEME ================= */
-const themeChristmas = document.getElementById('themeChristmas');
-const themeDefault = document.getElementById('themeDefault');
+/* ================= THEME NOEL ================= */
+const themeBtn = document.getElementById('themeBtn');
+const themeDefaultBtn = document.getElementById('themeDefaultBtn');
 const snowContainer = document.getElementById('snow-container');
 
-themeChristmas.onclick = () => {
+themeBtn.onclick = () => {
+  // fond
   document.body.style.backgroundImage = "url('noel.png')";
   document.body.style.backgroundSize = "cover";
   document.body.style.backgroundPosition = "center";
+
+  // créer neige
   snowContainer.innerHTML = '';
   for(let i=0;i<50;i++){
     const flake = document.createElement('div');
@@ -351,22 +389,27 @@ themeChristmas.onclick = () => {
     flake.textContent='❄';
     snowContainer.appendChild(flake);
   }
+
+  // contour sucre d'orge
   document.querySelectorAll('.owner-item').forEach(item=>{
     item.style.border='6px solid';
     item.style.borderImage='repeating-linear-gradient(45deg, red 0 10px, white 0 10px) 10';
+    item.style.position='relative';
+    item.style.zIndex='1';
   });
+
+  // arrière-plan rose devient bleu clair
+  document.getElementById('app-content').style.background='aliceblue';
 };
 
-themeDefault.onclick = () => {
-  document.body.style.background='#fff0f5';
+themeDefaultBtn.onclick = () => {
   document.body.style.backgroundImage = '';
   snowContainer.innerHTML = '';
   document.querySelectorAll('.owner-item').forEach(item=>{
     item.style.border='2px solid #b67385';
-    item.style.borderImage='none';
   });
+  document.getElementById('app-content').style.background='';
 };
 </script>
-
 </body>
 </html>
