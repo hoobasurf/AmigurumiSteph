@@ -88,11 +88,16 @@ const video = document.getElementById('intro-video');
 const btn = document.getElementById('welcome-btn');
 const app = document.getElementById('app');
 
-/* CLICK BIENVENUE */
+/* CLICK BIENVENUE - plus fluide */
 btn.addEventListener('click', () => {
-  btn.style.display = 'none';
+  // transition bouton
+  btn.style.transition = 'opacity 0.5s';
+  btn.style.opacity = 0;
+
+  // lecture vidéo
   video.play();
 
+  // fade-out du conteneur après fin vidéo
   video.onended = () => {
     intro.style.transition = 'opacity 1s';
     intro.style.opacity = 0;
