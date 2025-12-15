@@ -2,202 +2,199 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<title>Galerie - Mes créations</title>
+<title>Mes Créations</title>
 
 <style>
-*{
-  box-sizing:border-box;
-  margin:0;
-  padding:0;
-}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;font-family:'Comic Sans MS',cursive}
 
-html, body{
-  height:100%;
-  font-family:'Comic Sans MS', cursive;
-}
-
+/* ===== BODY ===== */
 body{
-  background-image:url('Photoroom_20251212_143703.PNG');
-  background-size:cover;
-  background-position:center top;
-  background-repeat:no-repeat;
-  background-attachment:fixed;
-  overflow:hidden;
-  display:flex;
-  flex-direction:column;
+  background:#fff0f5;
+  overflow-x:hidden;
+  padding-left:35px;
 }
 
-/* ---------- HEADER ---------- */
-header{
-  text-align:center;
-  padding:12px 0;
+/* ===== SIDEBAR ===== */
+#sidebar{
+  position:fixed;
+  top:0;
+  left:-220px;
+  width:220px;
+  height:100vh;
+  background:rgba(255,230,240,.15);
+  border-right:2px solid #b67385;
+  padding:20px;
+  transition:left .3s ease;
+  z-index:1000;
 }
 
-header img{
-  width:200px;
-  height:200px;
-  border-radius:20%;
-  display:block;
-  margin:0 auto;
-}
+#sidebar.sidebar-open{left:0}
 
-.title{
-  font-size:36px;
-  color:#b84c6f;
-  font-weight:bold;
-  margin-top:8px;
-}
-
-/* ---------- BOUTONS VUE ---------- */
-#viewSelector{
+#toggleSidebar{
+  position:absolute;
+  top:50%;
+  right:-30px;
+  width:30px;
+  height:60px;
+  background:#ffb6c1;
+  color:#8b3a3a;
+  border-radius:0 12px 12px 0;
   display:flex;
   justify-content:center;
-  gap:12px;
-  margin:15px 0;
-}
-
-#viewSelector button{
-  background:#fff0f7;
-  border:2px solid #b84c6f;
-  color:#b84c6f;
-  padding:10px 18px;
-  font-size:18px;
-  border-radius:20px;
+  align-items:center;
   cursor:pointer;
+  border:1px solid #b67385;
   font-weight:bold;
 }
 
-#viewSelector button.active{
-  background:#ffeaf2;
-}
-
-/* ---------- CONTENEUR ---------- */
-.center-zone{
-  flex:1;
-  overflow:hidden;
-}
-
-#visitor-list{
+#sidebar button{
   width:100%;
-  height:100%;
+  margin-bottom:10px;
+  padding:10px;
+  border:none;
+  border-radius:12px;
+  background:#ffb6c1;
+  color:#8b3a3a;
+  font-weight:bold;
+  cursor:pointer;
 }
 
-/* ---------- ITEMS ---------- */
-.visitor-item{
+/* ===== TITRE ===== */
+h1{
+  text-align:center;
+  color:#b84c6f;
+  margin:20px 0;
+}
+
+/* ===== BOUTONS VUE ===== */
+#display-modes{
+  text-align:center;
+  margin-bottom:20px;
+}
+
+#display-modes button{
+  margin:0 6px;
+  padding:10px 16px;
+  font-size:18px;
+  border-radius:16px;
+  border:2px solid #b67385;
+  background:#ffe6f0;
+  color:#8b3a3a;
+  font-weight:bold;
+  cursor:pointer;
+}
+
+/* ===== LISTE PHOTOS ===== */
+#owner-list{
+  display:flex;
+  flex-wrap:wrap;
+  justify-content:center;
+  gap:18px;
+  padding-bottom:40px;
+}
+
+/* MODES */
+#owner-list.grid .owner-item{width:150px}
+
+#owner-list.list{
+  flex-direction:column;
+  align-items:center;
+}
+#owner-list.list .owner-item{
+  width:90%;
+  display:flex;
+  align-items:center;
+  gap:12px;
+}
+
+#owner-list.carousel{
+  flex-wrap:nowrap;
+  overflow-x:auto;
+  padding-bottom:10px;
+}
+
+/* ITEM */
+.owner-item{
+  background:#ffe6f0;
+  border:3px solid #b67385;
+  border-radius:18px;
+  padding:10px;
   text-align:center;
   cursor:pointer;
 }
 
-.visitor-item img{
-  width:220px;
-  height:220px;
-  object-fit:contain;
-  border:4px solid #b67385;
+.owner-item img{
+  width:120px;
+  height:120px;
+  object-fit:cover;
+  border-radius:12px;
 }
 
-.visitor-item p{
-  margin-top:8px;
-  font-size:18px;
-  color:#b84c6f;
+.owner-item p{
+  margin-top:6px;
+  color:#8b3a3a;
   font-weight:bold;
-}
-
-/* ---------- VUES ---------- */
-.carousel-view{
-  display:flex;
-  gap:40px;
-  overflow-x:auto;
-  padding:20px;
-}
-
-.grid-view{
-  display:grid;
-  grid-template-columns:repeat(auto-fill,minmax(220px,1fr));
-  gap:24px;
-  padding:20px;
-  overflow-y:auto;
-}
-
-.list-view{
-  display:flex;
-  flex-direction:column;
-  gap:18px;
-  padding:20px;
-  overflow-y:auto;
-}
-
-.list-view .visitor-item{
-  display:flex;
-  align-items:center;
-  gap:18px;
-}
-
-.list-view img{
-  width:140px;
-  height:140px;
 }
 </style>
 </head>
 
 <body>
 
-<header>
-  <img src="favicon.png" alt="Logo">
-  <div class="title">Mes créations</div>
-</header>
-
-<!-- BOUTONS -->
-<div id="viewSelector">
-  <button id="btnCarousel" class="active">Carrousel</button>
-  <button id="btnGrid">Grille</button>
-  <button id="btnList">Liste</button>
+<!-- SIDEBAR -->
+<div id="sidebar">
+  <div id="toggleSidebar">☰</div>
+  <button>Vidéos</button>
+  <button>Mailles</button>
+  <button>Pelotes</button>
+  <button>Notes</button>
 </div>
 
-<!-- CONTENU -->
-<div class="center-zone">
-  <div id="visitor-list"></div>
+<h1>Mes Créations</h1>
+
+<!-- 3 BOUTONS UNIQUEMENT -->
+<div id="display-modes">
+  <button onclick="setMode('carousel')">Carrousel</button>
+  <button onclick="setMode('grid')">Grille</button>
+  <button onclick="setMode('list')">Liste</button>
 </div>
+
+<!-- PHOTOS -->
+<div id="owner-list" class="grid"></div>
 
 <script>
-const list = document.getElementById('visitor-list');
-const btnCarousel = document.getElementById('btnCarousel');
-const btnGrid = document.getElementById('btnGrid');
-const btnList = document.getElementById('btnList');
+/* SIDEBAR */
+const sidebar=document.getElementById("sidebar");
+document.getElementById("toggleSidebar").onclick=()=>{
+  sidebar.classList.toggle("sidebar-open");
+};
 
-/* ⚠️ EXEMPLE DE DONNÉES (remplacées par Supabase plus tard) */
-const creations = [
-  { name:'Création 1', imgUrl:'https://via.placeholder.com/400' },
-  { name:'Création 2', imgUrl:'https://via.placeholder.com/400' },
-  { name:'Création 3', imgUrl:'https://via.placeholder.com/400' }
+/* DONNÉES TEST */
+const creations=[
+  {name:"Création 1",img:"https://via.placeholder.com/300"},
+  {name:"Création 2",img:"https://via.placeholder.com/300"},
+  {name:"Création 3",img:"https://via.placeholder.com/300"}
 ];
 
-let currentView = 'carousel';
+/* RENDER */
+const list=document.getElementById("owner-list");
 
 function render(){
-  list.innerHTML = '';
-  list.className = currentView + '-view';
-
+  list.innerHTML="";
   creations.forEach(c=>{
-    const d = document.createElement('div');
-    d.className = 'visitor-item';
-    d.innerHTML = `
-      <img src="${c.imgUrl}">
+    const d=document.createElement("div");
+    d.className="owner-item";
+    d.innerHTML=`
+      <img src="${c.img}">
       <p>${c.name}</p>
     `;
     list.appendChild(d);
   });
-
-  document.querySelectorAll('#viewSelector button')
-    .forEach(b=>b.classList.remove('active'));
-
-  if(currentView==='carousel') btnCarousel.classList.add('active');
-  if(currentView==='grid') btnGrid.classList.add('active');
-  if(currentView==='list') btnList.classList.add('active');
 }
 
-btnCarousel.onclick = ()=>{ currentView='carousel'; render(); };
-btnGrid.onclick = ()=>{ currentView='grid'; render(); };
-btnList.onclick = ()=>{ currentView='list'; render(); };
+function setMode(mode){
+  list.className=mode;
+}
 
 render();
 </script>
