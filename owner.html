@@ -348,7 +348,10 @@ function render(){
 }
 
 /* VUES */
-function setView(v){
+btnCarousel.onclick=()=>setView('carousel');
+btnGrid.onclick=()=>setView('grid');
+btnList.onclick=()=>setView('list');
+  function setView(v){
   currentView=v;
   render();
   refreshThemeBorders(); // 🔹 on force la bordure après le rendu
