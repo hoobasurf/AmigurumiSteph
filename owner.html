@@ -177,7 +177,7 @@ header img{width:98px;height:98px;border-radius:20%;margin:auto}
   border:4px solid #b67385;
   width:340px;
 }
-.form-modal input{
+.form-modal input, .form-modal textarea{
   width:100%;
   margin-bottom:10px;
   padding:10px;
@@ -270,19 +270,31 @@ header img{width:98px;height:98px;border-radius:20%;margin:auto}
 <div class="modal-bg" id="modal" onclick="closeModal()">
   <div class="modal-box" onclick="event.stopPropagation()">
     <div class="close-modal" onclick="closeModal()">×</div>
+
     <img id="modalMain" class="modal-main-img">
+
     <button id="modalBackBtn" onclick="closeModal()">← Retour</button>
+
     <div class="icon-bar">
-      <div class="icon-btn" onclick="openLikeModal()">❤️</div>
+
+      <!-- LIKE -->
+      <div class="icon-btn" onclick="openLikeModal()">
+        <span class="heart" id="heart">♡</span>
+        <span id="likeCount">0</span>
+      </div>
+
+      <!-- COMMENT -->
       <div class="icon-btn" onclick="openCommentForm()">💬
         <span id="commentCount">0</span>
       </div>
+
     </div>
+
     <div id="commentsList" class="comment-section"></div>
   </div>
 </div>
 
-<!-- FORM COMMENTAIRE -->
+<!-- FORM COMMENT -->
 <div class="form-modal-bg" id="commentFormBg" onclick="if(event.target===commentFormBg) commentFormBg.style.display='none'">
   <div class="form-modal" onclick="event.stopPropagation()">
     <input id="commentName" placeholder="Prénom">
@@ -326,7 +338,6 @@ const modal=document.getElementById('modal');
 const modalMain=document.getElementById('modalMain');
 const commentFormBg=document.getElementById('commentFormBg');
 const likeFormBg=document.getElementById('likeFormBg');
-const heart=document.getElementById('heart');
 const commentCount=document.getElementById('commentCount');
 const commentList=document.getElementById('commentsList');
 
@@ -345,24 +356,25 @@ function render(){
     d.onclick=()=>openModal(i);
     list.appendChild(d);
   });
+  refreshThemeBorders();
 }
 
 /* VUES */
 btnCarousel.onclick=()=>setView('carousel');
 btnGrid.onclick=()=>setView('grid');
 btnList.onclick=()=>setView('list');
-  function setView(v){
+function setView(v){
   currentView=v;
   render();
-  refreshThemeBorders(); // 🔹 on force la bordure après le rendu
 }
 
-/* MODAL IMAGE */
+/* MODAL */
 function openModal(i){
   currentIndex=i;
   modalMain.src=creations[i].imgUrl;
   modal.style.display='flex';
   loadComments();
+  loadLikes();
 }
 function closeModal(){modal.style.display='none'}
 
@@ -394,7 +406,16 @@ function submitLike(){
   likes.includes(name)?likes=likes.filter(n=>n!==name):likes.push(name);
   localStorage.setItem(key,JSON.stringify(likes));
   likeFormBg.style.display='none';
-  alert("Merci ❤️"); // simple retour
+  loadLikes();
+}
+function loadLikes(){
+  const key='likes_'+currentIndex;
+  const likes=JSON.parse(localStorage.getItem(key)||'[]');
+  const heart=document.getElementById('heart');
+  const likeCount=document.getElementById('likeCount');
+  heart.textContent=likes.length?'❤️':'♡';
+  heart.classList.toggle('liked',likes.length>0);
+  likeCount.textContent=likes.length?likes.length+' · '+likes.join(', '):'0';
 }
 
 /* SIDEBAR */
@@ -411,58 +432,49 @@ function closeThemeModal(e){if(e.target===themeModal||e.target.tagName==='BUTTON
 function setTheme(theme){
   if(theme==='noel'){
     document.body.style.backgroundImage="url('noel.png')";
-    document.querySelectorAll('.visitor-item img').forEach(img=>{
-      img.style.border="6px solid";
-      img.style.borderImage="repeating-linear-gradient(45deg, red 0 10px, white 0 20px) 10";
-      img.style.background='none';
-    });
     snow.style.display='block';
   }else{
     document.body.style.backgroundImage="url('Photoroom_20251212_143703.PNG')";
-    document.querySelectorAll('.visitor-item img').forEach(img=>{
-      img.style.border="4px solid #b67385";
-      img.style.background='#ffe6f0';
-    });
     snow.style.display='none';
   }
+  refreshThemeBorders();
 }
 
-/* NEIGE */
-function createSnow(){
-  if(snow.style.display==='none') return;
-  const flake=document.createElement('div');
-  flake.textContent='❄';
-  flake.style.position='absolute';
-  flake.style.fontSize=(Math.random()*20+10)+'px';
-  flake.style.top='-30px';
-  flake.style.left=Math.random()*window.innerWidth+'px';
-  flake.style.opacity=Math.random();
-  snow.appendChild(flake);
-  let speed=Math.random()*3+2;
-  const fall=setInterval(()=>{
-    let top=parseFloat(flake.style.top);
-    if(top>window.innerHeight){flake.remove();clearInterval(fall);}
-    flake.style.top=top+speed+'px';
-  },20);
-}
-setInterval(createSnow,150);
-
-/* FORCE LES BORDURES SELON LE THEME */
+/* BORDURES */
 function refreshThemeBorders(){
-  const isNoel = snow.style.display === 'block';
+  const isNoel=snow.style.display==='block';
   document.querySelectorAll('.visitor-item img').forEach(img=>{
     if(isNoel){
       img.style.border="6px solid";
       img.style.borderImage="repeating-linear-gradient(45deg, red 0 10px, white 0 20px) 10";
       img.style.background='none';
-    } else {
+    }else{
       img.style.border="4px solid #b67385";
       img.style.background='#ffe6f0';
+      img.style.borderImage='';
     }
   });
 }
 
-  /* RENDER INITIAL */
+/* NEIGE */
+function createSnow(){
+  if(snow.style.display==='none')return;
+  const f=document.createElement('div');
+  f.textContent='❄';
+  f.style.position='absolute';
+  f.style.top='-30px';
+  f.style.left=Math.random()*innerWidth+'px';
+  f.style.fontSize=(Math.random()*20+10)+'px';
+  f.style.opacity=Math.random();
+  snow.appendChild(f);
+  const fall=setInterval(()=>{
+    f.style.top=parseFloat(f.style.top)+3+'px';
+    if(parseFloat(f.style.top)>innerHeight){f.remove();clearInterval(fall);}
+  },20);
+}
+setInterval(createSnow,150);
+
+/* INIT */
 render();
 </script>
 </body>
