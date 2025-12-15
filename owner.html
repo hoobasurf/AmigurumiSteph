@@ -348,10 +348,11 @@ function render(){
 }
 
 /* VUES */
-btnCarousel.onclick=()=>setView('carousel');
-btnGrid.onclick=()=>setView('grid');
-btnList.onclick=()=>setView('list');
-function setView(v){currentView=v;render()}
+function setView(v){
+  currentView=v;
+  render();
+  refreshThemeBorders(); // 🔹 on force la bordure après le rendu
+}
 
 /* MODAL IMAGE */
 function openModal(i){
@@ -443,7 +444,22 @@ function createSnow(){
 }
 setInterval(createSnow,150);
 
-/* RENDER INITIAL */
+/* FORCE LES BORDURES SELON LE THEME */
+function refreshThemeBorders(){
+  const isNoel = snow.style.display === 'block';
+  document.querySelectorAll('.visitor-item img').forEach(img=>{
+    if(isNoel){
+      img.style.border="6px solid";
+      img.style.borderImage="repeating-linear-gradient(45deg, red 0 10px, white 0 20px) 10";
+      img.style.background='none';
+    } else {
+      img.style.border="4px solid #b67385";
+      img.style.background='#ffe6f0';
+    }
+  });
+}
+
+  /* RENDER INITIAL */
 render();
 </script>
 </body>
