@@ -36,7 +36,14 @@ header img{width:98px;height:98px;border-radius:20%;margin:auto}
   border-radius:24px;
   cursor:pointer;
 }
-#viewSelector button.active{background:#ffeaf2}
+#viewSelector{
+  display:flex;
+  justify-content:center;
+  gap:12px;
+
+  margin-top:40px;   /* ⬅️ FAIT DESCENDRE LES BOUTONS */
+  margin-bottom:-20px; /* ⬅️ les rapproche des images */
+}
 
 /* CONTENU */
 .center-zone{
@@ -252,6 +259,14 @@ header img{width:98px;height:98px;border-radius:20%;margin:auto}
   z-index:5;
   display:none;
 }
+
+@media (max-width: 600px){
+  #viewSelector{
+    margin-top:8px;
+    margin-bottom:8px;
+  }
+}
+  
 </style>
 </head>
 <body>
