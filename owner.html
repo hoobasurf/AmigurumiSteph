@@ -18,40 +18,23 @@ body{
 header{text-align:center;padding:12px 0}
 header img{width:98px;height:98px;border-radius:20%;margin:auto}
 .title{
-  display:none;
-}
+  display:
   
-/* BOUTONS VUE */
-#viewSelector{
-  display:flex;
-  justify-content:center;
-  gap:12px;
-  margin:12px 0;
-}
-#viewSelector button{
-  background:#fff0f7;
-  border:2px solid #b84c6f;
-  color:#b84c6f;
-  padding:8px 16px;
-  border-radius:24px;
-  cursor:pointer;
-}
-#viewSelector{
-  display:flex;
-  justify-content:center;
-  gap:12px;
-
-  margin-top:40px;   /* ⬅️ FAIT DESCENDRE LES BOUTONS */
-  margin-bottom:-20px; /* ⬅️ les rapproche des images */
-}
-
-/* CONTENU */
 .center-zone{
   flex:1;
   display:flex;
   justify-content:center;
-  align-items:center; /* ⬅️ DESCEND AU CENTRE */
-  padding-top:40px;   /* ⬅️ ajustable */
+  align-items:center;
+}
+
+.center-zone > div{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+}
+
+#viewSelector{
+  margin-bottom:20px;
 }
 #visitor-list{width:100%;max-width:1200px}
 
@@ -284,7 +267,15 @@ header img{width:98px;height:98px;border-radius:20%;margin:auto}
 </div>
 
 <div class="center-zone">
-  <div id="visitor-list"></div>
+  <div>
+    <div id="viewSelector">
+      <button id="btnCarousel">Carrousel</button>
+      <button id="btnGrid">Grille</button>
+      <button id="btnList">Liste</button>
+    </div>
+
+    <div id="visitor-list"></div>
+  </div>
 </div>
 
 <!-- MODAL IMAGE -->
