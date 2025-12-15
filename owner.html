@@ -5,7 +5,9 @@
 <title>Galerie - Mes créations</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-html,body{height:100%;font-family:'Comic Sans MS',cursive;}
+html,body{height:100%;font-family:'Comic Sans MS',cursive}
+
+/* BODY */
 body{
   background:url('Photoroom_20251212_143703.PNG') center top / cover no-repeat fixed;
   overflow:hidden;
@@ -46,6 +48,7 @@ header img{width:98px;height:98px;border-radius:20%;margin:auto}
   height:220px;
   object-fit:contain;
   border:4px solid #b67385;
+  background:#ffe6f0;
 }
 .visitor-item p{
   margin-top:8px;
@@ -84,7 +87,7 @@ header img{width:98px;height:98px;border-radius:20%;margin:auto}
 }
 .list-view img{width:140px;height:140px}
 
-/* MODAL */
+/* MODAL IMAGE */
 .modal-bg{
   position:fixed;
   inset:0;
@@ -95,7 +98,7 @@ header img{width:98px;height:98px;border-radius:20%;margin:auto}
   z-index:1000;
 }
 .modal-box{
-  background:#fff0f7;
+  background:rgba(255,228,235,0.95);
   border:4px solid #b67385;
   border-radius:18px;
   padding:18px;
@@ -104,6 +107,7 @@ header img{width:98px;height:98px;border-radius:20%;margin:auto}
   max-height:80vh;
   overflow-y:auto;
   position:relative;
+  text-align:center;
 }
 .close-modal{
   position:absolute;
@@ -113,19 +117,22 @@ header img{width:98px;height:98px;border-radius:20%;margin:auto}
   cursor:pointer;
   color:#b84c6f;
 }
-.modal-back{
-  display:block;
-  text-align:center;
-  margin-top:12px;
-  cursor:pointer;
-  font-weight:bold;
+#modalBackBtn{
+  margin-top:10px;
+  padding:6px 18px;
+  border-radius:12px;
+  border:2px solid #b67385;
+  background:#ffe6f0;
   color:#b84c6f;
+  font-weight:bold;
+  cursor:pointer;
 }
 .modal-main-img{
   width:100%;
   max-height:500px;
   object-fit:contain;
   border:4px solid #b67385;
+  background:#ffe6f0;
 }
 
 /* ICONES */
@@ -141,15 +148,20 @@ header img{width:98px;height:98px;border-radius:20%;margin:auto}
   display:flex;
   align-items:center;
   gap:8px;
+  background:#ffe6f0;
+  padding:6px 12px;
+  border-radius:12px;
+  border:2px solid #b67385;
 }
 .heart{font-size:26px}
 .heart.liked{color:#ff4b82}
 
 /* COMMENTAIRES */
-.comment{background:#fff0f7;padding:10px;border-radius:10px;margin-top:8px}
+.comment-section{margin-top:16px}
+.comment{background:#ffe6f0;padding:10px;border-radius:10px;margin-bottom:10px}
 
-/* FORM */
-.comment-form-bg{
+/* FORM COMMENTAIRE ET LIKE */
+.form-modal-bg{
   position:fixed;
   inset:0;
   background:rgba(0,0,0,.6);
@@ -158,34 +170,60 @@ header img{width:98px;height:98px;border-radius:20%;margin:auto}
   align-items:center;
   z-index:2000;
 }
-.comment-form{
-  background:#fff0f7;
+.form-modal{
+  background:#ffe6f0;
   padding:18px;
   border-radius:14px;
   border:4px solid #b67385;
   width:340px;
 }
-
-/* NEIGE */
-.snow{
-  position:fixed;
-  inset:0;
-  pointer-events:none;
-  z-index:5;
-  display:none; /* activé uniquement thème Noël */
+.form-modal input{
+  width:100%;
+  margin-bottom:10px;
+  padding:10px;
+  border-radius:8px;
+  border:1px solid #b67385;
+}
+.form-modal button{
+  width:100%;
+  padding:10px;
+  border:none;
+  border-radius:12px;
+  background:#ffb6c1;
+  color:#8b3a3a;
+  font-weight:bold;
+  cursor:pointer;
 }
 
 /* SIDEBAR */
 #sidebar{
   position:fixed;
   top:0;
-  left:0;
-  width:200px;
+  left:-220px;
+  width:220px;
   height:100vh;
-  background:rgba(255,182,193,0.15); /* légère transparence */
+  background:rgba(255,230,240,0.15);
   border-right:2px solid #b67385;
   padding:20px;
+  transition:left .3s ease;
   z-index:10;
+}
+#sidebar.sidebar-open{left:0;}
+#toggleSidebar{
+  position:absolute;
+  top:50%;
+  right:-30px;
+  width:30px;
+  height:60px;
+  background:#ffb6c1;
+  color:#8b3a3a;
+  border-radius:0 12px 12px 0;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  cursor:pointer;
+  border:1px solid #b67385;
+  font-weight:bold;
 }
 #sidebar button{
   width:100%;
@@ -198,22 +236,25 @@ header img{width:98px;height:98px;border-radius:20%;margin:auto}
   font-weight:bold;
   cursor:pointer;
 }
+
+/* NEIGE */
+.snow{
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  z-index:5;
+  display:none;
+}
 </style>
 </head>
 <body>
 
-<div class="snow" id="snow"></div>
+<div id="snow" class="snow"></div>
 
 <header>
   <img src="favicon.png">
   <h1 class="title">Mes créations</h1>
 </header>
-
-<div id="sidebar">
-  <button onclick="openThemeModal()">Thème</button>
-  <button>Autre 1</button>
-  <button>Autre 2</button>
-</div>
 
 <div id="viewSelector">
   <button id="btnCarousel">Carrousel</button>
@@ -225,43 +266,57 @@ header img{width:98px;height:98px;border-radius:20%;margin:auto}
   <div id="visitor-list"></div>
 </div>
 
-<!-- MODAL -->
+<!-- MODAL IMAGE -->
 <div class="modal-bg" id="modal" onclick="closeModal()">
   <div class="modal-box" onclick="event.stopPropagation()">
     <div class="close-modal" onclick="closeModal()">×</div>
     <img id="modalMain" class="modal-main-img">
-
+    <button id="modalBackBtn" onclick="closeModal()">← Retour</button>
     <div class="icon-bar">
-      <div class="icon-btn" onclick="toggleLike()">
-        <span id="heart" class="heart">♡</span>
-        <span id="likeCount">0</span>
-      </div>
+      <div class="icon-btn" onclick="openLikeModal()">❤️</div>
       <div class="icon-btn" onclick="openCommentForm()">💬
         <span id="commentCount">0</span>
       </div>
     </div>
-
-    <div id="commentsList"></div>
-    <div class="modal-back" onclick="closeModal()">← Retour</div>
+    <div id="commentsList" class="comment-section"></div>
   </div>
 </div>
 
-<!-- COMMENT FORM -->
-<div class="comment-form-bg" id="commentFormBg" onclick="closeCommentForm(event)">
-  <div class="comment-form" onclick="event.stopPropagation()">
+<!-- FORM COMMENTAIRE -->
+<div class="form-modal-bg" id="commentFormBg" onclick="if(event.target===commentFormBg) commentFormBg.style.display='none'">
+  <div class="form-modal" onclick="event.stopPropagation()">
     <input id="commentName" placeholder="Prénom">
     <textarea id="commentText" rows="4" placeholder="Commentaire"></textarea>
     <button onclick="submitComment()">Envoyer</button>
   </div>
 </div>
 
-<!-- MODAL THEME -->
-<div class="modal-bg" id="themeModal" onclick="closeThemeModal()">
+<!-- FORM LIKE -->
+<div class="form-modal-bg" id="likeFormBg" onclick="if(event.target===likeFormBg) likeFormBg.style.display='none'">
+  <div class="form-modal" onclick="event.stopPropagation()">
+    <input id="likeName" placeholder="Ton prénom">
+    <button onclick="submitLike()">J'aime</button>
+  </div>
+</div>
+
+<!-- SIDEBAR -->
+<div id="sidebar">
+  <div id="toggleSidebar">☰</div>
+  <button onclick="openThemeModal()">Thème</button>
+  <button>Vidéos</button>
+  <button>Mailles</button>
+  <button>Pelotes</button>
+  <button>Notes</button>
+  <button>Paramètres</button>
+</div>
+
+<!-- THEME MODAL -->
+<div class="modal-bg" id="themeModal" onclick="closeThemeModal(event)">
   <div class="modal-box" onclick="event.stopPropagation()">
-    <h2>Choisir un thème</h2>
-    <button onclick="setTheme('default')">Défaut</button>
-    <button onclick="setTheme('noel')">Noël</button>
-    <div class="modal-back" onclick="closeThemeModal()">← Retour</div>
+    <h3>Choisir un thème</h3>
+    <button onclick="setTheme('noel')">🎄 Noël</button>
+    <button onclick="setTheme('default')">💠 Défaut</button>
+    <button onclick="closeThemeModal(event)">✕ Fermer</button>
   </div>
 </div>
 
@@ -269,13 +324,11 @@ header img{width:98px;height:98px;border-radius:20%;margin:auto}
 const list=document.getElementById('visitor-list');
 const modal=document.getElementById('modal');
 const modalMain=document.getElementById('modalMain');
+const commentFormBg=document.getElementById('commentFormBg');
+const likeFormBg=document.getElementById('likeFormBg');
 const heart=document.getElementById('heart');
-const likeCount=document.getElementById('likeCount');
 const commentCount=document.getElementById('commentCount');
 const commentList=document.getElementById('commentsList');
-const commentFormBg=document.getElementById('commentFormBg');
-const snow=document.getElementById('snow');
-const themeModal=document.getElementById('themeModal');
 
 let creations=JSON.parse(localStorage.getItem('creations')||'[]');
 let currentIndex=null;
@@ -300,35 +353,17 @@ btnGrid.onclick=()=>setView('grid');
 btnList.onclick=()=>setView('list');
 function setView(v){currentView=v;render()}
 
-/* MODAL */
+/* MODAL IMAGE */
 function openModal(i){
   currentIndex=i;
   modalMain.src=creations[i].imgUrl;
   modal.style.display='flex';
-  loadLikes();
   loadComments();
 }
 function closeModal(){modal.style.display='none'}
 
-/* LIKE */
-function toggleLike(){
-  const name=prompt("Ton prénom :")||"Anonyme";
-  const key='likes_'+currentIndex;
-  let likes=JSON.parse(localStorage.getItem(key)||'[]');
-  likes.includes(name)?likes=likes.filter(n=>n!==name):likes.push(name);
-  localStorage.setItem(key,JSON.stringify(likes));
-  loadLikes();
-}
-function loadLikes(){
-  const likes=JSON.parse(localStorage.getItem('likes_'+currentIndex)||'[]');
-  heart.textContent=likes.length?'❤️':'♡';
-  heart.classList.toggle('liked',likes.length>0);
-  likeCount.textContent=likes.length;
-}
-
-/* COMMENTS */
+/* COMMENT */
 function openCommentForm(){commentFormBg.style.display='flex'}
-function closeCommentForm(e){if(e.target===commentFormBg)commentFormBg.style.display='none'}
 function submitComment(){
   const n=document.getElementById('commentName').value;
   const t=document.getElementById('commentText').value;
@@ -346,9 +381,29 @@ function loadComments(){
   commentList.innerHTML=c.map(x=>`<div class="comment"><b>${x.n}</b><br>${x.t}</div>`).join('');
 }
 
+/* LIKE */
+function openLikeModal(){likeFormBg.style.display='flex'}
+function submitLike(){
+  const name=document.getElementById('likeName').value||"Anonyme";
+  const key='likes_'+currentIndex;
+  let likes=JSON.parse(localStorage.getItem(key)||'[]');
+  likes.includes(name)?likes=likes.filter(n=>n!==name):likes.push(name);
+  localStorage.setItem(key,JSON.stringify(likes));
+  likeFormBg.style.display='none';
+  alert("Merci ❤️"); // simple retour
+}
+
+/* SIDEBAR */
+const sidebar=document.getElementById('sidebar');
+const toggleSidebar=document.getElementById('toggleSidebar');
+toggleSidebar.onclick=()=>sidebar.classList.toggle('sidebar-open');
+
 /* THEME */
+const snow=document.getElementById('snow');
+const themeModal=document.getElementById('themeModal');
 function openThemeModal(){themeModal.style.display='flex'}
-function closeThemeModal(){themeModal.style.display='none'}
+function closeThemeModal(e){if(e.target===themeModal||e.target.tagName==='BUTTON') themeModal.style.display='none'}
+
 function setTheme(theme){
   if(theme==='noel'){
     document.body.style.backgroundImage="url('noel.png')";
@@ -358,19 +413,17 @@ function setTheme(theme){
       img.style.background='none';
     });
     snow.style.display='block';
-  } else {
+  }else{
     document.body.style.backgroundImage="url('Photoroom_20251212_143703.PNG')";
     document.querySelectorAll('.visitor-item img').forEach(img=>{
       img.style.border="4px solid #b67385";
-      img.style.borderImage="";
-      img.style.background='none';
+      img.style.background='#ffe6f0';
     });
     snow.style.display='none';
   }
-  closeThemeModal();
 }
 
-/* NEIGE ANIMATION */
+/* NEIGE */
 function createSnow(){
   if(snow.style.display==='none') return;
   const flake=document.createElement('div');
@@ -389,6 +442,8 @@ function createSnow(){
   },20);
 }
 setInterval(createSnow,150);
+
+/* RENDER INITIAL */
 render();
 </script>
 </body>
