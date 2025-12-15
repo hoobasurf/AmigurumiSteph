@@ -22,29 +22,24 @@ header img{width:98px;height:98px;border-radius:20%;margin:auto}
 }
   
 /* BOUTONS VUE */
-#viewSelector{
-  display:flex;
-  justify-content:center;
-  gap:12px;
 
-  margin-top:80px;   /* ⬅️ PLUS GRAND = PLUS BAS */
-  margin-bottom:20px;
-}
 #viewSelector button{
   background:#fff0f7;
   border:2px solid #b84c6f;
   color:#b84c6f;
-  padding:8px 16px;
-  border-radius:24px;
+
+  padding:12px 22px;   /* ⬅️ PLUS GROS */
+  font-size:17px;      /* ⬅️ PLUS LISIBLE */
+
+  border-radius:26px;
   cursor:pointer;
 }
+  
 #viewSelector{
   display:flex;
   justify-content:center;
-  gap:12px;
-
-  margin-top:40px;   /* ⬅️ FAIT DESCENDRE LES BOUTONS */
-  margin-bottom:-20px; /* ⬅️ les rapproche des images */
+  gap:16px;
+  margin:12px 0 8px; /* juste au-dessus des images */
 }
 
 /* CONTENU */
@@ -52,9 +47,9 @@ header img{width:98px;height:98px;border-radius:20%;margin:auto}
   flex:1;
   display:flex;
   justify-content:center;
-  align-items:center; /* ⬅️ DESCEND AU CENTRE */
-  padding-top:40px;   /* ⬅️ ajustable */
+  align-items:flex-start;
 }
+  
 #visitor-list{width:100%;max-width:1200px}
 
 /* ITEMS */
