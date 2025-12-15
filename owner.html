@@ -5,7 +5,7 @@
 <title>Galerie - Mes créations</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-html,body{height:100%;font-family:'Comic Sans MS',cursive;}
+html,body{height:100%;font-family:'Comic Sans MS',cursive}
 
 /* BODY */
 body{
@@ -48,6 +48,7 @@ header img{width:98px;height:98px;border-radius:20%;margin:auto}
   height:220px;
   object-fit:contain;
   border:4px solid #b67385;
+  background:#ffe6f0;
 }
 .visitor-item p{
   margin-top:8px;
@@ -106,6 +107,7 @@ header img{width:98px;height:98px;border-radius:20%;margin:auto}
   max-height:80vh;
   overflow-y:auto;
   position:relative;
+  text-align:center;
 }
 .close-modal{
   position:absolute;
@@ -115,11 +117,22 @@ header img{width:98px;height:98px;border-radius:20%;margin:auto}
   cursor:pointer;
   color:#b84c6f;
 }
+#modalBackBtn{
+  margin-top:10px;
+  padding:6px 18px;
+  border-radius:12px;
+  border:2px solid #b67385;
+  background:#ffe6f0;
+  color:#b84c6f;
+  font-weight:bold;
+  cursor:pointer;
+}
 .modal-main-img{
   width:100%;
   max-height:500px;
   object-fit:contain;
   border:4px solid #b67385;
+  background:#ffe6f0;
 }
 
 /* ICONES */
@@ -135,13 +148,17 @@ header img{width:98px;height:98px;border-radius:20%;margin:auto}
   display:flex;
   align-items:center;
   gap:8px;
+  background:#ffe6f0;
+  padding:6px 12px;
+  border-radius:12px;
+  border:2px solid #b67385;
 }
 .heart{font-size:26px}
 .heart.liked{color:#ff4b82}
 
 /* COMMENTAIRES */
 .comment-section{margin-top:16px}
-.comment{background:#fff0f7;padding:10px;border-radius:10px;margin-bottom:10px}
+.comment{background:#ffe6f0;padding:10px;border-radius:10px;margin-bottom:10px}
 
 /* FORM */
 .comment-form-bg{
@@ -252,6 +269,7 @@ header img{width:98px;height:98px;border-radius:20%;margin:auto}
   <div class="modal-box" onclick="event.stopPropagation()">
     <div class="close-modal" onclick="closeModal()">×</div>
     <img id="modalMain" class="modal-main-img">
+    <button id="modalBackBtn" onclick="closeModal()">← Retour</button>
     <div class="icon-bar">
       <div class="icon-btn" onclick="toggleLike()">
         <span id="heart" class="heart">♡</span>
@@ -304,6 +322,7 @@ const likeCount=document.getElementById('likeCount');
 const commentCount=document.getElementById('commentCount');
 const commentList=document.getElementById('commentsList');
 const commentFormBg=document.getElementById('commentFormBg');
+const modalBackBtn=document.getElementById('modalBackBtn');
 
 let creations=JSON.parse(localStorage.getItem('creations')||'[]');
 let currentIndex=null;
@@ -340,7 +359,7 @@ function closeModal(){modal.style.display='none'}
 
 /* LIKE */
 function toggleLike(){
-  const name=prompt("Ton prénom pour liker cette image :")||"Anonyme";
+  const name=prompt("Ton prénom :")||"Anonyme";
   const key='likes_'+currentIndex;
   let likes=JSON.parse(localStorage.getItem(key)||'[]');
   likes.includes(name)?likes=likes.filter(n=>n!==name):likes.push(name);
@@ -382,17 +401,20 @@ const themeModal=document.getElementById('themeModal');
 toggleSidebar.onclick=()=>sidebar.classList.toggle('sidebar-open');
 function openThemeModal(){themeModal.style.display='flex'}
 function closeThemeModal(e){if(e.target===themeModal||e.target.tagName==='BUTTON') themeModal.style.display='none'}
+
 function setTheme(theme){
   if(theme==='noel'){
     document.body.style.backgroundImage="url('noel.png')";
     document.querySelectorAll('.visitor-item img').forEach(img=>{
       img.style.border="4px dashed red";
+      img.style.background='none';
     });
     snow.style.display='block';
   }else{
     document.body.style.backgroundImage="url('Photoroom_20251212_143703.PNG')";
     document.querySelectorAll('.visitor-item img').forEach(img=>{
       img.style.border="4px solid #b67385";
+      img.style.background='#ffe6f0';
     });
     snow.style.display='none';
   }
