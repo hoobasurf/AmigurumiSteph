@@ -3,7 +3,6 @@
 <head>
 <meta charset="UTF-8">
 <title>Galerie - Mes créations</title>
-
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{height:100%;font-family:'Comic Sans MS',cursive}
@@ -35,9 +34,7 @@ header img{width:98px;height:98px;border-radius:20%;margin:auto}
   border-radius:24px;
   cursor:pointer;
 }
-#viewSelector button.active{
-  background:#ffeaf2;
-}
+#viewSelector button.active{background:#ffeaf2}
 
 /* CONTENU */
 .center-zone{flex:1;display:flex;justify-content:center}
@@ -124,6 +121,21 @@ header img{width:98px;height:98px;border-radius:20%;margin:auto}
   border:4px solid #b67385;
 }
 
+/* BOUTON RETOUR MODAL */
+#modalBackBtn{
+  position:absolute;
+  top:12px;
+  left:16px;
+  padding:6px 12px;
+  background:#ffb6c1;
+  border:2px solid #b84c6f;
+  border-radius:12px;
+  color:#8b3a3a;
+  font-weight:bold;
+  cursor:pointer;
+  z-index:1010;
+}
+
 /* ICONES */
 .icon-bar{
   display:flex;
@@ -161,6 +173,30 @@ header img{width:98px;height:98px;border-radius:20%;margin:auto}
   width:340px;
 }
 
+/* SIDEBAR */
+#sidebar{
+  position:fixed;
+  top:0;
+  left:0;
+  width:220px;
+  height:100vh;
+  background:rgba(255,230,240,0.15); /* transparence très légère */
+  border-right:2px solid #b67385;
+  padding:20px;
+  z-index:10;
+}
+#sidebar button{
+  width:100%;
+  margin-bottom:10px;
+  padding:10px;
+  border:none;
+  border-radius:12px;
+  background:#ffb6c1;
+  color:#8b3a3a;
+  font-weight:bold;
+  cursor:pointer;
+}
+
 /* NEIGE */
 .snow{
   position:fixed;
@@ -181,7 +217,7 @@ header img{width:98px;height:98px;border-radius:20%;margin:auto}
 </header>
 
 <div id="viewSelector">
-  <button id="btnCarousel" class="active">Carrousel</button>
+  <button id="btnCarousel">Carrousel</button>
   <button id="btnGrid">Grille</button>
   <button id="btnList">Liste</button>
 </div>
@@ -190,9 +226,16 @@ header img{width:98px;height:98px;border-radius:20%;margin:auto}
   <div id="visitor-list"></div>
 </div>
 
+<!-- SIDEBAR THÈME -->
+<div id="sidebar">
+  <button onclick="setTheme('noel')">🎄 Noël</button>
+  <button onclick="setTheme('default')">💠 Défaut</button>
+</div>
+
 <!-- MODAL -->
 <div class="modal-bg" id="modal" onclick="closeModal()">
   <div class="modal-box" onclick="event.stopPropagation()">
+    <button id="modalBackBtn">← Retour</button>
     <div class="close-modal" onclick="closeModal()">×</div>
     <img id="modalMain" class="modal-main-img">
 
@@ -229,10 +272,6 @@ const commentCount=document.getElementById('commentCount');
 const commentList=document.getElementById('commentsList');
 const commentFormBg=document.getElementById('commentFormBg');
 
-const btnCarousel=document.getElementById('btnCarousel');
-const btnGrid=document.getElementById('btnGrid');
-const btnList=document.getElementById('btnList');
-
 let creations=JSON.parse(localStorage.getItem('creations')||'[]');
 let currentIndex=null;
 let currentView='carousel';
@@ -250,17 +289,11 @@ function render(){
   });
 }
 
-/* BOUTONS VUE (AJOUT MINIMAL) */
-function setView(v,btn){
-  currentView=v;
-  [btnCarousel,btnGrid,btnList].forEach(b=>b.classList.remove('active'));
-  btn.classList.add('active');
-  render();
-}
-
-btnCarousel.onclick=()=>setView('carousel',btnCarousel);
-btnGrid.onclick=()=>setView('grid',btnGrid);
-btnList.onclick=()=>setView('list',btnList);
+/* VUES */
+btnCarousel.onclick=()=>setView('carousel');
+btnGrid.onclick=()=>setView('grid');
+btnList.onclick=()=>setView('list');
+function setView(v){currentView=v;render()}
 
 /* MODAL */
 function openModal(i){
@@ -271,6 +304,9 @@ function openModal(i){
   loadComments();
 }
 function closeModal(){modal.style.display='none'}
+
+/* BOUTON RETOUR MODAL */
+document.getElementById('modalBackBtn').onclick=()=>{modal.style.display='none'};
 
 /* LIKE */
 function toggleLike(){
@@ -308,7 +344,21 @@ function loadComments(){
   commentList.innerHTML=c.map(x=>`<div class="comment"><b>${x.n}</b><br>${x.t}</div>`).join('');
 }
 
-/* INIT */
+/* THEME */
+function setTheme(theme){
+  if(theme==='noel'){
+    document.body.style.backgroundImage="url('noel.png')";
+    document.querySelectorAll('.visitor-item img').forEach(img=>{
+      img.style.border="4px dashed red"; // rayures simplifiées
+    });
+  }else{
+    document.body.style.backgroundImage="url('Photoroom_20251212_143703.PNG')";
+    document.querySelectorAll('.visitor-item img').forEach(img=>{
+      img.style.border="4px solid #b67385";
+    });
+  }
+}
+
 render();
 </script>
 
