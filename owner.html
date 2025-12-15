@@ -5,9 +5,7 @@
 <title>Galerie - Mes créations</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-html,body{height:100%;font-family:'Comic Sans MS',cursive}
-
-/* BODY */
+html,body{height:100%;font-family:'Comic Sans MS',cursive;}
 body{
   background:url('Photoroom_20251212_143703.PNG') center top / cover no-repeat fixed;
   overflow:hidden;
@@ -48,7 +46,6 @@ header img{width:98px;height:98px;border-radius:20%;margin:auto}
   height:220px;
   object-fit:contain;
   border:4px solid #b67385;
-  background:#ffe6f0;
 }
 .visitor-item p{
   margin-top:8px;
@@ -87,7 +84,7 @@ header img{width:98px;height:98px;border-radius:20%;margin:auto}
 }
 .list-view img{width:140px;height:140px}
 
-/* MODAL IMAGE */
+/* MODAL */
 .modal-bg{
   position:fixed;
   inset:0;
@@ -98,7 +95,7 @@ header img{width:98px;height:98px;border-radius:20%;margin:auto}
   z-index:1000;
 }
 .modal-box{
-  background:rgba(255,228,235,0.95);
+  background:#fff0f7;
   border:4px solid #b67385;
   border-radius:18px;
   padding:18px;
@@ -107,7 +104,6 @@ header img{width:98px;height:98px;border-radius:20%;margin:auto}
   max-height:80vh;
   overflow-y:auto;
   position:relative;
-  text-align:center;
 }
 .close-modal{
   position:absolute;
@@ -117,22 +113,19 @@ header img{width:98px;height:98px;border-radius:20%;margin:auto}
   cursor:pointer;
   color:#b84c6f;
 }
-#modalBackBtn{
-  margin-top:10px;
-  padding:6px 18px;
-  border-radius:12px;
-  border:2px solid #b67385;
-  background:#ffe6f0;
-  color:#b84c6f;
-  font-weight:bold;
+.modal-back{
+  display:block;
+  text-align:center;
+  margin-top:12px;
   cursor:pointer;
+  font-weight:bold;
+  color:#b84c6f;
 }
 .modal-main-img{
   width:100%;
   max-height:500px;
   object-fit:contain;
   border:4px solid #b67385;
-  background:#ffe6f0;
 }
 
 /* ICONES */
@@ -148,17 +141,12 @@ header img{width:98px;height:98px;border-radius:20%;margin:auto}
   display:flex;
   align-items:center;
   gap:8px;
-  background:#ffe6f0;
-  padding:6px 12px;
-  border-radius:12px;
-  border:2px solid #b67385;
 }
 .heart{font-size:26px}
 .heart.liked{color:#ff4b82}
 
 /* COMMENTAIRES */
-.comment-section{margin-top:16px}
-.comment{background:#ffe6f0;padding:10px;border-radius:10px;margin-bottom:10px}
+.comment{background:#fff0f7;padding:10px;border-radius:10px;margin-top:8px}
 
 /* FORM */
 .comment-form-bg{
@@ -171,63 +159,33 @@ header img{width:98px;height:98px;border-radius:20%;margin:auto}
   z-index:2000;
 }
 .comment-form{
-  background:#ffe6f0;
+  background:#fff0f7;
   padding:18px;
   border-radius:14px;
+  border:4px solid #b67385;
   width:340px;
-  
-}.comment-form, .modal-box {
-  background: #fff0f7; /* rose pâle */
-  border: 4px solid #b67385; /* bordeaux */
-  border-radius: 14px;
 }
-.comment-form input, .comment-form textarea{
-  width:100%;
-  margin-bottom:10px;
-  padding:10px;
-  border-radius:8px;
-  border:1px solid #b67385;
-}
-.comment-form button{
-  width:100%;
-  padding:10px;
-  border:none;
-  border-radius:12px;
-  background:#ffb6c1;
-  color:#8b3a3a;
-  font-weight:bold;
-  cursor:pointer;
+
+/* NEIGE */
+.snow{
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  z-index:5;
+  display:none; /* activé uniquement thème Noël */
 }
 
 /* SIDEBAR */
 #sidebar{
   position:fixed;
   top:0;
-  left:-220px;
-  width:220px;
+  left:0;
+  width:200px;
   height:100vh;
-  background:rgba(255,230,240,0.15);
+  background:rgba(255,182,193,0.15); /* légère transparence */
   border-right:2px solid #b67385;
   padding:20px;
-  transition:left .3s ease;
   z-index:10;
-}
-#sidebar.sidebar-open{left:0;}
-#toggleSidebar{
-  position:absolute;
-  top:50%;
-  right:-30px;
-  width:30px;
-  height:60px;
-  background:#ffb6c1;
-  color:#8b3a3a;
-  border-radius:0 12px 12px 0;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  cursor:pointer;
-  border:1px solid #b67385;
-  font-weight:bold;
 }
 #sidebar button{
   width:100%;
@@ -240,24 +198,22 @@ header img{width:98px;height:98px;border-radius:20%;margin:auto}
   font-weight:bold;
   cursor:pointer;
 }
-
-/* NEIGE */
-.snow{
-  position:fixed;
-  inset:0;
-  pointer-events:none;
-  z-index:5;
-}
 </style>
 </head>
 <body>
 
-<div id="snow" class="snow" style="display:none;"></div>
+<div class="snow" id="snow"></div>
 
 <header>
   <img src="favicon.png">
   <h1 class="title">Mes créations</h1>
 </header>
+
+<div id="sidebar">
+  <button onclick="openThemeModal()">Thème</button>
+  <button>Autre 1</button>
+  <button>Autre 2</button>
+</div>
 
 <div id="viewSelector">
   <button id="btnCarousel">Carrousel</button>
@@ -269,12 +225,12 @@ header img{width:98px;height:98px;border-radius:20%;margin:auto}
   <div id="visitor-list"></div>
 </div>
 
-<!-- MODAL IMAGE -->
+<!-- MODAL -->
 <div class="modal-bg" id="modal" onclick="closeModal()">
   <div class="modal-box" onclick="event.stopPropagation()">
     <div class="close-modal" onclick="closeModal()">×</div>
     <img id="modalMain" class="modal-main-img">
-    <button id="modalBackBtn" onclick="closeModal()">← Retour</button>
+
     <div class="icon-bar">
       <div class="icon-btn" onclick="toggleLike()">
         <span id="heart" class="heart">♡</span>
@@ -284,12 +240,14 @@ header img{width:98px;height:98px;border-radius:20%;margin:auto}
         <span id="commentCount">0</span>
       </div>
     </div>
-    <div id="commentsList" class="comment-section"></div>
+
+    <div id="commentsList"></div>
+    <div class="modal-back" onclick="closeModal()">← Retour</div>
   </div>
 </div>
 
 <!-- COMMENT FORM -->
-<div class="comment-form-bg" id="commentFormBg" onclick="if(event.target===commentFormBg) commentFormBg.style.display='none'">
+<div class="comment-form-bg" id="commentFormBg" onclick="closeCommentForm(event)">
   <div class="comment-form" onclick="event.stopPropagation()">
     <input id="commentName" placeholder="Prénom">
     <textarea id="commentText" rows="4" placeholder="Commentaire"></textarea>
@@ -297,24 +255,13 @@ header img{width:98px;height:98px;border-radius:20%;margin:auto}
   </div>
 </div>
 
-<!-- SIDEBAR -->
-<div id="sidebar">
-  <div id="toggleSidebar">☰</div>
-  <button onclick="openSection('videos')">Vidéos</button>
-  <button onclick="openSection('mailles')">Mailles</button>
-  <button onclick="openSection('pelotes')">Pelotes</button>
-  <button onclick="openSection('notes')">Notes</button>
-  <button onclick="openSection('settings')">Paramètres</button>
-  <button onclick="openThemeModal()">Thème</button>
-</div>
-
-<!-- THEME MODAL -->
-<div class="modal-bg" id="themeModal" onclick="closeThemeModal(event)">
+<!-- MODAL THEME -->
+<div class="modal-bg" id="themeModal" onclick="closeThemeModal()">
   <div class="modal-box" onclick="event.stopPropagation()">
-    <h3>Choisir un thème</h3>
-    <button onclick="setTheme('noel')">🎄 Noël</button>
-    <button onclick="setTheme('default')">💠 Défaut</button>
-    <button onclick="closeThemeModal(event)">✕ Fermer</button>
+    <h2>Choisir un thème</h2>
+    <button onclick="setTheme('default')">Défaut</button>
+    <button onclick="setTheme('noel')">Noël</button>
+    <div class="modal-back" onclick="closeThemeModal()">← Retour</div>
   </div>
 </div>
 
@@ -327,7 +274,8 @@ const likeCount=document.getElementById('likeCount');
 const commentCount=document.getElementById('commentCount');
 const commentList=document.getElementById('commentsList');
 const commentFormBg=document.getElementById('commentFormBg');
-const modalBackBtn=document.getElementById('modalBackBtn');
+const snow=document.getElementById('snow');
+const themeModal=document.getElementById('themeModal');
 
 let creations=JSON.parse(localStorage.getItem('creations')||'[]');
 let currentIndex=null;
@@ -352,7 +300,7 @@ btnGrid.onclick=()=>setView('grid');
 btnList.onclick=()=>setView('list');
 function setView(v){currentView=v;render()}
 
-/* MODAL IMAGE */
+/* MODAL */
 function openModal(i){
   currentIndex=i;
   modalMain.src=creations[i].imgUrl;
@@ -380,6 +328,7 @@ function loadLikes(){
 
 /* COMMENTS */
 function openCommentForm(){commentFormBg.style.display='flex'}
+function closeCommentForm(e){if(e.target===commentFormBg)commentFormBg.style.display='none'}
 function submitComment(){
   const n=document.getElementById('commentName').value;
   const t=document.getElementById('commentText').value;
@@ -397,67 +346,9 @@ function loadComments(){
   commentList.innerHTML=c.map(x=>`<div class="comment"><b>${x.n}</b><br>${x.t}</div>`).join('');
 }
 
-/* SIDEBAR & THEME */
-const sidebar=document.getElementById('sidebar');
-const toggleSidebar=document.getElementById('toggleSidebar');
-const snow=document.getElementById('snow');
-const themeModal=document.getElementById('themeModal');
-
-toggleSidebar.onclick=()=>sidebar.classList.toggle('sidebar-open');
+/* THEME */
 function openThemeModal(){themeModal.style.display='flex'}
-function closeThemeModal(e){if(e.target===themeModal||e.target.tagName==='BUTTON') themeModal.style.display='none'}
-
-function setTheme(theme){
-  if(theme==='noel'){
-    document.body.style.backgroundImage="url('noel.png')";
-    document.querySelectorAll('.visitor-item img').forEach(img=>{
-      img.style.border="4px dashed red";
-      img.style.background='none';
-    });
-    snow.style.display='block';
-  }else{
-    document.body.style.backgroundImage="url('Photoroom_20251212_143703.PNG')";
-    document.querySelectorAll('.visitor-item img').forEach(img=>{
-      img.style.border="4px solid #b67385";
-      img.style.background='#ffe6f0';
-    });
-    snow.style.display='none';
-  }
-}
-
-/* NEIGE */
-function createSnow(){
-  for(let i=0;i<100;i++){
-    const s=document.createElement('div');
-    s.classList.add('flake');
-    s.style.position='absolute';
-    s.style.width='6px';
-    s.style.height='6px';
-    s.style.background='white';
-    s.style.borderRadius='50%';
-    s.style.opacity=Math.random();
-    s.style.left=Math.random()*window.innerWidth+'px';
-    s.style.top=Math.random()*window.innerHeight+'px';
-    snow.appendChild(s);
-  }
-  animateSnow();
-}
-function animateSnow(){
-  document.querySelectorAll('.flake').forEach(f=>{
-    let top=parseFloat(f.style.top);
-    top+=Math.random()*2+1;
-    if(top>window.innerHeight) top=0;
-    f.style.top=top+'px';
-  });
-  requestAnimationFrame(animateSnow);
-}
-createSnow();
-
-/* RENDER INITIAL */
-
-<script>
-const snow = document.getElementById('snow'); // déjà dans ton HTML
-
+function closeThemeModal(){themeModal.style.display='none'}
 function setTheme(theme){
   if(theme==='noel'){
     document.body.style.backgroundImage="url('noel.png')";
@@ -467,17 +358,38 @@ function setTheme(theme){
       img.style.background='none';
     });
     snow.style.display='block';
-  } else { // thème défaut
+  } else {
     document.body.style.backgroundImage="url('Photoroom_20251212_143703.PNG')";
     document.querySelectorAll('.visitor-item img').forEach(img=>{
       img.style.border="4px solid #b67385";
       img.style.borderImage="";
-      img.style.background='#ffe6f0';
+      img.style.background='none';
     });
     snow.style.display='none';
   }
+  closeThemeModal();
 }
-</script>
+
+/* NEIGE ANIMATION */
+function createSnow(){
+  if(snow.style.display==='none') return;
+  const flake=document.createElement('div');
+  flake.textContent='❄';
+  flake.style.position='absolute';
+  flake.style.fontSize=(Math.random()*20+10)+'px';
+  flake.style.top='-30px';
+  flake.style.left=Math.random()*window.innerWidth+'px';
+  flake.style.opacity=Math.random();
+  snow.appendChild(flake);
+  let speed=Math.random()*3+2;
+  const fall=setInterval(()=>{
+    let top=parseFloat(flake.style.top);
+    if(top>window.innerHeight){flake.remove();clearInterval(fall);}
+    flake.style.top=top+speed+'px';
+  },20);
+}
+setInterval(createSnow,150);
+render();
 </script>
 </body>
 </html>
