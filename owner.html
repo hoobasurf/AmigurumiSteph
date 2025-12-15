@@ -16,25 +16,31 @@ body{
 
 /* HEADER */
 header{text-align:center;padding:12px 0}
-header img{width:98px;height:98px;border-radius:20%;margin:auto}
-.title{
-  display:
-  
+.title{display:none}
+
+/* BOUTONS VUE */
+#viewSelector{
+  display:flex;
+  justify-content:center;
+  gap:12px;
+  margin-bottom:20px;
+}
+#viewSelector button{
+  background:#fff0f7;
+  border:2px solid #b84c6f;
+  color:#b84c6f;
+  padding:8px 16px;
+  border-radius:24px;
+  cursor:pointer;
+}
+
+/* CONTENU */
 .center-zone{
   flex:1;
   display:flex;
   justify-content:center;
-  align-items:center;
-}
-
-.center-zone > div{
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-}
-
-#viewSelector{
-  margin-bottom:20px;
+  align-items:flex-start; /* ⬅️ DESCEND TOUT L’ENSEMBLE */
+  padding-top:90px;       /* ⬅️ ajuste ici si besoin */
 }
 #visitor-list{width:100%;max-width:1200px}
 
@@ -55,210 +61,90 @@ header img{width:98px;height:98px;border-radius:20%;margin:auto}
 }
 
 /* VUES */
-.carousel-view{
-  display:flex;
-  gap:40px;
-  overflow-x:auto;
-  padding:20px;
-}
+.carousel-view{display:flex;gap:40px;overflow-x:auto;padding:20px}
 .grid-view{
   display:grid;
   grid-template-columns:repeat(auto-fill,minmax(220px,1fr));
-  gap:24px;
-  padding:20px;
-  overflow-y:auto;
-  max-height:calc(100vh - 260px);
+  gap:24px;padding:20px;overflow-y:auto;
 }
-.list-view{
-  display:flex;
-  flex-direction:column;
-  gap:18px;
-  padding:20px;
-  overflow-y:auto;
-  max-height:calc(100vh - 260px);
-}
-.list-view .visitor-item{
-  display:flex;
-  align-items:center;
-  gap:18px;
-}
+.list-view{display:flex;flex-direction:column;gap:18px;padding:20px}
 .list-view img{width:140px;height:140px}
 
 /* MODAL IMAGE */
 .modal-bg{
-  position:fixed;
-  inset:0;
-  background:rgba(0,0,0,.65);
-  display:none;
-  justify-content:center;
-  align-items:center;
-  z-index:1000;
+  position:fixed;inset:0;background:rgba(0,0,0,.65);
+  display:none;justify-content:center;align-items:center;z-index:1000
 }
 .modal-box{
-  background:rgba(255,228,235,0.95);
-  border:4px solid #b67385;
-  border-radius:18px;
-  padding:18px;
-  max-width:900px;
-  width:95%;
-  max-height:80vh;
-  overflow-y:auto;
-  position:relative;
-  text-align:center;
+  background:rgba(255,228,235,.95);
+  border:4px solid #b67385;border-radius:18px;
+  padding:18px;max-width:900px;width:95%;text-align:center
 }
-.close-modal{
-  position:absolute;
-  top:10px;
-  right:14px;
-  font-size:28px;
-  cursor:pointer;
-  color:#b84c6f;
+.close-modal{position:absolute;top:10px;right:14px;font-size:28px;cursor:pointer}
+.modal-main-img{
+  width:100%;max-height:500px;object-fit:contain;
+  border:4px solid #b67385;background:#ffe6f0
 }
 #modalBackBtn{
-  margin-top:10px;
-  padding:6px 18px;
-  border-radius:12px;
-  border:2px solid #b67385;
-  background:#ffe6f0;
-  color:#b84c6f;
-  font-weight:bold;
-  cursor:pointer;
-}
-.modal-main-img{
-  width:100%;
-  max-height:500px;
-  object-fit:contain;
-  border:4px solid #b67385;
-  background:#ffe6f0;
+  margin:10px auto;padding:6px 18px;border-radius:12px;
+  border:2px solid #b67385;background:#ffe6f0;cursor:pointer
 }
 
 /* ICONES */
-.icon-bar{
-  display:flex;
-  justify-content:center;
-  gap:30px;
-  margin-top:12px;
-}
+.icon-bar{display:flex;justify-content:center;gap:30px;margin-top:12px}
 .icon-btn{
-  cursor:pointer;
-  color:#b84c6f;
-  display:flex;
-  align-items:center;
-  gap:8px;
-  background:#ffe6f0;
-  padding:6px 12px;
-  border-radius:12px;
-  border:2px solid #b67385;
+  display:flex;align-items:center;gap:8px;
+  background:#ffe6f0;padding:6px 12px;
+  border-radius:12px;border:2px solid #b67385;cursor:pointer
 }
 .heart{font-size:26px}
 .heart.liked{color:#ff4b82}
 
 /* COMMENTAIRES */
-.comment-section{margin-top:16px}
-.comment{background:#ffe6f0;padding:10px;border-radius:10px;margin-bottom:10px}
+.comment{background:#ffe6f0;padding:10px;border-radius:10px;margin-top:8px}
 
-/* FORM COMMENTAIRE ET LIKE */
+/* FORM */
 .form-modal-bg{
-  position:fixed;
-  inset:0;
-  background:rgba(0,0,0,.6);
-  display:none;
-  justify-content:center;
-  align-items:center;
-  z-index:2000;
+  position:fixed;inset:0;background:rgba(0,0,0,.6);
+  display:none;justify-content:center;align-items:center;z-index:2000
 }
 .form-modal{
-  background:#ffe6f0;
-  padding:18px;
-  border-radius:14px;
-  border:4px solid #b67385;
-  width:340px;
+  background:#ffe6f0;padding:18px;border-radius:14px;
+  border:4px solid #b67385;width:340px
 }
-.form-modal input, .form-modal textarea{
-  width:100%;
-  margin-bottom:10px;
-  padding:10px;
-  border-radius:8px;
-  border:1px solid #b67385;
+.form-modal input,.form-modal textarea{
+  width:100%;margin-bottom:10px;padding:10px;border-radius:8px
 }
 .form-modal button{
-  width:100%;
-  padding:10px;
-  border:none;
-  border-radius:12px;
-  background:#ffb6c1;
-  color:#8b3a3a;
-  font-weight:bold;
-  cursor:pointer;
+  width:100%;padding:10px;border-radius:12px;
+  background:#ffb6c1;font-weight:bold;cursor:pointer
 }
 
 /* SIDEBAR */
 #sidebar{
-  position:fixed;
-  top:0;
-  left:-220px;
-  width:220px;
-  height:100vh;
-  background:rgba(255,230,240,0.15);
-  border-right:2px solid #b67385;
-  padding:20px;
-  transition:left .3s ease;
-  z-index:10;
+  position:fixed;left:-220px;top:0;width:220px;height:100vh;
+  background:rgba(255,230,240,.15);border-right:2px solid #b67385;
+  padding:20px;transition:.3s;z-index:10
 }
-#sidebar.sidebar-open{left:0;}
+#sidebar.sidebar-open{left:0}
 #toggleSidebar{
-  position:absolute;
-  top:50%;
-  right:-30px;
-  width:30px;
-  height:60px;
-  background:#ffb6c1;
-  color:#8b3a3a;
-  border-radius:0 12px 12px 0;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  cursor:pointer;
-  border:1px solid #b67385;
-  font-weight:bold;
+  position:absolute;top:50%;right:-30px;width:30px;height:60px;
+  background:#ffb6c1;border-radius:0 12px 12px 0;
+  display:flex;align-items:center;justify-content:center;cursor:pointer
 }
 #sidebar button{
-  width:100%;
-  margin-bottom:10px;
-  padding:10px;
-  border:none;
-  border-radius:12px;
-  background:#ffb6c1;
-  color:#8b3a3a;
-  font-weight:bold;
-  cursor:pointer;
+  width:100%;margin-bottom:10px;padding:10px;
+  border-radius:12px;background:#ffb6c1;cursor:pointer
 }
 
 /* NEIGE */
-.snow{
-  position:fixed;
-  inset:0;
-  pointer-events:none;
-  z-index:5;
-  display:none;
-}
-
-@media (max-width: 600px){
-  #viewSelector{
-    margin-top:8px;
-    margin-bottom:8px;
-  }
-}
-  
+.snow{position:fixed;inset:0;pointer-events:none;z-index:5;display:none}
 </style>
 </head>
+
 <body>
 
 <div id="snow" class="snow"></div>
-
-<header>
-  <h1 class="title">Mes créations</h1>
-</header>
 
 <div id="viewSelector">
   <button id="btnCarousel">Carrousel</button>
@@ -267,194 +153,62 @@ header img{width:98px;height:98px;border-radius:20%;margin:auto}
 </div>
 
 <div class="center-zone">
-  <div>
-    <div id="viewSelector">
-      <button id="btnCarousel">Carrousel</button>
-      <button id="btnGrid">Grille</button>
-      <button id="btnList">Liste</button>
-    </div>
-
-    <div id="visitor-list"></div>
-  </div>
-</div>
-
-<!-- MODAL IMAGE -->
-<div class="modal-bg" id="modal" onclick="closeModal()">
-  <div class="modal-box" onclick="event.stopPropagation()">
-    <div class="close-modal" onclick="closeModal()">×</div>
-
-    <img id="modalMain" class="modal-main-img">
-
-    <button id="modalBackBtn" onclick="closeModal()">← Retour</button>
-
-    <div class="icon-bar">
-
-      <!-- LIKE -->
-      <div class="icon-btn" onclick="openLikeModal()">
-        <span class="heart" id="heart">♡</span>
-        <span id="likeCount">0</span>
-      </div>
-
-      <!-- COMMENT -->
-      <div class="icon-btn" onclick="openCommentForm()">💬
-        <span id="commentCount">0</span>
-      </div>
-
-    </div>
-
-    <div id="commentsList" class="comment-section"></div>
-  </div>
-</div>
-
-<!-- FORM COMMENT -->
-<div class="form-modal-bg" id="commentFormBg" onclick="if(event.target===commentFormBg) commentFormBg.style.display='none'">
-  <div class="form-modal" onclick="event.stopPropagation()">
-    <input id="commentName" placeholder="Prénom">
-    <textarea id="commentText" rows="4" placeholder="Commentaire"></textarea>
-    <button onclick="submitComment()">Envoyer</button>
-  </div>
-</div>
-
-<!-- FORM LIKE -->
-<div class="form-modal-bg" id="likeFormBg" onclick="if(event.target===likeFormBg) likeFormBg.style.display='none'">
-  <div class="form-modal" onclick="event.stopPropagation()">
-    <input id="likeName" placeholder="Ton prénom">
-    <button onclick="submitLike()">J'aime</button>
-  </div>
+  <div id="visitor-list"></div>
 </div>
 
 <!-- SIDEBAR -->
 <div id="sidebar">
   <div id="toggleSidebar">☰</div>
   <button onclick="openThemeModal()">Thème</button>
-  <button>Vidéos</button>
-  <button>Mailles</button>
-  <button>Pelotes</button>
-  <button>Notes</button>
-  <button>Paramètres</button>
 </div>
 
 <!-- THEME MODAL -->
 <div class="modal-bg" id="themeModal" onclick="closeThemeModal(event)">
   <div class="modal-box" onclick="event.stopPropagation()">
     <h3>Choisir un thème</h3>
-    <button onclick="setTheme('noel')">🎄 Noël</button>
     <button onclick="setTheme('default')">💠 Défaut</button>
+    <button onclick="setTheme('noel')">🎄 Noël</button>
+    <button onclick="setTheme('girly')">🍭 Sweetly Girly</button>
     <button onclick="closeThemeModal(event)">✕ Fermer</button>
   </div>
 </div>
 
 <script>
 const list=document.getElementById('visitor-list');
-const modal=document.getElementById('modal');
-const modalMain=document.getElementById('modalMain');
-const commentFormBg=document.getElementById('commentFormBg');
-const likeFormBg=document.getElementById('likeFormBg');
-const commentCount=document.getElementById('commentCount');
-const commentList=document.getElementById('commentsList');
+const snow=document.getElementById('snow');
+const themeModal=document.getElementById('themeModal');
+const sidebar=document.getElementById('sidebar');
 
-let creations=JSON.parse(localStorage.getItem('creations')||'[]');
-let currentIndex=null;
 let currentView='carousel';
+let creations=JSON.parse(localStorage.getItem('creations')||'[]');
 
-/* RENDER */
 function render(){
   list.innerHTML='';
   list.className=currentView+'-view';
-  creations.forEach((c,i)=>{
+  creations.forEach(c=>{
     const d=document.createElement('div');
     d.className='visitor-item';
     d.innerHTML=`<img src="${c.imgUrl}"><p>${c.name}</p>`;
-    d.onclick=()=>openModal(i);
     list.appendChild(d);
   });
   refreshThemeBorders();
 }
 
-/* VUES */
 btnCarousel.onclick=()=>setView('carousel');
 btnGrid.onclick=()=>setView('grid');
 btnList.onclick=()=>setView('list');
-function setView(v){
-  currentView=v;
-  render();
-}
+function setView(v){currentView=v;render()}
 
-/* MODAL */
-function openModal(i){
-  currentIndex=i;
-  modalMain.src=creations[i].imgUrl;
-  modal.style.display='flex';
-  loadComments();
-  loadLikes();
-}
-function closeModal(){modal.style.display='none'}
-
-/* COMMENT */
-function openCommentForm(){commentFormBg.style.display='flex'}
-function submitComment(){
-  const n=document.getElementById('commentName').value;
-  const t=document.getElementById('commentText').value;
-  if(!n||!t)return;
-  const key='comments_'+currentIndex;
-  const c=JSON.parse(localStorage.getItem(key)||'[]');
-  c.push({n,t});
-  localStorage.setItem(key,JSON.stringify(c));
-  commentFormBg.style.display='none';
-  loadComments();
-}
-function loadComments(){
-  const c=JSON.parse(localStorage.getItem('comments_'+currentIndex)||'[]');
-  commentCount.textContent=c.length;
-  commentList.innerHTML=c.map(x=>`<div class="comment"><b>${x.n}</b><br>${x.t}</div>`).join('');
-}
-
-/* LIKE */
-function openLikeModal(){likeFormBg.style.display='flex'}
-function submitLike(){
-  const name = document.getElementById('likeName').value.trim();
-
-  if(!name){
-    alert("Merci d'indiquer ton prénom ❤️");
-    return;
-  }
-
-  const key = 'likes_' + currentIndex;
-  let likes = JSON.parse(localStorage.getItem(key) || '[]');
-
-  if(!likes.includes(name)){
-    likes.push(name);
-  }
-
-  localStorage.setItem(key, JSON.stringify(likes));
-  likeFormBg.style.display = 'none';
-  loadLikes();
-}
-function loadLikes(){
-  const key='likes_'+currentIndex;
-  const likes=JSON.parse(localStorage.getItem(key)||'[]');
-  const heart=document.getElementById('heart');
-  const likeCount=document.getElementById('likeCount');
-  heart.textContent=likes.length?'❤️':'♡';
-  heart.classList.toggle('liked',likes.length>0);
-  likeCount.textContent=likes.length?likes.length+' · '+likes.join(', '):'0';
-}
-
-/* SIDEBAR */
-const sidebar=document.getElementById('sidebar');
-const toggleSidebar=document.getElementById('toggleSidebar');
-toggleSidebar.onclick=()=>sidebar.classList.toggle('sidebar-open');
-
-/* THEME */
-const snow=document.getElementById('snow');
-const themeModal=document.getElementById('themeModal');
 function openThemeModal(){themeModal.style.display='flex'}
-function closeThemeModal(e){if(e.target===themeModal||e.target.tagName==='BUTTON') themeModal.style.display='none'}
+function closeThemeModal(e){if(e.target===themeModal||e.target.tagName==='BUTTON')themeModal.style.display='none'}
 
 function setTheme(theme){
   if(theme==='noel'){
     document.body.style.backgroundImage="url('noel.png')";
     snow.style.display='block';
+  }else if(theme==='girly'){
+    document.body.style.backgroundImage="url('sweetly-girly.png')";
+    snow.style.display='none';
   }else{
     document.body.style.backgroundImage="url('Photoroom_20251212_143703.PNG')";
     snow.style.display='none';
@@ -462,7 +216,6 @@ function setTheme(theme){
   refreshThemeBorders();
 }
 
-/* BORDURES */
 function refreshThemeBorders(){
   const isNoel=snow.style.display==='block';
   document.querySelectorAll('.visitor-item img').forEach(img=>{
@@ -478,25 +231,8 @@ function refreshThemeBorders(){
   });
 }
 
-/* NEIGE */
-function createSnow(){
-  if(snow.style.display==='none')return;
-  const f=document.createElement('div');
-  f.textContent='❄';
-  f.style.position='absolute';
-  f.style.top='-30px';
-  f.style.left=Math.random()*innerWidth+'px';
-  f.style.fontSize=(Math.random()*20+10)+'px';
-  f.style.opacity=Math.random();
-  snow.appendChild(f);
-  const fall=setInterval(()=>{
-    f.style.top=parseFloat(f.style.top)+3+'px';
-    if(parseFloat(f.style.top)>innerHeight){f.remove();clearInterval(fall);}
-  },20);
-}
-setInterval(createSnow,150);
+toggleSidebar.onclick=()=>sidebar.classList.toggle('sidebar-open');
 
-/* INIT */
 render();
 </script>
 </body>
