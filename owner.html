@@ -400,12 +400,22 @@ function loadComments(){
 /* LIKE */
 function openLikeModal(){likeFormBg.style.display='flex'}
 function submitLike(){
-  const name=document.getElementById('likeName').value||"Anonyme";
-  const key='likes_'+currentIndex;
-  let likes=JSON.parse(localStorage.getItem(key)||'[]');
-  likes.includes(name)?likes=likes.filter(n=>n!==name):likes.push(name);
-  localStorage.setItem(key,JSON.stringify(likes));
-  likeFormBg.style.display='none';
+  const name = document.getElementById('likeName').value.trim();
+
+  if(!name){
+    alert("Merci d'indiquer ton prénom ❤️");
+    return;
+  }
+
+  const key = 'likes_' + currentIndex;
+  let likes = JSON.parse(localStorage.getItem(key) || '[]');
+
+  if(!likes.includes(name)){
+    likes.push(name);
+  }
+
+  localStorage.setItem(key, JSON.stringify(likes));
+  likeFormBg.style.display = 'none';
   loadLikes();
 }
 function loadLikes(){
