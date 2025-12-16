@@ -465,9 +465,10 @@ function setTheme(theme){
     document.body.style.backgroundImage="url('noel.png')";
     snow.style.display='block';
 
-  } else if(theme==='sweety'){
-    document.body.style.backgroundImage="url('sweety-girly.png')";
-    snow.style.display='block';
+  } else if(theme === 'sweety'){
+  document.body.style.background =
+    "url('sweety-girly.png') center center / cover no-repeat fixed";
+  snow.style.display = 'none';
 
   } else { // default
     document.body.style.backgroundImage="url('Photoroom_20251212_143703.PNG')";
