@@ -464,22 +464,33 @@ function setTheme(theme){
   if(theme==='noel'){
     document.body.style.backgroundImage="url('noel.png')";
     snow.style.display='block';
-  }else{
+
+  } else if(theme==='sweety'){
+    document.body.style.backgroundImage="url('sweety-girly.png')";
+    snow.style.display='none';
+
+  } else { // default
     document.body.style.backgroundImage="url('Photoroom_20251212_143703.PNG')";
     snow.style.display='none';
   }
+
   refreshThemeBorders();
 }
 
 /* BORDURES */
 function refreshThemeBorders(){
-  const isNoel=snow.style.display==='block';
   document.querySelectorAll('.visitor-item img').forEach(img=>{
-    if(isNoel){
+    if(document.body.style.backgroundImage.includes('noel')){
       img.style.border="6px solid";
       img.style.borderImage="repeating-linear-gradient(45deg, red 0 10px, white 0 20px) 10";
       img.style.background='none';
-    }else{
+
+    } else if(document.body.style.backgroundImage.includes('sweety')){
+      img.style.border="4px solid #ffb6c1";
+      img.style.background="#fff0f7";
+      img.style.borderImage='';
+
+    } else {
       img.style.border="4px solid #b67385";
       img.style.background='#ffe6f0';
       img.style.borderImage='';
