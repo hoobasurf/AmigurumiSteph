@@ -45,10 +45,10 @@ header img{width:98px;height:98px;border-radius:20%;margin:auto}
   align-items:center;
   padding-top:300px;
 }
-#visitor-list{width:100%;max-width:1200px}
+#visitor-list{width:100%;max-width:1200px;display:flex;flex-wrap:wrap;gap:10px}
 
 /* ITEMS */
-.visitor-item{text-align:center;cursor:pointer}
+.visitor-item{text-align:center;cursor:pointer;position:relative}
 .visitor-item img{
   width:220px;
   height:220px;
@@ -113,26 +113,6 @@ header img{width:98px;height:98px;border-radius:20%;margin:auto}
   z-index:5;
   display:none;
 }
-
-/* THEME MODAL */
-.modal-bg{
-  position:fixed;
-  inset:0;
-  background:rgba(0,0,0,.65);
-  display:none;
-  justify-content:center;
-  align-items:center;
-  z-index:1000;
-}
-.modal-box{
-  background:rgba(255,228,235,0.95);
-  border:4px solid #b67385;
-  border-radius:18px;
-  padding:18px;
-  max-width:400px;
-  width:90%;
-  text-align:center;
-}
 </style>
 </head>
 
@@ -156,7 +136,6 @@ header img{width:98px;height:98px;border-radius:20%;margin:auto}
 <div id="sidebar">
   <div id="toggleSidebar">☰</div>
 
-  <!-- AJOUT FORMULAIRE -->
   <hr>
   <h3 style="text-align:center;color:#8b3a3a;margin-bottom:10px;">Ajouter une création</h3>
 
@@ -164,7 +143,6 @@ header img{width:98px;height:98px;border-radius:20%;margin:auto}
   <input id="photo" type="file" accept="image/*" style="width:100%;margin-bottom:10px;">
   <button id="add">Ajouter</button>
   <hr>
-  <!-- FIN AJOUT -->
 
   <button onclick="openThemeModal()">Thème</button>
   <button>Vidéos</button>
@@ -186,61 +164,67 @@ header img{width:98px;height:98px;border-radius:20%;margin:auto}
 </div>
 
 <script>
-const sidebar=document.getElementById('sidebar');
-const toggleSidebar=document.getElementById('toggleSidebar');
-toggleSidebar.onclick=()=>sidebar.classList.toggle('sidebar-open');
+const sidebar = document.getElementById('sidebar');
+const toggleSidebar = document.getElementById('toggleSidebar');
+toggleSidebar.onclick = () => sidebar.classList.toggle('sidebar-open');
+
+/* NEIGE */
+const snow = document.getElementById('snow');
+function createSnow(){
+  if(snow.style.display==='none') return;
+  const f=document.createElement('div');
+  f.textContent='❄';
+  f.style.position='absolute';
+  f.style.top='-30px';
+  f.style.left=Math.random()*innerWidth+'px';
+  f.style.fontSize=(Math.random()*20+10)+'px';
+  f.style.opacity=Math.random();
+  snow.appendChild(f);
+  const fall=setInterval(()=>{
+    f.style.top=parseFloat(f.style.top)+3+'px';
+    if(parseFloat(f.style.top)>innerHeight){f.remove();clearInterval(fall);}
+  },20);
+}
+setInterval(createSnow,150);
 
 /* THEME */
-const snow = document.getElementById('snow');
 const themeModal = document.getElementById('themeModal');
-
-function openThemeModal() {
-  themeModal.style.display = 'flex';
-}
-
-function closeThemeModal(e) {
-  if(e.target === themeModal || e.target.tagName === 'BUTTON') {
-    themeModal.style.display = 'none';
-  }
-}
-
 const sweetRain = document.createElement('div');
-sweetRain.id = 'sweetRain';
-sweetRain.style.position = 'fixed';
-sweetRain.style.inset = '0';
-sweetRain.style.pointerEvents = 'none';
-sweetRain.style.zIndex = '5';
-sweetRain.style.display = 'none';
+sweetRain.id='sweetRain';
+sweetRain.style.position='fixed';
+sweetRain.style.inset='0';
+sweetRain.style.pointerEvents='none';
+sweetRain.style.zIndex='5';
+sweetRain.style.display='none';
 document.body.appendChild(sweetRain);
+
+function openThemeModal() { themeModal.style.display='flex'; }
+function closeThemeModal(e){ if(e.target===themeModal || e.target.tagName==='BUTTON'){ themeModal.style.display='none'; } }
 
 function createSweet(){
   if(sweetRain.style.display==='none') return;
   const candy = document.createElement('div');
-  candy.textContent = '🍬';
-  candy.style.position = 'absolute';
-  candy.style.top = '-30px';
-  candy.style.left = Math.random() * innerWidth + 'px';
-  candy.style.fontSize = (Math.random()*24+16) + 'px';
-  candy.style.opacity = Math.random() * 0.8 + 0.3;
+  candy.textContent='🍬';
+  candy.style.position='absolute';
+  candy.style.top='-30px';
+  candy.style.left=Math.random()*innerWidth+'px';
+  candy.style.fontSize=(Math.random()*24+16)+'px';
+  candy.style.opacity=Math.random()*0.8+0.3;
   sweetRain.appendChild(candy);
-  
-  const fall = setInterval(() => {
-    candy.style.top = parseFloat(candy.style.top) + (Math.random()*3+2) + 'px';
-    candy.style.left = parseFloat(candy.style.left) + Math.sin(Date.now()/200)*1.5 + 'px';
-    if(parseFloat(candy.style.top) > innerHeight){
-      candy.remove();
-      clearInterval(fall);
-    }
-  }, 20);
+  const fall = setInterval(()=>{
+    candy.style.top=parseFloat(candy.style.top)+(Math.random()*3+2)+'px';
+    candy.style.left=parseFloat(candy.style.left)+Math.sin(Date.now()/200)*1.5+'px';
+    if(parseFloat(candy.style.top)>innerHeight){ candy.remove(); clearInterval(fall);}
+  },20);
 }
-setInterval(createSweet, 150);
+setInterval(createSweet,150);
 
 function setTheme(theme){
   if(theme==='noel'){
     document.body.style.backgroundImage="url('noel.png')";
     snow.style.display='block';
     sweetRain.style.display='none';
-  } else if(theme === 'sweety'){
+  } else if(theme==='sweety'){
     document.body.style.background="url('sweety-girly.png') center center / cover no-repeat fixed";
     snow.style.display='none';
     sweetRain.style.display='block';
@@ -249,7 +233,7 @@ function setTheme(theme){
     snow.style.display='none';
     sweetRain.style.display='none';
   }
-
+  // Bordures images
   document.querySelectorAll('.visitor-item img').forEach(img=>{
     if(document.body.style.backgroundImage.includes('noel')){
       img.style.border="6px solid";
@@ -266,6 +250,42 @@ function setTheme(theme){
     }
   });
 }
+
+/* AJOUT CREATION */
+const nameInput = document.getElementById('name');
+const photoInput = document.getElementById('photo');
+const addBtn = document.getElementById('add');
+const list = document.getElementById('visitor-list');
+
+let creations = JSON.parse(localStorage.getItem('creations')||'[]');
+
+function renderCreations(){
+  list.innerHTML='';
+  creations.forEach(item=>{
+    const div = document.createElement('div');
+    div.className='visitor-item';
+    div.innerHTML=`<p>${item.name}</p><img src="${item.imgUrl}">`;
+    list.appendChild(div);
+  });
+}
+
+addBtn.onclick = () => {
+  const name = nameInput.value.trim();
+  const file = photoInput.files[0];
+  if(!name || !file){ alert("Merci de remplir le nom et choisir une photo !"); return; }
+
+  const reader = new FileReader();
+  reader.onload = (e)=>{
+    const imgUrl = e.target.result;
+    creations.unshift({name,imgUrl});
+    localStorage.setItem('creations',JSON.stringify(creations));
+    renderCreations();
+    nameInput.value=''; photoInput.value='';
+  };
+  reader.readAsDataURL(file);
+};
+
+renderCreations();
 </script>
 
 </body>
