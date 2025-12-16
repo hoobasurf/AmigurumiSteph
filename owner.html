@@ -292,6 +292,38 @@ header img{width:98px;height:98px;border-radius:20%;margin:auto}
   }
 }
 
+/* Noël : guirlande qui clignote */
+.visitor-item.noel img {
+  border: 6px solid;
+  border-image: repeating-linear-gradient(45deg, red 0 10px, white 0 20px) 10;
+  animation: blinkGuirlande 1s infinite;
+  background: none;
+}
+@keyframes blinkGuirlande {
+  0%, 50%, 100% { opacity: 1; }
+  25%, 75% { opacity: 0.4; }
+}
+
+/* Sweety-Girly : bordure rose scintillante */
+.visitor-item.sweety img {
+  border: 4px solid #ffb6c1;
+  box-shadow: 0 0 10px #ffb6c1, 0 0 20px #ff69b4, 0 0 30px #ffb6c1;
+  animation: glitter 1.5s infinite alternate;
+}
+@keyframes glitter {
+  from { box-shadow: 0 0 5px #ffb6c1, 0 0 10px #ff69b4, 0 0 15px #ffb6c1; }
+  to   { box-shadow: 0 0 15px #ffb6c1, 0 0 25px #ff69b4, 0 0 35px #ffb6c1; }
+}
+
+/* Default : pattes de chat */
+.visitor-item.default img {
+  border: 4px solid #b67385;
+  background-image: url('cat-paw.png');
+  background-size: 30px 30px;
+  background-repeat: repeat;
+}
+
+  
 </style>
 </head>
 <body>
