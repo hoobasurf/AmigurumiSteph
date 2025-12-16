@@ -20,8 +20,9 @@ header img{width:98px;height:98px;border-radius:20%;margin:auto}
 .title{
   display:none;
 }
-
+  
 /* BOUTONS VUE */
+
 #viewSelector button{
   position:relative;
   top:300px;
@@ -33,10 +34,12 @@ header img{width:98px;height:98px;border-radius:20%;margin:auto}
   cursor:pointer;
 }
 
+  
 #viewSelector{
   display:flex;
   justify-content:center;
   gap:16px;
+
   margin-top:205px;   /* ⬅️ DESCEND LES BOUTONS */
   margin-bottom:0;
 }
@@ -65,35 +68,6 @@ header img{width:98px;height:98px;border-radius:20%;margin:auto}
   font-size:20px;
   color:#b84c6f;
   font-weight:bold;
-}
-
-/* BORDURES ANIMEES THEMES */
-.visitor-item.noel img {
-  border:4px solid;
-  box-shadow: 0 0 5px red,0 0 10px green,0 0 15px gold;
-  animation: guirlande 2s infinite alternate;
-}
-@keyframes guirlande {
-  0% { box-shadow: 0 0 5px red,0 0 10px green,0 0 15px gold; }
-  50% { box-shadow: 0 0 10px green,0 0 15px red,0 0 20px gold; }
-  100% { box-shadow: 0 0 5px gold,0 0 10px red,0 0 15px green; }
-}
-
-.visitor-item.sweety img {
-  border:4px solid #ffb6c1;
-  box-shadow: 0 0 5px #fff0f7, 0 0 10px #ff69b4;
-  animation: glitter 1.5s infinite alternate;
-}
-@keyframes glitter {
-  0% { box-shadow: 0 0 5px #fff0f7, 0 0 10px #ff69b4; }
-  50% { box-shadow: 0 0 10px #ffb6c1, 0 0 15px #ff69b4; }
-  100% { box-shadow: 0 0 5px #fff0f7, 0 0 10px #ff69b4; }
-}
-
-.visitor-item.default img {
-  border:4px solid #b67385;
-  border-image: url('pattes.png') 30 repeat;
-  box-shadow:0 0 3px #b67385;
 }
 
 /* VUES */
@@ -291,7 +265,7 @@ header img{width:98px;height:98px;border-radius:20%;margin:auto}
     margin-bottom:8px;
   }
 }
-
+  
 </style>
 </head>
 <body>
@@ -448,15 +422,19 @@ function loadComments(){
 function openLikeModal(){likeFormBg.style.display='flex'}
 function submitLike(){
   const name = document.getElementById('likeName').value.trim();
+
   if(!name){
     alert("Merci d'indiquer ton prénom ❤️");
     return;
   }
+
   const key = 'likes_' + currentIndex;
   let likes = JSON.parse(localStorage.getItem(key) || '[]');
+
   if(!likes.includes(name)){
     likes.push(name);
   }
+
   localStorage.setItem(key, JSON.stringify(likes));
   likeFormBg.style.display = 'none';
   loadLikes();
@@ -482,31 +460,70 @@ const themeModal=document.getElementById('themeModal');
 function openThemeModal(){themeModal.style.display='flex'}
 function closeThemeModal(e){if(e.target===themeModal||e.target.tagName==='BUTTON') themeModal.style.display='none'}
 
+/* SWEETY-GIRLY RAIN */
+const sweetRain = document.createElement('div');
+sweetRain.style.position = 'fixed';
+sweetRain.style.inset = '0';
+sweetRain.style.pointerEvents = 'none';
+sweetRain.style.zIndex = '5';
+sweetRain.style.display = 'none';
+document.body.appendChild(sweetRain);
+
+function createSweet(){
+  if(sweetRain.style.display==='none') return;
+  const candy = document.createElement('div');
+  candy.textContent = '🍬'; // tu peux remplacer par 🍭
+  candy.style.position = 'absolute';
+  candy.style.top = '-30px';
+  candy.style.left = Math.random() * innerWidth + 'px';
+  candy.style.fontSize = (Math.random()*24+16) + 'px';
+  candy.style.opacity = Math.random() * 0.8 + 0.3;
+  sweetRain.appendChild(candy);
+  
+  const fall = setInterval(() => {
+    candy.style.top = parseFloat(candy.style.top) + (Math.random()*3+2) + 'px';
+    candy.style.left = parseFloat(candy.style.left) + Math.sin(Date.now()/200)*1.5 + 'px';
+    if(parseFloat(candy.style.top) > innerHeight){
+      candy.remove();
+      clearInterval(fall);
+    }
+  }, 20);
+}
+setInterval(createSweet, 150);
+
 function setTheme(theme){
   if(theme==='noel'){
     document.body.style.backgroundImage="url('noel.png')";
     snow.style.display='block';
+    sweetRain.style.display='none';
   } else if(theme === 'sweety'){
     document.body.style.background =
       "url('sweety-girly.png') center center / cover no-repeat fixed";
     snow.style.display = 'none';
+    sweetRain.style.display = 'block';
   } else { // default
     document.body.style.backgroundImage="url('Photoroom_20251212_143703.PNG')";
     snow.style.display='none';
+    sweetRain.style.display = 'none';
   }
   refreshThemeBorders();
 }
 
 /* BORDURES */
 function refreshThemeBorders(){
-  document.querySelectorAll('.visitor-item').forEach(el=>{
-    el.classList.remove('noel','sweety','default');
+  document.querySelectorAll('.visitor-item img').forEach(img=>{
     if(document.body.style.backgroundImage.includes('noel')){
-      el.classList.add('noel');
+      img.style.border="6px solid";
+      img.style.borderImage="repeating-linear-gradient(45deg, red 0 10px, white 0 20px) 10";
+      img.style.background='none';
     } else if(document.body.style.backgroundImage.includes('sweety')){
-      el.classList.add('sweety');
+      img.style.border="4px solid #ffb6c1";
+      img.style.background="#fff0f7";
+      img.style.borderImage='';
     } else {
-      el.classList.add('default');
+      img.style.border="4px solid #b67385";
+      img.style.background='#ffe6f0';
+      img.style.borderImage='';
     }
   });
 }
