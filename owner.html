@@ -104,6 +104,35 @@ header img{width:98px;height:98px;border-radius:20%;margin:auto}
   font-weight:bold;
   cursor:pointer;
 }
+
+/* NEIGE */
+.snow{
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  z-index:5;
+  display:none;
+}
+
+/* THEME MODAL */
+.modal-bg{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.65);
+  display:none;
+  justify-content:center;
+  align-items:center;
+  z-index:1000;
+}
+.modal-box{
+  background:rgba(255,228,235,0.95);
+  border:4px solid #b67385;
+  border-radius:18px;
+  padding:18px;
+  max-width:400px;
+  width:90%;
+  text-align:center;
+}
 </style>
 </head>
 
@@ -129,35 +158,31 @@ header img{width:98px;height:98px;border-radius:20%;margin:auto}
 
   <!-- AJOUT FORMULAIRE -->
   <hr>
+  <h3 style="text-align:center;color:#8b3a3a;margin-bottom:10px;">Ajouter une création</h3>
 
-  <h3 style="text-align:center;color:#8b3a3a;margin-bottom:10px;">
-    Ajouter une création
-  </h3>
-
-  <input
-    id="name"
-    placeholder="Nom de la création"
-    style="width:100%;margin-bottom:8px;padding:8px;border-radius:8px;border:1px solid #b67385;"
-  >
-
-  <input
-    id="photo"
-    type="file"
-    accept="image/*"
-    style="width:100%;margin-bottom:10px;"
-  >
-
+  <input id="name" placeholder="Nom de la création" style="width:100%;margin-bottom:8px;padding:8px;border-radius:8px;border:1px solid #b67385;">
+  <input id="photo" type="file" accept="image/*" style="width:100%;margin-bottom:10px;">
   <button id="add">Ajouter</button>
-
   <hr>
   <!-- FIN AJOUT -->
 
-  <button>Thème</button>
+  <button onclick="openThemeModal()">Thème</button>
   <button>Vidéos</button>
   <button>Mailles</button>
   <button>Pelotes</button>
   <button>Notes</button>
   <button>Paramètres</button>
+</div>
+
+<!-- THEME MODAL -->
+<div class="modal-bg" id="themeModal" onclick="closeThemeModal(event)">
+  <div class="modal-box" onclick="event.stopPropagation()">
+    <h3>Choisir un thème</h3>
+    <button onclick="setTheme('noel')">🎄 Noël</button>
+    <button onclick="setTheme('default')">💠 Défaut</button>
+    <button onclick="setTheme('sweety')">🌸 Sweety-Girly</button>
+    <button onclick="closeThemeModal(event)">✕ Fermer</button>
+  </div>
 </div>
 
 <script>
@@ -179,34 +204,52 @@ function closeThemeModal(e) {
   }
 }
 
-function setTheme(theme) {
-  const sweetRain = document.getElementById('sweetRain') || (() => {
-    const div = document.createElement('div');
-    div.id = 'sweetRain';
-    div.style.position = 'fixed';
-    div.style.inset = '0';
-    div.style.pointerEvents = 'none';
-    div.style.zIndex = '5';
-    div.style.display = 'none';
-    document.body.appendChild(div);
-    return div;
-  })();
+const sweetRain = document.createElement('div');
+sweetRain.id = 'sweetRain';
+sweetRain.style.position = 'fixed';
+sweetRain.style.inset = '0';
+sweetRain.style.pointerEvents = 'none';
+sweetRain.style.zIndex = '5';
+sweetRain.style.display = 'none';
+document.body.appendChild(sweetRain);
 
-  if(theme === 'noel'){
-    document.body.style.backgroundImage = "url('noel.png')";
-    snow.style.display = 'block';
-    sweetRain.style.display = 'none';
+function createSweet(){
+  if(sweetRain.style.display==='none') return;
+  const candy = document.createElement('div');
+  candy.textContent = '🍬';
+  candy.style.position = 'absolute';
+  candy.style.top = '-30px';
+  candy.style.left = Math.random() * innerWidth + 'px';
+  candy.style.fontSize = (Math.random()*24+16) + 'px';
+  candy.style.opacity = Math.random() * 0.8 + 0.3;
+  sweetRain.appendChild(candy);
+  
+  const fall = setInterval(() => {
+    candy.style.top = parseFloat(candy.style.top) + (Math.random()*3+2) + 'px';
+    candy.style.left = parseFloat(candy.style.left) + Math.sin(Date.now()/200)*1.5 + 'px';
+    if(parseFloat(candy.style.top) > innerHeight){
+      candy.remove();
+      clearInterval(fall);
+    }
+  }, 20);
+}
+setInterval(createSweet, 150);
+
+function setTheme(theme){
+  if(theme==='noel'){
+    document.body.style.backgroundImage="url('noel.png')";
+    snow.style.display='block';
+    sweetRain.style.display='none';
   } else if(theme === 'sweety'){
-    document.body.style.background = "url('sweety-girly.png') center center / cover no-repeat fixed";
-    snow.style.display = 'none';
-    sweetRain.style.display = 'block';
-  } else { // default
-    document.body.style.backgroundImage = "url('Photoroom_20251212_143703.PNG')";
-    snow.style.display = 'none';
-    sweetRain.style.display = 'none';
+    document.body.style.background="url('sweety-girly.png') center center / cover no-repeat fixed";
+    snow.style.display='none';
+    sweetRain.style.display='block';
+  } else {
+    document.body.style.backgroundImage="url('Photoroom_20251212_143703.PNG')";
+    snow.style.display='none';
+    sweetRain.style.display='none';
   }
 
-  // Met à jour les bordures des images
   document.querySelectorAll('.visitor-item img').forEach(img=>{
     if(document.body.style.backgroundImage.includes('noel')){
       img.style.border="6px solid";
@@ -223,7 +266,6 @@ function setTheme(theme) {
     }
   });
 }
-
 </script>
 
 </body>
