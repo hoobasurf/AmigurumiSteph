@@ -2,80 +2,15 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<title>Galerie - Mes créations</title>
 <style>
-  * { box-sizing:border-box; margin:0; padding:0; }
-  html, body { height:100%; font-family:'Comic Sans MS', cursive; }
-  body {
-    background-image: url('Photoroom_20251212_143703.png');
-    background-size: cover; 
-    background-position: center top;
-    background-repeat: no-repeat;
-    background-attachment: fixed;
-    display:flex;
-    flex-direction:column;
-    min-height:100vh;
-    overflow-x:hidden;
-  }
-  header { text-align:center; padding:12px 0; }
-  header img { width:98px; height:98px; border-radius:20%; display:block; margin:0 auto; }
-  .title { font-size:42px; color:#b84c6f; font-weight:bold; letter-spacing:1px; margin-bottom:12px; }
-  #viewSelector { display:flex; justify-content:center; gap:12px; margin-bottom:14px; }
-  #viewSelector button {
-    background:#fff0f7; border:2px solid #b84c6f; color:#b84c6f; padding:8px 16px; border-radius:24px; cursor:pointer;
-    font-size:15px; transition: all 0.18s ease;
-  }
-  #viewSelector button.active { background:linear-gradient(90deg,#ffeaf2,#fff5f8); color:#7a2b45; transform:translateY(-2px); }
-  #viewSelector button:hover { transform:translateY(-2px); }
-
-  .center-zone { flex:1; display:flex; align-items:center; justify-content:center; padding:8px; }
-  #visitor-list { width:calc(100% - 40px); max-width:1200px; margin:0 auto; transition:all 0.2s ease; }
-
-  .visitor-item { text-align:center; cursor:pointer; user-select:none; }
-  .visitor-item img { display:block; margin:0 auto; object-fit:contain; border:4px solid #b67385; background:transparent; transition: box-shadow 0.3s ease, transform 0.3s ease; }
-  .visitor-item:hover img { box-shadow: 0 8px 20px rgba(184,76,111,0.3); transform: scale(1.03); }
-  .visitor-item p { margin:8px 0 0; font-size:20px; color:#b84c6f; font-weight:bold; line-height:1.1; }
-
-  .carousel-view { display:flex; gap:40px; overflow-x:auto; scroll-behavior:smooth; padding:10px; align-items:center; }
-  .carousel-view::-webkit-scrollbar { height:8px; }
-  .carousel-view::-webkit-scrollbar-thumb { background:#b84c6f66; border-radius:20px; }
-  .carousel-view .visitor-item img { width:260px; height:260px; }
-
-  .grid-view { display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:24px; padding:16px; max-height:68vh; overflow-y:auto; }
-  .grid-view .visitor-item img { width:100%; height:200px; }
-
-  .list-view { display:flex; flex-direction:column; gap:18px; padding:16px; max-height:68vh; overflow-y:auto; }
-  .list-view .visitor-item { display:flex; gap:18px; align-items:center; padding:8px; }
-  .list-view .visitor-item img { width:140px; height:140px; }
-  .list-view .visitor-item p { margin:0; font-size:18px; text-align:left; }
-
-  .modal-bg { position:fixed; inset:0; background: rgba(0,0,0,0.65); display:none; justify-content:center; align-items:center; z-index:1000; padding:20px; }
-  .modal-box { background:#fff5f8; border-radius:16px; padding:18px; max-width:980px; width:94%; max-height:90vh; overflow-y:auto; box-shadow:0 8px 30px rgba(184,76,111,0.25); text-align:center; position:relative; cursor:default; }
-  .close-modal { position:absolute; top:10px; right:12px; font-size:28px; cursor:pointer; color:#b84c6f; font-weight:bold; }
-  .modal-main-img { width:100%; max-height:520px; object-fit:contain; border:4px solid #b67385; background:white; }
-
-  .thumbs { margin-top:16px; display:flex; gap:12px; justify-content:center; flex-wrap:wrap; }
-  .thumbs img { width:110px; height:110px; object-fit:contain; border:4px solid #b67385; background:transparent; cursor:pointer; transition: transform 0.2s ease, box-shadow 0.2s ease; }
-  .thumbs img:hover { transform:scale(1.06); box-shadow:0 6px 14px rgba(184,76,111,0.3); }
-
-  .icon-bar { margin-top:12px; display:flex; justify-content:center; gap:36px; align-items:center; }
-  .icon-btn { display:flex; gap:8px; align-items:center; cursor:pointer; color:#b84c6f; font-size:18px; }
-  .heart { font-size:26px; transition: color .18s; }
-  .heart.liked { color:#ff4b82; }
-  .like-info { font-size:14px; color:#7a2b45; margin-left:6px; }
-  .comment-info { font-size:14px; color:#7a2b45; margin-left:6px; }
-
-  .comment-section { margin-top:14px; text-align:left; }
-  .comment { background:#fff0f7; border:1px solid rgba(184,76,111,0.12); padding:10px; border-radius:10px; margin-bottom:10px; }
-  .add-comment-btn { margin-top:12px; padding:10px 20px; background:#b84c6f; color:#fff; border-radius:26px; font-size:16px; border:none; cursor:pointer; }
-  .comment-form-bg { position: fixed; inset:0; background: rgba(0,0,0,0.6); display:none; justify-content:center; align-items:center; z-index:2000; }
-  .comment-form { background:white; padding:18px; border-radius:12px; width:340px; box-shadow:0 8px 20px rgba(0,0,0,0.25); text-align:center; }
-  .comment-form input, .comment-form textarea { width:100%; padding:10px; border-radius:8px; border:2px solid rgba(184,76,111,0.12); margin-bottom:10px; font-size:15px; }
+/* … tout ton CSS existant … */
 </style>
 </head>
 <body>
+
+<div id="snow" class="snow"></div>
+
 <header>
-  <img src="favicon.png" alt="Logo">
   <h1 class="title">Mes créations</h1>
 </header>
 
@@ -86,50 +21,74 @@
 </div>
 
 <div class="center-zone">
-  <div id="visitor-list" role="list"></div>
+  <div id="visitor-list"></div>
 </div>
 
-<!-- ====================== BOUTON AJOUTER PHOTO ====================== -->
-<div id="addPhotoContainer" style="margin:16px 0; text-align:center;">
-  <button id="btnAddPhoto" style="padding:8px 16px; background:#b84c6f; color:white; border:none; border-radius:24px; cursor:pointer; font-size:16px;">
-    Ajouter photo
-  </button>
-  <input type="file" id="fileInput" accept="image/*" style="display:none;" />
-</div>
-
-<div class="modal-bg" id="modal" onclick="if(event.target===this) closeModal()">
-  <div class="modal-box">
+<!-- MODAL IMAGE -->
+<div class="modal-bg" id="modal" onclick="closeModal()">
+  <div class="modal-box" onclick="event.stopPropagation()">
     <div class="close-modal" onclick="closeModal()">×</div>
-    <img id="modalMain" class="modal-main-img" alt="Image agrandie">
+    <img id="modalMain" class="modal-main-img">
+    <button id="modalBackBtn" onclick="closeModal()">← Retour</button>
     <div class="icon-bar">
-      <div class="icon-btn" onclick="toggleLike()">
-        <span id="heart" class="heart">♡</span>
-        <span id="likeCount" class="like-info">0</span>
+      <div class="icon-btn" onclick="openLikeModal()">
+        <span class="heart" id="heart">♡</span>
+        <span id="likeCount">0</span>
       </div>
-      <div class="icon-btn" onclick="scrollToComments()">
-        💬 <span id="commentCount" class="comment-info">0</span>
+      <div class="icon-btn" onclick="openCommentForm()">💬
+        <span id="commentCount">0</span>
       </div>
     </div>
-    <div id="thumbsContainer" class="thumbs"></div>
-    <button class="add-comment-btn" onclick="openCommentForm()">Ajouter un commentaire</button>
     <div id="commentsList" class="comment-section"></div>
   </div>
 </div>
 
-<div class="comment-form-bg" id="commentFormBg" onclick="if(event.target===this) closeCommentForm()">
-  <div class="comment-form">
-    <h3 style="margin-top:0;color:#b84c6f">Laisser un commentaire</h3>
-    <input id="commentName" placeholder="Prénom" />
-    <textarea id="commentText" rows="4" placeholder="Votre commentaire..."></textarea>
+<!-- FORM COMMENT -->
+<div class="form-modal-bg" id="commentFormBg" onclick="if(event.target===commentFormBg) commentFormBg.style.display='none'">
+  <div class="form-modal" onclick="event.stopPropagation()">
+    <input id="commentName" placeholder="Prénom">
+    <textarea id="commentText" rows="4" placeholder="Commentaire"></textarea>
     <button onclick="submitComment()">Envoyer</button>
   </div>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
+<!-- FORM LIKE -->
+<div class="form-modal-bg" id="likeFormBg" onclick="if(event.target===likeFormBg) likeFormBg.style.display='none'">
+  <div class="form-modal" onclick="event.stopPropagation()">
+    <input id="likeName" placeholder="Ton prénom">
+    <button onclick="submitLike()">J'aime</button>
+  </div>
+</div>
+
+<!-- SIDEBAR -->
+<div id="sidebar">
+  <div id="toggleSidebar">☰</div>
+  <button onclick="openThemeModal()">Thème</button>
+
+  <!-- AJOUT PHOTO -->
+  <button onclick="openAddPhoto()">➕ Ajouter une photo</button>
+  <input type="file" id="addPhotoInput" accept="image/*" style="display:none" onchange="uploadPhoto(this)">
+  
+  <button>Vidéos</button>
+  <button>Mailles</button>
+  <button>Pelotes</button>
+  <button>Notes</button>
+</div>
+
+<!-- THEME MODAL -->
+<div class="modal-bg" id="themeModal" onclick="closeThemeModal(event)">
+  <div class="modal-box" onclick="event.stopPropagation()">
+    <h3>Choisir un thème</h3>
+    <button onclick="setTheme('noel')">🎄 Noël</button>
+    <button onclick="setTheme('default')">💠 Défaut</button>
+    <button onclick="closeThemeModal(event)">✕ Fermer</button>
+    <button onclick="setTheme('sweety')">🌸 Sweety-Girly</button>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
 <script>
-const SUPABASE_URL = "https://iubbxvipgofxasatmvzg.supabase.co";
-const SUPABASE_ANON_KEY = "sb_publishable_GDoZmwIdoP28XOdrfYYVNw_E_HiCQB1";
-const supabase = supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 const list=document.getElementById('visitor-list');
 const modal=document.getElementById('modal');
 const modalMain=document.getElementById('modalMain');
@@ -160,10 +119,7 @@ function render(){
 btnCarousel.onclick=()=>setView('carousel');
 btnGrid.onclick=()=>setView('grid');
 btnList.onclick=()=>setView('list');
-function setView(v){
-  currentView=v;
-  render();
-}
+function setView(v){ currentView=v; render(); }
 
 /* MODAL */
 function openModal(i){
@@ -198,59 +154,105 @@ function loadComments(){
 function openLikeModal(){likeFormBg.style.display='flex'}
 function submitLike(){
   const name = document.getElementById('likeName').value.trim();
+  if(!name){ alert("Merci d'indiquer ton prénom ❤️"); return; }
+  const key = 'likes_' + currentIndex;
+  let likes = JSON.parse(localStorage.getItem(key) || '[]');
+  if(!likes.includes(name)) likes.push(name);
+  localStorage.setItem(key, JSON.stringify(likes));
+  likeFormBg.style.display = 'none';
+  loadLikes();
+}
+function loadLikes(){
+  const key='likes_'+currentIndex;
+  const likes=JSON.parse(localStorage.getItem(key)||'[]');
+  const heart=document.getElementById('heart');
+  const likeCount=document.getElementById('likeCount');
+  heart.textContent=likes.length?'❤️':'♡';
+  heart.classList.toggle('liked',likes.length>0);
+  likeCount.textContent=likes.length?likes.length+' · '+likes.join(', '):'0';
 }
 
-/* ====================== AJOUT PHOTO SUPABASE ====================== */
-const btnAddPhoto = document.getElementById('btnAddPhoto');
-const fileInput = document.getElementById('fileInput');
+/* SIDEBAR */
+const sidebar=document.getElementById('sidebar');
+const toggleSidebar=document.getElementById('toggleSidebar');
+toggleSidebar.onclick=()=>sidebar.classList.toggle('sidebar-open');
 
-// Clic sur le bouton → ouvre le sélecteur de fichier
-btnAddPhoto.addEventListener('click', () => fileInput.click());
+/* THEME */
+const snow=document.getElementById('snow');
+const themeModal=document.getElementById('themeModal');
+function openThemeModal(){themeModal.style.display='flex'}
+function closeThemeModal(e){if(e.target===themeModal||e.target.tagName==='BUTTON') themeModal.style.display='none'}
 
-// Quand un fichier est choisi
-fileInput.addEventListener('change', async (event) => {
-  const file = event.target.files[0];
-  if (!file) return;
+/* SWEETY-GIRLY RAIN */
+const sweetRain = document.createElement('div');
+sweetRain.style.position = 'fixed';
+sweetRain.style.inset = '0';
+sweetRain.style.pointerEvents = 'none';
+sweetRain.style.zIndex = '5';
+sweetRain.style.display = 'none';
+document.body.appendChild(sweetRain);
 
-  try {
-    // Upload vers le bucket Supabase 'owners'
-    const fileName = `${Date.now()}_${file.name}`;
-    const { data, error } = await supabase
-      .storage
-      .from('owners')
-      .upload(fileName, file);
+function createSweet(){ /* ... ton code existant ... */ }
+setInterval(createSweet, 150);
+function setTheme(theme){ /* ... ton code existant ... */ }
+function refreshThemeBorders(){ /* ... ton code existant ... */ }
 
-    if (error) {
-      console.error("Erreur upload Supabase :", error.message);
-      alert("Erreur lors de l'envoi de la photo.");
-      return;
-    }
+/* NEIGE */
+function createSnow(){ /* ... ton code existant ... */ }
+setInterval(createSnow,150);
 
-    // Récupère l'URL publique
-    const { publicURL, error: urlError } = supabase
-      .storage
-      .from('owners')
-      .getPublicUrl(fileName);
+/* ================= SUPABASE ================= */
+const SUPABASE_URL = "https://iubbxvipgofxasatmvzg.supabase.co";
+const SUPABASE_ANON_KEY = "sb_publishable_GDoZmwIdoP28XOdrfYYVNw_E_HiCQB1";
+const supabaseClient = supabaseJs.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    if (urlError) {
-      console.error("Erreur récupération URL :", urlError.message);
-      return;
-    }
+/* ================= AJOUT PHOTO ================= */
+function openAddPhoto(){
+  document.getElementById('addPhotoInput').click();
+}
 
-    // Ajoute immédiatement la photo dans la page owner (creations)
-    creations.push({ name: fileName, imgUrl: publicURL });
-    render(); // Utilise ta fonction existante pour afficher
+async function uploadPhoto(input){
+  const file = input.files[0];
+  if(!file) return;
+  const fileName = Date.now() + "_" + file.name.replace(/\s+/g,'_');
 
-    // Réinitialise le input pour pouvoir renvoyer un fichier identique si besoin
-    fileInput.value = '';
+  const { error } = await supabaseClient
+    .storage
+    .from('owners')
+    .upload(fileName, file);
 
-    alert("Photo ajoutée avec succès ! Elle apparaîtra également sur visitor.html.");
+  if(error){ alert("Erreur upload"); console.error(error); return; }
 
-  } catch (err) {
-    console.error("Erreur inattendue :", err);
-    alert("Erreur lors de l'ajout de la photo.");
-  }
-});
+  // URL publique
+  const { data } = supabaseClient
+    .storage
+    .from('owners')
+    .getPublicUrl(fileName);
+
+  creations.push({ name: file.name, imgUrl: data.publicUrl });
+  localStorage.setItem('creations', JSON.stringify(creations));
+  render();
+  input.value = '';
+}
+
+/* ================= CHARGEMENT INITIAL SUPABASE ================= */
+async function loadSupabaseCreations(){
+  const { data, error } = await supabaseClient.storage.from('owners').list();
+  if(error){ console.error(error); return; }
+
+  const supaCreations = data.map(item=>{
+    const { publicUrl } = supabaseClient.storage.from('owners').getPublicUrl(item.name).data;
+    return { name: item.name, imgUrl: publicUrl };
+  });
+
+  // Merge avec localStorage
+  creations = [...supaCreations, ...creations];
+  render();
+}
+
+/* INIT */
+loadSupabaseCreations();
+render();
 </script>
 </body>
 </html>
