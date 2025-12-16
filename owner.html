@@ -265,12 +265,36 @@ header img{width:98px;height:98px;border-radius:20%;margin:auto}
     margin-bottom:8px;
   }
 }
+
+.sweet-rain{
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  z-index:5;
+  display:none;
+}
+
+.sweet-item{
+  position:absolute;
+  top:-40px;
+  animation: sweetFall linear forwards;
+}
+
+@keyframes sweetFall{
+  to{
+    transform: translateY(110vh) rotate(360deg);
+    opacity:0.9;
+  }
+}
+
   
 </style>
 </head>
 <body>
 
 <div id="snow" class="snow"></div>
+
+<div id="sweetRain" class="sweet-rain"></div>
 
 <header>
   <h1 class="title">Mes créations</h1>
@@ -475,6 +499,20 @@ function setTheme(theme){
     snow.style.display='none';
   }
 
+} else if(theme === 'sweety'){
+  document.body.style.background =
+    "url('sweety-girly.png') center center / cover no-repeat fixed";
+  snow.style.display = 'none';
+  sweetRain.style.display = 'block';
+
+} else {
+  document.body.style.background =
+    "url('Photoroom_20251212_143703.PNG') center center / cover no-repeat fixed";
+  snow.style.display = 'none';
+  sweetRain.style.display = 'none';
+}
+
+  
   refreshThemeBorders();
 }
 
@@ -517,6 +555,29 @@ function createSnow(){
 }
 setInterval(createSnow,150);
 
+const sweetRain = document.getElementById('sweetRain');
+const sweetIcons = ['🍬','🍭','💗','🍓','🧁'];
+
+function createSweet(){
+  if(sweetRain.style.display === 'none') return;
+
+  const s = document.createElement('div');
+  s.className = 'sweet-item';
+  s.textContent = sweetIcons[Math.floor(Math.random()*sweetIcons.length)];
+
+  s.style.left = Math.random() * innerWidth + 'px';
+  s.style.fontSize = (Math.random()*20 + 18) + 'px';
+  s.style.animationDuration = (Math.random()*4 + 5) + 's';
+  s.style.opacity = Math.random();
+
+  sweetRain.appendChild(s);
+
+  setTimeout(()=>s.remove(), 9000);
+}
+
+setInterval(createSweet, 350);
+
+  
 /* INIT */
 render();
 </script>
