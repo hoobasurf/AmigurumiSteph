@@ -1,3 +1,4 @@
+// ====================== VARIABLES EXISTANTES ======================
 const nameInput = document.getElementById('name');
 const photoInput = document.getElementById('photo');
 const addBtn = document.getElementById('add');
@@ -37,8 +38,7 @@ function compressImage(file, maxWidth = 900, quality = 0.8) {
   });
 }
 
-
-// --------- AFFICHAGE ----------
+// ====================== RENDER EXISTANT ======================
 function renderCreations() {
   list.innerHTML = "";
 
@@ -56,8 +56,7 @@ function renderCreations() {
   });
 }
 
-
-// --------- SUPPRESSION (fenêtre rose pastel) ----------
+// ====================== SUPPRESSION ======================
 function showDeletePopup(index) {
   const overlay = document.createElement("div");
   overlay.style = `
@@ -124,8 +123,7 @@ function showDeletePopup(index) {
   box.querySelector("#delNo").onclick = () => overlay.remove();
 }
 
-
-// --------- AJOUT ----------
+// ====================== AJOUT ======================
 addBtn.onclick = async () => {
   const name = nameInput.value.trim();
   const file = photoInput.files[0];
@@ -135,18 +133,22 @@ addBtn.onclick = async () => {
     return;
   }
 
+  // On compresse l'image pour stockage
   const imgUrl = await compressImage(file);
-  creations.unshift({ name, imgUrl });
 
+  // On ajoute en début de tableau
+  creations.unshift({ name, imgUrl });
   localStorage.setItem("creations", JSON.stringify(creations));
+
+  // On met à jour l'affichage
   renderCreations();
 
+  // Reset
   nameInput.value = "";
   photoInput.value = "";
 };
 
-
-// --------- CLIC SUR LA CROIX ----------
+// ====================== CLIC SUR LA CROIX ======================
 list.addEventListener("click", (e) => {
   if (e.target.classList.contains("delete-btn")) {
     const index = e.target.dataset.index;
@@ -154,16 +156,12 @@ list.addEventListener("click", (e) => {
   }
 });
 
-// --------- INIT ----------
+// ====================== INIT ======================
 renderCreations();
 
-
-// ====================== NOUVEAU POUR SIDEBAR & AFFICHAGE ======================
-
+// ====================== SIDEBAR EXISTANT ======================
 const sidebar = document.getElementById("sidebar");
 const toggle = document.getElementById("toggleSidebar");
-const displayModes = document.getElementById("display-modes");
-
 toggle.onclick = () => sidebar.classList.toggle("sidebar-open");
 
 // Modes d’affichage uniquement pour Mes Créations
