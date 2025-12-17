@@ -24,7 +24,7 @@ header img{width:98px;height:98px;border-radius:20%;margin:auto}
   display:flex;
   justify-content:center;
   gap:12px;
-  margin-top:500px;
+  margin-top:20px;
   margin-bottom:20px;
 }
 #viewSelector button{
@@ -70,7 +70,7 @@ header img{width:98px;height:98px;border-radius:20%;margin:auto}
 
 /* VUES */
 .carousel-view{
-  flex-wrap:nowrap;          /* ✅ FIX CARROUSEL */
+  flex-wrap:nowrap;
   overflow-x:auto;
   scroll-behavior:smooth;
 }
@@ -205,12 +205,9 @@ header img{width:98px;height:98px;border-radius:20%;margin:auto}
   100%{transform:translateY(110vh) rotate(360deg)}
 }
 
-/* OWNER BOX */
+/* FORMULAIRE AJOUT */
 .owner-box { margin:20px; }
 .owner-box input, .owner-box button { padding:10px; margin:5px; border-radius:8px; border:1px solid #ccc; }
-#owner-list { display:flex; flex-wrap:wrap; gap:10px; }
-.owner-item { background:#fff; padding:10px; border-radius:10px; box-shadow:0 0 5px #ccc; }
-.owner-item img { max-width:100px; border-radius:8px; display:block; }
 
 </style>
 </head>
@@ -218,15 +215,14 @@ header img{width:98px;height:98px;border-radius:20%;margin:auto}
 
 <div id="snow" class="snow"></div>
 
-<!-- Owner Box -->
+<!-- FORMULAIRE AJOUT -->
 <div class="owner-box">
   <input id="name" placeholder="Nom de la création">
   <input id="photo" type="file" accept="image/*">
   <button id="add">Ajouter</button>
 </div>
-<div id="owner-list"></div>
 
-<!-- VUE SELECTOR -->
+<!-- BOUTONS CARROUSEL / GRILLE / LISTE -->
 <div id="viewSelector">
   <button id="btnCarousel">Carrousel</button>
   <button id="btnGrid">Grille</button>
@@ -270,15 +266,6 @@ function renderCreations(){
     d.innerHTML=`<p>${c.name}</p><img src="${c.imgUrl}">`;
     list.appendChild(d);
   });
-
-  const ownerList = document.getElementById('owner-list');
-  ownerList.innerHTML='';
-  creations.forEach(c=>{
-    const d=document.createElement('div');
-    d.className='owner-item';
-    d.innerHTML=`<p>${c.name}</p><img src="${c.imgUrl}">`;
-    ownerList.appendChild(d);
-  });
 }
 
 function setView(v){
@@ -290,7 +277,7 @@ btnCarousel.onclick=()=>setView('carousel');
 btnGrid.onclick=()=>setView('grid');
 btnList.onclick=()=>setView('list');
 
-/* ✅ BOUTON AJOUTER – FONCTIONNEL */
+/* BOUTON AJOUTER */
 addBtn.onclick=()=>{
   const name=nameInput.value.trim();
   const file=photoInput.files[0];
@@ -340,7 +327,6 @@ function setTheme(t){
 /* SIDEBAR FIX */
 const sidebar = document.getElementById('sidebar');
 const toggleSidebar = document.getElementById('toggleSidebar');
-
 toggleSidebar.onclick = () => {
   sidebar.classList.toggle('sidebar-open');
 };
