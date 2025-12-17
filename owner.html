@@ -14,12 +14,18 @@ body{
   flex-direction:column;
 }
 
+/* HEADER */
+header{text-align:center;padding:12px 0}
+header img{width:98px;height:98px;border-radius:20%;margin:auto}
+.title{display:none}
+
 /* BOUTONS VUE */
 #viewSelector{
   display:flex;
   justify-content:center;
   gap:12px;
-  margin:10px 0;
+  margin-top:500px;
+  margin-bottom:20px;
 }
 #viewSelector button{
   background:#fff0f7;
@@ -28,6 +34,22 @@ body{
   padding:8px 16px;
   border-radius:24px;
   cursor:pointer;
+}
+
+/* CONTENU */
+.center-zone{
+  flex:1;
+  display:flex;
+  justify-content:center;
+  align-items:flex-start;
+  width:100%;
+  overflow:auto;
+}
+#visitor-list{
+  display:flex;
+  justify-content:center;
+  gap:16px;
+  max-width:1200px;
 }
 
 /* ITEMS */
@@ -44,6 +66,32 @@ body{
   font-size:20px;
   color:#b84c6f;
   font-weight:bold;
+}
+
+/* VUES */
+.carousel-view{
+  flex-wrap:nowrap;          /* ✅ FIX CARROUSEL */
+  overflow-x:auto;
+  scroll-behavior:smooth;
+}
+.carousel-view::-webkit-scrollbar{height:8px}
+.carousel-view::-webkit-scrollbar-thumb{background:#b84c6f88;border-radius:20px}
+
+.grid-view{
+  flex-wrap:wrap;
+}
+
+.list-view{
+  flex-direction:column;
+}
+.list-view .visitor-item{
+  display:flex;
+  align-items:center;
+  gap:16px;
+}
+.list-view .visitor-item img{
+  width:140px;
+  height:140px;
 }
 
 /* SIDEBAR */
@@ -87,7 +135,6 @@ body{
   font-weight:bold;
   cursor:pointer;
 }
-
 /* NEIGE */
 .snow{
   position:fixed;
@@ -125,6 +172,11 @@ body{
   font-weight:bold;
 }
 
+#sidebar,
+#sidebar * {
+  pointer-events: auto;
+}
+
 /* ❄️ FLOCONS */
 .snowflake{
   position:absolute;
@@ -134,6 +186,7 @@ body{
   animation: snowFall linear infinite;
   pointer-events:none;
 }
+
 @keyframes snowFall{
   0%{transform:translateY(0)}
   100%{transform:translateY(110vh)}
@@ -147,6 +200,7 @@ body{
   animation: candyFall linear infinite;
   pointer-events:none;
 }
+
 @keyframes candyFall{
   100%{transform:translateY(110vh) rotate(360deg)}
 }
@@ -158,14 +212,6 @@ body{
 .owner-item { background:#fff; padding:10px; border-radius:10px; box-shadow:0 0 5px #ccc; }
 .owner-item img { max-width:100px; border-radius:8px; display:block; }
 
-/* CENTER ZONE */
-.center-zone{
-  display:flex;
-  justify-content:center;
-  flex-wrap:wrap;
-  gap:16px;
-  margin-bottom:20px;
-}
 </style>
 </head>
 <body>
@@ -187,8 +233,10 @@ body{
   <button id="btnList">Liste</button>
 </div>
 
-<!-- VISITOR LIST (IMAGES EN HAUT UNIQUEMENT) -->
-<div class="center-zone" id="visitor-list"></div>
+<!-- VISITOR LIST -->
+<div class="center-zone">
+  <div id="visitor-list"></div>
+</div>
 
 <!-- SIDEBAR -->
 <div id="sidebar">
@@ -242,7 +290,7 @@ btnCarousel.onclick=()=>setView('carousel');
 btnGrid.onclick=()=>setView('grid');
 btnList.onclick=()=>setView('list');
 
-/* BOUTON AJOUTER */
+/* ✅ BOUTON AJOUTER – FONCTIONNEL */
 addBtn.onclick=()=>{
   const name=nameInput.value.trim();
   const file=photoInput.files[0];
@@ -292,6 +340,7 @@ function setTheme(t){
 /* SIDEBAR FIX */
 const sidebar = document.getElementById('sidebar');
 const toggleSidebar = document.getElementById('toggleSidebar');
+
 toggleSidebar.onclick = () => {
   sidebar.classList.toggle('sidebar-open');
 };
