@@ -45,10 +45,10 @@ header img{width:98px;height:98px;border-radius:20%;margin:auto}
   align-items:center;
   padding-top:300px;
 }
-#visitor-list{width:100%;max-width:1200px}
+#visitor-list{width:100%;max-width:1200px;display:flex;flex-wrap:wrap;gap:10px}
 
 /* ITEMS */
-.visitor-item{text-align:center;cursor:pointer}
+.visitor-item{text-align:center;cursor:pointer;position:relative}
 .visitor-item img{
   width:220px;
   height:220px;
@@ -61,35 +61,6 @@ header img{width:98px;height:98px;border-radius:20%;margin:auto}
   font-size:20px;
   color:#b84c6f;
   font-weight:bold;
-}
-
-/* ===== VUES (CORRECTION ESSENTIELLE) ===== */
-.carousel-view{
-  display:flex;
-  gap:20px;
-  overflow-x:auto;
-  padding:20px;
-}
-.grid-view{
-  display:grid;
-  grid-template-columns:repeat(auto-fill,minmax(220px,1fr));
-  gap:20px;
-  padding:20px;
-}
-.list-view{
-  display:flex;
-  flex-direction:column;
-  gap:16px;
-  padding:20px;
-}
-.list-view .visitor-item{
-  display:flex;
-  align-items:center;
-  gap:16px;
-}
-.list-view .visitor-item img{
-  width:120px;
-  height:120px;
 }
 
 /* SIDEBAR */
@@ -159,8 +130,10 @@ header img{width:98px;height:98px;border-radius:20%;margin:auto}
   border-radius:18px;
   padding:20px;
   text-align:center;
+  min-width:260px;
 }
 .modal-box button{
+  display:block;
   width:100%;
   margin:8px 0;
   padding:10px;
@@ -169,6 +142,7 @@ header img{width:98px;height:98px;border-radius:20%;margin:auto}
   background:#ffb6c1;
   color:#8b3a3a;
   font-weight:bold;
+  cursor:pointer;
 }
 </style>
 </head>
@@ -176,6 +150,8 @@ header img{width:98px;height:98px;border-radius:20%;margin:auto}
 <body>
 
 <div id="snow" class="snow"></div>
+
+<header></header>
 
 <div id="viewSelector">
   <button id="btnCarousel">Carrousel</button>
@@ -194,12 +170,17 @@ header img{width:98px;height:98px;border-radius:20%;margin:auto}
   <hr>
   <h3 style="text-align:center;color:#8b3a3a;margin-bottom:10px;">Ajouter une création</h3>
 
-  <input id="name" placeholder="Nom de la création">
-  <input id="photo" type="file" accept="image/*">
+  <input id="name" placeholder="Nom de la création" style="width:100%;margin-bottom:8px;padding:8px;border-radius:8px;border:1px solid #b67385;">
+  <input id="photo" type="file" accept="image/*" style="width:100%;margin-bottom:10px;">
   <button id="add">Ajouter</button>
   <hr>
 
   <button onclick="openThemeModal()">Thème</button>
+  <button>Vidéos</button>
+  <button>Mailles</button>
+  <button>Pelotes</button>
+  <button>Notes</button>
+  <button>Paramètres</button>
 </div>
 
 <!-- THEME MODAL -->
@@ -208,96 +189,136 @@ header img{width:98px;height:98px;border-radius:20%;margin:auto}
     <h3>Choisir un thème</h3>
     <button onclick="setTheme('noel')">🎄 Noël</button>
     <button onclick="setTheme('default')">💠 Défaut</button>
-    <button onclick="setTheme('sweety')">🌸 Sweety</button>
+    <button onclick="setTheme('sweety')">🌸 Sweety-Girly</button>
     <button onclick="closeThemeModal(event)">✕ Fermer</button>
   </div>
 </div>
 
 <script>
-/* ===== VUE ===== */
-let currentView='grid';
-const list=document.getElementById('visitor-list');
+/* ==================== VUES CARROUSEL / GRILLE / LISTE ==================== */
+let currentView='grid'; // par défaut
 
-function setView(v){
-  currentView=v;
+const btnCarousel=document.getElementById('btnCarousel');
+const btnGrid=document.getElementById('btnGrid');
+const btnList=document.getElementById('btnList');
+
+function renderCreations(){
+  const list=document.getElementById('visitor-list');
+  list.innerHTML='';
+  list.className=currentView+'-view';
+  creations.forEach(item=>{
+    const div=document.createElement('div');
+    div.className='visitor-item';
+    div.innerHTML=`<p>${item.name}</p><img src="${item.imgUrl}">`;
+    list.appendChild(div);
+  });
+}
+
+function setView(view){
+  currentView=view;
   renderCreations();
 }
+
 btnCarousel.onclick=()=>setView('carousel');
 btnGrid.onclick=()=>setView('grid');
 btnList.onclick=()=>setView('list');
 
-/* SIDEBAR */
+/* ==================== SIDEBAR ==================== */
+const sidebar=document.getElementById('sidebar');
+const toggleSidebar=document.getElementById('toggleSidebar');
 toggleSidebar.onclick=()=>sidebar.classList.toggle('sidebar-open');
 
-/* NEIGE */
+/* ==================== NEIGE ==================== */
 const snow=document.getElementById('snow');
-setInterval(()=>{
-  if(snow.style.display==='none')return;
+function createSnow(){
+  if(snow.style.display==='none') return;
   const f=document.createElement('div');
   f.textContent='❄';
   f.style.position='absolute';
+  f.style.top='-30px';
   f.style.left=Math.random()*innerWidth+'px';
-  f.style.top='-20px';
+  f.style.fontSize=(Math.random()*20+10)+'px';
+  f.style.opacity=Math.random();
   snow.appendChild(f);
-  setTimeout(()=>f.remove(),3000);
-},200);
+  const fall=setInterval(()=>{
+    f.style.top=parseFloat(f.style.top)+3+'px';
+    if(parseFloat(f.style.top)>innerHeight){ f.remove(); clearInterval(fall);}
+  },20);
+}
+setInterval(createSnow,150);
 
-/* THEME */
+/* ==================== THEME ==================== */
 const themeModal=document.getElementById('themeModal');
 const sweetRain=document.createElement('div');
 sweetRain.style.position='fixed';
 sweetRain.style.inset='0';
 sweetRain.style.pointerEvents='none';
+sweetRain.style.zIndex='5';
 sweetRain.style.display='none';
 document.body.appendChild(sweetRain);
 
-function openThemeModal(){themeModal.style.display='flex'}
-function closeThemeModal(e){if(e.target===themeModal)themeModal.style.display='none'}
+function openThemeModal(){ themeModal.style.display='flex'; }
+function closeThemeModal(e){ if(e.target===themeModal||e.target.tagName==='BUTTON') themeModal.style.display='none'; }
 
-function setTheme(t){
-  if(t==='noel'){
+function createSweet(){
+  if(sweetRain.style.display==='none') return;
+  const candy=document.createElement('div');
+  candy.textContent='🍬';
+  candy.style.position='absolute';
+  candy.style.top='-30px';
+  candy.style.left=Math.random()*innerWidth+'px';
+  candy.style.fontSize=(Math.random()*24+16)+'px';
+  candy.style.opacity=Math.random()*0.8+0.3;
+  sweetRain.appendChild(candy);
+  const fall=setInterval(()=>{
+    candy.style.top=parseFloat(candy.style.top)+(Math.random()*3+2)+'px';
+    candy.style.left=parseFloat(candy.style.left)+Math.sin(Date.now()/200)*1.5+'px';
+    if(parseFloat(candy.style.top)>innerHeight){ candy.remove(); clearInterval(fall);}
+  },20);
+}
+setInterval(createSweet,150);
+
+function setTheme(theme){
+  if(theme==='noel'){
     document.body.style.backgroundImage="url('noel.png')";
     snow.style.display='block';
     sweetRain.style.display='none';
-  }else if(t==='sweety'){
-    document.body.style.background="url('sweety-girly.png') center/cover fixed";
+  } else if(theme==='sweety'){
+    document.body.style.background="url('sweety-girly.png') center center / cover no-repeat fixed";
     snow.style.display='none';
     sweetRain.style.display='block';
-  }else{
+  } else {
     document.body.style.backgroundImage="url('Photoroom_20251212_143703.PNG')";
     snow.style.display='none';
     sweetRain.style.display='none';
   }
 }
 
-/* CREATIONS */
+/* ==================== AJOUT CREATION ==================== */
+const nameInput=document.getElementById('name');
+const photoInput=document.getElementById('photo');
+const addBtn=document.getElementById('add');
+
 let creations=JSON.parse(localStorage.getItem('creations')||'[]');
 
-function renderCreations(){
-  list.innerHTML='';
-  list.className=currentView+'-view';
-  creations.forEach(c=>{
-    const d=document.createElement('div');
-    d.className='visitor-item';
-    d.innerHTML=`<img src="${c.imgUrl}"><p>${c.name}</p>`;
-    list.appendChild(d);
-  });
-}
+addBtn.onclick=()=>{
+  const name=nameInput.value.trim();
+  const file=photoInput.files[0];
+  if(!name||!file){ alert("Merci de remplir le nom et choisir une photo !"); return; }
 
-add.onclick=()=>{
-  if(!name.value||!photo.files[0])return;
-  const r=new FileReader();
-  r.onload=e=>{
-    creations.unshift({name:name.value,imgUrl:e.target.result});
+  const reader=new FileReader();
+  reader.onload=(e)=>{
+    creations.unshift({name,imgUrl:e.target.result});
     localStorage.setItem('creations',JSON.stringify(creations));
     renderCreations();
-    name.value='';photo.value='';
+    nameInput.value=''; photoInput.value='';
   };
-  r.readAsDataURL(photo.files[0]);
+  reader.readAsDataURL(file);
 };
 
+/* ==================== INITIALISATION ==================== */
 renderCreations();
-</script>
 
+</script>
 </body>
 </html>
