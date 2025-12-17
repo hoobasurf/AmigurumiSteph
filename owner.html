@@ -293,20 +293,21 @@ sweetRain.style.display='none';
 document.body.appendChild(sweetRain);
 
 function setTheme(t){
+  snow.style.display='none';
+  sweetRain.style.display='none';
+
   if(t==='noel'){
     document.body.style.backgroundImage="url('noel.png')";
     snow.style.display='block';
-    sweetRain.style.display='none';
+    createSnow();
   }
   else if(t==='sweety'){
     document.body.style.backgroundImage="url('sweety-girly.png')";
-    snow.style.display='none';
     sweetRain.style.display='block';
+    createCandy();
   }
   else{
     document.body.style.backgroundImage="url('Photoroom_20251212_143703.PNG')";
-    snow.style.display='none';
-    sweetRain.style.display='none';
   }
 
   document.getElementById('themeModal').style.display='none';
