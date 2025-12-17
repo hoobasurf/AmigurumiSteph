@@ -151,10 +151,14 @@ body{
   100%{transform:translateY(110vh) rotate(360deg)}
 }
 
-/* FORMULAIRE AJOUT */
+/* OWNER BOX */
 .owner-box { margin:20px; }
 .owner-box input, .owner-box button { padding:10px; margin:5px; border-radius:8px; border:1px solid #ccc; }
+#owner-list { display:flex; flex-wrap:wrap; gap:10px; }
+.owner-item { background:#fff; padding:10px; border-radius:10px; box-shadow:0 0 5px #ccc; }
+.owner-item img { max-width:100px; border-radius:8px; display:block; }
 
+/* CENTER ZONE */
 .center-zone{
   display:flex;
   justify-content:center;
@@ -168,21 +172,22 @@ body{
 
 <div id="snow" class="snow"></div>
 
-<!-- FORMULAIRE AJOUT -->
+<!-- Owner Box -->
 <div class="owner-box">
   <input id="name" placeholder="Nom de la création">
   <input id="photo" type="file" accept="image/*">
   <button id="add">Ajouter</button>
 </div>
+<div id="owner-list"></div>
 
-<!-- BOUTONS CARROUSEL / GRILLE / LISTE -->
+<!-- VUE SELECTOR -->
 <div id="viewSelector">
   <button id="btnCarousel">Carrousel</button>
   <button id="btnGrid">Grille</button>
   <button id="btnList">Liste</button>
 </div>
 
-<!-- IMAGES EN HAUT -->
+<!-- VISITOR LIST (IMAGES EN HAUT UNIQUEMENT) -->
 <div class="center-zone" id="visitor-list"></div>
 
 <!-- SIDEBAR -->
@@ -216,6 +221,15 @@ function renderCreations(){
     d.className='visitor-item';
     d.innerHTML=`<p>${c.name}</p><img src="${c.imgUrl}">`;
     list.appendChild(d);
+  });
+
+  const ownerList = document.getElementById('owner-list');
+  ownerList.innerHTML='';
+  creations.forEach(c=>{
+    const d=document.createElement('div');
+    d.className='owner-item';
+    d.innerHTML=`<p>${c.name}</p><img src="${c.imgUrl}">`;
+    ownerList.appendChild(d);
   });
 }
 
@@ -257,6 +271,7 @@ document.body.appendChild(sweetRain);
 function setTheme(t){
   snow.style.display='none';
   sweetRain.style.display='none';
+
   if(t==='noel'){
     document.body.style.backgroundImage="url('noel.png')";
     snow.style.display='block';
@@ -270,6 +285,7 @@ function setTheme(t){
   else{
     document.body.style.backgroundImage="url('Photoroom_20251212_143703.PNG')";
   }
+
   document.getElementById('themeModal').style.display='none';
 }
 
@@ -317,5 +333,6 @@ renderCreations();
 </script>
 
 <script type="module" src="owner.js"></script>
+
 </body>
 </html>
