@@ -36,22 +36,6 @@ header img{width:98px;height:98px;border-radius:20%;margin:auto}
   cursor:pointer;
 }
 
-/* CONTENU */
-.center-zone{
-  flex:1;
-  display:flex;
-  justify-content:center;
-  align-items:flex-start;
-  width:100%;
-  overflow:auto;
-}
-#visitor-list{
-  display:flex;
-  justify-content:center;
-  gap:16px;
-  max-width:1200px;
-}
-
 /* ITEMS */
 .visitor-item{text-align:center;cursor:pointer}
 .visitor-item img{
@@ -66,32 +50,6 @@ header img{width:98px;height:98px;border-radius:20%;margin:auto}
   font-size:20px;
   color:#b84c6f;
   font-weight:bold;
-}
-
-/* VUES */
-.carousel-view{
-  flex-wrap:nowrap;
-  overflow-x:auto;
-  scroll-behavior:smooth;
-}
-.carousel-view::-webkit-scrollbar{height:8px}
-.carousel-view::-webkit-scrollbar-thumb{background:#b84c6f88;border-radius:20px}
-
-.grid-view{
-  flex-wrap:wrap;
-}
-
-.list-view{
-  flex-direction:column;
-}
-.list-view .visitor-item{
-  display:flex;
-  align-items:center;
-  gap:16px;
-}
-.list-view .visitor-item img{
-  width:140px;
-  height:140px;
 }
 
 /* SIDEBAR */
@@ -135,6 +93,7 @@ header img{width:98px;height:98px;border-radius:20%;margin:auto}
   font-weight:bold;
   cursor:pointer;
 }
+
 /* NEIGE */
 .snow{
   position:fixed;
@@ -172,11 +131,6 @@ header img{width:98px;height:98px;border-radius:20%;margin:auto}
   font-weight:bold;
 }
 
-#sidebar,
-#sidebar * {
-  pointer-events: auto;
-}
-
 /* ❄️ FLOCONS */
 .snowflake{
   position:absolute;
@@ -209,31 +163,29 @@ header img{width:98px;height:98px;border-radius:20%;margin:auto}
 .owner-box { margin:20px; }
 .owner-box input, .owner-box button { padding:10px; margin:5px; border-radius:8px; border:1px solid #ccc; }
 
+.center-zone{display:flex; justify-content:center; flex-wrap:wrap; gap:16px;}
 </style>
 </head>
 <body>
 
 <div id="snow" class="snow"></div>
 
-<!-- FORMULAIRE + BOUTONS EN HAUT -->
-<div class="top-section">
-  <div class="owner-box">
-    <input id="name" placeholder="Nom de la création">
-    <input id="photo" type="file" accept="image/*">
-    <button id="add">Ajouter</button>
-  </div>
+<!-- FORMULAIRE AJOUT + IMAGES EN HAUT -->
+<div class="owner-box">
+  <input id="name" placeholder="Nom de la création">
+  <input id="photo" type="file" accept="image/*">
+  <button id="add">Ajouter</button>
+</div>
 
-  <div id="viewSelector">
-    <button id="btnCarousel">Carrousel</button>
-    <button id="btnGrid">Grille</button>
-    <button id="btnList">Liste</button>
-  </div>
+<!-- BOUTONS CARROUSEL / GRILLE / LISTE -->
+<div id="viewSelector">
+  <button id="btnCarousel">Carrousel</button>
+  <button id="btnGrid">Grille</button>
+  <button id="btnList">Liste</button>
 </div>
 
 <!-- VISITOR LIST -->
-<div class="center-zone">
-  <div id="visitor-list"></div>
-</div>
+<div class="center-zone" id="visitor-list"></div>
 
 <!-- SIDEBAR -->
 <div id="sidebar">
