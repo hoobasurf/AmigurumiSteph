@@ -21,8 +21,6 @@ header img{width:98px;height:98px;border-radius:20%;margin:auto}
 
 /* BOUTONS VUE */
 #viewSelector button{
-  position:relative;
-  top:0;
   background:#fff0f7;
   border:2px solid #b84c6f;
   color:#b84c6f;
@@ -42,9 +40,11 @@ header img{width:98px;height:98px;border-radius:20%;margin:auto}
   flex:1;
   display:flex;
   justify-content:center;
-  align-items:center;
+  align-items:flex-start;
+  overflow:auto;
+  padding:12px;
 }
-#visitor-list{width:100%;max-width:1200px;display:flex;flex-wrap:wrap;gap:10px}
+#visitor-list{width:100%;max-width:1200px;}
 
 /* ITEMS */
 .visitor-item{text-align:center;cursor:pointer;position:relative}
@@ -54,6 +54,7 @@ header img{width:98px;height:98px;border-radius:20%;margin:auto}
   object-fit:contain;
   border:4px solid #b67385;
   background:#ffe6f0;
+  transition: transform 0.2s ease;
 }
 .visitor-item p{
   margin-top:8px;
@@ -61,6 +62,32 @@ header img{width:98px;height:98px;border-radius:20%;margin:auto}
   color:#b84c6f;
   font-weight:bold;
 }
+.visitor-item:hover img{ transform:scale(1.05); }
+
+/* VUES */
+.carousel-view{
+  display:flex;
+  gap:20px;
+  overflow-x:auto;
+  padding:12px;
+  scroll-behavior:smooth;
+}
+.carousel-view::-webkit-scrollbar{ height:8px; }
+.carousel-view::-webkit-scrollbar-thumb{ background:#b84c6f88; border-radius:20px; }
+
+.grid-view{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(220px,1fr));
+  gap:16px;
+}
+
+.list-view{
+  display:flex;
+  flex-direction:column;
+  gap:16px;
+}
+.list-view .visitor-item{ display:flex; align-items:center; gap:16px; }
+.list-view .visitor-item img{ width:140px; height:140px; }
 
 /* SIDEBAR */
 #sidebar{
@@ -145,7 +172,6 @@ header img{width:98px;height:98px;border-radius:20%;margin:auto}
 }
 </style>
 </head>
-
 <body>
 
 <div id="snow" class="snow"></div>
@@ -196,12 +222,10 @@ header img{width:98px;height:98px;border-radius:20%;margin:auto}
 <script>
 /* ==================== VUES ==================== */
 let currentView = 'grid';
-
 const btnCarousel = document.getElementById('btnCarousel');
 const btnGrid = document.getElementById('btnGrid');
 const btnList = document.getElementById('btnList');
 const list = document.getElementById('visitor-list');
-
 let creations = JSON.parse(localStorage.getItem('creations')||'[]');
 
 function renderCreations(){
