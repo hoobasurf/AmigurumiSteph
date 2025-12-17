@@ -200,6 +200,20 @@ header img{width:98px;height:98px;border-radius:20%;margin:auto}
 </div>
 
 <script>
+
+  const btnCarousel = document.getElementById('btnCarousel');
+const btnGrid = document.getElementById('btnGrid');
+const btnList = document.getElementById('btnList');
+
+function setView(v){
+  currentView = v;
+  render();
+}
+
+btnCarousel.onclick = () => setView('carousel');
+btnGrid.onclick = () => setView('grid');
+btnList.onclick = () => setView('list');
+  
 const sidebar = document.getElementById('sidebar');
 const toggleSidebar = document.getElementById('toggleSidebar');
 toggleSidebar.onclick = () => sidebar.classList.toggle('sidebar-open');
