@@ -252,7 +252,16 @@ function setTheme(t){
   else{snow.style.display='none';sweetRain.style.display='none'}
 }
 
+/* ==================== SIDEBAR FIX ==================== */
+const sidebar = document.getElementById('sidebar');
+const toggleSidebar = document.getElementById('toggleSidebar');
+
+toggleSidebar.onclick = () => {
+  sidebar.classList.toggle('sidebar-open');
+};
+  
 renderCreations();
+
 </script>
 </body>
 </html>
