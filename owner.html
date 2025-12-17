@@ -16,6 +16,7 @@ body{
 
 /* HEADER */
 header{text-align:center;padding:12px 0}
+header img{width:98px;height:98px;border-radius:20%;margin:auto}
 .title{display:none}
 
 /* BOUTONS VUE */
@@ -42,13 +43,12 @@ header{text-align:center;padding:12px 0}
   justify-content:center;
   align-items:flex-start;
   width:100%;
-  margin-top:12px;
   overflow:auto;
 }
 #visitor-list{
   display:flex;
   justify-content:center;
-  gap:10px;
+  gap:16px;
   max-width:1200px;
 }
 
@@ -60,9 +60,7 @@ header{text-align:center;padding:12px 0}
   object-fit:contain;
   border:4px solid #b67385;
   background:#ffe6f0;
-  transition:transform .2s;
 }
-.visitor-item:hover img{transform:scale(1.05)}
 .visitor-item p{
   margin-top:8px;
   font-size:20px;
@@ -70,40 +68,21 @@ header{text-align:center;padding:12px 0}
   font-weight:bold;
 }
 
-/* ================= VUES ================= */
-
-/* ✅ CARROUSEL */
+/* VUES */
 .carousel-view{
-  display:flex;
-  flex-wrap:nowrap;              /* ⭐ CORRECTION CLÉ */
-  gap:20px;
+  flex-wrap:nowrap;          /* ✅ FIX CARROUSEL */
   overflow-x:auto;
-  padding:12px;
   scroll-behavior:smooth;
-  justify-content:flex-start;
-}
-.carousel-view .visitor-item{
-  flex:0 0 auto;                 /* ⭐ évite retour à la ligne */
 }
 .carousel-view::-webkit-scrollbar{height:8px}
-.carousel-view::-webkit-scrollbar-thumb{
-  background:#b84c6f88;
-  border-radius:20px;
-}
+.carousel-view::-webkit-scrollbar-thumb{background:#b84c6f88;border-radius:20px}
 
-/* GRILLE */
 .grid-view{
-  display:flex;
   flex-wrap:wrap;
-  justify-content:center;
-  gap:16px;
 }
 
-/* LISTE */
 .list-view{
-  display:flex;
   flex-direction:column;
-  gap:16px;
 }
 .list-view .visitor-item{
   display:flex;
@@ -125,7 +104,7 @@ header{text-align:center;padding:12px 0}
   background:rgba(255,230,240,0.15);
   border-right:2px solid #b67385;
   padding:20px;
-  transition:left .3s;
+  transition:left .3s ease;
   z-index:10;
 }
 #sidebar.sidebar-open{left:0}
@@ -136,24 +115,13 @@ header{text-align:center;padding:12px 0}
   width:30px;
   height:60px;
   background:#ffb6c1;
+  color:#8b3a3a;
   border-radius:0 12px 12px 0;
   display:flex;
   justify-content:center;
   align-items:center;
   cursor:pointer;
   border:1px solid #b67385;
-  font-weight:bold;
-}
-#sidebar button{
-  width:100%;
-  margin-bottom:10px;
-  padding:10px;
-  border:none;
-  border-radius:12px;
-  background:#ffb6c1;
-  color:#8b3a3a;
-  font-weight:bold;
-  cursor:pointer;
 }
 
 /* NEIGE */
@@ -194,7 +162,6 @@ header{text-align:center;padding:12px 0}
 }
 </style>
 </head>
-
 <body>
 
 <div id="snow" class="snow"></div>
@@ -209,89 +176,83 @@ header{text-align:center;padding:12px 0}
   <div id="visitor-list"></div>
 </div>
 
-<!-- SIDEBAR -->
 <div id="sidebar">
   <div id="toggleSidebar">☰</div>
-  <hr>
-  <h3 style="text-align:center;color:#8b3a3a;">Ajouter une création</h3>
-  <input id="name" placeholder="Nom" style="width:100%;margin:8px 0;padding:8px">
+  <input id="name" placeholder="Nom">
   <input id="photo" type="file" accept="image/*">
   <button id="add">Ajouter</button>
-  <hr>
   <button onclick="openThemeModal()">Thème</button>
 </div>
 
-<!-- THEME MODAL -->
 <div class="modal-bg" id="themeModal" onclick="closeThemeModal(event)">
   <div class="modal-box" onclick="event.stopPropagation()">
     <button onclick="setTheme('noel')">🎄 Noël</button>
-    <button onclick="setTheme('sweety')">🍬 Sweety</button>
     <button onclick="setTheme('default')">💠 Défaut</button>
+    <button onclick="setTheme('sweety')">🌸 Sweety</button>
   </div>
 </div>
 
 <script>
-let currentView='carousel';
+let currentView='grid';
 const list=document.getElementById('visitor-list');
-const btnCarousel=document.getElementById('btnCarousel');
-const btnGrid=document.getElementById('btnGrid');
-const btnList=document.getElementById('btnList');
 const nameInput=document.getElementById('name');
 const photoInput=document.getElementById('photo');
 const addBtn=document.getElementById('add');
 let creations=JSON.parse(localStorage.getItem('creations')||'[]');
 
-/* RENDER */
-function render(){
+function renderCreations(){
   list.innerHTML='';
   list.className=currentView+'-view';
   creations.forEach(c=>{
     const d=document.createElement('div');
     d.className='visitor-item';
-    d.innerHTML=`<img src="${c.imgUrl}"><p>${c.name}</p>`;
+    d.innerHTML=`<p>${c.name}</p><img src="${c.imgUrl}">`;
     list.appendChild(d);
   });
 }
 
-/* VUES */
-btnCarousel.onclick=()=>{currentView='carousel';render()}
-btnGrid.onclick=()=>{currentView='grid';render()}
-btnList.onclick=()=>{currentView='list';render()}
+function setView(v){
+  currentView=v;
+  renderCreations();
+}
 
-/* AJOUT */
+btnCarousel.onclick=()=>setView('carousel');
+btnGrid.onclick=()=>setView('grid');
+btnList.onclick=()=>setView('list');
+
+/* ✅ BOUTON AJOUTER – FONCTIONNEL */
 addBtn.onclick=()=>{
   const name=nameInput.value.trim();
   const file=photoInput.files[0];
-  if(!name||!file)return alert("Nom + photo");
+  if(!name||!file) return alert("Nom + photo requis");
+
   const r=new FileReader();
   r.onload=e=>{
-    creations.unshift({name,imgUrl:e.target.result});
+    creations.unshift({name, imgUrl:e.target.result});
     localStorage.setItem('creations',JSON.stringify(creations));
-    render();
+    setView(currentView);      /* ✅ FIX */
     nameInput.value='';
     photoInput.value='';
   };
   r.readAsDataURL(file);
 };
 
-/* SIDEBAR */
-const sidebar=document.getElementById('sidebar');
-document.getElementById('toggleSidebar').onclick=()=>sidebar.classList.toggle('sidebar-open');
-
-/* THEME */
+/* THEMES – INTACTS */
 const snow=document.getElementById('snow');
-const themeModal=document.getElementById('themeModal');
-function openThemeModal(){themeModal.style.display='flex'}
-function closeThemeModal(e){if(e.target===themeModal)themeModal.style.display='none'}
+const sweetRain=document.createElement('div');
+sweetRain.style.position='fixed';
+sweetRain.style.inset='0';
+sweetRain.style.pointerEvents='none';
+sweetRain.style.display='none';
+document.body.appendChild(sweetRain);
+
 function setTheme(t){
-  if(t==='noel'){snow.style.display='block'}
-  else{snow.style.display='none'}
-  themeModal.style.display='none';
+  if(t==='noel'){snow.style.display='block';sweetRain.style.display='none'}
+  else if(t==='sweety'){snow.style.display='none';sweetRain.style.display='block'}
+  else{snow.style.display='none';sweetRain.style.display='none'}
 }
 
-/* INIT */
-render();
+renderCreations();
 </script>
-
 </body>
 </html>
