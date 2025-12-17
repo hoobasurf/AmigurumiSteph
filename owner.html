@@ -22,7 +22,7 @@ header img{width:98px;height:98px;border-radius:20%;margin:auto}
 /* BOUTONS VUE */
 #viewSelector button{
   position:relative;
-  top:300px;
+  top:0;
   background:#fff0f7;
   border:2px solid #b84c6f;
   color:#b84c6f;
@@ -34,7 +34,7 @@ header img{width:98px;height:98px;border-radius:20%;margin:auto}
   display:flex;
   justify-content:center;
   gap:16px;
-  margin-top:205px;
+  margin-top:12px;
 }
 
 /* CONTENU */
@@ -43,7 +43,6 @@ header img{width:98px;height:98px;border-radius:20%;margin:auto}
   display:flex;
   justify-content:center;
   align-items:center;
-  padding-top:300px;
 }
 #visitor-list{width:100%;max-width:1200px;display:flex;flex-wrap:wrap;gap:10px}
 
@@ -195,17 +194,19 @@ header img{width:98px;height:98px;border-radius:20%;margin:auto}
 </div>
 
 <script>
-/* ==================== VUES CARROUSEL / GRILLE / LISTE ==================== */
-let currentView='grid'; // par défaut
+/* ==================== VUES ==================== */
+let currentView = 'grid';
 
-const btnCarousel=document.getElementById('btnCarousel');
-const btnGrid=document.getElementById('btnGrid');
-const btnList=document.getElementById('btnList');
+const btnCarousel = document.getElementById('btnCarousel');
+const btnGrid = document.getElementById('btnGrid');
+const btnList = document.getElementById('btnList');
+const list = document.getElementById('visitor-list');
+
+let creations = JSON.parse(localStorage.getItem('creations')||'[]');
 
 function renderCreations(){
-  const list=document.getElementById('visitor-list');
   list.innerHTML='';
-  list.className=currentView+'-view';
+  list.className = currentView + '-view';
   creations.forEach(item=>{
     const div=document.createElement('div');
     div.className='visitor-item';
@@ -224,15 +225,15 @@ btnGrid.onclick=()=>setView('grid');
 btnList.onclick=()=>setView('list');
 
 /* ==================== SIDEBAR ==================== */
-const sidebar=document.getElementById('sidebar');
-const toggleSidebar=document.getElementById('toggleSidebar');
-toggleSidebar.onclick=()=>sidebar.classList.toggle('sidebar-open');
+const sidebar = document.getElementById('sidebar');
+const toggleSidebar = document.getElementById('toggleSidebar');
+toggleSidebar.onclick = ()=>sidebar.classList.toggle('sidebar-open');
 
 /* ==================== NEIGE ==================== */
-const snow=document.getElementById('snow');
+const snow = document.getElementById('snow');
 function createSnow(){
   if(snow.style.display==='none') return;
-  const f=document.createElement('div');
+  const f = document.createElement('div');
   f.textContent='❄';
   f.style.position='absolute';
   f.style.top='-30px';
@@ -240,16 +241,16 @@ function createSnow(){
   f.style.fontSize=(Math.random()*20+10)+'px';
   f.style.opacity=Math.random();
   snow.appendChild(f);
-  const fall=setInterval(()=>{
+  const fall = setInterval(()=>{
     f.style.top=parseFloat(f.style.top)+3+'px';
-    if(parseFloat(f.style.top)>innerHeight){ f.remove(); clearInterval(fall);}
+    if(parseFloat(f.style.top)>innerHeight){f.remove();clearInterval(fall);}
   },20);
 }
 setInterval(createSnow,150);
 
 /* ==================== THEME ==================== */
-const themeModal=document.getElementById('themeModal');
-const sweetRain=document.createElement('div');
+const themeModal = document.getElementById('themeModal');
+const sweetRain = document.createElement('div');
 sweetRain.style.position='fixed';
 sweetRain.style.inset='0';
 sweetRain.style.pointerEvents='none';
@@ -262,7 +263,7 @@ function closeThemeModal(e){ if(e.target===themeModal||e.target.tagName==='BUTTO
 
 function createSweet(){
   if(sweetRain.style.display==='none') return;
-  const candy=document.createElement('div');
+  const candy = document.createElement('div');
   candy.textContent='🍬';
   candy.style.position='absolute';
   candy.style.top='-30px';
@@ -273,7 +274,7 @@ function createSweet(){
   const fall=setInterval(()=>{
     candy.style.top=parseFloat(candy.style.top)+(Math.random()*3+2)+'px';
     candy.style.left=parseFloat(candy.style.left)+Math.sin(Date.now()/200)*1.5+'px';
-    if(parseFloat(candy.style.top)>innerHeight){ candy.remove(); clearInterval(fall);}
+    if(parseFloat(candy.style.top)>innerHeight){candy.remove();clearInterval(fall);}
   },20);
 }
 setInterval(createSweet,150);
@@ -295,30 +296,29 @@ function setTheme(theme){
 }
 
 /* ==================== AJOUT CREATION ==================== */
-const nameInput=document.getElementById('name');
-const photoInput=document.getElementById('photo');
-const addBtn=document.getElementById('add');
+const nameInput = document.getElementById('name');
+const photoInput = document.getElementById('photo');
+const addBtn = document.getElementById('add');
 
-let creations=JSON.parse(localStorage.getItem('creations')||'[]');
+addBtn.onclick = ()=>{
+  const name = nameInput.value.trim();
+  const file = photoInput.files[0];
+  if(!name || !file){ alert("Merci de remplir le nom et choisir une photo !"); return; }
 
-addBtn.onclick=()=>{
-  const name=nameInput.value.trim();
-  const file=photoInput.files[0];
-  if(!name||!file){ alert("Merci de remplir le nom et choisir une photo !"); return; }
-
-  const reader=new FileReader();
-  reader.onload=(e)=>{
+  const reader = new FileReader();
+  reader.onload = e=>{
     creations.unshift({name,imgUrl:e.target.result});
     localStorage.setItem('creations',JSON.stringify(creations));
     renderCreations();
-    nameInput.value=''; photoInput.value='';
+    nameInput.value='';
+    photoInput.value='';
   };
   reader.readAsDataURL(file);
 };
 
 /* ==================== INITIALISATION ==================== */
 renderCreations();
-
 </script>
+
 </body>
 </html>
