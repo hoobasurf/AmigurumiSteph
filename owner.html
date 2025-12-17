@@ -16,6 +16,7 @@ body{
 
 /* HEADER */
 header{text-align:center;padding:12px 0}
+header img{width:98px;height:98px;border-radius:20%;margin:auto}
 .title{display:none}
 
 /* BOUTONS VUE */
@@ -23,6 +24,8 @@ header{text-align:center;padding:12px 0}
   display:flex;
   justify-content:center;
   gap:12px;
+
+  margin-top:500px;   /* ⬅️ PLUS GRAND = PLUS BAS */
   margin-bottom:20px;
 }
 #viewSelector button{
@@ -39,19 +42,28 @@ header{text-align:center;padding:12px 0}
   flex:1;
   display:flex;
   justify-content:center;
-  align-items:flex-start; /* ⬅️ DESCEND TOUT L’ENSEMBLE */
-  padding-top:90px;       /* ⬅️ ajuste ici si besoin */
+  align-items:flex-start;
+  width:100%;
+  margin-top:12px;
+  overflow:auto;
 }
-#visitor-list{width:100%;max-width:1200px}
+#visitor-list{
+  display:flex;
+  flex-wrap:wrap;
+  justify-content:center;
+  gap:10px;
+  max-width:1200px;
+}
 
 /* ITEMS */
-.visitor-item{text-align:center;cursor:pointer}
+.visitor-item{text-align:center;cursor:pointer;position:relative}
 .visitor-item img{
   width:220px;
   height:220px;
   object-fit:contain;
   border:4px solid #b67385;
   background:#ffe6f0;
+  transition: transform 0.2s ease;
 }
 .visitor-item p{
   margin-top:8px;
@@ -59,92 +71,106 @@ header{text-align:center;padding:12px 0}
   color:#b84c6f;
   font-weight:bold;
 }
+.visitor-item:hover img{ transform:scale(1.05); }
 
 /* VUES */
-.carousel-view{display:flex;gap:40px;overflow-x:auto;padding:20px}
-.grid-view{
-  display:grid;
-  grid-template-columns:repeat(auto-fill,minmax(220px,1fr));
-  gap:24px;padding:20px;overflow-y:auto;
-}
-.list-view{display:flex;flex-direction:column;gap:18px;padding:20px}
-.list-view img{width:140px;height:140px}
+.carousel-view{ display:flex; gap:20px; overflow-x:auto; padding:12px; scroll-behavior:smooth;}
+.carousel-view::-webkit-scrollbar{ height:8px; }
+.carousel-view::-webkit-scrollbar-thumb{ background:#b84c6f88; border-radius:20px; }
 
-/* MODAL IMAGE */
-.modal-bg{
-  position:fixed;inset:0;background:rgba(0,0,0,.65);
-  display:none;justify-content:center;align-items:center;z-index:1000
-}
-.modal-box{
-  background:rgba(255,228,235,.95);
-  border:4px solid #b67385;border-radius:18px;
-  padding:18px;max-width:900px;width:95%;text-align:center
-}
-.close-modal{position:absolute;top:10px;right:14px;font-size:28px;cursor:pointer}
-.modal-main-img{
-  width:100%;max-height:500px;object-fit:contain;
-  border:4px solid #b67385;background:#ffe6f0
-}
-#modalBackBtn{
-  margin:10px auto;padding:6px 18px;border-radius:12px;
-  border:2px solid #b67385;background:#ffe6f0;cursor:pointer
-}
-
-/* ICONES */
-.icon-bar{display:flex;justify-content:center;gap:30px;margin-top:12px}
-.icon-btn{
-  display:flex;align-items:center;gap:8px;
-  background:#ffe6f0;padding:6px 12px;
-  border-radius:12px;border:2px solid #b67385;cursor:pointer
-}
-.heart{font-size:26px}
-.heart.liked{color:#ff4b82}
-
-/* COMMENTAIRES */
-.comment{background:#ffe6f0;padding:10px;border-radius:10px;margin-top:8px}
-
-/* FORM */
-.form-modal-bg{
-  position:fixed;inset:0;background:rgba(0,0,0,.6);
-  display:none;justify-content:center;align-items:center;z-index:2000
-}
-.form-modal{
-  background:#ffe6f0;padding:18px;border-radius:14px;
-  border:4px solid #b67385;width:340px
-}
-.form-modal input,.form-modal textarea{
-  width:100%;margin-bottom:10px;padding:10px;border-radius:8px
-}
-.form-modal button{
-  width:100%;padding:10px;border-radius:12px;
-  background:#ffb6c1;font-weight:bold;cursor:pointer
-}
+.grid-view{ display:flex; flex-wrap:wrap; justify-content:center; gap:16px;}
+.list-view{ display:flex; flex-direction:column; gap:16px;}
+.list-view .visitor-item{ display:flex; align-items:center; gap:16px;}
+.list-view .visitor-item img{ width:140px; height:140px; }
 
 /* SIDEBAR */
 #sidebar{
-  position:fixed;left:-220px;top:0;width:220px;height:100vh;
-  background:rgba(255,230,240,.15);border-right:2px solid #b67385;
-  padding:20px;transition:.3s;z-index:10
+  position:fixed;
+  top:0;
+  left:-220px;
+  width:220px;
+  height:100vh;
+  background:rgba(255,230,240,0.15);
+  border-right:2px solid #b67385;
+  padding:20px;
+  transition:left .3s ease;
+  z-index:10;
 }
 #sidebar.sidebar-open{left:0}
 #toggleSidebar{
-  position:absolute;top:50%;right:-30px;width:30px;height:60px;
-  background:#ffb6c1;border-radius:0 12px 12px 0;
-  display:flex;align-items:center;justify-content:center;cursor:pointer
+  position:absolute;
+  top:50%;
+  right:-30px;
+  width:30px;
+  height:60px;
+  background:#ffb6c1;
+  color:#8b3a3a;
+  border-radius:0 12px 12px 0;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  cursor:pointer;
+  border:1px solid #b67385;
+  font-weight:bold;
 }
 #sidebar button{
-  width:100%;margin-bottom:10px;padding:10px;
-  border-radius:12px;background:#ffb6c1;cursor:pointer
+  width:100%;
+  margin-bottom:10px;
+  padding:10px;
+  border:none;
+  border-radius:12px;
+  background:#ffb6c1;
+  color:#8b3a3a;
+  font-weight:bold;
+  cursor:pointer;
 }
 
 /* NEIGE */
-.snow{position:fixed;inset:0;pointer-events:none;z-index:5;display:none}
+.snow{
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  z-index:5;
+  display:none;
+}
+
+/* MODAL THEME */
+.modal-bg{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.6);
+  display:none;
+  justify-content:center;
+  align-items:center;
+  z-index:9999;
+}
+.modal-box{
+  background:#ffe6f0;
+  border:4px solid #b67385;
+  border-radius:18px;
+  padding:20px;
+  text-align:center;
+  min-width:260px;
+}
+.modal-box button{
+  display:block;
+  width:100%;
+  margin:8px 0;
+  padding:10px;
+  border:none;
+  border-radius:12px;
+  background:#ffb6c1;
+  color:#8b3a3a;
+  font-weight:bold;
+  cursor:pointer;
+}
 </style>
 </head>
-
 <body>
 
 <div id="snow" class="snow"></div>
+
+<header></header>
 
 <div id="viewSelector">
   <button id="btnCarousel">Carrousel</button>
@@ -159,81 +185,170 @@ header{text-align:center;padding:12px 0}
 <!-- SIDEBAR -->
 <div id="sidebar">
   <div id="toggleSidebar">☰</div>
+  <hr>
+  <h3 style="text-align:center;color:#8b3a3a;margin-bottom:10px;">Ajouter une création</h3>
+  <input id="name" placeholder="Nom de la création" style="width:100%;margin-bottom:8px;padding:8px;border-radius:8px;border:1px solid #b67385;">
+  <input id="photo" type="file" accept="image/*" style="width:100%;margin-bottom:10px;">
+  <button id="add">Ajouter</button>
+  <hr>
   <button onclick="openThemeModal()">Thème</button>
+  <button>Vidéos</button>
+  <button>Mailles</button>
+  <button>Pelotes</button>
+  <button>Notes</button>
+  <button>Paramètres</button>
 </div>
 
 <!-- THEME MODAL -->
 <div class="modal-bg" id="themeModal" onclick="closeThemeModal(event)">
   <div class="modal-box" onclick="event.stopPropagation()">
     <h3>Choisir un thème</h3>
-    <button onclick="setTheme('default')">💠 Défaut</button>
     <button onclick="setTheme('noel')">🎄 Noël</button>
-    <button onclick="setTheme('girly')">🍭 Sweetly Girly</button>
+    <button onclick="setTheme('default')">💠 Défaut</button>
+    <button onclick="setTheme('sweety')">🌸 Sweety-Girly</button>
     <button onclick="closeThemeModal(event)">✕ Fermer</button>
   </div>
 </div>
 
 <script>
-const list=document.getElementById('visitor-list');
-const snow=document.getElementById('snow');
-const themeModal=document.getElementById('themeModal');
-const sidebar=document.getElementById('sidebar');
+/* ==================== VARIABLES ==================== */
+let currentView = 'grid';
+const btnCarousel = document.getElementById('btnCarousel');
+const btnGrid = document.getElementById('btnGrid');
+const btnList = document.getElementById('btnList');
+const list = document.getElementById('visitor-list');
+const nameInput = document.getElementById('name');
+const photoInput = document.getElementById('photo');
+const addBtn = document.getElementById('add');
+let creations = JSON.parse(localStorage.getItem('creations')||'[]');
 
-let currentView='carousel';
-let creations=JSON.parse(localStorage.getItem('creations')||'[]');
-
-function render(){
+/* ==================== FONCTIONS ==================== */
+function renderCreations(){
   list.innerHTML='';
-  list.className=currentView+'-view';
-  creations.forEach(c=>{
-    const d=document.createElement('div');
-    d.className='visitor-item';
-    d.innerHTML=`<img src="${c.imgUrl}"><p>${c.name}</p>`;
-    list.appendChild(d);
+  list.className = currentView + '-view';
+  creations.forEach(item=>{
+    const div = document.createElement('div');
+    div.className='visitor-item';
+    div.innerHTML=`<p>${item.name}</p><img src="${item.imgUrl}">`;
+    list.appendChild(div);
   });
-  refreshThemeBorders();
 }
 
-btnCarousel.onclick=()=>setView('carousel');
-btnGrid.onclick=()=>setView('grid');
-btnList.onclick=()=>setView('list');
-function setView(v){currentView=v;render()}
+function setView(v){
+  currentView=v;
+  renderCreations();
+}
 
-function openThemeModal(){themeModal.style.display='flex'}
-function closeThemeModal(e){if(e.target===themeModal||e.target.tagName==='BUTTON')themeModal.style.display='none'}
+btnCarousel.onclick = ()=>setView('carousel');
+btnGrid.onclick = ()=>setView('grid');
+btnList.onclick = ()=>setView('list');
+
+/* ==================== BOUTON AJOUTER ==================== */
+addBtn.onclick = () => {
+  const name = nameInput.value.trim();
+  const file = photoInput.files[0];
+
+  if (!name || !file) {
+    alert("Merci de renseigner un nom et une photo 💕");
+    return;
+  }
+
+  if (file.size > 3 * 1024 * 1024) {
+    alert("Image trop lourde (max 3 Mo)");
+    return;
+  }
+
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    creations.unshift({
+      name: name,
+      imgUrl: e.target.result
+    });
+
+    localStorage.setItem('creations', JSON.stringify(creations));
+    renderCreations();
+
+    nameInput.value = '';
+    photoInput.value = '';
+    alert("Création ajoutée avec succès ✨");
+  };
+
+  reader.readAsDataURL(file);
+};
+
+/* ==================== SIDEBAR ==================== */
+const sidebar = document.getElementById('sidebar');
+const toggleSidebar = document.getElementById('toggleSidebar');
+toggleSidebar.onclick = ()=> sidebar.classList.toggle('sidebar-open');
+
+/* ==================== THEME ==================== */
+const themeModal = document.getElementById('themeModal');
+const sweetRain = document.createElement('div');
+sweetRain.style.position='fixed';
+sweetRain.style.inset='0';
+sweetRain.style.pointerEvents='none';
+sweetRain.style.zIndex='5';
+sweetRain.style.display='none';
+document.body.appendChild(sweetRain);
+
+function openThemeModal(){ themeModal.style.display='flex'; }
+function closeThemeModal(e){ if(e.target===themeModal || e.target.tagName==='BUTTON') themeModal.style.display='none'; }
+
+function createSweet(){
+  if(sweetRain.style.display==='none') return;
+  const candy=document.createElement('div');
+  candy.textContent='🍬';
+  candy.style.position='absolute';
+  candy.style.top='-30px';
+  candy.style.left=Math.random()*innerWidth+'px';
+  candy.style.fontSize=(Math.random()*24+16)+'px';
+  candy.style.opacity=Math.random()*0.8+0.3;
+  sweetRain.appendChild(candy);
+  const fall=setInterval(()=>{
+    candy.style.top=parseFloat(candy.style.top)+(Math.random()*3+2)+'px';
+    candy.style.left=parseFloat(candy.style.left)+Math.sin(Date.now()/200)*1.5+'px';
+    if(parseFloat(candy.style.top)>innerHeight){ candy.remove(); clearInterval(fall);}
+  },20);
+}
+setInterval(createSweet,150);
 
 function setTheme(theme){
   if(theme==='noel'){
     document.body.style.backgroundImage="url('noel.png')";
-    snow.style.display='block';
-  }else if(theme==='girly'){
-    document.body.style.backgroundImage="url('sweetly-girly.png')";
-    snow.style.display='none';
-  }else{
+    document.getElementById('snow').style.display='block';
+    sweetRain.style.display='none';
+  } else if(theme==='sweety'){
+    document.body.style.background="url('sweety-girly.png') center center / cover no-repeat fixed";
+    document.getElementById('snow').style.display='none';
+    sweetRain.style.display='block';
+  } else {
     document.body.style.backgroundImage="url('Photoroom_20251212_143703.PNG')";
-    snow.style.display='none';
+    document.getElementById('snow').style.display='none';
+    sweetRain.style.display='none';
   }
-  refreshThemeBorders();
 }
 
-function refreshThemeBorders(){
-  const isNoel=snow.style.display==='block';
-  document.querySelectorAll('.visitor-item img').forEach(img=>{
-    if(isNoel){
-      img.style.border="6px solid";
-      img.style.borderImage="repeating-linear-gradient(45deg, red 0 10px, white 0 20px) 10";
-      img.style.background='none';
-    }else{
-      img.style.border="4px solid #b67385";
-      img.style.background='#ffe6f0';
-      img.style.borderImage='';
-    }
-  });
+/* ==================== NEIGE ==================== */
+const snow = document.getElementById('snow');
+function createSnow(){
+  if(snow.style.display==='none') return;
+  const f=document.createElement('div');
+  f.textContent='❄';
+  f.style.position='absolute';
+  f.style.top='-30px';
+  f.style.left=Math.random()*innerWidth+'px';
+  f.style.fontSize=(Math.random()*20+10)+'px';
+  f.style.opacity=Math.random();
+  snow.appendChild(f);
+  const fall=setInterval(()=>{
+    f.style.top=parseFloat(f.style.top)+3+'px';
+    if(parseFloat(f.style.top)>innerHeight){ f.remove(); clearInterval(fall);}
+  },20);
 }
+setInterval(createSnow,150);
 
-toggleSidebar.onclick=()=>sidebar.classList.toggle('sidebar-open');
-
-render();
+/* ==================== INIT ==================== */
+renderCreations();
 </script>
 </body>
 </html>
