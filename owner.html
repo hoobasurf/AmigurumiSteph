@@ -124,7 +124,6 @@ header img{width:98px;height:98px;border-radius:20%;margin:auto}
   align-items:center;
   z-index:9999;
 }
-
 .modal-box{
   background:#ffe6f0;
   border:4px solid #b67385;
@@ -133,7 +132,6 @@ header img{width:98px;height:98px;border-radius:20%;margin:auto}
   text-align:center;
   min-width:260px;
 }
-
 .modal-box button{
   display:block;
   width:100%;
@@ -146,8 +144,6 @@ header img{width:98px;height:98px;border-radius:20%;margin:auto}
   font-weight:bold;
   cursor:pointer;
 }
-
-  
 </style>
 </head>
 
@@ -194,26 +190,30 @@ header img{width:98px;height:98px;border-radius:20%;margin:auto}
     <button onclick="setTheme('noel')">🎄 Noël</button>
     <button onclick="setTheme('default')">💠 Défaut</button>
     <button onclick="setTheme('sweety')">🌸 Sweety-Girly</button>
-    <button onclick="openThemeModal()">Thème</button>
     <button onclick="closeThemeModal(event)">✕ Fermer</button>
   </div>
 </div>
 
 <script>
 
-  const btnCarousel = document.getElementById('btnCarousel');
+/* ===================== CORRECTION 1 ===================== */
+let currentView = 'grid';
+
+/* BOUTONS VUE */
+const btnCarousel = document.getElementById('btnCarousel');
 const btnGrid = document.getElementById('btnGrid');
 const btnList = document.getElementById('btnList');
 
 function setView(v){
   currentView = v;
-  render();
+  renderCreations();   /* ===================== CORRECTION 2 ===================== */
 }
 
 btnCarousel.onclick = () => setView('carousel');
 btnGrid.onclick = () => setView('grid');
 btnList.onclick = () => setView('list');
-  
+
+/* SIDEBAR */
 const sidebar = document.getElementById('sidebar');
 const toggleSidebar = document.getElementById('toggleSidebar');
 toggleSidebar.onclick = () => sidebar.classList.toggle('sidebar-open');
@@ -240,7 +240,6 @@ setInterval(createSnow,150);
 /* THEME */
 const themeModal = document.getElementById('themeModal');
 const sweetRain = document.createElement('div');
-sweetRain.id='sweetRain';
 sweetRain.style.position='fixed';
 sweetRain.style.inset='0';
 sweetRain.style.pointerEvents='none';
@@ -248,12 +247,12 @@ sweetRain.style.zIndex='5';
 sweetRain.style.display='none';
 document.body.appendChild(sweetRain);
 
-function openThemeModal() { themeModal.style.display='flex'; }
-function closeThemeModal(e){ if(e.target===themeModal || e.target.tagName==='BUTTON'){ themeModal.style.display='none'; } }
+function openThemeModal(){ themeModal.style.display='flex'; }
+function closeThemeModal(e){ if(e.target===themeModal||e.target.tagName==='BUTTON') themeModal.style.display='none'; }
 
 function createSweet(){
   if(sweetRain.style.display==='none') return;
-  const candy = document.createElement('div');
+  const candy=document.createElement('div');
   candy.textContent='🍬';
   candy.style.position='absolute';
   candy.style.top='-30px';
@@ -261,10 +260,10 @@ function createSweet(){
   candy.style.fontSize=(Math.random()*24+16)+'px';
   candy.style.opacity=Math.random()*0.8+0.3;
   sweetRain.appendChild(candy);
-  const fall = setInterval(()=>{
+  const fall=setInterval(()=>{
     candy.style.top=parseFloat(candy.style.top)+(Math.random()*3+2)+'px';
     candy.style.left=parseFloat(candy.style.left)+Math.sin(Date.now()/200)*1.5+'px';
-    if(parseFloat(candy.style.top)>innerHeight){ candy.remove(); clearInterval(fall);}
+    if(parseFloat(candy.style.top)>innerHeight){candy.remove();clearInterval(fall);}
   },20);
 }
 setInterval(createSweet,150);
@@ -274,63 +273,48 @@ function setTheme(theme){
     document.body.style.backgroundImage="url('noel.png')";
     snow.style.display='block';
     sweetRain.style.display='none';
-  } else if(theme==='sweety'){
+  }else if(theme==='sweety'){
     document.body.style.background="url('sweety-girly.png') center center / cover no-repeat fixed";
     snow.style.display='none';
     sweetRain.style.display='block';
-  } else {
+  }else{
     document.body.style.backgroundImage="url('Photoroom_20251212_143703.PNG')";
     snow.style.display='none';
     sweetRain.style.display='none';
   }
-  // Bordures images
-  document.querySelectorAll('.visitor-item img').forEach(img=>{
-    if(document.body.style.backgroundImage.includes('noel')){
-      img.style.border="6px solid";
-      img.style.borderImage="repeating-linear-gradient(45deg, red 0 10px, white 0 20px) 10";
-      img.style.background='none';
-    } else if(document.body.style.backgroundImage.includes('sweety')){
-      img.style.border="4px solid #ffb6c1";
-      img.style.background="#fff0f7";
-      img.style.borderImage='';
-    } else {
-      img.style.border="4px solid #b67385";
-      img.style.background='#ffe6f0';
-      img.style.borderImage='';
-    }
-  });
 }
 
 /* AJOUT CREATION */
-const nameInput = document.getElementById('name');
-const photoInput = document.getElementById('photo');
-const addBtn = document.getElementById('add');
-const list = document.getElementById('visitor-list');
+const nameInput=document.getElementById('name');
+const photoInput=document.getElementById('photo');
+const addBtn=document.getElementById('add');
+const list=document.getElementById('visitor-list');
 
-let creations = JSON.parse(localStorage.getItem('creations')||'[]');
+let creations=JSON.parse(localStorage.getItem('creations')||'[]');
 
 function renderCreations(){
   list.innerHTML='';
+  list.className = currentView + '-view'; /* ===================== CORRECTION 3 ===================== */
+
   creations.forEach(item=>{
-    const div = document.createElement('div');
+    const div=document.createElement('div');
     div.className='visitor-item';
     div.innerHTML=`<p>${item.name}</p><img src="${item.imgUrl}">`;
     list.appendChild(div);
   });
 }
 
-addBtn.onclick = () => {
-  const name = nameInput.value.trim();
-  const file = photoInput.files[0];
-  if(!name || !file){ alert("Merci de remplir le nom et choisir une photo !"); return; }
+addBtn.onclick=()=>{
+  const name=nameInput.value.trim();
+  const file=photoInput.files[0];
+  if(!name||!file){alert("Merci de remplir le nom et choisir une photo !");return;}
 
-  const reader = new FileReader();
-  reader.onload = (e)=>{
-    const imgUrl = e.target.result;
-    creations.unshift({name,imgUrl});
+  const reader=new FileReader();
+  reader.onload=(e)=>{
+    creations.unshift({name,imgUrl:e.target.result});
     localStorage.setItem('creations',JSON.stringify(creations));
     renderCreations();
-    nameInput.value=''; photoInput.value='';
+    nameInput.value='';photoInput.value='';
   };
   reader.readAsDataURL(file);
 };
