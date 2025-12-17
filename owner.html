@@ -205,7 +205,7 @@ header img{width:98px;height:98px;border-radius:20%;margin:auto}
   100%{transform:translateY(110vh) rotate(360deg)}
 }
 
-/* OWNER BOX */
+/* OWNER BOX (Ajout Supabase) */
 .owner-box { margin:20px; }
 .owner-box input, .owner-box button { padding:10px; margin:5px; border-radius:8px; border:1px solid #ccc; }
 #owner-list { display:flex; flex-wrap:wrap; gap:10px; }
@@ -241,6 +241,9 @@ header img{width:98px;height:98px;border-radius:20%;margin:auto}
 <!-- SIDEBAR -->
 <div id="sidebar">
   <div id="toggleSidebar">☰</div>
+  <input id="nameSidebar" placeholder="Nom">
+  <input id="photoSidebar" type="file" accept="image/*">
+  <button id="addSidebar">Ajouter</button>
   <button onclick="openThemeModal()">Thème</button>
 </div>
 
@@ -307,7 +310,7 @@ addBtn.onclick=()=>{
   r.readAsDataURL(file);
 };
 
-/* THEMES */
+/* THEMES – INTACTS */
 const snow=document.getElementById('snow');
 const sweetRain=document.createElement('div');
 sweetRain.style.position='fixed';
@@ -337,7 +340,7 @@ function setTheme(t){
   document.getElementById('themeModal').style.display='none';
 }
 
-/* SIDEBAR FIX */
+/* ==================== SIDEBAR FIX ==================== */
 const sidebar = document.getElementById('sidebar');
 const toggleSidebar = document.getElementById('toggleSidebar');
 
@@ -379,6 +382,7 @@ function createCandy(){
 }
 
 renderCreations();
+
 </script>
 
 <script type="module" src="owner.js"></script>
