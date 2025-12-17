@@ -277,6 +277,16 @@ const toggleSidebar = document.getElementById('toggleSidebar');
 toggleSidebar.onclick = () => {
   sidebar.classList.toggle('sidebar-open');
 };
+
+  
+function openThemeModal(){
+  document.getElementById('themeModal').style.display = 'flex';
+}
+
+function closeThemeModal(e){
+  document.getElementById('themeModal').style.display = 'none';
+}
+
   
 renderCreations();
 
