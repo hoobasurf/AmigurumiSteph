@@ -244,19 +244,35 @@ btnGrid.onclick = ()=>setView('grid');
 btnList.onclick = ()=>setView('list');
 
 /* ==================== BOUTON AJOUTER ==================== */
-addBtn.onclick = ()=>{
+addBtn.onclick = () => {
   const name = nameInput.value.trim();
   const file = photoInput.files[0];
-  if(!name || !file){ alert("Merci de remplir le nom et choisir une photo !"); return; }
+
+  if (!name || !file) {
+    alert("Merci de renseigner un nom et une photo 💕");
+    return;
+  }
+
+  if (file.size > 3 * 1024 * 1024) {
+    alert("Image trop lourde (max 3 Mo)");
+    return;
+  }
 
   const reader = new FileReader();
-  reader.onload = (e)=>{
-    creations.unshift({name: name, imgUrl: e.target.result});
+  reader.onload = (e) => {
+    creations.unshift({
+      name: name,
+      imgUrl: e.target.result
+    });
+
     localStorage.setItem('creations', JSON.stringify(creations));
     renderCreations();
-    nameInput.value='';
-    photoInput.value='';
+
+    nameInput.value = '';
+    photoInput.value = '';
+    alert("Création ajoutée avec succès ✨");
   };
+
   reader.readAsDataURL(file);
 };
 
