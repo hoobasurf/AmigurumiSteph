@@ -177,6 +177,34 @@ header img{width:98px;height:98px;border-radius:20%;margin:auto}
 #sidebar * {
   pointer-events: auto;
 }
+
+/* ❄️ FLOCONS */
+.snowflake{
+  position:absolute;
+  top:-10px;
+  color:white;
+  font-size:16px;
+  animation: snowFall linear infinite;
+  pointer-events:none;
+}
+
+@keyframes snowFall{
+  0%{transform:translateY(0)}
+  100%{transform:translateY(110vh)}
+}
+
+/* 🍬 BONBONS */
+.candy{
+  position:absolute;
+  top:-20px;
+  font-size:22px;
+  animation: candyFall linear infinite;
+  pointer-events:none;
+}
+
+@keyframes candyFall{
+  100%{transform:translateY(110vh) rotate(360deg)}
+}
   
 </style>
 </head>
@@ -301,6 +329,30 @@ function closeThemeModal(e){
   document.getElementById('themeModal').style.display = 'none';
 }
 
+function createSnow(){
+  snow.innerHTML='';
+  for(let i=0;i<35;i++){
+    const f=document.createElement('div');
+    f.className='snowflake';
+    f.textContent='❄️';
+    f.style.left=Math.random()*100+'%';
+    f.style.animationDuration=4+Math.random()*6+'s';
+    f.style.fontSize=12+Math.random()*14+'px';
+    snow.appendChild(f);
+  }
+}
+
+function createCandy(){
+  sweetRain.innerHTML='';
+  for(let i=0;i<35;i++){
+    const c=document.createElement('div');
+    c.className='candy';
+    c.textContent='🍬';
+    c.style.left=Math.random()*100+'%';
+    c.style.animationDuration=4+Math.random()*6+'s';
+    sweetRain.appendChild(c);
+  }
+}
   
 renderCreations();
 
