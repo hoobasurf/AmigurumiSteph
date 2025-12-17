@@ -74,10 +74,15 @@ header img{width:98px;height:98px;border-radius:20%;margin:auto}
 .visitor-item:hover img{ transform:scale(1.05); }
 
 /* VUES */
-.carousel-view{ display:flex; gap:20px; overflow-x:auto; padding:12px; scroll-behavior:smooth;}
-.carousel-view::-webkit-scrollbar{ height:8px; }
-.carousel-view::-webkit-scrollbar-thumb{ background:#b84c6f88; border-radius:20px; }
-
+.carousel-view{
+  display:flex;
+  flex-wrap:nowrap;          /* ✅ OBLIGATOIRE */
+  gap:20px;
+  overflow-x:auto;           /* ✅ scroll horizontal */
+  padding:12px;
+  scroll-behavior:smooth;
+  justify-content:flex-start; /* ✅ pas centré */
+}
 .grid-view{ display:flex; flex-wrap:wrap; justify-content:center; gap:16px;}
 .list-view{ display:flex; flex-direction:column; gap:16px;}
 .list-view .visitor-item{ display:flex; align-items:center; gap:16px;}
