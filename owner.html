@@ -305,6 +305,37 @@ function loadComments(){
   commentList.innerHTML=c.map(x=>`<div class="comment"><strong>${x.n}</strong><br>${x.t}</div>`).join('');
 }
 
+// --- AJOUT DE CRÉATION (OWNER) ---
+const nameInput = document.getElementById('name');
+const photoInput = document.getElementById('photo');
+const addBtn = document.getElementById('add');
+
+addBtn.onclick = () => {
+  const name = nameInput.value.trim();
+  const file = photoInput.files[0];
+
+  if (!name || !file) {
+    alert("Nom + photo requis");
+    return;
+  }
+
+  const reader = new FileReader();
+  reader.onload = e => {
+    creations.unshift({
+      name: name,
+      imgUrl: e.target.result
+    });
+
+    localStorage.setItem('creations', JSON.stringify(creations));
+    render(); // 🔥 MAJ immédiate de la galerie
+
+    nameInput.value = '';
+    photoInput.value = '';
+  };
+
+  reader.readAsDataURL(file);
+};
+  
 render();
 </script>
 
