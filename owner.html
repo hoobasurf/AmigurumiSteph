@@ -4,8 +4,8 @@
 <meta charset="UTF-8">
 <title>Owner - Mes créations</title>
 <style>
-*{box-sizing:border-box;margin:0;padding:0}
-html,body{height:100%;font-family:'Comic Sans MS',cursive}
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;font-family:'Comic Sans MS',cursive;}
 
 /* BODY */
 body{
@@ -16,16 +16,19 @@ body{
 }
 
 /* HEADER */
-header{text-align:center;padding:12px 0}
-header img{width:98px;height:98px;border-radius:20%;margin:auto}
-.title{
-  display:none;
-}
+header{text-align:center;padding:12px 0;}
+header img{width:98px;height:98px;border-radius:20%;margin:auto;}
+.title{display:none;}
 
 /* BOUTONS VUE */
+#viewSelector{
+  display:flex;
+  justify-content:center;
+  gap:16px;
+  margin-top:20px;
+  margin-bottom:10px;
+}
 #viewSelector button{
-  position:relative;
-  top:0;
   background:#fff0f7;
   border:2px solid #b84c6f;
   color:#b84c6f;
@@ -34,55 +37,41 @@ header img{width:98px;height:98px;border-radius:20%;margin:auto}
   cursor:pointer;
 }
 
-#viewSelector{
-  display:flex;
-  justify-content:center;
-  gap:16px;
-  margin-top:20px;
-}
-
-/* CENTER ZONE */
+/* CONTENU */
 .center-zone{
   flex:1;
   display:flex;
   justify-content:center;
   align-items:flex-start;
   padding-top:20px;
+  overflow:hidden;
 }
-#visitor-list{width:100%;max-width:1200px}
+#visitor-list{width:100%;max-width:1200px;}
 
 /* ITEMS */
 .visitor-item{
   text-align:center;
   cursor:pointer;
-  background:#fff0f7;
+  box-shadow:0 6px 12px rgba(0,0,0,0.15);
   border-radius:16px;
-  padding:10px;
-  box-shadow:0 8px 16px rgba(0,0,0,0.25);
+  background:#ffe6f0;
+  padding:8px;
   display:flex;
   flex-direction:column;
-  justify-content:center;
   align-items:center;
-  overflow:hidden;
-  border:3px solid #b84c6f;
 }
-
 .visitor-item img{
   width:100%;
-  height:auto;
   object-fit:contain;
-  border-radius:12px;
+  border:4px solid #b84c6f;
+  border-radius:16px;
   margin-bottom:8px;
-  border:2px solid #b84c6f;
 }
-
 .visitor-item p{
-  font-size:20px;
-  color:#b84c6f;
+  font-size:18px;
   font-weight:bold;
+  color:#8b3a3a;
   text-align:center;
-  margin:0;
-  text-shadow:1px 1px 2px rgba(0,0,0,0.2);
 }
 
 /* VUES */
@@ -90,34 +79,35 @@ header img{width:98px;height:98px;border-radius:20%;margin:auto}
   display:flex;
   gap:20px;
   overflow-x:auto;
-  padding:20px;
+  scroll-snap-type: x mandatory;
 }
 .carousel-view .visitor-item{
-  min-width:calc(50% - 10px);
-  max-width:calc(50% - 10px);
+  min-width:calc(50% - 20px);
   flex-shrink:0;
+  scroll-snap-align:start;
 }
-
 .grid-view{
   display:grid;
   grid-template-columns:repeat(2,1fr);
   grid-auto-rows:minmax(200px,1fr);
   gap:20px;
-  padding:20px;
   overflow-y:auto;
-  max-height:calc(100vh - 200px);
+  max-height:calc(100vh - 150px);
 }
-
 .list-view{
   display:flex;
   flex-direction:column;
   gap:20px;
-  padding:20px;
   overflow-y:auto;
-  max-height:calc(100vh - 200px);
+  max-height:calc(100vh - 150px);
 }
 .list-view .visitor-item{
-  width:100%;
+  flex-direction:row;
+  gap:16px;
+}
+.list-view img{
+  width:calc(50% - 16px);
+  height:auto;
 }
 
 /* MODAL IMAGE */
@@ -165,6 +155,7 @@ header img{width:98px;height:98px;border-radius:20%;margin:auto}
   max-height:500px;
   object-fit:contain;
   border:4px solid #b67385;
+  border-radius:16px;
   background:#ffe6f0;
 }
 
@@ -186,10 +177,12 @@ header img{width:98px;height:98px;border-radius:20%;margin:auto}
   border-radius:12px;
   border:2px solid #b67385;
 }
+.heart{font-size:26px}
+.heart.liked{color:#ff4b82}
 
 /* COMMENTAIRES */
 .comment-section{margin-top:16px}
-.comment{background:#ffe6f0;padding:10px;border-radius:10px;margin-bottom:10px}
+.comment{background:#ffe6f0;padding:10px;border-radius:10px;margin-bottom:10px;}
 
 /* FORM COMMENTAIRE ET LIKE */
 .form-modal-bg{
@@ -267,11 +260,21 @@ header img{width:98px;height:98px;border-radius:20%;margin:auto}
   font-weight:bold;
   cursor:pointer;
 }
+
+/* NEIGE / SWEETY */
+.snow, #sweetRain{
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  z-index:5;
+  display:none;
+}
 </style>
 </head>
 <body>
 
 <div id="snow" class="snow"></div>
+<div id="sweetRain"></div>
 
 <header>
   <h1 class="title">Mes créations</h1>
@@ -291,26 +294,17 @@ header img{width:98px;height:98px;border-radius:20%;margin:auto}
 <div class="modal-bg" id="modal" onclick="closeModal()">
   <div class="modal-box" onclick="event.stopPropagation()">
     <div class="close-modal" onclick="closeModal()">×</div>
-
     <img id="modalMain" class="modal-main-img">
-
     <button id="modalBackBtn" onclick="closeModal()">← Retour</button>
-
     <div class="icon-bar">
-
-      <!-- LIKE -->
       <div class="icon-btn" onclick="openLikeModal()">
         <span class="heart" id="heart">♡</span>
         <span id="likeCount">0</span>
       </div>
-
-      <!-- COMMENT -->
       <div class="icon-btn" onclick="openCommentForm()">💬
         <span id="commentCount">0</span>
       </div>
-
     </div>
-
     <div id="commentsList" class="comment-section"></div>
   </div>
 </div>
@@ -344,27 +338,28 @@ header img{width:98px;height:98px;border-radius:20%;margin:auto}
   <button>Paramètres</button>
 </div>
 
+<!-- ADD MODAL -->
+<div class="form-modal-bg" id="addModal" onclick="if(event.target===addModal) addModal.style.display='none'">
+  <div class="form-modal" onclick="event.stopPropagation()">
+    <input id="newName" placeholder="Nom de la création">
+    <input id="newFile" type="file" accept="image/*">
+    <button onclick="submitAdd()">Ajouter</button>
+  </div>
+</div>
+
 <!-- THEME MODAL -->
 <div class="modal-bg" id="themeModal" onclick="closeThemeModal(event)">
   <div class="modal-box" onclick="event.stopPropagation()">
     <h3>Choisir un thème</h3>
     <button onclick="setTheme('noel')">🎄 Noël</button>
     <button onclick="setTheme('default')">💠 Défaut</button>
-    <button onclick="closeThemeModal(event)">✕ Fermer</button>
     <button onclick="setTheme('sweety')">🌸 Sweety-Girly</button>
-  </div>
-</div>
-
-<!-- MODAL AJOUT -->
-<div class="form-modal-bg" id="addModalBg" onclick="if(event.target===addModalBg) addModalBg.style.display='none'">
-  <div class="form-modal" onclick="event.stopPropagation()">
-    <input id="name" placeholder="Nom de la création">
-    <input id="photo" type="file" accept="image/*">
-    <button id="addBtn">Ajouter</button>
+    <button onclick="closeThemeModal(event)">✕ Fermer</button>
   </div>
 </div>
 
 <script>
+/* VARIABLES */
 const list=document.getElementById('visitor-list');
 const modal=document.getElementById('modal');
 const modalMain=document.getElementById('modalMain');
@@ -372,11 +367,9 @@ const commentFormBg=document.getElementById('commentFormBg');
 const likeFormBg=document.getElementById('likeFormBg');
 const commentCount=document.getElementById('commentCount');
 const commentList=document.getElementById('commentsList');
-const addModalBg=document.getElementById('addModalBg');
-
-const nameInput=document.getElementById('name');
-const photoInput=document.getElementById('photo');
-const addBtn=document.getElementById('addBtn');
+const addModal=document.getElementById('addModal');
+const snow=document.getElementById('snow');
+const sweetRain=document.getElementById('sweetRain');
 
 let creations=JSON.parse(localStorage.getItem('creations')||'[]');
 let currentIndex=null;
@@ -394,13 +387,12 @@ function render(){
     list.appendChild(d);
   });
 }
-render();
 
 /* VUES */
 btnCarousel.onclick=()=>setView('carousel');
 btnGrid.onclick=()=>setView('grid');
 btnList.onclick=()=>setView('list');
-function setView(v){currentView=v; render()}
+function setView(v){currentView=v;render();}
 
 /* MODAL */
 function openModal(i){
@@ -412,14 +404,32 @@ function openModal(i){
 }
 function closeModal(){modal.style.display='none'}
 
+/* ADD */
+function openAddModal(){addModal.style.display='flex'}
+function submitAdd(){
+  const name=document.getElementById('newName').value.trim();
+  const file=document.getElementById('newFile').files[0];
+  if(!name||!file){alert("Nom et fichier requis"); return;}
+  const reader=new FileReader();
+  reader.onload=(e)=>{
+    creations.unshift({name,imgUrl:e.target.result});
+    localStorage.setItem('creations',JSON.stringify(creations));
+    document.getElementById('newName').value='';
+    document.getElementById('newFile').value='';
+    addModal.style.display='none';
+    render();
+  };
+  reader.readAsDataURL(file);
+}
+
 /* COMMENT */
 function openCommentForm(){commentFormBg.style.display='flex'}
 function submitComment(){
-  const n=document.getElementById('commentName').value;
-  const t=document.getElementById('commentText').value;
-  if(!n||!t)return;
+  const n=document.getElementById('commentName').value.trim();
+  const t=document.getElementById('commentText').value.trim();
+  if(!n||!t) return;
   const key='comments_'+currentIndex;
-  const c=JSON.parse(localStorage.getItem(key)||'[]');
+  let c=JSON.parse(localStorage.getItem(key)||'[]');
   c.push({n,t});
   localStorage.setItem(key,JSON.stringify(c));
   commentFormBg.style.display='none';
@@ -434,40 +444,23 @@ function loadComments(){
 /* LIKE */
 function openLikeModal(){likeFormBg.style.display='flex'}
 function submitLike(){
-  const name = document.getElementById('likeName').value.trim();
-  if(!name)return alert("Merci d'indiquer ton prénom ❤️");
-  const key = 'likes_' + currentIndex;
-  let likes = JSON.parse(localStorage.getItem(key) || '[]');
+  const name=document.getElementById('likeName').value.trim();
+  if(!name){alert("Indique ton prénom"); return;}
+  const key='likes_'+currentIndex;
+  let likes=JSON.parse(localStorage.getItem(key)||'[]');
   if(!likes.includes(name)) likes.push(name);
-  localStorage.setItem(key, JSON.stringify(likes));
-  likeFormBg.style.display = 'none';
+  localStorage.setItem(key,JSON.stringify(likes));
+  likeFormBg.style.display='none';
   loadLikes();
 }
 function loadLikes(){
   const key='likes_'+currentIndex;
   const likes=JSON.parse(localStorage.getItem(key)||'[]');
   const heart=document.getElementById('heart');
+  const likeCount=document.getElementById('likeCount');
   heart.textContent=likes.length?'❤️':'♡';
   heart.classList.toggle('liked',likes.length>0);
-  document.getElementById('likeCount').textContent=likes.length?likes.length+' · '+likes.join(', '):'0';
-}
-
-/* AJOUT */
-function openAddModal(){addModalBg.style.display='flex'}
-addBtn.onclick=()=>{
-  const name=nameInput.value.trim();
-  const file=photoInput.files[0];
-  if(!name || !file) return alert("Merci de remplir le nom et choisir une photo !");
-  const reader=new FileReader();
-  reader.onload=e=>{
-    const imgUrl=e.target.result;
-    creations.unshift({name,imgUrl});
-    localStorage.setItem('creations',JSON.stringify(creations));
-    render();
-    nameInput.value=''; photoInput.value='';
-    addModalBg.style.display='none';
-  };
-  reader.readAsDataURL(file);
+  likeCount.textContent=likes.length?likes.length+' · '+likes.join(', '):'0';
 }
 
 /* SIDEBAR */
@@ -476,26 +469,12 @@ const toggleSidebar=document.getElementById('toggleSidebar');
 toggleSidebar.onclick=()=>sidebar.classList.toggle('sidebar-open');
 
 /* THEME */
-const snow=document.getElementById('snow');
 const themeModal=document.getElementById('themeModal');
 function openThemeModal(){themeModal.style.display='flex'}
 function closeThemeModal(e){if(e.target===themeModal||e.target.tagName==='BUTTON') themeModal.style.display='none'}
-function setTheme(theme){
-  if(theme==='noel'){
-    document.body.style.backgroundImage="url('noel.png')";
-    snow.style.display='block';
-  } else if(theme==='sweety'){
-    document.body.style.background="url('sweety-girly.png') center center / cover no-repeat fixed";
-    snow.style.display='none';
-  } else {
-    document.body.style.backgroundImage="url('Photoroom_20251212_143703.PNG')";
-    snow.style.display='none';
-  }
-}
 
-/* NEIGE */
-function createSnow(){
-  if(snow.style.display==='none')return;
+/* ANIMATIONS */
+function createSnow(){if(snow.style.display==='none') return;
   const f=document.createElement('div');
   f.textContent='❄';
   f.style.position='absolute';
@@ -510,6 +489,32 @@ function createSnow(){
   },20);
 }
 setInterval(createSnow,150);
+
+function createCandy(){if(sweetRain.style.display==='none') return;
+  const c=document.createElement('div');
+  c.textContent='🍬';
+  c.style.position='absolute';
+  c.style.top='-30px';
+  c.style.left=Math.random()*innerWidth+'px';
+  c.style.fontSize=(Math.random()*24+16)+'px';
+  c.style.opacity=Math.random()*0.8+0.3;
+  sweetRain.appendChild(c);
+  const fall=setInterval(()=>{
+    c.style.top=parseFloat(c.style.top)+(Math.random()*3+2)+'px';
+    c.style.left=parseFloat(c.style.left)+Math.sin(Date.now()/200)*1.5+'px';
+    if(parseFloat(c.style.top)>innerHeight){c.remove();clearInterval(fall);}
+  },20);
+}
+setInterval(createCandy,150);
+
+function setTheme(theme){
+  if(theme==='noel'){document.body.style.backgroundImage="url('noel.png')"; snow.style.display='block'; sweetRain.style.display='none';}
+  else if(theme==='sweety'){document.body.style.backgroundImage="url('sweety-girly.png')"; snow.style.display='none'; sweetRain.style.display='block';}
+  else{document.body.style.backgroundImage="url('Photoroom_20251212_143703.PNG')"; snow.style.display='none'; sweetRain.style.display='none';}
+}
+
+/* INIT */
+render();
 </script>
 </body>
 </html>
