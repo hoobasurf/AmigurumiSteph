@@ -1,32 +1,285 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-  <meta charset="UTF-8">
-  <title>Owner - Test Ajouter</title>
-  <style>
-    body { font-family: sans-serif; padding: 20px; background: #fff0f5; }
-    .owner-box { margin-bottom: 20px; }
-    input, button { padding: 10px; margin: 5px; border-radius: 8px; border: 1px solid #ccc; }
-    button { background-color: #ffb6c1; cursor: pointer; }
-    #owner-list { display: flex; flex-wrap: wrap; gap: 10px; }
-    .owner-item { background: #fff; padding: 10px; border-radius: 10px; box-shadow: 0 0 5px #ccc; }
-    .owner-item img { max-width: 100px; border-radius: 8px; display: block; }
-  </style>
+<meta charset="UTF-8" />
+<title>Galerie - Mes créations</title>
+
+<style>
+* { box-sizing:border-box; margin:0; padding:0; }
+html, body { height:100%; font-family:'Comic Sans MS', cursive; }
+body {
+  background-image: url('Photoroom_20251212_143703.PNG');
+  background-size: cover;
+  background-position: center top;
+  background-repeat: no-repeat;
+  background-attachment: fixed;
+  margin:0;
+  padding:0;
+  overflow:hidden;
+  display:flex;
+  flex-direction:column;
+}
+
+header { text-align:center; padding:12px 0; }
+header img { width:400px; height:400px; border-radius:20%; display:block; margin:0 auto; }
+.title { font-size:42px; color:#b84c6f; font-weight:bold; text-align:center; margin-bottom:8px; }
+
+#viewSelector {
+  display:flex;
+  justify-content:center;
+  gap:12px;
+  margin-top: 12px;
+}
+#viewSelector button {
+  background:#fff0f7;
+  border:2px solid #b84c6f;
+  color:#b84c6f;
+  padding:16px 32px;
+  font-size:30px;
+  border-radius:24px;
+  cursor:pointer;
+}
+#viewSelector button.active { background:#ffeaf2; }
+
+.center-zone {
+  flex:1;
+  display:flex;
+  justify-content:center;
+  margin-top: 1cm;
+}
+#visitor-list { width:100%; max-width:1200px; }
+
+.visitor-item { text-align:center; cursor:pointer; user-select:none; }
+.visitor-item img { width:220px; height:220px; object-fit:contain; border:4px solid #b67385; transition: transform 0.2s ease; }
+.visitor-item:hover img { transform: scale(1.02); }
+.visitor-item p { margin-top:8px; font-size:20px; color:#b84c6f; font-weight:bold; }
+
+.carousel-view {
+  display:flex;
+  gap:40px;
+  overflow-x:auto;
+  padding:20px;
+  scroll-behavior:smooth;
+  margin-top:2cm;
+}
+.carousel-view::-webkit-scrollbar { height:8px; }
+.carousel-view::-webkit-scrollbar-thumb { background:#b84c6f88; border-radius:20px; }
+
+.grid-view, .list-view { overflow-y:auto; -webkit-overflow-scrolling: touch; max-height: calc(100vh - 260px); overscroll-behavior: contain; }
+.grid-view { display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:24px; padding:20px; }
+.list-view { display:flex; flex-direction:column; gap:18px; padding:20px; }
+.list-view .visitor-item { display:flex; align-items:center; gap:18px; }
+.list-view .visitor-item img { width:140px; height:140px; }
+
+.modal-bg {
+  position:fixed; inset:0; background:rgba(0,0,0,0.65);
+  display:none; justify-content:center; align-items:center; z-index:1000;
+}
+.modal-box {
+  background: rgba(255,245,248,0.95);
+  border: 4px solid #b67385;
+  border-radius:18px;
+  box-shadow:0 0 30px rgba(184,76,111,0.4);
+  padding:18px;
+  max-width:900px; width:95%;
+  max-height:80vh;
+  overflow-y:auto;
+  position:relative;
+}
+#modalBackBtn {
+  display:block;
+  margin: 12px auto;
+  background: #ff99cc;
+  border: 2px solid #b84c6f;
+  color: white;
+  padding: 10px 20px;
+  font-size: 20px;
+  border-radius: 12px;
+  cursor: pointer;
+}
+.close-modal {
+  position:absolute; top:12px; right:16px;
+  font-size:30px; cursor:pointer; color:#b84c6f;
+}
+.modal-main-img { width:100%; max-height:500px; object-fit:contain; border:4px solid #b67385; }
+
+.icon-bar { display:flex; justify-content:center; gap:30px; margin-top:12px; }
+.icon-btn { display:flex; align-items:center; gap:8px; cursor:pointer; color:#b84c6f; }
+.heart { font-size:26px; }
+.heart.liked { color:#ff4b82; }
+.comment-icon { font-size:22px; }
+.like-info { font-size:14px; }
+
+.comment-section { margin-top:16px; }
+.comment { background:#fff0f7; padding:10px; border-radius:10px; margin-bottom:10px; }
+
+.comment-form-bg, #likeNameFormBg {
+  position:fixed; inset:0; background:rgba(0,0,0,.6);
+  display:none; justify-content:center; align-items:center; z-index:2000;
+}
+.comment-form, #likeNameForm {
+  background:#ffdde5;
+  border:2px solid #b84c6f;
+  padding:18px;
+  border-radius:14px;
+  width:340px;
+  text-align:center;
+}
+#likeNameForm input { width:100%; margin-bottom:10px; padding:10px; border-radius:8px; border:1px solid #b84c6f; }
+
+</style>
 </head>
 <body>
 
-<h1>Ajouter une création</h1>
+<header>
+  <img src="favicon.png" alt="Logo">
+  <h1 class="title">Mes créations</h1>
+</header>
 
-<div class="owner-box">
-  <input id="name" placeholder="Nom de la création">
-  <input id="photo" type="file" accept="image/*">
-  <button id="add">Ajouter</button>
+<div id="viewSelector">
+  <button id="btnCarousel">Carrousel</button>
+  <button id="btnGrid">Grille</button>
+  <button id="btnList">Liste</button>
 </div>
 
-<h2>Liste des créations</h2>
-<div id="owner-list"></div>
+<div class="center-zone">
+  <div id="visitor-list"></div>
+</div>
 
-<script type="module" src="owner.js"></script>
+<!-- MODAL -->
+<div class="modal-bg" id="modal" onclick="closeModal()">
+  <div class="modal-box" onclick="event.stopPropagation()">
+    <button id="modalBackBtn">Retour</button>
+    <div class="close-modal" onclick="closeModal(); event.stopPropagation()">×</div>
+    <img id="modalMain" class="modal-main-img">
+
+    <div class="icon-bar">
+      <div class="icon-btn" onclick="toggleLike(); event.stopPropagation()">
+        <span id="heart" class="heart">♡</span>
+        <span id="likeCount" class="like-info">0</span>
+      </div>
+      <div class="icon-btn" onclick="openCommentForm(); event.stopPropagation()">
+        <span class="comment-icon">💬</span>
+        <span id="commentCount" class="like-info">0</span>
+      </div>
+    </div>
+
+    <div id="commentsList" class="comment-section"></div>
+  </div>
+</div>
+
+<!-- COMMENT FORM -->
+<div class="comment-form-bg" id="commentFormBg" onclick="if(event.target===this) commentFormBg.style.display='none'">
+  <div class="comment-form" onclick="event.stopPropagation()">
+    <input id="commentName" placeholder="Prénom">
+    <textarea id="commentText" rows="4" placeholder="Commentaire"></textarea>
+    <button onclick="submitComment()">Envoyer</button>
+  </div>
+</div>
+
+<!-- LIKE NAME FORM -->
+<div id="likeNameFormBg" onclick="if(event.target===this) likeNameFormBg.style.display='none'">
+  <div id="likeNameForm" onclick="event.stopPropagation()">
+    <p>Ton prénom pour liker :</p>
+    <input type="text" id="likeNameInput" placeholder="Prénom">
+    <button id="submitLikeName">Envoyer</button>
+  </div>
+</div>
+
+<script>
+const list = document.getElementById('visitor-list');
+const modal = document.getElementById('modal');
+const modalMain = document.getElementById('modalMain');
+const heart = document.getElementById('heart');
+const likeCount = document.getElementById('likeCount');
+const commentCount = document.getElementById('commentCount');
+const commentList = document.getElementById('commentsList');
+const commentFormBg = document.getElementById('commentFormBg');
+const commentName = document.getElementById('commentName');
+const commentText = document.getElementById('commentText');
+const modalBackBtn = document.getElementById('modalBackBtn');
+
+const likeNameFormBg = document.getElementById('likeNameFormBg');
+const likeNameInput = document.getElementById('likeNameInput');
+const submitLikeName = document.getElementById('submitLikeName');
+
+let creations = JSON.parse(localStorage.getItem('creations') || '[]');
+let currentIndex = null;
+let currentView = 'carousel';
+
+function render() {
+  list.innerHTML='';
+  list.className = currentView+'-view';
+  creations.forEach((c,i)=>{
+    const d=document.createElement('div');
+    d.className='visitor-item';
+    d.innerHTML=`<img src="${c.imgUrl}"><p>${c.name}</p>`;
+    d.onclick=()=>openModal(i);
+    list.appendChild(d);
+  });
+}
+
+function setView(v){ currentView=v; render(); }
+document.getElementById('btnCarousel').onclick=()=>setView('carousel');
+document.getElementById('btnGrid').onclick=()=>setView('grid');
+document.getElementById('btnList').onclick=()=>setView('list');
+
+function openModal(i){
+  currentIndex=i;
+  modalMain.src=creations[i].imgUrl;
+  modal.style.display='flex';
+  loadLikes();
+  loadComments();
+}
+
+function closeModal(){ modal.style.display='none'; }
+modalBackBtn.onclick = () => { modal.style.display='none'; };
+
+// --- Like avec prénom ---
+function toggleLike(){
+  if(currentIndex===null) return;
+  likeNameInput.value='';
+  likeNameFormBg.style.display='flex';
+}
+submitLikeName.onclick = () => {
+  const name = likeNameInput.value.trim() || "Anonyme";
+  const key='likes_'+currentIndex;
+  let likes=JSON.parse(localStorage.getItem(key)||'[]');
+  if(!likes.includes(name)) likes.push(name);
+  localStorage.setItem(key,JSON.stringify(likes));
+  likeNameFormBg.style.display='none';
+  loadLikes();
+};
+
+function loadLikes(){
+  const likes=JSON.parse(localStorage.getItem('likes_'+currentIndex)||'[]');
+  heart.classList.toggle('liked',likes.length>0);
+  heart.textContent = likes.length?'❤️':'♡';
+  likeCount.textContent = likes.length>0 ? likes.join(', ') : 0;
+}
+
+function openCommentForm(){ commentFormBg.style.display='flex'; }
+function submitComment(){
+  const n=commentName.value.trim();
+  const t=commentText.value.trim();
+  if(!n||!t)return;
+  const key='comments_'+currentIndex;
+  const c=JSON.parse(localStorage.getItem(key)||'[]');
+  c.push({n,t});
+  localStorage.setItem(key,JSON.stringify(c));
+  commentName.value=''; commentText.value='';
+  commentFormBg.style.display='none';
+  loadComments();
+}
+
+function loadComments(){
+  const c=JSON.parse(localStorage.getItem('comments_'+currentIndex)||'[]');
+  commentCount.textContent=c.length;
+  commentList.innerHTML=c.map(x=>`<div class="comment"><strong>${x.n}</strong><br>${x.t}</div>`).join('');
+}
+
+render();
+</script>
 
 </body>
 </html>
