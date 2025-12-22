@@ -24,6 +24,7 @@ header { text-align:center; padding:12px 0; }
 header img { width:400px; height:400px; border-radius:20%; display:block; margin:0 auto; }
 .title { font-size:42px; color:#b84c6f; font-weight:bold; text-align:center; margin-bottom:8px; }
 
+
 #viewSelector {
   display:flex;
   justify-content:center;
@@ -127,6 +128,25 @@ header img { width:400px; height:400px; border-radius:20%; display:block; margin
 }
 #likeNameForm input { width:100%; margin-bottom:10px; padding:10px; border-radius:8px; border:1px solid #b84c6f; }
 
+.owner-box{
+  display:flex;
+  justify-content:center;
+  gap:10px;
+  margin-top:20px;
+}
+.owner-box input,
+.owner-box button{
+  padding:10px;
+  border-radius:8px;
+  border:2px solid #b84c6f;
+}
+.owner-box button{
+  background:#ffb6c1;
+  color:#8b3a3a;
+  font-weight:bold;
+  cursor:pointer;
+}
+  
 </style>
 </head>
 <body>
@@ -136,6 +156,13 @@ header img { width:400px; height:400px; border-radius:20%; display:block; margin
   <h1 class="title">Mes créations</h1>
 </header>
 
+<!-- OWNER BOX -->
+<div class="owner-box">
+  <input id="name" placeholder="Nom de la création">
+  <input id="photo" type="file" accept="image/*">
+  <button id="add">Ajouter</button>
+</div>
+  
 <div id="viewSelector">
   <button id="btnCarousel">Carrousel</button>
   <button id="btnGrid">Grille</button>
