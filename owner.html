@@ -95,6 +95,7 @@ header img{width:98px;height:98px;border-radius:20%;margin:auto}
 }
 
 /* SIDEBAR */
+/* SIDEBAR */
 #sidebar{
   position:fixed;
   top:0;
@@ -204,50 +205,31 @@ header img{width:98px;height:98px;border-radius:20%;margin:auto}
 @keyframes candyFall{
   100%{transform:translateY(110vh) rotate(360deg)}
 }
-
-/* OWNER BOX (Ajout Supabase) */
-.owner-box { margin:20px; }
-.owner-box input, .owner-box button { padding:10px; margin:5px; border-radius:8px; border:1px solid #ccc; }
-#owner-list { display:flex; flex-wrap:wrap; gap:10px; }
-.owner-item { background:#fff; padding:10px; border-radius:10px; box-shadow:0 0 5px #ccc; }
-.owner-item img { max-width:100px; border-radius:8px; display:block; }
-
+  
 </style>
 </head>
 <body>
 
 <div id="snow" class="snow"></div>
 
-<!-- Owner Box -->
-<div class="owner-box">
-  <input id="name" placeholder="Nom de la création">
-  <input id="photo" type="file" accept="image/*">
-  <button id="add">Ajouter</button>
-</div>
-<div id="owner-list"></div>
-
-<!-- VUE SELECTOR -->
 <div id="viewSelector">
   <button id="btnCarousel">Carrousel</button>
   <button id="btnGrid">Grille</button>
   <button id="btnList">Liste</button>
 </div>
 
-<!-- VISITOR LIST -->
 <div class="center-zone">
   <div id="visitor-list"></div>
 </div>
 
-<!-- SIDEBAR -->
 <div id="sidebar">
   <div id="toggleSidebar">☰</div>
-  <input id="nameSidebar" placeholder="Nom">
-  <input id="photoSidebar" type="file" accept="image/*">
-  <button id="addSidebar">Ajouter</button>
+  <input id="name" placeholder="Nom">
+  <input id="photo" type="file" accept="image/*">
+  <button id="add">Ajouter</button>
   <button onclick="openThemeModal()">Thème</button>
 </div>
 
-<!-- MODAL THEME -->
 <div class="modal-bg" id="themeModal" onclick="closeThemeModal(event)">
   <div class="modal-box" onclick="event.stopPropagation()">
     <button onclick="setTheme('noel')">🎄 Noël</button>
@@ -273,15 +255,6 @@ function renderCreations(){
     d.innerHTML=`<p>${c.name}</p><img src="${c.imgUrl}">`;
     list.appendChild(d);
   });
-
-  const ownerList = document.getElementById('owner-list');
-  ownerList.innerHTML='';
-  creations.forEach(c=>{
-    const d=document.createElement('div');
-    d.className='owner-item';
-    d.innerHTML=`<p>${c.name}</p><img src="${c.imgUrl}">`;
-    ownerList.appendChild(d);
-  });
 }
 
 function setView(v){
@@ -303,7 +276,7 @@ addBtn.onclick=()=>{
   r.onload=e=>{
     creations.unshift({name, imgUrl:e.target.result});
     localStorage.setItem('creations',JSON.stringify(creations));
-    setView(currentView);
+    setView(currentView);      /* ✅ FIX */
     nameInput.value='';
     photoInput.value='';
   };
@@ -348,6 +321,7 @@ toggleSidebar.onclick = () => {
   sidebar.classList.toggle('sidebar-open');
 };
 
+  
 function openThemeModal(){
   document.getElementById('themeModal').style.display = 'flex';
 }
@@ -380,12 +354,9 @@ function createCandy(){
     sweetRain.appendChild(c);
   }
 }
-
+  
 renderCreations();
 
 </script>
-
-<script type="module" src="owner.js"></script>
-
 </body>
 </html>
