@@ -2,12 +2,12 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<title>Owner - Galerie</title>
+<title>Owner</title>
+
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{height:100%;font-family:'Comic Sans MS',cursive}
 
-/* BODY */
 body{
   background:url('Photoroom_20251212_143703.PNG') center top / cover no-repeat fixed;
   overflow:hidden;
@@ -15,12 +15,25 @@ body{
   flex-direction:column;
 }
 
-/* HEADER */
-header{text-align:center;padding:12px 0}
-header img{width:98px;height:98px;border-radius:20%;margin:auto}
-.title{display:none}
+/* OWNER ADD */
+.owner-box{
+  display:flex;
+  justify-content:center;
+  gap:10px;
+  margin-top:20px;
+}
+.owner-box input, .owner-box button{
+  padding:10px;
+  border-radius:10px;
+  border:1px solid #b67385;
+}
+.owner-box button{
+  background:#ffb6c1;
+  font-weight:bold;
+  cursor:pointer;
+}
 
-/* BOUTONS VUE */
+/* VIEW BUTTONS */
 #viewSelector{
   display:flex;
   justify-content:center;
@@ -36,28 +49,18 @@ header img{width:98px;height:98px;border-radius:20%;margin:auto}
   cursor:pointer;
 }
 
-/* OWNER BOX */
-.owner-box { display:flex; justify-content:center; gap:10px; margin:20px; }
-.owner-box input, .owner-box button { padding:10px; border-radius:8px; border:1px solid #ccc; }
-.owner-box button { background:#ffb6c1; cursor:pointer; }
-
-/* VISITOR LIST */
+/* CENTER */
 .center-zone{
   flex:1;
   display:flex;
   justify-content:center;
   align-items:flex-start;
-  width:100%;
   overflow:auto;
 }
-#visitor-list{
-  display:flex;
-  justify-content:center;
-  flex-wrap:wrap;
-  gap:16px;
-  max-width:1200px;
-}
-.visitor-item{text-align:center; cursor:pointer;}
+#visitor-list{width:100%;max-width:1200px}
+
+/* ITEMS */
+.visitor-item{text-align:center;cursor:pointer}
 .visitor-item img{
   width:220px;
   height:220px;
@@ -72,12 +75,31 @@ header img{width:98px;height:98px;border-radius:20%;margin:auto}
   font-weight:bold;
 }
 
-/* VUES */
-.carousel-view{flex-wrap:nowrap; overflow-x:auto; gap:20px;}
-.grid-view{flex-wrap:wrap; display:flex; justify-content:center; gap:16px;}
-.list-view{flex-direction:column;}
-.list-view .visitor-item{display:flex; align-items:center; gap:16px;}
-.list-view .visitor-item img{width:140px;height:140px;}
+/* VIEWS */
+.carousel-view{
+  display:flex;
+  gap:40px;
+  overflow-x:auto;
+  padding:20px;
+}
+.grid-view{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(220px,1fr));
+  gap:24px;
+  padding:20px;
+}
+.list-view{
+  display:flex;
+  flex-direction:column;
+  gap:18px;
+  padding:20px;
+}
+.list-view .visitor-item{
+  display:flex;
+  align-items:center;
+  gap:18px;
+}
+.list-view img{width:140px;height:140px}
 
 /* SIDEBAR */
 #sidebar{
@@ -92,7 +114,7 @@ header img{width:98px;height:98px;border-radius:20%;margin:auto}
   transition:left .3s ease;
   z-index:10;
 }
-#sidebar.sidebar-open{left:0;}
+#sidebar.sidebar-open{left:0}
 #toggleSidebar{
   position:absolute;
   top:50%;
@@ -100,13 +122,11 @@ header img{width:98px;height:98px;border-radius:20%;margin:auto}
   width:30px;
   height:60px;
   background:#ffb6c1;
-  color:#8b3a3a;
   border-radius:0 12px 12px 0;
   display:flex;
   justify-content:center;
   align-items:center;
   cursor:pointer;
-  border:1px solid #b67385;
   font-weight:bold;
 }
 #sidebar button{
@@ -116,15 +136,12 @@ header img{width:98px;height:98px;border-radius:20%;margin:auto}
   border:none;
   border-radius:12px;
   background:#ffb6c1;
-  color:#8b3a3a;
-  font-weight:bold;
   cursor:pointer;
 }
 
-/* MODAL THEME */
+/* MODALS / THEME */
 .modal-bg{
-  position:fixed;
-  inset:0;
+  position:fixed; inset:0;
   background:rgba(0,0,0,.6);
   display:none;
   justify-content:center;
@@ -136,34 +153,23 @@ header img{width:98px;height:98px;border-radius:20%;margin:auto}
   border:4px solid #b67385;
   border-radius:18px;
   padding:20px;
-  text-align:center;
 }
-.modal-box button{
-  width:100%;
-  margin:8px 0;
-  padding:10px;
-  border:none;
-  border-radius:12px;
-  background:#ffb6c1;
-  color:#8b3a3a;
-  font-weight:bold;
-}
+.snow{position:fixed;inset:0;pointer-events:none;display:none;z-index:5}
 </style>
 </head>
+
 <body>
 
 <div id="snow" class="snow"></div>
 
-<header>
-  <h1 class="title">Mes créations</h1>
-</header>
-
+<!-- ADD -->
 <div class="owner-box">
   <input id="name" placeholder="Nom de la création">
   <input id="photo" type="file" accept="image/*">
   <button id="add">Ajouter</button>
 </div>
 
+<!-- VIEW -->
 <div id="viewSelector">
   <button id="btnCarousel">Carrousel</button>
   <button id="btnGrid">Grille</button>
@@ -178,99 +184,82 @@ header img{width:98px;height:98px;border-radius:20%;margin:auto}
 <div id="sidebar">
   <div id="toggleSidebar">☰</div>
   <button onclick="openThemeModal()">Thème</button>
-  <button>Vidéos</button>
-  <button>Mailles</button>
-  <button>Pelotes</button>
-  <button>Notes</button>
-  <button>Paramètres</button>
 </div>
 
-<!-- MODAL THEME -->
+<!-- THEME -->
 <div class="modal-bg" id="themeModal" onclick="closeThemeModal(event)">
   <div class="modal-box" onclick="event.stopPropagation()">
-    <h3>Choisir un thème</h3>
     <button onclick="setTheme('noel')">🎄 Noël</button>
-    <button onclick="setTheme('default')">💠 Défaut</button>
     <button onclick="setTheme('sweety')">🌸 Sweety</button>
-    <button onclick="closeThemeModal(event)">✕ Fermer</button>
+    <button onclick="setTheme('default')">💠 Défaut</button>
   </div>
 </div>
 
 <script>
-const CLOUD_NAME = 'YOUR_CLOUD_NAME'; // ← remplace par ton Cloudinary
-const list=document.getElementById('visitor-list');
-const nameInput=document.getElementById('name');
-const photoInput=document.getElementById('photo');
-const addBtn=document.getElementById('add');
-let creations=JSON.parse(localStorage.getItem('creations')||'[]');
-let currentView='grid';
+/* CLOUDINARY */
+const CLOUD_NAME = "dcdk7sr1n";
+const UPLOAD_PRESET = "Unsigned";
+
+/* DATA */
+let creations = JSON.parse(localStorage.getItem('creations') || '[]');
+let currentView = 'carousel';
+
+const list = document.getElementById('visitor-list');
 
 /* RENDER */
 function render(){
   list.innerHTML='';
-  list.className=currentView+'-view';
+  list.className = currentView + '-view';
   creations.forEach(c=>{
     const d=document.createElement('div');
     d.className='visitor-item';
-    d.innerHTML=`<p>${c.name}</p><img src="${c.imgUrl}">`;
+    d.innerHTML=`<img src="${c.imgUrl}"><p>${c.name}</p>`;
     list.appendChild(d);
   });
 }
+render();
 
-/* VIEW BUTTONS */
-btnCarousel.onclick=()=>setView('carousel');
-btnGrid.onclick=()=>setView('grid');
-btnList.onclick=()=>setView('list');
-function setView(v){currentView=v; render();}
+/* VIEWS */
+btnCarousel.onclick=()=>{currentView='carousel';render();}
+btnGrid.onclick=()=>{currentView='grid';render();}
+btnList.onclick=()=>{currentView='list';render();}
 
-/* ADD IMAGE TO CLOUDINARY */
-addBtn.onclick = () => {
+/* ADD IMAGE */
+add.onclick = async ()=>{
   const name = nameInput.value.trim();
-  const file = photoInput.files[0];
-  if(!name || !file) return alert("Nom + photo requis");
+  const file = photo.files[0];
+  if(!name || !file) return alert("Nom + image requis");
 
-  const formData = new FormData();
-  formData.append('file', file);
-  formData.append('upload_preset','unsigned'); // Préparer preset unsigned dans Cloudinary
+  const fd = new FormData();
+  fd.append("file", file);
+  fd.append("upload_preset", UPLOAD_PRESET);
 
-  fetch(`https://api.cloudinary.com/v1_1/${dcdk7sr1n}/image/upload`,{
-    method:'POST',
-    body:formData
-  })
-  .then(res=>res.json())
-  .then(data=>{
-    creations.unshift({name, imgUrl:data.secure_url});
-    localStorage.setItem('creations',JSON.stringify(creations));
-    nameInput.value='';
-    photoInput.value='';
-    render();
-  })
-  .catch(err=>alert('Erreur upload: '+err));
+  const res = await fetch(`https://api.cloudinary.com/v1_1/${CLOUD_NAME}/image/upload`,{
+    method:"POST",
+    body:fd
+  });
+  const data = await res.json();
+
+  creations.unshift({name, imgUrl:data.secure_url});
+  localStorage.setItem('creations', JSON.stringify(creations));
+
+  nameInput.value='';
+  photo.value='';
+  render();
 };
 
 /* SIDEBAR */
-const sidebar=document.getElementById('sidebar');
-document.getElementById('toggleSidebar').onclick = ()=> sidebar.classList.toggle('sidebar-open');
+toggleSidebar.onclick=()=>sidebar.classList.toggle('sidebar-open');
 
-/* THEMES */
-const snow=document.getElementById('snow');
-const themeModal=document.getElementById('themeModal');
+/* THEME */
 function openThemeModal(){themeModal.style.display='flex'}
-function closeThemeModal(e){if(e.target===themeModal||e.target.tagName==='BUTTON') themeModal.style.display='none'}
-
-function setTheme(theme){
-  if(theme==='noel'){
-    document.body.style.backgroundImage="url('noel.png')";
-    snow.style.display='block';
-  } else if(theme==='sweety'){
-    document.body.style.backgroundImage="url('sweety-girly.png')";
-    snow.style.display='none';
-  } else {
-    document.body.style.backgroundImage="url('Photoroom_20251212_143703.PNG')";
-    snow.style.display='none';
-  }
+function closeThemeModal(e){if(e.target===themeModal)themeModal.style.display='none'}
+function setTheme(t){
+  if(t==='noel'){document.body.style.backgroundImage="url('noel.png')"}
+  else if(t==='sweety'){document.body.style.backgroundImage="url('sweety-girly.png')"}
+  else{document.body.style.backgroundImage="url('Photoroom_20251212_143703.PNG')"}
+  themeModal.style.display='none';
 }
-render();
 </script>
 
 </body>
