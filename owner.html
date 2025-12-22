@@ -2,283 +2,152 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<title>Owner - Mes créations</title>
+<title>Owner - Galerie</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
-html,body{height:100%;font-family:'Comic Sans MS',cursive;}
-
-/* BODY */
-body{
-  background:url('Photoroom_20251212_143703.PNG') center top / cover no-repeat fixed;
-  overflow:hidden;
-  display:flex;
-  flex-direction:column;
-}
+html,body{height:100%;font-family:'Comic Sans MS',cursive;overflow:hidden;display:flex;flex-direction:column;}
+body{background:url('Photoroom_20251212_143703.PNG') center top / cover no-repeat fixed;}
 
 /* HEADER */
 header{text-align:center;padding:12px 0;}
 header img{width:98px;height:98px;border-radius:20%;margin:auto;}
 .title{display:none;}
 
-/* BOUTONS VUE */
-#viewSelector{
-  display:flex;
-  justify-content:center;
-  gap:16px;
-  margin-top:20px;
-  margin-bottom:10px;
+/* SIDEBAR */
+#sidebar{
+  position:fixed;top:0;left:-220px;width:220px;height:100vh;
+  background:rgba(255,230,240,0.15);border-right:2px solid #b67385;
+  padding:20px;transition:left .3s ease;z-index:10;
 }
-#viewSelector button{
-  background:#fff0f7;
-  border:2px solid #b84c6f;
-  color:#b84c6f;
-  padding:8px 16px;
-  border-radius:24px;
-  cursor:pointer;
+#sidebar.sidebar-open{left:0;}
+#toggleSidebar{
+  position:absolute;top:50%;right:-30px;width:30px;height:60px;
+  background:#ffb6c1;color:#8b3a3a;border-radius:0 12px 12px 0;
+  display:flex;justify-content:center;align-items:center;cursor:pointer;
+  border:1px solid #b67385;font-weight:bold;
+}
+#sidebar button{
+  width:100%;margin-bottom:10px;padding:10px;border:none;
+  border-radius:12px;background:#ffb6c1;color:#8b3a3a;
+  font-weight:bold;cursor:pointer;
 }
 
-/* CONTENU */
+/* VUE SELECTION */
+#viewSelector{
+  display:flex;justify-content:center;gap:16px;margin-top:16px;
+}
+#viewSelector button{
+  background:#fff0f7;border:2px solid #b84c6f;color:#b84c6f;
+  padding:8px 16px;border-radius:24px;cursor:pointer;
+}
+#viewSelector button.active{background:#ffeaf2;}
+
+/* CENTER ZONE */
 .center-zone{
-  flex:1;
-  display:flex;
-  justify-content:center;
-  align-items:flex-start;
-  padding-top:20px;
-  overflow:hidden;
+  flex:1;display:flex;justify-content:center;align-items:flex-start;
+  padding:20px 0;overflow:hidden;width:100%;
 }
 #visitor-list{width:100%;max-width:1200px;}
 
 /* ITEMS */
 .visitor-item{
-  text-align:center;
-  cursor:pointer;
-  box-shadow:0 6px 12px rgba(0,0,0,0.15);
+  text-align:center;cursor:pointer;
   border-radius:16px;
-  background:#ffe6f0;
-  padding:8px;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
+  box-shadow:0 6px 15px rgba(0,0,0,0.2);
+  background:rgba(255,230,240,0.6);
+  padding:10px;
+  display:flex;flex-direction:column;align-items:center;
 }
 .visitor-item img{
-  width:100%;
-  object-fit:contain;
-  border:4px solid #b84c6f;
-  border-radius:16px;
-  margin-bottom:8px;
+  width:100%;height:auto;object-fit:contain;
+  border:4px solid #b84c6f;border-radius:16px;
+  box-shadow:0 4px 12px rgba(0,0,0,0.3);
 }
 .visitor-item p{
-  font-size:18px;
-  font-weight:bold;
-  color:#8b3a3a;
-  text-align:center;
+  margin-top:8px;font-size:18px;font-weight:bold;
+  color:#b84c6f;text-align:center;
 }
 
 /* VUES */
 .carousel-view{
-  display:flex;
-  gap:20px;
-  overflow-x:auto;
-  scroll-snap-type: x mandatory;
+  display:flex;gap:20px;overflow-x:auto;scroll-behavior:smooth;
+  padding:0 10px;width:100%;
 }
 .carousel-view .visitor-item{
-  min-width:calc(50% - 20px);
-  flex-shrink:0;
-  scroll-snap-align:start;
+  flex:0 0 calc(50% - 10px); /* 2 images visibles */
 }
+
 .grid-view{
-  display:grid;
-  grid-template-columns:repeat(2,1fr);
-  grid-auto-rows:minmax(200px,1fr);
-  gap:20px;
-  overflow-y:auto;
-  max-height:calc(100vh - 150px);
+  display:grid;grid-template-columns:repeat(2,1fr);
+  grid-auto-rows:1fr;gap:20px;
+  overflow-y:auto;max-height:calc(100vh - 120px);
 }
+.grid-view .visitor-item{width:100%;height:100%;}
+
 .list-view{
-  display:flex;
-  flex-direction:column;
-  gap:20px;
-  overflow-y:auto;
-  max-height:calc(100vh - 150px);
+  display:flex;flex-direction:column;gap:20px;
+  overflow-y:auto;max-height:calc(100vh - 120px);
 }
-.list-view .visitor-item{
-  flex-direction:row;
-  gap:16px;
-}
-.list-view img{
-  width:calc(50% - 16px);
-  height:auto;
-}
+.list-view .visitor-item{width:100%;flex:0 0 calc(50% - 10px);} /* 2 par écran */
 
 /* MODAL IMAGE */
 .modal-bg{
-  position:fixed;
-  inset:0;
-  background:rgba(0,0,0,.65);
-  display:none;
-  justify-content:center;
-  align-items:center;
-  z-index:1000;
+  position:fixed;inset:0;background:rgba(0,0,0,.65);
+  display:none;justify-content:center;align-items:center;z-index:1000;
 }
 .modal-box{
-  background:rgba(255,228,235,0.95);
-  border:4px solid #b67385;
-  border-radius:18px;
-  padding:18px;
-  max-width:900px;
-  width:95%;
-  max-height:80vh;
-  overflow-y:auto;
-  position:relative;
-  text-align:center;
+  background:rgba(255,228,235,0.95);border:4px solid #b67385;
+  border-radius:18px;padding:18px;max-width:900px;width:95%;
+  max-height:80vh;overflow-y:auto;position:relative;text-align:center;
 }
 .close-modal{
-  position:absolute;
-  top:10px;
-  right:14px;
-  font-size:28px;
-  cursor:pointer;
-  color:#b84c6f;
+  position:absolute;top:10px;right:14px;font-size:28px;
+  cursor:pointer;color:#b84c6f;
 }
-#modalBackBtn{
-  margin-top:10px;
-  padding:6px 18px;
-  border-radius:12px;
-  border:2px solid #b67385;
-  background:#ffe6f0;
-  color:#b84c6f;
-  font-weight:bold;
-  cursor:pointer;
-}
-.modal-main-img{
-  width:100%;
-  max-height:500px;
-  object-fit:contain;
-  border:4px solid #b67385;
-  border-radius:16px;
-  background:#ffe6f0;
-}
+#modalBackBtn{margin-top:10px;padding:6px 18px;border-radius:12px;
+border:2px solid #b67385;background:#ffe6f0;color:#b84c6f;font-weight:bold;
+cursor:pointer;}
+.modal-main-img{width:100%;max-height:500px;object-fit:contain;
+border:4px solid #b67385;background:#ffe6f0;border-radius:16px;}
 
 /* ICONES */
-.icon-bar{
-  display:flex;
-  justify-content:center;
-  gap:30px;
-  margin-top:12px;
-}
-.icon-btn{
-  cursor:pointer;
-  color:#b84c6f;
-  display:flex;
-  align-items:center;
-  gap:8px;
-  background:#ffe6f0;
-  padding:6px 12px;
-  border-radius:12px;
-  border:2px solid #b67385;
-}
-.heart{font-size:26px}
-.heart.liked{color:#ff4b82}
+.icon-bar{display:flex;justify-content:center;gap:30px;margin-top:12px;}
+.icon-btn{cursor:pointer;color:#b84c6f;display:flex;align-items:center;gap:8px;
+background:#ffe6f0;padding:6px 12px;border-radius:12px;border:2px solid #b67385;}
+.heart{font-size:26px}.heart.liked{color:#ff4b82}
 
 /* COMMENTAIRES */
 .comment-section{margin-top:16px}
-.comment{background:#ffe6f0;padding:10px;border-radius:10px;margin-bottom:10px;}
+.comment{background:#ffe6f0;padding:10px;border-radius:10px;margin-bottom:10px}
 
 /* FORM COMMENTAIRE ET LIKE */
 .form-modal-bg{
-  position:fixed;
-  inset:0;
-  background:rgba(0,0,0,.6);
-  display:none;
-  justify-content:center;
-  align-items:center;
-  z-index:2000;
+  position:fixed;inset:0;background:rgba(0,0,0,.6);
+  display:none;justify-content:center;align-items:center;z-index:2000;
 }
 .form-modal{
-  background:#ffe6f0;
-  padding:18px;
-  border-radius:14px;
-  border:4px solid #b67385;
-  width:340px;
+  background:#ffe6f0;padding:18px;border-radius:14px;border:4px solid #b67385;width:340px;
 }
-.form-modal input, .form-modal textarea{
-  width:100%;
-  margin-bottom:10px;
-  padding:10px;
-  border-radius:8px;
-  border:1px solid #b67385;
-}
-.form-modal button{
-  width:100%;
-  padding:10px;
-  border:none;
-  border-radius:12px;
-  background:#ffb6c1;
-  color:#8b3a3a;
-  font-weight:bold;
-  cursor:pointer;
-}
-
-/* SIDEBAR */
-#sidebar{
-  position:fixed;
-  top:0;
-  left:-220px;
-  width:220px;
-  height:100vh;
-  background:rgba(255,230,240,0.15);
-  border-right:2px solid #b67385;
-  padding:20px;
-  transition:left .3s ease;
-  z-index:10;
-}
-#sidebar.sidebar-open{left:0;}
-#toggleSidebar{
-  position:absolute;
-  top:50%;
-  right:-30px;
-  width:30px;
-  height:60px;
-  background:#ffb6c1;
-  color:#8b3a3a;
-  border-radius:0 12px 12px 0;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  cursor:pointer;
-  border:1px solid #b67385;
-  font-weight:bold;
-}
-#sidebar button{
-  width:100%;
-  margin-bottom:10px;
-  padding:10px;
-  border:none;
-  border-radius:12px;
-  background:#ffb6c1;
-  color:#8b3a3a;
-  font-weight:bold;
-  cursor:pointer;
-}
-
-/* NEIGE / SWEETY */
-.snow, #sweetRain{
-  position:fixed;
-  inset:0;
-  pointer-events:none;
-  z-index:5;
-  display:none;
-}
+.form-modal input,.form-modal textarea{width:100%;margin-bottom:10px;padding:10px;border-radius:8px;border:1px solid #b67385;}
+.form-modal button{width:100%;padding:10px;border:none;border-radius:12px;background:#ffb6c1;color:#8b3a3a;font-weight:bold;cursor:pointer;}
 </style>
 </head>
 <body>
 
 <div id="snow" class="snow"></div>
-<div id="sweetRain"></div>
 
-<header>
-  <h1 class="title">Mes créations</h1>
-</header>
+<header><h1 class="title">Mes créations</h1></header>
+
+<div id="sidebar">
+  <div id="toggleSidebar">☰</div>
+  <button onclick="openAddModal()">Ajouter</button>
+  <button onclick="openThemeModal()">Thème</button>
+  <button>Vidéos</button>
+  <button>Mailles</button>
+  <button>Pelotes</button>
+  <button>Notes</button>
+  <button>Paramètres</button>
+</div>
 
 <div id="viewSelector">
   <button id="btnCarousel">Carrousel</button>
@@ -297,13 +166,8 @@ header img{width:98px;height:98px;border-radius:20%;margin:auto;}
     <img id="modalMain" class="modal-main-img">
     <button id="modalBackBtn" onclick="closeModal()">← Retour</button>
     <div class="icon-bar">
-      <div class="icon-btn" onclick="openLikeModal()">
-        <span class="heart" id="heart">♡</span>
-        <span id="likeCount">0</span>
-      </div>
-      <div class="icon-btn" onclick="openCommentForm()">💬
-        <span id="commentCount">0</span>
-      </div>
+      <div class="icon-btn" onclick="openLikeModal()"><span class="heart" id="heart">♡</span><span id="likeCount">0</span></div>
+      <div class="icon-btn" onclick="openCommentForm()">💬<span id="commentCount">0</span></div>
     </div>
     <div id="commentsList" class="comment-section"></div>
   </div>
@@ -326,23 +190,11 @@ header img{width:98px;height:98px;border-radius:20%;margin:auto;}
   </div>
 </div>
 
-<!-- SIDEBAR -->
-<div id="sidebar">
-  <div id="toggleSidebar">☰</div>
-  <button onclick="openAddModal()">Ajouter</button>
-  <button onclick="openThemeModal()">Thème</button>
-  <button>Vidéos</button>
-  <button>Mailles</button>
-  <button>Pelotes</button>
-  <button>Notes</button>
-  <button>Paramètres</button>
-</div>
-
-<!-- ADD MODAL -->
-<div class="form-modal-bg" id="addModal" onclick="if(event.target===addModal) addModal.style.display='none'">
+<!-- FORM AJOUT IMAGE -->
+<div class="form-modal-bg" id="addFormBg" onclick="if(event.target===addFormBg) addFormBg.style.display='none'">
   <div class="form-modal" onclick="event.stopPropagation()">
-    <input id="newName" placeholder="Nom de la création">
-    <input id="newFile" type="file" accept="image/*">
+    <input id="name" placeholder="Nom de la création">
+    <input id="photo" type="file" accept="image/*">
     <button onclick="submitAdd()">Ajouter</button>
   </div>
 </div>
@@ -352,24 +204,21 @@ header img{width:98px;height:98px;border-radius:20%;margin:auto;}
   <div class="modal-box" onclick="event.stopPropagation()">
     <h3>Choisir un thème</h3>
     <button onclick="setTheme('noel')">🎄 Noël</button>
-    <button onclick="setTheme('default')">💠 Défaut</button>
     <button onclick="setTheme('sweety')">🌸 Sweety-Girly</button>
+    <button onclick="setTheme('default')">💠 Défaut</button>
     <button onclick="closeThemeModal(event)">✕ Fermer</button>
   </div>
 </div>
 
 <script>
-/* VARIABLES */
 const list=document.getElementById('visitor-list');
 const modal=document.getElementById('modal');
 const modalMain=document.getElementById('modalMain');
 const commentFormBg=document.getElementById('commentFormBg');
 const likeFormBg=document.getElementById('likeFormBg');
+const addFormBg=document.getElementById('addFormBg');
 const commentCount=document.getElementById('commentCount');
 const commentList=document.getElementById('commentsList');
-const addModal=document.getElementById('addModal');
-const snow=document.getElementById('snow');
-const sweetRain=document.getElementById('sweetRain');
 
 let creations=JSON.parse(localStorage.getItem('creations')||'[]');
 let currentIndex=null;
@@ -387,6 +236,7 @@ function render(){
     list.appendChild(d);
   });
 }
+render();
 
 /* VUES */
 btnCarousel.onclick=()=>setView('carousel');
@@ -394,40 +244,16 @@ btnGrid.onclick=()=>setView('grid');
 btnList.onclick=()=>setView('list');
 function setView(v){currentView=v;render();}
 
-/* MODAL */
-function openModal(i){
-  currentIndex=i;
-  modalMain.src=creations[i].imgUrl;
-  modal.style.display='flex';
-  loadComments();
-  loadLikes();
-}
-function closeModal(){modal.style.display='none'}
-
-/* ADD */
-function openAddModal(){addModal.style.display='flex'}
-function submitAdd(){
-  const name=document.getElementById('newName').value.trim();
-  const file=document.getElementById('newFile').files[0];
-  if(!name||!file){alert("Nom et fichier requis"); return;}
-  const reader=new FileReader();
-  reader.onload=(e)=>{
-    creations.unshift({name,imgUrl:e.target.result});
-    localStorage.setItem('creations',JSON.stringify(creations));
-    document.getElementById('newName').value='';
-    document.getElementById('newFile').value='';
-    addModal.style.display='none';
-    render();
-  };
-  reader.readAsDataURL(file);
-}
+/* MODAL IMAGE */
+function openModal(i){currentIndex=i;modalMain.src=creations[i].imgUrl;modal.style.display='flex';loadComments();loadLikes();}
+function closeModal(){modal.style.display='none';}
 
 /* COMMENT */
 function openCommentForm(){commentFormBg.style.display='flex'}
 function submitComment(){
   const n=document.getElementById('commentName').value.trim();
   const t=document.getElementById('commentText').value.trim();
-  if(!n||!t) return;
+  if(!n||!t)return;
   const key='comments_'+currentIndex;
   let c=JSON.parse(localStorage.getItem(key)||'[]');
   c.push({n,t});
@@ -444,8 +270,8 @@ function loadComments(){
 /* LIKE */
 function openLikeModal(){likeFormBg.style.display='flex'}
 function submitLike(){
-  const name=document.getElementById('likeName').value.trim();
-  if(!name){alert("Indique ton prénom"); return;}
+  const name = document.getElementById('likeName').value.trim();
+  if(!name)return alert("Merci d'indiquer ton prénom ❤️");
   const key='likes_'+currentIndex;
   let likes=JSON.parse(localStorage.getItem(key)||'[]');
   if(!likes.includes(name)) likes.push(name);
@@ -463,58 +289,40 @@ function loadLikes(){
   likeCount.textContent=likes.length?likes.length+' · '+likes.join(', '):'0';
 }
 
+/* AJOUT IMAGE */
+function openAddModal(){addFormBg.style.display='flex'}
+function submitAdd(){
+  const nameInput=document.getElementById('name').value.trim();
+  const photoInput=document.getElementById('photo').files[0];
+  if(!nameInput||!photoInput)return alert("Remplis le nom et choisis une image !");
+  const reader=new FileReader();
+  reader.onload=(e)=>{
+    creations.unshift({name:nameInput,imgUrl:e.target.result});
+    localStorage.setItem('creations',JSON.stringify(creations));
+    addFormBg.style.display='none';
+    render();
+    document.getElementById('name').value='';
+    document.getElementById('photo').value='';
+  };
+  reader.readAsDataURL(photoInput);
+}
+
 /* SIDEBAR */
 const sidebar=document.getElementById('sidebar');
 const toggleSidebar=document.getElementById('toggleSidebar');
 toggleSidebar.onclick=()=>sidebar.classList.toggle('sidebar-open');
 
 /* THEME */
+const snow=document.getElementById('snow');
 const themeModal=document.getElementById('themeModal');
 function openThemeModal(){themeModal.style.display='flex'}
 function closeThemeModal(e){if(e.target===themeModal||e.target.tagName==='BUTTON') themeModal.style.display='none'}
 
-/* ANIMATIONS */
-function createSnow(){if(snow.style.display==='none') return;
-  const f=document.createElement('div');
-  f.textContent='❄';
-  f.style.position='absolute';
-  f.style.top='-30px';
-  f.style.left=Math.random()*innerWidth+'px';
-  f.style.fontSize=(Math.random()*20+10)+'px';
-  f.style.opacity=Math.random();
-  snow.appendChild(f);
-  const fall=setInterval(()=>{
-    f.style.top=parseFloat(f.style.top)+3+'px';
-    if(parseFloat(f.style.top)>innerHeight){f.remove();clearInterval(fall);}
-  },20);
-}
-setInterval(createSnow,150);
-
-function createCandy(){if(sweetRain.style.display==='none') return;
-  const c=document.createElement('div');
-  c.textContent='🍬';
-  c.style.position='absolute';
-  c.style.top='-30px';
-  c.style.left=Math.random()*innerWidth+'px';
-  c.style.fontSize=(Math.random()*24+16)+'px';
-  c.style.opacity=Math.random()*0.8+0.3;
-  sweetRain.appendChild(c);
-  const fall=setInterval(()=>{
-    c.style.top=parseFloat(c.style.top)+(Math.random()*3+2)+'px';
-    c.style.left=parseFloat(c.style.left)+Math.sin(Date.now()/200)*1.5+'px';
-    if(parseFloat(c.style.top)>innerHeight){c.remove();clearInterval(fall);}
-  },20);
-}
-setInterval(createCandy,150);
-
 function setTheme(theme){
-  if(theme==='noel'){document.body.style.backgroundImage="url('noel.png')"; snow.style.display='block'; sweetRain.style.display='none';}
-  else if(theme==='sweety'){document.body.style.backgroundImage="url('sweety-girly.png')"; snow.style.display='none'; sweetRain.style.display='block';}
-  else{document.body.style.backgroundImage="url('Photoroom_20251212_143703.PNG')"; snow.style.display='none'; sweetRain.style.display='none';}
+  if(theme==='noel'){document.body.style.backgroundImage="url('noel.png')";snow.style.display='block';}
+  else if(theme==='sweety'){document.body.style.background="url('sweety-girly.png') center center / cover no-repeat fixed";snow.style.display='none';}
+  else{document.body.style.backgroundImage="url('Photoroom_20251212_143703.PNG')";snow.style.display='none';}
 }
-
-/* INIT */
-render();
 </script>
 </body>
 </html>
