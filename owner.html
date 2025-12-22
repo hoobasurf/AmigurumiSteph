@@ -2,10 +2,10 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<title>Owner - Mes créations</title>
+<title>Owner - Galerie</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-html,body{height:100%;font-family:'Comic Sans MS',cursive}
+html,body{height:100%;font-family:'Comic Sans MS',cursive;}
 
 /* BODY */
 body{
@@ -21,84 +21,232 @@ header{text-align:center;padding:12px 0}
 header img{width:98px;height:98px;border-radius:20%;margin:auto}
 .title{display:none}
 
-/* OWNER BOX */
-.owner-box { margin-bottom:20px; }
-.owner-box input, .owner-box button { padding:10px; margin:5px; border-radius:8px; border:1px solid #ccc; }
-button{cursor:pointer;}
-#owner-list{display:flex; flex-wrap:wrap; gap:10px;}
-.owner-item{background:#fff; padding:10px; border-radius:10px; box-shadow:0 0 5px #ccc;}
-.owner-item img{max-width:100px; border-radius:8px; display:block;}
+/* BOUTONS VUE */
+#viewSelector{
+  display:flex;
+  justify-content:center;
+  gap:16px;
+  margin-top:20px;
+  margin-bottom:20px;
+}
+#viewSelector button{
+  background:#fff0f7;
+  border:2px solid #b84c6f;
+  color:#b84c6f;
+  padding:10px 16px;
+  border-radius:24px;
+  cursor:pointer;
+}
 
-/* VUES */
-#viewSelector{display:flex; justify-content:center; gap:16px; margin-top:20px;}
-#viewSelector button{background:#fff0f7; border:2px solid #b84c6f; color:#b84c6f; padding:8px 16px; border-radius:24px;}
-.carousel-view{display:flex; gap:40px; overflow-x:auto; padding:20px;}
-.grid-view{display:grid; grid-template-columns:repeat(auto-fill,minmax(220px,1fr)); gap:24px; padding:20px; max-height:calc(100vh - 260px); overflow-y:auto;}
-.list-view{display:flex; flex-direction:column; gap:18px; padding:20px; max-height:calc(100vh - 260px); overflow-y:auto;}
-.list-view .visitor-item{display:flex; align-items:center; gap:18px;}
-.list-view img{width:140px;height:140px}
+/* OWNER BOX */
+.owner-box{
+  display:flex;
+  justify-content:center;
+  gap:10px;
+  margin-bottom:20px;
+}
+.owner-box input, .owner-box button{
+  padding:10px;
+  border-radius:8px;
+  border:1px solid #ccc;
+}
+
+/* VISITOR LIST */
+.center-zone{
+  flex:1;
+  display:flex;
+  justify-content:center;
+  align-items:flex-start;
+  width:100%;
+  overflow:auto;
+}
+#visitor-list{
+  display:flex;
+  flex-wrap:wrap;
+  justify-content:center;
+  gap:16px;
+  max-width:1200px;
+}
 
 /* ITEMS */
-.visitor-item{text-align:center; cursor:pointer;}
-.visitor-item img{width:220px; height:220px; object-fit:contain; border:4px solid #b67385; background:#ffe6f0;}
-.visitor-item p{margin-top:8px; font-size:20px; color:#b84c6f; font-weight:bold;}
+.visitor-item{
+  text-align:center;
+  cursor:pointer;
+}
+.visitor-item img{
+  width:220px;
+  height:220px;
+  object-fit:contain;
+  border:4px solid #b67385;
+  background:#ffe6f0;
+  border-radius:10px;
+}
+.visitor-item p{
+  margin-top:8px;
+  font-size:20px;
+  color:#b84c6f;
+  font-weight:bold;
+}
+
+/* VUES */
+.carousel-view{
+  flex-wrap:nowrap;
+  overflow-x:auto;
+  gap:40px;
+  padding:20px;
+}
+.carousel-view::-webkit-scrollbar{height:8px}
+.carousel-view::-webkit-scrollbar-thumb{background:#b84c6f88;border-radius:20px}
+
+.grid-view{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(220px,1fr));
+  gap:24px;
+}
+.list-view{
+  display:flex;
+  flex-direction:column;
+  gap:18px;
+}
+.list-view .visitor-item{
+  display:flex;
+  align-items:center;
+  gap:18px;
+}
+.list-view img{
+  width:140px;
+  height:140px;
+}
 
 /* MODAL IMAGE */
-.modal-bg{position:fixed; inset:0; background:rgba(0,0,0,.65); display:none; justify-content:center; align-items:center; z-index:1000;}
-.modal-box{background:rgba(255,228,235,0.95); border:4px solid #b67385; border-radius:18px; padding:18px; max-width:900px; width:95%; max-height:80vh; overflow-y:auto; position:relative; text-align:center;}
-.close-modal{position:absolute; top:10px; right:14px; font-size:28px; cursor:pointer; color:#b84c6f;}
-#modalBackBtn{margin-top:10px; padding:6px 18px; border-radius:12px; border:2px solid #b67385; background:#ffe6f0; color:#b84c6f; font-weight:bold; cursor:pointer;}
-.modal-main-img{width:100%; max-height:500px; object-fit:contain; border:4px solid #b67385; background:#ffe6f0;}
-
-/* ICONES */
-.icon-bar{display:flex; justify-content:center; gap:30px; margin-top:12px;}
-.icon-btn{cursor:pointer; color:#b84c6f; display:flex; align-items:center; gap:8px; background:#ffe6f0; padding:6px 12px; border-radius:12px; border:2px solid #b67385;}
-.heart{font-size:26px;}
-.heart.liked{color:#ff4b82;}
-
-/* COMMENTAIRES */
-.comment-section{margin-top:16px;}
-.comment{background:#ffe6f0; padding:10px; border-radius:10px; margin-bottom:10px;}
-
-/* FORM MODAL */
-.form-modal-bg{position:fixed; inset:0; background:rgba(0,0,0,.6); display:none; justify-content:center; align-items:center; z-index:2000;}
-.form-modal{background:#ffe6f0; padding:18px; border-radius:14px; border:4px solid #b67385; width:340px;}
-.form-modal input, .form-modal textarea{width:100%; margin-bottom:10px; padding:10px; border-radius:8px; border:1px solid #b67385;}
-.form-modal button{width:100%; padding:10px; border:none; border-radius:12px; background:#ffb6c1; color:#8b3a3a; font-weight:bold; cursor:pointer;}
+.modal-bg{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.65);
+  display:none;
+  justify-content:center;
+  align-items:center;
+  z-index:1000;
+}
+.modal-box{
+  background:rgba(255,228,235,0.95);
+  border:4px solid #b67385;
+  border-radius:18px;
+  padding:18px;
+  max-width:900px;
+  width:95%;
+  max-height:80vh;
+  overflow-y:auto;
+  position:relative;
+  text-align:center;
+}
+.close-modal{
+  position:absolute;
+  top:10px;
+  right:14px;
+  font-size:28px;
+  cursor:pointer;
+  color:#b84c6f;
+}
+#modalBackBtn{
+  margin-top:10px;
+  padding:6px 18px;
+  border-radius:12px;
+  border:2px solid #b67385;
+  background:#ffe6f0;
+  color:#b84c6f;
+  font-weight:bold;
+  cursor:pointer;
+}
+.modal-main-img{
+  width:100%;
+  max-height:500px;
+  object-fit:contain;
+  border:4px solid #b67385;
+  background:#ffe6f0;
+}
 
 /* SIDEBAR */
-#sidebar{position:fixed; top:0; left:-220px; width:220px; height:100vh; background:rgba(255,230,240,0.15); border-right:2px solid #b67385; padding:20px; transition:left .3s ease; z-index:10;}
+#sidebar{
+  position:fixed;
+  top:0;
+  left:-220px;
+  width:220px;
+  height:100vh;
+  background:rgba(255,230,240,0.15);
+  border-right:2px solid #b67385;
+  padding:20px;
+  transition:left .3s ease;
+  z-index:10;
+}
 #sidebar.sidebar-open{left:0;}
-#toggleSidebar{position:absolute; top:50%; right:-30px; width:30px; height:60px; background:#ffb6c1; color:#8b3a3a; border-radius:0 12px 12px 0; display:flex; justify-content:center; align-items:center; cursor:pointer; border:1px solid #b67385; font-weight:bold;}
-#sidebar button{width:100%; margin-bottom:10px; padding:10px; border:none; border-radius:12px; background:#ffb6c1; color:#8b3a3a; font-weight:bold; cursor:pointer;}
+#toggleSidebar{
+  position:absolute;
+  top:50%;
+  right:-30px;
+  width:30px;
+  height:60px;
+  background:#ffb6c1;
+  color:#8b3a3a;
+  border-radius:0 12px 12px 0;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  cursor:pointer;
+  border:1px solid #b67385;
+  font-weight:bold;
+}
+#sidebar button{
+  width:100%;
+  margin-bottom:10px;
+  padding:10px;
+  border:none;
+  border-radius:12px;
+  background:#ffb6c1;
+  color:#8b3a3a;
+  font-weight:bold;
+  cursor:pointer;
+}
 
-/* NEIGE / SWEETY */
-.snow{position:fixed; inset:0; pointer-events:none; z-index:5; display:none;}
+/* NEIGE / BONBONS */
+.snow, #sweetRain{
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  z-index:5;
+  display:none;
+}
+.snowflake, .candy{
+  position:absolute;
+  top:-30px;
+  font-size:20px;
+}
 </style>
 </head>
 <body>
 
 <div id="snow" class="snow"></div>
+<div id="sweetRain"></div>
 
 <header>
   <h1 class="title">Mes créations</h1>
 </header>
 
-<!-- OWNER BOX -->
+<!-- Owner Box -->
 <div class="owner-box">
   <input id="name" placeholder="Nom de la création">
   <input id="photo" type="file" accept="image/*">
   <button id="add">Ajouter</button>
 </div>
-<div id="owner-list"></div>
 
-<!-- VUES -->
+<!-- Vue Selector -->
 <div id="viewSelector">
   <button id="btnCarousel">Carrousel</button>
   <button id="btnGrid">Grille</button>
   <button id="btnList">Liste</button>
 </div>
 
+<!-- Visitor List -->
 <div class="center-zone">
   <div id="visitor-list"></div>
 </div>
@@ -109,33 +257,6 @@ button{cursor:pointer;}
     <div class="close-modal" onclick="closeModal()">×</div>
     <img id="modalMain" class="modal-main-img">
     <button id="modalBackBtn" onclick="closeModal()">← Retour</button>
-    <div class="icon-bar">
-      <div class="icon-btn" onclick="openLikeModal()">
-        <span class="heart" id="heart">♡</span>
-        <span id="likeCount">0</span>
-      </div>
-      <div class="icon-btn" onclick="openCommentForm()">💬
-        <span id="commentCount">0</span>
-      </div>
-    </div>
-    <div id="commentsList" class="comment-section"></div>
-  </div>
-</div>
-
-<!-- FORM COMMENT -->
-<div class="form-modal-bg" id="commentFormBg" onclick="if(event.target===commentFormBg) commentFormBg.style.display='none'">
-  <div class="form-modal" onclick="event.stopPropagation()">
-    <input id="commentName" placeholder="Prénom">
-    <textarea id="commentText" rows="4" placeholder="Commentaire"></textarea>
-    <button onclick="submitComment()">Envoyer</button>
-  </div>
-</div>
-
-<!-- FORM LIKE -->
-<div class="form-modal-bg" id="likeFormBg" onclick="if(event.target===likeFormBg) likeFormBg.style.display='none'">
-  <div class="form-modal" onclick="event.stopPropagation()">
-    <input id="likeName" placeholder="Ton prénom">
-    <button onclick="submitLike()">J'aime</button>
   </div>
 </div>
 
@@ -156,171 +277,138 @@ button{cursor:pointer;}
     <h3>Choisir un thème</h3>
     <button onclick="setTheme('noel')">🎄 Noël</button>
     <button onclick="setTheme('default')">💠 Défaut</button>
-    <button onclick="setTheme('sweety')">🌸 Sweety</button>
+    <button onclick="setTheme('sweety')">🌸 Sweety-Girly</button>
     <button onclick="closeThemeModal(event)">✕ Fermer</button>
   </div>
 </div>
 
 <script>
-const nameInput=document.getElementById('name');
-const photoInput=document.getElementById('photo');
-const addBtn=document.getElementById('add');
-const ownerList=document.getElementById('owner-list');
+// -------------------- VARIABLES --------------------
+const nameInput = document.getElementById('name');
+const photoInput = document.getElementById('photo');
+const addBtn = document.getElementById('add');
+const list = document.getElementById('visitor-list');
+const modal = document.getElementById('modal');
+const modalMain = document.getElementById('modalMain');
+const btnCarousel = document.getElementById('btnCarousel');
+const btnGrid = document.getElementById('btnGrid');
+const btnList = document.getElementById('btnList');
+const themeModal = document.getElementById('themeModal');
+const snow = document.getElementById('snow');
+const sweetRain = document.getElementById('sweetRain');
+const sidebar = document.getElementById('sidebar');
+const toggleSidebar = document.getElementById('toggleSidebar');
 
-const list=document.getElementById('visitor-list');
-const modal=document.getElementById('modal');
-const modalMain=document.getElementById('modalMain');
-const commentFormBg=document.getElementById('commentFormBg');
-const likeFormBg=document.getElementById('likeFormBg');
-const commentCount=document.getElementById('commentCount');
-const commentList=document.getElementById('commentsList');
+let creations = JSON.parse(localStorage.getItem('creations')||'[]');
+let currentIndex = null;
+let currentView = 'grid';
 
-let creations=JSON.parse(localStorage.getItem('creations')||'[]');
-let currentIndex=null;
-let currentView='grid';
-
-/* AJOUT IMAGE */
-addBtn.onclick=()=>{
-  const name=nameInput.value.trim();
-  const file=photoInput.files[0];
-  if(!name||!file)return alert("Nom et photo requis");
-
-  const reader=new FileReader();
-  reader.onload=e=>{
-    const imgUrl=e.target.result;
-    const obj={name,imgUrl};
-    creations.unshift(obj);
-    localStorage.setItem('creations',JSON.stringify(creations));
-    render();
-    nameInput.value=''; photoInput.value='';
-  };
-  reader.readAsDataURL(file);
-};
-
-/* RENDER */
+// -------------------- RENDER --------------------
 function render(){
-  list.innerHTML=''; list.className=currentView+'-view';
-  ownerList.innerHTML='';
+  list.innerHTML='';
+  list.className=currentView+'-view';
   creations.forEach((c,i)=>{
     const d=document.createElement('div');
     d.className='visitor-item';
     d.innerHTML=`<img src="${c.imgUrl}"><p>${c.name}</p>`;
     d.onclick=()=>openModal(i);
     list.appendChild(d);
-
-    const od=document.createElement('div');
-    od.className='owner-item';
-    od.innerHTML=`<p>${c.name}</p><img src="${c.imgUrl}">`;
-    ownerList.appendChild(od);
   });
 }
 
-/* VUES */
-document.getElementById('btnCarousel').onclick=()=>setView('carousel');
-document.getElementById('btnGrid').onclick=()=>setView('grid');
-document.getElementById('btnList').onclick=()=>setView('list');
-function setView(v){ currentView=v; render(); }
-
-/* MODAL */
-function openModal(i){currentIndex=i; modalMain.src=creations[i].imgUrl; modal.style.display='flex'; loadComments(); loadLikes();}
-function closeModal(){modal.style.display='none';}
-
-/* COMMENT */
-function openCommentForm(){commentFormBg.style.display='flex';}
-function submitComment(){
-  const n=document.getElementById('commentName').value;
-  const t=document.getElementById('commentText').value;
-  if(!n||!t)return;
-  const key='comments_'+currentIndex;
-  let c=JSON.parse(localStorage.getItem(key)||'[]');
-  c.push({n,t});
-  localStorage.setItem(key,JSON.stringify(c));
-  commentFormBg.style.display='none';
-  loadComments();
+// -------------------- VIEWS --------------------
+function setView(v){
+  currentView=v;
+  render();
 }
-function loadComments(){
-  const c=JSON.parse(localStorage.getItem('comments_'+currentIndex)||'[]');
-  commentCount.textContent=c.length;
-  commentList.innerHTML=c.map(x=>`<div class="comment"><b>${x.n}</b><br>${x.t}</div>`).join('');
-}
+btnCarousel.onclick=()=>setView('carousel');
+btnGrid.onclick=()=>setView('grid');
+btnList.onclick=()=>setView('list');
 
-/* LIKE */
-function openLikeModal(){likeFormBg.style.display='flex';}
-function submitLike(){
-  const name=document.getElementById('likeName').value.trim();
-  if(!name)return alert("Merci d'indiquer ton prénom ❤️");
-  const key='likes_'+currentIndex;
-  let likes=JSON.parse(localStorage.getItem(key)||'[]');
-  if(!likes.includes(name))likes.push(name);
-  localStorage.setItem(key,JSON.stringify(likes));
-  likeFormBg.style.display='none';
-  loadLikes();
+// -------------------- MODAL --------------------
+function openModal(i){
+  currentIndex=i;
+  modalMain.src=creations[i].imgUrl;
+  modal.style.display='flex';
 }
-function loadLikes(){
-  const key='likes_'+currentIndex;
-  const likes=JSON.parse(localStorage.getItem(key)||'[]');
-  const heart=document.getElementById('heart');
-  const likeCount=document.getElementById('likeCount');
-  heart.textContent=likes.length?'❤️':'♡';
-  heart.classList.toggle('liked',likes.length>0);
-  likeCount.textContent=likes.length?likes.length+' · '+likes.join(', '):'0';
-}
+function closeModal(){modal.style.display='none'}
 
-/* SIDEBAR */
-const sidebar=document.getElementById('sidebar');
-const toggleSidebar=document.getElementById('toggleSidebar');
+// -------------------- AJOUT --------------------
+addBtn.onclick=()=>{
+  const name=nameInput.value.trim();
+  const file=photoInput.files[0];
+  if(!name||!file) return alert("Nom + photo requis");
+
+  const reader=new FileReader();
+  reader.onload=e=>{
+    const imgUrl=e.target.result;
+    creations.unshift({name,imgUrl});
+    localStorage.setItem('creations',JSON.stringify(creations));
+    render();
+    nameInput.value='';
+    photoInput.value='';
+  };
+  reader.readAsDataURL(file);
+};
+
+// -------------------- SIDEBAR --------------------
 toggleSidebar.onclick=()=>sidebar.classList.toggle('sidebar-open');
 
-/* THEME */
-const snow=document.getElementById('snow');
-const themeModal=document.getElementById('themeModal');
-function openThemeModal(){themeModal.style.display='flex';}
-function closeThemeModal(e){if(e.target===themeModal||e.target.tagName==='BUTTON') themeModal.style.display='none';}
+// -------------------- THEME --------------------
+function openThemeModal(){themeModal.style.display='flex'}
+function closeThemeModal(e){if(e.target===themeModal||e.target.tagName==='BUTTON') themeModal.style.display='none'}
+function setTheme(theme){
+  if(theme==='noel'){
+    document.body.style.backgroundImage="url('noel.png')";
+    snow.style.display='block';
+    sweetRain.style.display='none';
+  } else if(theme==='sweety'){
+    document.body.style.background="url('sweety-girly.png') center center / cover no-repeat fixed";
+    sweetRain.style.display='block';
+    snow.style.display='none';
+  } else {
+    document.body.style.backgroundImage="url('Photoroom_20251212_143703.PNG')";
+    snow.style.display='none';
+    sweetRain.style.display='none';
+  }
+}
 
-/* SWEETY / NEIGE */
-const sweetRain=document.createElement('div');
-sweetRain.style.position='fixed';
-sweetRain.style.inset='0';
-sweetRain.style.pointerEvents='none';
-sweetRain.style.zIndex='5';
-sweetRain.style.display='none';
-document.body.appendChild(sweetRain);
-
-function createSweet(){
-  if(sweetRain.style.display==='none') return;
-  const candy=document.createElement('div');
-  candy.textContent='🍬';
-  candy.style.position='absolute';
-  candy.style.top='-30px';
-  candy.style.left=Math.random()*innerWidth+'px';
-  candy.style.fontSize=(Math.random()*24+16)+'px';
-  candy.style.opacity=Math.random()*0.8+0.3;
-  sweetRain.appendChild(candy);
+// -------------------- NEIGE & SWEETY --------------------
+function createSnow(){
+  if(snow.style.display==='none') return;
+  const f=document.createElement('div');
+  f.textContent='❄';
+  f.style.position='absolute';
+  f.style.top='-30px';
+  f.style.left=Math.random()*innerWidth+'px';
+  f.style.fontSize=(Math.random()*20+10)+'px';
+  f.style.opacity=Math.random();
+  snow.appendChild(f);
   const fall=setInterval(()=>{
-    candy.style.top=parseFloat(candy.style.top)+(Math.random()*3+2)+'px';
-    candy.style.left=parseFloat(candy.style.left)+Math.sin(Date.now()/200)*1.5+'px';
-    if(parseFloat(candy.style.top)>innerHeight){candy.remove(); clearInterval(fall);}
+    f.style.top=parseFloat(f.style.top)+3+'px';
+    if(parseFloat(f.style.top)>innerHeight){f.remove(); clearInterval(fall);}
   },20);
 }
-setInterval(createSweet,150);
+setInterval(createSnow,150);
 
-function setTheme(theme){
-  if(theme==='noel'){document.body.style.backgroundImage="url('noel.png')"; snow.style.display='block'; sweetRain.style.display='none';}
-  else if(theme==='sweety'){document.body.style.background="url('sweety-girly.png') center center / cover no-repeat fixed"; snow.style.display='none'; sweetRain.style.display='block';}
-  else{document.body.style.backgroundImage="url('Photoroom_20251212_143703.PNG')"; snow.style.display='none'; sweetRain.style.display='none';}
-  refreshBorders();
+function createCandy(){
+  if(sweetRain.style.display==='none') return;
+  const c=document.createElement('div');
+  c.textContent='🍬';
+  c.style.position='absolute';
+  c.style.top='-30px';
+  c.style.left=Math.random()*innerWidth+'px';
+  c.style.fontSize=(Math.random()*24+16)+'px';
+  c.style.opacity=Math.random();
+  sweetRain.appendChild(c);
+  const fall=setInterval(()=>{
+    c.style.top=parseFloat(c.style.top)+3+'px';
+    if(parseFloat(c.style.top)>innerHeight){c.remove(); clearInterval(fall);}
+  },20);
 }
+setInterval(createCandy,150);
 
-/* BORDURES */
-function refreshBorders(){
-  document.querySelectorAll('.visitor-item img').forEach(img=>{
-    if(document.body.style.backgroundImage.includes('noel')){img.style.border="6px solid"; img.style.borderImage="repeating-linear-gradient(45deg, red 0 10px, white 0 20px) 10"; img.style.background='none';}
-    else if(document.body.style.backgroundImage.includes('sweety')){img.style.border="4px solid #ffb6c1"; img.style.background="#fff0f7"; img.style.borderImage='';}
-    else{img.style.border="4px solid #b67385"; img.style.background='#ffe6f0'; img.style.borderImage='';}
-  });
-}
-
-/* INIT */
+// -------------------- INIT --------------------
 render();
 </script>
 </body>
