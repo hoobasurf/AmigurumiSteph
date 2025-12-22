@@ -5,7 +5,7 @@
 <title>Owner - Galerie</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-html,body{height:100%;font-family:'Comic Sans MS',cursive;}
+html,body{height:100%;font-family:'Comic Sans MS',cursive}
 
 /* BODY */
 body{
@@ -13,7 +13,6 @@ body{
   overflow:hidden;
   display:flex;
   flex-direction:column;
-  padding:20px;
 }
 
 /* HEADER */
@@ -27,29 +26,20 @@ header img{width:98px;height:98px;border-radius:20%;margin:auto}
   justify-content:center;
   gap:16px;
   margin-top:20px;
-  margin-bottom:20px;
 }
 #viewSelector button{
   background:#fff0f7;
   border:2px solid #b84c6f;
   color:#b84c6f;
-  padding:10px 16px;
+  padding:8px 16px;
   border-radius:24px;
   cursor:pointer;
 }
 
 /* OWNER BOX */
-.owner-box{
-  display:flex;
-  justify-content:center;
-  gap:10px;
-  margin-bottom:20px;
-}
-.owner-box input, .owner-box button{
-  padding:10px;
-  border-radius:8px;
-  border:1px solid #ccc;
-}
+.owner-box { display:flex; justify-content:center; gap:10px; margin:20px; }
+.owner-box input, .owner-box button { padding:10px; border-radius:8px; border:1px solid #ccc; }
+.owner-box button { background:#ffb6c1; cursor:pointer; }
 
 /* VISITOR LIST */
 .center-zone{
@@ -62,24 +52,18 @@ header img{width:98px;height:98px;border-radius:20%;margin:auto}
 }
 #visitor-list{
   display:flex;
-  flex-wrap:wrap;
   justify-content:center;
+  flex-wrap:wrap;
   gap:16px;
   max-width:1200px;
 }
-
-/* ITEMS */
-.visitor-item{
-  text-align:center;
-  cursor:pointer;
-}
+.visitor-item{text-align:center; cursor:pointer;}
 .visitor-item img{
   width:220px;
   height:220px;
   object-fit:contain;
   border:4px solid #b67385;
   background:#ffe6f0;
-  border-radius:10px;
 }
 .visitor-item p{
   margin-top:8px;
@@ -89,82 +73,11 @@ header img{width:98px;height:98px;border-radius:20%;margin:auto}
 }
 
 /* VUES */
-.carousel-view{
-  flex-wrap:nowrap;
-  overflow-x:auto;
-  gap:40px;
-  padding:20px;
-}
-.carousel-view::-webkit-scrollbar{height:8px}
-.carousel-view::-webkit-scrollbar-thumb{background:#b84c6f88;border-radius:20px}
-
-.grid-view{
-  display:grid;
-  grid-template-columns:repeat(auto-fill,minmax(220px,1fr));
-  gap:24px;
-}
-.list-view{
-  display:flex;
-  flex-direction:column;
-  gap:18px;
-}
-.list-view .visitor-item{
-  display:flex;
-  align-items:center;
-  gap:18px;
-}
-.list-view img{
-  width:140px;
-  height:140px;
-}
-
-/* MODAL IMAGE */
-.modal-bg{
-  position:fixed;
-  inset:0;
-  background:rgba(0,0,0,.65);
-  display:none;
-  justify-content:center;
-  align-items:center;
-  z-index:1000;
-}
-.modal-box{
-  background:rgba(255,228,235,0.95);
-  border:4px solid #b67385;
-  border-radius:18px;
-  padding:18px;
-  max-width:900px;
-  width:95%;
-  max-height:80vh;
-  overflow-y:auto;
-  position:relative;
-  text-align:center;
-}
-.close-modal{
-  position:absolute;
-  top:10px;
-  right:14px;
-  font-size:28px;
-  cursor:pointer;
-  color:#b84c6f;
-}
-#modalBackBtn{
-  margin-top:10px;
-  padding:6px 18px;
-  border-radius:12px;
-  border:2px solid #b67385;
-  background:#ffe6f0;
-  color:#b84c6f;
-  font-weight:bold;
-  cursor:pointer;
-}
-.modal-main-img{
-  width:100%;
-  max-height:500px;
-  object-fit:contain;
-  border:4px solid #b67385;
-  background:#ffe6f0;
-}
+.carousel-view{flex-wrap:nowrap; overflow-x:auto; gap:20px;}
+.grid-view{flex-wrap:wrap; display:flex; justify-content:center; gap:16px;}
+.list-view{flex-direction:column;}
+.list-view .visitor-item{display:flex; align-items:center; gap:16px;}
+.list-view .visitor-item img{width:140px;height:140px;}
 
 /* SIDEBAR */
 #sidebar{
@@ -208,56 +121,57 @@ header img{width:98px;height:98px;border-radius:20%;margin:auto}
   cursor:pointer;
 }
 
-/* NEIGE / BONBONS */
-.snow, #sweetRain{
+/* MODAL THEME */
+.modal-bg{
   position:fixed;
   inset:0;
-  pointer-events:none;
-  z-index:5;
+  background:rgba(0,0,0,.6);
   display:none;
+  justify-content:center;
+  align-items:center;
+  z-index:9999;
 }
-.snowflake, .candy{
-  position:absolute;
-  top:-30px;
-  font-size:20px;
+.modal-box{
+  background:#ffe6f0;
+  border:4px solid #b67385;
+  border-radius:18px;
+  padding:20px;
+  text-align:center;
+}
+.modal-box button{
+  width:100%;
+  margin:8px 0;
+  padding:10px;
+  border:none;
+  border-radius:12px;
+  background:#ffb6c1;
+  color:#8b3a3a;
+  font-weight:bold;
 }
 </style>
 </head>
 <body>
 
 <div id="snow" class="snow"></div>
-<div id="sweetRain"></div>
 
 <header>
   <h1 class="title">Mes créations</h1>
 </header>
 
-<!-- Owner Box -->
 <div class="owner-box">
   <input id="name" placeholder="Nom de la création">
   <input id="photo" type="file" accept="image/*">
   <button id="add">Ajouter</button>
 </div>
 
-<!-- Vue Selector -->
 <div id="viewSelector">
   <button id="btnCarousel">Carrousel</button>
   <button id="btnGrid">Grille</button>
   <button id="btnList">Liste</button>
 </div>
 
-<!-- Visitor List -->
 <div class="center-zone">
   <div id="visitor-list"></div>
-</div>
-
-<!-- MODAL IMAGE -->
-<div class="modal-bg" id="modal" onclick="closeModal()">
-  <div class="modal-box" onclick="event.stopPropagation()">
-    <div class="close-modal" onclick="closeModal()">×</div>
-    <img id="modalMain" class="modal-main-img">
-    <button id="modalBackBtn" onclick="closeModal()">← Retour</button>
-  </div>
 </div>
 
 <!-- SIDEBAR -->
@@ -271,145 +185,93 @@ header img{width:98px;height:98px;border-radius:20%;margin:auto}
   <button>Paramètres</button>
 </div>
 
-<!-- THEME MODAL -->
+<!-- MODAL THEME -->
 <div class="modal-bg" id="themeModal" onclick="closeThemeModal(event)">
   <div class="modal-box" onclick="event.stopPropagation()">
     <h3>Choisir un thème</h3>
     <button onclick="setTheme('noel')">🎄 Noël</button>
     <button onclick="setTheme('default')">💠 Défaut</button>
-    <button onclick="setTheme('sweety')">🌸 Sweety-Girly</button>
+    <button onclick="setTheme('sweety')">🌸 Sweety</button>
     <button onclick="closeThemeModal(event)">✕ Fermer</button>
   </div>
 </div>
 
 <script>
-// -------------------- VARIABLES --------------------
-const nameInput = document.getElementById('name');
-const photoInput = document.getElementById('photo');
-const addBtn = document.getElementById('add');
-const list = document.getElementById('visitor-list');
-const modal = document.getElementById('modal');
-const modalMain = document.getElementById('modalMain');
-const btnCarousel = document.getElementById('btnCarousel');
-const btnGrid = document.getElementById('btnGrid');
-const btnList = document.getElementById('btnList');
-const themeModal = document.getElementById('themeModal');
-const snow = document.getElementById('snow');
-const sweetRain = document.getElementById('sweetRain');
-const sidebar = document.getElementById('sidebar');
-const toggleSidebar = document.getElementById('toggleSidebar');
+const CLOUD_NAME = 'YOUR_CLOUD_NAME'; // ← remplace par ton Cloudinary
+const list=document.getElementById('visitor-list');
+const nameInput=document.getElementById('name');
+const photoInput=document.getElementById('photo');
+const addBtn=document.getElementById('add');
+let creations=JSON.parse(localStorage.getItem('creations')||'[]');
+let currentView='grid';
 
-let creations = JSON.parse(localStorage.getItem('creations')||'[]');
-let currentIndex = null;
-let currentView = 'grid';
-
-// -------------------- RENDER --------------------
+/* RENDER */
 function render(){
   list.innerHTML='';
   list.className=currentView+'-view';
-  creations.forEach((c,i)=>{
+  creations.forEach(c=>{
     const d=document.createElement('div');
     d.className='visitor-item';
-    d.innerHTML=`<img src="${c.imgUrl}"><p>${c.name}</p>`;
-    d.onclick=()=>openModal(i);
+    d.innerHTML=`<p>${c.name}</p><img src="${c.imgUrl}">`;
     list.appendChild(d);
   });
 }
 
-// -------------------- VIEWS --------------------
-function setView(v){
-  currentView=v;
-  render();
-}
+/* VIEW BUTTONS */
 btnCarousel.onclick=()=>setView('carousel');
 btnGrid.onclick=()=>setView('grid');
 btnList.onclick=()=>setView('list');
+function setView(v){currentView=v; render();}
 
-// -------------------- MODAL --------------------
-function openModal(i){
-  currentIndex=i;
-  modalMain.src=creations[i].imgUrl;
-  modal.style.display='flex';
-}
-function closeModal(){modal.style.display='none'}
+/* ADD IMAGE TO CLOUDINARY */
+addBtn.onclick = () => {
+  const name = nameInput.value.trim();
+  const file = photoInput.files[0];
+  if(!name || !file) return alert("Nom + photo requis");
 
-// -------------------- AJOUT --------------------
-addBtn.onclick=()=>{
-  const name=nameInput.value.trim();
-  const file=photoInput.files[0];
-  if(!name||!file) return alert("Nom + photo requis");
+  const formData = new FormData();
+  formData.append('file', file);
+  formData.append('upload_preset','unsigned'); // Préparer preset unsigned dans Cloudinary
 
-  const reader=new FileReader();
-  reader.onload=e=>{
-    const imgUrl=e.target.result;
-    creations.unshift({name,imgUrl});
+  fetch(`https://api.cloudinary.com/v1_1/${dcdk7sr1n}/image/upload`,{
+    method:'POST',
+    body:formData
+  })
+  .then(res=>res.json())
+  .then(data=>{
+    creations.unshift({name, imgUrl:data.secure_url});
     localStorage.setItem('creations',JSON.stringify(creations));
-    render();
     nameInput.value='';
     photoInput.value='';
-  };
-  reader.readAsDataURL(file);
+    render();
+  })
+  .catch(err=>alert('Erreur upload: '+err));
 };
 
-// -------------------- SIDEBAR --------------------
-toggleSidebar.onclick=()=>sidebar.classList.toggle('sidebar-open');
+/* SIDEBAR */
+const sidebar=document.getElementById('sidebar');
+document.getElementById('toggleSidebar').onclick = ()=> sidebar.classList.toggle('sidebar-open');
 
-// -------------------- THEME --------------------
+/* THEMES */
+const snow=document.getElementById('snow');
+const themeModal=document.getElementById('themeModal');
 function openThemeModal(){themeModal.style.display='flex'}
 function closeThemeModal(e){if(e.target===themeModal||e.target.tagName==='BUTTON') themeModal.style.display='none'}
+
 function setTheme(theme){
   if(theme==='noel'){
     document.body.style.backgroundImage="url('noel.png')";
     snow.style.display='block';
-    sweetRain.style.display='none';
   } else if(theme==='sweety'){
-    document.body.style.background="url('sweety-girly.png') center center / cover no-repeat fixed";
-    sweetRain.style.display='block';
+    document.body.style.backgroundImage="url('sweety-girly.png')";
     snow.style.display='none';
   } else {
     document.body.style.backgroundImage="url('Photoroom_20251212_143703.PNG')";
     snow.style.display='none';
-    sweetRain.style.display='none';
   }
 }
-
-// -------------------- NEIGE & SWEETY --------------------
-function createSnow(){
-  if(snow.style.display==='none') return;
-  const f=document.createElement('div');
-  f.textContent='❄';
-  f.style.position='absolute';
-  f.style.top='-30px';
-  f.style.left=Math.random()*innerWidth+'px';
-  f.style.fontSize=(Math.random()*20+10)+'px';
-  f.style.opacity=Math.random();
-  snow.appendChild(f);
-  const fall=setInterval(()=>{
-    f.style.top=parseFloat(f.style.top)+3+'px';
-    if(parseFloat(f.style.top)>innerHeight){f.remove(); clearInterval(fall);}
-  },20);
-}
-setInterval(createSnow,150);
-
-function createCandy(){
-  if(sweetRain.style.display==='none') return;
-  const c=document.createElement('div');
-  c.textContent='🍬';
-  c.style.position='absolute';
-  c.style.top='-30px';
-  c.style.left=Math.random()*innerWidth+'px';
-  c.style.fontSize=(Math.random()*24+16)+'px';
-  c.style.opacity=Math.random();
-  sweetRain.appendChild(c);
-  const fall=setInterval(()=>{
-    c.style.top=parseFloat(c.style.top)+3+'px';
-    if(parseFloat(c.style.top)>innerHeight){c.remove(); clearInterval(fall);}
-  },20);
-}
-setInterval(createCandy,150);
-
-// -------------------- INIT --------------------
 render();
 </script>
+
 </body>
 </html>
