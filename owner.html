@@ -2,8 +2,7 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-
-<title>Galerie – Owner</title>
+<title>Galerie</title>
 
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
@@ -11,147 +10,121 @@ html,body{height:100%;font-family:'Comic Sans MS',cursive}
 
 body{
   background:url('Photoroom_20251212_143703.PNG') center/cover no-repeat fixed;
-  overflow:hidden;
   display:flex;
   flex-direction:column;
+  overflow:hidden;
 }
-
-/* ===== HEADER ===== */
-header{text-align:center;padding:10px 0}
 
 /* ===== VIEW BUTTONS ===== */
 #viewSelector{
   display:flex;
   justify-content:center;
-  gap:14px;
-  margin-top:20px;
+  gap:16px;
+  margin:20px 0;
 }
 #viewSelector button{
   background:#fff0f7;
   border:2px solid #b84c6f;
   color:#b84c6f;
   padding:10px 22px;
-  border-radius:20px;
-  font-size:18px;
+  border-radius:22px;
   cursor:pointer;
 }
-#viewSelector button.active{background:#ffe3ee}
 
-/* ===== CENTER ZONE ===== */
+/* ===== GALLERY ZONE ===== */
 .center-zone{
   flex:1;
   display:flex;
   justify-content:center;
-  align-items:flex-start;
-  padding-top:25px;
+  overflow:hidden;
 }
-#visitor-list{width:100%;max-width:1100px}
+#visitor-list{
+  width:100%;
+  max-width:1200px;
+}
 
-/* ===== GALERIE ITEMS ===== */
+/* ===== ITEM BASE ===== */
 .visitor-item{
-  text-align:center;
-  cursor:pointer;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:10px;
 }
 .visitor-item img{
   width:100%;
   height:auto;
+  max-height:260px;
   object-fit:contain;
-  border-radius:18px;
-  border:3px solid #b67385;
-  box-shadow:0 14px 25px rgba(0,0,0,0.25);
-  background:transparent;
+  border-radius:20px;
+  border:4px solid #b67385;
+  box-shadow:0 12px 18px rgba(0,0,0,.25);
+  background:rgba(255,255,255,.65);
 }
 .visitor-item p{
-  margin-top:10px;
   font-size:22px;
   font-weight:bold;
-  color:#b84c6f;
-  text-shadow:1px 1px 0 #00000030;
+  color:#8b2f4a;
+  text-shadow:1px 1px 0 #000;
 }
 
-/* ===== VIEWS ===== */
+/* ===== CAROUSEL ===== */
 .carousel-view{
   display:flex;
-  gap:30px;
-  overflow-x:auto;
+  gap:24px;
   padding:20px;
+  overflow-x:auto;
 }
 .carousel-view .visitor-item{
-  flex:0 0 calc(50% - 15px); /* 2 images */
+  flex:0 0 calc(50% - 12px);
 }
 
+/* ===== GRID ===== */
 .grid-view{
   display:grid;
-  grid-template-columns:repeat(2,1fr); /* 2x2 = 4 */
-  gap:26px;
+  grid-template-columns:repeat(2,1fr);
+  gap:24px;
   padding:20px;
   overflow-y:auto;
-  max-height:calc(100vh - 200px);
 }
 
+/* ===== LIST ===== */
 .list-view{
   display:flex;
   flex-direction:column;
-  gap:26px;
+  gap:24px;
   padding:20px;
   overflow-y:auto;
-  max-height:calc(100vh - 200px);
 }
-.list-view .visitor-item img{
-  max-height:260px;
+.list-view .visitor-item{
+  flex-direction:row;
+  gap:20px;
 }
-
-/* ===== MODAL ===== */
-.modal-bg{
-  position:fixed;
-  inset:0;
-  background:rgba(0,0,0,0.65);
-  display:none;
-  justify-content:center;
-  align-items:center;
-  z-index:1000;
-}
-.modal-box{
-  background:rgba(255,245,248,0.95);
-  border:4px solid #b67385;
-  border-radius:18px;
-  padding:18px;
-  width:95%;
-  max-width:900px;
-  max-height:80vh;
-  overflow:auto;
-  text-align:center;
-}
-.modal-main-img{
-  width:100%;
-  max-height:450px;
-  object-fit:contain;
-  border-radius:16px;
-  border:3px solid #b67385;
+.list-view img{
+  max-height:200px;
+  width:auto;
 }
 
 /* ===== SIDEBAR ===== */
 #sidebar{
   position:fixed;
-  top:0;
   left:-220px;
+  top:0;
   width:220px;
   height:100%;
-  background:rgba(255,230,240,0.2);
+  background:rgba(255,230,240,.2);
   border-right:2px solid #b67385;
   padding:20px;
   transition:.3s;
-  z-index:2000;
+  z-index:50;
 }
 #sidebar.open{left:0}
 #toggleSidebar{
   position:absolute;
   right:-30px;
   top:50%;
+  background:#ffb6c1;
   width:30px;
   height:60px;
-  background:#ffb6c1;
-  border-radius:0 12px 12px 0;
   display:flex;
   align-items:center;
   justify-content:center;
@@ -159,33 +132,64 @@ header{text-align:center;padding:10px 0}
 }
 #sidebar button{
   width:100%;
-  margin-bottom:12px;
+  margin-bottom:10px;
   padding:10px;
   border:none;
   border-radius:12px;
   background:#ffb6c1;
-  color:#8b3a3a;
-  font-weight:bold;
   cursor:pointer;
 }
 
+/* ===== ADD MODAL ===== */
+.modal-bg{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.6);
+  display:none;
+  justify-content:center;
+  align-items:center;
+  z-index:100;
+}
+.modal-box{
+  background:#ffe6f0;
+  padding:20px;
+  border-radius:16px;
+}
+.modal-box input, .modal-box button{
+  width:100%;
+  margin-bottom:10px;
+  padding:10px;
+}
+
 /* ===== SNOW & SWEET ===== */
-#snow,#sweetRain{
+.snow,.sweet{
   position:fixed;
   inset:0;
   pointer-events:none;
   display:none;
   z-index:5;
 }
+.snow span,.sweet span{
+  position:absolute;
+  top:-30px;
+  animation:fall linear infinite;
+}
+@keyframes fall{
+  to{transform:translateY(110vh)}
+}
 </style>
 </head>
 
 <body>
 
-<div id="snow"></div>
-<div id="sweetRain"></div>
+<div id="snow" class="snow"></div>
+<div id="sweet" class="sweet"></div>
 
-<header></header>
+<div id="sidebar">
+  <div id="toggleSidebar">☰</div>
+  <button onclick="openAdd()">Ajouter</button>
+  <button onclick="openTheme()">Thème</button>
+</div>
 
 <div id="viewSelector">
   <button onclick="setView('carousel')">Carrousel</button>
@@ -197,16 +201,7 @@ header{text-align:center;padding:10px 0}
   <div id="visitor-list"></div>
 </div>
 
-<!-- SIDEBAR -->
-<div id="sidebar">
-  <div id="toggleSidebar" onclick="sidebar.classList.toggle('open')">☰</div>
-  <button onclick="openAdd()">➕ Ajouter</button>
-  <button onclick="setTheme('default')">Défaut</button>
-  <button onclick="setTheme('noel')">🎄 Noël</button>
-  <button onclick="setTheme('sweety')">🍬 Sweety</button>
-</div>
-
-<!-- ADD MODAL -->
+<!-- ADD -->
 <div class="modal-bg" id="addModal">
   <div class="modal-box">
     <input id="name" placeholder="Nom">
@@ -215,50 +210,78 @@ header{text-align:center;padding:10px 0}
   </div>
 </div>
 
+<!-- THEME -->
+<div class="modal-bg" id="themeModal">
+  <div class="modal-box">
+    <button onclick="setTheme('default')">Défaut</button>
+    <button onclick="setTheme('noel')">🎄 Noël</button>
+    <button onclick="setTheme('sweety')">🌸 Sweety</button>
+  </div>
+</div>
+
 <script>
 const list=document.getElementById('visitor-list');
-const sidebar=document.getElementById('sidebar');
-const snow=document.getElementById('snow');
-const sweetRain=document.getElementById('sweetRain');
-
 let creations=JSON.parse(localStorage.getItem('creations')||'[]');
-let view='carousel';
+let currentView='carousel';
 
 function render(){
   list.innerHTML='';
-  list.className=view+'-view';
+  list.className=currentView+'-view';
   creations.forEach(c=>{
     const d=document.createElement('div');
     d.className='visitor-item';
-    d.innerHTML=`<img src="${c.img}"><p>${c.name}</p>`;
+    d.innerHTML=`<img src="${c.imgUrl}"><p>${c.name}</p>`;
     list.appendChild(d);
   });
 }
-function setView(v){view=v;render()}
-
-function openAdd(){document.getElementById('addModal').style.display='flex'}
-
+function setView(v){currentView=v;render()}
 function addImage(){
-  const n=document.getElementById('name').value;
-  const f=document.getElementById('photo').files[0];
+  const n=name.value.trim();
+  const f=photo.files[0];
   if(!n||!f)return;
   const r=new FileReader();
   r.onload=e=>{
-    creations.push({name:n,img:e.target.result});
+    creations.unshift({name:n,imgUrl:e.target.result});
     localStorage.setItem('creations',JSON.stringify(creations));
-    document.getElementById('addModal').style.display='none';
     render();
+    addModal.style.display='none';
   };
   r.readAsDataURL(f);
 }
 
+function openAdd(){addModal.style.display='flex'}
+function openTheme(){themeModal.style.display='flex'}
+
 function setTheme(t){
   snow.style.display='none';
-  sweetRain.style.display='none';
-  if(t==='noel') snow.style.display='block';
-  if(t==='sweety') sweetRain.style.display='block';
+  sweet.style.display='none';
+  if(t==='noel'){snow.style.display='block';spawnSnow()}
+  if(t==='sweety'){sweet.style.display='block';spawnSweet()}
+  themeModal.style.display='none';
 }
 
+function spawnSnow(){
+  snow.innerHTML='';
+  for(let i=0;i<30;i++){
+    const s=document.createElement('span');
+    s.textContent='❄️';
+    s.style.left=Math.random()*100+'%';
+    s.style.animationDuration=4+Math.random()*6+'s';
+    snow.appendChild(s);
+  }
+}
+function spawnSweet(){
+  sweet.innerHTML='';
+  for(let i=0;i<30;i++){
+    const s=document.createElement('span');
+    s.textContent='🍬';
+    s.style.left=Math.random()*100+'%';
+    s.style.animationDuration=4+Math.random()*6+'s';
+    sweet.appendChild(s);
+  }
+}
+
+toggleSidebar.onclick=()=>sidebar.classList.toggle('open');
 render();
 </script>
 
