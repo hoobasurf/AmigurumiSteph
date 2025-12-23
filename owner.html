@@ -10,8 +10,6 @@ html,body{
   height:100%;
   font-family:'Comic Sans MS',cursive;
   overflow:hidden;
-  display:flex;
-  flex-direction:column;
 }
 
 body{
@@ -36,15 +34,10 @@ body{
   cursor:pointer;border:1px solid #b67385;
 }
 #sidebar button{
-  width:100%;
-  margin-bottom:10px;
-  padding:10px;
-  border:none;
-  border-radius:12px;
-  background:#ffb6c1;
-  color:#8b3a3a;
-  font-weight:bold;
-  cursor:pointer;
+  width:100%;margin-bottom:10px;padding:10px;
+  border:none;border-radius:12px;
+  background:#ffb6c1;color:#8b3a3a;
+  font-weight:bold;cursor:pointer;
 }
 
 /* VIEW BUTTONS */
@@ -65,97 +58,81 @@ body{
 
 /* CENTER */
 .center-zone{
-  flex:1;
-  display:flex;
-  justify-content:center;
-  align-items:flex-start;
+  height:calc(100vh - 100px);
   overflow:hidden;
 }
 #visitor-list{
-  width:100%;
-  max-width:1200px;
+  height:100%;
 }
 
-/* ================= */
-/* === VISUELS ==== */
-/* ================= */
-
-.visitor-item{
-  padding:0;
-  margin:0;
-  background:none;
-  border:none;
-  cursor:pointer;
-}
-
+/* IMAGE */
 .visitor-item img{
   width:100%;
-  height:160px;
+  height:140px;
   object-fit:contain;
   display:block;
 }
 
-/* ===== VIEWS ===== */
+/* ===================== */
+/* ===== CARROUSEL ===== */
+/* ===================== */
 
-/* CARROUSEL → 3 / 3 (6 total) */
 .carousel-view{
-  display:grid;
-  grid-template-columns:repeat(3,1fr);
-  grid-template-rows:repeat(2,auto);
-  gap:0;
-  padding:0;
+  display:flex;
+  height:100%;
   overflow-x:auto;
-  min-width:900px;
+  scroll-snap-type:x mandatory;
 }
 
-/* GRILLE → 2 / 2 / 2 */
+.carousel-page{
+  min-width:100vw;
+  height:100%;
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  grid-template-rows:repeat(2,1fr);
+  scroll-snap-align:start;
+}
+
+/* ================= */
+/* ===== GRID ===== */
+/* ================= */
+
 .grid-view{
   display:grid;
   grid-template-columns:repeat(2,1fr);
-  gap:0;
-  padding:0;
+  grid-auto-rows:1fr;
+  height:100%;
   overflow-y:auto;
-  max-height:calc(100vh - 140px);
 }
 
-/* LISTE → 2 visibles */
+/* ================= */
+/* ===== LIST ===== */
+/* ================= */
+
 .list-view{
   display:flex;
   flex-direction:column;
-  gap:0;
+  height:100%;
   overflow-y:auto;
 }
-.list-view .visitor-item img{
-  height:220px;
-}
 
-/* MODAL IMAGE */
+/* MODAL */
 .modal-bg{
-  position:fixed;
-  inset:0;
-  background:rgba(0,0,0,.65);
+  position:fixed;inset:0;
+  background:rgba(0,0,0,.6);
   display:none;
   justify-content:center;
   align-items:center;
   z-index:1000;
 }
-.modal-box{
-  background:#fff;
-  border-radius:18px;
-  padding:18px;
-  max-width:900px;
-  width:95%;
-}
-.modal-main-img{
-  width:100%;
-  max-height:500px;
-  object-fit:contain;
+.modal-box img{
+  max-width:90vw;
+  max-height:80vh;
 }
 
 /* ADD MODAL */
 .form-modal-bg{
-  position:fixed;
-  inset:0;
+  position:fixed;inset:0;
   background:rgba(0,0,0,.6);
   display:none;
   justify-content:center;
@@ -167,28 +144,19 @@ body{
   padding:18px;
   border-radius:14px;
   border:4px solid #b67385;
-  width:340px;
+  width:320px;
 }
 .form-modal input,
 .form-modal button{
   width:100%;
   margin-bottom:10px;
   padding:10px;
-  border-radius:10px;
-  border:1px solid #b67385;
-}
-.form-modal button{
-  background:#ffb6c1;
-  color:#8b3a3a;
-  font-weight:bold;
-  cursor:pointer;
 }
 </style>
 </head>
 
 <body>
 
-<!-- SIDEBAR -->
 <div id="sidebar">
   <div id="toggleSidebar">☰</div>
   <button onclick="openAddModal()">Ajouter</button>
@@ -197,28 +165,26 @@ body{
   <button onclick="setView('list')">Liste</button>
 </div>
 
-<!-- VIEW SELECTOR -->
 <div id="viewSelector">
   <button onclick="setView('carousel')">Carrousel</button>
   <button onclick="setView('grid')">Grille</button>
   <button onclick="setView('list')">Liste</button>
 </div>
 
-<!-- CENTER -->
 <div class="center-zone">
   <div id="visitor-list"></div>
 </div>
 
 <!-- MODAL IMAGE -->
-<div class="modal-bg" id="modal" onclick="closeModal()">
-  <div class="modal-box" onclick="event.stopPropagation()">
-    <img id="modalMain" class="modal-main-img">
+<div class="modal-bg" id="modal" onclick="this.style.display='none'">
+  <div class="modal-box">
+    <img id="modalMain">
   </div>
 </div>
 
-<!-- ADD MODAL -->
+<!-- ADD -->
 <div class="form-modal-bg" id="addFormBg" onclick="if(event.target===this)this.style.display='none'">
-  <div class="form-modal" onclick="event.stopPropagation()">
+  <div class="form-modal">
     <input id="name" placeholder="Nom">
     <input id="photo" type="file" accept="image/*">
     <button onclick="submitAdd()">Ajouter</button>
@@ -234,57 +200,60 @@ const addFormBg=document.getElementById('addFormBg');
 let creations=JSON.parse(localStorage.getItem('creations')||'[]');
 let currentView='carousel';
 
-/* RENDER */
 function render(){
   list.innerHTML='';
   list.className=currentView+'-view';
+
+  if(currentView==='carousel'){
+    for(let i=0;i<creations.length;i+=6){
+      const page=document.createElement('div');
+      page.className='carousel-page';
+      creations.slice(i,i+6).forEach(c=>{
+        const d=document.createElement('div');
+        d.className='visitor-item';
+        d.innerHTML=`<img src="${c.imgUrl}">`;
+        d.onclick=()=>{modalMain.src=c.imgUrl;modal.style.display='flex'};
+        page.appendChild(d);
+      });
+      list.appendChild(page);
+    }
+    return;
+  }
+
   creations.forEach(c=>{
     const d=document.createElement('div');
     d.className='visitor-item';
     d.innerHTML=`<img src="${c.imgUrl}">`;
-    d.onclick=()=>openModal(c.imgUrl);
+    d.onclick=()=>{modalMain.src=c.imgUrl;modal.style.display='flex'};
     list.appendChild(d);
   });
 }
+
 render();
 
-/* VIEWS */
 function setView(v){
   currentView=v;
   render();
 }
 
-/* MODAL */
-function openModal(src){
-  modalMain.src=src;
-  modal.style.display='flex';
-}
-function closeModal(){
-  modal.style.display='none';
-}
-
-/* ADD */
 function openAddModal(){
   addFormBg.style.display='flex';
 }
-function submitAdd(){
-  const n=document.getElementById('name').value.trim();
-  const f=document.getElementById('photo').files[0];
-  if(!n||!f)return;
 
+function submitAdd(){
+  const n=name.value.trim();
+  const f=photo.files[0];
+  if(!n||!f)return;
   const r=new FileReader();
   r.onload=e=>{
     creations.push({name:n,imgUrl:e.target.result});
     localStorage.setItem('creations',JSON.stringify(creations));
     addFormBg.style.display='none';
-    document.getElementById('name').value='';
-    document.getElementById('photo').value='';
     render();
   };
   r.readAsDataURL(f);
 }
 
-/* SIDEBAR */
 toggleSidebar.onclick=()=>sidebar.classList.toggle('sidebar-open');
 </script>
 
