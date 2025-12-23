@@ -13,15 +13,14 @@ html,body{
   display:flex;
   flex-direction:column;
 }
-
 body{
   background:url('Photoroom_20251212_143703.PNG') center center / cover no-repeat fixed;
 }
 
-/* HEADER */
+/* ================= HEADER ================= */
 header{text-align:center;padding:12px 0}
 
-/* SIDEBAR */
+/* ================= SIDEBAR ================= */
 #sidebar{
   position:fixed;top:0;left:-220px;width:220px;height:100vh;
   background:rgba(255,230,240,0.18);
@@ -43,12 +42,12 @@ header{text-align:center;padding:12px 0}
   font-weight:bold;cursor:pointer;
 }
 
-/* VIEW BUTTONS */
+/* ================= VIEW BUTTONS ================= */
 #viewSelector{
   display:flex;
   justify-content:center;
   gap:16px;
-  margin-top:50px;
+  margin:40px 0 10px;
 }
 #viewSelector button{
   background:#fff0f7;
@@ -59,13 +58,13 @@ header{text-align:center;padding:12px 0}
   cursor:pointer;
 }
 
-/* CENTER */
+/* ================= CENTER ================= */
 .center-zone{
   flex:1;
   display:flex;
   justify-content:center;
   align-items:center;
-  padding:20px;
+  padding:10px;
   overflow:hidden;
 }
 #visitor-list{
@@ -73,68 +72,68 @@ header{text-align:center;padding:12px 0}
   max-width:900px;
 }
 
-/* ===================== */
-/* ==== IMAGE CARDS ==== */
-/* ===================== */
-
+/* ================= CARDS ================= */
 .visitor-item{
   display:flex;
   flex-direction:column;
   align-items:center;
+  gap:10px;
   cursor:pointer;
 }
 
+/* IMAGE SEULE — PAS DE FOND */
 .visitor-item img{
-  width:180px;                 /* ⬅️ PETITE TAILLE */
+  width:180px;
   height:180px;
   object-fit:contain;
-  border-radius:24px;
-  background:none;
-  border:4px solid #b84c6f;    /* cadre album */
-  padding:10px;
-  box-shadow:0 10px 25px rgba(0,0,0,0.25);
+  border-radius:18px;
+  border:3px solid #b84c6f;
+  box-shadow:0 10px 18px rgba(0,0,0,.25);
+  background:transparent;
 }
 
+/* TITRE */
 .visitor-item p{
-  margin-top:10px;
   font-size:18px;
-  font-weight:800;
+  font-weight:bold;
   color:#8b3a55;
   text-align:center;
 }
 
-/* ===== VIEWS ===== */
+/* ================= VIEWS ================= */
 
+/* CAROUSEL — 2 par écran */
 .carousel-view{
   display:flex;
-  gap:40px;
+  gap:30px;
   overflow-x:auto;
-  justify-content:center;
+  padding:20px;
 }
 .carousel-view .visitor-item{
-  flex:0 0 auto;
+  flex:0 0 calc(50% - 15px);
 }
 
+/* GRID — 2x2 */
 .grid-view{
   display:grid;
-  grid-template-columns:repeat(3,1fr);
-  gap:40px;
-  justify-items:center;
+  grid-template-columns:repeat(2,1fr);
+  gap:30px;
   overflow-y:auto;
-  max-height:calc(100vh - 180px);
+  max-height:70vh;
+  justify-items:center;
 }
 
+/* LIST — 2 visibles */
 .list-view{
   display:flex;
   flex-direction:column;
   gap:30px;
-  align-items:center;
   overflow-y:auto;
-  max-height:calc(100vh - 180px);
+  max-height:70vh;
+  align-items:center;
 }
 
-/* ===== MODALS ===== */
-
+/* ================= MODALS ================= */
 .modal-bg{
   position:fixed;inset:0;
   background:rgba(0,0,0,.65);
@@ -144,30 +143,23 @@ header{text-align:center;padding:12px 0}
   z-index:1000;
 }
 .modal-box{
-  background:rgba(255,228,235,0.95);
+  background:#ffe6f0;
   border:4px solid #b67385;
   border-radius:18px;
   padding:18px;
-  max-width:400px;
-  width:90%;
+  width:340px;
 }
 
-/* SNOW */
-.snow{
-  position:fixed;
-  inset:0;
-  pointer-events:none;
-  z-index:5;
-  display:none;
-}
+/* ================= SNOW ================= */
+#snow{position:fixed;inset:0;pointer-events:none;z-index:5;display:none}
+.snowflake{position:absolute;font-size:18px;color:white}
+.candy{position:absolute;font-size:22px}
 </style>
 </head>
 
 <body>
 
-<div id="snow" class="snow"></div>
-
-<header></header>
+<div id="snow"></div>
 
 <div id="sidebar">
   <div id="toggleSidebar">☰</div>
@@ -192,8 +184,8 @@ header{text-align:center;padding:12px 0}
 <!-- ADD -->
 <div class="modal-bg" id="addFormBg" onclick="if(event.target===this)this.style.display='none'">
   <div class="modal-box">
-    <input id="name" placeholder="Nom">
-    <input id="photo" type="file" accept="image/*">
+    <input id="name" placeholder="Nom"><br><br>
+    <input id="photo" type="file" accept="image/*"><br><br>
     <button onclick="submitAdd()">Ajouter</button>
   </div>
 </div>
@@ -201,9 +193,8 @@ header{text-align:center;padding:12px 0}
 <!-- THEME -->
 <div class="modal-bg" id="themeModal" onclick="if(event.target===this)this.style.display='none'">
   <div class="modal-box">
-    <button onclick="setTheme('noel')">🎄 Noël</button>
-    <button onclick="setTheme('sweety')">🌸 Sweety-Girly</button>
-    <button onclick="setTheme('petitchat')">🐱 Petit-chat</button>
+    <button onclick="setTheme('noel')">🎄 Noël</button><br><br>
+    <button onclick="setTheme('sweety')">🍬 Sweety</button><br><br>
     <button onclick="setTheme('default')">💠 Défaut</button>
   </div>
 </div>
@@ -213,8 +204,6 @@ const list=document.getElementById('visitor-list');
 const addFormBg=document.getElementById('addFormBg');
 const themeModal=document.getElementById('themeModal');
 const snow=document.getElementById('snow');
-const sidebar=document.getElementById('sidebar');
-const toggleSidebar=document.getElementById('toggleSidebar');
 
 let creations=JSON.parse(localStorage.getItem('creations')||'[]');
 let currentView='grid';
@@ -232,79 +221,69 @@ function render(){
 }
 render();
 
+/* VIEW */
 function setView(v){currentView=v;render()}
 
-/* ADD — FIXED */
+/* ADD */
 function openAddModal(){addFormBg.style.display='flex'}
 function submitAdd(){
-  const n=document.getElementById('name').value.trim();
-  const f=document.getElementById('photo').files[0];
-  if(!n||!f)return;
-
+  const n=name.value.trim();
+  const f=photo.files[0];
+  if(!n||!f)return alert("Nom + image obligatoires");
   const r=new FileReader();
   r.onload=e=>{
     creations.unshift({name:n,imgUrl:e.target.result});
     localStorage.setItem('creations',JSON.stringify(creations));
     addFormBg.style.display='none';
     render();
-    document.getElementById('name').value='';
-    document.getElementById('photo').value='';
-  };
+    name.value=''; photo.value='';
+  }
   r.readAsDataURL(f);
 }
 
 /* SIDEBAR */
 toggleSidebar.onclick=()=>sidebar.classList.toggle('sidebar-open');
 
-/* THEMES */
+/* THEME */
 function openThemeModal(){themeModal.style.display='flex'}
 
 function setTheme(t){
+  snow.innerHTML='';
   snow.style.display='none';
+  document.body.style.backgroundImage="url('Photoroom_20251212_143703.PNG')";
 
-  if(t==='noel'){
-    document.body.style.backgroundImage="url('noel.png')";
-    snow.style.display='block';
-  }
-  else if(t==='sweety'){
-    document.body.style.backgroundImage="url('sweety-girly.png')";
-    startCandy();
-  }
-  else if(t==='petitchat'){
-    document.body.style.backgroundImage="url('Photoroom_20251223_114401.jpeg')";
-  }
-  else{
-    document.body.style.backgroundImage="url('Photoroom_20251212_143703.PNG')";
-  }
+  if(t==='noel'){snow.style.display='block';startSnow()}
+  if(t==='sweety'){startCandy()}
 }
 
-/* NEIGE */
-setInterval(()=>{
-  if(snow.style.display==='none')return;
-  const f=document.createElement('div');
-  f.textContent='❄';
-  f.style.position='absolute';
-  f.style.left=Math.random()*innerWidth+'px';
-  f.style.top='-20px';
-  snow.appendChild(f);
-  const i=setInterval(()=>{
-    f.style.top=parseFloat(f.style.top)+2+'px';
-    if(parseFloat(f.style.top)>innerHeight){f.remove();clearInterval(i);}
-  },20);
-},150);
+/* SNOW */
+function startSnow(){
+  setInterval(()=>{
+    const f=document.createElement('div');
+    f.className='snowflake';
+    f.textContent='❄';
+    f.style.left=Math.random()*innerWidth+'px';
+    f.style.top='-20px';
+    snow.appendChild(f);
+    const i=setInterval(()=>{
+      f.style.top=parseFloat(f.style.top)+2+'px';
+      if(parseFloat(f.style.top)>innerHeight){f.remove();clearInterval(i)}
+    },20);
+  },150);
+}
 
-/* BONBONS */
+/* CANDY */
 function startCandy(){
   setInterval(()=>{
     const c=document.createElement('div');
+    c.className='candy';
     c.textContent='🍬';
-    c.style.position='absolute';
     c.style.left=Math.random()*innerWidth+'px';
     c.style.top='-20px';
     document.body.appendChild(c);
     const i=setInterval(()=>{
       c.style.top=parseFloat(c.style.top)+2+'px';
-      if(parseFloat(c.style.top)>innerHeight){c.remove();clearInterval(i);}
+      if(parseFloat(c.style.top)>innerHeight){c.remove();clearInterval(i)}
     },20);
   },200);
 }
