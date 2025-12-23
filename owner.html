@@ -337,6 +337,103 @@ header img{width:98px;height:98px;border-radius:20%;margin:auto;}
   width:auto;
 }
 
+/* ============================= */
+/* CENTRAGE GLOBAL MOBILE */
+/* ============================= */
+
+.center-zone{
+  justify-content:center;
+  align-items:flex-start;
+}
+
+#visitor-list{
+  margin:0 auto;
+  padding:10px;
+}
+
+/* ============================= */
+/* CARTES UNIFORMES PRO */
+/* ============================= */
+
+.visitor-item{
+  width:100%;
+  max-width:170px;           /* taille uniforme mobile */
+  height:230px;              /* même hauteur partout */
+  padding:2mm;               /* espace précis autour image */
+  border-radius:18px;
+  background:#fff0f7;
+  border:2px solid #d28aa2;  /* contour pro */
+  box-shadow:0 4px 10px rgba(0,0,0,0.12);
+  margin:0 auto;             /* CENTRÉ à l’écran */
+}
+
+/* ============================= */
+/* IMAGE STRICTEMENT SYMÉTRIQUE */
+/* ============================= */
+
+.visitor-item img{
+  width:100%;
+  height:160px;              /* taille identique */
+  object-fit:contain;        /* ❌ jamais coupé */
+  object-position:center;
+  background:#ffffff;
+  border-radius:14px;
+  border:1.5px solid #e3a3b8;
+}
+
+/* ============================= */
+/* TEXTE */
+/* ============================= */
+
+.visitor-item p{
+  font-size:14px;
+  margin-top:6px;
+}
+
+/* ============================= */
+/* CARROUSEL – 6 HORIZONTAL */
+/* ============================= */
+
+.carousel-view{
+  display:flex;
+  gap:14px;
+  justify-content:center;
+  overflow-x:auto;
+  padding-bottom:10px;
+}
+
+.carousel-view .visitor-item{
+  flex-shrink:0;
+}
+
+/* ============================= */
+/* GRILLE – 6 VERTICAL */
+/* ============================= */
+
+.grid-view{
+  display:grid;
+  grid-template-columns:repeat(2, 1fr);
+  gap:14px;
+  justify-items:center;
+  overflow-y:auto;
+  max-height:720px; /* 6 cartes */
+}
+
+/* ============================= */
+/* LISTE – 3 VERTICAL */
+/* ============================= */
+
+.list-view{
+  gap:14px;
+  overflow-y:auto;
+  max-height:690px; /* 3 cartes */
+}
+
+.list-view .visitor-item{
+  max-width:95%;
+  height:230px;
+}
+  
 </style>
 </head>
 <body>
