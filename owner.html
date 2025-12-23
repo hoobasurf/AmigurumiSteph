@@ -267,6 +267,76 @@ header img{width:98px;height:98px;border-radius:20%;margin:auto;}
   z-index:5;
   display:none;
 }
+
+  
+/* ============================= */
+/* ESPACE AUTOUR DES PHOTOS */
+/* ============================= */
+
+.visitor-item{
+  padding:2mm; /* ✅ 2 millimètres EXACT */
+  height:260px;
+}
+
+.visitor-item img{
+  width:100%;
+  height:180px;
+  object-fit:contain;     /* ❌ jamais coupé */
+  object-position:center;
+}
+
+/* ============================= */
+/* CARROUSEL → 6 HORIZONTAL */
+/* ============================= */
+
+.carousel-view{
+  display:flex;
+  gap:20px;
+  overflow-x:auto;
+  overflow-y:hidden;
+}
+
+.carousel-view .visitor-item{
+  min-width:calc(100% / 3 - 20px); /* 3 par ligne → 6 visibles en scroll */
+  height:260px;
+}
+
+/* ============================= */
+/* GRILLE → 6 VERTICAL */
+/* ============================= */
+
+.grid-view{
+  display:grid;
+  grid-template-columns:repeat(2, 1fr);
+  gap:20px;
+  overflow-y:auto;
+  max-height:calc(260px * 3 + 40px); /* 6 visibles */
+}
+
+.grid-view .visitor-item{
+  height:260px;
+}
+
+/* ============================= */
+/* LISTE → 3 VERTICAL */
+/* ============================= */
+
+.list-view{
+  overflow-y:auto;
+  max-height:calc(260px * 3 + 40px); /* 3 visibles */
+}
+
+.list-view .visitor-item{
+  height:260px;
+  flex-direction:row;
+  align-items:center;
+}
+
+.list-view img{
+  height:180px;
+  width:auto;
+}
+
 </style>
 </head>
 <body>
