@@ -46,70 +46,68 @@ header img{width:98px;height:98px;border-radius:20%;margin:auto;}
   padding-top:20px;
   overflow:hidden;
 }
-#visitor-list{width:100%;max-width:1200px;}
+/* ============================= */
+/* TAILLE UNIFORME DES CARTES */
+/* ============================= */
 
-/* ITEMS */
 .visitor-item{
-  text-align:center;
-  cursor:pointer;
-  box-shadow:0 6px 12px rgba(0,0,0,0.15);
-  border-radius:16px;
-  background:#ffe6f0;
-  padding:8px;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
+  height:260px;
+  justify-content:space-between;
 }
+
+/* zone image */
 .visitor-item img{
   width:100%;
-  object-fit:contain;
-  border:4px solid #b84c6f;
-  border-radius:16px;
-  margin-bottom:8px;
-}
-.visitor-item p{
-  font-size:18px;
-  font-weight:bold;
-  color:#8b3a3a;
-  text-align:center;
+  height:180px;
+  object-fit:contain;      /* ⚠️ PAS COUPÉ */
+  object-position:center; /* bien centré */
 }
 
-/* VUES */
-.carousel-view{
-  display:flex;
-  gap:20px;
-  overflow-x:auto;
-  scroll-snap-type: x mandatory;
-}
-.carousel-view .visitor-item{
-  min-width:calc(50% - 20px);
-  flex-shrink:0;
-  scroll-snap-align:start;
-}
+/* ============================= */
+/* GRILLE (comme la photo) */
+/* ============================= */
+
 .grid-view{
   display:grid;
-  grid-template-columns:repeat(2,1fr);
-  grid-auto-rows:minmax(200px,1fr);
+  grid-template-columns:repeat(2, 1fr);
   gap:20px;
-  overflow-y:auto;
-  max-height:calc(100vh - 150px);
-}
-.list-view{
-  display:flex;
-  flex-direction:column;
-  gap:20px;
-  overflow-y:auto;
-  max-height:calc(100vh - 150px);
-}
-.list-view .visitor-item{
-  flex-direction:row;
-  gap:16px;
-}
-.list-view img{
-  width:calc(50% - 16px);
-  height:auto;
+  align-items:stretch;
 }
 
+.grid-view .visitor-item{
+  height:260px;
+}
+
+/* ============================= */
+/* CARROUSEL = 6 VERTICAUX */
+/* ============================= */
+
+.carousel-view{
+  display:grid;
+  grid-template-columns:repeat(2, 1fr);
+  grid-auto-rows:260px;
+  gap:20px;
+  overflow-y:auto;
+  overflow-x:hidden;
+}
+
+.carousel-view .visitor-item{
+  min-width:unset;
+  height:260px;
+}
+
+/* ============================= */
+/* LISTE (alignée proprement) */
+/* ============================= */
+
+.list-view .visitor-item{
+  height:220px;
+}
+
+.list-view img{
+  height:180px;
+  width:auto;
+}
 /* MODAL IMAGE */
 .modal-bg{
   position:fixed;
