@@ -19,7 +19,7 @@ body{
   overflow:hidden;
 }
 
-/* ================= BOUTONS VUE (STYLE 2e CODE) ================= */
+/* ================= BOUTONS VUE ================= */
 #viewSelector{
   display:flex;
   justify-content:center;
@@ -48,7 +48,7 @@ body{
   padding:18px;
 }
 
-/* ================= CARD – COPIE COLLÉE DU 1er CODE ================= */
+/* ================= CARDS – 1er code ================= */
 .visitor-item{
   width:100%;
   max-width:240px;
@@ -76,7 +76,7 @@ body{
   padding-bottom:6px;
 }
 
-/* ================= CARROUSEL (1er code) ================= */
+/* ================= CARROUSEL ================= */
 .carousel-view{
   display:flex;
   gap:18px;
@@ -88,7 +88,7 @@ body{
   flex-shrink:0;
 }
 
-/* ================= GRILLE (1er code) ================= */
+/* ================= GRILLE ================= */
 .grid-view{
   display:grid;
   grid-template-columns:repeat(2,1fr);
@@ -96,7 +96,7 @@ body{
   justify-items:center;
 }
 
-/* ================= LISTE (1er code) ================= */
+/* ================= LISTE ================= */
 .list-view{
   display:flex;
   flex-direction:column;
@@ -178,16 +178,75 @@ body{
   font-weight:700;
   cursor:pointer;
 }
+
+/* ================= MODALS ADD / THEME ================= */
+.form-modal-bg{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.6);
+  display:none;
+  justify-content:center;
+  align-items:center;
+  z-index:2000;
+}
+.form-modal{
+  background:#fff;
+  padding:18px;
+  border-radius:22px;
+  width:320px;
+}
+.form-modal input{
+  width:100%;
+  padding:10px;
+  margin-bottom:10px;
+  border-radius:12px;
+  border:1px solid #ccc;
+}
+.form-modal button{
+  width:100%;
+  padding:12px;
+  margin-bottom:10px;
+  border:none;
+  border-radius:14px;
+  font-weight:600;
+  cursor:pointer;
+}
+
+/* ================= ANIMATIONS ================= */
+.snow,#sweetRain{
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  display:none;
+  z-index:5;
+}
+.snow::after{
+  content:"❄ ❄ ❄ ❄ ❄ ❄ ❄";
+  animation:fall 6s linear infinite;
+  font-size:24px;
+}
+#sweetRain::after{
+  content:"🌸 🌸 🌸 🌸 🌸";
+  animation:fall 8s linear infinite;
+  font-size:22px;
+}
+@keyframes fall{
+  from{transform:translateY(-10%)}
+  to{transform:translateY(110%)}
+}
 </style>
 </head>
 
 <body>
 
+<div id="snow" class="snow"></div>
+<div id="sweetRain"></div>
+
 <!-- SIDEBAR -->
 <div id="sidebar">
   <div id="toggleSidebar">☰</div>
-  <button>Ajouter</button>
-  <button>Thème</button>
+  <button onclick="openAddModal()">➕ Ajouter</button>
+  <button onclick="openThemeModal()">🎨 Thèmes</button>
   <button>Vidéos</button>
   <button>Notes</button>
 </div>
@@ -204,7 +263,7 @@ body{
   <div id="visitor-list"></div>
 </div>
 
-<!-- MODAL -->
+<!-- MODAL IMAGE -->
 <div class="modal-bg" id="modal" onclick="closeModal()">
   <div class="modal-box" onclick="event.stopPropagation()">
     <div class="close-modal" onclick="closeModal()">×</div>
@@ -212,15 +271,41 @@ body{
   </div>
 </div>
 
+<!-- ADD MODAL -->
+<div class="form-modal-bg" id="addFormBg">
+  <div class="form-modal">
+    <input id="addName" placeholder="Nom">
+    <input id="addImg" placeholder="URL image">
+    <button onclick="addCreation()">Ajouter</button>
+  </div>
+</div>
+
+<!-- THEME MODAL -->
+<div class="form-modal-bg" id="themeFormBg">
+  <div class="form-modal">
+    <button onclick="setTheme('default')">Default</button>
+    <button onclick="setTheme('noel')">🎄 Noël</button>
+    <button onclick="setTheme('sweety')">🌸 Sweety</button>
+    <button onclick="setTheme('chat')">🐱 Petit chat</button>
+  </div>
+</div>
+
 <script>
+/* ===== ELEMENTS ===== */
 const list=document.getElementById('visitor-list');
 const modal=document.getElementById('modal');
 const modalMain=document.getElementById('modalMain');
 const sidebar=document.getElementById('sidebar');
+const toggleSidebar=document.getElementById('toggleSidebar');
+const addFormBg=document.getElementById('addFormBg');
+const themeFormBg=document.getElementById('themeFormBg');
+const snow=document.getElementById('snow');
+const sweetRain=document.getElementById('sweetRain');
 
 let creations=JSON.parse(localStorage.getItem('creations')||'[]');
 let currentView='carousel';
 
+/* ===== RENDER CARDS ===== */
 function render(){
   list.innerHTML='';
   list.className=currentView+'-view';
@@ -233,18 +318,56 @@ function render(){
   });
 }
 
+/* ===== VIEWS ===== */
 btnCarousel.onclick=()=>{currentView='carousel';render();}
 btnGrid.onclick=()=>{currentView='grid';render();}
 btnList.onclick=()=>{currentView='list';render();}
 
+/* ===== MODAL ===== */
 function openModal(i){
   modalMain.src=creations[i].imgUrl;
   modal.style.display='flex';
 }
-function closeModal(){modal.style.display='none';}
+function closeModal(){modal.style.display='none'}
 
+/* ===== SIDEBAR ===== */
 toggleSidebar.onclick=()=>sidebar.classList.toggle('sidebar-open');
+function openAddModal(){addFormBg.style.display='flex'}
+function openThemeModal(){themeFormBg.style.display='flex'}
 
+/* ===== ADD CREATION ===== */
+function addCreation(){
+  const name=addName.value.trim();
+  const img=addImg.value.trim();
+  if(!name||!img)return;
+  creations.push({name,imgUrl:img});
+  localStorage.setItem('creations',JSON.stringify(creations));
+  addFormBg.style.display='none';
+  render();
+}
+
+/* ===== THEMES ===== */
+function setTheme(t){
+  snow.style.display='none';
+  sweetRain.style.display='none';
+
+  if(t==='noel'){
+    document.body.style.backgroundImage="url('noel.png')";
+    snow.style.display='block';
+  }else if(t==='sweety'){
+    document.body.style.backgroundImage="url('sweety-girly.png')";
+    sweetRain.style.display='block';
+  }else if(t==='chat'){
+    document.body.style.backgroundImage="url('Photoroom_20251223_114401.jpeg')";
+  }else{
+    document.body.style.backgroundImage="url('Photoroom_20251212_143703.PNG')";
+  }
+  localStorage.setItem('theme',t);
+  themeFormBg.style.display='none';
+}
+
+/* ===== INIT ===== */
+setTheme(localStorage.getItem('theme')||'default');
 render();
 </script>
 
