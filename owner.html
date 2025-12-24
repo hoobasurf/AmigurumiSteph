@@ -39,9 +39,11 @@ body{
 /* ================= ZONE CONTENU ================= */
 .center-zone{
   flex:1;
-  overflow:hidden; /* important */
   display:flex;
+  overflow:hidden;
 }
+
+/* ================= LISTE CONTENEUR ================= */
 #visitor-list{
   width:100%;
   padding:18px;
@@ -91,25 +93,27 @@ body{
   cursor:pointer;
 }
 
-/* ================= CARROUSEL ================= */
+/* ================= CARROUSEL (RESTAURÉ) ================= */
 .carousel-view{
   display:flex;
   gap:18px;
   overflow-x:auto;
-  padding-bottom:24px;
+  overflow-y:visible;
+  padding:24px 18px;
+  align-items:center;              /* ✅ cards bien visibles */
 }
 .carousel-view .visitor-item{
   flex-shrink:0;
 }
 
-/* ================= GRILLE (SCROLL VERTICAL) ================= */
+/* ================= GRILLE ================= */
 .grid-view{
   display:grid;
   grid-template-columns:repeat(2,1fr);
   gap:18px;
   justify-items:center;
-  overflow-y:auto;          /* ✅ scroll vertical */
-  height:100%;              /* ✅ prend toute la zone */
+  overflow-y:auto;
+  height:100%;
 }
 
 /* ================= LISTE ================= */
@@ -120,10 +124,8 @@ body{
   align-items:center;
   overflow-y:auto;
 }
-
-/* ✅ largeur réduite UNIQUEMENT en liste */
 .list-view .visitor-item{
-  max-width:180px;          /* ← plus étroit */
+  max-width:180px;
 }
 
 /* ================= MODAL ================= */
@@ -207,32 +209,15 @@ body{
   width:100%;
   margin-bottom:10px;
 }
-
-/* ================= ANIMATIONS ================= */
-.snow span,.sweet span{
-  position:fixed;
-  top:-10%;
-  animation:fall linear infinite;
-  pointer-events:none;
-}
-@keyframes fall{
-  to{transform:translateY(120vh)}
-}
 </style>
 </head>
 
 <body>
 
-<div id="snow"></div>
-<div id="sweet"></div>
-
 <!-- SIDEBAR -->
 <div id="sidebar">
   <div id="toggleSidebar">☰</div>
   <button onclick="openAddModal()">➕ Ajouter</button>
-  <button onclick="setTheme('default')">Default</button>
-  <button onclick="setTheme('noel')">🎄 Noël</button>
-  <button onclick="setTheme('sweety')">🍬 Sweety</button>
 </div>
 
 <!-- VIEWS -->
@@ -246,19 +231,10 @@ body{
   <div id="visitor-list"></div>
 </div>
 
-<!-- MODAL IMAGE -->
+<!-- MODAL -->
 <div class="modal-bg" id="modal" onclick="this.style.display='none'">
   <div class="modal-box" onclick="event.stopPropagation()">
     <img id="modalMain" class="modal-main-img">
-  </div>
-</div>
-
-<!-- ADD MODAL -->
-<div class="form-modal-bg" id="addFormBg">
-  <div class="form-modal">
-    <input id="addName" placeholder="Nom">
-    <input id="addFile" type="file" accept="image/*">
-    <button onclick="addCreation()">Ajouter</button>
   </div>
 </div>
 
@@ -267,8 +243,6 @@ const list=document.getElementById('visitor-list');
 const modal=document.getElementById('modal');
 const modalMain=document.getElementById('modalMain');
 const sidebar=document.getElementById('sidebar');
-const snow=document.getElementById('snow');
-const sweet=document.getElementById('sweet');
 
 let creations=JSON.parse(localStorage.getItem('creations')||'[]');
 let currentView='carousel';
@@ -290,21 +264,6 @@ function render(){
 }
 
 function setView(v){currentView=v;render();}
-
-function openAddModal(){addFormBg.style.display='flex'}
-function addCreation(){
-  const file=addFile.files[0];
-  if(!file)return;
-  const r=new FileReader();
-  r.onload=()=>{
-    creations.push({name:addName.value||'',img:r.result});
-    localStorage.setItem('creations',JSON.stringify(creations));
-    addFormBg.style.display='none';
-    addFile.value='';
-    render();
-  }
-  r.readAsDataURL(file);
-}
 
 function deleteItem(i){
   creations.splice(i,1);
