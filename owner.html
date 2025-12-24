@@ -103,7 +103,7 @@ body{
   flex-shrink:0;
 }
 
-/* ================= GRILLE (6 IMAGES) ================= */
+/* ================= GRILLE ================= */
 .grid-view{
   display:grid;
   grid-template-columns:repeat(2,1fr);
@@ -278,10 +278,10 @@ function render(){
     d.className='visitor-item';
     d.innerHTML=`
       <div class="delete-btn" onclick="deleteItem(${i});event.stopPropagation()">×</div>
-      <img src="${c.img}">
+      <img src="${c.img || c.imgUrl}">
       <p>${c.name}</p>
     `;
-    d.onclick=()=>{modalMain.src=c.img;modal.style.display='flex';}
+    d.onclick=()=>{modalMain.src=(c.img || c.imgUrl);modal.style.display='flex';}
     list.appendChild(d);
   });
 }
