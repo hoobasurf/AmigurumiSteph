@@ -39,9 +39,7 @@ body{
 /* ================= ZONE CONTENU ================= */
 .center-zone{
   flex:1;
-  overflow-y:auto; /* 🔑 scroll vertical global */
-  display:flex;
-  align-items:center;
+  overflow:hidden;              /* ⛔ on gère le scroll par vue */
 }
 #visitor-list{
   width:100%;
@@ -97,38 +95,47 @@ body{
   display:flex;
   gap:18px;
   overflow-x:auto;
+  overflow-y:hidden;
   padding-bottom:24px;
 }
 .carousel-view .visitor-item{
   flex-shrink:0;
 }
 
-/* ================= GRILLE ================= */
+/* ================= GRILLE (SCROLL VERTICAL OK) ================= */
 .grid-view{
   display:grid;
   grid-template-columns:repeat(2,1fr);
   gap:18px;
   justify-items:center;
-  overflow-y:auto; /* ✅ scroll vertical garanti */
+
+  height:100%;
+  overflow-y:auto;             /* ✅ SCROLL VERTICAL */
+  padding-bottom:40px;
 }
 .grid-view .visitor-item:nth-child(n+7){
   display:none;
 }
 
-/* ================= LISTE ================= */
+/* ================= LISTE (ÉTROITE & LÉGÈRE) ================= */
 .list-view{
   display:flex;
   flex-direction:column;
   gap:14px;
+
+  height:100%;
+  overflow-y:auto;
 }
 
-/* 🔥 IMAGES TRÈS RÉDUITES EN MODE LISTE */
+/* card plus fine */
 .list-view .visitor-item{
-  max-width:90%;
-  box-shadow:0 10px 22px rgba(0,0,0,.15);
+  max-width:70%;               /* ✅ beaucoup plus étroit */
+  box-shadow:0 8px 18px rgba(0,0,0,.15);
 }
+
+/* image très réduite */
 .list-view .visitor-item img{
-  max-width:120px;
+  max-width:100px;
   margin:0 auto;
   aspect-ratio:1/1;
 }
@@ -214,24 +221,10 @@ body{
   width:100%;
   margin-bottom:10px;
 }
-
-/* ================= ANIMATIONS ================= */
-.snow span,.sweet span{
-  position:fixed;
-  top:-10%;
-  animation:fall linear infinite;
-  pointer-events:none;
-}
-@keyframes fall{
-  to{transform:translateY(120vh)}
-}
 </style>
 </head>
 
 <body>
-
-<div id="snow"></div>
-<div id="sweet"></div>
 
 <!-- SIDEBAR -->
 <div id="sidebar">
@@ -274,8 +267,6 @@ const list=document.getElementById('visitor-list');
 const modal=document.getElementById('modal');
 const modalMain=document.getElementById('modalMain');
 const sidebar=document.getElementById('sidebar');
-const snow=document.getElementById('snow');
-const sweet=document.getElementById('sweet');
 
 let creations=JSON.parse(localStorage.getItem('creations')||'[]');
 let currentView='carousel';
@@ -288,10 +279,10 @@ function render(){
     d.className='visitor-item';
     d.innerHTML=`
       <div class="delete-btn" onclick="deleteItem(${i});event.stopPropagation()">×</div>
-      <img src="${c.img || c.imgUrl}">
+      <img src="${c.img}">
       <p>${c.name}</p>
     `;
-    d.onclick=()=>{modalMain.src=(c.img || c.imgUrl);modal.style.display='flex';}
+    d.onclick=()=>{modalMain.src=c.img;modal.style.display='flex';}
     list.appendChild(d);
   });
 }
@@ -317,25 +308,6 @@ function deleteItem(i){
   creations.splice(i,1);
   localStorage.setItem('creations',JSON.stringify(creations));
   render();
-}
-
-function setTheme(t){
-  snow.innerHTML=''; sweet.innerHTML='';
-  document.body.style.backgroundImage=
-    t==='noel' ? "url('noel.png')" :
-    t==='sweety' ? "url('sweety-girly.png')" :
-    "url('Photoroom_20251212_143703.PNG')";
-
-  if(t==='noel'){
-    for(let i=0;i<24;i++){
-      snow.innerHTML+=`<span style="left:${Math.random()*100}%;animation-duration:${5+Math.random()*5}s">❄</span>`;
-    }
-  }
-  if(t==='sweety'){
-    for(let i=0;i<24;i++){
-      sweet.innerHTML+=`<span style="left:${Math.random()*100}%;animation-duration:${6+Math.random()*6}s">🍬</span>`;
-    }
-  }
 }
 
 toggleSidebar.onclick=()=>sidebar.classList.toggle('sidebar-open');
