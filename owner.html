@@ -5,9 +5,6 @@
 <title>Owner - Mes créations</title>
 
 <style>
-/* ============================= */
-/* BASE */
-/* ============================= */
 *{box-sizing:border-box;margin:0;padding:0;}
 html,body{
   height:100%;
@@ -37,39 +34,30 @@ header{text-align:center;padding:12px 0;}
   padding:14px 0;
 }
 #viewSelector button{
-  background:white;
+  background:#fff;
   border:none;
-  padding:10px 18px;
-  border-radius:20px;
+  padding:12px 20px;
+  border-radius:22px;
   font-weight:600;
-  box-shadow:0 4px 10px rgba(0,0,0,.12);
+  box-shadow:0 6px 14px rgba(0,0,0,.18);
   cursor:pointer;
 }
 
 /* ============================= */
 /* ZONE CONTENU */
 /* ============================= */
-.center-zone{
-  flex:1;
-  overflow:auto;
-}
-#visitor-list{
-  width:100%;
-  padding:18px;
-}
+.center-zone{flex:1;overflow:auto;}
+#visitor-list{width:100%;padding:18px;}
 
 /* ============================= */
-/* CARTE – APP STORE */
+/* CARD – APP STORE */
 /* ============================= */
 .visitor-item{
-  width:100%;
   max-width:240px;
-  margin:0 auto;
   display:flex;
   flex-direction:column;
   gap:10px;
   border-radius:28px;
-  background:transparent;
   box-shadow:0 18px 40px rgba(0,0,0,.18);
   cursor:pointer;
 }
@@ -77,19 +65,16 @@ header{text-align:center;padding:12px 0;}
   width:100%;
   aspect-ratio:1/1;
   object-fit:contain;
-  display:block;
   border-radius:28px;
 }
 .visitor-item p{
   text-align:center;
-  font-size:15px;
   font-weight:600;
   color:#1d1d1f;
-  padding-bottom:6px;
 }
 
 /* ============================= */
-/* CARROUSEL – CENTRÉ ÉCRAN */
+/* CARROUSEL CENTRÉ */
 /* ============================= */
 .carousel-view{
   display:flex;
@@ -121,9 +106,7 @@ header{text-align:center;padding:12px 0;}
   flex-direction:column;
   gap:18px;
 }
-.list-view .visitor-item{
-  max-width:95%;
-}
+.list-view .visitor-item{max-width:95%;}
 
 /* ============================= */
 /* MODAL IMAGE */
@@ -138,7 +121,7 @@ header{text-align:center;padding:12px 0;}
   z-index:1000;
 }
 .modal-box{
-  background:white;
+  background:#fff4f7;
   border-radius:28px;
   padding:18px;
   width:95%;
@@ -146,6 +129,7 @@ header{text-align:center;padding:12px 0;}
   max-height:85vh;
   overflow:auto;
   position:relative;
+  border:4px solid #8b2f4a;
 }
 .modal-main-img{
   width:100%;
@@ -159,10 +143,11 @@ header{text-align:center;padding:12px 0;}
   right:16px;
   font-size:26px;
   cursor:pointer;
+  color:#8b2f4a;
 }
 
 /* ============================= */
-/* ICONES */
+/* LIKE / COMMENT */
 /* ============================= */
 .icon-bar{
   display:flex;
@@ -173,20 +158,21 @@ header{text-align:center;padding:12px 0;}
 .icon-btn{
   display:flex;
   align-items:center;
-  gap:6px;
+  gap:8px;
   cursor:pointer;
+  font-weight:600;
+  color:#8b2f4a;
 }
 .heart{font-size:26px}
-.heart.liked{color:#ff3b5c}
+.heart.liked{color:#c2185b}
 
 /* ============================= */
 /* COMMENTAIRES */
 /* ============================= */
-.comment-section{margin-top:16px}
 .comment{
-  background:#f2f2f7;
+  background:#fdecef;
   padding:10px;
-  border-radius:12px;
+  border-radius:14px;
   margin-bottom:10px;
 }
 
@@ -203,57 +189,74 @@ header{text-align:center;padding:12px 0;}
   z-index:2000;
 }
 .form-modal{
-  background:white;
+  background:#fff0f4;
   padding:18px;
-  border-radius:20px;
+  border-radius:22px;
   width:340px;
+  border:4px solid #8b2f4a;
 }
 .form-modal input,
 .form-modal textarea{
   width:100%;
   margin-bottom:10px;
-  padding:10px;
-  border-radius:10px;
-  border:1px solid #ccc;
+  padding:12px;
+  border-radius:12px;
+  border:1px solid #b85c74;
 }
 .form-modal button{
   width:100%;
-  padding:10px;
+  padding:12px;
   border:none;
-  border-radius:14px;
-  background:#007aff;
+  border-radius:16px;
+  background:#8b2f4a;
   color:white;
-  font-weight:600;
+  font-weight:700;
   cursor:pointer;
 }
 
 /* ============================= */
-/* SIDEBAR */
+/* SIDEBAR PRO */
 /* ============================= */
 #sidebar{
   position:fixed;
   top:0;
-  left:-220px;
-  width:220px;
+  left:-240px;
+  width:240px;
   height:100vh;
-  background:rgba(255,255,255,.85);
+  background:linear-gradient(180deg,#7a1f3d,#a23a5f);
   padding:20px;
   transition:left .3s;
   z-index:10;
 }
 #sidebar.sidebar-open{left:0;}
+
 #toggleSidebar{
   position:absolute;
   top:50%;
-  right:-30px;
-  width:30px;
-  height:60px;
-  background:#007aff;
+  right:-44px;
+  width:44px;
+  height:90px;
+  background:#7a1f3d;
   color:white;
-  border-radius:0 12px 12px 0;
+  border-radius:0 22px 22px 0;
   display:flex;
   justify-content:center;
   align-items:center;
+  font-size:22px;
+  box-shadow:0 8px 20px rgba(0,0,0,.35);
+  cursor:pointer;
+}
+
+#sidebar button{
+  width:100%;
+  margin-bottom:14px;
+  padding:14px;
+  border:none;
+  border-radius:20px;
+  background:#fff;
+  color:#7a1f3d;
+  font-weight:700;
+  box-shadow:0 6px 14px rgba(0,0,0,.25);
   cursor:pointer;
 }
 
@@ -275,9 +278,7 @@ header{text-align:center;padding:12px 0;}
 <div id="snow" class="snow"></div>
 <div id="sweetRain"></div>
 
-<header>
-  <h1 class="title">Mes créations</h1>
-</header>
+<header></header>
 
 <div id="viewSelector">
   <button id="btnCarousel">Carrousel</button>
@@ -289,7 +290,7 @@ header{text-align:center;padding:12px 0;}
   <div id="visitor-list"></div>
 </div>
 
-<!-- MODAL IMAGE + LIKE + COMMENT -->
+<!-- MODAL -->
 <div class="modal-bg" id="modal" onclick="closeModal()">
   <div class="modal-box" onclick="event.stopPropagation()">
     <div class="close-modal" onclick="closeModal()">×</div>
@@ -303,13 +304,13 @@ header{text-align:center;padding:12px 0;}
         <span id="commentCount">0</span>
       </div>
     </div>
-    <div id="commentsList" class="comment-section"></div>
+    <div id="commentsList"></div>
   </div>
 </div>
 
 <!-- FORM COMMENT -->
-<div class="form-modal-bg" id="commentFormBg" onclick="if(event.target===commentFormBg) commentFormBg.style.display='none'">
-  <div class="form-modal" onclick="event.stopPropagation()">
+<div class="form-modal-bg" id="commentFormBg">
+  <div class="form-modal">
     <input id="commentName" placeholder="Prénom">
     <textarea id="commentText" rows="4" placeholder="Commentaire"></textarea>
     <button onclick="submitComment()">Envoyer</button>
@@ -317,10 +318,10 @@ header{text-align:center;padding:12px 0;}
 </div>
 
 <!-- FORM LIKE -->
-<div class="form-modal-bg" id="likeFormBg" onclick="if(event.target===likeFormBg) likeFormBg.style.display='none'">
-  <div class="form-modal" onclick="event.stopPropagation()">
+<div class="form-modal-bg" id="likeFormBg">
+  <div class="form-modal">
     <input id="likeName" placeholder="Ton prénom">
-    <button onclick="submitLike()">J'aime</button>
+    <button onclick="submitLike()">J’aime</button>
   </div>
 </div>
 
@@ -336,30 +337,7 @@ header{text-align:center;padding:12px 0;}
   <button>Paramètres</button>
 </div>
 
-<!-- ADD MODAL -->
-<div class="form-modal-bg" id="addModal" onclick="if(event.target===addModal) addModal.style.display='none'">
-  <div class="form-modal" onclick="event.stopPropagation()">
-    <input id="newName" placeholder="Nom de la création">
-    <input id="newFile" type="file" accept="image/*">
-    <button onclick="submitAdd()">Ajouter</button>
-  </div>
-</div>
-
-<!-- THEME MODAL -->
-<div class="modal-bg" id="themeModal" onclick="closeThemeModal(event)">
-  <div class="modal-box" onclick="event.stopPropagation()">
-    <h3>Choisir un thème</h3>
-    <button onclick="setTheme('noel')">🎄 Noël</button>
-    <button onclick="setTheme('default')">💠 Défaut</button>
-    <button onclick="setTheme('sweety')">🌸 Sweety-Girly</button>
-    <button onclick="closeThemeModal(event)">✕ Fermer</button>
-  </div>
-</div>
-
 <script>
-/* ============================= */
-/* JS COMPLET – ORIGINAL */
-/* ============================= */
 const list=document.getElementById('visitor-list');
 const modal=document.getElementById('modal');
 const modalMain=document.getElementById('modalMain');
@@ -367,9 +345,6 @@ const commentFormBg=document.getElementById('commentFormBg');
 const likeFormBg=document.getElementById('likeFormBg');
 const commentCount=document.getElementById('commentCount');
 const commentList=document.getElementById('commentsList');
-const addModal=document.getElementById('addModal');
-const snow=document.getElementById('snow');
-const sweetRain=document.getElementById('sweetRain');
 
 let creations=JSON.parse(localStorage.getItem('creations')||'[]');
 let currentIndex=null;
@@ -401,30 +376,15 @@ function openModal(i){
 }
 function closeModal(){modal.style.display='none'}
 
-function openAddModal(){addModal.style.display='flex'}
-function submitAdd(){
-  const name=document.getElementById('newName').value.trim();
-  const file=document.getElementById('newFile').files[0];
-  if(!name||!file) return;
-  const reader=new FileReader();
-  reader.onload=e=>{
-    creations.unshift({name,imgUrl:e.target.result});
-    localStorage.setItem('creations',JSON.stringify(creations));
-    addModal.style.display='none';
-    render();
-  };
-  reader.readAsDataURL(file);
-}
-
 function openCommentForm(){commentFormBg.style.display='flex'}
 function submitComment(){
   const n=commentName.value.trim();
   const t=commentText.value.trim();
-  if(!n||!t) return;
-  const key='comments_'+currentIndex;
-  const c=JSON.parse(localStorage.getItem(key)||'[]');
+  if(!n||!t)return;
+  const k='comments_'+currentIndex;
+  const c=JSON.parse(localStorage.getItem(k)||'[]');
   c.push({n,t});
-  localStorage.setItem(key,JSON.stringify(c));
+  localStorage.setItem(k,JSON.stringify(c));
   commentFormBg.style.display='none';
   loadComments();
 }
@@ -437,32 +397,22 @@ function loadComments(){
 function openLikeModal(){likeFormBg.style.display='flex'}
 function submitLike(){
   const name=likeName.value.trim();
-  if(!name) return;
-  const key='likes_'+currentIndex;
-  const likes=JSON.parse(localStorage.getItem(key)||'[]');
-  if(!likes.includes(name)) likes.push(name);
-  localStorage.setItem(key,JSON.stringify(likes));
+  if(!name)return;
+  const k='likes_'+currentIndex;
+  const l=JSON.parse(localStorage.getItem(k)||'[]');
+  if(!l.includes(name))l.push(name);
+  localStorage.setItem(k,JSON.stringify(l));
   likeFormBg.style.display='none';
   loadLikes();
 }
 function loadLikes(){
-  const likes=JSON.parse(localStorage.getItem('likes_'+currentIndex)||'[]');
-  heart.textContent=likes.length?'❤️':'♡';
-  heart.classList.toggle('liked',likes.length>0);
-  likeCount.textContent=likes.length;
+  const l=JSON.parse(localStorage.getItem('likes_'+currentIndex)||'[]');
+  heart.textContent=l.length?'❤️':'♡';
+  heart.classList.toggle('liked',l.length>0);
+  likeCount.textContent=l.length?`${l.length} · ${l.join(', ')}`:'0';
 }
 
-/* SIDEBAR */
 toggleSidebar.onclick=()=>sidebar.classList.toggle('sidebar-open');
-
-/* THEME */
-function openThemeModal(){themeModal.style.display='flex'}
-function closeThemeModal(e){if(e.target===themeModal||e.target.tagName==='BUTTON') themeModal.style.display='none'}
-function setTheme(t){
-  if(t==='noel'){snow.style.display='block';sweetRain.style.display='none';}
-  else if(t==='sweety'){snow.style.display='none';sweetRain.style.display='block';}
-  else{snow.style.display='none';sweetRain.style.display='none';}
-}
 
 render();
 </script>
