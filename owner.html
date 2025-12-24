@@ -3,21 +3,11 @@
 <head>
 <meta charset="UTF-8">
 <title>Owner - Mes créations</title>
-
 <style>
 /* ================= BASE ================= */
 *{box-sizing:border-box;margin:0;padding:0;}
-html,body{
-  height:100%;
-  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
-}
-
-body{
-  background:url('Photoroom_20251212_143703.PNG') center top / cover no-repeat fixed;
-  display:flex;
-  flex-direction:column;
-  overflow:hidden;
-}
+html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;}
+body{background:url('Photoroom_20251212_143703.PNG') center/cover no-repeat fixed;display:flex;flex-direction:column;overflow:hidden;}
 
 /* ================= BOUTONS VUE ================= */
 #viewSelector{
@@ -82,10 +72,12 @@ body{
   gap:18px;
   overflow-x:auto;
   overflow-y:visible;
-  padding-bottom:24px;
+  padding:0 calc(50vw - 120px) 24px;
+  scroll-snap-type:x mandatory;
 }
 .carousel-view .visitor-item{
   flex-shrink:0;
+  scroll-snap-align:center;
 }
 
 /* ================= GRILLE ================= */
@@ -147,10 +139,11 @@ body{
   left:-240px;
   width:240px;
   height:100%;
-  background:linear-gradient(180deg,#8b2f4a,#a23a5f);
+  background:rgba(122,31,61,0.85);
   padding:20px;
   transition:left .3s;
   z-index:1200;
+  backdrop-filter:blur(6px);
 }
 #sidebar.sidebar-open{left:0;}
 #toggleSidebar{
@@ -159,7 +152,7 @@ body{
   right:-44px;
   width:44px;
   height:90px;
-  background:#8b2f4a;
+  background:rgba(122,31,61,0.85);
   color:white;
   border-radius:0 22px 22px 0;
   display:flex;
@@ -213,33 +206,32 @@ body{
 }
 
 /* ================= ANIMATIONS ================= */
-.snow,#sweetRain{
+.snow,.sweetRain{
   position:fixed;
   inset:0;
   pointer-events:none;
   display:none;
   z-index:5;
 }
-.snow::after{
-  content:"❄ ❄ ❄ ❄ ❄ ❄ ❄";
-  animation:fall 6s linear infinite;
+.falling{
+  position:absolute;
+  top:-50px;
   font-size:24px;
-}
-#sweetRain::after{
-  content:"🍬 🍬 🍬 🍬 🍬";
-  animation:fall 8s linear infinite;
-  font-size:22px;
+  user-select:none;
+  pointer-events:none;
+  animation-name:fall;
+  animation-timing-function:linear;
+  animation-iteration-count:infinite;
 }
 @keyframes fall{
-  from{transform:translateY(-10%)}
-  to{transform:translateY(110%)}
+  0%{transform:translateY(-50px);}
+  100%{transform:translateY(110vh);}
 }
 </style>
 </head>
 
 <body>
-
-<div id="snow" class="snow"></div>
+<div id="snow"></div>
 <div id="sweetRain"></div>
 
 <!-- SIDEBAR -->
@@ -251,14 +243,14 @@ body{
   <button>Notes</button>
 </div>
 
-<!-- BOUTONS -->
+<!-- VIEWS -->
 <div id="viewSelector">
   <button id="btnCarousel">Carrousel</button>
   <button id="btnGrid">Grille</button>
   <button id="btnList">Liste</button>
 </div>
 
-<!-- CONTENU -->
+<!-- CONTENT -->
 <div class="center-zone">
   <div id="visitor-list"></div>
 </div>
@@ -275,7 +267,7 @@ body{
 <div class="form-modal-bg" id="addFormBg">
   <div class="form-modal">
     <input id="addName" placeholder="Nom">
-    <input type="file" id="addImgFile" accept="image/*">
+    <input type="file" id="addFile" accept="image/*">
     <button onclick="addCreation()">Ajouter</button>
   </div>
 </div>
@@ -301,7 +293,7 @@ const addFormBg=document.getElementById('addFormBg');
 const themeFormBg=document.getElementById('themeFormBg');
 const snow=document.getElementById('snow');
 const sweetRain=document.getElementById('sweetRain');
-const addImgFile=document.getElementById('addImgFile');
+const addFile=document.getElementById('addFile');
 const addName=document.getElementById('addName');
 
 let creations=JSON.parse(localStorage.getItem('creations')||'[]');
@@ -337,40 +329,56 @@ toggleSidebar.onclick=()=>sidebar.classList.toggle('sidebar-open');
 function openAddModal(){addFormBg.style.display='flex'}
 function openThemeModal(){themeFormBg.style.display='flex'}
 
-/* ===== ADD CREATION (FICHIER LOCAL) ===== */
+/* ===== ADD CREATION LOCAL FILE ===== */
 function addCreation(){
   const name=addName.value.trim();
-  const file=addImgFile.files[0];
-  if(!name||!file)return;
-
+  const file=addFile.files[0];
+  if(!name||!file) return;
   const reader=new FileReader();
   reader.onload=function(e){
-    const imgData=e.target.result;
-    creations.push({name,imgUrl:imgData});
+    creations.push({name,imgUrl:e.target.result});
     localStorage.setItem('creations',JSON.stringify(creations));
     addFormBg.style.display='none';
     addName.value='';
-    addImgFile.value='';
+    addFile.value='';
     render();
-  }
+  };
   reader.readAsDataURL(file);
 }
 
 /* ===== THEMES ===== */
 function setTheme(t){
+  snow.innerHTML='';
+  sweetRain.innerHTML='';
   snow.style.display='none';
   sweetRain.style.display='none';
+
   if(t==='noel'){
     document.body.style.backgroundImage="url('noel.png')";
     snow.style.display='block';
+    for(let i=0;i<30;i++){
+      const floc=document.createElement('div');
+      floc.className='falling';
+      floc.style.left=Math.random()*100+'vw';
+      floc.style.fontSize=(12+Math.random()*18)+'px';
+      floc.style.animationDuration=(4+Math.random()*6)+'s';
+      floc.textContent='❄';
+      snow.appendChild(floc);
+    }
   }else if(t==='sweety'){
     document.body.style.backgroundImage="url('sweety-girly.png')";
     sweetRain.style.display='block';
+    for(let i=0;i<30;i++){
+      const bonbon=document.createElement('div');
+      bonbon.className='falling';
+      bonbon.style.left=Math.random()*100+'vw';
+      bonbon.style.fontSize=(18+Math.random()*12)+'px';
+      bonbon.style.animationDuration=(5+Math.random()*5)+'s';
+      bonbon.textContent='🍬';
+      sweetRain.appendChild(bonbon);
+    }
   }else if(t==='chat'){
     document.body.style.backgroundImage="url('Photoroom_20251223_114401.jpeg')";
-    document.body.style.backgroundSize='contain';
-    document.body.style.backgroundRepeat='no-repeat';
-    document.body.style.backgroundPosition='center';
   }else{
     document.body.style.backgroundImage="url('Photoroom_20251212_143703.PNG')";
   }
@@ -382,6 +390,5 @@ function setTheme(t){
 setTheme(localStorage.getItem('theme')||'default');
 render();
 </script>
-
 </body>
 </html>
