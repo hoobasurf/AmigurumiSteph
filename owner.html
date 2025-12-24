@@ -2,16 +2,17 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Owner - Mes créations</title>
 
 <style>
-/* ================= BASE ================= */
-*{box-sizing:border-box;margin:0;padding:0;}
+*{box-sizing:border-box;margin:0;padding:0}
 html,body{
   height:100%;
   font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
 }
 
+/* ===== BODY ===== */
 body{
   background:url('Photoroom_20251212_143703.PNG') center center / cover no-repeat fixed;
   display:flex;
@@ -19,109 +20,114 @@ body{
   overflow:hidden;
 }
 
-/* ================= BOUTONS VUE ================= */
+/* ===== SIDEBAR ===== */
+#sidebar{
+  position:fixed;
+  top:0;
+  left:-240px;
+  width:240px;
+  height:100%;
+  background:rgba(255,255,255,.55);
+  backdrop-filter:blur(14px);
+  padding:20px;
+  transition:left .3s;
+  z-index:1200;
+}
+#sidebar.sidebar-open{left:0}
+
+#toggleSidebar{
+  position:absolute;
+  top:50%;
+  right:-44px;
+  width:44px;
+  height:90px;
+  background:rgba(255,255,255,.6);
+  border-radius:0 22px 22px 0;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  font-size:22px;
+  cursor:pointer;
+}
+
+#sidebar button{
+  width:100%;
+  margin-bottom:14px;
+  padding:14px;
+  border:none;
+  border-radius:18px;
+  background:rgba(255,255,255,.8);
+  font-weight:600;
+}
+
+/* ===== VIEW BUTTONS ===== */
 #viewSelector{
   display:flex;
   justify-content:center;
-  gap:14px;
-  padding:14px 0;
+  gap:12px;
+  padding:14px;
 }
 #viewSelector button{
-  background:#fff;
+  padding:10px 18px;
   border:none;
-  padding:12px 20px;
-  border-radius:22px;
-  font-weight:600;
-  box-shadow:0 6px 14px rgba(0,0,0,.18);
-  cursor:pointer;
+  border-radius:20px;
+  background:white;
+  box-shadow:0 6px 14px rgba(0,0,0,.15);
 }
 
-/* ================= ZONE CONTENU ================= */
+/* ===== CONTENT ===== */
 .center-zone{
   flex:1;
   overflow:auto;
-  display:flex;
-  align-items:center;
 }
 #visitor-list{
-  width:100%;
-  padding:18px;
+  padding:16px;
 }
 
-/* ================= CARD ================= */
-.visitor-item{
-  width:100%;
-  max-width:240px;
-  margin:0 auto;
-  display:flex;
-  flex-direction:column;
-  gap:10px;
-  border-radius:28px;
-  background:transparent;
-  box-shadow:0 18px 40px rgba(0,0,0,.18);
-  cursor:pointer;
-  position:relative;
+/* ===== GRID EXACTE 2 x 3 ===== */
+.grid-view{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:16px;
+  justify-items:center;
 }
+
+/* ===== CARD ===== */
+.visitor-item{
+  position:relative;
+  width:100%;
+  max-width:160px;
+  background:rgba(255,255,255,.6);
+  border-radius:22px;
+  padding:10px;
+  box-shadow:0 10px 25px rgba(0,0,0,.12);
+}
+
 .visitor-item img{
   width:100%;
   aspect-ratio:1/1;
   object-fit:contain;
-  border-radius:28px;
-}
-.visitor-item p{
-  text-align:center;
-  font-size:15px;
-  font-weight:600;
-  color:#1d1d1f;
-  padding-bottom:6px;
+  border-radius:16px;
 }
 
-/* ===== CROIX SUPPRESSION ===== */
+/* ===== DELETE ===== */
 .delete-btn{
   position:absolute;
-  top:8px;
-  right:8px;
-  width:26px;
-  height:26px;
+  top:6px;
+  right:6px;
+  width:24px;
+  height:24px;
   border-radius:50%;
   background:rgba(0,0,0,.45);
   color:white;
-  font-size:18px;
-  line-height:26px;
   text-align:center;
-  cursor:pointer;
-  opacity:.35;
-  transition:.2s;
-  z-index:5;
+  line-height:24px;
+  font-size:16px;
+  opacity:.4;
 }
-.visitor-item:hover .delete-btn{
-  opacity:1;
-}
+.visitor-item:hover .delete-btn{opacity:1}
 
-/* ================= VUES ================= */
-.carousel-view{
-  display:flex;
-  gap:18px;
-  overflow-x:auto;
-  padding-bottom:24px;
-}
-.carousel-view .visitor-item{flex-shrink:0;}
-
-.grid-view{
-  display:grid;
-  grid-template-columns:repeat(2,1fr);
-  gap:18px;
-  justify-items:center;
-}
-
-.list-view{
-  display:flex;
-  flex-direction:column;
-  gap:18px;
-}
-.list-view .visitor-item{max-width:95%;}
-
-/* ================= MODAL IMAGE ================= */
+/* ===== MODAL IMAGE ===== */
 .modal-bg{
   position:fixed;
   inset:0;
@@ -129,71 +135,21 @@ body{
   display:none;
   justify-content:center;
   align-items:center;
-  z-index:1000;
+  z-index:2000;
 }
 .modal-box{
   background:white;
-  border-radius:28px;
-  padding:18px;
-  width:95%;
-  max-width:900px;
+  border-radius:24px;
+  padding:14px;
+  max-width:90%;
 }
-.modal-main-img{
+.modal-box img{
   width:100%;
-  max-height:70vh;
+  max-height:80vh;
   object-fit:contain;
-  border-radius:22px;
-}
-.close-modal{
-  position:absolute;
-  top:12px;
-  right:16px;
-  font-size:26px;
-  cursor:pointer;
 }
 
-/* ================= SIDEBAR ================= */
-#sidebar{
-  position:fixed;
-  top:0;
-  left:-220px;
-  width:220px;
-  height:100%;
-  background:rgba(255,255,255,.85);
-  backdrop-filter:blur(10px);
-  padding:20px;
-  transition:left .3s;
-  z-index:1200;
-}
-#sidebar.sidebar-open{left:0;}
-
-#toggleSidebar{
-  position:absolute;
-  top:50%;
-  right:-36px;
-  width:36px;
-  height:72px;
-  background:rgba(255,255,255,.9);
-  border-radius:0 16px 16px 0;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  font-size:20px;
-  cursor:pointer;
-}
-
-#sidebar button{
-  width:100%;
-  margin-bottom:12px;
-  padding:12px;
-  border:none;
-  border-radius:14px;
-  background:#f5f5f7;
-  font-weight:600;
-  cursor:pointer;
-}
-
-/* ================= MODAL AJOUT ================= */
+/* ===== FORM MODALS ===== */
 .form-modal-bg{
   position:fixed;
   inset:0;
@@ -201,7 +157,7 @@ body{
   display:none;
   justify-content:center;
   align-items:center;
-  z-index:2000;
+  z-index:3000;
 }
 .form-modal{
   background:white;
@@ -211,131 +167,152 @@ body{
 }
 .form-modal input{
   width:100%;
-  margin-bottom:10px;
+  margin-bottom:12px;
   padding:10px;
   border-radius:12px;
-  border:1px solid #ccc;
 }
-.form-modal button{
-  width:100%;
-  padding:12px;
-  border:none;
-  border-radius:14px;
-  font-weight:600;
-  cursor:pointer;
+
+/* ===== ANIMATIONS ===== */
+.snow,.sweet{
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  display:none;
+}
+.snow::after{
+  content:"❄ ❄ ❄ ❄ ❄ ❄";
+  animation:fall 6s linear infinite;
+  font-size:26px;
+}
+.sweet::after{
+  content:"🍬 🍭 🍬 🍭 🍬";
+  animation:fall 7s linear infinite;
+  font-size:24px;
+}
+@keyframes fall{
+  from{transform:translateY(-10%)}
+  to{transform:translateY(110%)}
 }
 </style>
 </head>
 
 <body>
 
+<div id="snow" class="snow"></div>
+<div id="sweet" class="sweet"></div>
+
 <!-- SIDEBAR -->
 <div id="sidebar">
   <div id="toggleSidebar">☰</div>
-  <button onclick="openAddModal()">➕ Ajouter</button>
+  <button onclick="openAdd()">➕ Ajouter</button>
+  <button onclick="openTheme()">🎨 Thèmes</button>
 </div>
 
-<!-- BOUTONS -->
+<!-- VIEW -->
 <div id="viewSelector">
-  <button id="btnCarousel">Carrousel</button>
-  <button id="btnGrid">Grille</button>
-  <button id="btnList">Liste</button>
+  <button onclick="setGrid()">Grille</button>
 </div>
 
-<!-- CONTENU -->
 <div class="center-zone">
-  <div id="visitor-list"></div>
+  <div id="visitor-list" class="grid-view"></div>
 </div>
 
-<!-- MODAL IMAGE -->
-<div class="modal-bg" id="modal" onclick="closeModal()">
+<!-- IMAGE MODAL -->
+<div id="modal" class="modal-bg" onclick="closeModal()">
   <div class="modal-box" onclick="event.stopPropagation()">
-    <div class="close-modal" onclick="closeModal()">×</div>
-    <img id="modalMain" class="modal-main-img">
+    <img id="modalImg">
   </div>
 </div>
 
-<!-- MODAL AJOUT -->
-<div class="form-modal-bg" id="addFormBg" onclick="closeAddModal()">
-  <div class="form-modal" onclick="event.stopPropagation()">
+<!-- ADD -->
+<div id="addBg" class="form-modal-bg">
+  <div class="form-modal">
     <input id="addName" placeholder="Nom">
-    <input type="file" id="addFile" accept="image/*">
+    <input id="addFile" type="file" accept="image/*">
     <button onclick="addCreation()">Ajouter</button>
+  </div>
+</div>
+
+<!-- THEME -->
+<div id="themeBg" class="form-modal-bg">
+  <div class="form-modal">
+    <button onclick="setTheme('default')">Default</button>
+    <button onclick="setTheme('noel')">🎄 Noël</button>
+    <button onclick="setTheme('sweety')">🍬 Sweety</button>
+    <button onclick="setTheme('chat')">🐱 Chat</button>
   </div>
 </div>
 
 <script>
 const list=document.getElementById('visitor-list');
 const modal=document.getElementById('modal');
-const modalMain=document.getElementById('modalMain');
+const modalImg=document.getElementById('modalImg');
 const sidebar=document.getElementById('sidebar');
+const snow=document.getElementById('snow');
+const sweet=document.getElementById('sweet');
 
 let creations=JSON.parse(localStorage.getItem('creations')||'[]');
-let currentView='carousel';
 
 /* ===== RENDER ===== */
 function render(){
   list.innerHTML='';
-  list.className=currentView+'-view';
   creations.forEach((c,i)=>{
-    const card=document.createElement('div');
-    card.className='visitor-item';
-    card.innerHTML=`
-      <div class="delete-btn" onclick="event.stopPropagation();deleteCreation(${i})">×</div>
-      <img src="${c.imgUrl}">
-      <p>${c.name}</p>
+    const d=document.createElement('div');
+    d.className='visitor-item';
+    d.innerHTML=`
+      <div class="delete-btn" onclick="event.stopPropagation();del(${i})">×</div>
+      <img src="${c.img}">
     `;
-    card.onclick=()=>openModal(i);
-    list.appendChild(card);
+    d.onclick=()=>{modalImg.src=c.img;modal.style.display='flex'}
+    list.appendChild(d);
   });
 }
 
-/* ===== VIEWS ===== */
-btnCarousel.onclick=()=>{currentView='carousel';render();}
-btnGrid.onclick=()=>{currentView='grid';render();}
-btnList.onclick=()=>{currentView='list';render();}
-
-/* ===== MODAL IMAGE ===== */
-function openModal(i){
-  modalMain.src=creations[i].imgUrl;
-  modal.style.display='flex';
-}
-function closeModal(){modal.style.display='none'}
-
-/* ===== SIDEBAR ===== */
-toggleSidebar.onclick=()=>sidebar.classList.toggle('sidebar-open');
-
-/* ===== AJOUT ===== */
-function openAddModal(){
-  document.getElementById('addFormBg').style.display='flex';
-}
-function closeAddModal(){
-  document.getElementById('addFormBg').style.display='none';
-}
-function addCreation(){
-  const name=addName.value.trim();
-  const file=addFile.files[0];
-  if(!name||!file)return;
-
-  const reader=new FileReader();
-  reader.onload=e=>{
-    creations.push({name,imgUrl:e.target.result});
-    localStorage.setItem('creations',JSON.stringify(creations));
-    closeAddModal();
-    addName.value='';
-    addFile.value='';
-    render();
-  };
-  reader.readAsDataURL(file);
-}
-
-/* ===== SUPPRESSION ===== */
-function deleteCreation(i){
-  if(!confirm("Supprimer cette création ?"))return;
+/* ===== DELETE ===== */
+function del(i){
   creations.splice(i,1);
   localStorage.setItem('creations',JSON.stringify(creations));
   render();
 }
+
+/* ===== ADD (QUI MARCHE) ===== */
+function addCreation(){
+  const file=document.getElementById('addFile').files[0];
+  if(!file)return;
+  const r=new FileReader();
+  r.onload=e=>{
+    creations.push({img:e.target.result});
+    localStorage.setItem('creations',JSON.stringify(creations));
+    document.getElementById('addBg').style.display='none';
+    render();
+  };
+  r.readAsDataURL(file);
+}
+
+/* ===== THEMES ===== */
+function setTheme(t){
+  snow.style.display='none';
+  sweet.style.display='none';
+
+  if(t==='noel'){
+    document.body.style.backgroundImage="url('noel.png')";
+    snow.style.display='block';
+  }else if(t==='sweety'){
+    document.body.style.backgroundImage="url('sweety-girly.png')";
+    sweet.style.display='block';
+  }else if(t==='chat'){
+    document.body.style.backgroundImage="url('Photoroom_20251223_114401.jpeg')";
+  }else{
+    document.body.style.backgroundImage="url('Photoroom_20251212_143703.PNG')";
+  }
+  document.getElementById('themeBg').style.display='none';
+}
+
+/* ===== UI ===== */
+toggleSidebar.onclick=()=>sidebar.classList.toggle('sidebar-open');
+function openAdd(){document.getElementById('addBg').style.display='flex'}
+function openTheme(){document.getElementById('themeBg').style.display='flex'}
+function closeModal(){modal.style.display='none'}
 
 render();
 </script>
