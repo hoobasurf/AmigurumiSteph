@@ -39,7 +39,7 @@ body{
 /* ================= ZONE CONTENU ================= */
 .center-zone{
   flex:1;
-  overflow:auto;
+  overflow-y:auto; /* 🔑 scroll vertical global */
   display:flex;
   align-items:center;
 }
@@ -109,6 +109,7 @@ body{
   grid-template-columns:repeat(2,1fr);
   gap:18px;
   justify-items:center;
+  overflow-y:auto; /* ✅ scroll vertical garanti */
 }
 .grid-view .visitor-item:nth-child(n+7){
   display:none;
@@ -118,9 +119,19 @@ body{
 .list-view{
   display:flex;
   flex-direction:column;
-  gap:18px;
+  gap:14px;
 }
-.list-view .visitor-item{max-width:95%;}
+
+/* 🔥 IMAGES TRÈS RÉDUITES EN MODE LISTE */
+.list-view .visitor-item{
+  max-width:90%;
+  box-shadow:0 10px 22px rgba(0,0,0,.15);
+}
+.list-view .visitor-item img{
+  max-width:120px;
+  margin:0 auto;
+  aspect-ratio:1/1;
+}
 
 /* ================= MODAL ================= */
 .modal-bg{
@@ -269,7 +280,6 @@ const sweet=document.getElementById('sweet');
 let creations=JSON.parse(localStorage.getItem('creations')||'[]');
 let currentView='carousel';
 
-/* ===== RENDER ===== */
 function render(){
   list.innerHTML='';
   list.className=currentView+'-view';
@@ -286,10 +296,8 @@ function render(){
   });
 }
 
-/* ===== VIEWS ===== */
 function setView(v){currentView=v;render();}
 
-/* ===== ADD ===== */
 function openAddModal(){addFormBg.style.display='flex'}
 function addCreation(){
   const file=addFile.files[0];
@@ -305,14 +313,12 @@ function addCreation(){
   r.readAsDataURL(file);
 }
 
-/* ===== DELETE ===== */
 function deleteItem(i){
   creations.splice(i,1);
   localStorage.setItem('creations',JSON.stringify(creations));
   render();
 }
 
-/* ===== THEME ===== */
 function setTheme(t){
   snow.innerHTML=''; sweet.innerHTML='';
   document.body.style.backgroundImage=
@@ -332,7 +338,6 @@ function setTheme(t){
   }
 }
 
-/* ===== INIT ===== */
 toggleSidebar.onclick=()=>sidebar.classList.toggle('sidebar-open');
 render();
 </script>
