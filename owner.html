@@ -5,20 +5,22 @@
 <title>Owner - Mes créations</title>
 
 <style>
+/* ============================= */
+/* BASE */
+/* ============================= */
 *{box-sizing:border-box;margin:0;padding:0;}
-html,body{height:100%;font-family:'Comic Sans MS',cursive;}
+html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;}
 
 body{
-  background:url('Photoroom_20251212_143703.PNG') center top / cover no-repeat fixed;
+  background:#f5f5f7; /* fond iOS neutre */
   display:flex;
   flex-direction:column;
   overflow:hidden;
 }
 
 /* ============================= */
-/* BOUTONS */
+/* BOUTONS VUE */
 /* ============================= */
-
 #viewSelector{
   display:flex;
   justify-content:center;
@@ -27,130 +29,101 @@ body{
 }
 
 #viewSelector button{
-  background:#fff0f7;
-  border:2px solid #c77a95;
-  color:#8b3a3a;
-  padding:8px 18px;
-  border-radius:24px;
-  font-weight:bold;
+  background:white;
+  border:none;
+  padding:10px 18px;
+  border-radius:20px;
+  font-weight:600;
+  box-shadow:0 4px 10px rgba(0,0,0,.12);
   cursor:pointer;
 }
 
 /* ============================= */
-/* ZONE CENTRALE */
+/* ZONE CONTENU */
 /* ============================= */
-
 .center-zone{
   flex:1;
-  display:flex;
-  justify-content:center;
-  align-items:flex-start;
-  overflow:hidden;
+  overflow:auto; /* 🔑 PLUS JAMAIS DE COUPURE */
 }
 
 #visitor-list{
+  padding:18px;
   width:100%;
-  padding:14px;
-  margin:0 auto;
 }
 
 /* ============================= */
-/* CARTE PRO */
+/* CARTE – APP STORE */
 /* ============================= */
-
 .visitor-item{
   width:100%;
-  max-width:220px;
-  height:300px;
-  padding:10px;
-  background:linear-gradient(180deg,#ffffff,#fff4f8);
-  border-radius:22px;
-  border:1.5px solid #e6a5bb;
-  box-shadow:
-    0 6px 14px rgba(0,0,0,0.15),
-    inset 0 0 0 2px #ffffff;
+  max-width:240px;
+  margin:0 auto;
   display:flex;
   flex-direction:column;
-  justify-content:space-between;
-  align-items:center;
-  margin:0 auto;
+  gap:10px;
+  border-radius:28px;
+  background:transparent;
+  box-shadow:0 18px 40px rgba(0,0,0,.18);
   cursor:pointer;
 }
 
 /* IMAGE */
 .visitor-item img{
   width:100%;
-  height:200px; /* 🔥 image plus grande */
+  aspect-ratio:1/1;        /* format App Store */
   object-fit:contain;
-  background:#ffffff;
-  border-radius:16px;
-  border:1px solid #f0b8cb;
+  display:block;
+  border-radius:28px;
 }
 
 /* TEXTE */
 .visitor-item p{
-  font-size:15px;
-  font-weight:bold;
-  color:#8b3a3a;
-  margin-top:6px;
   text-align:center;
+  font-size:15px;
+  font-weight:600;
+  color:#1d1d1f;
+  padding-bottom:6px;
 }
 
 /* ============================= */
 /* CARROUSEL – HORIZONTAL */
 /* ============================= */
-
 .carousel-view{
   display:flex;
-  gap:16px;
+  gap:18px;
   overflow-x:auto;
-  overflow-y:hidden;
-  justify-content:center;
-  padding-bottom:10px;
+  overflow-y:visible;
+  padding-bottom:24px;
 }
-
-.carousel-view .visitor-item{
-  flex-shrink:0;
-}
+.carousel-view .visitor-item{flex-shrink:0;}
 
 /* ============================= */
 /* GRILLE – VERTICAL */
 /* ============================= */
-
 .grid-view{
   display:grid;
   grid-template-columns:repeat(2,1fr);
-  gap:16px;
+  gap:18px;
   justify-items:center;
-  overflow-y:auto;
-  max-height:calc(100vh - 160px); /* PLUS DE COUPURE */
 }
 
 /* ============================= */
 /* LISTE – VERTICAL */
 /* ============================= */
-
 .list-view{
   display:flex;
   flex-direction:column;
-  gap:16px;
-  overflow-y:auto;
-  max-height:calc(100vh - 160px);
+  gap:18px;
 }
-
-.list-view .visitor-item{
-  max-width:95%;
-  height:280px;
-}
+.list-view .visitor-item{max-width:95%;}
 
 /* ============================= */
 /* MODAL */
 /* ============================= */
-
 .modal-bg{
   position:fixed;
   inset:0;
-  background:rgba(0,0,0,0.6);
+  background:rgba(0,0,0,.6);
   display:none;
   justify-content:center;
   align-items:center;
@@ -158,50 +131,48 @@ body{
 }
 
 .modal-box{
-  background:#fff4f8;
-  border-radius:20px;
+  background:white;
+  border-radius:28px;
   padding:18px;
-  max-width:900px;
   width:95%;
+  max-width:900px;
   max-height:85vh;
-  overflow-y:auto;
+  overflow:auto;
   position:relative;
-  text-align:center;
-  border:2px solid #d99db3;
 }
 
 .modal-main-img{
   width:100%;
-  max-height:480px;
+  max-height:70vh;
   object-fit:contain;
-  border-radius:16px;
-  border:2px solid #e6a5bb;
-  background:white;
+  border-radius:22px;
 }
 
 .close-modal{
   position:absolute;
-  top:10px;
-  right:14px;
-  font-size:28px;
+  top:12px;
+  right:16px;
+  font-size:26px;
   cursor:pointer;
-  color:#b84c6f;
 }
 </style>
 </head>
 
 <body>
 
+<!-- BOUTONS -->
 <div id="viewSelector">
   <button id="btnCarousel">Carrousel</button>
   <button id="btnGrid">Grille</button>
   <button id="btnList">Liste</button>
 </div>
 
+<!-- CONTENU -->
 <div class="center-zone">
   <div id="visitor-list"></div>
 </div>
 
+<!-- MODAL -->
 <div class="modal-bg" id="modal" onclick="closeModal()">
   <div class="modal-box" onclick="event.stopPropagation()">
     <div class="close-modal" onclick="closeModal()">×</div>
@@ -210,6 +181,9 @@ body{
 </div>
 
 <script>
+/* ============================= */
+/* JS CLEAN */
+/* ============================= */
 const list=document.getElementById('visitor-list');
 const modal=document.getElementById('modal');
 const modalMain=document.getElementById('modalMain');
@@ -221,11 +195,11 @@ function render(){
   list.innerHTML='';
   list.className=currentView+'-view';
   creations.forEach((c,i)=>{
-    const d=document.createElement('div');
-    d.className='visitor-item';
-    d.innerHTML=`<img src="${c.imgUrl}"><p>${c.name}</p>`;
-    d.onclick=()=>openModal(i);
-    list.appendChild(d);
+    const card=document.createElement('div');
+    card.className='visitor-item';
+    card.innerHTML=`<img src="${c.imgUrl}"><p>${c.name}</p>`;
+    card.onclick=()=>openModal(i);
+    list.appendChild(card);
   });
 }
 
@@ -237,7 +211,7 @@ function openModal(i){
   modalMain.src=creations[i].imgUrl;
   modal.style.display='flex';
 }
-function closeModal(){modal.style.display='none'}
+function closeModal(){modal.style.display='none';}
 
 render();
 </script>
