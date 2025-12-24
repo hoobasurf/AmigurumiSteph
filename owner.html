@@ -3,13 +3,16 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Owner</title>
+<title>Owner - Mes créations</title>
 
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto}
+html,body{
+  height:100%;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+}
 
-/* ================== BODY ================== */
+/* ================= BODY ================= */
 body{
   background:url('Photoroom_20251212_143703.PNG') center top / cover no-repeat fixed;
   display:flex;
@@ -17,46 +20,47 @@ body{
   overflow:hidden;
 }
 
-/* ================== THEMES FX ================== */
-.snow,.sweetRain{
-  position:fixed;
-  inset:0;
-  pointer-events:none;
-  display:none;
-  z-index:5;
-}
-
-/* ================== BUTTONS ================== */
+/* ================= HEADER BUTTONS ================= */
 #viewSelector{
   display:flex;
   justify-content:center;
   gap:14px;
   padding:14px 0;
 }
-button{
-  background:rgba(255,255,255,.85);
-  backdrop-filter:blur(14px);
+#viewSelector button,
+#sidebar button{
+  background:#fff;
   border:none;
-  padding:12px 20px;
-  border-radius:22px;
+  padding:12px 18px;
+  border-radius:18px;
   font-weight:600;
-  box-shadow:0 6px 16px rgba(0,0,0,.18);
+  box-shadow:0 6px 14px rgba(0,0,0,.25);
+  cursor:pointer;
 }
 
-/* ================== CONTENT ================== */
+/* ================= CONTENT ================= */
 .center-zone{flex:1;overflow:hidden}
 #visitor-list{height:100%}
 
-/* ================== CARD ================== */
+/* ================= CARD ================= */
 .visitor-item{
   border-radius:22px;
-  overflow:hidden;
   box-shadow:0 12px 30px rgba(0,0,0,.18);
+  overflow:hidden;
+  background:white;
 }
-.visitor-item img{width:100%;aspect-ratio:1/1;object-fit:contain}
-.visitor-item p{text-align:center;font-weight:600;padding:6px}
+.visitor-item img{
+  width:100%;
+  aspect-ratio:1/1;
+  object-fit:contain;
+}
+.visitor-item p{
+  text-align:center;
+  font-weight:600;
+  padding:6px;
+}
 
-/* ================== CAROUSEL 6 ================== */
+/* ================= CAROUSEL 6 / SCREEN ================= */
 .carousel-view{
   display:grid;
   grid-auto-flow:column;
@@ -71,51 +75,179 @@ button{
 .carousel-view::-webkit-scrollbar{display:none}
 .carousel-view .visitor-item{scroll-snap-align:start}
 
-/* ================== GRID / LIST ================== */
-.grid-view{display:grid;grid-template-columns:repeat(2,1fr);gap:14px;padding:14px;overflow:auto}
-.list-view{display:flex;flex-direction:column;gap:14px;padding:14px;overflow:auto}
-
-/* ================== SIDEBAR ================== */
-#sidebar{
-  position:fixed;
-  top:0;left:-240px;
-  width:240px;height:100%;
-  background:rgba(255,255,255,.78);
-  backdrop-filter:blur(22px);
-  transition:.3s;
-  z-index:100;
-  padding:20px;
+/* ================= GRID / LIST ================= */
+.grid-view{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:14px;
+  padding:14px;
+  overflow:auto;
 }
-#sidebar.sidebar-open{left:0}
-#toggleSidebar{
-  position:absolute;
-  top:50%;right:-42px;
-  width:42px;height:86px;
-  border-radius:0 22px 22px 0;
+.list-view{
+  display:flex;
+  flex-direction:column;
+  gap:14px;
+  padding:14px;
+  overflow:auto;
 }
-#sidebar button{width:100%;margin-bottom:10px}
 
-/* ================== MODAL ================== */
+/* ================= MODAL IMAGE ================= */
 .modal-bg{
-  position:fixed;inset:0;
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.65);
+  display:none;
+  justify-content:center;
+  align-items:center;
+  z-index:1000;
+}
+.modal-box{
+  background:#fff4f7;
+  border-radius:28px;
+  padding:18px;
+  width:95%;
+  max-width:900px;
+  max-height:85vh;
+  overflow:auto;
+  position:relative;
+  border:4px solid #8b2f4a;
+}
+.modal-main-img{
+  width:100%;
+  max-height:70vh;
+  object-fit:contain;
+  border-radius:22px;
+}
+.close-modal{
+  position:absolute;
+  top:12px;
+  right:16px;
+  font-size:26px;
+  cursor:pointer;
+  color:#8b2f4a;
+}
+
+/* ================= LIKE / COMMENT ================= */
+.icon-bar{
+  display:flex;
+  justify-content:center;
+  gap:24px;
+  margin-top:12px;
+}
+.icon-btn{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  cursor:pointer;
+  font-weight:600;
+  color:#8b2f4a;
+}
+.heart{font-size:26px}
+.heart.liked{color:#c2185b}
+.comment{
+  background:#fdecef;
+  padding:10px;
+  border-radius:14px;
+  margin-bottom:10px;
+}
+
+/* ================= FORMS ================= */
+.form-modal-bg{
+  position:fixed;
+  inset:0;
   background:rgba(0,0,0,.6);
   display:none;
   justify-content:center;
   align-items:center;
+  z-index:2000;
 }
-.modal-box{background:white;border-radius:28px;padding:18px;width:95%}
-.modal-main-img{width:100%;max-height:70vh;object-fit:contain}
+.form-modal{
+  background:#fff0f4;
+  padding:18px;
+  border-radius:22px;
+  width:340px;
+  border:4px solid #8b2f4a;
+}
+.form-modal input,
+.form-modal textarea{
+  width:100%;
+  margin-bottom:10px;
+  padding:12px;
+  border-radius:12px;
+  border:1px solid #b85c74;
+}
+.form-modal button{
+  width:100%;
+  padding:12px;
+  border:none;
+  border-radius:16px;
+  background:#8b2f4a;
+  color:white;
+  font-weight:700;
+}
+
+/* ================= SIDEBAR PRO ================= */
+#sidebar{
+  position:fixed;
+  top:0;
+  left:-240px;
+  width:240px;
+  height:100%;
+  background:linear-gradient(180deg,#7a1f3d,#a23a5f);
+  padding:20px;
+  transition:left .3s;
+  z-index:1200;
+}
+#sidebar.sidebar-open{left:0}
+#toggleSidebar{
+  position:absolute;
+  top:50%;
+  right:-44px;
+  width:44px;
+  height:90px;
+  background:#7a1f3d;
+  color:white;
+  border-radius:0 22px 22px 0;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  font-size:22px;
+}
+
+/* ================= THEME FX ================= */
+.snow,.sweetRain{
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  display:none;
+  z-index:5;
+}
+.snow::after{
+  content:"❄ ❄ ❄ ❄ ❄ ❄ ❄ ❄ ❄ ❄";
+  animation:fall 6s linear infinite;
+  font-size:24px;
+}
+@keyframes fall{
+  from{transform:translateY(-10%)}
+  to{transform:translateY(110%)}
+}
+.sweetRain::after{
+  content:"🌸 🌸 🌸 🌸 🌸";
+  animation:fall 8s linear infinite;
+  font-size:22px;
+}
 </style>
 </head>
 
 <body>
 
-<div class="snow" id="snow"></div>
-<div class="sweetRain" id="sweetRain"></div>
+<div id="snow" class="snow"></div>
+<div id="sweetRain" class="sweetRain"></div>
 
 <!-- SIDEBAR -->
 <div id="sidebar">
   <div id="toggleSidebar">☰</div>
+  <button onclick="openAddModal()">Ajouter</button>
   <button onclick="setView('carousel')">Carrousel</button>
   <button onclick="setView('grid')">Grille</button>
   <button onclick="setView('list')">Liste</button>
@@ -126,7 +258,7 @@ button{
   <button onclick="setTheme('chat')">🐱 Petit chat</button>
 </div>
 
-<!-- HEADER BUTTONS -->
+<!-- HEADER -->
 <div id="viewSelector">
   <button onclick="setView('carousel')">Carrousel</button>
   <button onclick="setView('grid')">Grille</button>
@@ -137,9 +269,47 @@ button{
   <div id="visitor-list"></div>
 </div>
 
-<div class="modal-bg" id="modal" onclick="this.style.display='none'">
+<!-- MODAL IMAGE -->
+<div class="modal-bg" id="modal" onclick="closeModal()">
   <div class="modal-box" onclick="event.stopPropagation()">
+    <div class="close-modal" onclick="closeModal()">×</div>
     <img id="modalMain" class="modal-main-img">
+    <div class="icon-bar">
+      <div class="icon-btn" onclick="openLikeModal()">
+        <span class="heart" id="heart">♡</span>
+        <span id="likeCount">0</span>
+      </div>
+      <div class="icon-btn" onclick="openCommentForm()">💬
+        <span id="commentCount">0</span>
+      </div>
+    </div>
+    <div id="commentsList"></div>
+  </div>
+</div>
+
+<!-- ADD FORM -->
+<div class="form-modal-bg" id="addFormBg">
+  <div class="form-modal">
+    <input id="addName" placeholder="Nom">
+    <input id="addImg" placeholder="URL image">
+    <button onclick="addCreation()">Ajouter</button>
+  </div>
+</div>
+
+<!-- COMMENT FORM -->
+<div class="form-modal-bg" id="commentFormBg">
+  <div class="form-modal">
+    <input id="commentName" placeholder="Prénom">
+    <textarea id="commentText" rows="4" placeholder="Commentaire"></textarea>
+    <button onclick="submitComment()">Envoyer</button>
+  </div>
+</div>
+
+<!-- LIKE FORM -->
+<div class="form-modal-bg" id="likeFormBg">
+  <div class="form-modal">
+    <input id="likeName" placeholder="Ton prénom">
+    <button onclick="submitLike()">J’aime</button>
   </div>
 </div>
 
@@ -149,10 +319,10 @@ const modal=document.getElementById('modal');
 const modalMain=document.getElementById('modalMain');
 const snow=document.getElementById('snow');
 const sweetRain=document.getElementById('sweetRain');
-const sidebar=document.getElementById('sidebar');
 
 let creations=JSON.parse(localStorage.getItem('creations')||'[]');
-let currentView=localStorage.getItem('view')||'carousel';
+let currentIndex=null;
+let currentView='carousel';
 
 function render(){
   list.innerHTML='';
@@ -161,43 +331,95 @@ function render(){
     const d=document.createElement('div');
     d.className='visitor-item';
     d.innerHTML=`<img src="${c.imgUrl}"><p>${c.name}</p>`;
-    d.onclick=()=>{modalMain.src=c.imgUrl;modal.style.display='flex'}
+    d.onclick=()=>openModal(i);
     list.appendChild(d);
   });
 }
-function setView(v){
-  currentView=v;
-  localStorage.setItem('view',v);
+
+function setView(v){currentView=v;render();}
+
+/* ===== ADD ===== */
+function openAddModal(){addFormBg.style.display='flex'}
+function addCreation(){
+  const name=addName.value.trim();
+  const imgUrl=addImg.value.trim();
+  if(!name||!imgUrl)return;
+  creations.push({name,imgUrl});
+  localStorage.setItem('creations',JSON.stringify(creations));
+  addFormBg.style.display='none';
   render();
 }
 
-/* ========== THEMES ========== */
+/* ===== MODAL ===== */
+function openModal(i){
+  currentIndex=i;
+  modalMain.src=creations[i].imgUrl;
+  modal.style.display='flex';
+  loadComments();
+  loadLikes();
+}
+function closeModal(){modal.style.display='none'}
+
+/* ===== COMMENTS ===== */
+function openCommentForm(){commentFormBg.style.display='flex'}
+function submitComment(){
+  const n=commentName.value,t=commentText.value;
+  if(!n||!t)return;
+  const k='comments_'+currentIndex;
+  const c=JSON.parse(localStorage.getItem(k)||'[]');
+  c.push({n,t});
+  localStorage.setItem(k,JSON.stringify(c));
+  commentFormBg.style.display='none';
+  loadComments();
+}
+function loadComments(){
+  const c=JSON.parse(localStorage.getItem('comments_'+currentIndex)||'[]');
+  commentCount.textContent=c.length;
+  commentsList.innerHTML=c.map(x=>`<div class="comment"><b>${x.n}</b><br>${x.t}</div>`).join('');
+}
+
+/* ===== LIKES ===== */
+function openLikeModal(){likeFormBg.style.display='flex'}
+function submitLike(){
+  const name=likeName.value;
+  if(!name)return;
+  const k='likes_'+currentIndex;
+  const l=JSON.parse(localStorage.getItem(k)||'[]');
+  if(!l.includes(name))l.push(name);
+  localStorage.setItem(k,JSON.stringify(l));
+  likeFormBg.style.display='none';
+  loadLikes();
+}
+function loadLikes(){
+  const l=JSON.parse(localStorage.getItem('likes_'+currentIndex)||'[]');
+  heart.textContent=l.length?'❤️':'♡';
+  heart.classList.toggle('liked',l.length>0);
+  likeCount.textContent=l.length;
+}
+
+/* ===== THEMES ===== */
 function setTheme(t){
   snow.style.display='none';
   sweetRain.style.display='none';
 
   if(t==='noel'){
-    body.style.backgroundImage="url('noel.png')";
+    document.body.style.backgroundImage="url('noel.png')";
     snow.style.display='block';
   }else if(t==='sweety'){
-    body.style.backgroundImage="url('sweety-girly.png')";
+    document.body.style.backgroundImage="url('sweety-girly.png')";
     sweetRain.style.display='block';
   }else if(t==='chat'){
-    body.style.backgroundImage="url('chat.png')";
+    document.body.style.backgroundImage="url('Photoroom_20251223_114401.jpeg')";
   }else{
-    body.style.backgroundImage="url('Photoroom_20251212_143703.PNG')";
+    document.body.style.backgroundImage="url('Photoroom_20251212_143703.PNG')";
   }
   localStorage.setItem('theme',t);
 }
 
-/* LOAD THEME */
 setTheme(localStorage.getItem('theme')||'default');
-
-document.getElementById('toggleSidebar').onclick=()=>{
-  sidebar.classList.toggle('sidebar-open');
-};
-
 render();
+
+toggleSidebar.onclick=()=>sidebar.classList.toggle('sidebar-open');
 </script>
 
 </body>
