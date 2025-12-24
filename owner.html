@@ -39,11 +39,10 @@ body{
 /* ================= ZONE CONTENU ================= */
 .center-zone{
   flex:1;
+  overflow:auto;
   display:flex;
-  overflow:hidden;
+  align-items:center;
 }
-
-/* ================= LISTE CONTENEUR ================= */
 #visitor-list{
   width:100%;
   padding:18px;
@@ -68,6 +67,7 @@ body{
   aspect-ratio:1/1;
   object-fit:contain;
   border-radius:28px;
+  background: rgba(255,255,255,0.01);
 }
 .visitor-item p{
   text-align:center;
@@ -76,35 +76,14 @@ body{
   padding-bottom:6px;
 }
 
-/* ===== CROIX SUPPRESSION ===== */
-.delete-btn{
-  position:absolute;
-  top:8px;
-  right:8px;
-  width:20px;
-  height:20px;
-  border-radius:50%;
-  background:rgba(0,0,0,.45);
-  color:#fff;
-  font-size:14px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  cursor:pointer;
-}
-
-/* ================= CARROUSEL (RESTAURÉ) ================= */
+/* ================= CARROUSEL ================= */
 .carousel-view{
   display:flex;
   gap:18px;
   overflow-x:auto;
-  overflow-y:visible;
-  padding:24px 18px;
-  align-items:center;              /* ✅ cards bien visibles */
+  padding-bottom:24px;
 }
-.carousel-view .visitor-item{
-  flex-shrink:0;
-}
+.carousel-view .visitor-item{flex-shrink:0;}
 
 /* ================= GRILLE ================= */
 .grid-view{
@@ -112,8 +91,6 @@ body{
   grid-template-columns:repeat(2,1fr);
   gap:18px;
   justify-items:center;
-  overflow-y:auto;
-  height:100%;
 }
 
 /* ================= LISTE ================= */
@@ -121,12 +98,8 @@ body{
   display:flex;
   flex-direction:column;
   gap:18px;
-  align-items:center;
-  overflow-y:auto;
 }
-.list-view .visitor-item{
-  max-width:180px;
-}
+.list-view .visitor-item{max-width:95%;}
 
 /* ================= MODAL ================= */
 .modal-bg{
@@ -231,10 +204,19 @@ body{
   <div id="visitor-list"></div>
 </div>
 
-<!-- MODAL -->
+<!-- MODAL IMAGE -->
 <div class="modal-bg" id="modal" onclick="this.style.display='none'">
   <div class="modal-box" onclick="event.stopPropagation()">
     <img id="modalMain" class="modal-main-img">
+  </div>
+</div>
+
+<!-- ADD MODAL -->
+<div class="form-modal-bg" id="addFormBg">
+  <div class="form-modal">
+    <input id="addName" placeholder="Nom">
+    <input id="addFile" type="file" accept="image/*">
+    <button onclick="addCreation()">Ajouter</button>
   </div>
 </div>
 
@@ -244,31 +226,43 @@ const modal=document.getElementById('modal');
 const modalMain=document.getElementById('modalMain');
 const sidebar=document.getElementById('sidebar');
 
+/* ✅ CORRECTION AJOUT */
+const addFormBg=document.getElementById('addFormBg');
+const addName=document.getElementById('addName');
+const addFile=document.getElementById('addFile');
+
 let creations=JSON.parse(localStorage.getItem('creations')||'[]');
 let currentView='carousel';
 
 function render(){
   list.innerHTML='';
   list.className=currentView+'-view';
-  creations.forEach((c,i)=>{
+  creations.forEach(c=>{
     const d=document.createElement('div');
     d.className='visitor-item';
-    d.innerHTML=`
-      <div class="delete-btn" onclick="deleteItem(${i});event.stopPropagation()">×</div>
-      <img src="${c.img}">
-      <p>${c.name}</p>
-    `;
-    d.onclick=()=>{modalMain.src=c.img;modal.style.display='flex';}
+    d.innerHTML=`<img src="${c.img}"><p>${c.name}</p>`;
+    d.onclick=()=>{modalMain.src=c.img;modal.style.display='flex';};
     list.appendChild(d);
   });
 }
 
 function setView(v){currentView=v;render();}
 
-function deleteItem(i){
-  creations.splice(i,1);
-  localStorage.setItem('creations',JSON.stringify(creations));
-  render();
+function openAddModal(){addFormBg.style.display='flex';}
+
+function addCreation(){
+  const file=addFile.files[0];
+  if(!file)return;
+  const r=new FileReader();
+  r.onload=()=>{
+    creations.push({name:addName.value||'',img:r.result});
+    localStorage.setItem('creations',JSON.stringify(creations));
+    addFormBg.style.display='none';
+    addFile.value='';
+    addName.value='';
+    render();
+  };
+  r.readAsDataURL(file);
 }
 
 toggleSidebar.onclick=()=>sidebar.classList.toggle('sidebar-open');
