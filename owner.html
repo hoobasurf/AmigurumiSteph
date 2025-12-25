@@ -214,59 +214,76 @@ body{
 <!-- ADD MODAL -->
 <div class="form-modal-bg" id="addFormBg">
   <div class="form-modal">
-    <input id="addName" placeholder="Nom">
+    <input id="addName" placeholder="Nom de la création">
     <input id="addFile" type="file" accept="image/*">
     <button onclick="addCreation()">Ajouter</button>
   </div>
 </div>
 
 <script>
-const list=document.getElementById('visitor-list');
-const modal=document.getElementById('modal');
-const modalMain=document.getElementById('modalMain');
-const sidebar=document.getElementById('sidebar');
+const list = document.getElementById('visitor-list');
+const modal = document.getElementById('modal');
+const modalMain = document.getElementById('modalMain');
+const sidebar = document.getElementById('sidebar');
 
-/* ✅ CORRECTION AJOUT */
-const addFormBg=document.getElementById('addFormBg');
-const addName=document.getElementById('addName');
-const addFile=document.getElementById('addFile');
+const addFormBg = document.getElementById('addFormBg');
+const addName = document.getElementById('addName');
+const addFile = document.getElementById('addFile');
 
-let creations=JSON.parse(localStorage.getItem('creations')||'[]');
-let currentView='carousel';
+let currentView = 'carousel';
 
-function render(){
-  list.innerHTML='';
-  list.className=currentView+'-view';
-  creations.forEach(c=>{
-    const d=document.createElement('div');
-    d.className='visitor-item';
-    d.innerHTML=`<img src="${c.img}"><p>${c.name}</p>`;
-    d.onclick=()=>{modalMain.src=c.img;modal.style.display='flex';};
-    list.appendChild(d);
-  });
+function render(){}
+
+function setView(v){
+  currentView = v;
+  list.className = v + '-view';
 }
 
-function setView(v){currentView=v;render();}
+function openAddModal(){
+  addFormBg.style.display = 'flex';
+}
 
-function openAddModal(){addFormBg.style.display='flex';}
-
+/* ================== BOUTON AJOUT (LOGIQUE ORIGINALE) ================== */
 function addCreation(){
-  const file=addFile.files[0];
-  if(!file)return;
-  const r=new FileReader();
-  r.onload=()=>{
-    creations.push({name:addName.value||'',img:r.result});
-    localStorage.setItem('creations',JSON.stringify(creations));
-    addFormBg.style.display='none';
-    addFile.value='';
-    addName.value='';
-    render();
-  };
-  r.readAsDataURL(file);
-}
+  const name = addName.value.trim();
+  const file = addFile.files[0];
 
-toggleSidebar.onclick=()=>sidebar.classList.toggle('sidebar-open');
-render();
+  if (!name || !file) {
+    alert("Merci de remplir le nom et choisir une photo !");
+    return;
+  }
+
+  console.log("Nom :", name);
+  console.log("Fichier sélectionné :", file);
+
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    const imgUrl = e.target.result;
+
+    const div = document.createElement('div');
+    div.className = 'visitor-item';
+    div.innerHTML = `
+      <img src="${imgUrl}">
+      <p>${name}</p>
+    `;
+
+    div.onclick = () => {
+      modalMain.src = imgUrl;
+      modal.style.display = 'flex';
+    };
+
+    list.prepend(div);
+
+    addName.value = '';
+    addFile.value = '';
+    addFormBg.style.display = 'none';
+  };
+
+  reader.readAsDataURL(file);
+}
+/* ==================================================================== */
+
+toggleSidebar.onclick = () => sidebar.classList.toggle('sidebar-open');
 </script>
 
 </body>
