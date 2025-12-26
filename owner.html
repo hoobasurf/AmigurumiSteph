@@ -41,6 +41,7 @@ body{
   flex:1;
   overflow:auto;
   display:flex;
+  flex-direction:column;
   align-items:center;
 }
 #visitor-list{
@@ -180,6 +181,18 @@ body{
   width:100%;
   margin-bottom:10px;
 }
+
+/* ================= BOUTON CHARGER PLUS ================= */
+#loadMore{
+  margin:12px auto;
+  padding:10px 20px;
+  border:none;
+  border-radius:20px;
+  background:#fff;
+  font-weight:700;
+  cursor:pointer;
+  box-shadow:0 6px 14px rgba(0,0,0,.18);
+}
 </style>
 </head>
 
@@ -200,6 +213,7 @@ body{
 
 <div class="center-zone">
   <div id="visitor-list"></div>
+  <button id="loadMore">Charger plus</button>
 </div>
 
 <!-- MODAL IMAGE -->
@@ -230,21 +244,28 @@ const list = document.getElementById('visitor-list');
 const modal = document.getElementById('modal');
 const modalMain = document.getElementById('modalMain');
 const sidebar = document.getElementById('sidebar');
+const loadMoreBtn = document.getElementById('loadMore');
 
 const addFormBg = document.getElementById('addFormBg');
 const addName = document.getElementById('addName');
 const addFile = document.getElementById('addFile');
 
 let currentView = 'carousel';
+let page = 0;
+const pageSize = 50;
 
-/********** 2️⃣ Render / Load depuis Supabase **********/
-async function render(){
-  list.innerHTML='';
-  const { data } = await supabase.from('creations').select('*').order('created_at',{ascending:false});
+/********** 2️⃣ Render / Load avec Pagination **********/
+async function render(loadMore=false){
+  if(!loadMore) list.innerHTML=''; // si pas "charger plus", reset
+  const { data } = await supabase.from('creations')
+    .select('*')
+    .order('created_at',{ascending:false})
+    .range(page*pageSize,(page+1)*pageSize-1);
+
   data.forEach(c=>{
     const div = document.createElement('div');
     div.className = 'visitor-item';
-    div.innerHTML = `<img src="${c.image_url}"><p>${c.name}</p>`;
+    div.innerHTML = `<img src="${c.image_url}" loading="lazy"><p>${c.name}</p>`;
     div.onclick = () => {
       modalMain.src = c.image_url;
       modal.style.display = 'flex';
@@ -304,15 +325,22 @@ async function addCreation(){
   await supabase.from('creations').insert([{ name, image_url: data.publicUrl }]);
 
   addName.value=''; addFile.value=''; addFormBg.style.display='none';
+  page = 0;
   render();
 }
 
-/********** 6️⃣ Ping automatique pour éviter pause **********/
+/********** 6️⃣ Bouton "Charger plus" **********/
+loadMoreBtn.onclick = ()=>{
+  page++;
+  render(true);
+};
+
+/********** 7️⃣ Ping automatique pour éviter pause **********/
 setInterval(async ()=>{
   await supabase.from('creations').select('id').limit(1);
-},1000*60*60*12); // toutes les 12h
+},1000*60*60*12);
 
-/********** 7️⃣ Initial Render **********/
+/********** 8️⃣ Initial Render **********/
 render();
 </script>
 </body>
