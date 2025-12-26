@@ -2,87 +2,75 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
+<title>Mes créations</title>
+
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-html,body{height:100%;font-family:'Comic Sans MS',cursive}
+html,body{height:100%;font-family:Arial,sans-serif}
 
 /* BODY */
 body{
-  background:url('Photoroom_20251212_143703.PNG') center top / cover no-repeat fixed;
+  background:#f7f7f7;
   overflow:hidden;
-  display:flex;
-  flex-direction:column;
 }
 
-/* HEADER */
-header{text-align:center;padding:12px 0}
-header img{width:98px;height:98px;border-radius:20%;margin:auto}
-.title{display:none}
-
-/* BOUTONS VUE */
+/* VIEW BUTTONS */
 #viewSelector{
   display:flex;
   justify-content:center;
-  gap:16px;
-  margin-top:205px;
+  gap:12px;
+  padding:12px;
 }
 #viewSelector button{
-  background:#fff0f7;
-  border:2px solid #b84c6f;
-  color:#b84c6f;
-  padding:8px 16px;
-  border-radius:24px;
+  padding:10px 18px;
+  border-radius:20px;
+  border:none;
+  background:#fff;
+  box-shadow:0 4px 10px rgba(0,0,0,.15);
   cursor:pointer;
-}
-
-/* CONTENU */
-.center-zone{
-  flex:1;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  padding-top:300px;
-}
-#visitor-list{width:100%;max-width:1200px}
-
-/* ITEMS */
-.visitor-item{text-align:center;cursor:pointer}
-.visitor-item img{
-  width:220px;
-  height:220px;
-  object-fit:contain;
-  border:4px solid #b67385;
-  background:#ffe6f0;
-}
-.visitor-item p{
-  margin-top:8px;
-  font-size:20px;
-  color:#b84c6f;
   font-weight:bold;
 }
 
-/* VUES */
-.carousel-view{display:flex;gap:40px;overflow-x:auto;padding:20px}
-.grid-view{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:24px;padding:20px}
-.list-view{display:flex;flex-direction:column;gap:18px;padding:20px}
-
-/* MODAL */
-.modal-bg{
-  position:fixed;
-  inset:0;
-  background:rgba(0,0,0,.65);
-  display:none;
-  justify-content:center;
-  align-items:center;
-  z-index:1000;
+/* CONTENT */
+.center-zone{
+  height:calc(100vh - 70px);
+  overflow:auto;
+  padding:20px;
 }
-.modal-box{
-  background:rgba(255,228,235,0.95);
-  border:4px solid #b67385;
-  border-radius:18px;
-  padding:18px;
-  max-width:900px;
-  width:95%;
+#visitor-list{
+  width:100%;
+}
+
+/* ITEMS */
+.visitor-item{
+  background:white;
+  border-radius:16px;
+  padding:10px;
+  text-align:center;
+  cursor:pointer;
+}
+.visitor-item img{
+  width:180px;
+  height:180px;
+  object-fit:contain;
+}
+.visitor-item p{margin-top:8px}
+
+/* VIEWS */
+.carousel-view{
+  display:flex;
+  gap:20px;
+  overflow-x:auto;
+}
+.grid-view{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(180px,1fr));
+  gap:20px;
+}
+.list-view{
+  display:flex;
+  flex-direction:column;
+  gap:16px;
 }
 
 /* SIDEBAR */
@@ -92,13 +80,30 @@ header img{width:98px;height:98px;border-radius:20%;margin:auto}
   left:-220px;
   width:220px;
   height:100vh;
-  background:rgba(255,230,240,0.15);
+  background:#ffe6f0;
   border-right:2px solid #b67385;
   padding:20px;
   transition:left .3s ease;
-  z-index:10;
+  z-index:1000;
+  pointer-events:auto;
 }
 #sidebar.sidebar-open{left:0}
+
+#toggleSidebar{
+  position:absolute;
+  top:50%;
+  right:-30px;
+  width:30px;
+  height:60px;
+  background:#ffb6c1;
+  border-radius:0 12px 12px 0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+  font-weight:bold;
+}
+
 #sidebar button{
   width:100%;
   margin-bottom:10px;
@@ -106,75 +111,76 @@ header img{width:98px;height:98px;border-radius:20%;margin:auto}
   border:none;
   border-radius:12px;
   background:#ffb6c1;
-  color:#8b3a3a;
-  font-weight:bold;
   cursor:pointer;
+  font-weight:bold;
 }
 
-/* BOUTON SIDEBAR */
-#toggleSidebar{
-  position:fixed;
-  top:50%;
-  left:0;
-  width:30px;
-  height:60px;
-  background:#ffb6c1;
-  color:#8b3a3a;
-  border-radius:0 12px 12px 0;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  cursor:pointer;
-  border:1px solid #b67385;
-  font-weight:bold;
-  z-index:20;
-}
+/* IMPORTANT : RIEN NE BLOQUE LES CLICS */
+.center-zone{pointer-events:auto}
 </style>
 </head>
 
 <body>
 
-<!-- ✅ BOUTON TOUJOURS CLIQUABLE -->
-<div id="toggleSidebar">☰</div>
+<!-- SIDEBAR -->
+<div id="sidebar">
+  <div id="toggleSidebar">☰</div>
+  <button onclick="alert('Thème')">Thème</button>
+  <button onclick="alert('Vidéos')">Vidéos</button>
+  <button onclick="alert('Mailles')">Mailles</button>
+  <button onclick="alert('Pelotes')">Pelotes</button>
+  <button onclick="alert('Notes')">Notes</button>
+</div>
 
-<header></header>
-
+<!-- VIEW BUTTONS -->
 <div id="viewSelector">
   <button id="btnCarousel">Carrousel</button>
   <button id="btnGrid">Grille</button>
   <button id="btnList">Liste</button>
 </div>
 
+<!-- CONTENT -->
 <div class="center-zone">
   <div id="visitor-list"></div>
 </div>
 
-<!-- SIDEBAR -->
-<div id="sidebar">
-  <button>Thème</button>
-  <button>Vidéos</button>
-  <button>Mailles</button>
-  <button>Pelotes</button>
-  <button>Notes</button>
-  <button>Paramètres</button>
-</div>
-
 <script>
-/* SIDEBAR — EXACTEMENT COMME AVANT */
-const sidebar = document.getElementById('sidebar');
-const toggleSidebar = document.getElementById('toggleSidebar');
-toggleSidebar.onclick = () => {
-  sidebar.classList.toggle('sidebar-open');
-};
+/* DATA DEMO */
+const creations=[
+  {name:'Création 1',img:'https://via.placeholder.com/300'},
+  {name:'Création 2',img:'https://via.placeholder.com/300'},
+  {name:'Création 3',img:'https://via.placeholder.com/300'},
+  {name:'Création 4',img:'https://via.placeholder.com/300'}
+];
 
-/* DEMO CONTENU */
 const list=document.getElementById('visitor-list');
-for(let i=1;i<=8;i++){
-  const d=document.createElement('div');
-  d.className='visitor-item';
-  d.innerHTML=`<img src="https://picsum.photos/300?${i}"><p>Image ${i}</p>`;
-  list.appendChild(d);
+let currentView='carousel';
+
+/* RENDER */
+function render(){
+  list.innerHTML='';
+  list.className=currentView+'-view';
+
+  creations.forEach(c=>{
+    const div=document.createElement('div');
+    div.className='visitor-item';
+    div.innerHTML=`<img src="${c.img}"><p>${c.name}</p>`;
+    list.appendChild(div);
+  });
 }
+
+/* VIEW BUTTONS */
+btnCarousel.onclick=()=>{currentView='carousel';render()};
+btnGrid.onclick=()=>{currentView='grid';render()};
+btnList.onclick=()=>{currentView='list';render()};
+
+/* SIDEBAR */
+const sidebar=document.getElementById('sidebar');
+const toggleSidebar=document.getElementById('toggleSidebar');
+toggleSidebar.onclick=()=>sidebar.classList.toggle('sidebar-open');
+
+/* INIT */
+render();
 </script>
 
 </body>
