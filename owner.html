@@ -237,7 +237,7 @@ const addFile = document.getElementById('addFile');
 
 let currentView = 'carousel';
 
-/********** 2️⃣ Render / Load **********/
+/********** 2️⃣ Render / Load depuis Supabase **********/
 async function render(){
   list.innerHTML='';
   const { data } = await supabase.from('creations').select('*').order('created_at',{ascending:false});
@@ -300,21 +300,20 @@ async function addCreation(){
   // URL publique
   const { data } = supabase.storage.from('photos').getPublicUrl(path);
 
-  // Sauvegarde DB
+  // Sauvegarde dans la table creations
   await supabase.from('creations').insert([{ name, image_url: data.publicUrl }]);
 
   addName.value=''; addFile.value=''; addFormBg.style.display='none';
   render();
 }
 
-/********** 6️⃣ Ping automatique **********/
+/********** 6️⃣ Ping automatique pour éviter pause **********/
 setInterval(async ()=>{
   await supabase.from('creations').select('id').limit(1);
 },1000*60*60*12); // toutes les 12h
 
 /********** 7️⃣ Initial Render **********/
 render();
-
 </script>
 </body>
 </html>
