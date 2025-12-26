@@ -3,10 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <title>Mes créations</title>
-
 <style>
-*{box-sizing:border-box;margin:0;padding:0}
-html,body{height:100%;font-family:'Comic Sans MS',cursive}
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;font-family:'Comic Sans MS',cursive;}
 
 /* BODY */
 body{
@@ -36,47 +35,47 @@ body{
   overflow:auto;
   padding:20px;
 }
-#visitor-list{width:100%}
+#visitor-list{width:100%;display:flex;flex-wrap:wrap;gap:20px;justify-content:center;}
 
-/* ITEMS */
-.visitor-item{text-align:center;cursor:pointer}
-.visitor-item img{
+/* CARDS VALIDÉES */
+.visitor-item{
   width:220px;
-  height:220px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  border-radius:28px;
+  background:rgba(255,255,255,0.95);
+  box-shadow:0 12px 30px rgba(0,0,0,0.15);
+  cursor:pointer;
+  transition:transform 0.2s;
+}
+.visitor-item:hover{transform:translateY(-5px);}
+.visitor-item img{
+  width:100%;
+  aspect-ratio:1/1;
   object-fit:contain;
-  border:4px solid #b67385;
-  background:#ffe6f0;
+  border-radius:28px;
 }
 .visitor-item p{
   margin-top:8px;
-  font-size:20px;
+  font-size:16px;
+  font-weight:600;
   color:#b84c6f;
-  font-weight:bold;
+  text-align:center;
+  padding-bottom:6px;
 }
 
 /* VIEWS */
-.carousel-view{
-  display:flex;
-  gap:40px;
-  overflow-x:auto;
-}
-.grid-view{
-  display:grid;
-  grid-template-columns:repeat(auto-fill,minmax(220px,1fr));
-  gap:24px;
-}
-.list-view{
-  display:flex;
-  flex-direction:column;
-  gap:18px;
-}
+.carousel-view{flex-wrap:nowrap;overflow-x:auto;}
+.grid-view{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:20px;}
+.list-view{display:flex;flex-direction:column;gap:18px;align-items:center;}
 
 /* SIDEBAR */
 #sidebar{
   position:fixed;
   top:0;
-  left:-220px;
-  width:220px;
+  left:-240px;
+  width:240px;
   height:100vh;
   background:rgba(255,230,240,0.95);
   border-right:2px solid #b67385;
@@ -84,9 +83,7 @@ body{
   transition:left .3s ease;
   z-index:9999;
 }
-#sidebar.sidebar-open{
-  left:0 !important;
-}
+#sidebar.sidebar-open{left:0;}
 #toggleSidebar{
   position:absolute;
   top:50%;
@@ -143,7 +140,7 @@ body{
 </div>
 
 <script>
-/* DATA TEST */
+/* TEST DATA */
 const creations=[
   {name:'Création 1',img:'https://via.placeholder.com/300'},
   {name:'Création 2',img:'https://via.placeholder.com/300'},
@@ -154,7 +151,7 @@ const creations=[
 const list=document.getElementById('visitor-list');
 let currentView='carousel';
 
-/* RENDER */
+/* RENDER CARDS */
 function render(){
   list.innerHTML='';
   list.className=currentView+'-view';
@@ -171,7 +168,7 @@ btnCarousel.onclick=()=>{currentView='carousel';render();}
 btnGrid.onclick=()=>{currentView='grid';render();}
 btnList.onclick=()=>{currentView='list';render();}
 
-/* SIDEBAR FIX FINAL */
+/* SIDEBAR */
 document.addEventListener('DOMContentLoaded',()=>{
   const sidebar=document.getElementById('sidebar');
   const toggle=document.getElementById('toggleSidebar');
@@ -185,6 +182,5 @@ document.addEventListener('DOMContentLoaded',()=>{
 /* INIT */
 render();
 </script>
-
 </body>
 </html>
