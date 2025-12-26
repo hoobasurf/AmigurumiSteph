@@ -9,66 +9,113 @@ html,body{height:100%;font-family:'Comic Sans MS',cursive;}
 
 /* BODY */
 body{
-  background:url('Photoroom_20251212_143703.PNG') center top / cover no-repeat fixed;
+  background:url('Photoroom_20251212_143703.PNG') center center / cover no-repeat fixed;
+  display:flex;
+  flex-direction:column;
   overflow:hidden;
 }
 
-/* VIEW BUTTONS */
+/* VUES BOUTONS */
 #viewSelector{
   display:flex;
   justify-content:center;
-  gap:16px;
-  padding:16px;
+  gap:14px;
+  padding:14px 0;
 }
 #viewSelector button{
-  background:#fff0f7;
-  border:2px solid #b84c6f;
-  color:#b84c6f;
-  padding:8px 16px;
-  border-radius:24px;
+  background:#fff;
+  border:none;
+  padding:12px 20px;
+  border-radius:22px;
+  font-weight:600;
+  box-shadow:0 6px 14px rgba(0,0,0,.18);
   cursor:pointer;
 }
 
-/* CONTENT */
+/* CONTENU */
 .center-zone{
-  height:calc(100vh - 80px);
+  flex:1;
   overflow:auto;
-  padding:20px;
-}
-#visitor-list{width:100%;display:flex;flex-wrap:wrap;gap:20px;justify-content:center;}
-
-/* CARDS VALIDÉES */
-.visitor-item{
-  width:220px;
   display:flex;
   flex-direction:column;
   align-items:center;
-  border-radius:28px;
-  background:rgba(255,255,255,0.95);
-  box-shadow:0 12px 30px rgba(0,0,0,0.15);
-  cursor:pointer;
-  transition:transform 0.2s;
 }
-.visitor-item:hover{transform:translateY(-5px);}
+#visitor-list{
+  width:100%;
+  padding:18px;
+}
+
+/* CARDS */
+.visitor-item{
+  width:100%;
+  max-width:240px;
+  margin:0 auto 18px;
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+  border-radius:28px;
+  background:transparent;
+  box-shadow:0 18px 40px rgba(0,0,0,.18);
+  cursor:pointer;
+  position:relative;
+}
 .visitor-item img{
   width:100%;
   aspect-ratio:1/1;
   object-fit:contain;
   border-radius:28px;
+  background: rgba(255,255,255,0.01);
 }
 .visitor-item p{
-  margin-top:8px;
-  font-size:16px;
-  font-weight:600;
-  color:#b84c6f;
   text-align:center;
+  font-size:15px;
+  font-weight:600;
   padding-bottom:6px;
 }
 
 /* VIEWS */
-.carousel-view{flex-wrap:nowrap;overflow-x:auto;}
-.grid-view{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:20px;}
-.list-view{display:flex;flex-direction:column;gap:18px;align-items:center;}
+.carousel-view{
+  display:flex;
+  gap:18px;
+  overflow-x:auto;
+  padding-bottom:24px;
+}
+.carousel-view .visitor-item{flex-shrink:0;}
+
+.grid-view{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:18px;
+  justify-items:center;
+}
+
+.list-view{
+  display:flex;
+  flex-direction:column;
+  gap:18px;
+}
+.list-view .visitor-item{max-width:95%;}
+
+/* MODAL IMAGE */
+.modal-bg{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.6);
+  display:none;
+  justify-content:center;
+  align-items:center;
+  z-index:1000;
+}
+.modal-box{
+  background:white;
+  border-radius:28px;
+  padding:18px;
+  max-width:90vw;
+}
+.modal-main-img{
+  max-height:70vh;
+  object-fit:contain;
+}
 
 /* SIDEBAR */
 #sidebar{
@@ -76,43 +123,39 @@ body{
   top:0;
   left:-240px;
   width:240px;
-  height:100vh;
-  background:rgba(255,230,240,0.95);
-  border-right:2px solid #b67385;
+  height:100%;
+  background:rgba(255,255,255,.7);
+  backdrop-filter:blur(10px);
   padding:20px;
-  transition:left .3s ease;
-  z-index:9999;
+  transition:left .3s;
+  z-index:1200;
 }
-#sidebar.sidebar-open{left:0;}
 #toggleSidebar{
   position:absolute;
   top:50%;
-  right:-30px;
-  width:30px;
-  height:60px;
-  background:#ffb6c1;
-  color:#8b3a3a;
-  border-radius:0 12px 12px 0;
+  right:-44px;
+  width:44px;
+  height:90px;
+  background:rgba(255,255,255,.85);
+  border-radius:0 22px 22px 0;
   display:flex;
   justify-content:center;
   align-items:center;
+  font-size:22px;
   cursor:pointer;
-  border:1px solid #b67385;
-  font-weight:bold;
 }
 #sidebar button{
   width:100%;
-  margin-bottom:10px;
-  padding:10px;
+  margin-bottom:14px;
+  padding:14px;
   border:none;
-  border-radius:12px;
-  background:#ffb6c1;
-  color:#8b3a3a;
-  font-weight:bold;
+  border-radius:20px;
+  background:#fff;
+  font-weight:700;
   cursor:pointer;
 }
 
-/* ADD MODAL */
+/* MODAL AJOUT */
 .form-modal-bg{
   position:fixed;
   inset:0;
@@ -132,16 +175,6 @@ body{
   width:100%;
   margin-bottom:10px;
 }
-.form-modal button{
-  width:100%;
-  padding:10px;
-  border:none;
-  border-radius:12px;
-  background:#ffb6c1;
-  color:#8b3a3a;
-  font-weight:bold;
-  cursor:pointer;
-}
 </style>
 </head>
 <body>
@@ -150,7 +183,6 @@ body{
 <div id="sidebar">
   <div id="toggleSidebar">☰</div>
   <button onclick="openAddModal()">➕ Ajouter</button>
-  <button onclick="alert('Thème')">Thème</button>
   <button onclick="alert('Vidéos')">Vidéos</button>
   <button onclick="alert('Mailles')">Mailles</button>
   <button onclick="alert('Pelotes')">Pelotes</button>
@@ -158,19 +190,25 @@ body{
   <button onclick="alert('Paramètres')">Paramètres</button>
 </div>
 
-<!-- VIEW SELECTOR -->
+<!-- VUES -->
 <div id="viewSelector">
-  <button id="btnCarousel">Carrousel</button>
-  <button id="btnGrid">Grille</button>
-  <button id="btnList">Liste</button>
+  <button onclick="setView('carousel')">Carrousel</button>
+  <button onclick="setView('grid')">Grille</button>
+  <button onclick="setView('list')">Liste</button>
 </div>
 
-<!-- CONTENT -->
 <div class="center-zone">
   <div id="visitor-list"></div>
 </div>
 
-<!-- ADD MODAL -->
+<!-- MODAL IMAGE -->
+<div class="modal-bg" id="modal" onclick="this.style.display='none'">
+  <div class="modal-box" onclick="event.stopPropagation()">
+    <img id="modalMain" class="modal-main-img">
+  </div>
+</div>
+
+<!-- MODAL AJOUT -->
 <div class="form-modal-bg" id="addFormBg">
   <div class="form-modal">
     <input id="addName" placeholder="Nom de la création">
@@ -180,43 +218,47 @@ body{
 </div>
 
 <script>
-/* DATA */
-let creations=JSON.parse(localStorage.getItem('creations')||'[]');
-const list=document.getElementById('visitor-list');
-let currentView='carousel';
+/* ========== VARIABLES ========== */
+const sidebar = document.getElementById('sidebar');
+const toggleSidebar = document.getElementById('toggleSidebar');
+const addFormBg = document.getElementById('addFormBg');
+const list = document.getElementById('visitor-list');
+let creations = JSON.parse(localStorage.getItem('creations')||'[]');
+let currentView = 'carousel';
 
-/* RENDER CARDS */
+/* ========== SIDEBAR ========== */
+toggleSidebar.onclick = () => sidebar.classList.toggle('sidebar-open');
+function openAddModal(){ addFormBg.style.display='flex'; }
+
+/* ========== VIEW SELECTOR ========== */
+function setView(v){
+  currentView = v;
+  list.className = v+'-view';
+}
+
+/* ========== RENDER CARDS ========== */
 function render(){
   list.innerHTML='';
-  list.className=currentView+'-view';
+  list.className = currentView+'-view';
   creations.forEach((c,i)=>{
-    const d=document.createElement('div');
-    d.className='visitor-item';
-    d.innerHTML=`<img src="${c.img}"><p>${c.name}</p>`;
-    list.appendChild(d);
+    const div = document.createElement('div');
+    div.className='visitor-item';
+    div.innerHTML = `<img src="${c.img}" loading="lazy"><p>${c.name}</p>`;
+    div.onclick=()=>{ document.getElementById('modalMain').src=c.img; document.getElementById('modal').style.display='flex'; };
+    list.appendChild(div);
   });
 }
 
-/* VIEW BUTTONS */
-btnCarousel.onclick=()=>{currentView='carousel';render();}
-btnGrid.onclick=()=>{currentView='grid';render();}
-btnList.onclick=()=>{currentView='list';render();}
-
-/* SIDEBAR TOGGLE */
-const sidebar=document.getElementById('sidebar');
-const toggleSidebar=document.getElementById('toggleSidebar');
-toggleSidebar.onclick=()=>sidebar.classList.toggle('sidebar-open');
-
-/* ADD MODAL */
-const addFormBg=document.getElementById('addFormBg');
-function openAddModal(){ addFormBg.style.display='flex'; }
+/* ========== AJOUT CREATION ========== */
 function addCreation(){
-  const name=document.getElementById('addName').value.trim();
-  const file=document.getElementById('addFile').files[0];
-  if(!name||!file){ alert("Nom et image obligatoires !"); return; }
-  const reader=new FileReader();
-  reader.onload=e=>{
-    creations.unshift({name,img:e.target.result});
+  const name = document.getElementById('addName').value.trim();
+  const file = document.getElementById('addFile').files[0];
+  if(!name || !file){ alert("Nom et image obligatoires !"); return; }
+
+  const reader = new FileReader();
+  reader.onload = function(e){
+    const imgData = e.target.result;
+    creations.unshift({name,img:imgData});
     localStorage.setItem('creations',JSON.stringify(creations));
     addFormBg.style.display='none';
     document.getElementById('addName').value='';
@@ -226,7 +268,7 @@ function addCreation(){
   reader.readAsDataURL(file);
 }
 
-/* INIT */
+/* ========== INIT ========== */
 render();
 </script>
 </body>
