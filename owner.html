@@ -111,14 +111,45 @@ body{
   font-weight:bold;
   cursor:pointer;
 }
+
+/* ADD MODAL */
+.form-modal-bg{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.6);
+  display:none;
+  justify-content:center;
+  align-items:center;
+  z-index:2000;
+}
+.form-modal{
+  background:#fff;
+  padding:18px;
+  border-radius:22px;
+  width:320px;
+}
+.form-modal input{
+  width:100%;
+  margin-bottom:10px;
+}
+.form-modal button{
+  width:100%;
+  padding:10px;
+  border:none;
+  border-radius:12px;
+  background:#ffb6c1;
+  color:#8b3a3a;
+  font-weight:bold;
+  cursor:pointer;
+}
 </style>
 </head>
-
 <body>
 
 <!-- SIDEBAR -->
 <div id="sidebar">
   <div id="toggleSidebar">☰</div>
+  <button onclick="openAddModal()">➕ Ajouter</button>
   <button onclick="alert('Thème')">Thème</button>
   <button onclick="alert('Vidéos')">Vidéos</button>
   <button onclick="alert('Mailles')">Mailles</button>
@@ -139,15 +170,18 @@ body{
   <div id="visitor-list"></div>
 </div>
 
-<script>
-/* TEST DATA */
-const creations=[
-  {name:'Création 1',img:'https://via.placeholder.com/300'},
-  {name:'Création 2',img:'https://via.placeholder.com/300'},
-  {name:'Création 3',img:'https://via.placeholder.com/300'},
-  {name:'Création 4',img:'https://via.placeholder.com/300'}
-];
+<!-- ADD MODAL -->
+<div class="form-modal-bg" id="addFormBg">
+  <div class="form-modal">
+    <input id="addName" placeholder="Nom de la création">
+    <input id="addFile" type="file" accept="image/*">
+    <button onclick="addCreation()">Ajouter</button>
+  </div>
+</div>
 
+<script>
+/* DATA */
+let creations=JSON.parse(localStorage.getItem('creations')||'[]');
 const list=document.getElementById('visitor-list');
 let currentView='carousel';
 
@@ -155,7 +189,7 @@ let currentView='carousel';
 function render(){
   list.innerHTML='';
   list.className=currentView+'-view';
-  creations.forEach(c=>{
+  creations.forEach((c,i)=>{
     const d=document.createElement('div');
     d.className='visitor-item';
     d.innerHTML=`<img src="${c.img}"><p>${c.name}</p>`;
@@ -168,16 +202,29 @@ btnCarousel.onclick=()=>{currentView='carousel';render();}
 btnGrid.onclick=()=>{currentView='grid';render();}
 btnList.onclick=()=>{currentView='list';render();}
 
-/* SIDEBAR */
-document.addEventListener('DOMContentLoaded',()=>{
-  const sidebar=document.getElementById('sidebar');
-  const toggle=document.getElementById('toggleSidebar');
+/* SIDEBAR TOGGLE */
+const sidebar=document.getElementById('sidebar');
+const toggleSidebar=document.getElementById('toggleSidebar');
+toggleSidebar.onclick=()=>sidebar.classList.toggle('sidebar-open');
 
-  toggle.addEventListener('click',(e)=>{
-    e.stopPropagation();
-    sidebar.classList.toggle('sidebar-open');
-  });
-});
+/* ADD MODAL */
+const addFormBg=document.getElementById('addFormBg');
+function openAddModal(){ addFormBg.style.display='flex'; }
+function addCreation(){
+  const name=document.getElementById('addName').value.trim();
+  const file=document.getElementById('addFile').files[0];
+  if(!name||!file){ alert("Nom et image obligatoires !"); return; }
+  const reader=new FileReader();
+  reader.onload=e=>{
+    creations.unshift({name,img:e.target.result});
+    localStorage.setItem('creations',JSON.stringify(creations));
+    addFormBg.style.display='none';
+    document.getElementById('addName').value='';
+    document.getElementById('addFile').value='';
+    render();
+  };
+  reader.readAsDataURL(file);
+}
 
 /* INIT */
 render();
