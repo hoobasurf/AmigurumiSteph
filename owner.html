@@ -181,18 +181,6 @@ body{
   width:100%;
   margin-bottom:10px;
 }
-
-/* ================= BOUTON CHARGER PLUS ================= */
-#loadMore{
-  margin:12px auto;
-  padding:10px 20px;
-  border:none;
-  border-radius:20px;
-  background:#fff;
-  font-weight:700;
-  cursor:pointer;
-  box-shadow:0 6px 14px rgba(0,0,0,.18);
-}
 </style>
 </head>
 
@@ -213,7 +201,6 @@ body{
 
 <div class="center-zone">
   <div id="visitor-list"></div>
-  <button id="loadMore">Charger plus</button>
 </div>
 
 <!-- MODAL IMAGE -->
@@ -244,7 +231,6 @@ const list = document.getElementById('visitor-list');
 const modal = document.getElementById('modal');
 const modalMain = document.getElementById('modalMain');
 const sidebar = document.getElementById('sidebar');
-const loadMoreBtn = document.getElementById('loadMore');
 
 const addFormBg = document.getElementById('addFormBg');
 const addName = document.getElementById('addName');
@@ -253,10 +239,11 @@ const addFile = document.getElementById('addFile');
 let currentView = 'carousel';
 let page = 0;
 const pageSize = 50;
+let loading = false; // pour éviter les requêtes multiples
 
 /********** 2️⃣ Render / Load avec Pagination **********/
 async function render(loadMore=false){
-  if(!loadMore) list.innerHTML=''; // si pas "charger plus", reset
+  if(!loadMore) list.innerHTML=''; // si pas scroll infini, reset
   const { data } = await supabase.from('creations')
     .select('*')
     .order('created_at',{ascending:false})
@@ -329,11 +316,20 @@ async function addCreation(){
   render();
 }
 
-/********** 6️⃣ Bouton "Charger plus" **********/
-loadMoreBtn.onclick = ()=>{
-  page++;
-  render(true);
-};
+/********** 6️⃣ Scroll Infini **********/
+window.addEventListener('scroll', async () => {
+  if(loading) return;
+
+  const scrollPosition = window.innerHeight + window.scrollY;
+  const nearBottom = document.body.offsetHeight - 200;
+
+  if(scrollPosition >= nearBottom){
+    loading = true;
+    page++;
+    await render(true);
+    loading = false;
+  }
+});
 
 /********** 7️⃣ Ping automatique pour éviter pause **********/
 setInterval(async ()=>{
