@@ -130,19 +130,21 @@ body{
   left:-240px;
   width:240px;
   height:100%;
-  background:rgba(255,255,255,.7);
-  backdrop-filter:blur(10px);
+  background:rgba(255,230,240,0.95);
+  border-right:2px solid #b67385;
   padding:20px;
   transition:left .3s;
   z-index:1200;
 }
+#sidebar.sidebar-open{left:0;}
 #toggleSidebar{
   position:absolute;
   top:50%;
   right:-44px;
   width:44px;
   height:90px;
-  background:rgba(255,255,255,.85);
+  background:#ffb6c1;
+  color:#8b3a3a;
   border-radius:0 22px 22px 0;
   display:flex;
   justify-content:center;
@@ -190,6 +192,11 @@ body{
 <div id="sidebar">
   <div id="toggleSidebar">☰</div>
   <button onclick="openAddModal()">➕ Ajouter</button>
+  <button>Vidéos</button>
+  <button>Mailles</button>
+  <button>Pelotes</button>
+  <button>Notes</button>
+  <button>Paramètres</button>
 </div>
 
 <!-- VIEWS -->
@@ -327,12 +334,7 @@ document.querySelector('.center-zone').addEventListener('scroll', async (e)=>{
   }
 });
 
-/********** 7️⃣ Ping automatique pour Free Plan **********/
-setInterval(async ()=>{
-  await supabase.from('creations').select('id').limit(1);
-},1000*60*60*12);
-
-/********** 8️⃣ Initial Render **********/
+/********** 7️⃣ Initial Render **********/
 render();
 </script>
 </body>
