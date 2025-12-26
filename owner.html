@@ -5,83 +5,204 @@
 <title>Owner - Mes créations</title>
 
 <style>
+/* ================= BASE ================= */
 *{box-sizing:border-box;margin:0;padding:0;}
-html,body{height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;}
+html,body{
+  height:100%;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
+}
+
 body{
   background:url('Photoroom_20251212_143703.PNG') center center / cover no-repeat fixed;
-  display:flex; flex-direction:column; overflow:hidden;
+  display:flex;
+  flex-direction:column;
+  overflow:hidden;
 }
 
-/* ===== VUES ===== */
-#viewSelector{display:flex;justify-content:center;gap:14px;padding:14px 0;}
+/* ================= BOUTONS VUE ================= */
+#viewSelector{
+  display:flex;
+  justify-content:center;
+  gap:14px;
+  padding:14px 0;
+}
 #viewSelector button{
-  background:#fff; border:none; padding:12px 20px; border-radius:22px; font-weight:600;
-  box-shadow:0 6px 14px rgba(0,0,0,.18); cursor:pointer;
+  background:#fff;
+  border:none;
+  padding:12px 20px;
+  border-radius:22px;
+  font-weight:600;
+  box-shadow:0 6px 14px rgba(0,0,0,.18);
+  cursor:pointer;
 }
 
-/* ===== ZONE CONTENU ===== */
-.center-zone{flex:1; overflow:auto; display:flex; flex-direction:column; align-items:center;}
-#visitor-list{width:100%; padding:18px;}
-.visitor-item{width:100%; max-width:240px; margin:0 auto; display:flex; flex-direction:column; gap:10px; border-radius:28px; background:transparent; box-shadow:0 18px 40px rgba(0,0,0,.18); cursor:pointer; position:relative;}
-.visitor-item img{width:100%; aspect-ratio:1/1; object-fit:contain; border-radius:28px; background: rgba(255,255,255,0.01);}
-.visitor-item p{text-align:center; font-size:15px; font-weight:600; padding-bottom:6px;}
-.carousel-view{display:flex; gap:18px; overflow-x:auto; padding-bottom:24px;}
+/* ================= ZONE CONTENU ================= */
+.center-zone{
+  flex:1;
+  overflow:auto;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  padding:12px;
+}
+#visitor-list{
+  width:100%;
+  padding:12px;
+}
+
+/* ================= CARDS ================= */
+.visitor-item{
+  width:100%;
+  max-width:240px;
+  margin:0 auto;
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+  border-radius:28px;
+  background:transparent;
+  box-shadow:0 18px 40px rgba(0,0,0,.18);
+  cursor:pointer;
+  position:relative;
+}
+.visitor-item img{
+  width:100%;
+  aspect-ratio:1/1;
+  object-fit:contain;
+  border-radius:28px;
+  background: rgba(255,255,255,0.01);
+}
+.visitor-item p{
+  text-align:center;
+  font-size:15px;
+  font-weight:600;
+  padding-bottom:6px;
+}
+
+/* ================= CARROUSEL ================= */
+.carousel-view{
+  display:flex;
+  gap:18px;
+  overflow-x:auto;
+  padding-bottom:24px;
+}
 .carousel-view .visitor-item{flex-shrink:0;}
-.grid-view{display:grid; grid-template-columns:repeat(2,1fr); gap:18px; justify-items:center;}
-.list-view{display:flex; flex-direction:column; gap:18px;}
+
+/* ================= GRILLE ================= */
+.grid-view{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:18px;
+  justify-items:center;
+}
+
+/* ================= LISTE ================= */
+.list-view{
+  display:flex;
+  flex-direction:column;
+  gap:18px;
+}
 .list-view .visitor-item{max-width:95%;}
 
-/* ===== MODAL ===== */
-.modal-bg{position:fixed; inset:0; background:rgba(0,0,0,.6); display:none; justify-content:center; align-items:center; z-index:1000;}
-.modal-box{background:white; border-radius:28px; padding:18px; max-width:90vw;}
-.modal-main-img{max-height:70vh; object-fit:contain;}
+/* ================= MODAL ================= */
+.modal-bg{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.6);
+  display:none;
+  justify-content:center;
+  align-items:center;
+  z-index:1000;
+}
+.modal-box{
+  background:white;
+  border-radius:28px;
+  padding:18px;
+  max-width:90vw;
+}
+.modal-main-img{
+  max-height:70vh;
+  object-fit:contain;
+}
 
-/* ===== SIDEBAR ===== */
+/* ================= SIDEBAR ================= */
 #sidebar{
-  position:fixed; top:0; left:-220px; width:220px; height:100%; background:rgba(255,230,240,0.95);
-  border-right:2px solid #b67385; padding:20px; transition:left .3s ease; z-index:1200;
+  position:fixed;
+  top:0;
+  left:-220px;
+  width:220px;
+  height:100%;
+  background:rgba(255,230,240,0.95);
+  border-right:2px solid #b67385;
+  padding:20px;
+  transition:left .3s ease;
+  z-index:1200;
 }
 #sidebar.sidebar-open{left:0;}
 #toggleSidebar{
-  position:absolute; top:50%; right:-30px; width:30px; height:60px; background:#ffb6c1;
-  color:#8b3a3a; border-radius:0 12px 12px 0; display:flex; justify-content:center; align-items:center;
-  font-size:22px; cursor:pointer; border:1px solid #b67385;
+  position:fixed;
+  top:50%;
+  left:0;
+  width:30px;
+  height:60px;
+  background:#ffb6c1;
+  color:#8b3a3a;
+  border-radius:0 12px 12px 0;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  font-size:22px;
+  cursor:pointer;
+  border:1px solid #b67385;
+  z-index:1300;
 }
 #sidebar button{
-  width:100%; margin-bottom:10px; padding:10px; border:none; border-radius:12px;
-  background:#ffb6c1; color:#8b3a3a; font-weight:bold; cursor:pointer;
+  width:100%;
+  margin-bottom:10px;
+  padding:10px;
+  border:none;
+  border-radius:12px;
+  background:#ffb6c1;
+  color:#8b3a3a;
+  font-weight:bold;
+  cursor:pointer;
 }
 
-/* ===== ADD MODAL ===== */
-.form-modal-bg{position:fixed; inset:0; background:rgba(0,0,0,.6); display:none; justify-content:center; align-items:center; z-index:2000;}
-.form-modal{background:#fff; padding:18px; border-radius:22px; width:320px;}
-.form-modal input{width:100%; margin-bottom:10px;}
+/* ================= MODAL AJOUT ================= */
+.form-modal-bg{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.6);
+  display:none;
+  justify-content:center;
+  align-items:center;
+  z-index:2000;
+}
+.form-modal{
+  background:#fff;
+  padding:18px;
+  border-radius:22px;
+  width:320px;
+}
+.form-modal input{
+  width:100%;
+  margin-bottom:10px;
+}
 </style>
 </head>
 
 <body>
 
+<!-- TOGGLE SIDEBAR -->
+<div id="toggleSidebar">☰</div>
+
 <!-- SIDEBAR -->
 <div id="sidebar">
-  <div id="toggleSidebar">☰</div>
-  <button onclick="openThemeModal()">🎨 Thème</button>
   <button onclick="openAddModal()">➕ Ajouter</button>
   <button>Vidéos</button>
   <button>Mailles</button>
   <button>Pelotes</button>
   <button>Notes</button>
   <button>Paramètres</button>
-</div>
-
-<!-- THEME MODAL -->
-<div class="modal-bg" id="themeModal">
-  <div class="modal-box" onclick="event.stopPropagation()">
-    <h3>Choisir un thème</h3>
-    <button onclick="setTheme('noel')">🎄 Noël</button>
-    <button onclick="setTheme('sweety')">🌸 Sweety-Girly</button>
-    <button onclick="setTheme('default')">💠 Défaut</button>
-    <button onclick="closeThemeModal()">✕ Fermer</button>
-  </div>
 </div>
 
 <!-- VIEWS -->
@@ -111,109 +232,117 @@ body{
   </div>
 </div>
 
-<!-- NEIGE / SWEETY -->
-<div id="snow" style="position:fixed; inset:0; pointer-events:none; z-index:5; display:none;"></div>
-<div id="sweetRain" style="position:fixed; inset:0; pointer-events:none; z-index:5; display:none;"></div>
-
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
 <script>
-/********** Supabase Init **********/
+/********** 1️⃣ Supabase Init **********/
 const supabaseUrl = 'https://tzrwnyserlflrirvhafb.supabase.co';
 const supabaseKey = 'sb_publishable__7MMGWAcD78fCtWFz1nUhA_O-rJMbl-';
 const supabase = supabase.createClient(supabaseUrl, supabaseKey);
 
-/********** DOM Elements **********/
+/********** 2️⃣ Elements **********/
 const list = document.getElementById('visitor-list');
 const modal = document.getElementById('modal');
 const modalMain = document.getElementById('modalMain');
+
 const sidebar = document.getElementById('sidebar');
 const toggleSidebar = document.getElementById('toggleSidebar');
+
 const addFormBg = document.getElementById('addFormBg');
 const addName = document.getElementById('addName');
 const addFile = document.getElementById('addFile');
-const snow = document.getElementById('snow');
-const sweetRain = document.getElementById('sweetRain');
-const themeModal = document.getElementById('themeModal');
 
 let currentView = 'carousel';
 let page = 0;
 const pageSize = 50;
 let loading = false;
 
-/********** Render / Load **********/
+/********** 3️⃣ Render / Load avec Pagination **********/
 async function render(loadMore=false){
-  if(!loadMore) list.innerHTML='';
-  const { data, error } = await supabase.from('creations')
+  if(!loadMore) list.innerHTML=''; 
+  const { data } = await supabase.from('creations')
     .select('*')
     .order('created_at',{ascending:false})
     .range(page*pageSize,(page+1)*pageSize-1);
-  if(error){ console.log(error); return; }
 
   data.forEach(c=>{
     const div = document.createElement('div');
     div.className = 'visitor-item';
     div.innerHTML = `<img src="${c.image_url}" loading="lazy"><p>${c.name}</p>`;
-    div.onclick = () => { modalMain.src=c.image_url; modal.style.display='flex'; };
+    div.onclick = () => {
+      modalMain.src = c.image_url;
+      modal.style.display = 'flex';
+    };
     list.appendChild(div);
   });
-  list.className = currentView+'-view';
+
+  setView(currentView);
 }
 
-/********** View Selector **********/
-function setView(v){ currentView=v; list.className=v+'-view'; }
+/********** 4️⃣ View Selector **********/
+function setView(v){
+  currentView = v;
+  list.className = v + '-view';
+}
 
-/********** Sidebar **********/
-toggleSidebar.onclick = ()=>sidebar.classList.toggle('sidebar-open');
+/********** 5️⃣ Sidebar **********/
+toggleSidebar.onclick = () => sidebar.classList.toggle('sidebar-open');
 function openAddModal(){ addFormBg.style.display='flex'; }
 
-/********** Theme Modal **********/
-function openThemeModal(){ themeModal.style.display='flex'; }
-function closeThemeModal(){ themeModal.style.display='none'; }
-
-/********** Set Theme =====*/
-function setTheme(theme){
-  if(theme==='noel'){ document.body.style.background="url('noel.png') center / cover no-repeat"; snow.style.display='block'; sweetRain.style.display='none'; }
-  else if(theme==='sweety'){ document.body.style.background="url('sweety-girly.png') center / cover no-repeat"; snow.style.display='none'; sweetRain.style.display='block'; }
-  else{ document.body.style.background="url('Photoroom_20251212_143703.PNG') center / cover no-repeat"; snow.style.display='none'; sweetRain.style.display='none'; }
-}
-
-/********** Add Creation **********/
+/********** 6️⃣ Compression + Upload Supabase **********/
 async function addCreation(){
-  const name = addName.value.trim(); const file = addFile.files[0];
-  if(!name||!file){ alert("Merci de remplir le nom et choisir une photo !"); return; }
+  const name = addName.value.trim();
+  const file = addFile.files[0];
+  if(!name || !file){ alert("Merci de remplir le nom et choisir une photo !"); return; }
 
-  const compressed = await new Promise(resolve=>{
-    const img = new Image(); const canvas=document.createElement('canvas'); const reader=new FileReader();
-    reader.onload=e=>img.src=e.target.result;
-    img.onload=()=>{
-      const MAX=1600; let w=img.width,h=img.height;
+  const compressed = await new Promise(resolve => {
+    const img = new Image();
+    const canvas = document.createElement('canvas');
+    const reader = new FileReader();
+
+    reader.onload = e => img.src = e.target.result;
+    img.onload = () => {
+      const MAX = 1600;
+      let w = img.width, h = img.height;
       if(w>MAX||h>MAX){ if(w>h){ h*=MAX/w; w=MAX; } else { w*=MAX/h; h=MAX; } }
       canvas.width=w; canvas.height=h;
       canvas.getContext('2d').drawImage(img,0,0,w,h);
       canvas.toBlob(blob=>resolve(blob),'image/webp',0.8);
-    }; reader.readAsDataURL(file);
+    };
+    reader.readAsDataURL(file);
   });
 
-  if(compressed.size>1024*1024){ alert("Image trop lourde"); return; }
+  if(compressed.size > 1024*1024){ alert("Image trop lourde"); return; }
+
   const path = `${Date.now()}.webp`;
   const { error } = await supabase.storage.from('photos').upload(path, compressed);
   if(error){ alert("Erreur upload"); console.log(error); return; }
+
   const { data } = supabase.storage.from('photos').getPublicUrl(path);
   await supabase.from('creations').insert([{ name, image_url: data.publicUrl }]);
-  addName.value=''; addFile.value=''; addFormBg.style.display='none'; page=0; render();
+
+  addName.value=''; addFile.value=''; addFormBg.style.display='none';
+  page = 0;
+  render();
 }
 
-/********** Scroll Infini **********/
-document.querySelector('.center-zone').addEventListener('scroll',async(e)=>{
+/********** 7️⃣ Scroll Infini **********/
+document.querySelector('.center-zone').addEventListener('scroll', async (e)=>{
   if(loading) return;
-  const container=e.target;
-  const scrollPosition=container.scrollTop + container.clientHeight;
-  const nearBottom=container.scrollHeight-100;
-  if(scrollPosition>=nearBottom){ loading=true; page++; await render(true); loading=false; }
+  const container = e.target;
+  if(container.scrollTop + container.clientHeight >= container.scrollHeight - 100){
+    loading = true;
+    page++;
+    await render(true);
+    loading = false;
+  }
 });
 
-/********** Initial Render **********/
+/********** 8️⃣ Ping automatique pour Free Plan **********/
+setInterval(async ()=>{
+  await supabase.from('creations').select('id').limit(1);
+},1000*60*60*12);
+
+/********** 9️⃣ Initial Render **********/
 render();
 </script>
 </body>
