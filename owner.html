@@ -239,11 +239,11 @@ const addFile = document.getElementById('addFile');
 let currentView = 'carousel';
 let page = 0;
 const pageSize = 50;
-let loading = false; // pour éviter les requêtes multiples
+let loading = false;
 
 /********** 2️⃣ Render / Load avec Pagination **********/
 async function render(loadMore=false){
-  if(!loadMore) list.innerHTML=''; // si pas scroll infini, reset
+  if(!loadMore) list.innerHTML=''; 
   const { data } = await supabase.from('creations')
     .select('*')
     .order('created_at',{ascending:false})
@@ -279,7 +279,6 @@ async function addCreation(){
   const file = addFile.files[0];
   if(!name || !file){ alert("Merci de remplir le nom et choisir une photo !"); return; }
 
-  // Compression WebP
   const compressed = await new Promise(resolve => {
     const img = new Image();
     const canvas = document.createElement('canvas');
@@ -300,15 +299,10 @@ async function addCreation(){
   if(compressed.size > 1024*1024){ alert("Image trop lourde"); return; }
 
   const path = `${Date.now()}.webp`;
-
-  // Upload
   const { error } = await supabase.storage.from('photos').upload(path, compressed);
   if(error){ alert("Erreur upload"); console.log(error); return; }
 
-  // URL publique
   const { data } = supabase.storage.from('photos').getPublicUrl(path);
-
-  // Sauvegarde dans la table creations
   await supabase.from('creations').insert([{ name, image_url: data.publicUrl }]);
 
   addName.value=''; addFile.value=''; addFormBg.style.display='none';
@@ -316,12 +310,13 @@ async function addCreation(){
   render();
 }
 
-/********** 6️⃣ Scroll Infini **********/
-window.addEventListener('scroll', async () => {
+/********** 6️⃣ Scroll Infini sur .center-zone **********/
+document.querySelector('.center-zone').addEventListener('scroll', async (e)=>{
   if(loading) return;
 
-  const scrollPosition = window.innerHeight + window.scrollY;
-  const nearBottom = document.body.offsetHeight - 200;
+  const container = e.target;
+  const scrollPosition = container.scrollTop + container.clientHeight;
+  const nearBottom = container.scrollHeight - 100;
 
   if(scrollPosition >= nearBottom){
     loading = true;
@@ -331,7 +326,7 @@ window.addEventListener('scroll', async () => {
   }
 });
 
-/********** 7️⃣ Ping automatique pour éviter pause **********/
+/********** 7️⃣ Ping automatique pour Free Plan **********/
 setInterval(async ()=>{
   await supabase.from('creations').select('id').limit(1);
 },1000*60*60*12);
