@@ -2,159 +2,103 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<title>Owner - Mes créations</title>
-
 <style>
-/* ================= BASE ================= */
-*{box-sizing:border-box;margin:0;padding:0;}
-html,body{
-  height:100%;
-  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
-}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;font-family:'Comic Sans MS',cursive}
 
+/* BODY */
 body{
-  background:url('Photoroom_20251212_143703.PNG') center center / cover no-repeat fixed;
+  background:url('Photoroom_20251212_143703.PNG') center top / cover no-repeat fixed;
+  overflow:hidden;
   display:flex;
   flex-direction:column;
-  overflow:hidden;
 }
 
-/* ================= BOUTONS VUE ================= */
+/* HEADER */
+header{text-align:center;padding:12px 0}
+header img{width:98px;height:98px;border-radius:20%;margin:auto}
+.title{display:none}
+
+/* BOUTONS VUE */
 #viewSelector{
   display:flex;
   justify-content:center;
-  gap:14px;
-  padding:14px 0;
+  gap:16px;
+  margin-top:205px;
 }
 #viewSelector button{
-  background:#fff;
-  border:none;
-  padding:12px 20px;
-  border-radius:22px;
-  font-weight:600;
-  box-shadow:0 6px 14px rgba(0,0,0,.18);
+  background:#fff0f7;
+  border:2px solid #b84c6f;
+  color:#b84c6f;
+  padding:8px 16px;
+  border-radius:24px;
   cursor:pointer;
 }
 
-/* ================= ZONE CONTENU ================= */
+/* CONTENU */
 .center-zone{
   flex:1;
-  overflow:auto;
   display:flex;
-  flex-direction:column;
+  justify-content:center;
   align-items:center;
-  padding:12px;
+  padding-top:300px;
 }
-#visitor-list{
-  width:100%;
-  padding:12px;
-}
+#visitor-list{width:100%;max-width:1200px}
 
-/* ================= CARDS ================= */
-.visitor-item{
-  width:100%;
-  max-width:240px;
-  margin:0 auto;
-  display:flex;
-  flex-direction:column;
-  gap:10px;
-  border-radius:28px;
-  background:transparent;
-  box-shadow:0 18px 40px rgba(0,0,0,.18);
-  cursor:pointer;
-  position:relative;
-}
+/* ITEMS */
+.visitor-item{text-align:center;cursor:pointer}
 .visitor-item img{
-  width:100%;
-  aspect-ratio:1/1;
+  width:220px;
+  height:220px;
   object-fit:contain;
-  border-radius:28px;
-  background: rgba(255,255,255,0.01);
+  border:4px solid #b67385;
+  background:#ffe6f0;
 }
 .visitor-item p{
-  text-align:center;
-  font-size:15px;
-  font-weight:600;
-  padding-bottom:6px;
+  margin-top:8px;
+  font-size:20px;
+  color:#b84c6f;
+  font-weight:bold;
 }
 
-/* ================= CARROUSEL ================= */
-.carousel-view{
-  display:flex;
-  gap:18px;
-  overflow-x:auto;
-  padding-bottom:24px;
-}
-.carousel-view .visitor-item{flex-shrink:0;}
+/* VUES */
+.carousel-view{display:flex;gap:40px;overflow-x:auto;padding:20px}
+.grid-view{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:24px;padding:20px}
+.list-view{display:flex;flex-direction:column;gap:18px;padding:20px}
 
-/* ================= GRILLE ================= */
-.grid-view{
-  display:grid;
-  grid-template-columns:repeat(2,1fr);
-  gap:18px;
-  justify-items:center;
-}
-
-/* ================= LISTE ================= */
-.list-view{
-  display:flex;
-  flex-direction:column;
-  gap:18px;
-}
-.list-view .visitor-item{max-width:95%;}
-
-/* ================= MODAL ================= */
+/* MODAL */
 .modal-bg{
   position:fixed;
   inset:0;
-  background:rgba(0,0,0,.6);
+  background:rgba(0,0,0,.65);
   display:none;
   justify-content:center;
   align-items:center;
   z-index:1000;
 }
 .modal-box{
-  background:white;
-  border-radius:28px;
+  background:rgba(255,228,235,0.95);
+  border:4px solid #b67385;
+  border-radius:18px;
   padding:18px;
-  max-width:90vw;
-}
-.modal-main-img{
-  max-height:70vh;
-  object-fit:contain;
+  max-width:900px;
+  width:95%;
 }
 
-/* ================= SIDEBAR ================= */
+/* SIDEBAR */
 #sidebar{
   position:fixed;
   top:0;
   left:-220px;
   width:220px;
-  height:100%;
-  background:rgba(255,230,240,0.95);
+  height:100vh;
+  background:rgba(255,230,240,0.15);
   border-right:2px solid #b67385;
   padding:20px;
   transition:left .3s ease;
-  z-index:1200;
+  z-index:10;
 }
-#sidebar.sidebar-open{left:0;}
-#toggleSidebar{
-  position:fixed;
-  top:50%;
-  left:0;
-  width:30px;
-  height:60px;
-  background:#ffb6c1;
-  color:#8b3a3a;
-  border-radius:0 12px 12px 0;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  font-size:22px;
-  cursor:pointer;
-  border:1px solid #b67385;
-  z-index:1300;
-}
+#sidebar.sidebar-open{left:0}
 #sidebar button{
   width:100%;
   margin-bottom:10px;
@@ -167,37 +111,47 @@ body{
   cursor:pointer;
 }
 
-/* ================= MODAL AJOUT ================= */
-.form-modal-bg{
+/* BOUTON SIDEBAR */
+#toggleSidebar{
   position:fixed;
-  inset:0;
-  background:rgba(0,0,0,.6);
-  display:none;
+  top:50%;
+  left:0;
+  width:30px;
+  height:60px;
+  background:#ffb6c1;
+  color:#8b3a3a;
+  border-radius:0 12px 12px 0;
+  display:flex;
   justify-content:center;
   align-items:center;
-  z-index:2000;
-}
-.form-modal{
-  background:#fff;
-  padding:18px;
-  border-radius:22px;
-  width:320px;
-}
-.form-modal input{
-  width:100%;
-  margin-bottom:10px;
+  cursor:pointer;
+  border:1px solid #b67385;
+  font-weight:bold;
+  z-index:20;
 }
 </style>
 </head>
 
 <body>
 
-<!-- TOGGLE SIDEBAR -->
+<!-- ✅ BOUTON TOUJOURS CLIQUABLE -->
 <div id="toggleSidebar">☰</div>
+
+<header></header>
+
+<div id="viewSelector">
+  <button id="btnCarousel">Carrousel</button>
+  <button id="btnGrid">Grille</button>
+  <button id="btnList">Liste</button>
+</div>
+
+<div class="center-zone">
+  <div id="visitor-list"></div>
+</div>
 
 <!-- SIDEBAR -->
 <div id="sidebar">
-  <button onclick="openAddModal()">➕ Ajouter</button>
+  <button>Thème</button>
   <button>Vidéos</button>
   <button>Mailles</button>
   <button>Pelotes</button>
@@ -205,145 +159,23 @@ body{
   <button>Paramètres</button>
 </div>
 
-<!-- VIEWS -->
-<div id="viewSelector">
-  <button onclick="setView('carousel')">Carrousel</button>
-  <button onclick="setView('grid')">Grille</button>
-  <button onclick="setView('list')">Liste</button>
-</div>
-
-<div class="center-zone">
-  <div id="visitor-list"></div>
-</div>
-
-<!-- MODAL IMAGE -->
-<div class="modal-bg" id="modal" onclick="this.style.display='none'">
-  <div class="modal-box" onclick="event.stopPropagation()">
-    <img id="modalMain" class="modal-main-img">
-  </div>
-</div>
-
-<!-- ADD MODAL -->
-<div class="form-modal-bg" id="addFormBg">
-  <div class="form-modal">
-    <input id="addName" placeholder="Nom de la création">
-    <input id="addFile" type="file" accept="image/*">
-    <button onclick="addCreation()">Ajouter</button>
-  </div>
-</div>
-
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-/********** 1️⃣ Supabase Init **********/
-const supabaseUrl = 'https://tzrwnyserlflrirvhafb.supabase.co';
-const supabaseKey = 'sb_publishable__7MMGWAcD78fCtWFz1nUhA_O-rJMbl-';
-const supabase = supabase.createClient(supabaseUrl, supabaseKey);
-
-/********** 2️⃣ Elements **********/
-const list = document.getElementById('visitor-list');
-const modal = document.getElementById('modal');
-const modalMain = document.getElementById('modalMain');
-
+/* SIDEBAR — EXACTEMENT COMME AVANT */
 const sidebar = document.getElementById('sidebar');
 const toggleSidebar = document.getElementById('toggleSidebar');
+toggleSidebar.onclick = () => {
+  sidebar.classList.toggle('sidebar-open');
+};
 
-const addFormBg = document.getElementById('addFormBg');
-const addName = document.getElementById('addName');
-const addFile = document.getElementById('addFile');
-
-let currentView = 'carousel';
-let page = 0;
-const pageSize = 50;
-let loading = false;
-
-/********** 3️⃣ Render / Load avec Pagination **********/
-async function render(loadMore=false){
-  if(!loadMore) list.innerHTML=''; 
-  const { data } = await supabase.from('creations')
-    .select('*')
-    .order('created_at',{ascending:false})
-    .range(page*pageSize,(page+1)*pageSize-1);
-
-  data.forEach(c=>{
-    const div = document.createElement('div');
-    div.className = 'visitor-item';
-    div.innerHTML = `<img src="${c.image_url}" loading="lazy"><p>${c.name}</p>`;
-    div.onclick = () => {
-      modalMain.src = c.image_url;
-      modal.style.display = 'flex';
-    };
-    list.appendChild(div);
-  });
-
-  setView(currentView);
+/* DEMO CONTENU */
+const list=document.getElementById('visitor-list');
+for(let i=1;i<=8;i++){
+  const d=document.createElement('div');
+  d.className='visitor-item';
+  d.innerHTML=`<img src="https://picsum.photos/300?${i}"><p>Image ${i}</p>`;
+  list.appendChild(d);
 }
-
-/********** 4️⃣ View Selector **********/
-function setView(v){
-  currentView = v;
-  list.className = v + '-view';
-}
-
-/********** 5️⃣ Sidebar **********/
-toggleSidebar.onclick = () => sidebar.classList.toggle('sidebar-open');
-function openAddModal(){ addFormBg.style.display='flex'; }
-
-/********** 6️⃣ Compression + Upload Supabase **********/
-async function addCreation(){
-  const name = addName.value.trim();
-  const file = addFile.files[0];
-  if(!name || !file){ alert("Merci de remplir le nom et choisir une photo !"); return; }
-
-  const compressed = await new Promise(resolve => {
-    const img = new Image();
-    const canvas = document.createElement('canvas');
-    const reader = new FileReader();
-
-    reader.onload = e => img.src = e.target.result;
-    img.onload = () => {
-      const MAX = 1600;
-      let w = img.width, h = img.height;
-      if(w>MAX||h>MAX){ if(w>h){ h*=MAX/w; w=MAX; } else { w*=MAX/h; h=MAX; } }
-      canvas.width=w; canvas.height=h;
-      canvas.getContext('2d').drawImage(img,0,0,w,h);
-      canvas.toBlob(blob=>resolve(blob),'image/webp',0.8);
-    };
-    reader.readAsDataURL(file);
-  });
-
-  if(compressed.size > 1024*1024){ alert("Image trop lourde"); return; }
-
-  const path = `${Date.now()}.webp`;
-  const { error } = await supabase.storage.from('photos').upload(path, compressed);
-  if(error){ alert("Erreur upload"); console.log(error); return; }
-
-  const { data } = supabase.storage.from('photos').getPublicUrl(path);
-  await supabase.from('creations').insert([{ name, image_url: data.publicUrl }]);
-
-  addName.value=''; addFile.value=''; addFormBg.style.display='none';
-  page = 0;
-  render();
-}
-
-/********** 7️⃣ Scroll Infini **********/
-document.querySelector('.center-zone').addEventListener('scroll', async (e)=>{
-  if(loading) return;
-  const container = e.target;
-  if(container.scrollTop + container.clientHeight >= container.scrollHeight - 100){
-    loading = true;
-    page++;
-    await render(true);
-    loading = false;
-  }
-});
-
-/********** 8️⃣ Ping automatique pour Free Plan **********/
-setInterval(async ()=>{
-  await supabase.from('creations').select('id').limit(1);
-},1000*60*60*12);
-
-/********** 9️⃣ Initial Render **********/
-render();
 </script>
+
 </body>
 </html>
