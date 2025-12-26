@@ -135,8 +135,6 @@ body{
   transition:left .3s;
   z-index:1200;
 }
-#sidebar.sidebar-open{left:0;}
-
 #toggleSidebar{
   position:absolute;
   top:50%;
@@ -220,7 +218,14 @@ body{
   </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
 <script>
+/********** 1️⃣ Supabase Init **********/
+const supabaseUrl = 'https://tzrwnyserlflrirvhafb.supabase.co';
+const supabaseKey = 'sb_publishable__7MMGWAcD78fCtWFz1nUhA_O-rJMbl-';
+const supabase = supabase.createClient(supabaseUrl, supabaseKey);
+
 const list = document.getElementById('visitor-list');
 const modal = document.getElementById('modal');
 const modalMain = document.getElementById('modalMain');
@@ -232,59 +237,84 @@ const addFile = document.getElementById('addFile');
 
 let currentView = 'carousel';
 
-function render(){}
+/********** 2️⃣ Render / Load **********/
+async function render(){
+  list.innerHTML='';
+  const { data } = await supabase.from('creations').select('*').order('created_at',{ascending:false});
+  data.forEach(c=>{
+    const div = document.createElement('div');
+    div.className = 'visitor-item';
+    div.innerHTML = `<img src="${c.image_url}"><p>${c.name}</p>`;
+    div.onclick = () => {
+      modalMain.src = c.image_url;
+      modal.style.display = 'flex';
+    };
+    list.appendChild(div);
+  });
+}
 
+/********** 3️⃣ View Selector **********/
 function setView(v){
   currentView = v;
   list.className = v + '-view';
 }
 
+/********** 4️⃣ Sidebar **********/
+toggleSidebar.onclick = () => sidebar.classList.toggle('sidebar-open');
 function openAddModal(){
   addFormBg.style.display = 'flex';
 }
 
-/* ================== BOUTON AJOUT (LOGIQUE ORIGINALE) ================== */
-function addCreation(){
+/********** 5️⃣ Compression + Upload Supabase **********/
+async function addCreation(){
   const name = addName.value.trim();
   const file = addFile.files[0];
+  if(!name || !file){ alert("Merci de remplir le nom et choisir une photo !"); return; }
 
-  if (!name || !file) {
-    alert("Merci de remplir le nom et choisir une photo !");
-    return;
-  }
+  // Compression WebP
+  const compressed = await new Promise(resolve => {
+    const img = new Image();
+    const canvas = document.createElement('canvas');
+    const reader = new FileReader();
 
-  console.log("Nom :", name);
-  console.log("Fichier sélectionné :", file);
-
-  const reader = new FileReader();
-  reader.onload = (e) => {
-    const imgUrl = e.target.result;
-
-    const div = document.createElement('div');
-    div.className = 'visitor-item';
-    div.innerHTML = `
-      <img src="${imgUrl}">
-      <p>${name}</p>
-    `;
-
-    div.onclick = () => {
-      modalMain.src = imgUrl;
-      modal.style.display = 'flex';
+    reader.onload = e => img.src = e.target.result;
+    img.onload = () => {
+      const MAX = 1600;
+      let w = img.width, h = img.height;
+      if(w>MAX||h>MAX){ if(w>h){ h*=MAX/w; w=MAX; } else { w*=MAX/h; h=MAX; } }
+      canvas.width=w; canvas.height=h;
+      canvas.getContext('2d').drawImage(img,0,0,w,h);
+      canvas.toBlob(blob=>resolve(blob),'image/webp',0.8);
     };
+    reader.readAsDataURL(file);
+  });
 
-    list.prepend(div);
+  if(compressed.size > 1024*1024){ alert("Image trop lourde"); return; }
 
-    addName.value = '';
-    addFile.value = '';
-    addFormBg.style.display = 'none';
-  };
+  const path = `${Date.now()}.webp`;
 
-  reader.readAsDataURL(file);
+  // Upload
+  const { error } = await supabase.storage.from('photos').upload(path, compressed);
+  if(error){ alert("Erreur upload"); console.log(error); return; }
+
+  // URL publique
+  const { data } = supabase.storage.from('photos').getPublicUrl(path);
+
+  // Sauvegarde DB
+  await supabase.from('creations').insert([{ name, image_url: data.publicUrl }]);
+
+  addName.value=''; addFile.value=''; addFormBg.style.display='none';
+  render();
 }
-/* ==================================================================== */
 
-toggleSidebar.onclick = () => sidebar.classList.toggle('sidebar-open');
+/********** 6️⃣ Ping automatique **********/
+setInterval(async ()=>{
+  await supabase.from('creations').select('id').limit(1);
+},1000*60*60*12); // toutes les 12h
+
+/********** 7️⃣ Initial Render **********/
+render();
+
 </script>
-
 </body>
 </html>
