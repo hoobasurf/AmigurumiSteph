@@ -126,17 +126,22 @@ body{
   <button>Vidéos</button>
 </div>
 
-<!-- ================= SUPABASE LIB (AJOUT) ================= -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <script>
-/* ================= TON CODE (INTOUCHÉ) ================= */
+/* ================= SUPABASE ================= */
+const supabaseUrl = 'https://tzrwnyserlflrirvhafb.supabase.co';
+const supabaseKey = 'sb_publishable__7MMGWAcD78fCtWFz1nUhA_O-rJMbl-';
+const supabase = supabase.createClient(supabaseUrl, supabaseKey);
+
+/* ================= ELEMENTS ================= */
 const nameInput = document.getElementById('name');
 const photoInput = document.getElementById('photo');
 const addBtn = document.getElementById('add');
 const list = document.getElementById('owner-list');
 
-addBtn.onclick = () => {
+/* ================= AJOUT (INCHANGÉ MAIS AVEC SUPABASE) ================= */
+addBtn.onclick = async () => {
   const name = nameInput.value.trim();
   const file = photoInput.files[0];
 
@@ -146,9 +151,10 @@ addBtn.onclick = () => {
   }
 
   const reader = new FileReader();
-  reader.onload = (e) => {
+  reader.onload = async (e) => {
     const imgUrl = e.target.result;
 
+    /* affichage immédiat */
     const div = document.createElement('div');
     div.className = 'owner-item';
     div.innerHTML = `
@@ -157,6 +163,25 @@ addBtn.onclick = () => {
     `;
     list.prepend(div);
 
+    /* upload supabase */
+    const filePath = Date.now() + '_' + file.name;
+    const { error:uploadError } = await supabase
+      .storage.from('photos')
+      .upload(filePath, file);
+
+    if(uploadError){
+      alert("Erreur upload");
+      return;
+    }
+
+    const { data } = supabase
+      .storage.from('photos')
+      .getPublicUrl(filePath);
+
+    await supabase.from('creations').insert([
+      { name:name, image_url:data.publicUrl }
+    ]);
+
     nameInput.value = '';
     photoInput.value = '';
   };
@@ -164,45 +189,36 @@ addBtn.onclick = () => {
   reader.readAsDataURL(file);
 };
 
-/* SIDEBAR */
+/* ================= SIDEBAR (INCHANGÉ) ================= */
 const sidebar=document.getElementById('sidebar');
 const toggleSidebar=document.getElementById('toggleSidebar');
 toggleSidebar.onclick=()=>sidebar.classList.toggle('sidebar-open');
-</script>
 
-<!-- ================= AJOUT SUPABASE SANS TOUCHER LE CODE ================= -->
-<script>
-const supabaseUrl = 'https://tzrwnyserlflrirvhafb.supabase.co';
-const supabaseKey = 'sb_publishable__7MMGWAcD78fCtWFz1nUhA_O-rJMbl-';
-const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+/* ================= CHARGEMENT AU RAFRAÎCHISSEMENT ================= */
+async function loadCreations(){
+  const { data, error } = await supabase
+    .from('creations')
+    .select('*')
+    .order('created_at', { ascending:false });
 
-/* écoute le même bouton SANS le modifier */
-addBtn.addEventListener('click', async () => {
-  const name = nameInput.value.trim();
-  const file = photoInput.files[0];
-  if(!name || !file) return;
-
-  const path = `${Date.now()}-${file.name}`;
-
-  const { error: uploadError } = await supabase
-    .storage
-    .from('photos')
-    .upload(path, file);
-
-  if(uploadError){
-    console.error(uploadError);
+  if(error){
+    console.error(error);
     return;
   }
 
-  const { data } = supabase
-    .storage
-    .from('photos')
-    .getPublicUrl(path);
+  data.forEach(c => {
+    const div = document.createElement('div');
+    div.className = 'owner-item';
+    div.innerHTML = `
+      <p>${c.name}</p>
+      <img src="${c.image_url}">
+    `;
+    list.appendChild(div);
+  });
+}
 
-  await supabase.from('creations').insert([
-    { name: name, image_url: data.publicUrl }
-  ]);
-});
+/* chargement au démarrage */
+loadCreations();
 </script>
 
 </body>
