@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<title>Owner - Mes créations</title>
+<title>Mes créations</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
 html,body{height:100%;font-family:'Comic Sans MS',cursive;}
@@ -33,9 +33,10 @@ body{
   align-items:flex-start;
   padding-top:40px;
   flex-wrap:wrap;
+  overflow:auto;
 }
 #owner-list{display:flex;gap:40px;flex-wrap:wrap;}
-.owner-item{text-align:center;cursor:pointer}
+.owner-item{text-align:center;cursor:pointer;}
 .owner-item img{
   width:220px;
   height:220px;
@@ -49,6 +50,8 @@ body{
   color:#b84c6f;
   font-weight:bold;
 }
+
+/* SIDEBAR */
 #sidebar{
   position:fixed;
   top:0;
@@ -94,21 +97,13 @@ body{
 #addForm{
   display:none;
   flex-direction:column;
-  gap:10px;
+  gap:6px;
   margin-top:10px;
 }
-#addForm input{
+#addForm input, #addForm button{
   padding:6px;
   border-radius:6px;
   border:1px solid #b67385;
-}
-#addForm button{
-  padding:6px;
-  border-radius:8px;
-  border:none;
-  background:#ffb6c1;
-  color:#8b3a3a;
-  font-weight:bold;
   cursor:pointer;
 }
 </style>
@@ -125,6 +120,7 @@ body{
   <div id="owner-list"></div>
 </div>
 
+<!-- SIDEBAR -->
 <div id="sidebar">
   <div id="toggleSidebar">☰</div>
   <button onclick="toggleAddForm()">➕ Ajouter</button>
@@ -145,16 +141,17 @@ const supabaseKey = 'sb_publishable__7MMGWAcD78fCtWFz1nUhA_O-rJMbl-';
 const supabase = supabase.createClient(supabaseUrl, supabaseKey);
 
 /* ================= SIDEBAR ================= */
-const sidebar=document.getElementById('sidebar');
-const toggleSidebar=document.getElementById('toggleSidebar');
-toggleSidebar.onclick=()=>sidebar.classList.toggle('sidebar-open');
+const sidebar = document.getElementById('sidebar');
+const toggleSidebar = document.getElementById('toggleSidebar');
+toggleSidebar.onclick = () => sidebar.classList.toggle('sidebar-open');
 
+/* ================= FORMULAIRE AJOUT ================= */
 const addFormDiv = document.getElementById('addForm');
 function toggleAddForm(){
   addFormDiv.style.display = addFormDiv.style.display==='flex'?'none':'flex';
 }
 
-/* ================= AJOUT ================= */
+/* ================= AJOUT CREATION ================= */
 const nameInput = document.getElementById('name');
 const photoInput = document.getElementById('photo');
 const addBtn = document.getElementById('add');
