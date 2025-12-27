@@ -6,88 +6,68 @@
 
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-html,body{height:100%;font-family:'Comic Sans MS',cursive}
+html,body{height:100%;font-family:Arial,sans-serif}
 
 /* BODY */
 body{
-  background:url('Photoroom_20251212_143703.PNG') center center / cover no-repeat fixed;
+  background:url('Photoroom_20251212_143703.PNG') center/cover no-repeat fixed;
+  overflow:hidden;
   display:flex;
   flex-direction:column;
-  overflow:hidden;
 }
 
-/* ===== VUES ===== */
+/* VIEW BUTTONS */
 #viewSelector{
   display:flex;
   justify-content:center;
-  gap:16px;
+  gap:14px;
   padding:14px;
 }
 #viewSelector button{
-  background:#fff0f7;
-  border:2px solid #b67385;
-  color:#b67385;
   padding:10px 18px;
-  border-radius:22px;
-  font-weight:bold;
+  border-radius:20px;
+  border:none;
   cursor:pointer;
+  font-weight:bold;
 }
 
-/* ===== CONTENU ===== */
+/* CONTENT */
 .center-zone{
   flex:1;
   overflow:auto;
 }
-#visitor-list{
+#owner-list{
   padding:20px;
 }
 
-/* ===== CARDS (TAILLE ORIGINALE) ===== */
-.visitor-item{
-  text-align:center;
-  cursor:pointer;
+/* CARDS (TAILLE D’ORIGINE) */
+.owner-item{
+  width:240px;
+  margin:10px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:8px;
 }
-.visitor-item img{
+.owner-item img{
   width:220px;
   height:220px;
   object-fit:contain;
   border:4px solid #b67385;
   background:#ffe6f0;
 }
-.visitor-item p{
-  margin-top:8px;
-  font-size:20px;
-  color:#b84c6f;
+.owner-item p{
   font-weight:bold;
+  color:#b84c6f;
 }
 
-/* ===== VUES ===== */
-.carousel-view{
-  display:flex;
-  gap:40px;
-  overflow-x:auto;
-}
-.grid-view{
-  display:grid;
-  grid-template-columns:repeat(auto-fill,minmax(220px,1fr));
-  gap:24px;
-}
-.list-view{
-  display:flex;
-  flex-direction:column;
-  gap:18px;
-}
-.list-view .visitor-item{
-  display:flex;
-  align-items:center;
-  gap:18px;
-}
-.list-view img{
-  width:140px;
-  height:140px;
-}
+/* VIEWS */
+.carousel-view{display:flex;gap:30px;overflow-x:auto}
+.grid-view{display:grid;grid-template-columns:repeat(auto-fill,240px);gap:24px}
+.list-view{display:flex;flex-direction:column}
+.list-view .owner-item{flex-direction:row}
 
-/* ===== SIDEBAR ===== */
+/* SIDEBAR */
 #sidebar{
   position:fixed;
   top:0;
@@ -95,14 +75,11 @@ body{
   width:220px;
   height:100vh;
   background:rgba(255,230,240,0.95);
-  border-right:2px solid #b67385;
   padding:20px;
-  transition:left .3s ease;
+  transition:left .3s;
   z-index:1000;
 }
-#sidebar.sidebar-open{
-  left:0;
-}
+#sidebar.sidebar-open{left:0}
 #toggleSidebar{
   position:absolute;
   top:50%;
@@ -110,29 +87,32 @@ body{
   width:30px;
   height:60px;
   background:#ffb6c1;
-  color:#8b3a3a;
   border-radius:0 12px 12px 0;
-  display:flex;
-  justify-content:center;
-  align-items:center;
   cursor:pointer;
-  border:1px solid #b67385;
-  font-weight:bold;
+  display:flex;
+  align-items:center;
+  justify-content:center;
 }
 #sidebar button{
   width:100%;
   margin-bottom:10px;
   padding:10px;
   border:none;
-  border-radius:12px;
-  background:#ffb6c1;
-  color:#8b3a3a;
-  font-weight:bold;
+  border-radius:10px;
   cursor:pointer;
 }
 
-/* ===== MODALS ===== */
-.modal-bg{
+/* ADD FORM */
+#addForm{
+  padding:14px;
+  display:flex;
+  gap:10px;
+  justify-content:center;
+}
+#addForm input{padding:6px}
+
+/* MODAL */
+.modal{
   position:fixed;
   inset:0;
   background:rgba(0,0,0,.6);
@@ -142,13 +122,10 @@ body{
   z-index:2000;
 }
 .modal-box{
-  background:#ffe6f0;
-  padding:18px;
+  background:white;
+  padding:20px;
   border-radius:16px;
-  border:4px solid #b67385;
-}
-.modal-box img{
-  max-height:70vh;
+  max-width:90%;
 }
 </style>
 </head>
@@ -158,103 +135,117 @@ body{
 <!-- SIDEBAR -->
 <div id="sidebar">
   <div id="toggleSidebar">☰</div>
-  <button onclick="openAddModal()">➕ Ajouter</button>
-  <button>Vidéos</button>
-  <button>Mailles</button>
-  <button>Pelotes</button>
-  <button>Notes</button>
+  <button onclick="setTheme('default')">Défaut</button>
+  <button onclick="setTheme('girly')">Girly</button>
 </div>
 
-<!-- BOUTONS VUE -->
+<!-- VIEW -->
 <div id="viewSelector">
   <button onclick="setView('carousel')">Carrousel</button>
   <button onclick="setView('grid')">Grille</button>
   <button onclick="setView('list')">Liste</button>
 </div>
 
+<!-- ADD (CODE ORIGINAL CONSERVÉ) -->
+<div id="addForm">
+  <input id="name" placeholder="Nom">
+  <input id="photo" type="file" accept="image/*">
+  <button id="add">Ajouter</button>
+</div>
+
 <div class="center-zone">
-  <div id="visitor-list"></div>
+  <div id="owner-list" class="carousel-view"></div>
 </div>
 
-<!-- MODAL IMAGE -->
-<div class="modal-bg" id="modal" onclick="this.style.display='none'">
+<!-- MODAL COMMENTS -->
+<div class="modal" id="commentModal" onclick="this.style.display='none'">
   <div class="modal-box" onclick="event.stopPropagation()">
-    <img id="modalImg">
+    <h3>Commentaires</h3>
+    <div id="commentList"></div>
+    <input id="commentInput" placeholder="Commentaire">
+    <button onclick="addComment()">Envoyer</button>
   </div>
 </div>
 
-<!-- MODAL AJOUT -->
-<div class="modal-bg" id="addModal">
-  <div class="modal-box">
-    <input id="addName" placeholder="Nom de la création"><br><br>
-    <input id="addFile" type="file" accept="image/*"><br><br>
-    <button onclick="addCreation()">Ajouter</button>
-  </div>
-</div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <script>
-  <script>
-/* ===== ELEMENTS AJOUT (FIX) ===== */
-const addModal = document.getElementById('addModal');
-const addName  = document.getElementById('addName');
-const addFile  = document.getElementById('addFile');
-const modal    = document.getElementById('modal');
-const modalImg = document.getElementById('modalImg');
+/* ===== SUPABASE ===== */
+const supabase = supabase.createClient(
+  'https://tzrwnyserlflrirvhafb.supabase.co',
+  'sb_publishable__7MMGWAcD78fCtWFz1nUhA_O-rJMbl-'
+);
+
+/* ===== BASE CODE (INTOUCHABLE) ===== */
+const nameInput = document.getElementById('name');
+const photoInput = document.getElementById('photo');
+const addBtn = document.getElementById('add');
+const list = document.getElementById('owner-list');
+
+let creations = [];
+let currentView = 'carousel';
+
+addBtn.onclick = () => {
+  const name = nameInput.value.trim();
+  const file = photoInput.files[0];
+
+  if (!name || !file) {
+    alert("Merci de remplir le nom et choisir une photo !");
+    return;
+  }
+
+  const reader = new FileReader();
+  reader.onload = async (e) => {
+    const imgUrl = e.target.result;
+
+    const div = document.createElement('div');
+    div.className = 'owner-item';
+    div.innerHTML = `<p>${name}</p><img src="${imgUrl}">`;
+    list.prepend(div);
+
+    // sync Supabase (en arrière-plan)
+    const path = Date.now()+'.webp';
+    const blob = await (await fetch(imgUrl)).blob();
+    await supabase.storage.from('photos').upload(path, blob);
+    const { data } = supabase.storage.from('photos').getPublicUrl(path);
+    await supabase.from('creations').insert({ name, image_url: data.publicUrl });
+
+    nameInput.value='';
+    photoInput.value='';
+  };
+  reader.readAsDataURL(file);
+};
+
+/* ===== VIEW ===== */
+function setView(v){
+  currentView=v;
+  list.className=v+'-view';
+}
+
 /* ===== SIDEBAR ===== */
-const sidebar=document.getElementById('sidebar');
 document.getElementById('toggleSidebar').onclick=
-()=>sidebar.classList.toggle('sidebar-open');
+()=>document.getElementById('sidebar').classList.toggle('sidebar-open');
 
-/* ===== DATA ===== */
-let creations=JSON.parse(localStorage.getItem('creations')||'[]');
-const list=document.getElementById('visitor-list');
-let currentView='carousel';
+/* ===== THEME ===== */
+function setTheme(t){
+  if(t==='girly'){
+    document.body.style.background='#fff0f7';
+  }else{
+    document.body.style.backgroundImage="url('Photoroom_20251212_143703.PNG')";
+  }
+}
 
-/* ===== RENDER ===== */
-function render(){
-  list.innerHTML='';
-  list.className=currentView+'-view';
-  creations.forEach(c=>{
+/* ===== LOAD SUPABASE ===== */
+async function load(){
+  const { data } = await supabase.from('creations').select('*').order('created_at',{ascending:false});
+  data.forEach(c=>{
     const d=document.createElement('div');
-    d.className='visitor-item';
-    d.innerHTML=`<img src="${c.img}"><p>${c.name}</p>`;
-    d.onclick=()=>{
-      modalImg.src=c.img;
-      modal.style.display='flex';
-    };
+    d.className='owner-item';
+    d.innerHTML=`<p>${c.name}</p><img src="${c.image_url}">`;
     list.appendChild(d);
   });
 }
-
-/* ===== VIEWS ===== */
-function setView(v){
-  currentView=v;
-  render();
-}
-
-/* ===== AJOUT (FONCTIONNEL) ===== */
-function openAddModal(){
-  addModal.style.display='flex';
-}
-function addCreation(){
-  const name=addName.value.trim();
-  const file=addFile.files[0];
-  if(!name||!file)return;
-
-  const r=new FileReader();
-  r.onload=e=>{
-    creations.unshift({name,img:e.target.result});
-    localStorage.setItem('creations',JSON.stringify(creations));
-    addName.value='';
-    addFile.value='';
-    addModal.style.display='none';
-    render();
-  };
-  r.readAsDataURL(file);
-}
-
-/* INIT */
-render();
+load();
 </script>
 
 </body>
