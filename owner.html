@@ -36,8 +36,9 @@ body{
   flex:1;
   display:flex;
   justify-content:center;
-  align-items:center;
-  padding-top:300px;
+  align-items:flex-start;
+  padding-top:40px;
+  flex-wrap:wrap;
 }
 #owner-list{display:flex;gap:40px;flex-wrap:wrap}
 
@@ -98,9 +99,30 @@ body{
   font-weight:bold;
   cursor:pointer;
 }
+
+/* FORMULAIRE DANS SIDEBAR */
+#addForm{
+  display:none;
+  flex-direction:column;
+  gap:10px;
+  margin-top:10px;
+}
+#addForm input{
+  padding:6px;
+  border-radius:6px;
+  border:1px solid #b67385;
+}
+#addForm button{
+  padding:6px;
+  border-radius:8px;
+  border:none;
+  background:#ffb6c1;
+  color:#8b3a3a;
+  font-weight:bold;
+  cursor:pointer;
+}
 </style>
 </head>
-
 <body>
 
 <div id="viewSelector">
@@ -113,23 +135,20 @@ body{
   <div id="owner-list"></div>
 </div>
 
-<!-- FORMULAIRE D'AJOUT (dans sidebar) -->
-<div id="addForm" style="display:none; text-align:center; padding:20px;">
-  <input id="name" placeholder="Nom">
-  <input id="photo" type="file" accept="image/*">
-  <button id="add">Ajouter</button>
-</div>
-
 <!-- SIDEBAR -->
 <div id="sidebar">
   <div id="toggleSidebar">☰</div>
-  <button onclick="document.getElementById('addForm').style.display='block'">➕ Ajouter</button>
+  <button onclick="toggleAddForm()">➕ Ajouter</button>
+  <div id="addForm">
+    <input id="name" placeholder="Nom">
+    <input id="photo" type="file" accept="image/*">
+    <button id="add">Ajouter</button>
+  </div>
   <button>Thème</button>
   <button>Vidéos</button>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
 <script>
 /* ================= SUPABASE ================= */
 const supabaseUrl = 'https://tzrwnyserlflrirvhafb.supabase.co';
@@ -137,69 +156,79 @@ const supabaseKey = 'sb_publishable__7MMGWAcD78fCtWFz1nUhA_O-rJMbl-';
 const supabaseClient = window.supabase.createClient(supabaseUrl, supabaseKey);
 
 /* ================= ELEMENTS ================= */
+const sidebar=document.getElementById('sidebar');
+const toggleSidebar=document.getElementById('toggleSidebar');
+toggleSidebar.onclick=()=>sidebar.classList.toggle('sidebar-open');
+
+const addFormDiv = document.getElementById('addForm');
+function toggleAddForm(){
+  addFormDiv.style.display = addFormDiv.style.display==='flex'?'none':'flex';
+}
+
 const nameInput = document.getElementById('name');
 const photoInput = document.getElementById('photo');
 const addBtn = document.getElementById('add');
 const list = document.getElementById('owner-list');
 
 /* ================= AJOUT ================= */
-addBtn.onclick = () => {
+addBtn.onclick = async () => {
   const name = nameInput.value.trim();
   const file = photoInput.files[0];
 
-  if (!name || !file) {
+  if(!name || !file){
     alert("Merci de remplir le nom et choisir une photo !");
     return;
   }
 
-  const reader = new FileReader();
-  reader.onload = async (e) => {
-    const imgUrl = e.target.result;
+  const path = Date.now() + '_' + file.name;
 
-    const div = document.createElement('div');
-    div.className = 'owner-item';
-    div.innerHTML = `
-      <p>${name}</p>
-      <img src="${imgUrl}">
-    `;
-    list.prepend(div);
+  // Upload dans Supabase
+  const { error: uploadError } = await supabaseClient.storage.from('photos').upload(path, file);
+  if(uploadError){
+    alert("Erreur upload: "+uploadError.message);
+    return;
+  }
 
-    // Upload vers Supabase
-    const path = Date.now() + '_' + file.name;
-    await supabaseClient.storage.from('photos').upload(path, file);
+  // Récupère URL publique
+  const { data } = supabaseClient.storage.from('photos').getPublicUrl(path);
 
-    const { data } = supabaseClient.storage.from('photos').getPublicUrl(path);
-    await supabaseClient.from('creations').insert([
-      { name, image_url: data.publicUrl }
-    ]);
+  // Enregistre dans table creations
+  const { error: insertError } = await supabaseClient.from('creations').insert([
+    { name, image_url: data.publicUrl }
+  ]);
+  if(insertError){
+    alert("Erreur enregistrement: "+insertError.message);
+    return;
+  }
 
-    nameInput.value='';
-    photoInput.value='';
-    document.getElementById('addForm').style.display='none';
-  };
+  // Ajoute dans la liste visible
+  const div=document.createElement('div');
+  div.className='owner-item';
+  div.innerHTML=`<p>${name}</p><img src="${data.publicUrl}">`;
+  list.prepend(div);
 
-  reader.readAsDataURL(file);
+  // Reset
+  nameInput.value='';
+  photoInput.value='';
+  addFormDiv.style.display='none';
 };
-
-/* ================= SIDEBAR ================= */
-const sidebar=document.getElementById('sidebar');
-const toggleSidebar=document.getElementById('toggleSidebar');
-toggleSidebar.onclick=()=>sidebar.classList.toggle('sidebar-open');
 
 /* ================= LOAD AU REFRESH ================= */
 async function loadCreations(){
-  const { data } = await supabaseClient
+  const { data, error } = await supabaseClient
     .from('creations')
     .select('*')
     .order('created_at',{ascending:false});
 
+  if(error){
+    console.error(error);
+    return;
+  }
+
   data.forEach(c=>{
     const div=document.createElement('div');
     div.className='owner-item';
-    div.innerHTML=`
-      <p>${c.name}</p>
-      <img src="${c.image_url}">
-    `;
+    div.innerHTML=`<p>${c.name}</p><img src="${c.image_url}">`;
     list.appendChild(div);
   });
 }
