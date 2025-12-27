@@ -2,16 +2,19 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<title>Mes créations</title>
 <style>
-*{box-sizing:border-box;margin:0;padding:0;}
-html,body{height:100%;font-family:'Comic Sans MS',cursive;}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;font-family:'Comic Sans MS',cursive}
+
+/* BODY */
 body{
   background:url('Photoroom_20251212_143703.PNG') center top / cover no-repeat fixed;
   overflow:hidden;
   display:flex;
   flex-direction:column;
 }
+
+/* BOUTONS VUE */
 #viewSelector{
   display:flex;
   justify-content:center;
@@ -26,17 +29,24 @@ body{
   border-radius:24px;
   cursor:pointer;
 }
+
+/* CONTENU */
 .center-zone{
   flex:1;
   display:flex;
   justify-content:center;
-  align-items:flex-start;
-  padding-top:40px;
-  flex-wrap:wrap;
-  overflow:auto;
+  align-items:center;
+  padding-top:300px;
 }
-#owner-list{display:flex;gap:40px;flex-wrap:wrap;}
-.owner-item{text-align:center;cursor:pointer;}
+#owner-list{
+  display:flex;
+  gap:40px;
+  flex-wrap:wrap;
+  justify-content:center;
+}
+
+/* ITEMS */
+.owner-item{text-align:center;cursor:pointer}
 .owner-item img{
   width:220px;
   height:220px;
@@ -63,8 +73,6 @@ body{
   padding:20px;
   transition:left .3s ease;
   z-index:10;
-  display:flex;
-  flex-direction:column;
 }
 #sidebar.sidebar-open{left:0;}
 #toggleSidebar{
@@ -95,19 +103,19 @@ body{
   cursor:pointer;
 }
 #addForm{
-  display:none;
+  display:flex;
   flex-direction:column;
-  gap:6px;
-  margin-top:10px;
+  gap:10px;
+  margin-top:20px;
 }
 #addForm input, #addForm button{
-  padding:6px;
-  border-radius:6px;
+  padding:8px;
+  border-radius:8px;
   border:1px solid #b67385;
-  cursor:pointer;
 }
 </style>
 </head>
+
 <body>
 
 <div id="viewSelector">
@@ -123,65 +131,75 @@ body{
 <!-- SIDEBAR -->
 <div id="sidebar">
   <div id="toggleSidebar">☰</div>
-  <button onclick="toggleAddForm()">➕ Ajouter</button>
+  <button>Thème</button>
+  <button>Vidéos</button>
+
+  <!-- AJOUT DANS SIDEBAR -->
   <div id="addForm">
     <input id="name" placeholder="Nom">
     <input id="photo" type="file" accept="image/*">
     <button id="add">Ajouter</button>
   </div>
-  <button>Thème</button>
-  <button>Vidéos</button>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
 <script>
 /* ================= SUPABASE ================= */
 const supabaseUrl = 'https://tzrwnyserlflrirvhafb.supabase.co';
 const supabaseKey = 'sb_publishable__7MMGWAcD78fCtWFz1nUhA_O-rJMbl-';
-const supabase = supabase.createClient(supabaseUrl, supabaseKey);
+const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
 
-/* ================= SIDEBAR ================= */
-const sidebar = document.getElementById('sidebar');
-const toggleSidebar = document.getElementById('toggleSidebar');
-toggleSidebar.onclick = () => sidebar.classList.toggle('sidebar-open');
-
-/* ================= FORMULAIRE AJOUT ================= */
-const addFormDiv = document.getElementById('addForm');
-function toggleAddForm(){
-  addFormDiv.style.display = addFormDiv.style.display==='flex'?'none':'flex';
-}
-
-/* ================= AJOUT CREATION ================= */
+/* ================= ELEMENTS ================= */
 const nameInput = document.getElementById('name');
 const photoInput = document.getElementById('photo');
 const addBtn = document.getElementById('add');
 const list = document.getElementById('owner-list');
+const sidebar = document.getElementById('sidebar');
+const toggleSidebar = document.getElementById('toggleSidebar');
 
+/* ================= SIDEBAR TOGGLE ================= */
+toggleSidebar.onclick = () => sidebar.classList.toggle('sidebar-open');
+
+/* ================= AJOUT DANS SUPABASE ================= */
 addBtn.onclick = async () => {
   const name = nameInput.value.trim();
   const file = photoInput.files[0];
-  if(!name || !file){ alert("Merci de remplir le nom et choisir une photo !"); return; }
 
-  const path = Date.now()+'_'+file.name;
+  if (!name || !file) {
+    alert("Merci de remplir le nom et choisir une photo !");
+    return;
+  }
 
+  // Upload direct vers Supabase
+  const path = Date.now() + '_' + file.name;
   const { error: uploadError } = await supabase.storage.from('photos').upload(path, file);
-  if(uploadError){ alert("Erreur upload: "+uploadError.message); return; }
+  if(uploadError){
+    alert("Erreur upload : " + uploadError.message);
+    return;
+  }
 
-  const { data } = supabase.storage.from('photos').getPublicUrl(path);
+  const { data: urlData } = supabase.storage.from('photos').getPublicUrl(path);
+  const imageUrl = urlData.publicUrl;
 
+  // Insert dans la table creations
   const { error: insertError } = await supabase.from('creations').insert([
-    { name, image_url: data.publicUrl }
+    { name, image_url: imageUrl }
   ]);
-  if(insertError){ alert("Erreur insert: "+insertError.message); return; }
+  if(insertError){
+    alert("Erreur enregistrement : " + insertError.message);
+    return;
+  }
 
-  const div=document.createElement('div');
-  div.className='owner-item';
-  div.innerHTML=`<p>${name}</p><img src="${data.publicUrl}">`;
+  // Affichage immédiat
+  const div = document.createElement('div');
+  div.className = 'owner-item';
+  div.innerHTML = `<p>${name}</p><img src="${imageUrl}">`;
   list.prepend(div);
 
+  // Reset form
   nameInput.value='';
   photoInput.value='';
-  addFormDiv.style.display='none';
 };
 
 /* ================= LOAD AU REFRESH ================= */
@@ -190,16 +208,22 @@ async function loadCreations(){
     .from('creations')
     .select('*')
     .order('created_at',{ascending:false});
-  if(error){ console.error(error); return; }
+
+  if(error){
+    console.error(error);
+    return;
+  }
+
   data.forEach(c=>{
-    const div=document.createElement('div');
-    div.className='owner-item';
-    div.innerHTML=`<p>${c.name}</p><img src="${c.image_url}">`;
+    const div = document.createElement('div');
+    div.className = 'owner-item';
+    div.innerHTML = `<p>${c.name}</p><img src="${c.image_url}">`;
     list.appendChild(div);
   });
 }
 
 loadCreations();
 </script>
+
 </body>
 </html>
