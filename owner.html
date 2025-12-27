@@ -98,146 +98,112 @@ body{
   font-weight:bold;
   cursor:pointer;
 }
-
-/* FORM MODAL */
-.form-modal-bg{
-  position:fixed;
-  inset:0;
-  background:rgba(0,0,0,.6);
-  display:none;
-  justify-content:center;
-  align-items:center;
-  z-index:2000;
-}
-.form-modal{
-  background:#ffe6f0;
-  padding:20px;
-  border-radius:12px;
-  width:260px;
-}
-.form-modal input{
-  width:100%;
-  margin-bottom:10px;
-  padding:8px;
-  border-radius:8px;
-  border:1px solid #b67385;
-}
-.form-modal button{
-  width:100%;
-  padding:8px;
-  border:none;
-  border-radius:12px;
-  background:#ffb6c1;
-  color:#8b3a3a;
-  font-weight:bold;
-  cursor:pointer;
-}
 </style>
 </head>
+
 <body>
 
-<!-- VIEWS -->
 <div id="viewSelector">
-  <button onclick="setView('carousel')">Carrousel</button>
-  <button onclick="setView('grid')">Grille</button>
-  <button onclick="setView('list')">Liste</button>
+  <button>Carrousel</button>
+  <button>Grille</button>
+  <button>Liste</button>
 </div>
 
-<!-- CONTENT -->
 <div class="center-zone">
   <div id="owner-list"></div>
+</div>
+
+<!-- FORMULAIRE D'AJOUT (dans sidebar) -->
+<div id="addForm" style="display:none; text-align:center; padding:20px;">
+  <input id="name" placeholder="Nom">
+  <input id="photo" type="file" accept="image/*">
+  <button id="add">Ajouter</button>
 </div>
 
 <!-- SIDEBAR -->
 <div id="sidebar">
   <div id="toggleSidebar">☰</div>
-  <button onclick="openAddModal()">➕ Ajouter</button>
+  <button onclick="document.getElementById('addForm').style.display='block'">➕ Ajouter</button>
   <button>Thème</button>
   <button>Vidéos</button>
 </div>
 
-<!-- MODAL AJOUT -->
-<div class="form-modal-bg" id="addFormBg">
-  <div class="form-modal">
-    <input id="name" placeholder="Nom">
-    <input id="photo" type="file" accept="image/*">
-    <button id="addBtn">Ajouter</button>
-  </div>
-</div>
-
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
 <script>
-// ---------- Supabase Init ----------
+/* ================= SUPABASE ================= */
 const supabaseUrl = 'https://tzrwnyserlflrirvhafb.supabase.co';
 const supabaseKey = 'sb_publishable__7MMGWAcD78fCtWFz1nUhA_O-rJMbl-';
-const supabase = supabase.createClient(supabaseUrl, supabaseKey);
+const supabaseClient = window.supabase.createClient(supabaseUrl, supabaseKey);
 
-// ---------- DOM ----------
-const list = document.getElementById('owner-list');
-const sidebar = document.getElementById('sidebar');
-const toggleSidebar = document.getElementById('toggleSidebar');
-
-const addFormBg = document.getElementById('addFormBg');
-const addBtn = document.getElementById('addBtn');
+/* ================= ELEMENTS ================= */
 const nameInput = document.getElementById('name');
 const photoInput = document.getElementById('photo');
+const addBtn = document.getElementById('add');
+const list = document.getElementById('owner-list');
 
-let currentView = 'carousel';
+/* ================= AJOUT ================= */
+addBtn.onclick = () => {
+  const name = nameInput.value.trim();
+  const file = photoInput.files[0];
 
-// ---------- SIDEBAR ----------
-toggleSidebar.onclick = () => sidebar.classList.toggle('sidebar-open');
-function openAddModal(){ addFormBg.style.display='flex'; }
-addFormBg.onclick = (e) => { if(e.target===addFormBg) addFormBg.style.display='none'; }
+  if (!name || !file) {
+    alert("Merci de remplir le nom et choisir une photo !");
+    return;
+  }
 
-// ---------- VIEWS ----------
-function setView(v){
-  currentView=v;
-  list.className = v + '-view';
-}
+  const reader = new FileReader();
+  reader.onload = async (e) => {
+    const imgUrl = e.target.result;
 
-// ---------- LOAD CREATIONS ----------
-async function loadCreations(){
-  list.innerHTML='';
-  const { data, error } = await supabase
-    .from('creations')
-    .select('*')
-    .order('created_at', { ascending:false });
-
-  if(error){ console.error(error); return; }
-
-  data.forEach(c=>{
     const div = document.createElement('div');
     div.className = 'owner-item';
-    div.innerHTML = `<p>${c.name}</p><img src="${c.image_url}">`;
+    div.innerHTML = `
+      <p>${name}</p>
+      <img src="${imgUrl}">
+    `;
+    list.prepend(div);
+
+    // Upload vers Supabase
+    const path = Date.now() + '_' + file.name;
+    await supabaseClient.storage.from('photos').upload(path, file);
+
+    const { data } = supabaseClient.storage.from('photos').getPublicUrl(path);
+    await supabaseClient.from('creations').insert([
+      { name, image_url: data.publicUrl }
+    ]);
+
+    nameInput.value='';
+    photoInput.value='';
+    document.getElementById('addForm').style.display='none';
+  };
+
+  reader.readAsDataURL(file);
+};
+
+/* ================= SIDEBAR ================= */
+const sidebar=document.getElementById('sidebar');
+const toggleSidebar=document.getElementById('toggleSidebar');
+toggleSidebar.onclick=()=>sidebar.classList.toggle('sidebar-open');
+
+/* ================= LOAD AU REFRESH ================= */
+async function loadCreations(){
+  const { data } = await supabaseClient
+    .from('creations')
+    .select('*')
+    .order('created_at',{ascending:false});
+
+  data.forEach(c=>{
+    const div=document.createElement('div');
+    div.className='owner-item';
+    div.innerHTML=`
+      <p>${c.name}</p>
+      <img src="${c.image_url}">
+    `;
     list.appendChild(div);
   });
 }
 
-// ---------- ADD CREATION ----------
-addBtn.onclick = async () => {
-  const name = nameInput.value.trim();
-  const file = photoInput.files[0];
-  if(!name || !file){ alert("Merci de remplir le nom et choisir une photo !"); return; }
-
-  // compression simple
-  const reader = new FileReader();
-  reader.onload = async (e)=>{
-    const blob = await fetch(e.target.result).then(r=>r.blob());
-    const path = `${Date.now()}-${file.name}`;
-    const { error: uploadError } = await supabase.storage.from('photos').upload(path, blob);
-    if(uploadError){ alert("Erreur upload"); console.log(uploadError); return; }
-
-    const { data: publicData } = supabase.storage.from('photos').getPublicUrl(path);
-    await supabase.from('creations').insert([{ name, image_url: publicData.publicUrl }]);
-
-    nameInput.value=''; photoInput.value='';
-    addFormBg.style.display='none';
-    loadCreations();
-  };
-  reader.readAsDataURL(file);
-};
-
-// ---------- INIT ----------
 loadCreations();
 </script>
 
