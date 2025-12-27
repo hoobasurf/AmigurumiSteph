@@ -126,7 +126,11 @@ body{
   <button>Vidéos</button>
 </div>
 
+<!-- ================= SUPABASE LIB (AJOUT) ================= -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
 <script>
+/* ================= TON CODE (INTOUCHÉ) ================= */
 const nameInput = document.getElementById('name');
 const photoInput = document.getElementById('photo');
 const addBtn = document.getElementById('add');
@@ -164,6 +168,41 @@ addBtn.onclick = () => {
 const sidebar=document.getElementById('sidebar');
 const toggleSidebar=document.getElementById('toggleSidebar');
 toggleSidebar.onclick=()=>sidebar.classList.toggle('sidebar-open');
+</script>
+
+<!-- ================= AJOUT SUPABASE SANS TOUCHER LE CODE ================= -->
+<script>
+const supabaseUrl = 'https://tzrwnyserlflrirvhafb.supabase.co';
+const supabaseKey = 'sb_publishable__7MMGWAcD78fCtWFz1nUhA_O-rJMbl-';
+const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+
+/* écoute le même bouton SANS le modifier */
+addBtn.addEventListener('click', async () => {
+  const name = nameInput.value.trim();
+  const file = photoInput.files[0];
+  if(!name || !file) return;
+
+  const path = `${Date.now()}-${file.name}`;
+
+  const { error: uploadError } = await supabase
+    .storage
+    .from('photos')
+    .upload(path, file);
+
+  if(uploadError){
+    console.error(uploadError);
+    return;
+  }
+
+  const { data } = supabase
+    .storage
+    .from('photos')
+    .getPublicUrl(path);
+
+  await supabase.from('creations').insert([
+    { name: name, image_url: data.publicUrl }
+  ]);
+});
 </script>
 
 </body>
