@@ -6,16 +6,12 @@
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
 html,body{height:100%;font-family:'Comic Sans MS',cursive;}
-
-/* BODY */
 body{
   background:url('Photoroom_20251212_143703.PNG') center top / cover no-repeat fixed;
   overflow:hidden;
   display:flex;
   flex-direction:column;
 }
-
-/* BOUTONS VUE */
 #viewSelector{
   display:flex;
   justify-content:center;
@@ -30,8 +26,6 @@ body{
   border-radius:24px;
   cursor:pointer;
 }
-
-/* CONTENU */
 .center-zone{
   flex:1;
   display:flex;
@@ -40,9 +34,7 @@ body{
   padding-top:40px;
   flex-wrap:wrap;
 }
-#owner-list{display:flex;gap:40px;flex-wrap:wrap}
-
-/* ITEMS */
+#owner-list{display:flex;gap:40px;flex-wrap:wrap;}
 .owner-item{text-align:center;cursor:pointer}
 .owner-item img{
   width:220px;
@@ -57,8 +49,6 @@ body{
   color:#b84c6f;
   font-weight:bold;
 }
-
-/* SIDEBAR */
 #sidebar{
   position:fixed;
   top:0;
@@ -70,6 +60,8 @@ body{
   padding:20px;
   transition:left .3s ease;
   z-index:10;
+  display:flex;
+  flex-direction:column;
 }
 #sidebar.sidebar-open{left:0;}
 #toggleSidebar{
@@ -99,8 +91,6 @@ body{
   font-weight:bold;
   cursor:pointer;
 }
-
-/* FORMULAIRE DANS SIDEBAR */
 #addForm{
   display:none;
   flex-direction:column;
@@ -135,7 +125,6 @@ body{
   <div id="owner-list"></div>
 </div>
 
-<!-- SIDEBAR -->
 <div id="sidebar">
   <div id="toggleSidebar">☰</div>
   <button onclick="toggleAddForm()">➕ Ajouter</button>
@@ -153,9 +142,9 @@ body{
 /* ================= SUPABASE ================= */
 const supabaseUrl = 'https://tzrwnyserlflrirvhafb.supabase.co';
 const supabaseKey = 'sb_publishable__7MMGWAcD78fCtWFz1nUhA_O-rJMbl-';
-const supabaseClient = window.supabase.createClient(supabaseUrl, supabaseKey);
+const supabase = supabase.createClient(supabaseUrl, supabaseKey);
 
-/* ================= ELEMENTS ================= */
+/* ================= SIDEBAR ================= */
 const sidebar=document.getElementById('sidebar');
 const toggleSidebar=document.getElementById('toggleSidebar');
 toggleSidebar.onclick=()=>sidebar.classList.toggle('sidebar-open');
@@ -165,49 +154,34 @@ function toggleAddForm(){
   addFormDiv.style.display = addFormDiv.style.display==='flex'?'none':'flex';
 }
 
+/* ================= AJOUT ================= */
 const nameInput = document.getElementById('name');
 const photoInput = document.getElementById('photo');
 const addBtn = document.getElementById('add');
 const list = document.getElementById('owner-list');
 
-/* ================= AJOUT ================= */
 addBtn.onclick = async () => {
   const name = nameInput.value.trim();
   const file = photoInput.files[0];
+  if(!name || !file){ alert("Merci de remplir le nom et choisir une photo !"); return; }
 
-  if(!name || !file){
-    alert("Merci de remplir le nom et choisir une photo !");
-    return;
-  }
+  const path = Date.now()+'_'+file.name;
 
-  const path = Date.now() + '_' + file.name;
+  const { error: uploadError } = await supabase.storage.from('photos').upload(path, file);
+  if(uploadError){ alert("Erreur upload: "+uploadError.message); return; }
 
-  // Upload dans Supabase
-  const { error: uploadError } = await supabaseClient.storage.from('photos').upload(path, file);
-  if(uploadError){
-    alert("Erreur upload: "+uploadError.message);
-    return;
-  }
+  const { data } = supabase.storage.from('photos').getPublicUrl(path);
 
-  // Récupère URL publique
-  const { data } = supabaseClient.storage.from('photos').getPublicUrl(path);
-
-  // Enregistre dans table creations
-  const { error: insertError } = await supabaseClient.from('creations').insert([
+  const { error: insertError } = await supabase.from('creations').insert([
     { name, image_url: data.publicUrl }
   ]);
-  if(insertError){
-    alert("Erreur enregistrement: "+insertError.message);
-    return;
-  }
+  if(insertError){ alert("Erreur insert: "+insertError.message); return; }
 
-  // Ajoute dans la liste visible
   const div=document.createElement('div');
   div.className='owner-item';
   div.innerHTML=`<p>${name}</p><img src="${data.publicUrl}">`;
   list.prepend(div);
 
-  // Reset
   nameInput.value='';
   photoInput.value='';
   addFormDiv.style.display='none';
@@ -215,16 +189,11 @@ addBtn.onclick = async () => {
 
 /* ================= LOAD AU REFRESH ================= */
 async function loadCreations(){
-  const { data, error } = await supabaseClient
+  const { data, error } = await supabase
     .from('creations')
     .select('*')
     .order('created_at',{ascending:false});
-
-  if(error){
-    console.error(error);
-    return;
-  }
-
+  if(error){ console.error(error); return; }
   data.forEach(c=>{
     const div=document.createElement('div');
     div.className='owner-item';
@@ -235,6 +204,5 @@ async function loadCreations(){
 
 loadCreations();
 </script>
-
 </body>
 </html>
