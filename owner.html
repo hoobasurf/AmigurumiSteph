@@ -2,20 +2,15 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<title>Mes créations</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{height:100%;font-family:'Comic Sans MS',cursive}
-
-/* BODY */
 body{
   background:url('Photoroom_20251212_143703.PNG') center top / cover no-repeat fixed;
   overflow:hidden;
   display:flex;
   flex-direction:column;
 }
-
-/* BOUTONS VUE */
 #viewSelector{
   display:flex;
   justify-content:center;
@@ -30,8 +25,6 @@ body{
   border-radius:24px;
   cursor:pointer;
 }
-
-/* CONTENU */
 .center-zone{
   flex:1;
   display:flex;
@@ -45,8 +38,6 @@ body{
   gap:40px;
   flex-wrap:wrap;
 }
-
-/* ITEMS */
 .owner-item{text-align:center;cursor:pointer}
 .owner-item img{
   width:220px;
@@ -61,8 +52,6 @@ body{
   color:#b84c6f;
   font-weight:bold;
 }
-
-/* SIDEBAR */
 #sidebar{
   position:fixed;
   top:0;
@@ -103,6 +92,11 @@ body{
   font-weight:bold;
   cursor:pointer;
 }
+#sidebar input{
+  width:100%;
+  margin-bottom:10px;
+  padding:6px;
+}
 </style>
 </head>
 <body>
@@ -120,8 +114,8 @@ body{
 <!-- SIDEBAR -->
 <div id="sidebar">
   <div id="toggleSidebar">☰</div>
-  <input id="name" placeholder="Nom" style="width:100%;margin-bottom:10px">
-  <input id="photo" type="file" accept="image/*" style="width:100%;margin-bottom:10px">
+  <input id="name" placeholder="Nom">
+  <input id="photo" type="file" accept="image/*">
   <button id="add">Ajouter</button>
   <button>Thème</button>
   <button>Vidéos</button>
@@ -129,12 +123,10 @@ body{
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-/* ================= SUPABASE ================= */
 const supabaseUrl = 'https://tzrwnyserlflrirvhafb.supabase.co';
 const supabaseKey = 'sb_publishable__7MMGWAcD78fCtWFz1nUhA_O-rJMbl-';
 const supabase = supabase.createClient(supabaseUrl, supabaseKey);
 
-/* ================= ELEMENTS ================= */
 const nameInput = document.getElementById('name');
 const photoInput = document.getElementById('photo');
 const addBtn = document.getElementById('add');
@@ -142,14 +134,13 @@ const list = document.getElementById('owner-list');
 const sidebar = document.getElementById('sidebar');
 const toggleSidebar = document.getElementById('toggleSidebar');
 
-/* ================= SIDEBAR ================= */
+/* OUVERTURE SIDEBAR */
 toggleSidebar.onclick = () => sidebar.classList.toggle('sidebar-open');
 
-/* ================= AJOUT CREATION ================= */
+/* AJOUT DANS SUPABASE */
 addBtn.onclick = async () => {
   const name = nameInput.value.trim();
   const file = photoInput.files[0];
-
   if(!name || !file){
     alert("Merci de remplir le nom et choisir une photo !");
     return;
@@ -164,19 +155,22 @@ addBtn.onclick = async () => {
     return;
   }
 
-  const { data } = supabase.storage.from('photos').getPublicUrl(path);
-  await supabase.from('creations').insert([{ name, image_url: data.publicUrl }]);
+  // Récupérer l'URL publique correctement
+  const { data: publicData } = supabase.storage.from('photos').getPublicUrl(path);
+  const url = publicData.publicUrl;
+
+  await supabase.from('creations').insert([{ name, image_url: url }]);
 
   const div = document.createElement('div');
   div.className = 'owner-item';
-  div.innerHTML = `<p>${name}</p><img src="${data.publicUrl}">`;
+  div.innerHTML = `<p>${name}</p><img src="${url}">`;
   list.prepend(div);
 
   nameInput.value='';
   photoInput.value='';
 };
 
-/* ================= LOAD AU REFRESH ================= */
+/* LOAD AU RAFRAÎCHISSEMENT */
 async function loadCreations(){
   const { data, error } = await supabase
     .from('creations')
@@ -189,7 +183,7 @@ async function loadCreations(){
   }
 
   list.innerHTML='';
-  data.forEach(c => {
+  data.forEach(c=>{
     const div = document.createElement('div');
     div.className = 'owner-item';
     div.innerHTML = `<p>${c.name}</p><img src="${c.image_url}">`;
