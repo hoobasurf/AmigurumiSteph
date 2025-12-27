@@ -2,9 +2,10 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
+<title>Owner - Mes créations</title>
 <style>
-*{box-sizing:border-box;margin:0;padding:0}
-html,body{height:100%;font-family:'Comic Sans MS',cursive}
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;font-family:'Comic Sans MS',cursive;}
 
 /* BODY */
 body{
@@ -85,7 +86,6 @@ body{
   cursor:pointer;
   border:1px solid #b67385;
   font-weight:bold;
-  z-index:20;
 }
 #sidebar button{
   width:100%;
@@ -99,8 +99,8 @@ body{
   cursor:pointer;
 }
 
-/* MODAL AJOUT */
-#addFormBg{
+/* FORM MODAL */
+.form-modal-bg{
   position:fixed;
   inset:0;
   background:rgba(0,0,0,.6);
@@ -109,124 +109,103 @@ body{
   align-items:center;
   z-index:2000;
 }
-#addFormBg .form-modal{
+.form-modal{
   background:#ffe6f0;
-  padding:18px;
+  padding:20px;
   border-radius:12px;
-  width:280px;
+  width:260px;
 }
-#addFormBg input, #addFormBg button{
+.form-modal input{
   width:100%;
   margin-bottom:10px;
   padding:8px;
   border-radius:8px;
   border:1px solid #b67385;
 }
-#addFormBg button{
+.form-modal button{
+  width:100%;
+  padding:8px;
+  border:none;
+  border-radius:12px;
   background:#ffb6c1;
   color:#8b3a3a;
   font-weight:bold;
-  border:none;
   cursor:pointer;
 }
 </style>
 </head>
-
 <body>
-
-<!-- SIDEBAR -->
-<div id="sidebar">
-  <div id="toggleSidebar">☰</div>
-  <button onclick="openAddModal()">Ajouter</button>
-  <button>Thème</button>
-  <button>Vidéos</button>
-</div>
 
 <!-- VIEWS -->
 <div id="viewSelector">
-  <button>Carrousel</button>
-  <button>Grille</button>
-  <button>Liste</button>
+  <button onclick="setView('carousel')">Carrousel</button>
+  <button onclick="setView('grid')">Grille</button>
+  <button onclick="setView('list')">Liste</button>
 </div>
 
+<!-- CONTENT -->
 <div class="center-zone">
   <div id="owner-list"></div>
 </div>
 
-<!-- FORM AJOUT -->
-<div id="addFormBg">
+<!-- SIDEBAR -->
+<div id="sidebar">
+  <div id="toggleSidebar">☰</div>
+  <button onclick="openAddModal()">➕ Ajouter</button>
+  <button>Thème</button>
+  <button>Vidéos</button>
+</div>
+
+<!-- MODAL AJOUT -->
+<div class="form-modal-bg" id="addFormBg">
   <div class="form-modal">
     <input id="name" placeholder="Nom">
     <input id="photo" type="file" accept="image/*">
-    <button id="add">Ajouter</button>
+    <button id="addBtn">Ajouter</button>
   </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-/********** 1️⃣ Supabase Init **********/
+// ---------- Supabase Init ----------
 const supabaseUrl = 'https://tzrwnyserlflrirvhafb.supabase.co';
 const supabaseKey = 'sb_publishable__7MMGWAcD78fCtWFz1nUhA_O-rJMbl-';
 const supabase = supabase.createClient(supabaseUrl, supabaseKey);
 
-const nameInput = document.getElementById('name');
-const photoInput = document.getElementById('photo');
-const addBtn = document.getElementById('add');
+// ---------- DOM ----------
 const list = document.getElementById('owner-list');
-
 const sidebar = document.getElementById('sidebar');
 const toggleSidebar = document.getElementById('toggleSidebar');
 
 const addFormBg = document.getElementById('addFormBg');
+const addBtn = document.getElementById('addBtn');
+const nameInput = document.getElementById('name');
+const photoInput = document.getElementById('photo');
 
+let currentView = 'carousel';
+
+// ---------- SIDEBAR ----------
 toggleSidebar.onclick = () => sidebar.classList.toggle('sidebar-open');
 function openAddModal(){ addFormBg.style.display='flex'; }
+addFormBg.onclick = (e) => { if(e.target===addFormBg) addFormBg.style.display='none'; }
 
-/********** 2️⃣ Ajouter image dans Supabase **********/
-addBtn.onclick = async () => {
-  const name = nameInput.value.trim();
-  const file = photoInput.files[0];
+// ---------- VIEWS ----------
+function setView(v){
+  currentView=v;
+  list.className = v + '-view';
+}
 
-  if(!name || !file){ alert("Merci de remplir le nom et choisir une photo !"); return; }
-
-  // Compression simple pour display rapide
-  const reader = new FileReader();
-  reader.onload = async (e) => {
-    const imgUrl = e.target.result;
-
-    // Upload dans Supabase bucket
-    const path = `${Date.now()}_${file.name}`;
-    const { error } = await supabase.storage.from('photos').upload(path, file);
-    if(error){ alert("Erreur upload"); console.log(error); return; }
-
-    const { data } = supabase.storage.from('photos').getPublicUrl(path);
-
-    // Ajout dans table creations
-    await supabase.from('creations').insert([{ name, image_url: data.publicUrl }]);
-
-    // Affichage immédiat
-    const div = document.createElement('div');
-    div.className = 'owner-item';
-    div.innerHTML = `<p>${name}</p><img src="${data.publicUrl}">`;
-    list.prepend(div);
-
-    // Reset
-    nameInput.value=''; photoInput.value='';
-    addFormBg.style.display='none';
-  };
-  reader.readAsDataURL(file);
-};
-
-/********** 3️⃣ Charger créations depuis Supabase **********/
+// ---------- LOAD CREATIONS ----------
 async function loadCreations(){
+  list.innerHTML='';
   const { data, error } = await supabase
     .from('creations')
     .select('*')
-    .order('created_at',{ascending:false});
+    .order('created_at', { ascending:false });
 
   if(error){ console.error(error); return; }
 
-  data.forEach(c => {
+  data.forEach(c=>{
     const div = document.createElement('div');
     div.className = 'owner-item';
     div.innerHTML = `<p>${c.name}</p><img src="${c.image_url}">`;
@@ -234,7 +213,31 @@ async function loadCreations(){
   });
 }
 
-/* chargement au démarrage */
+// ---------- ADD CREATION ----------
+addBtn.onclick = async () => {
+  const name = nameInput.value.trim();
+  const file = photoInput.files[0];
+  if(!name || !file){ alert("Merci de remplir le nom et choisir une photo !"); return; }
+
+  // compression simple
+  const reader = new FileReader();
+  reader.onload = async (e)=>{
+    const blob = await fetch(e.target.result).then(r=>r.blob());
+    const path = `${Date.now()}-${file.name}`;
+    const { error: uploadError } = await supabase.storage.from('photos').upload(path, blob);
+    if(uploadError){ alert("Erreur upload"); console.log(uploadError); return; }
+
+    const { data: publicData } = supabase.storage.from('photos').getPublicUrl(path);
+    await supabase.from('creations').insert([{ name, image_url: publicData.publicUrl }]);
+
+    nameInput.value=''; photoInput.value='';
+    addFormBg.style.display='none';
+    loadCreations();
+  };
+  reader.readAsDataURL(file);
+};
+
+// ---------- INIT ----------
 loadCreations();
 </script>
 
