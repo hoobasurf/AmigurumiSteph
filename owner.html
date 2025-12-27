@@ -2,10 +2,12 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
+<title>Owner - Mes créations</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{height:100%;font-family:'Comic Sans MS',cursive}
 
+/* BODY */
 body{
   background:url('Photoroom_20251212_143703.PNG') center top / cover no-repeat fixed;
   overflow:hidden;
@@ -37,7 +39,7 @@ body{
   align-items:center;
   padding-top:300px;
 }
-#owner-list{display:flex;gap:40px}
+#owner-list{display:flex;gap:40px;flex-wrap:wrap}
 
 /* ITEMS */
 .owner-item{text-align:center;cursor:pointer}
@@ -96,11 +98,30 @@ body{
   font-weight:bold;
   cursor:pointer;
 }
+
+/* MODAL ADD */
+#addFormBg{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.6);
+  display:none;
+  justify-content:center;
+  align-items:center;
+  z-index:2000;
+}
+#addFormBg .form-modal{
+  background:#ffe6f0;
+  padding:20px;
+  border-radius:14px;
+  width:280px;
+}
+#addFormBg input{width:100%;margin-bottom:10px;padding:8px;border-radius:8px;border:1px solid #b67385;}
+#addFormBg button{width:100%;padding:10px;border:none;border-radius:12px;background:#ffb6c1;color:#8b3a3a;font-weight:bold;cursor:pointer;}
 </style>
 </head>
-
 <body>
 
+<!-- VIEWS -->
 <div id="viewSelector">
   <button>Carrousel</button>
   <button>Grille</button>
@@ -111,96 +132,82 @@ body{
   <div id="owner-list"></div>
 </div>
 
-<!-- FORM -->
-<div style="text-align:center;padding:20px">
-  <input id="name" placeholder="Nom">
-  <input id="photo" type="file" accept="image/*">
-  <button id="add">Ajouter</button>
-</div>
-
 <!-- SIDEBAR -->
 <div id="sidebar">
   <div id="toggleSidebar">☰</div>
+  <button onclick="openAddModal()">➕ Ajouter</button>
   <button>Thème</button>
   <button>Vidéos</button>
 </div>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<!-- MODAL ADD -->
+<div id="addFormBg">
+  <div class="form-modal">
+    <input id="name" placeholder="Nom">
+    <input id="photo" type="file" accept="image/*">
+    <button id="addBtnModal">Ajouter</button>
+  </div>
+</div>
 
+<!-- Supabase -->
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-/* ================= SUPABASE ================= */
 const supabaseUrl = 'https://tzrwnyserlflrirvhafb.supabase.co';
 const supabaseKey = 'sb_publishable__7MMGWAcD78fCtWFz1nUhA_O-rJMbl-';
-const supabaseClient = window.supabase.createClient(supabaseUrl, supabaseKey);
+const supabase = supabase.createClient(supabaseUrl, supabaseKey);
 
-/* ================= ELEMENTS ================= */
-const nameInput = document.getElementById('name');
-const photoInput = document.getElementById('photo');
-const addBtn = document.getElementById('add');
 const list = document.getElementById('owner-list');
+const sidebar = document.getElementById('sidebar');
+const toggleSidebar = document.getElementById('toggleSidebar');
 
-/* ================= AJOUT (NE TOUCHE PAS) ================= */
-addBtn.onclick = () => {
-  const name = nameInput.value.trim();
-  const file = photoInput.files[0];
+const addFormBg = document.getElementById('addFormBg');
+const addName = document.getElementById('name');
+const addPhoto = document.getElementById('photo');
+const addBtnModal = document.getElementById('addBtnModal');
 
-  if (!name || !file) {
-    alert("Merci de remplir le nom et choisir une photo !");
-    return;
-  }
+/* SIDEBAR */
+toggleSidebar.onclick = () => sidebar.classList.toggle('sidebar-open');
+function openAddModal(){ addFormBg.style.display='flex'; }
 
-  const reader = new FileReader();
-  reader.onload = async (e) => {
-    const imgUrl = e.target.result;
+/* AJOUTER IMAGE + SUPABASE */
+addBtnModal.onclick = async () => {
+  const name = addName.value.trim();
+  const file = addPhoto.files[0];
 
-    const div = document.createElement('div');
-    div.className = 'owner-item';
-    div.innerHTML = `
-      <p>${name}</p>
-      <img src="${imgUrl}">
-    `;
-    list.prepend(div);
+  if(!name || !file){ alert("Merci de remplir le nom et choisir une photo !"); return; }
 
-    const path = Date.now() + '_' + file.name;
+  const fileName = `${Date.now()}-${file.name}`;
+  const { data: uploadData, error: uploadError } = await supabase
+    .storage.from('photos').upload(fileName, file);
 
-    await supabaseClient.storage.from('photos').upload(path, file);
+  if(uploadError){ console.error(uploadError); alert("Erreur lors de l'upload !"); return; }
 
-    const { data } = supabaseClient.storage.from('photos').getPublicUrl(path);
+  const { data: urlData } = supabase.storage.from('photos').getPublicUrl(fileName);
+  const publicUrl = urlData.publicUrl;
 
-    await supabaseClient.from('creations').insert([
-      { name, image_url: data.publicUrl }
-    ]);
+  const { error: insertError } = await supabase.from('creations').insert([{ name, image_url: publicUrl }]);
+  if(insertError){ console.error(insertError); alert("Erreur lors de l'enregistrement !"); return; }
 
-    nameInput.value='';
-    photoInput.value='';
-  };
+  const div = document.createElement('div');
+  div.className = 'owner-item';
+  div.innerHTML = `<p>${name}</p><img src="${publicUrl}">`;
+  list.prepend(div);
 
-  reader.readAsDataURL(file);
+  addName.value=''; addPhoto.value=''; addFormBg.style.display='none';
 };
 
-/* ================= SIDEBAR ================= */
-const sidebar=document.getElementById('sidebar');
-const toggleSidebar=document.getElementById('toggleSidebar');
-toggleSidebar.onclick=()=>sidebar.classList.toggle('sidebar-open');
-
-/* ================= LOAD AU REFRESH ================= */
+/* CHARGEMENT AU DEMARRAGE */
 async function loadCreations(){
-  const { data } = await supabaseClient
-    .from('creations')
-    .select('*')
-    .order('created_at',{ascending:false});
-
-  data.forEach(c=>{
-    const div=document.createElement('div');
+  const { data, error } = await supabase.from('creations').select('*').order('created_at',{ascending:false});
+  if(error){ console.error(error); return; }
+  list.innerHTML='';
+  data.forEach(c => {
+    const div = document.createElement('div');
     div.className='owner-item';
-    div.innerHTML=`
-      <p>${c.name}</p>
-      <img src="${c.image_url}">
-    `;
+    div.innerHTML = `<p>${c.name}</p><img src="${c.image_url}">`;
     list.appendChild(div);
   });
 }
-
 loadCreations();
 </script>
 
