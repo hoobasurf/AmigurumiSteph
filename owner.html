@@ -2,7 +2,7 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<title>Owner - Ajout avec Supabase</title>
+<title>Owner - Test Ajouter</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{height:100%;font-family:'Comic Sans MS',cursive}
@@ -20,7 +20,7 @@ body{
   display:flex;
   justify-content:center;
   gap:16px;
-  margin-top:205px;
+  margin-top:50px;
 }
 #viewSelector button{
   background:#fff0f7;
@@ -29,6 +29,7 @@ body{
   padding:8px 16px;
   border-radius:24px;
   cursor:pointer;
+  font-size:16px;
 }
 
 /* CONTENT */
@@ -36,10 +37,15 @@ body{
   flex:1;
   display:flex;
   justify-content:center;
-  align-items:center;
-  padding-top:300px;
+  align-items:flex-start;
+  padding-top:30px;
 }
-#owner-list{display:flex;gap:40px;flex-wrap:wrap;justify-content:center}
+#owner-list{
+  display:flex;
+  gap:20px;
+  flex-wrap:wrap;
+  justify-content:center;
+}
 
 /* CARD */
 .owner-item{text-align:center}
@@ -64,7 +70,7 @@ body{
   left:-220px;
   width:220px;
   height:100vh;
-  background:rgba(255,230,240,0.15);
+  background:rgba(255,230,240,0.95);
   border-right:2px solid #b67385;
   padding:20px;
   transition:left .3s ease;
@@ -127,12 +133,14 @@ body{
 
 <body>
 
+<!-- VIEWS -->
 <div id="viewSelector">
   <button>Carrousel</button>
   <button>Grille</button>
   <button>Liste</button>
 </div>
 
+<!-- LISTE DES CREATIONS -->
 <div class="center-zone">
   <div id="owner-list"></div>
 </div>
@@ -143,7 +151,7 @@ body{
   <button onclick="openAdd()">➕ Ajouter</button>
 </div>
 
-<!-- ADD MODAL -->
+<!-- MODAL ADD -->
 <div id="addModal">
   <div class="box">
     <input id="name" placeholder="Nom">
@@ -155,75 +163,63 @@ body{
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-/* SUPABASE */
+/* ================= SUPABASE ================= */
 const supabaseUrl = 'https://tzrwnyserlflrirvhafb.supabase.co';
 const supabaseKey = 'sb_publishable__7MMGWAcD78fCtWFz1nUhA_O-rJMbl-';
 const supabaseClient = window.supabase.createClient(supabaseUrl, supabaseKey);
 
-/* ELEMENTS */
+/* ================= ELEMENTS ================= */
 const list = document.getElementById('owner-list');
 const nameInput = document.getElementById('name');
 const photoInput = document.getElementById('photo');
 const addBtn = document.getElementById('add');
-
-/* SIDEBAR */
 const sidebar = document.getElementById('sidebar');
-document.getElementById('toggleSidebar').onclick =
-  () => sidebar.classList.toggle('sidebar-open');
 
-/* MODAL */
+/* ================= SIDEBAR ================= */
+document.getElementById('toggleSidebar').onclick = () => {
+  sidebar.classList.toggle('sidebar-open');
+};
+
+/* ================= MODAL ================= */
 function openAdd(){ document.getElementById('addModal').style.display='flex'; }
 function closeAdd(){ document.getElementById('addModal').style.display='none'; }
 
-/* ADD FUNCTION */
+/* ================= AJOUTER ================= */
 addBtn.onclick = async () => {
   const name = nameInput.value.trim();
   const file = photoInput.files[0];
-  if(!name || !file){ alert("Merci de mettre un nom et choisir une photo"); return; }
+  if(!name || !file){ alert("Merci de remplir le nom et choisir une photo !"); return; }
 
-  try {
-    const path = Date.now() + '_' + file.name.replace(/\s/g,'_');
+  const path = Date.now() + '_' + file.name;
+  await supabaseClient.storage.from('photos').upload(path, file);
 
-    // Upload
-    const { error: uploadError } = await supabaseClient.storage.from('photos').upload(path, file);
-    if(uploadError){ alert('Erreur upload: ' + uploadError.message); return; }
+  const { data } = supabaseClient.storage.from('photos').getPublicUrl(path);
 
-    // Récupération URL publique
-    const { data } = supabaseClient.storage.from('photos').getPublicUrl(path);
-    if(!data || !data.publicUrl){ alert('Impossible de récupérer l\'URL de l\'image'); return; }
+  await supabaseClient.from('creations').insert([{ name, image_url: data.publicUrl }]);
 
-    // Insertion création
-    const { error: insertError } = await supabaseClient.from('creations').insert([{ name, image_url: data.publicUrl }]);
-    if(insertError){ alert('Erreur insertion: ' + insertError.message); return; }
-
-    // Reset et fermeture modal
-    nameInput.value='';
-    photoInput.value='';
-    closeAdd();
-
-    // Recharge liste
-    await loadCreations();
-
-  } catch(e){
-    alert('Erreur inattendue: '+e.message);
-  }
+  nameInput.value='';
+  photoInput.value='';
+  closeAdd();
+  loadCreations();
 };
 
-/* LOAD */
+/* ================= LOAD AU DEMARRAGE ================= */
 async function loadCreations(){
   list.innerHTML='';
-  const { data } = await supabaseClient.from('creations').select('*').order('created_at',{ascending:false});
-  if(!data) return;
+  const { data, error } = await supabaseClient.from('creations')
+    .select('*')
+    .order('created_at',{ascending:false});
+
+  if(error){ console.error(error); return; }
 
   data.forEach(c=>{
-    const div=document.createElement('div');
+    const div = document.createElement('div');
     div.className='owner-item';
     div.innerHTML=`<p>${c.name}</p><img src="${c.image_url}">`;
     list.appendChild(div);
   });
 }
 
-/* CHARGEMENT INITIAL */
 loadCreations();
 </script>
 
