@@ -48,7 +48,7 @@ body{
   padding:18px;
 }
 
-/* ================= CARDS ================= */
+/* ================= CARDS – 1er code ================= */
 .visitor-item{
   width:100%;
   max-width:240px;
@@ -76,7 +76,7 @@ body{
   padding-bottom:6px;
 }
 
-/* ================= VIEWS ================= */
+/* ================= CARROUSEL ================= */
 .carousel-view{
   display:flex;
   gap:18px;
@@ -84,12 +84,29 @@ body{
   overflow-y:visible;
   padding-bottom:24px;
 }
-.carousel-view .visitor-item{ flex-shrink:0; }
-.grid-view{ display:grid; grid-template-columns:repeat(2,1fr); gap:18px; justify-items:center; }
-.list-view{ display:flex; flex-direction:column; gap:18px; }
-.list-view .visitor-item{ max-width:95%; }
+.carousel-view .visitor-item{
+  flex-shrink:0;
+}
 
-/* ================= MODAL IMAGE ================= */
+/* ================= GRILLE ================= */
+.grid-view{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:18px;
+  justify-items:center;
+}
+
+/* ================= LISTE ================= */
+.list-view{
+  display:flex;
+  flex-direction:column;
+  gap:18px;
+}
+.list-view .visitor-item{
+  max-width:95%;
+}
+
+/* ================= MODAL ================= */
 .modal-bg{
   position:fixed;
   inset:0;
@@ -162,7 +179,7 @@ body{
   cursor:pointer;
 }
 
-/* ================= MODAL ADD ================= */
+/* ================= MODALS ADD / THEME ================= */
 .form-modal-bg{
   position:fixed;
   inset:0;
@@ -194,19 +211,47 @@ body{
   font-weight:600;
   cursor:pointer;
 }
+
+/* ================= ANIMATIONS ================= */
+.snow,#sweetRain{
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  display:none;
+  z-index:5;
+}
+.snow::after{
+  content:"❄ ❄ ❄ ❄ ❄ ❄ ❄";
+  animation:fall 6s linear infinite;
+  font-size:24px;
+}
+#sweetRain::after{
+  content:"🌸 🌸 🌸 🌸 🌸";
+  animation:fall 8s linear infinite;
+  font-size:22px;
+}
+@keyframes fall{
+  from{transform:translateY(-10%)}
+  to{transform:translateY(110%)}
+}
 </style>
 </head>
 
 <body>
+
+<div id="snow" class="snow"></div>
+<div id="sweetRain"></div>
 
 <!-- SIDEBAR -->
 <div id="sidebar">
   <div id="toggleSidebar">☰</div>
   <button onclick="openAddModal()">➕ Ajouter</button>
   <button onclick="openThemeModal()">🎨 Thèmes</button>
+  <button>Vidéos</button>
+  <button>Notes</button>
 </div>
 
-<!-- BOUTONS VUE -->
+<!-- BOUTONS -->
 <div id="viewSelector">
   <button id="btnCarousel">Carrousel</button>
   <button id="btnGrid">Grille</button>
@@ -254,6 +299,8 @@ const sidebar=document.getElementById('sidebar');
 const toggleSidebar=document.getElementById('toggleSidebar');
 const addFormBg=document.getElementById('addFormBg');
 const themeFormBg=document.getElementById('themeFormBg');
+const snow=document.getElementById('snow');
+const sweetRain=document.getElementById('sweetRain');
 
 let creations=JSON.parse(localStorage.getItem('creations')||'[]');
 let currentView='carousel';
@@ -276,7 +323,7 @@ btnCarousel.onclick=()=>{currentView='carousel';render();}
 btnGrid.onclick=()=>{currentView='grid';render();}
 btnList.onclick=()=>{currentView='list';render();}
 
-/* ===== MODAL IMAGE ===== */
+/* ===== MODAL ===== */
 function openModal(i){
   modalMain.src=creations[i].imgUrl;
   modal.style.display='flex';
@@ -290,14 +337,14 @@ function openThemeModal(){themeFormBg.style.display='flex'}
 
 /* ===== ADD CREATION (PHOTO LOCAL) ===== */
 function addCreation(){
-  const name=document.getElementById('addName').value.trim();
-  const file=document.getElementById('addImg').files[0];
-  if(!name||!file)return;
+  const name = document.getElementById('addName').value.trim();
+  const file = document.getElementById('addImg').files[0];
+  if(!name || !file) return;
 
-  const reader=new FileReader();
-  reader.onload=(e)=>{
-    const imgData=e.target.result; // base64 data
-    creations.push({name,imgUrl:imgData});
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    const imgData = e.target.result; // base64
+    creations.push({ name, imgUrl: imgData });
     localStorage.setItem('creations',JSON.stringify(creations));
     render();
     addFormBg.style.display='none';
@@ -309,12 +356,20 @@ function addCreation(){
 
 /* ===== THEMES ===== */
 function setTheme(t){
-  document.getElementById('snow').style.display='none';
-  document.getElementById('sweetRain').style.display='none';
-  if(t==='noel'){ document.body.style.backgroundImage="url('noel.png')"; document.getElementById('snow').style.display='block'; }
-  else if(t==='sweety'){ document.body.style.backgroundImage="url('sweety-girly.png')"; document.getElementById('sweetRain').style.display='block'; }
-  else if(t==='chat'){ document.body.style.backgroundImage="url('Photoroom_20251223_114401.jpeg')"; }
-  else{ document.body.style.backgroundImage="url('Photoroom_20251212_143703.PNG')"; }
+  snow.style.display='none';
+  sweetRain.style.display='none';
+
+  if(t==='noel'){
+    document.body.style.backgroundImage="url('noel.png')";
+    snow.style.display='block';
+  }else if(t==='sweety'){
+    document.body.style.backgroundImage="url('sweety-girly.png')";
+    sweetRain.style.display='block';
+  }else if(t==='chat'){
+    document.body.style.backgroundImage="url('Photoroom_20251223_114401.jpeg')";
+  }else{
+    document.body.style.backgroundImage="url('Photoroom_20251212_143703.PNG')";
+  }
   localStorage.setItem('theme',t);
   themeFormBg.style.display='none';
 }
