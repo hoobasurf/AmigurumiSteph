@@ -7,44 +7,46 @@
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{height:100%;font-family:'Comic Sans MS',cursive}
 
+/* BODY */
 body{background:url('Photoroom_20251212_143703.PNG') center top / cover no-repeat fixed; overflow:hidden; display:flex; flex-direction:column;}
+
+/* VIEWS */
 #viewSelector{display:flex;justify-content:center;gap:16px;margin-top:50px;}
 #viewSelector button{background:#fff0f7;border:2px solid #b84c6f;color:#b84c6f;padding:8px 16px;border-radius:24px;cursor:pointer;font-size:16px;}
+
+/* CONTENT */
 .center-zone{flex:1;display:flex;justify-content:center;align-items:flex-start;padding-top:30px;}
 #owner-list{display:flex;gap:20px;flex-wrap:wrap;justify-content:center;}
+
+/* CARD */
 .owner-item{text-align:center}
 .owner-item img{width:220px;height:220px;object-fit:contain;border:4px solid #b67385;background:#ffe6f0;}
 .owner-item p{margin-bottom:8px;font-size:20px;color:#b84c6f;font-weight:bold;}
+
+/* SIDEBAR */
 #sidebar{position:fixed;top:0;left:-220px;width:220px;height:100vh;background:rgba(255,230,240,0.95);border-right:2px solid #b67385;padding:20px;transition:left .3s ease;z-index:10;}
 #sidebar.sidebar-open{left:0;}
 #toggleSidebar{position:absolute;top:50%;right:-30px;width:30px;height:60px;background:#ffb6c1;color:#8b3a3a;border-radius:0 12px 12px 0;display:flex;justify-content:center;align-items:center;cursor:pointer;border:1px solid #b67385;font-weight:bold;}
 #sidebar button{width:100%;margin-bottom:10px;padding:10px;border:none;border-radius:12px;background:#ffb6c1;color:#8b3a3a;font-weight:bold;cursor:pointer;}
+
+/* MODAL ADD */
 #addModal{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;justify-content:center;align-items:center;z-index:1000;}
 #addModal .box{background:#ffe6f0;padding:20px;border-radius:14px;width:300px;}
 #addModal input,#addModal button{width:100%;margin-bottom:10px;padding:10px;}
-/* FORMULAIRE PRINCIPAL HORS SIDEBAR */
-#mainAddBox{display:flex;justify-content:center;gap:10px;margin:20px;}
-#mainAddBox input,#mainAddBox button{padding:10px;border-radius:8px;border:1px solid #ccc;}
-#mainAddBox button{background-color:#ffb6c1;cursor:pointer;}
 </style>
 </head>
-
 <body>
+
+<!-- VIEWS -->
 <div id="viewSelector">
   <button>Carrousel</button>
   <button>Grille</button>
   <button>Liste</button>
 </div>
 
+<!-- LISTE DES CREATIONS -->
 <div class="center-zone">
   <div id="owner-list"></div>
-</div>
-
-<!-- FORMULAIRE PRINCIPAL HORS SIDEBAR -->
-<div id="mainAddBox">
-  <input id="mainName" placeholder="Nom">
-  <input id="mainPhoto" type="file" accept="image/*">
-  <button id="mainAdd">Ajouter</button>
 </div>
 
 <!-- SIDEBAR -->
@@ -75,7 +77,7 @@ document.getElementById('toggleSidebar').onclick = () => sidebar.classList.toggl
 function openAdd(){ document.getElementById('addModal').style.display='flex'; }
 function closeAdd(){ document.getElementById('addModal').style.display='none'; }
 
-// FONCTION GÉNÉRIQUE POUR AJOUTER UNE IMAGE
+// FONCTION D'AJOUT
 async function addCreation(nameInputEl, photoInputEl){
   const name = nameInputEl.value.trim();
   const file = photoInputEl.files[0];
@@ -84,21 +86,20 @@ async function addCreation(nameInputEl, photoInputEl){
   const path = Date.now() + '_' + file.name;
   await supabaseClient.storage.from('photos').upload(path, file);
 
-  const publicData = supabaseClient.storage.from('photos').getPublicUrl(path).data;
-  await supabaseClient.from('creations').insert([{ name, image_url: publicData.publicUrl }]);
+  const publicUrl = supabaseClient.storage.from('photos').getPublicUrl(path).data.publicUrl;
+
+  await supabaseClient.from('creations').insert([{ name, image_url: publicUrl }]);
 
   nameInputEl.value='';
   photoInputEl.value='';
+  closeAdd();
   loadCreations();
 }
 
-// BOUTON DANS SIDEBAR
+// BOUTON DANS MODAL SIDEBAR
 document.getElementById('add').onclick = () => addCreation(document.getElementById('name'), document.getElementById('photo'));
 
-// BOUTON PRINCIPAL HORS SIDEBAR
-document.getElementById('mainAdd').onclick = () => addCreation(document.getElementById('mainName'), document.getElementById('mainPhoto'));
-
-// CHARGEMENT
+// CHARGEMENT DES CREATIONS
 async function loadCreations(){
   list.innerHTML='';
   const { data, error } = await supabaseClient.from('creations').select('*').order('created_at',{ascending:false});
