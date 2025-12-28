@@ -6,13 +6,14 @@
 <title>Owner - Test Ajouter</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-html,body{height:100%;font-family:'Comic Sans MS',cursive}
+html,body{height:100%;font-family:'Comic Sans MS',cursive;}
 
 /* BODY */
 body{
   background:url('Photoroom_20251212_143703.PNG') center top / cover no-repeat fixed;
   display:flex;
   flex-direction:column;
+  overflow-x:hidden;
 }
 
 /* VIEWS */
@@ -190,15 +191,18 @@ async function loadCreations(){
     .select('*')
     .order('created_at',{ascending:false});
   if(!data) return;
+
   data.forEach(c=>{
     const div = document.createElement('div');
     div.className='owner-item';
-    div.innerHTML=`<p>${c.name}</p><img src="${c.image_url}">`;
+    // on force l'url https pour que mobile et safari l'affiche
+    const url = c.image_url.startsWith('http') ? c.image_url : `https://tzrwnyserlflrirvhafb.supabase.co/storage/v1/object/public/photos/${c.image_url}`;
+    div.innerHTML=`<p>${c.name}</p><img src="${url}">`;
     list.appendChild(div);
   });
 }
 
-/* ADD CREATION (FileReader pour affichage immédiat + Supabase) */
+/* ADD CREATION */
 addBtn.onclick = async () => {
   const name = nameInput.value.trim();
   const file = photoInput.files[0];
@@ -208,7 +212,7 @@ addBtn.onclick = async () => {
   const reader = new FileReader();
   reader.onload = (e) => {
     const div = document.createElement('div');
-    div.className = 'owner-item';
+    div.className='owner-item';
     div.innerHTML = `<p>${name}</p><img src="${e.target.result}">`;
     list.prepend(div);
   };
@@ -219,8 +223,8 @@ addBtn.onclick = async () => {
   const { error: uploadError } = await supabase.storage.from('photos').upload(safeName, file);
   if(uploadError){ alert("Erreur upload: "+uploadError.message); return; }
 
-  const { data } = supabase.storage.from('photos').getPublicUrl(safeName);
-  await supabase.from('creations').insert([{ name, image_url: data.publicUrl }]);
+  const publicUrl = `https://tzrwnyserlflrirvhafb.supabase.co/storage/v1/object/public/photos/${safeName}`;
+  await supabase.from('creations').insert([{ name, image_url: safeName }]);
 
   nameInput.value='';
   photoInput.value='';
