@@ -76,7 +76,7 @@ body{
   padding-bottom:6px;
 }
 
-/* ================= CARROUSEL / GRILLE / LISTE ================= */
+/* ================= VIEWS ================= */
 .carousel-view{
   display:flex;
   gap:18px;
@@ -85,12 +85,14 @@ body{
   padding-bottom:24px;
 }
 .carousel-view .visitor-item{ flex-shrink:0; }
+
 .grid-view{
   display:grid;
   grid-template-columns:repeat(2,1fr);
   gap:18px;
   justify-items:center;
 }
+
 .list-view{
   display:flex;
   flex-direction:column;
@@ -213,6 +215,8 @@ body{
   <div id="toggleSidebar">☰</div>
   <button onclick="openAddModal()">➕ Ajouter</button>
   <button>🎨 Thèmes</button>
+  <button>Vidéos</button>
+  <button>Notes</button>
 </div>
 
 <!-- BOUTONS VUE -->
@@ -252,49 +256,31 @@ const modalMain = document.getElementById('modalMain');
 const sidebar = document.getElementById('sidebar');
 const toggleSidebar = document.getElementById('toggleSidebar');
 const addFormBg = document.getElementById('addFormBg');
+const addName = document.getElementById('addName');
+const addImg = document.getElementById('addImg');
 
 let creations = JSON.parse(localStorage.getItem('creations') || '[]');
 let currentView = 'carousel';
 let selectedFile = null;
 
-const addName = document.getElementById('addName');
-const addImg = document.getElementById('addImg');
-
-/* ===== RENDER CARDS ===== */
-function render(){
-  list.innerHTML='';
-  list.className=currentView+'-view';
-  creations.forEach((c,i)=>{
-    const card=document.createElement('div');
-    card.className='visitor-item';
-    card.innerHTML=`<img src="${c.imgUrl}"><p>${c.name}</p>`;
-    card.onclick=()=>openModal(i);
-    list.appendChild(card);
-  });
-}
-
-/* ===== VIEWS ===== */
-document.getElementById('btnCarousel').onclick=()=>{currentView='carousel'; render();}
-document.getElementById('btnGrid').onclick=()=>{currentView='grid'; render();}
-document.getElementById('btnList').onclick=()=>{currentView='list'; render();}
-
-/* ===== MODAL IMAGE ===== */
-function openModal(i){
-  modalMain.src=creations[i].imgUrl;
-  modal.style.display='flex';
-}
-function closeModal(){ modal.style.display='none'; }
-
 /* ===== SIDEBAR ===== */
-toggleSidebar.onclick=()=>sidebar.classList.toggle('sidebar-open');
+toggleSidebar.onclick = () => sidebar.classList.toggle('sidebar-open');
 function openAddModal(){ addFormBg.style.display='flex'; }
 function closeAddModal(){ addFormBg.style.display='none'; }
 
-/* ===== ADD CREATION ===== */
+/* ===== MODAL IMAGE ===== */
+function openModal(i){
+  modalMain.src = creations[i].imgUrl;
+  modal.style.display = 'flex';
+}
+function closeModal(){ modal.style.display='none'; }
+
+/* ===== SELECT IMAGE ===== */
 addImg.addEventListener('change', e => {
   selectedFile = e.target.files[0] || null;
 });
 
+/* ===== AJOUTER CREATION ===== */
 function addCreation(){
   const name = addName.value.trim();
   if(!name || !selectedFile){
@@ -303,22 +289,38 @@ function addCreation(){
   }
 
   const reader = new FileReader();
-  reader.onload = (e) => {
+  reader.onload = e => {
     const imgData = e.target.result;
     creations.push({ name, imgUrl: imgData });
     localStorage.setItem('creations', JSON.stringify(creations));
     render();
 
     addFormBg.style.display='none';
-    addName.value='';
-    addImg.value='';
+    addName.value = '';
+    addImg.value = '';
     selectedFile = null;
   };
   reader.readAsDataURL(selectedFile);
 }
 
-/* ===== INIT ===== */
+/* ===== RENDER CARDS ===== */
+function render(){
+  list.innerHTML = '';
+  list.className = currentView + '-view';
+  creations.forEach((c,i)=>{
+    const card = document.createElement('div');
+    card.className = 'visitor-item';
+    card.innerHTML = `<img src="${c.imgUrl}"><p>${c.name}</p>`;
+    card.onclick = () => openModal(i);
+    list.appendChild(card);
+  });
+}
 render();
+
+/* ===== VIEWS ===== */
+document.getElementById('btnCarousel').onclick = () => { currentView='carousel'; render(); };
+document.getElementById('btnGrid').onclick = () => { currentView='grid'; render(); };
+document.getElementById('btnList').onclick = () => { currentView='list'; render(); };
 </script>
 
 </body>
