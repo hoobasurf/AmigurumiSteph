@@ -2,11 +2,12 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<title>Créations</title>
+<title>Owner - Ajout avec Supabase</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{height:100%;font-family:'Comic Sans MS',cursive}
 
+/* BODY */
 body{
   background:url('Photoroom_20251212_143703.PNG') center top / cover no-repeat fixed;
   overflow:hidden;
@@ -19,7 +20,7 @@ body{
   display:flex;
   justify-content:center;
   gap:16px;
-  margin-top:50px;
+  margin-top:205px;
 }
 #viewSelector button{
   background:#fff0f7;
@@ -35,28 +36,23 @@ body{
   flex:1;
   display:flex;
   justify-content:center;
-  align-items:flex-start;
-  padding-top:20px;
+  align-items:center;
+  padding-top:300px;
 }
-#owner-list{
-  display:flex;
-  flex-wrap:wrap;
-  gap:20px;
-  justify-content:center;
-}
+#owner-list{display:flex;gap:40px;flex-wrap:wrap;justify-content:center}
 
 /* CARD */
 .owner-item{text-align:center}
 .owner-item img{
   width:220px;
   height:220px;
-  object-fit:cover;
+  object-fit:contain;
   border:4px solid #b67385;
   background:#ffe6f0;
 }
 .owner-item p{
-  margin-top:8px;
-  font-size:18px;
+  margin-bottom:8px;
+  font-size:20px;
   color:#b84c6f;
   font-weight:bold;
 }
@@ -68,13 +64,14 @@ body{
   left:-220px;
   width:220px;
   height:100vh;
-  background:rgba(255,230,240,0.95);
+  background:rgba(255,230,240,0.15);
   border-right:2px solid #b67385;
   padding:20px;
   transition:left .3s ease;
   z-index:10;
 }
 #sidebar.sidebar-open{left:0;}
+
 #toggleSidebar{
   position:absolute;
   top:50%;
@@ -91,6 +88,7 @@ body{
   border:1px solid #b67385;
   font-weight:bold;
 }
+
 #sidebar button{
   width:100%;
   margin-bottom:10px;
@@ -126,16 +124,15 @@ body{
 }
 </style>
 </head>
+
 <body>
 
-<!-- VIEWS -->
 <div id="viewSelector">
   <button>Carrousel</button>
   <button>Grille</button>
   <button>Liste</button>
 </div>
 
-<!-- LISTE DES CREATIONS -->
 <div class="center-zone">
   <div id="owner-list"></div>
 </div>
@@ -146,70 +143,87 @@ body{
   <button onclick="openAdd()">➕ Ajouter</button>
 </div>
 
-<!-- MODAL AJOUT -->
+<!-- ADD MODAL -->
 <div id="addModal">
   <div class="box">
-    <input id="name" placeholder="Nom de la création">
+    <input id="name" placeholder="Nom">
     <input id="photo" type="file" accept="image/*">
     <button id="add">Ajouter</button>
     <button onclick="closeAdd()">Fermer</button>
   </div>
 </div>
 
-<!-- SUPABASE -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
+/* SUPABASE */
 const supabaseUrl = 'https://tzrwnyserlflrirvhafb.supabase.co';
 const supabaseKey = 'sb_publishable__7MMGWAcD78fCtWFz1nUhA_O-rJMbl-';
-const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
+const supabaseClient = window.supabase.createClient(supabaseUrl, supabaseKey);
 
+/* ELEMENTS */
 const list = document.getElementById('owner-list');
 const nameInput = document.getElementById('name');
 const photoInput = document.getElementById('photo');
 const addBtn = document.getElementById('add');
+
+/* SIDEBAR */
 const sidebar = document.getElementById('sidebar');
+document.getElementById('toggleSidebar').onclick =
+  () => sidebar.classList.toggle('sidebar-open');
 
-document.getElementById('toggleSidebar').onclick = () => sidebar.classList.toggle('sidebar-open');
-
+/* MODAL */
 function openAdd(){ document.getElementById('addModal').style.display='flex'; }
 function closeAdd(){ document.getElementById('addModal').style.display='none'; }
 
-async function loadCreations(){
-  list.innerHTML = '';
-  const { data, error } = await supabaseClient
-    .from('creations')
-    .select('*')
-    .order('created_at',{ascending:false});
-
-  if(error){ console.error(error); return; }
-
-  data.forEach(c=>{
-    const div = document.createElement('div');
-    div.className = 'owner-item';
-    div.innerHTML = `<p>${c.name}</p><img src="${c.image_url}">`;
-    list.appendChild(div);
-  });
-}
-
+/* ADD FUNCTION */
 addBtn.onclick = async () => {
   const name = nameInput.value.trim();
   const file = photoInput.files[0];
   if(!name || !file){ alert("Merci de mettre un nom et choisir une photo"); return; }
 
-  const path = Date.now() + '_' + file.name.replace(/\s/g,'_'); // pas d'espaces
-  const { error: uploadError } = await supabaseClient.storage.from('photos').upload(path, file);
-  if(uploadError){ alert('Erreur upload: ' + uploadError.message); return; }
+  try {
+    const path = Date.now() + '_' + file.name.replace(/\s/g,'_');
 
-  const { data } = supabaseClient.storage.from('photos').getPublicUrl(path);
+    // Upload
+    const { error: uploadError } = await supabaseClient.storage.from('photos').upload(path, file);
+    if(uploadError){ alert('Erreur upload: ' + uploadError.message); return; }
 
-  await supabaseClient.from('creations').insert([{ name, image_url: data.publicUrl }]);
+    // Récupération URL publique
+    const { data } = supabaseClient.storage.from('photos').getPublicUrl(path);
+    if(!data || !data.publicUrl){ alert('Impossible de récupérer l\'URL de l\'image'); return; }
 
-  closeAdd();
-  nameInput.value='';
-  photoInput.value='';
-  loadCreations();
+    // Insertion création
+    const { error: insertError } = await supabaseClient.from('creations').insert([{ name, image_url: data.publicUrl }]);
+    if(insertError){ alert('Erreur insertion: ' + insertError.message); return; }
+
+    // Reset et fermeture modal
+    nameInput.value='';
+    photoInput.value='';
+    closeAdd();
+
+    // Recharge liste
+    await loadCreations();
+
+  } catch(e){
+    alert('Erreur inattendue: '+e.message);
+  }
+};
+
+/* LOAD */
+async function loadCreations(){
+  list.innerHTML='';
+  const { data } = await supabaseClient.from('creations').select('*').order('created_at',{ascending:false});
+  if(!data) return;
+
+  data.forEach(c=>{
+    const div=document.createElement('div');
+    div.className='owner-item';
+    div.innerHTML=`<p>${c.name}</p><img src="${c.image_url}">`;
+    list.appendChild(div);
+  });
 }
 
+/* CHARGEMENT INITIAL */
 loadCreations();
 </script>
 
