@@ -8,33 +8,129 @@
 html,body{height:100%;font-family:'Comic Sans MS',cursive}
 
 /* BODY */
-body{background:url('Photoroom_20251212_143703.PNG') center top / cover no-repeat fixed; overflow:hidden; display:flex; flex-direction:column;}
+body{
+  background:url('Photoroom_20251212_143703.PNG') center top / cover no-repeat fixed;
+  overflow:hidden;
+  display:flex;
+  flex-direction:column;
+}
 
 /* VIEWS */
-#viewSelector{display:flex;justify-content:center;gap:16px;margin-top:50px;}
-#viewSelector button{background:#fff0f7;border:2px solid #b84c6f;color:#b84c6f;padding:8px 16px;border-radius:24px;cursor:pointer;font-size:16px;}
+#viewSelector{
+  display:flex;
+  justify-content:center;
+  gap:16px;
+  margin-top:50px;
+}
+#viewSelector button{
+  background:#fff0f7;
+  border:2px solid #b84c6f;
+  color:#b84c6f;
+  padding:8px 16px;
+  border-radius:24px;
+  cursor:pointer;
+  font-size:16px;
+}
 
 /* CONTENT */
-.center-zone{flex:1;display:flex;justify-content:center;align-items:flex-start;padding-top:30px;}
-#owner-list{display:flex;gap:20px;flex-wrap:wrap;justify-content:center;}
+.center-zone{
+  flex:1;
+  display:flex;
+  justify-content:center;
+  align-items:flex-start;
+  padding-top:30px;
+}
+#owner-list{
+  display:flex;
+  gap:20px;
+  flex-wrap:wrap;
+  justify-content:center;
+}
 
 /* CARD */
 .owner-item{text-align:center}
-.owner-item img{width:220px;height:220px;object-fit:contain;border:4px solid #b67385;background:#ffe6f0;}
-.owner-item p{margin-bottom:8px;font-size:20px;color:#b84c6f;font-weight:bold;}
+.owner-item img{
+  width:220px;
+  height:220px;
+  object-fit:contain;
+  border:4px solid #b67385;
+  background:#ffe6f0;
+}
+.owner-item p{
+  margin-bottom:8px;
+  font-size:20px;
+  color:#b84c6f;
+  font-weight:bold;
+}
 
 /* SIDEBAR */
-#sidebar{position:fixed;top:0;left:-220px;width:220px;height:100vh;background:rgba(255,230,240,0.95);border-right:2px solid #b67385;padding:20px;transition:left .3s ease;z-index:10;}
+#sidebar{
+  position:fixed;
+  top:0;
+  left:-220px;
+  width:220px;
+  height:100vh;
+  background:rgba(255,230,240,0.95);
+  border-right:2px solid #b67385;
+  padding:20px;
+  transition:left .3s ease;
+  z-index:10;
+}
 #sidebar.sidebar-open{left:0;}
-#toggleSidebar{position:absolute;top:50%;right:-30px;width:30px;height:60px;background:#ffb6c1;color:#8b3a3a;border-radius:0 12px 12px 0;display:flex;justify-content:center;align-items:center;cursor:pointer;border:1px solid #b67385;font-weight:bold;}
-#sidebar button{width:100%;margin-bottom:10px;padding:10px;border:none;border-radius:12px;background:#ffb6c1;color:#8b3a3a;font-weight:bold;cursor:pointer;}
+
+#toggleSidebar{
+  position:absolute;
+  top:50%;
+  right:-30px;
+  width:30px;
+  height:60px;
+  background:#ffb6c1;
+  color:#8b3a3a;
+  border-radius:0 12px 12px 0;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  cursor:pointer;
+  border:1px solid #b67385;
+  font-weight:bold;
+}
+
+#sidebar button{
+  width:100%;
+  margin-bottom:10px;
+  padding:10px;
+  border:none;
+  border-radius:12px;
+  background:#ffb6c1;
+  color:#8b3a3a;
+  font-weight:bold;
+  cursor:pointer;
+}
 
 /* MODAL ADD */
-#addModal{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;justify-content:center;align-items:center;z-index:1000;}
-#addModal .box{background:#ffe6f0;padding:20px;border-radius:14px;width:300px;}
-#addModal input,#addModal button{width:100%;margin-bottom:10px;padding:10px;}
+#addModal{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.6);
+  display:none;
+  justify-content:center;
+  align-items:center;
+  z-index:1000;
+}
+#addModal .box{
+  background:#ffe6f0;
+  padding:20px;
+  border-radius:14px;
+  width:300px;
+}
+#addModal input, #addModal button{
+  width:100%;
+  margin-bottom:10px;
+  padding:10px;
+}
 </style>
 </head>
+
 <body>
 
 <!-- VIEWS -->
@@ -67,52 +163,71 @@ body{background:url('Photoroom_20251212_143703.PNG') center top / cover no-repea
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
+/* ================= SUPABASE ================= */
 const supabaseUrl = 'https://tzrwnyserlflrirvhafb.supabase.co';
 const supabaseKey = 'sb_publishable__7MMGWAcD78fCtWFz1nUhA_O-rJMbl-';
-const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
+const supabaseClient = window.supabase.createClient(supabaseUrl, supabaseKey);
 
+/* ================= ELEMENTS ================= */
 const list = document.getElementById('owner-list');
+const nameInput = document.getElementById('name');
+const photoInput = document.getElementById('photo');
+const addBtn = document.getElementById('add');
 const sidebar = document.getElementById('sidebar');
-document.getElementById('toggleSidebar').onclick = () => sidebar.classList.toggle('sidebar-open');
+
+/* ================= SIDEBAR ================= */
+document.getElementById('toggleSidebar').onclick = () => {
+  sidebar.classList.toggle('sidebar-open');
+};
+
+/* ================= MODAL ================= */
 function openAdd(){ document.getElementById('addModal').style.display='flex'; }
 function closeAdd(){ document.getElementById('addModal').style.display='none'; }
 
-// FONCTION D'AJOUT
-async function addCreation(nameInputEl, photoInputEl){
-  const name = nameInputEl.value.trim();
-  const file = photoInputEl.files[0];
+/* ================= AJOUTER ================= */
+addBtn.onclick = async () => {
+  const name = nameInput.value.trim();
+  const file = photoInput.files[0];
   if(!name || !file){ alert("Merci de remplir le nom et choisir une photo !"); return; }
 
-  const path = Date.now() + '_' + file.name;
+  // Normaliser le nom du fichier pour iPhone/Android
+  const cleanFileName = file.name.replace(/\s/g,'_').replace(/[^\w.-]/g,'');
+
+  const path = Date.now() + '_' + cleanFileName;
   await supabaseClient.storage.from('photos').upload(path, file);
 
-  const publicUrl = supabaseClient.storage.from('photos').getPublicUrl(path).data.publicUrl;
+  const { data } = supabaseClient.storage.from('photos').getPublicUrl(path);
+
+  // Encoder l'URL pour éviter les "?"
+  const publicUrl = encodeURI(data.publicUrl);
 
   await supabaseClient.from('creations').insert([{ name, image_url: publicUrl }]);
 
-  nameInputEl.value='';
-  photoInputEl.value='';
+  nameInput.value='';
+  photoInput.value='';
   closeAdd();
   loadCreations();
-}
+};
 
-// BOUTON DANS MODAL SIDEBAR
-document.getElementById('add').onclick = () => addCreation(document.getElementById('name'), document.getElementById('photo'));
-
-// CHARGEMENT DES CREATIONS
+/* ================= LOAD AU DEMARRAGE ================= */
 async function loadCreations(){
   list.innerHTML='';
-  const { data, error } = await supabaseClient.from('creations').select('*').order('created_at',{ascending:false});
+  const { data, error } = await supabaseClient.from('creations')
+    .select('*')
+    .order('created_at',{ascending:false});
+
   if(error){ console.error(error); return; }
+
   data.forEach(c=>{
     const div = document.createElement('div');
     div.className='owner-item';
-    div.innerHTML=`<p>${c.name}</p><img src="${c.image_url}">`;
+    div.innerHTML=`<p>${c.name}</p><img src="${encodeURI(c.image_url)}">`;
     list.appendChild(div);
   });
 }
 
 loadCreations();
 </script>
+
 </body>
 </html>
