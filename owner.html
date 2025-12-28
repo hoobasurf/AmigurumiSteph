@@ -2,16 +2,17 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-
+<title>Owner - Test Ajouter</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-html,body{height:100%;font-family:'Comic Sans MS',cursive}
+html,body{height:100%;font-family:'Comic Sans MS',cursive;}
 
+/* BODY */
 body{
   background:url('Photoroom_20251212_143703.PNG') center top / cover no-repeat fixed;
-  overflow:hidden;
   display:flex;
   flex-direction:column;
+  padding:20px;
 }
 
 /* VIEWS */
@@ -19,7 +20,7 @@ body{
   display:flex;
   justify-content:center;
   gap:16px;
-  margin-top:205px;
+  margin-top:20px;
 }
 #viewSelector button{
   background:#fff0f7;
@@ -36,13 +37,13 @@ body{
   display:flex;
   justify-content:center;
   align-items:center;
-  padding-top:300px;
+  margin-top:20px;
 }
 #owner-list{
   display:flex;
-  gap:40px;
   flex-wrap:wrap;
-  justify-content:center
+  gap:20px;
+  justify-content:center;
 }
 
 /* CARD */
@@ -105,7 +106,7 @@ body{
   cursor:pointer;
 }
 
-/* MODAL */
+/* MODAL ADD */
 #addModal{
   position:fixed;
   inset:0;
@@ -128,7 +129,6 @@ body{
 }
 </style>
 </head>
-
 <body>
 
 <div id="viewSelector">
@@ -147,7 +147,7 @@ body{
   <button onclick="openAdd()">➕ Ajouter</button>
 </div>
 
-<!-- MODAL -->
+<!-- ADD MODAL -->
 <div id="addModal">
   <div class="box">
     <input id="name" placeholder="Nom">
@@ -158,73 +158,74 @@ body{
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
 <script>
-/* SUPABASE */
+/* ================= SUPABASE ================= */
 const supabaseUrl = 'https://tzrwnyserlflrirvhafb.supabase.co';
 const supabaseKey = 'sb_publishable__7MMGWAcD78fCtWFz1nUhA_O-rJMbl-';
-const supabaseClient = window.supabase.createClient(supabaseUrl, supabaseKey);
+const supabase = supabase.createClient(supabaseUrl, supabaseKey);
 
-/* ELEMENTS */
+/* ================= ELEMENTS ================= */
 const list = document.getElementById('owner-list');
 const nameInput = document.getElementById('name');
 const photoInput = document.getElementById('photo');
 const addBtn = document.getElementById('add');
-
-/* SIDEBAR */
 const sidebar = document.getElementById('sidebar');
-document.getElementById('toggleSidebar').onclick =
-  () => sidebar.classList.toggle('sidebar-open');
 
-/* MODAL */
+/* ================= SIDEBAR ================= */
+document.getElementById('toggleSidebar').onclick = () => sidebar.classList.toggle('sidebar-open');
+
+/* ================= MODAL ================= */
 function openAdd(){ document.getElementById('addModal').style.display='flex'; }
 function closeAdd(){ document.getElementById('addModal').style.display='none'; }
 
-/* ADD */
-addBtn.onclick = async () => {
-  const name = nameInput.value.trim();
-  const file = photoInput.files[0];
-  if(!name || !file){ alert("Nom + photo"); return; }
-
-  const ext = file.name.split('.').pop();
-  const path = Date.now() + '.' + ext;
-
-  await supabaseClient.storage.from('photos').upload(path, file);
-
-  const { data } = supabaseClient
-    .storage
-    .from('photos')
-    .getPublicUrl(path);
-
-  await supabaseClient.from('creations').insert([
-    { name, image_url: data.publicUrl }
-  ]);
-
-  closeAdd();
-  nameInput.value='';
-  photoInput.value='';
-  loadCreations();
-};
-
-/* LOAD */
+/* ================= LOAD CREATIONS ================= */
 async function loadCreations(){
-  list.innerHTML='';
-  const { data } = await supabaseClient
+  list.innerHTML = '';
+  const { data } = await supabase
     .from('creations')
     .select('*')
     .order('created_at',{ascending:false});
 
   data.forEach(c=>{
-    const div=document.createElement('div');
-    div.className='owner-item';
-    div.innerHTML=`
-      <p>${c.name}</p>
-      <img src="${c.image_url}" crossorigin="anonymous">
-    `;
+    const div = document.createElement('div');
+    div.className = 'owner-item';
+    div.innerHTML = `<p>${c.name}</p><img src="${c.image_url}">`;
     list.appendChild(div);
   });
 }
 
+/* ================= ADD CREATION ================= */
+addBtn.onclick = async () => {
+  const name = nameInput.value.trim();
+  const file = photoInput.files[0];
+  if(!name || !file){ alert("Merci de remplir le nom et choisir une photo !"); return; }
+
+  // Nom safe
+  const safeFileName = Date.now() + '_' + file.name.replace(/[^a-zA-Z0-9.-]/g,'_');
+
+  // Upload
+  const { error: uploadError } = await supabase.storage.from('photos').upload(safeFileName, file);
+  if(uploadError){ alert("Erreur upload: "+uploadError.message); return; }
+
+  // URL publique
+  const { data } = supabase.storage.from('photos').getPublicUrl(safeFileName);
+
+  // Insert base
+  const { error: insertError } = await supabase.from('creations').insert([{ name, image_url: data.publicUrl }]);
+  if(insertError){ alert("Erreur base: "+insertError.message); return; }
+
+  // Affichage immédiat
+  const div = document.createElement('div');
+  div.className='owner-item';
+  div.innerHTML=`<p>${name}</p><img src="${data.publicUrl}">`;
+  list.prepend(div);
+
+  nameInput.value='';
+  photoInput.value='';
+  closeAdd();
+};
+
+/* ================= INITIAL LOAD ================= */
 loadCreations();
 </script>
 
