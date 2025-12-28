@@ -2,18 +2,16 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Owner - Test Ajouter</title>
+<title>Créations</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-html,body{height:100%;font-family:'Comic Sans MS',cursive;}
+html,body{height:100%;font-family:'Comic Sans MS',cursive}
 
-/* BODY */
 body{
   background:url('Photoroom_20251212_143703.PNG') center top / cover no-repeat fixed;
+  overflow:hidden;
   display:flex;
   flex-direction:column;
-  overflow-x:hidden;
 }
 
 /* VIEWS */
@@ -21,16 +19,15 @@ body{
   display:flex;
   justify-content:center;
   gap:16px;
-  margin-top:20px;
+  margin-top:50px;
 }
 #viewSelector button{
   background:#fff0f7;
   border:2px solid #b84c6f;
   color:#b84c6f;
   padding:8px 16px;
-  border-radius:12px;
+  border-radius:24px;
   cursor:pointer;
-  font-size:16px;
 }
 
 /* CONTENT */
@@ -38,8 +35,8 @@ body{
   flex:1;
   display:flex;
   justify-content:center;
-  align-items:center;
-  margin-top:20px;
+  align-items:flex-start;
+  padding-top:20px;
 }
 #owner-list{
   display:flex;
@@ -53,12 +50,12 @@ body{
 .owner-item img{
   width:220px;
   height:220px;
-  object-fit:contain;
+  object-fit:cover;
   border:4px solid #b67385;
   background:#ffe6f0;
 }
 .owner-item p{
-  margin-bottom:8px;
+  margin-top:8px;
   font-size:18px;
   color:#b84c6f;
   font-weight:bold;
@@ -75,15 +72,13 @@ body{
   border-right:2px solid #b67385;
   padding:20px;
   transition:left .3s ease;
-  z-index:999;
+  z-index:10;
 }
 #sidebar.sidebar-open{left:0;}
-
 #toggleSidebar{
-  position:fixed;
+  position:absolute;
   top:50%;
-  left:0;
-  transform:translate(-100%,-50%);
+  right:-30px;
   width:30px;
   height:60px;
   background:#ffb6c1;
@@ -95,9 +90,7 @@ body{
   cursor:pointer;
   border:1px solid #b67385;
   font-weight:bold;
-  z-index:1000;
 }
-
 #sidebar button{
   width:100%;
   margin-bottom:10px;
@@ -118,7 +111,7 @@ body{
   display:none;
   justify-content:center;
   align-items:center;
-  z-index:1001;
+  z-index:1000;
 }
 #addModal .box{
   background:#ffe6f0;
@@ -130,108 +123,93 @@ body{
   width:100%;
   margin-bottom:10px;
   padding:10px;
-  font-size:16px;
 }
 </style>
 </head>
 <body>
 
+<!-- VIEWS -->
 <div id="viewSelector">
   <button>Carrousel</button>
   <button>Grille</button>
   <button>Liste</button>
 </div>
 
+<!-- LISTE DES CREATIONS -->
 <div class="center-zone">
   <div id="owner-list"></div>
 </div>
 
 <!-- SIDEBAR -->
 <div id="sidebar">
+  <div id="toggleSidebar">☰</div>
   <button onclick="openAdd()">➕ Ajouter</button>
 </div>
-<div id="toggleSidebar">☰</div>
 
-<!-- ADD MODAL -->
+<!-- MODAL AJOUT -->
 <div id="addModal">
   <div class="box">
-    <input id="name" placeholder="Nom">
+    <input id="name" placeholder="Nom de la création">
     <input id="photo" type="file" accept="image/*">
     <button id="add">Ajouter</button>
     <button onclick="closeAdd()">Fermer</button>
   </div>
 </div>
 
+<!-- SUPABASE -->
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 const supabaseUrl = 'https://tzrwnyserlflrirvhafb.supabase.co';
 const supabaseKey = 'sb_publishable__7MMGWAcD78fCtWFz1nUhA_O-rJMbl-';
-const supabase = supabase.createClient(supabaseUrl, supabaseKey);
+const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
 
-/* ELEMENTS */
 const list = document.getElementById('owner-list');
 const nameInput = document.getElementById('name');
 const photoInput = document.getElementById('photo');
 const addBtn = document.getElementById('add');
 const sidebar = document.getElementById('sidebar');
-const toggleSidebar = document.getElementById('toggleSidebar');
 
-/* SIDEBAR TOGGLE */
-toggleSidebar.onclick = ()=> sidebar.classList.toggle('sidebar-open');
+document.getElementById('toggleSidebar').onclick = () => sidebar.classList.toggle('sidebar-open');
 
-/* MODAL */
 function openAdd(){ document.getElementById('addModal').style.display='flex'; }
 function closeAdd(){ document.getElementById('addModal').style.display='none'; }
 
-/* LOAD CREATIONS */
 async function loadCreations(){
-  list.innerHTML='';
-  const { data } = await supabase
+  list.innerHTML = '';
+  const { data, error } = await supabaseClient
     .from('creations')
     .select('*')
     .order('created_at',{ascending:false});
-  if(!data) return;
+
+  if(error){ console.error(error); return; }
 
   data.forEach(c=>{
     const div = document.createElement('div');
-    div.className='owner-item';
-    // on force l'url https pour que mobile et safari l'affiche
-    const url = c.image_url.startsWith('http') ? c.image_url : `https://tzrwnyserlflrirvhafb.supabase.co/storage/v1/object/public/photos/${c.image_url}`;
-    div.innerHTML=`<p>${c.name}</p><img src="${url}">`;
+    div.className = 'owner-item';
+    div.innerHTML = `<p>${c.name}</p><img src="${c.image_url}">`;
     list.appendChild(div);
   });
 }
 
-/* ADD CREATION */
 addBtn.onclick = async () => {
   const name = nameInput.value.trim();
   const file = photoInput.files[0];
-  if(!name || !file){ alert("Nom + photo"); return; }
+  if(!name || !file){ alert("Merci de mettre un nom et choisir une photo"); return; }
 
-  // Affichage immédiat local
-  const reader = new FileReader();
-  reader.onload = (e) => {
-    const div = document.createElement('div');
-    div.className='owner-item';
-    div.innerHTML = `<p>${name}</p><img src="${e.target.result}">`;
-    list.prepend(div);
-  };
-  reader.readAsDataURL(file);
+  const path = Date.now() + '_' + file.name.replace(/\s/g,'_'); // pas d'espaces
+  const { error: uploadError } = await supabaseClient.storage.from('photos').upload(path, file);
+  if(uploadError){ alert('Erreur upload: ' + uploadError.message); return; }
 
-  // Upload Supabase
-  const safeName = Date.now() + '_' + file.name.replace(/[^a-zA-Z0-9.-]/g,'_');
-  const { error: uploadError } = await supabase.storage.from('photos').upload(safeName, file);
-  if(uploadError){ alert("Erreur upload: "+uploadError.message); return; }
+  const { data } = supabaseClient.storage.from('photos').getPublicUrl(path);
 
-  const publicUrl = `https://tzrwnyserlflrirvhafb.supabase.co/storage/v1/object/public/photos/${safeName}`;
-  await supabase.from('creations').insert([{ name, image_url: safeName }]);
+  await supabaseClient.from('creations').insert([{ name, image_url: data.publicUrl }]);
 
+  closeAdd();
   nameInput.value='';
   photoInput.value='';
-  closeAdd();
-};
+  loadCreations();
+}
 
-/* INITIAL LOAD */
 loadCreations();
 </script>
 
