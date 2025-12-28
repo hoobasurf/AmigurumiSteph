@@ -70,30 +70,23 @@ addBtn.onclick = async () => {
   const file = photoInput.files[0];
   if(!name || !file){ alert("Merci de remplir le nom et choisir une photo !"); return; }
 
-  try {
-    const path = Date.now() + '_' + file.name;
+  const path = Date.now() + '_' + file.name;
 
-    // Upload
-    const { error: uploadError } = await supabaseClient.storage.from('photos').upload(path, file);
-    if(uploadError) throw uploadError;
+  // Upload file
+  await supabaseClient.storage.from('photos').upload(path, file);
 
-    // URL publique
-    const { data: publicData, error: urlError } = supabaseClient.storage.from('photos').getPublicUrl(path);
-    if(urlError) throw urlError;
+  // Récupère URL publique
+  const publicData = supabaseClient.storage.from('photos').getPublicUrl(path).data;
 
-    // DB
-    const { error: dbError } = await supabaseClient.from('creations').insert([{ name, image_url: publicData.publicUrl }]);
-    if(dbError) throw dbError;
+  // Ajoute en base
+  await supabaseClient.from('creations').insert([{ name, image_url: publicData.publicUrl }]);
 
-    nameInput.value='';
-    photoInput.value='';
-    closeAdd();
-    loadCreations();
-  } catch(err){
-    console.error(err);
-    alert("Erreur : " + err.message);
-  }
-}
+  // Reset
+  nameInput.value='';
+  photoInput.value='';
+  closeAdd();
+  loadCreations();
+};
 
 async function loadCreations(){
   list.innerHTML='';
