@@ -6,6 +6,7 @@
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{height:100%;font-family:'Comic Sans MS',cursive}
+
 body{background:url('Photoroom_20251212_143703.PNG') center top / cover no-repeat fixed; overflow:hidden; display:flex; flex-direction:column;}
 #viewSelector{display:flex;justify-content:center;gap:16px;margin-top:50px;}
 #viewSelector button{background:#fff0f7;border:2px solid #b84c6f;color:#b84c6f;padding:8px 16px;border-radius:24px;cursor:pointer;font-size:16px;}
@@ -21,6 +22,10 @@ body{background:url('Photoroom_20251212_143703.PNG') center top / cover no-repea
 #addModal{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;justify-content:center;align-items:center;z-index:1000;}
 #addModal .box{background:#ffe6f0;padding:20px;border-radius:14px;width:300px;}
 #addModal input,#addModal button{width:100%;margin-bottom:10px;padding:10px;}
+/* FORMULAIRE PRINCIPAL HORS SIDEBAR */
+#mainAddBox{display:flex;justify-content:center;gap:10px;margin:20px;}
+#mainAddBox input,#mainAddBox button{padding:10px;border-radius:8px;border:1px solid #ccc;}
+#mainAddBox button{background-color:#ffb6c1;cursor:pointer;}
 </style>
 </head>
 
@@ -35,11 +40,20 @@ body{background:url('Photoroom_20251212_143703.PNG') center top / cover no-repea
   <div id="owner-list"></div>
 </div>
 
+<!-- FORMULAIRE PRINCIPAL HORS SIDEBAR -->
+<div id="mainAddBox">
+  <input id="mainName" placeholder="Nom">
+  <input id="mainPhoto" type="file" accept="image/*">
+  <button id="mainAdd">Ajouter</button>
+</div>
+
+<!-- SIDEBAR -->
 <div id="sidebar">
   <div id="toggleSidebar">☰</div>
   <button onclick="openAdd()">➕ Ajouter</button>
 </div>
 
+<!-- MODAL ADD -->
 <div id="addModal">
   <div class="box">
     <input id="name" placeholder="Nom">
@@ -56,38 +70,35 @@ const supabaseKey = 'sb_publishable__7MMGWAcD78fCtWFz1nUhA_O-rJMbl-';
 const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
 
 const list = document.getElementById('owner-list');
-const nameInput = document.getElementById('name');
-const photoInput = document.getElementById('photo');
-const addBtn = document.getElementById('add');
 const sidebar = document.getElementById('sidebar');
-
 document.getElementById('toggleSidebar').onclick = () => sidebar.classList.toggle('sidebar-open');
 function openAdd(){ document.getElementById('addModal').style.display='flex'; }
 function closeAdd(){ document.getElementById('addModal').style.display='none'; }
 
-addBtn.onclick = async () => {
-  const name = nameInput.value.trim();
-  const file = photoInput.files[0];
+// FONCTION GÉNÉRIQUE POUR AJOUTER UNE IMAGE
+async function addCreation(nameInputEl, photoInputEl){
+  const name = nameInputEl.value.trim();
+  const file = photoInputEl.files[0];
   if(!name || !file){ alert("Merci de remplir le nom et choisir une photo !"); return; }
 
   const path = Date.now() + '_' + file.name;
-
-  // Upload file
   await supabaseClient.storage.from('photos').upload(path, file);
 
-  // Récupère URL publique
   const publicData = supabaseClient.storage.from('photos').getPublicUrl(path).data;
-
-  // Ajoute en base
   await supabaseClient.from('creations').insert([{ name, image_url: publicData.publicUrl }]);
 
-  // Reset
-  nameInput.value='';
-  photoInput.value='';
-  closeAdd();
+  nameInputEl.value='';
+  photoInputEl.value='';
   loadCreations();
-};
+}
 
+// BOUTON DANS SIDEBAR
+document.getElementById('add').onclick = () => addCreation(document.getElementById('name'), document.getElementById('photo'));
+
+// BOUTON PRINCIPAL HORS SIDEBAR
+document.getElementById('mainAdd').onclick = () => addCreation(document.getElementById('mainName'), document.getElementById('mainPhoto'));
+
+// CHARGEMENT
 async function loadCreations(){
   list.innerHTML='';
   const { data, error } = await supabaseClient.from('creations').select('*').order('created_at',{ascending:false});
