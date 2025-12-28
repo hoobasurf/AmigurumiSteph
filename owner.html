@@ -2,7 +2,6 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
@@ -15,7 +14,7 @@ body{
   flex-direction:column;
 }
 
-/* VIEW */
+/* VIEWS */
 #viewSelector{
   display:flex;
   justify-content:center;
@@ -43,6 +42,7 @@ body{
   display:flex;
   gap:40px;
   flex-wrap:wrap;
+  justify-content:center
 }
 
 /* CARD */
@@ -72,9 +72,10 @@ body{
   border-right:2px solid #b67385;
   padding:20px;
   transition:left .3s ease;
-  z-index:1000;
+  z-index:10;
 }
 #sidebar.sidebar-open{left:0;}
+
 #toggleSidebar{
   position:absolute;
   top:50%;
@@ -91,6 +92,7 @@ body{
   border:1px solid #b67385;
   font-weight:bold;
 }
+
 #sidebar button{
   width:100%;
   margin-bottom:10px;
@@ -104,35 +106,25 @@ body{
 }
 
 /* MODAL */
-.form-bg{
+#addModal{
   position:fixed;
   inset:0;
   background:rgba(0,0,0,.6);
   display:none;
   justify-content:center;
   align-items:center;
-  z-index:2000;
+  z-index:1000;
 }
-.form-box{
+#addModal .box{
   background:#ffe6f0;
-  padding:18px;
+  padding:20px;
   border-radius:14px;
-  border:4px solid #b67385;
-  width:320px;
+  width:300px;
 }
-.form-box input{
+#addModal input, #addModal button{
   width:100%;
   margin-bottom:10px;
   padding:10px;
-  font-size:16px; /* 👈 anti zoom iOS */
-}
-.form-box button{
-  width:100%;
-  padding:10px;
-  border:none;
-  border-radius:12px;
-  background:#ffb6c1;
-  font-weight:bold;
 }
 </style>
 </head>
@@ -155,36 +147,40 @@ body{
   <button onclick="openAdd()">➕ Ajouter</button>
 </div>
 
-<!-- MODAL ADD -->
-<div class="form-bg" id="addBg" onclick="if(event.target===this)closeAdd()">
-  <div class="form-box">
+<!-- MODAL -->
+<div id="addModal">
+  <div class="box">
     <input id="name" placeholder="Nom">
     <input id="photo" type="file" accept="image/*">
     <button id="add">Ajouter</button>
+    <button onclick="closeAdd()">Fermer</button>
   </div>
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <script>
+/* SUPABASE */
 const supabaseUrl = 'https://tzrwnyserlflrirvhafb.supabase.co';
 const supabaseKey = 'sb_publishable__7MMGWAcD78fCtWFz1nUhA_O-rJMbl-';
-const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
+const supabaseClient = window.supabase.createClient(supabaseUrl, supabaseKey);
 
+/* ELEMENTS */
 const list = document.getElementById('owner-list');
 const nameInput = document.getElementById('name');
 const photoInput = document.getElementById('photo');
 const addBtn = document.getElementById('add');
+
+/* SIDEBAR */
 const sidebar = document.getElementById('sidebar');
-const toggleSidebar = document.getElementById('toggleSidebar');
-const addBg = document.getElementById('addBg');
+document.getElementById('toggleSidebar').onclick =
+  () => sidebar.classList.toggle('sidebar-open');
 
-toggleSidebar.onclick = () => sidebar.classList.toggle('sidebar-open');
+/* MODAL */
+function openAdd(){ document.getElementById('addModal').style.display='flex'; }
+function closeAdd(){ document.getElementById('addModal').style.display='none'; }
 
-function openAdd(){ addBg.style.display='flex'; }
-function closeAdd(){ addBg.style.display='none'; }
-
-/* ADD SAFE iOS */
+/* ADD */
 addBtn.onclick = async () => {
   const name = nameInput.value.trim();
   const file = photoInput.files[0];
@@ -193,22 +189,24 @@ addBtn.onclick = async () => {
   const ext = file.name.split('.').pop();
   const path = Date.now() + '.' + ext;
 
-  await supabaseClient.storage.from('photos').upload(path, file, { upsert:true });
+  await supabaseClient.storage.from('photos').upload(path, file);
 
-  const { data } = supabaseClient.storage.from('photos').getPublicUrl(path);
-  const url = encodeURI(data.publicUrl);
+  const { data } = supabaseClient
+    .storage
+    .from('photos')
+    .getPublicUrl(path);
 
   await supabaseClient.from('creations').insert([
-    { name, image_url: url }
+    { name, image_url: data.publicUrl }
   ]);
 
   closeAdd();
   nameInput.value='';
   photoInput.value='';
-
-  setTimeout(loadCreations, 500); // 👈 iOS fix
+  loadCreations();
 };
 
+/* LOAD */
 async function loadCreations(){
   list.innerHTML='';
   const { data } = await supabaseClient
@@ -217,15 +215,12 @@ async function loadCreations(){
     .order('created_at',{ascending:false});
 
   data.forEach(c=>{
-    const img = document.createElement('img');
-    img.src = encodeURI(c.image_url);
-    img.loading = 'lazy';
-
-    const div = document.createElement('div');
+    const div=document.createElement('div');
     div.className='owner-item';
-    div.innerHTML = `<p>${c.name}</p>`;
-    div.appendChild(img);
-
+    div.innerHTML=`
+      <p>${c.name}</p>
+      <img src="${c.image_url}" crossorigin="anonymous">
+    `;
     list.appendChild(div);
   });
 }
