@@ -2,12 +2,10 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<title>Owner - Test Ajouter</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{height:100%;font-family:'Comic Sans MS',cursive}
 
-/* BODY */
 body{
   background:url('Photoroom_20251212_143703.PNG') center top / cover no-repeat fixed;
   overflow:hidden;
@@ -20,7 +18,7 @@ body{
   display:flex;
   justify-content:center;
   gap:16px;
-  margin-top:50px;
+  margin-top:205px;
 }
 #viewSelector button{
   background:#fff0f7;
@@ -29,7 +27,6 @@ body{
   padding:8px 16px;
   border-radius:24px;
   cursor:pointer;
-  font-size:16px;
 }
 
 /* CONTENT */
@@ -37,15 +34,10 @@ body{
   flex:1;
   display:flex;
   justify-content:center;
-  align-items:flex-start;
-  padding-top:30px;
+  align-items:center;
+  padding-top:300px;
 }
-#owner-list{
-  display:flex;
-  gap:20px;
-  flex-wrap:wrap;
-  justify-content:center;
-}
+#owner-list{display:flex;gap:40px;flex-wrap:wrap;justify-content:center}
 
 /* CARD */
 .owner-item{text-align:center}
@@ -70,14 +62,13 @@ body{
   left:-220px;
   width:220px;
   height:100vh;
-  background:rgba(255,230,240,0.95);
+  background:rgba(255,230,240,0.15);
   border-right:2px solid #b67385;
   padding:20px;
   transition:left .3s ease;
   z-index:10;
 }
 #sidebar.sidebar-open{left:0;}
-
 #toggleSidebar{
   position:absolute;
   top:50%;
@@ -94,7 +85,6 @@ body{
   border:1px solid #b67385;
   font-weight:bold;
 }
-
 #sidebar button{
   width:100%;
   margin-bottom:10px;
@@ -133,14 +123,12 @@ body{
 
 <body>
 
-<!-- VIEWS -->
 <div id="viewSelector">
   <button>Carrousel</button>
   <button>Grille</button>
   <button>Liste</button>
 </div>
 
-<!-- LISTE DES CREATIONS -->
 <div class="center-zone">
   <div id="owner-list"></div>
 </div>
@@ -151,7 +139,7 @@ body{
   <button onclick="openAdd()">➕ Ajouter</button>
 </div>
 
-<!-- MODAL ADD -->
+<!-- ADD MODAL -->
 <div id="addModal">
   <div class="box">
     <input id="name" placeholder="Nom">
@@ -163,59 +151,61 @@ body{
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-/* ================= SUPABASE ================= */
+/* SUPABASE */
 const supabaseUrl = 'https://tzrwnyserlflrirvhafb.supabase.co';
 const supabaseKey = 'sb_publishable__7MMGWAcD78fCtWFz1nUhA_O-rJMbl-';
 const supabaseClient = window.supabase.createClient(supabaseUrl, supabaseKey);
 
-/* ================= ELEMENTS ================= */
+/* ELEMENTS */
 const list = document.getElementById('owner-list');
 const nameInput = document.getElementById('name');
 const photoInput = document.getElementById('photo');
 const addBtn = document.getElementById('add');
+
+/* SIDEBAR */
 const sidebar = document.getElementById('sidebar');
+document.getElementById('toggleSidebar').onclick =
+  () => sidebar.classList.toggle('sidebar-open');
 
-/* ================= SIDEBAR ================= */
-document.getElementById('toggleSidebar').onclick = () => {
-  sidebar.classList.toggle('sidebar-open');
-};
-
-/* ================= MODAL ================= */
+/* MODAL */
 function openAdd(){ document.getElementById('addModal').style.display='flex'; }
 function closeAdd(){ document.getElementById('addModal').style.display='none'; }
 
-/* ================= AJOUTER ================= */
+/* ADD */
 addBtn.onclick = async () => {
   const name = nameInput.value.trim();
   const file = photoInput.files[0];
-  if(!name || !file){ alert("Merci de remplir le nom et choisir une photo !"); return; }
+  if(!name || !file){ alert("Nom + photo"); return; }
 
   const path = Date.now() + '_' + file.name;
-  await supabaseClient.storage.from('photos').upload(path, file);
 
-  const { data } = supabaseClient.storage.from('photos').getPublicUrl(path);
+  // upload fichier
+  const { error: uploadError } = await supabaseClient.storage.from('photos').upload(path, file);
+  if(uploadError){ console.error(uploadError); alert("Erreur upload"); return; }
 
-  await supabaseClient.from('creations').insert([{ name, image_url: data.publicUrl }]);
+  // récupérer URL publique
+  const { data: publicData } = supabaseClient.storage.from('photos').getPublicUrl(path);
+  const imageUrl = publicData.publicUrl;
 
+  // insert dans la table
+  const { error: insertError } = await supabaseClient.from('creations').insert([{ name, image_url: imageUrl }]);
+  if(insertError){ console.error(insertError); alert("Erreur insert"); return; }
+
+  closeAdd();
   nameInput.value='';
   photoInput.value='';
-  closeAdd();
   loadCreations();
 };
 
-/* ================= LOAD AU DEMARRAGE ================= */
+/* LOAD */
 async function loadCreations(){
   list.innerHTML='';
-  const { data, error } = await supabaseClient.from('creations')
-    .select('*')
-    .order('created_at',{ascending:false});
-
+  const { data, error } = await supabaseClient.from('creations').select('*').order('created_at',{ascending:false});
   if(error){ console.error(error); return; }
-
   data.forEach(c=>{
     const div = document.createElement('div');
     div.className='owner-item';
-    div.innerHTML=`<p>${c.name}</p><img src="${c.image_url}">`;
+    div.innerHTML = `<p>${c.name}</p><img src="${c.image_url}">`;
     list.appendChild(div);
   });
 }
