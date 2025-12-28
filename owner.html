@@ -6,125 +6,25 @@
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{height:100%;font-family:'Comic Sans MS',cursive}
-
-body{
-  background:url('Photoroom_20251212_143703.PNG') center top / cover no-repeat fixed;
-  overflow:hidden;
-  display:flex;
-  flex-direction:column;
-}
-
-/* VIEWS */
-#viewSelector{
-  display:flex;
-  justify-content:center;
-  gap:16px;
-  margin-top:205px;
-}
-#viewSelector button{
-  background:#fff0f7;
-  border:2px solid #b84c6f;
-  color:#b84c6f;
-  padding:8px 16px;
-  border-radius:24px;
-  cursor:pointer;
-}
-
-/* CONTENT */
-.center-zone{
-  flex:1;
-  display:flex;
-  justify-content:center;
-  align-items:flex-start;
-  padding-top:50px;
-}
-#owner-list{display:flex;gap:20px;flex-wrap:wrap;justify-content:center}
-
-/* CARD */
+body{background:url('Photoroom_20251212_143703.PNG') center top / cover no-repeat fixed; overflow:hidden; display:flex; flex-direction:column;}
+#viewSelector{display:flex;justify-content:center;gap:16px;margin-top:50px;}
+#viewSelector button{background:#fff0f7;border:2px solid #b84c6f;color:#b84c6f;padding:8px 16px;border-radius:24px;cursor:pointer;font-size:16px;}
+.center-zone{flex:1;display:flex;justify-content:center;align-items:flex-start;padding-top:30px;}
+#owner-list{display:flex;gap:20px;flex-wrap:wrap;justify-content:center;}
 .owner-item{text-align:center}
-.owner-item img{
-  width:220px;
-  height:220px;
-  object-fit:cover;
-  border:4px solid #b67385;
-  background:#ffe6f0;
-}
-.owner-item p{
-  margin-bottom:8px;
-  font-size:20px;
-  color:#b84c6f;
-  font-weight:bold;
-}
-
-/* SIDEBAR */
-#sidebar{
-  position:fixed;
-  top:0;
-  left:-220px;
-  width:220px;
-  height:100vh;
-  background:rgba(255,230,240,0.15);
-  border-right:2px solid #b67385;
-  padding:20px;
-  transition:left .3s ease;
-  z-index:10;
-}
+.owner-item img{width:220px;height:220px;object-fit:contain;border:4px solid #b67385;background:#ffe6f0;}
+.owner-item p{margin-bottom:8px;font-size:20px;color:#b84c6f;font-weight:bold;}
+#sidebar{position:fixed;top:0;left:-220px;width:220px;height:100vh;background:rgba(255,230,240,0.95);border-right:2px solid #b67385;padding:20px;transition:left .3s ease;z-index:10;}
 #sidebar.sidebar-open{left:0;}
-
-#toggleSidebar{
-  position:absolute;
-  top:50%;
-  right:-30px;
-  width:30px;
-  height:60px;
-  background:#ffb6c1;
-  color:#8b3a3a;
-  border-radius:0 12px 12px 0;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  cursor:pointer;
-  border:1px solid #b67385;
-  font-weight:bold;
-}
-
-#sidebar button{
-  width:100%;
-  margin-bottom:10px;
-  padding:10px;
-  border:none;
-  border-radius:12px;
-  background:#ffb6c1;
-  color:#8b3a3a;
-  font-weight:bold;
-  cursor:pointer;
-}
-
-/* MODAL ADD */
-#addModal{
-  position:fixed;
-  inset:0;
-  background:rgba(0,0,0,.6);
-  display:none;
-  justify-content:center;
-  align-items:center;
-  z-index:1000;
-}
-#addModal .box{
-  background:#ffe6f0;
-  padding:20px;
-  border-radius:14px;
-  width:300px;
-}
-#addModal input, #addModal button{
-  width:100%;
-  margin-bottom:10px;
-  padding:10px;
-}
+#toggleSidebar{position:absolute;top:50%;right:-30px;width:30px;height:60px;background:#ffb6c1;color:#8b3a3a;border-radius:0 12px 12px 0;display:flex;justify-content:center;align-items:center;cursor:pointer;border:1px solid #b67385;font-weight:bold;}
+#sidebar button{width:100%;margin-bottom:10px;padding:10px;border:none;border-radius:12px;background:#ffb6c1;color:#8b3a3a;font-weight:bold;cursor:pointer;}
+#addModal{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;justify-content:center;align-items:center;z-index:1000;}
+#addModal .box{background:#ffe6f0;padding:20px;border-radius:14px;width:300px;}
+#addModal input,#addModal button{width:100%;margin-bottom:10px;padding:10px;}
 </style>
 </head>
-<body>
 
+<body>
 <div id="viewSelector">
   <button>Carrousel</button>
   <button>Grille</button>
@@ -135,13 +35,11 @@ body{
   <div id="owner-list"></div>
 </div>
 
-<!-- SIDEBAR -->
 <div id="sidebar">
   <div id="toggleSidebar">☰</div>
   <button onclick="openAdd()">➕ Ajouter</button>
 </div>
 
-<!-- ADD MODAL -->
 <div id="addModal">
   <div class="box">
     <input id="name" placeholder="Nom">
@@ -153,27 +51,20 @@ body{
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
-/* ================= SUPABASE ================= */
 const supabaseUrl = 'https://tzrwnyserlflrirvhafb.supabase.co';
 const supabaseKey = 'sb_publishable__7MMGWAcD78fCtWFz1nUhA_O-rJMbl-';
 const supabaseClient = supabase.createClient(supabaseUrl, supabaseKey);
 
-/* ================= ELEMENTS ================= */
 const list = document.getElementById('owner-list');
 const nameInput = document.getElementById('name');
 const photoInput = document.getElementById('photo');
 const addBtn = document.getElementById('add');
-
-/* ================= SIDEBAR ================= */
 const sidebar = document.getElementById('sidebar');
-document.getElementById('toggleSidebar').onclick =
-  () => sidebar.classList.toggle('sidebar-open');
 
-/* ================= MODAL ================= */
+document.getElementById('toggleSidebar').onclick = () => sidebar.classList.toggle('sidebar-open');
 function openAdd(){ document.getElementById('addModal').style.display='flex'; }
 function closeAdd(){ document.getElementById('addModal').style.display='none'; }
 
-/* ================= ADD CREATION ================= */
 addBtn.onclick = async () => {
   const name = nameInput.value.trim();
   const file = photoInput.files[0];
@@ -182,58 +73,41 @@ addBtn.onclick = async () => {
   try {
     const path = Date.now() + '_' + file.name;
 
-    // Upload dans Supabase Storage
-    const { data: uploadData, error: uploadError } = await supabaseClient
-      .storage.from('photos').upload(path, file);
-
+    // Upload
+    const { error: uploadError } = await supabaseClient.storage.from('photos').upload(path, file);
     if(uploadError) throw uploadError;
 
-    // Récupération URL publique
-    const { data: { publicUrl }, error: urlError } = supabaseClient
-      .storage.from('photos').getPublicUrl(path);
-
+    // URL publique
+    const { data: publicData, error: urlError } = supabaseClient.storage.from('photos').getPublicUrl(path);
     if(urlError) throw urlError;
 
-    // Insertion en DB
-    const { error: dbError } = await supabaseClient.from('creations').insert([
-      { name, image_url: publicUrl }
-    ]);
+    // DB
+    const { error: dbError } = await supabaseClient.from('creations').insert([{ name, image_url: publicData.publicUrl }]);
     if(dbError) throw dbError;
 
+    nameInput.value='';
+    photoInput.value='';
     closeAdd();
-    nameInput.value = '';
-    photoInput.value = '';
     loadCreations();
-  } catch (err) {
+  } catch(err){
     console.error(err);
-    alert("Erreur lors de l'ajout : " + err.message);
+    alert("Erreur : " + err.message);
   }
-};
+}
 
-/* ================= LOAD CREATIONS ================= */
 async function loadCreations(){
   list.innerHTML='';
-  const { data, error } = await supabaseClient
-    .from('creations')
-    .select('*')
-    .order('created_at',{ ascending:false });
-  
-  if(error){
-    console.error(error);
-    return;
-  }
-
+  const { data, error } = await supabaseClient.from('creations').select('*').order('created_at',{ascending:false});
+  if(error){ console.error(error); return; }
   data.forEach(c=>{
     const div = document.createElement('div');
-    div.className = 'owner-item';
-    div.innerHTML = `<p>${c.name}</p><img src="${c.image_url}">`;
+    div.className='owner-item';
+    div.innerHTML=`<p>${c.name}</p><img src="${c.image_url}">`;
     list.appendChild(div);
   });
 }
 
-/* ================= INITIAL LOAD ================= */
 loadCreations();
 </script>
-
 </body>
 </html>
