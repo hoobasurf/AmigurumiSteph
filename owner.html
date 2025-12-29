@@ -360,6 +360,10 @@ header img{width:98px;height:98px;border-radius:20%;margin:auto}
 <!-- SIDEBAR -->
 <div id="sidebar">
   <div id="toggleSidebar">☰</div>
+
+  <!-- ✅ BOUTON AJOUT IMAGE -->
+  <button onclick="addImage()">➕ Ajouter image</button>
+
   <button onclick="openThemeModal()">Thème</button>
   <button>Vidéos</button>
   <button>Mailles</button>
@@ -367,6 +371,9 @@ header img{width:98px;height:98px;border-radius:20%;margin:auto}
   <button>Notes</button>
   <button>Paramètres</button>
 </div>
+
+<!-- INPUT FILE INVISIBLE -->
+<input type="file" id="imageInput" accept="image/*" style="display:none">
 
 <!-- THEME MODAL -->
 <div class="modal-bg" id="themeModal" onclick="closeThemeModal(event)">
@@ -528,6 +535,21 @@ function createSnow(){
   },20);
 }
 setInterval(createSnow,150);
+
+/* ✅ AJOUT IMAGE */
+const imageInput = document.getElementById('imageInput');
+function addImage(){ imageInput.click(); }
+imageInput.addEventListener('change', () => {
+  const file = imageInput.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    creations.push({name:"Image", imgUrl:e.target.result});
+    localStorage.setItem('creations', JSON.stringify(creations));
+    render();
+  };
+  reader.readAsDataURL(file);
+});
 
 /* INIT */
 render();
