@@ -6,8 +6,45 @@
 
 <style>
 body{
+  margin:0;
   font-family: Arial, sans-serif;
   background:#ffe6f0;
+  display:flex;
+}
+
+/* ---------- SIDEBAR ---------- */
+.sidebar{
+  width:220px;
+  background:#fff0f5;
+  padding:15px;
+  border-right:2px solid #c07a8a;
+  box-shadow:2px 0 10px rgba(0,0,0,.1);
+}
+
+.sidebar h2{
+  text-align:center;
+  color:#8b3a3a;
+}
+
+.sidebar input,
+.sidebar button{
+  width:100%;
+  margin-top:8px;
+  padding:8px;
+  border-radius:12px;
+  border:1px solid #ccc;
+}
+
+.sidebar button{
+  background:#8b3a3a;
+  color:white;
+  border:none;
+  cursor:pointer;
+}
+
+/* ---------- CONTENU ---------- */
+.main{
+  flex:1;
   padding:20px;
 }
 
@@ -18,7 +55,6 @@ h1{
   border:2px solid #c07a8a;
   border-radius:20px;
   padding:10px;
-  margin-bottom:20px;
 }
 
 .gallery{
@@ -46,9 +82,9 @@ h1{
 .card p{
   margin:6px 0 0;
   color:#8b3a3a;
-  font-size:14px;
 }
 
+/* ---------- MODAL ---------- */
 .modal{
   position:fixed;
   inset:0;
@@ -108,62 +144,65 @@ input, textarea{
 
 <body>
 
-<h1>Créations</h1>
-<div class="gallery" id="gallery"></div>
+<!-- SIDEBAR -->
+<div class="sidebar">
+  <h2>Ajouter</h2>
+  <input id="name" placeholder="Nom du projet">
+  <input id="photo" type="file" accept="image/*">
+  <button id="add">Ajouter</button>
+</div>
 
+<!-- CONTENU -->
+<div class="main">
+  <h1>Créations</h1>
+  <div class="gallery" id="gallery"></div>
+</div>
+
+<!-- MODAL -->
 <div class="modal" id="modal">
   <div class="modal-content" id="modalContent"></div>
 </div>
 
 <script>
-// --------------------
-// CHARGEMENT DONNÉES
-// --------------------
-let creations = [];
-try {
-  creations = JSON.parse(localStorage.getItem("creations") || "[]");
-} catch {
-  creations = [];
-}
+// ====================
+// CHARGEMENT
+// ====================
+let creations = JSON.parse(localStorage.getItem("creations") || "[]");
 
-// si anciennes créations sans likes/commentaires
-creations.forEach(c => {
-  if (!c.likes) c.likes = 0;
-  if (!c.comments) c.comments = [];
+creations.forEach(c=>{
+  if(!c.likes) c.likes = 0;
+  if(!c.comments) c.comments = [];
 });
 
 const gallery = document.getElementById("gallery");
 const modal = document.getElementById("modal");
 const modalContent = document.getElementById("modalContent");
 
-// --------------------
-// AFFICHAGE GALERIE
-// --------------------
+// ====================
+// AFFICHAGE
+// ====================
 function renderGallery(){
   gallery.innerHTML = "";
-  creations.forEach((c, index) => {
-    const div = document.createElement("div");
-    div.className = "card";
-    div.innerHTML = `
+  creations.forEach((c,i)=>{
+    const d = document.createElement("div");
+    d.className="card";
+    d.innerHTML = `
       <img src="${c.imgUrl}">
       <p>${c.name}</p>
     `;
-    div.onclick = () => openModal(index);
-    gallery.appendChild(div);
+    d.onclick = ()=>openModal(i);
+    gallery.appendChild(d);
   });
 }
 
-// --------------------
-// MODAL PROJET
-// --------------------
+// ====================
+// MODAL
+// ====================
 function openModal(i){
   const c = creations[i];
-
   modalContent.innerHTML = `
     <img src="${c.imgUrl}">
-    <div class="like">
-      ❤️ ${c.likes} likes
-    </div>
+    <div class="like">❤️ ${c.likes} likes</div>
     <button id="likeBtn">J’aime</button>
 
     <h3>Commentaires</h3>
@@ -174,51 +213,63 @@ function openModal(i){
     <button id="send">Envoyer</button>
   `;
 
-  document.getElementById("likeBtn").onclick = () => {
+  document.getElementById("likeBtn").onclick = ()=>{
     c.likes++;
     save();
     openModal(i);
   };
 
-  const commentsBox = document.getElementById("comments");
-  commentsBox.innerHTML = "";
-  c.comments.forEach(cm => {
+  const box = document.getElementById("comments");
+  c.comments.forEach(cm=>{
     const d = document.createElement("div");
-    d.className = "comment";
+    d.className="comment";
     d.innerHTML = `<b>${cm.author}</b><br>${cm.text}`;
-    commentsBox.appendChild(d);
+    box.appendChild(d);
   });
 
-  document.getElementById("send").onclick = () => {
-    const author = document.getElementById("author").value.trim();
-    const text = document.getElementById("message").value.trim();
-    if(!author || !text) return;
-    c.comments.push({author, text});
+  document.getElementById("send").onclick = ()=>{
+    const a = author.value.trim();
+    const t = message.value.trim();
+    if(!a||!t) return;
+    c.comments.push({author:a,text:t});
     save();
     openModal(i);
   };
 
-  modal.style.display = "flex";
+  modal.style.display="flex";
 }
 
-// --------------------
-// SAUVEGARDE
-// --------------------
+modal.onclick = e=>{
+  if(e.target===modal) modal.style.display="none";
+};
+
+// ====================
+// AJOUT
+// ====================
+document.getElementById("add").onclick = ()=>{
+  const name = document.getElementById("name").value.trim();
+  const file = document.getElementById("photo").files[0];
+  if(!name||!file) return alert("Remplis tout");
+
+  const reader = new FileReader();
+  reader.onload = e=>{
+    creations.unshift({
+      name,
+      imgUrl:e.target.result,
+      likes:0,
+      comments:[]
+    });
+    save();
+  };
+  reader.readAsDataURL(file);
+};
+
+// ====================
 function save(){
   localStorage.setItem("creations", JSON.stringify(creations));
   renderGallery();
 }
 
-// --------------------
-// FERMER MODAL
-// --------------------
-modal.onclick = e => {
-  if(e.target === modal){
-    modal.style.display = "none";
-  }
-};
-
-// --------------------
 renderGallery();
 </script>
 
