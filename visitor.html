@@ -39,7 +39,7 @@ async function loadCreations() {
     const imgUrl = supabase.storage.from('creations').getPublicUrl(c.image_path).data.publicUrl;
     const div = document.createElement('div');
     div.className = 'visitor-item';
-    div.innerHTML = `<img src="${imgUrl}"><p>${c.name}</p>`;
+    div.innerHTML = `<img src="${imgUrl}" alt="${c.name}"><p>${c.name}</p>`;
     list.appendChild(div);
   });
 }
