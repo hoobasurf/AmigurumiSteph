@@ -48,6 +48,7 @@ body{
   object-fit:contain;
   border:4px solid #b67385;
   background:#ffe6f0;
+  background-color: rgba(255,255,255,0.01); /* ✅ FIX AFFICHAGE */
 }
 .visitor-item p{
   margin-top:8px;
@@ -79,12 +80,6 @@ body{
   overflow-y:auto;
   max-height:calc(100vh - 260px);
 }
-.list-view .visitor-item{
-  display:flex;
-  align-items:center;
-  gap:18px;
-}
-.list-view img{width:140px;height:140px}
 
 /* MODAL */
 .modal-bg{
@@ -97,8 +92,7 @@ body{
   z-index:1000;
 }
 .modal-box{
-  background:rgba(255,228,235,0.95);
-  border:4px solid #b67385;
+  background:#ffe6f0;
   border-radius:18px;
   padding:18px;
   max-width:900px;
@@ -110,7 +104,7 @@ body{
   object-fit:contain;
 }
 
-/* SIDEBAR TRANSPARENTE – FIX VISIBILITÉ */
+/* SIDEBAR TRANSPARENTE */
 #sidebar{
   position:fixed;
   top:0;
@@ -126,11 +120,11 @@ body{
 }
 #sidebar.sidebar-open{left:0}
 
-/* ✅ BOUTON TOUJOURS VISIBLE */
+/* BOUTON ☰ TOUJOURS VISIBLE */
 #toggleSidebar{
   position:fixed;
   top:50%;
-  left:0;              /* ⬅️ FIX */
+  left:0;
   width:36px;
   height:70px;
   background:#ffb6c1;
