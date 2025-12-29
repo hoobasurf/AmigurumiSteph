@@ -59,11 +59,10 @@ header{text-align:center;padding:12px 0;}
   </div>
 </div>
 
-<!-- Supabase JS -->
 <script type="module">
 import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
 
-/* ===== SUPABASE ===== */
+// ⚡ Tes clés Supabase intégrées
 const supabase = createClient(
   "https://jyhbamdcxmpveujjqjla.supabase.co",
   "sb_publishable_sqsxb-3Kl5o3-JQYv9kGFw_-g0EgwMa"
@@ -75,14 +74,15 @@ const addBtn = document.getElementById('add');
 const nameInput = document.getElementById('name');
 const photoInput = document.getElementById('photo');
 
-// Récupérer les créations existantes
+// Récupérer toutes les créations et afficher
 async function loadCreations() {
-  const { data, error } = await supabase.from('creations').select('*').order('created_at', { ascending:false });
+  const { data, error } = await supabase.from('creations').select('*').order('created_at',{ascending:false});
   if(error){ alert(error.message); return; }
-  render(data.map(c=>({
-    name: c.name,
-    imgUrl: supabase.storage.from('creations').getPublicUrl(c.image_path).data.publicUrl
-  })));
+  const creations = data.map(c=>{
+    const imgUrl = supabase.storage.from('creations').getPublicUrl(c.image_path).data.publicUrl;
+    return { name: c.name, imgUrl };
+  });
+  render(creations);
 }
 
 // Afficher les créations
@@ -92,33 +92,31 @@ function render(creations){
   creations.forEach(c=>{
     const d=document.createElement('div');
     d.className='visitor-item';
-    d.innerHTML=`<img src="${c.imgUrl}"><p>${c.name}</p>`;
+    d.innerHTML=`<img src="${c.imgUrl}" alt="${c.name}"><p>${c.name}</p>`;
     list.appendChild(d);
   });
 }
 
 // Vues
-document.getElementById('btnCarousel').onclick = ()=>{currentView='carousel'; render([]); loadCreations();}
-document.getElementById('btnGrid').onclick = ()=>{currentView='grid'; render([]); loadCreations();}
-document.getElementById('btnList').onclick = ()=>{currentView='list'; render([]); loadCreations();}
+document.getElementById('btnCarousel').onclick = ()=>{currentView='carousel'; loadCreations();}
+document.getElementById('btnGrid').onclick = ()=>{currentView='grid'; loadCreations();}
+document.getElementById('btnList').onclick = ()=>{currentView='list'; loadCreations();}
 
 // Ajouter une création
 addBtn.onclick = async ()=>{
   if(!nameInput.value || !photoInput.files[0]) return alert("Remplis tout");
   const file = photoInput.files[0];
   const fileName = Date.now() + '_' + file.name;
-  
+
   // Upload dans Supabase Storage
-  const { data, error } = await supabase.storage.from('creations').upload(fileName, file);
+  const { data, error } = await supabase.storage.from('creations').upload(fileName, file, { upsert:true });
   if(error){ alert(error.message); return; }
 
   // Ajouter dans la table
-  const { error: errInsert } = await supabase.from('creations').insert([
-    { name: nameInput.value, image_path: fileName }
-  ]);
+  const { error: errInsert } = await supabase.from('creations').insert([{ name: nameInput.value, image_path: fileName }]);
   if(errInsert){ alert(errInsert.message); return; }
 
-  // Reset form + recharger
+  // Reset et reload
   nameInput.value='';
   photoInput.value='';
   loadCreations();
