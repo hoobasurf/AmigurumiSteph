@@ -2,269 +2,224 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<title>Owner</title>
+<title>Créations</title>
 
 <style>
-*{box-sizing:border-box;margin:0;padding:0;}
-html,body{
-  height:100%;
-  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;
-}
-
 body{
-  background:url('Photoroom_20251212_143703.PNG') center top / cover no-repeat fixed;
-  display:flex;
-  flex-direction:column;
-  overflow:hidden;
+  font-family: Arial, sans-serif;
+  background:#ffe6f0;
+  padding:20px;
 }
 
-/* ---------------- BOUTONS VUE ---------------- */
-#viewSelector{
-  display:flex;
-  justify-content:center;
-  gap:14px;
-  padding:14px;
-}
-#viewSelector button{
-  background:white;
-  border:none;
-  padding:12px 20px;
-  border-radius:22px;
-  font-weight:600;
-  box-shadow:0 6px 14px rgba(0,0,0,.18);
-  cursor:pointer;
-}
-
-/* ---------------- CONTENU ---------------- */
-.center-zone{
-  flex:1;
-  overflow:auto;
-}
-#visitor-list{
-  padding:18px;
-}
-
-/* ---------------- CARDS ---------------- */
-.visitor-item{
-  max-width:240px;
-  border-radius:26px;
-  box-shadow:0 18px 40px rgba(0,0,0,.18);
-  cursor:pointer;
-  background:white;
-  position:relative;
-}
-.visitor-item img{
-  width:100%;
-  aspect-ratio:1/1;
-  object-fit:contain;
-  border-radius:26px;
-}
-.visitor-item p{
+h1{
   text-align:center;
-  padding:6px;
-  font-weight:600;
+  color:#8b3a3a;
+  background:#fff0f5;
+  border:2px solid #c07a8a;
+  border-radius:20px;
+  padding:10px;
+  margin-bottom:20px;
 }
 
-/* SUPPRIMER */
-.delete-btn{
-  position:absolute;
-  top:8px;
-  right:8px;
-  background:rgba(0,0,0,.6);
-  color:white;
-  border-radius:50%;
-  width:24px;
-  height:24px;
+.gallery{
   display:flex;
-  align-items:center;
+  flex-wrap:wrap;
+  gap:15px;
   justify-content:center;
+}
+
+.card{
+  background:#fff0f5;
+  border-radius:15px;
+  padding:10px;
+  width:140px;
+  text-align:center;
+  cursor:pointer;
+  box-shadow:0 4px 10px rgba(150,60,80,.25);
+}
+
+.card img{
+  width:100%;
+  border-radius:10px;
+}
+
+.card p{
+  margin:6px 0 0;
+  color:#8b3a3a;
   font-size:14px;
 }
 
-/* ---------------- VUES ---------------- */
-.carousel-view{
-  display:flex;
-  gap:18px;
-  overflow-x:auto;
-}
-.carousel-view .visitor-item{flex-shrink:0;}
-
-.grid-view{
-  display:grid;
-  grid-template-columns:repeat(2,1fr);
-  gap:16px;
-  justify-items:center;
-}
-
-.list-view{
-  display:flex;
-  flex-direction:column;
-  gap:18px;
-}
-
-/* ---------------- MODAL IMAGE ---------------- */
-.modal-bg{
+.modal{
   position:fixed;
   inset:0;
-  background:rgba(0,0,0,.65);
+  background:rgba(0,0,0,.45);
   display:none;
-  justify-content:center;
   align-items:center;
-  z-index:1000;
+  justify-content:center;
+  z-index:9999;
 }
-.modal-box{
-  background:white;
-  padding:18px;
-  border-radius:26px;
-  max-width:90%;
-}
-.modal-box img{
-  width:100%;
+
+.modal-content{
+  background:#fff;
   border-radius:20px;
-}
-
-/* ---------------- SIDEBAR ---------------- */
-#sidebar{
-  position:fixed;
-  top:0;
-  left:-230px;
-  width:230px;
-  height:100%;
-  background:rgba(255,255,255,.95);
-  box-shadow:4px 0 20px rgba(0,0,0,.2);
-  transition:.3s;
-  padding:20px;
-  z-index:2000;
-}
-#sidebar.sidebar-open{left:0;}
-
-#toggleSidebar{
-  position:absolute;
-  top:50%;
-  right:-40px;
-  width:40px;
-  height:80px;
-  background:white;
-  border-radius:0 18px 18px 0;
-  box-shadow:4px 4px 12px rgba(0,0,0,.2);
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-size:22px;
-  cursor:pointer;
-}
-
-#sidebar button{
+  padding:15px;
+  max-width:340px;
   width:100%;
-  margin-bottom:12px;
-  padding:12px;
-  border:none;
-  border-radius:14px;
-  background:#f3f3f3;
-  font-weight:600;
 }
 
-/* ---------------- ADD IMAGE ---------------- */
-#addInput{display:none;}
+.modal-content img{
+  width:100%;
+  border-radius:15px;
+}
+
+.like{
+  margin-top:10px;
+  font-weight:bold;
+  color:#8b3a3a;
+}
+
+button{
+  background:#8b3a3a;
+  color:white;
+  border:none;
+  padding:6px 14px;
+  border-radius:16px;
+  cursor:pointer;
+  margin-top:6px;
+}
+
+input, textarea{
+  width:100%;
+  padding:6px;
+  border-radius:12px;
+  border:1px solid #ccc;
+  margin-top:6px;
+}
+
+.comment{
+  background:#fff0f5;
+  border-radius:12px;
+  padding:6px;
+  margin-top:6px;
+  font-size:13px;
+}
 </style>
 </head>
 
 <body>
 
-<!-- SIDEBAR -->
-<div id="sidebar">
-  <div id="toggleSidebar">☰</div>
-  <button onclick="addImage()">➕ Ajouter image</button>
-</div>
+<h1>Créations</h1>
+<div class="gallery" id="gallery"></div>
 
-<!-- BOUTONS -->
-<div id="viewSelector">
-  <button onclick="setView('carousel')">Carrousel</button>
-  <button onclick="setView('grid')">Grille</button>
-  <button onclick="setView('list')">Liste</button>
+<div class="modal" id="modal">
+  <div class="modal-content" id="modalContent"></div>
 </div>
-
-<!-- CONTENU -->
-<div class="center-zone">
-  <div id="visitor-list"></div>
-</div>
-
-<!-- MODAL -->
-<div class="modal-bg" id="modal" onclick="closeModal()">
-  <div class="modal-box" onclick="event.stopPropagation()">
-    <img id="modalImg">
-  </div>
-</div>
-
-<input type="file" id="addInput" accept="image/*">
 
 <script>
-const list=document.getElementById('visitor-list');
-const modal=document.getElementById('modal');
-const modalImg=document.getElementById('modalImg');
-const input=document.getElementById('addInput');
-const sidebar=document.getElementById('sidebar');
+// --------------------
+// CHARGEMENT DONNÉES
+// --------------------
+let creations = [];
+try {
+  creations = JSON.parse(localStorage.getItem("creations") || "[]");
+} catch {
+  creations = [];
+}
 
-let creations=JSON.parse(localStorage.getItem('creations')||'[]');
-let currentView='grid';
+// si anciennes créations sans likes/commentaires
+creations.forEach(c => {
+  if (!c.likes) c.likes = 0;
+  if (!c.comments) c.comments = [];
+});
 
-/* --------- RENDER --------- */
-function render(){
-  list.innerHTML='';
-  list.className=currentView+'-view';
+const gallery = document.getElementById("gallery");
+const modal = document.getElementById("modal");
+const modalContent = document.getElementById("modalContent");
 
-  creations.forEach((c,i)=>{
-    const d=document.createElement('div');
-    d.className='visitor-item';
-    d.innerHTML=`
-      <div class="delete-btn" onclick="removeItem(${i});event.stopPropagation()">✕</div>
-      <img src="${c}">
+// --------------------
+// AFFICHAGE GALERIE
+// --------------------
+function renderGallery(){
+  gallery.innerHTML = "";
+  creations.forEach((c, index) => {
+    const div = document.createElement("div");
+    div.className = "card";
+    div.innerHTML = `
+      <img src="${c.imgUrl}">
+      <p>${c.name}</p>
     `;
-    d.onclick=()=>openModal(c);
-    list.appendChild(d);
+    div.onclick = () => openModal(index);
+    gallery.appendChild(div);
   });
 }
 
-/* --------- AJOUT IMAGE --------- */
-function addImage(){
-  input.click();
-}
-input.onchange=()=>{
-  const file=input.files[0];
-  if(!file)return;
-  const reader=new FileReader();
-  reader.onload=e=>{
-    creations.push(e.target.result);
-    localStorage.setItem('creations',JSON.stringify(creations));
-    render();
+// --------------------
+// MODAL PROJET
+// --------------------
+function openModal(i){
+  const c = creations[i];
+
+  modalContent.innerHTML = `
+    <img src="${c.imgUrl}">
+    <div class="like">
+      ❤️ ${c.likes} likes
+    </div>
+    <button id="likeBtn">J’aime</button>
+
+    <h3>Commentaires</h3>
+    <div id="comments"></div>
+
+    <input id="author" placeholder="Prénom">
+    <textarea id="message" placeholder="Commentaire"></textarea>
+    <button id="send">Envoyer</button>
+  `;
+
+  document.getElementById("likeBtn").onclick = () => {
+    c.likes++;
+    save();
+    openModal(i);
   };
-  reader.readAsDataURL(file);
+
+  const commentsBox = document.getElementById("comments");
+  commentsBox.innerHTML = "";
+  c.comments.forEach(cm => {
+    const d = document.createElement("div");
+    d.className = "comment";
+    d.innerHTML = `<b>${cm.author}</b><br>${cm.text}`;
+    commentsBox.appendChild(d);
+  });
+
+  document.getElementById("send").onclick = () => {
+    const author = document.getElementById("author").value.trim();
+    const text = document.getElementById("message").value.trim();
+    if(!author || !text) return;
+    c.comments.push({author, text});
+    save();
+    openModal(i);
+  };
+
+  modal.style.display = "flex";
+}
+
+// --------------------
+// SAUVEGARDE
+// --------------------
+function save(){
+  localStorage.setItem("creations", JSON.stringify(creations));
+  renderGallery();
+}
+
+// --------------------
+// FERMER MODAL
+// --------------------
+modal.onclick = e => {
+  if(e.target === modal){
+    modal.style.display = "none";
+  }
 };
 
-/* --------- DELETE --------- */
-function removeItem(i){
-  creations.splice(i,1);
-  localStorage.setItem('creations',JSON.stringify(creations));
-  render();
-}
-
-/* --------- MODAL --------- */
-function openModal(src){
-  modalImg.src=src;
-  modal.style.display='flex';
-}
-function closeModal(){modal.style.display='none';}
-
-/* --------- VIEWS --------- */
-function setView(v){
-  currentView=v;
-  render();
-}
-
-/* --------- SIDEBAR --------- */
-toggleSidebar.onclick=()=>sidebar.classList.toggle('sidebar-open');
-
-render();
+// --------------------
+renderGallery();
 </script>
 
 </body>
