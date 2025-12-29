@@ -7,6 +7,7 @@
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{height:100%;font-family:'Comic Sans MS',cursive}
 
+/* BODY */
 body{
   background:url('Photoroom_20251212_143703.PNG') center top / cover no-repeat fixed;
   overflow:hidden;
@@ -14,12 +15,17 @@ body{
   flex-direction:column;
 }
 
+/* HEADER */
+header{text-align:center;padding:12px 0}
+.title{display:none}
+
 /* BOUTONS VUE */
 #viewSelector{
   display:flex;
   justify-content:center;
-  gap:16px;
-  margin-top:205px;
+  gap:12px;
+  margin-top:500px;
+  margin-bottom:20px;
 }
 #viewSelector button{
   background:#fff0f7;
@@ -35,10 +41,14 @@ body{
   flex:1;
   display:flex;
   justify-content:center;
-  align-items:center;
-  padding-top:300px;
+  align-items:flex-start;
+  overflow:auto;
 }
-#visitor-list{width:100%;max-width:1200px}
+#visitor-list{
+  display:flex;
+  gap:16px;
+  padding:12px;
+}
 
 /* ITEMS */
 .visitor-item{text-align:center;cursor:pointer}
@@ -48,7 +58,6 @@ body{
   object-fit:contain;
   border:4px solid #b67385;
   background:#ffe6f0;
-  background-color: rgba(255,255,255,0.01); /* ✅ FIX AFFICHAGE */
 }
 .visitor-item p{
   margin-top:8px;
@@ -60,84 +69,45 @@ body{
 /* VUES */
 .carousel-view{
   display:flex;
-  gap:40px;
   overflow-x:auto;
-  padding:20px;
+  scroll-behavior:smooth;
 }
 .grid-view{
-  display:grid;
-  grid-template-columns:repeat(auto-fill,minmax(220px,1fr));
-  gap:24px;
-  padding:20px;
-  overflow-y:auto;
-  max-height:calc(100vh - 260px);
+  flex-wrap:wrap;
+  justify-content:center;
 }
 .list-view{
-  display:flex;
   flex-direction:column;
-  gap:18px;
-  padding:20px;
-  overflow-y:auto;
-  max-height:calc(100vh - 260px);
 }
 
-/* MODAL */
-.modal-bg{
-  position:fixed;
-  inset:0;
-  background:rgba(0,0,0,.65);
-  display:none;
-  justify-content:center;
-  align-items:center;
-  z-index:1000;
-}
-.modal-box{
-  background:#ffe6f0;
-  border-radius:18px;
-  padding:18px;
-  max-width:900px;
-  width:95%;
-}
-.modal-main-img{
-  width:100%;
-  max-height:500px;
-  object-fit:contain;
-}
-
-/* SIDEBAR TRANSPARENTE */
+/* SIDEBAR */
 #sidebar{
   position:fixed;
   top:0;
   left:-220px;
   width:220px;
   height:100vh;
-  background:rgba(255,255,255,0.15);
-  backdrop-filter:blur(6px);
+  background:rgba(255,230,240,0.95);
   border-right:2px solid #b67385;
   padding:20px;
   transition:left .3s ease;
-  z-index:2000;
+  z-index:50;
 }
 #sidebar.sidebar-open{left:0}
-
-/* BOUTON ☰ TOUJOURS VISIBLE */
 #toggleSidebar{
-  position:fixed;
+  position:absolute;
   top:50%;
-  left:0;
-  width:36px;
-  height:70px;
+  right:-30px;
+  width:30px;
+  height:60px;
   background:#ffb6c1;
-  border-radius:0 14px 14px 0;
-  display:flex;
-  justify-content:center;
-  align-items:center;
+  border-radius:0 12px 12px 0;
   cursor:pointer;
-  border:1px solid #b67385;
+  display:flex;
+  align-items:center;
+  justify-content:center;
   font-weight:bold;
-  z-index:2100;
 }
-
 #sidebar button{
   width:100%;
   margin-bottom:10px;
@@ -145,82 +115,171 @@ body{
   border:none;
   border-radius:12px;
   background:#ffb6c1;
-  color:#8b3a3a;
-  font-weight:bold;
   cursor:pointer;
 }
 
-#imageInput{display:none}
+/* IMPORTANT : clic sidebar */
+#sidebar,
+#sidebar *{
+  pointer-events:auto;
+}
+
+/* NEIGE */
+.snow{
+  position:fixed;
+  inset:0;
+  pointer-events:none;
+  display:none;
+  z-index:5;
+}
+
+/* MODAL THEME */
+.modal-bg{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.6);
+  display:none;
+  justify-content:center;
+  align-items:center;
+  z-index:9999;
+}
+.modal-box{
+  background:#ffe6f0;
+  border:4px solid #b67385;
+  border-radius:18px;
+  padding:20px;
+  text-align:center;
+}
+.modal-box button{
+  width:100%;
+  margin:6px 0;
+  padding:10px;
+  border:none;
+  border-radius:12px;
+  background:#ffb6c1;
+}
 </style>
 </head>
 
 <body>
 
+<div id="snow" class="snow"></div>
+
 <div id="viewSelector">
-  <button onclick="setView('carousel')">Carrousel</button>
-  <button onclick="setView('grid')">Grille</button>
-  <button onclick="setView('list')">Liste</button>
+  <button id="btnCarousel">Carrousel</button>
+  <button id="btnGrid">Grille</button>
+  <button id="btnList">Liste</button>
 </div>
 
 <div class="center-zone">
   <div id="visitor-list"></div>
 </div>
 
-<div class="modal-bg" id="modal" onclick="closeModal()">
+<!-- SIDEBAR -->
+<div id="sidebar">
+  <div id="toggleSidebar">☰</div>
+
+  <h3>Ajouter une création</h3>
+  <input id="name" placeholder="Nom">
+  <input id="photo" type="file" accept="image/*">
+  <button id="add">Ajouter</button>
+
+  <hr>
+  <button onclick="openThemeModal()">Thème</button>
+</div>
+
+<!-- MODAL THEME -->
+<div class="modal-bg" id="themeModal" onclick="closeThemeModal(event)">
   <div class="modal-box" onclick="event.stopPropagation()">
-    <img id="modalMain" class="modal-main-img">
+    <h3>Choisir un thème</h3>
+    <button onclick="setTheme('noel')">🎄 Noël</button>
+    <button onclick="setTheme('sweety')">🌸 Sweety-Girly</button>
+    <button onclick="setTheme('default')">💠 Défaut</button>
   </div>
 </div>
 
-<!-- SIDEBAR -->
-<div id="sidebar">
-  <button onclick="addImage()">➕ Ajouter image</button>
-</div>
-<div id="toggleSidebar">☰</div>
-
-<input type="file" id="imageInput" accept="image/*">
-
 <script>
-const list=document.getElementById('visitor-list');
-const modal=document.getElementById('modal');
-const modalMain=document.getElementById('modalMain');
-const sidebar=document.getElementById('sidebar');
-const toggleSidebar=document.getElementById('toggleSidebar');
-const imageInput=document.getElementById('imageInput');
-
-let creations=JSON.parse(localStorage.getItem('creations')||'[]');
+/* VARIABLES */
 let currentView='carousel';
+const list=document.getElementById('visitor-list');
+const btnCarousel=document.getElementById('btnCarousel');
+const btnGrid=document.getElementById('btnGrid');
+const btnList=document.getElementById('btnList');
+const nameInput=document.getElementById('name');
+const photoInput=document.getElementById('photo');
+const addBtn=document.getElementById('add');
+let creations=JSON.parse(localStorage.getItem('creations')||'[]');
 
+/* RENDER */
 function render(){
-  list.innerHTML='';
   list.className=currentView+'-view';
+  list.innerHTML='';
   creations.forEach(c=>{
     const d=document.createElement('div');
     d.className='visitor-item';
-    d.innerHTML=`<img src="${c.imgUrl}"><p>${c.name||''}</p>`;
-    d.onclick=()=>{modalMain.src=c.imgUrl;modal.style.display='flex'}
+    d.innerHTML=`<img src="${c.imgUrl}"><p>${c.name}</p>`;
     list.appendChild(d);
   });
 }
 
-function setView(v){currentView=v;render()}
-function closeModal(){modal.style.display='none'}
+/* VUES */
+btnCarousel.onclick=()=>{currentView='carousel';render();}
+btnGrid.onclick=()=>{currentView='grid';render();}
+btnList.onclick=()=>{currentView='list';render();}
 
-toggleSidebar.onclick=()=>sidebar.classList.toggle('sidebar-open');
-
-function addImage(){imageInput.click()}
-imageInput.addEventListener('change',()=>{
-  const f=imageInput.files[0];
-  if(!f)return;
+/* AJOUT */
+addBtn.onclick=()=>{
+  const name=nameInput.value.trim();
+  const file=photoInput.files[0];
+  if(!name||!file)return alert("Nom + photo requis");
   const r=new FileReader();
   r.onload=e=>{
-    creations.push({name:'Image',imgUrl:e.target.result});
+    creations.unshift({name,imgUrl:e.target.result});
     localStorage.setItem('creations',JSON.stringify(creations));
     render();
+    nameInput.value='';
+    photoInput.value='';
   };
-  r.readAsDataURL(f);
-});
+  r.readAsDataURL(file);
+};
 
+/* SIDEBAR */
+const sidebar=document.getElementById('sidebar');
+document.getElementById('toggleSidebar').onclick=()=>{
+  sidebar.classList.toggle('sidebar-open');
+};
+
+/* THEME */
+const themeModal=document.getElementById('themeModal');
+const snow=document.getElementById('snow');
+const sweet=document.createElement('div');
+sweet.style.position='fixed';
+sweet.style.inset='0';
+sweet.style.pointerEvents='none';
+sweet.style.display='none';
+document.body.appendChild(sweet);
+
+function openThemeModal(){themeModal.style.display='flex'}
+function closeThemeModal(e){if(e.target===themeModal)themeModal.style.display='none'}
+
+function setTheme(t){
+  if(t==='noel'){
+    document.body.style.backgroundImage="url('noel.png')";
+    snow.style.display='block';
+    sweet.style.display='none';
+  }else if(t==='sweety'){
+    document.body.style.background="url('sweety-girly.png') center/cover fixed";
+    snow.style.display='none';
+    sweet.style.display='block';
+  }else{
+    document.body.style.backgroundImage="url('Photoroom_20251212_143703.PNG')";
+    snow.style.display='none';
+    sweet.style.display='none';
+  }
+  themeModal.style.display='none';
+}
+
+/* INIT */
 render();
 </script>
 
