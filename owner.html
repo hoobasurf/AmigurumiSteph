@@ -146,6 +146,8 @@ header img{width:98px;height:98px;border-radius:20%;margin:auto}
   </div>
 </div>
 
+<button id="add">Ajouter</button>
+
 <script type="module">
 // --- Supabase setup ---
 import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
@@ -155,105 +157,62 @@ const SUPABASE_ANON_KEY = "YOUR_ANON_KEY";
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
 // --- Elements ---
-let currentView='grid';
-const list=document.getElementById('visitor-list');
-const nameInput=document.getElementById('name');
-const photoInput=document.getElementById('photo');
-const addBtn=document.getElementById('add');
-let creations=[];
+const addBtn = document.getElementById('add');
+const nameInput = document.getElementById('name');
+const photoInput = document.getElementById('photo');
+let creations = [];
 
-// --- Charger créations depuis Supabase ---
+// --- Affichage ---
+const list = document.getElementById('visitor-list');
+let currentView = 'grid';
+function renderCreations() {
+  list.innerHTML = '';
+  list.className = currentView + '-view';
+  creations.forEach(c => {
+    const d = document.createElement('div');
+    d.className = 'visitor-item';
+    d.innerHTML = `<p>${c.name}</p><img src="${c.imgUrl}">`;
+    list.appendChild(d);
+  });
+}
+
+// --- Charger créations existantes ---
 async function loadCreations() {
-  const { data, error } = await supabase
-    .from('creations')
-    .select('*')
-    .order('created_at', { ascending: false });
+  const { data, error } = await supabase.from('creations').select('*').order('created_at', { ascending: false });
   if (error) console.error(error);
   else creations = data.map(c => ({ name: c.name, imgUrl: c.image_url }));
   renderCreations();
 }
 
-// --- Render ---
-function renderCreations(){
-  list.innerHTML='';
-  list.className=currentView+'-view';
-  creations.forEach(c=>{
-    const d=document.createElement('div');
-    d.className='visitor-item';
-    d.innerHTML=`<p>${c.name}</p><img src="${c.imgUrl}">`;
-    list.appendChild(d);
-  });
-}
-
-// --- Set view ---
-function setView(v){
-  currentView=v;
-  renderCreations();
-}
-
-document.getElementById('btnCarousel').onclick=()=>setView('carousel');
-document.getElementById('btnGrid').onclick=()=>setView('grid');
-document.getElementById('btnList').onclick=()=>setView('list');
-
-// --- Ajouter ---
+// --- Ajouter image + création ---
 addBtn.onclick = async () => {
   const name = nameInput.value.trim();
   const file = photoInput.files[0];
-  if(!name || !file) return alert("Nom + photo requis");
+  if (!name || !file) return alert("Nom + photo requis");
 
-  // Upload image Supabase Storage
-  const fileExt = file.name.split('.').pop();
-  const fileName = `${Date.now()}.${fileExt}`;
-  const { data, error } = await supabase.storage
-    .from('images')
-    .upload(fileName, file);
+  // Préparer le nom unique
+  const ext = file.name.split('.').pop();
+  const fileName = `${Date.now()}.${ext}`;
 
-  if(error){ alert("Erreur upload: "+error.message); return; }
+  // Upload image dans Supabase
+  const { data, error } = await supabase.storage.from('images').upload(fileName, file);
+  if (error) { alert("Erreur upload: " + error.message); return; }
 
-  // Récupérer URL publique
-  const { publicURL, error: urlErr } = supabase.storage
-    .from('images')
-    .getPublicUrl(fileName);
-  if(urlErr){ alert("Erreur URL: "+urlErr.message); return; }
+  // URL publique
+  const { publicURL, error: urlErr } = supabase.storage.from('images').getPublicUrl(fileName);
+  if (urlErr) { alert("Erreur URL: " + urlErr.message); return; }
 
-  // Ajouter création dans table Supabase
-  const { error: insertErr } = await supabase
-    .from('creations')
-    .insert([{ name, image_url: publicURL }]);
-  if(insertErr){ alert("Erreur ajout table: "+insertErr.message); return; }
+  // Ajouter dans table Supabase
+  const { error: insertErr } = await supabase.from('creations').insert([{ name, image_url: publicURL }]);
+  if (insertErr) { alert("Erreur table: " + insertErr.message); return; }
 
-  // Mettre à jour localement et afficher
+  // Mettre à jour localement
   creations.unshift({ name, imgUrl: publicURL });
   renderCreations();
 
-  nameInput.value='';
-  photoInput.value='';
+  nameInput.value = '';
+  photoInput.value = '';
 };
-
-// --- Sidebar, thèmes et effets existants ---
-const snow=document.getElementById('snow');
-const sweetRain=document.createElement('div');
-sweetRain.style.position='fixed';
-sweetRain.style.inset='0';
-sweetRain.style.pointerEvents='none';
-sweetRain.style.display='none';
-document.body.appendChild(sweetRain);
-
-function setTheme(t){
-  snow.style.display='none';
-  sweetRain.style.display='none';
-  if(t==='noel'){document.body.style.backgroundImage="url('noel.png')";snow.style.display='block';createSnow();}
-  else if(t==='sweety'){document.body.style.backgroundImage="url('sweety-girly.png')";sweetRain.style.display='block';createCandy();}
-  else{document.body.style.backgroundImage="url('Photoroom_20251212_143703.PNG')";}
-  document.getElementById('themeModal').style.display='none';
-}
-const sidebar = document.getElementById('sidebar');
-const toggleSidebar = document.getElementById('toggleSidebar');
-toggleSidebar.onclick = () => { sidebar.classList.toggle('sidebar-open'); };
-function openThemeModal(){document.getElementById('themeModal').style.display = 'flex';}
-function closeThemeModal(e){document.getElementById('themeModal').style.display = 'none';}
-function createSnow(){ snow.innerHTML=''; for(let i=0;i<35;i++){ const f=document.createElement('div'); f.className='snowflake'; f.textContent='❄️'; f.style.left=Math.random()*100+'%'; f.style.animationDuration=4+Math.random()*6+'s'; f.style.fontSize=12+Math.random()*14+'px'; snow.appendChild(f);} }
-function createCandy(){ sweetRain.innerHTML=''; for(let i=0;i<35;i++){ const c=document.createElement('div'); c.className='candy'; c.textContent='🍬'; c.style.left=Math.random()*100+'%'; c.style.animationDuration=4+Math.random()*6+'s'; sweetRain.appendChild(c);} }
 
 // --- Initialisation ---
 loadCreations();
