@@ -2,223 +2,48 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
+<title>Visitor Gallery</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-html,body{height:100%;font-family:'Comic Sans MS',cursive}
-
-/* BODY */
-body{
-  background:url('Photoroom_20251212_143703.PNG') center top / cover no-repeat fixed;
-  overflow:auto;
-  display:flex;
-  flex-direction:column;
-}
-
-/* BOUTONS VUE */
-#viewSelector{
-  display:flex;
-  justify-content:center;
-  gap:12px;
-  margin-top:20px;
-  margin-bottom:20px;
-}
-#viewSelector button{
-  background:#fff0f7;
-  border:2px solid #b84c6f;
-  color:#b84c6f;
-  padding:8px 16px;
-  border-radius:24px;
-  cursor:pointer;
-}
-
-/* CONTENU */
-.center-zone{
-  flex:1;
-  display:flex;
-  justify-content:center;
-  align-items:flex-start;
-  overflow:auto;
-}
-#visitor-list{
-  display:flex;
-  gap:16px;
-  padding:12px;
-}
-
-/* ITEMS */
-.visitor-item{text-align:center}
-.visitor-item img{
-  width:220px;
-  height:220px;
-  object-fit:contain;
-  border:4px solid #b67385;
-  background:#ffe6f0;
-}
-.visitor-item p{
-  margin-top:8px;
-  font-size:20px;
-  color:#b84c6f;
-  font-weight:bold;
-}
-
-/* VUES */
-.carousel-view{
-  display:flex;
-  overflow-x:auto;
-  gap:20px;
-}
-.grid-view{
-  display:flex;
-  flex-wrap:wrap;
-  justify-content:center;
-}
-.list-view{
-  display:flex;
-  flex-direction:column;
-}
-
-/* NEIGE */
-.snow{
-  position:fixed;
-  inset:0;
-  pointer-events:none;
-  display:none;
-  z-index:5;
-}
-
-/* MODAL THEME */
-.modal-bg{
-  position:fixed;
-  inset:0;
-  background:rgba(0,0,0,.6);
-  display:none;
-  justify-content:center;
-  align-items:center;
-}
-.modal-box{
-  background:#ffe6f0;
-  padding:20px;
-  border-radius:16px;
-}
-.modal-box button{
-  width:100%;
-  margin:6px 0;
-}
+html,body{height:100%;font-family:'Comic Sans MS',cursive;}
+body{background:url('Photoroom_20251212_143703.PNG') center top / cover no-repeat fixed;display:flex;flex-direction:column;overflow:auto;}
+.center-zone{flex:1;display:flex;justify-content:center;align-items:flex-start;overflow:auto;}
+#visitor-list{display:flex;gap:16px;padding:12px;}
+.visitor-item{text-align:center;}
+.visitor-item img{width:220px;height:220px;object-fit:contain;border:4px solid #b67385;background:#ffe6f0;}
+.visitor-item p{margin-top:8px;font-size:20px;color:#b84c6f;font-weight:bold;}
 </style>
 </head>
-
 <body>
-
-<div id="snow" class="snow"></div>
-
-<div id="viewSelector">
-  <button id="btnCarousel">Carrousel</button>
-  <button id="btnGrid">Grille</button>
-  <button id="btnList">Liste</button>
-</div>
 
 <div class="center-zone">
   <div id="visitor-list"></div>
 </div>
 
-<!-- THEME -->
-<div class="modal-bg" id="themeModal" onclick="closeThemeModal(event)">
-  <div class="modal-box" onclick="event.stopPropagation()">
-    <button onclick="setTheme('noel')">🎄 Noël</button>
-    <button onclick="setTheme('sweety')">🌸 Sweety</button>
-    <button onclick="setTheme('default')">💠 Défaut</button>
-  </div>
-</div>
-
 <script type="module">
-import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
+import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm'
 
-/* ===== SUPABASE ===== */
+// ⚡ Remplace par ton projet et ta clé publishable
 const supabase = createClient(
-  "https://TON_PROJECT_URL.supabase.co", // ← remplace par ton Project URL
-  "sb_publishable_xxx..."              // ← remplace par ta clé publishable / anon
+  "https://TON_PROJECT_URL.supabase.co",
+  "sb_publishable_xxx"
 );
 
-/* ===== DOM ===== */
 const list = document.getElementById('visitor-list');
-const btnCarousel = document.getElementById('btnCarousel');
-const btnGrid = document.getElementById('btnGrid');
-const btnList = document.getElementById('btnList');
 
-const themeModal = document.getElementById('themeModal');
-const snow = document.getElementById('snow');
+async function loadCreations() {
+  const { data, error } = await supabase.from('creations').select('*').order('created_at',{ ascending:false });
+  if(error){ alert(error.message); return; }
 
-/* ===== STATE ===== */
-let currentView = 'carousel';
-let creations = [];
-
-/* ===== LOAD FROM SUPABASE ===== */
-async function loadCreations(){
-  const { data, error } = await supabase
-    .from("creations")
-    .select("*")
-    .order("created_at", { ascending:false });
-
-  if(error){
-    console.error(error);
-    return;
-  }
-
-  creations = data.map(c => ({
-    name: c.name,
-    imgUrl: supabase
-      .storage
-      .from("creations")
-      .getPublicUrl(c.image_path).data.publicUrl
-  }));
-
-  render();
-}
-
-/* ===== RENDER ===== */
-function render(){
-  list.innerHTML = '';
-  list.className = currentView + '-view';
-
-  creations.forEach(c=>{
-    const d = document.createElement('div');
-    d.className = 'visitor-item';
-    d.innerHTML = `<img src="${c.imgUrl}"><p>${c.name}</p>`;
-    list.appendChild(d);
+  data.forEach(c=>{
+    const imgUrl = supabase.storage.from('creations').getPublicUrl(c.image_path).data.publicUrl;
+    const div = document.createElement('div');
+    div.className = 'visitor-item';
+    div.innerHTML = `<img src="${imgUrl}"><p>${c.name}</p>`;
+    list.appendChild(div);
   });
 }
 
-/* ===== VUES ===== */
-btnCarousel.onclick = () => { currentView='carousel'; render(); };
-btnGrid.onclick = () => { currentView='grid'; render(); };
-btnList.onclick = () => { currentView='list'; render(); };
-
-/* ===== THEME ===== */
-function openThemeModal(){ themeModal.style.display='flex'; }
-function closeThemeModal(e){
-  if(e.target === themeModal){
-    themeModal.style.display='none';
-  }
-}
-
-window.openThemeModal = openThemeModal;
-window.closeThemeModal = closeThemeModal;
-
-function setTheme(t){
-  if(t==='noel'){
-    document.body.style.backgroundImage="url('noel.png')";
-    snow.style.display='block';
-  }else if(t==='sweety'){
-    document.body.style.backgroundImage="url('sweety-girly.png')";
-    snow.style.display='none';
-  }else{
-    document.body.style.backgroundImage="url('Photoroom_20251212_143703.PNG')";
-    snow.style.display='none';
-  }
-}
-window.setTheme = setTheme;
-
-/* ===== INIT ===== */
 loadCreations();
 </script>
 </body>
