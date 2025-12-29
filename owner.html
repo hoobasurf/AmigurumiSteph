@@ -176,55 +176,130 @@ header{text-align:center;padding:12px 0}
   </div>
 </div>
 
-<script>
-/* ===== VARIABLES ===== */
-let currentView = 'carousel';
+<script type="module">
+import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
+
+/* ===== SUPABASE ===== */
+const supabase = createClient(
+  "https://jyhbamdcxmpveujjqjla.supabase.co",
+  "sb_publishable_sqsxb-3Kl5o3-JQYv9kGFw_-g0EgwMa"
+);
+
+/* ===== DOM ===== */
 const list = document.getElementById('visitor-list');
 const addBtn = document.getElementById('add');
 const nameInput = document.getElementById('name');
 const photoInput = document.getElementById('photo');
-let creations = JSON.parse(localStorage.getItem('creations')||'[]');
+
+const btnCarousel = document.getElementById('btnCarousel');
+const btnGrid = document.getElementById('btnGrid');
+const btnList = document.getElementById('btnList');
+
+const sidebar = document.getElementById('sidebar');
+const toggleSidebar = document.getElementById('toggleSidebar');
+
+const themeModal = document.getElementById('themeModal');
+const snow = document.getElementById('snow');
+
+/* ===== STATE ===== */
+let currentView = 'carousel';
+let creations = [];
+
+/* ===== LOAD FROM SUPABASE ===== */
+async function loadCreations(){
+  const { data, error } = await supabase
+    .from("creations")
+    .select("*")
+    .order("created_at", { ascending:false });
+
+  if(error){
+    console.error(error);
+    return;
+  }
+
+  creations = data.map(c => ({
+    name: c.name,
+    imgUrl: supabase
+      .storage
+      .from("creations")
+      .getPublicUrl(c.image_path).data.publicUrl
+  }));
+
+  render();
+}
 
 /* ===== RENDER ===== */
 function render(){
-  list.innerHTML='';
-  list.className=currentView+'-view';
+  list.innerHTML = '';
+  list.className = currentView + '-view';
+
   creations.forEach(c=>{
-    const d=document.createElement('div');
-    d.className='visitor-item';
-    d.innerHTML=`<img src="${c.imgUrl}"><p>${c.name}</p>`;
+    const d = document.createElement('div');
+    d.className = 'visitor-item';
+    d.innerHTML = `<img src="${c.imgUrl}"><p>${c.name}</p>`;
     list.appendChild(d);
   });
 }
 
 /* ===== VUES ===== */
-btnCarousel.onclick=()=>{currentView='carousel';render();}
-btnGrid.onclick=()=>{currentView='grid';render();}
-btnList.onclick=()=>{currentView='list';render();}
+btnCarousel.onclick = () => { currentView='carousel'; render(); };
+btnGrid.onclick = () => { currentView='grid'; render(); };
+btnList.onclick = () => { currentView='list'; render(); };
 
-/* ===== AJOUT ===== */
-addBtn.onclick=()=>{
-  if(!nameInput.value || !photoInput.files[0]) return alert("Remplis tout");
-  const r=new FileReader();
-  r.onload=e=>{
-    creations.unshift({name:nameInput.value,imgUrl:e.target.result});
-    localStorage.setItem('creations',JSON.stringify(creations));
-    render();
-    nameInput.value='';
-    photoInput.value='';
-  };
-  r.readAsDataURL(photoInput.files[0]);
+/* ===== AJOUT (UPLOAD RÉEL) ===== */
+addBtn.onclick = async () => {
+  if(!nameInput.value || !photoInput.files[0]){
+    alert("Remplis tout");
+    return;
+  }
+
+  const file = photoInput.files[0];
+  const path = `${Date.now()}_${file.name}`;
+
+  const { error: uploadError } = await supabase
+    .storage
+    .from("creations")
+    .upload(path, file);
+
+  if(uploadError){
+    alert("Erreur upload");
+    console.error(uploadError);
+    return;
+  }
+
+  const { error: dbError } = await supabase
+    .from("creations")
+    .insert({
+      name: nameInput.value,
+      image_path: path
+    });
+
+  if(dbError){
+    alert("Erreur base");
+    console.error(dbError);
+    return;
+  }
+
+  nameInput.value = '';
+  photoInput.value = '';
+  loadCreations();
 };
 
 /* ===== SIDEBAR ===== */
-toggleSidebar.onclick=()=>sidebar.classList.toggle('sidebar-open');
+toggleSidebar.onclick = () => {
+  sidebar.classList.toggle('sidebar-open');
+};
 
 /* ===== THEME ===== */
-const themeModal=document.getElementById('themeModal');
-const snow=document.getElementById('snow');
+function openThemeModal(){ themeModal.style.display='flex'; }
+function closeThemeModal(e){
+  if(e.target === themeModal){
+    themeModal.style.display='none';
+  }
+}
 
-function openThemeModal(){themeModal.style.display='flex'}
-function closeThemeModal(e){if(e.target===themeModal)themeModal.style.display='none'}
+window.openThemeModal = openThemeModal;
+window.closeThemeModal = closeThemeModal;
 
 function setTheme(t){
   if(t==='noel'){
@@ -238,8 +313,10 @@ function setTheme(t){
     snow.style.display='none';
   }
 }
+window.setTheme = setTheme;
 
-render();
+/* ===== INIT ===== */
+loadCreations();
 </script>
 </body>
 </html>
