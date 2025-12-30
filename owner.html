@@ -3,9 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Gestion Amigurumi</title>
+<title>Owner</title>
 <style>
-/* === Ton CSS existant === */
+/* === TON CSS INTACT === */
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{height:100%;font-family:'Comic Sans MS',cursive}
 body{background:url('Photoroom_20251212_143703.PNG') center top / cover no-repeat fixed; overflow:hidden; display:flex; flex-direction:column;}
@@ -73,10 +73,12 @@ body{background:url('Photoroom_20251212_143703.PNG') center top / cover no-repea
 <script type="module">
 import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
 
+// --- Supabase ---
 const SUPABASE_URL = "https://jyhbamdcxmpveujjqjla.supabase.co";
 const SUPABASE_ANON_KEY = "sb_publishable_sqsxb-3Kl5o3-JQYv9kGFw_-g0EgwMa";
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+// --- Variables ---
 let creations=[];
 let currentView='grid';
 const list=document.getElementById('visitor-list');
@@ -86,14 +88,14 @@ const addBtn=document.getElementById('add');
 const statusDiv=document.getElementById('status');
 const themeBtn=document.getElementById('themeBtn');
 
-// Événements UI attachés **avant** tout async
+// --- UI Event Attachments **avant async**
 document.getElementById('btnCarousel').onclick=()=>setView('carousel');
 document.getElementById('btnGrid').onclick=()=>setView('grid');
 document.getElementById('btnList').onclick=()=>setView('list');
 themeBtn.onclick=()=>openThemeModal();
 document.getElementById('toggleSidebar').onclick=()=>document.getElementById('sidebar').classList.toggle('sidebar-open');
 
-// Fonctions UI
+// --- UI Functions ---
 function renderCreations(){
   list.innerHTML='';
   list.className=currentView+'-view';
@@ -129,7 +131,7 @@ function setTheme(t){
 function createSnow(){ snow.innerHTML=''; for(let i=0;i<35;i++){ const f=document.createElement('div'); f.className='snowflake'; f.textContent='❄️'; f.style.left=Math.random()*100+'%'; f.style.animationDuration=4+Math.random()*6+'s'; f.style.fontSize=12+Math.random()*14+'px'; snow.appendChild(f); } }
 function createCandy(){ sweetRain.innerHTML=''; for(let i=0;i<35;i++){ const c=document.createElement('div'); c.className='candy'; c.textContent='🍬'; c.style.left=Math.random()*100+'%'; c.style.animationDuration=4+Math.random()*6+'s'; sweetRain.appendChild(c); } }
 
-// Charger créations depuis Supabase
+// --- Async Functions ---
 async function loadCreations(){
   const { data, error } = await supabase.from('creations').select('*').order('created_at',{ascending:false});
   if(error){ console.error(error); return; }
@@ -137,18 +139,17 @@ async function loadCreations(){
   renderCreations();
 }
 
-// Ajouter une création
 addBtn.onclick=async()=>{
   const name=nameInput.value.trim();
   const file=photoInput.files[0];
   if(!name||!file){ alert("Nom + photo requis"); return; }
 
-  const fileExt = file.name.split('.').pop();
-  const fileName = `${Date.now()}.${fileExt}`;
-  const filePath = `images/${fileName}`;
+  const fileExt=file.name.split('.').pop();
+  const fileName=`${Date.now()}.${fileExt}`;
+  const filePath=`images/${fileName}`;
   statusDiv.textContent="📤 Upload en cours…";
 
-  const { data: uploadData, error: uploadError } = await supabase.storage.from('images').upload(filePath, file);
+  const { data: uploadData, error: uploadError } = await supabase.storage.from('images').upload(filePath,file);
   if(uploadError){ statusDiv.textContent=`❌ Upload: ${uploadError.message}`; console.error(uploadError); return; }
 
   const { publicURL } = supabase.storage.from('images').getPublicUrl(filePath);
@@ -159,11 +160,11 @@ addBtn.onclick=async()=>{
 
   creations.unshift({ name, imgUrl: publicURL });
   renderCreations();
-  nameInput.value='';
-  photoInput.value='';
+  nameInput.value=''; photoInput.value='';
   statusDiv.textContent="✅ Création ajoutée !";
 };
 
+// --- Initial Load ---
 loadCreations();
 </script>
 </body>
