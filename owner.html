@@ -8,7 +8,6 @@
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{height:100%;font-family:'Comic Sans MS',cursive}
 
-/* BODY */
 body{
   background:url('Photoroom_20251212_143703.PNG') center top / cover no-repeat fixed;
   overflow:hidden;
@@ -16,13 +15,12 @@ body{
   flex-direction:column;
 }
 
-/* BOUTONS VUE */
+/* BOUTONS */
 #viewSelector{
   display:flex;
   justify-content:center;
   gap:12px;
-  margin-top:20px;
-  margin-bottom:20px;
+  margin:20px 0;
 }
 #viewSelector button{
   background:#fff0f7;
@@ -47,10 +45,11 @@ body{
   justify-content:center;
   gap:16px;
   max-width:1200px;
+  flex-wrap:wrap;
 }
 
-/* ITEMS */
-.visitor-item{text-align:center;cursor:pointer;}
+/* ITEM */
+.visitor-item{text-align:center}
 .visitor-item img{
   width:220px;
   height:220px;
@@ -60,15 +59,10 @@ body{
 }
 .visitor-item p{
   margin-top:8px;
-  font-size:20px;
+  font-size:18px;
   color:#b84c6f;
   font-weight:bold;
 }
-
-/* VUES */
-.carousel-view{flex-wrap:nowrap;overflow-x:auto}
-.grid-view{flex-wrap:wrap}
-.list-view{flex-direction:column}
 
 /* SIDEBAR */
 #sidebar{
@@ -77,7 +71,7 @@ body{
   left:-220px;
   width:220px;
   height:100vh;
-  background:rgba(255,230,240,0.2);
+  background:rgba(255,230,240,0.25);
   border-right:2px solid #b67385;
   padding:20px;
   transition:left .3s;
@@ -97,91 +91,25 @@ body{
   justify-content:center;
   cursor:pointer;
 }
-#sidebar button{
+#sidebar input,#sidebar button{
   width:100%;
   margin-top:10px;
   padding:10px;
   border-radius:12px;
   border:none;
+}
+#sidebar button{
   background:#ffb6c1;
-  cursor:pointer;
   font-weight:bold;
-}
-
-/* MODAL */
-.modal-bg{
-  position:fixed;
-  inset:0;
-  background:rgba(0,0,0,.6);
-  display:none;
-  justify-content:center;
-  align-items:center;
-  z-index:9999;
-}
-.modal-box{
-  background:#ffe6f0;
-  padding:20px;
-  border-radius:18px;
-  border:4px solid #b67385;
-  max-width:500px;
-  width:90%;
-  text-align:center;
-}
-.modal-box img.main-photo{
-  width:100%;
-  max-height:400px;
-  object-fit:contain;
-  margin-bottom:10px;
-}
-.modal-box .thumbs{
-  display:flex;
-  justify-content:center;
-  gap:8px;
-  flex-wrap:wrap;
-}
-.modal-box .thumbs img{
-  width:60px;
-  height:60px;
-  object-fit:cover;
   cursor:pointer;
-  border:2px solid #b84c6f;
-  border-radius:8px;
 }
-.modal-box button{margin-top:10px;padding:10px;border-radius:12px;border:none;background:#ffb6c1;cursor:pointer; font-weight:bold;}
-
-/* Likes / commentaires */
-.likes-comments{
-  display:flex;
-  justify-content:space-between;
-  margin-top:10px;
-}
-.likes-comments .likes, .likes-comments .comments{
-  display:flex;
-  align-items:center;
-  gap:4px;
-  font-size:16px;
-}
-.comments-list{
-  margin-top:8px;
-  text-align:left;
-  max-height:150px;
-  overflow-y:auto;
-  font-size:14px;
-}
-.snow{position:fixed;inset:0;pointer-events:none;display:none}
-.snowflake{position:absolute;top:-10px;animation:snowFall linear infinite}
-@keyframes snowFall{100%{transform:translateY(110vh)}}
 </style>
 </head>
 
 <body>
 
-<div id="snow" class="snow"></div>
-
 <div id="viewSelector">
-  <button id="btnCarousel">Carrousel</button>
   <button id="btnGrid">Grille</button>
-  <button id="btnList">Liste</button>
 </div>
 
 <div class="center-zone">
@@ -193,31 +121,6 @@ body{
   <input id="name" placeholder="Nom">
   <input id="photo" type="file" accept="image/*">
   <button id="add">Ajouter</button>
-  <button onclick="openThemeModal()">Thème</button>
-</div>
-
-<!-- MODAL THÈME -->
-<div class="modal-bg" id="themeModal" onclick="closeThemeModal(event)">
-  <div class="modal-box" onclick="event.stopPropagation()">
-    <button onclick="setTheme('noel')">🎄 Noël</button>
-    <button onclick="setTheme('default')">💠 Défaut</button>
-    <button onclick="setTheme('sweety')">🌸 Sweety</button>
-  </div>
-</div>
-
-<!-- MODAL AJOUT / ZOOM -->
-<div class="modal-bg" id="photoModal">
-  <div class="modal-box" id="photoModalBox">
-    <input type="file" id="multiPhotoInput" multiple accept="image/*">
-    <img src="" class="main-photo" id="mainPhoto">
-    <div class="thumbs" id="thumbsContainer"></div>
-    <div class="likes-comments">
-      <div class="likes"><span id="likeBtn" style="cursor:pointer">❤️</span> <span id="likeCount">0</span></div>
-      <div class="comments">💬 <span id="commentCount">0</span></div>
-    </div>
-    <div class="comments-list" id="commentsList"></div>
-    <button onclick="closePhotoModal()">Fermer</button>
-  </div>
 </div>
 
 <script type="module">
@@ -228,123 +131,74 @@ const supabase = createClient(
   "sb_publishable_sqsxb-3Kl5o3-JQYv9kGFw_-g0EgwMa"
 );
 
-let creations=[];
-let currentView='grid';
+const list = document.getElementById('visitor-list');
+const nameInput = document.getElementById('name');
+const photoInput = document.getElementById('photo');
 
-const list=document.getElementById('visitor-list');
-const nameInput=document.getElementById('name');
-const photoInput=document.getElementById('photo');
+let creations = [];
 
+/* 🔁 LOAD (RAFRAÎCHISSEMENT OK) */
 async function loadCreations(){
   const { data, error } = await supabase
     .from("creations")
-    .select("*")
+    .select("name,image_path")
     .order("created_at",{ascending:false});
 
-  if(error){ console.error(error); return; }
+  if(error){
+    console.error(error);
+    return;
+  }
 
-  creations = data.map(c => {
-    const publicUrl = `https://jyhbamdcxmpveujjqjla.supabase.co/storage/v1/object/public/images/${c.image_path}`;
-    return { name: c.name, imgUrl: publicUrl };
-  });
+  creations = data.map(c => ({
+    name: c.name,
+    imgUrl: `https://jyhbamdcxmpveujjqjla.supabase.co/storage/v1/object/public/images/${c.image_path}`
+  }));
 
-  renderCreations();
+  render();
 }
 
-function renderCreations(){
+function render(){
   list.innerHTML='';
-  list.className=currentView+'-view';
   creations.forEach(c=>{
     const d=document.createElement('div');
     d.className='visitor-item';
-    d.innerHTML=`<p>${c.name}</p><img src="${c.imgUrl}" onclick="openPhotoModal('${c.imgUrl}')">`;
+    d.innerHTML=`<p>${c.name}</p><img src="${c.imgUrl}">`;
     list.appendChild(d);
   });
 }
 
-// Ajouter image(s) simple
-document.getElementById('add').addEventListener('click', ()=>{
-  document.getElementById('photoModal').style.display='flex';
-});
+/* ➕ AJOUT */
+document.getElementById('add').onclick = async () => {
+  const name = nameInput.value.trim();
+  const file = photoInput.files[0];
+  if(!name || !file) return alert("Nom + photo");
 
-// SIDEBAR toggle
-document.getElementById('toggleSidebar').onclick=()=>document.getElementById('sidebar').classList.toggle('sidebar-open');
+  const path = `${Date.now()}_${file.name}`;
 
-// Vues
-document.getElementById('btnCarousel').onclick=()=>{currentView='carousel';renderCreations();}
-document.getElementById('btnGrid').onclick=()=>{currentView='grid';renderCreations();}
-document.getElementById('btnList').onclick=()=>{currentView='list';renderCreations();}
+  const { error: upErr } = await supabase
+    .storage.from("images")
+    .upload(path, file);
 
-// Thèmes
-function openThemeModal(){document.getElementById('themeModal').style.display='flex'}
-function closeThemeModal(){document.getElementById('themeModal').style.display='none'}
-function setTheme(t){
-  if(t==='noel'){document.body.style.backgroundImage="url('noel.png')"}
-  else if(t==='sweety'){document.body.style.backgroundImage="url('sweety-girly.png')"}
-  else{document.body.style.backgroundImage="url('Photoroom_20251212_143703.PNG')"}
-  closeThemeModal();
-}
-window.openThemeModal=openThemeModal;
-window.closeThemeModal=closeThemeModal;
-window.setTheme=setTheme;
-
-// MODAL PHOTO
-const mainPhoto=document.getElementById('mainPhoto');
-const thumbsContainer=document.getElementById('thumbsContainer');
-const photoModal=document.getElementById('photoModal');
-const likeBtn=document.getElementById('likeBtn');
-const likeCount=document.getElementById('likeCount');
-const commentCount=document.getElementById('commentCount');
-const commentsList=document.getElementById('commentsList');
-const multiPhotoInput=document.getElementById('multiPhotoInput');
-
-let currentPhotos=[]; 
-let currentLikes=0;
-let currentComments=[];
-
-multiPhotoInput.addEventListener('change', async (e)=>{
-  const files=Array.from(e.target.files);
-  if(!files.length) return;
-  currentPhotos=[];
-  thumbsContainer.innerHTML='';
-  mainPhoto.src=URL.createObjectURL(files[0]);
-  for(let i=0;i<files.length;i++){
-    const f=files[i];
-    const url=URL.createObjectURL(f);
-    currentPhotos.push(url);
-    const img=document.createElement('img');
-    img.src=url;
-    img.onclick=()=>{mainPhoto.src=url;}
-    thumbsContainer.appendChild(img);
-    // Upload chaque fichier
-    const path=`${Date.now()}_${f.name}`;
-    const { error } = await supabase.storage.from("images").upload(path,f);
-    if(error){console.error(error);}
-    else{ await supabase.from("creations").insert([{name:nameInput.value||'Anon',image_path:path}]); }
+  if(upErr){
+    alert(upErr.message);
+    return;
   }
+
+  await supabase.from("creations").insert({
+    name,
+    image_path: path
+  });
+
+  nameInput.value='';
+  photoInput.value='';
   loadCreations();
-});
+};
 
-function openPhotoModal(url){
-  mainPhoto.src=url;
-  photoModal.style.display='flex';
-  currentLikes=0; likeCount.textContent=currentLikes;
-  currentComments=[]; commentCount.textContent=0; commentsList.innerHTML='';
-}
+/* SIDEBAR */
+document.getElementById('toggleSidebar').onclick=()=>{
+  document.getElementById('sidebar').classList.toggle('sidebar-open');
+};
 
-function closePhotoModal(){photoModal.style.display='none';}
-
-// Likes
-likeBtn.onclick=()=>{
-  const prenom=prompt("Ton prénom pour liker ?");
-  if(!prenom) return;
-  currentLikes++; likeCount.textContent=currentLikes;
-  const div=document.createElement('div');
-  div.textContent=prenom;
-  commentsList.appendChild(div);
-}
-
-// Charger images existantes
 loadCreations();
 </script>
 
