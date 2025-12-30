@@ -64,7 +64,6 @@ body{
   color:#b84c6f;
   font-weight:bold;
 }
-/* Croix supprimer image */
 .visitor-item .delete-btn{
   position:absolute;
   top:5px;
@@ -144,6 +143,7 @@ body{
   align-items:center;
 }
 #addModal input[type=file]{margin:10px 0;}
+#addModal input[type=text]{padding:8px;width:80%;margin-bottom:10px;}
 #addModal button{padding:10px 20px;border:none;background:#ff69b4;color:#fff;border-radius:12px;cursor:pointer;}
 
 /* MODAL ZOOM */
@@ -184,7 +184,6 @@ body{
 
 <div id="sidebar">
   <div id="toggleSidebar">☰</div>
-  <input id="name" placeholder="Nom">
   <button id="addBtn">Ajouter</button>
   <button onclick="openThemeModal()">Thème</button>
 </div>
@@ -193,6 +192,7 @@ body{
 <div id="addModal">
   <div class="modal-box">
     <h2>Ajouter des photos</h2>
+    <input type="text" id="modalName" placeholder="Nom">
     <input type="file" id="multiPhoto" accept="image/*" multiple>
     <button id="confirmAdd">Valider</button>
   </div>
@@ -209,18 +209,13 @@ body{
 
 <script type="module">
 import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
-
 const supabase = createClient(
   "https://jyhbamdcxmpveujjqjla.supabase.co",
   "sb_publishable_sqsxb-3Kl5o3-JQYv9kGFw_-g0EgwMa"
 );
 
-let creations=[];
-let currentView='grid';
-let currentZoomData=null;
-
+let creations=[]; let currentView='grid'; let currentZoomData=null;
 const list=document.getElementById('visitor-list');
-const nameInput=document.getElementById('name');
 const addModal=document.getElementById('addModal');
 const zoomModal=document.getElementById('zoomModal');
 const mainZoom=document.getElementById('mainZoom');
@@ -230,7 +225,6 @@ const thumbs=document.getElementById('thumbs');
 async function loadCreations(){
   const { data, error } = await supabase.from("creations").select("*").order("created_at",{ascending:false});
   if(error){ console.error(error); return; }
-
   creations = data.map(c=>{
     const publicUrl = `https://jyhbamdcxmpveujjqjla.supabase.co/storage/v1/object/public/images/${c.image_path}`;
     return {id:c.id, name:c.name, imgUrl:publicUrl, zoomGroup:[publicUrl]};
@@ -251,11 +245,7 @@ function renderCreations(){
       <img src="${c.imgUrl}">
     `;
     list.appendChild(d);
-
-    // Click pour zoom
     d.querySelector('img').onclick=()=>openZoom(c);
-
-    // Click pour supprimer
     d.querySelector('.delete-btn').onclick=()=>deleteImage(c.id);
   });
 }
@@ -263,29 +253,21 @@ function renderCreations(){
 // ------------------- ADD -------------------
 document.getElementById('addBtn').onclick = ()=> addModal.style.display='flex';
 addModal.onclick=(e)=>{ if(e.target===addModal) addModal.style.display='none'; };
-
 document.getElementById('confirmAdd').onclick = async ()=>{
   const files = document.getElementById('multiPhoto').files;
-  if(!files.length) return alert("Choisir au moins une photo");
-  const name = nameInput.value.trim();
-  if(!name) return alert("Entrer un nom");
+  const name = document.getElementById('modalName').value.trim();
+  if(!files.length || !name) return alert("Nom + au moins une photo");
 
-  let firstPublicUrl=null;
-  let firstId=null;
-  const zoomGroup=[];
-
+  let firstPublicUrl=null; let firstId=null; const zoomGroup=[];
   for(let i=0;i<files.length;i++){
     const file = files[i];
     const path = `${Date.now()}_${file.name}`;
     const { error } = await supabase.storage.from('images').upload(path,file);
     if(error){ alert(error.message); continue; }
-
     const { data:insertData, error:insertError } = await supabase.from('creations').insert([{name,image_path:path}]).select();
     if(insertError){ alert(insertError.message); continue; }
-
     const publicUrl=`https://jyhbamdcxmpveujjqjla.supabase.co/storage/v1/object/public/images/${path}`;
     zoomGroup.push(publicUrl);
-
     if(i===0){
       firstPublicUrl=publicUrl;
       firstId=insertData[0].id;
@@ -294,9 +276,8 @@ document.getElementById('confirmAdd').onclick = async ()=>{
       creations[0].zoomGroup.push(publicUrl);
     }
   }
-
   addModal.style.display='none';
-  nameInput.value='';
+  document.getElementById('modalName').value='';
   document.getElementById('multiPhoto').value='';
   renderCreations();
 };
@@ -354,6 +335,5 @@ window.setTheme=setTheme;
 // ------------------- LOAD -------------------
 loadCreations();
 </script>
-
 </body>
 </html>
