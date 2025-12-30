@@ -188,9 +188,7 @@ const nameInput=document.getElementById('name');
 const photoInput=document.getElementById('photo');
 const status=document.getElementById('status');
 
-// ======================
-// CHARGER LES CREATIONS
-// ======================
+// Charger les créations avec les URL publiques correctes
 async function loadCreations(){
   const { data, error } = await supabase
     .from("creations")
@@ -202,20 +200,15 @@ async function loadCreations(){
     return;
   }
 
-  // Convertir path en URL publique
   creations = data.map(c => {
-    const { publicUrl } = supabase.storage
-      .from('images')
-      .getPublicUrl(c.image_path);
+    // Ici on construit l'URL complète avec image_path
+    const publicUrl = `https://jyhbamdcxmpveujjqjla.supabase.co/storage/v1/object/public/images/${c.image_path}`;
     return { name: c.name, imgUrl: publicUrl };
   });
 
   renderCreations();
 }
 
-// ======================
-// RENDER DES CREATIONS
-// ======================
 function renderCreations(){
   list.innerHTML='';
   list.className=currentView+'-view';
@@ -227,9 +220,7 @@ function renderCreations(){
   });
 }
 
-// ======================
-// AJOUTER UNE IMAGE
-// ======================
+// Ajouter une image
 document.getElementById('add').addEventListener('click', async ()=>{
   const name=nameInput.value.trim();
   const file=photoInput.files[0];
@@ -241,11 +232,10 @@ document.getElementById('add').addEventListener('click', async ()=>{
   const { error } = await supabase.storage.from("images").upload(path,file);
   if(error) return status.textContent=error.message;
 
-  // Insérer uniquement le path
+  // Insérer seulement le nom du fichier dans la table
   await supabase.from("creations").insert([{name,image_path:path}]);
 
-  // Ajouter localement pour affichage immédiat
-  const { publicUrl } = supabase.storage.from('images').getPublicUrl(path);
+  const publicUrl = `https://jyhbamdcxmpveujjqjla.supabase.co/storage/v1/object/public/images/${path}`;
   creations.unshift({name,imgUrl:publicUrl});
   renderCreations();
 
@@ -254,25 +244,20 @@ document.getElementById('add').addEventListener('click', async ()=>{
   status.textContent="✅ Ajouté !";
 });
 
-// ======================
-// SIDEBAR TOGGLE
-// ======================
+// Sidebar toggle
 document.getElementById('toggleSidebar').onclick=()=>{
   document.getElementById('sidebar').classList.toggle('sidebar-open');
 };
 
-// ======================
-// VUES
-// ======================
+// Vues
 document.getElementById('btnCarousel').onclick=()=>{currentView='carousel';renderCreations();}
 document.getElementById('btnGrid').onclick=()=>{currentView='grid';renderCreations();}
 document.getElementById('btnList').onclick=()=>{currentView='list';renderCreations();}
 
-// ======================
-// THEMES
-// ======================
+// Thèmes
 function openThemeModal(){document.getElementById('themeModal').style.display='flex'}
 function closeThemeModal(){document.getElementById('themeModal').style.display='none'}
+
 function setTheme(t){
   if(t==='noel'){document.body.style.backgroundImage="url('noel.png')"}
   else if(t==='sweety'){document.body.style.backgroundImage="url('sweety-girly.png')"}
@@ -280,12 +265,12 @@ function setTheme(t){
   closeThemeModal();
 }
 
-// Rendre fonctions accessibles au HTML
+/* 🔥 RENDRE ACCESSIBLE AU HTML */
 window.openThemeModal=openThemeModal;
 window.closeThemeModal=closeThemeModal;
 window.setTheme=setTheme;
 
-// Charger les images au démarrage
+// Charger les images dès le chargement
 loadCreations();
 </script>
 
