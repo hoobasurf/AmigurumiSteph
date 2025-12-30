@@ -188,20 +188,34 @@ const nameInput=document.getElementById('name');
 const photoInput=document.getElementById('photo');
 const status=document.getElementById('status');
 
-/* 🔹 CHARGER LES IMAGES ET LES RENDRE PERSISTANTES */
+// ======================
+// CHARGER LES CREATIONS
+// ======================
 async function loadCreations(){
-  const { data, error } = await supabase.from("creations").select("*").order("created_at",{ascending:false});
-  if(error){ console.error(error); return; }
+  const { data, error } = await supabase
+    .from("creations")
+    .select("*")
+    .order("created_at",{ascending:false});
 
-  // Transformer le champ image_path en URL publique
-  creations = data.map(c => ({
-    name: c.name,
-    imgUrl: supabase.storage.from('images').getPublicUrl(c.image_path).publicUrl
-  }));
+  if(error){
+    console.error("Erreur Supabase:", error);
+    return;
+  }
+
+  // Convertir path en URL publique
+  creations = data.map(c => {
+    const { publicUrl } = supabase.storage
+      .from('images')
+      .getPublicUrl(c.image_path);
+    return { name: c.name, imgUrl: publicUrl };
+  });
 
   renderCreations();
 }
 
+// ======================
+// RENDER DES CREATIONS
+// ======================
 function renderCreations(){
   list.innerHTML='';
   list.className=currentView+'-view';
@@ -213,7 +227,9 @@ function renderCreations(){
   });
 }
 
-/* 🔹 BOUTON AJOUTER */
+// ======================
+// AJOUTER UNE IMAGE
+// ======================
 document.getElementById('add').addEventListener('click', async ()=>{
   const name=nameInput.value.trim();
   const file=photoInput.files[0];
@@ -225,10 +241,11 @@ document.getElementById('add').addEventListener('click', async ()=>{
   const { error } = await supabase.storage.from("images").upload(path,file);
   if(error) return status.textContent=error.message;
 
-  const { data:{publicUrl} } = supabase.storage.from("images").getPublicUrl(path);
+  // Insérer uniquement le path
+  await supabase.from("creations").insert([{name,image_path:path}]);
 
-  await supabase.from("creations").insert({name,image_path:path});
-
+  // Ajouter localement pour affichage immédiat
+  const { publicUrl } = supabase.storage.from('images').getPublicUrl(path);
   creations.unshift({name,imgUrl:publicUrl});
   renderCreations();
 
@@ -237,17 +254,23 @@ document.getElementById('add').addEventListener('click', async ()=>{
   status.textContent="✅ Ajouté !";
 });
 
-/* 🔹 SIDEBAR */
+// ======================
+// SIDEBAR TOGGLE
+// ======================
 document.getElementById('toggleSidebar').onclick=()=>{
   document.getElementById('sidebar').classList.toggle('sidebar-open');
 };
 
-/* 🔹 VUES */
+// ======================
+// VUES
+// ======================
 document.getElementById('btnCarousel').onclick=()=>{currentView='carousel';renderCreations();}
 document.getElementById('btnGrid').onclick=()=>{currentView='grid';renderCreations();}
 document.getElementById('btnList').onclick=()=>{currentView='list';renderCreations();}
 
-/* 🔹 THÈMES */
+// ======================
+// THEMES
+// ======================
 function openThemeModal(){document.getElementById('themeModal').style.display='flex'}
 function closeThemeModal(){document.getElementById('themeModal').style.display='none'}
 function setTheme(t){
@@ -257,12 +280,12 @@ function setTheme(t){
   closeThemeModal();
 }
 
-/* 🔹 RENDRE ACCESSIBLE AU HTML */
+// Rendre fonctions accessibles au HTML
 window.openThemeModal=openThemeModal;
 window.closeThemeModal=closeThemeModal;
 window.setTheme=setTheme;
 
-/* 🔹 LANCER CHARGEMENT AU DÉMARRAGE */
+// Charger les images au démarrage
 loadCreations();
 </script>
 
