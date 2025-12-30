@@ -285,41 +285,44 @@ function renderCreations(){
 document.getElementById('addBtn').onclick = ()=> addModal.style.display='flex';
 addModal.onclick=(e)=>{ if(e.target===addModal) addModal.style.display='none'; };
 
-document.getElementById('confirmAdd').onclick = async ()=>{
+document.getElementById('confirmAdd').onclick = async () => {
   const files = document.getElementById('multiPhoto').files;
-  if(!files.length) return alert("Choisir au moins une photo");
+  if (!files.length) return alert("Choisir au moins une photo");
   const name = nameInput.value.trim();
-  if(!name) return alert("Entrer un nom");
+  if (!name) return alert("Entrer un nom");
 
-  let firstPublicUrl=null;
-  let firstId=null;
-  const zoomGroup=[];
+  let firstPublicUrl = null;
+  let firstId = null;
+  const zoomGroup = [];
 
-  for(let i=0;i<files.length;i++){
+  for (let i = 0; i < files.length; i++) {
     const file = files[i];
     const path = `${Date.now()}_${file.name}`;
-    const { error } = await supabase.storage.from('images').upload(path,file);
-    if(error){ alert(error.message); continue; }
+    
+    const { error } = await supabase.storage.from('images').upload(path, file);
+    if (error) { alert(error.message); continue; }
 
-    const { data:insertData, error:insertError } = await supabase.from('creations').insert([{name,image_path:path}]).select();
-    if(insertError){ alert(insertError.message); continue; }
+    const { data: insertData, error: insertError } = await supabase
+      .from('creations')
+      .insert([{ name, image_path: path }])
+      .select();
+    if (insertError) { alert(insertError.message); continue; }
 
-    const publicUrl=`https://jyhbamdcxmpveujjqjla.supabase.co/storage/v1/object/public/images/${path}`;
+    const publicUrl = `https://jyhbamdcxmpveujjqjla.supabase.co/storage/v1/object/public/images/${path}`;
     zoomGroup.push(publicUrl);
 
-    if(i===0){
-      firstPublicUrl=publicUrl;
-      firstId=insertData[0].id;
-      creations.unshift({id:firstId,name,imgUrl:firstPublicUrl,zoomGroup, likes:[], comments:[]});
+    if (i === 0) {
+      firstPublicUrl = publicUrl;
+      firstId = insertData[0].id;
+      creations.unshift({ id: firstId, name, imgUrl: firstPublicUrl, zoomGroup });
     } else {
       creations[0].zoomGroup.push(publicUrl);
     }
   }
 
-  // Fermer la modal et réinitialiser les champs
-  addModal.style.display='none';
-  nameInput.value='';
-  document.getElementById('multiPhoto').value='';
+  addModal.style.display = 'none';
+  nameInput.value = '';
+  document.getElementById('multiPhoto').value = '';
   renderCreations();
 };
 
