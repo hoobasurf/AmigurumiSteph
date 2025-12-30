@@ -188,7 +188,13 @@ const nameInput=document.getElementById('name');
 const photoInput=document.getElementById('photo');
 const status=document.getElementById('status');
 
-// Charger les créations et convertir les paths en URL publiques
+// Convertir un path stocké en URL publique
+function pathToPublicUrl(path){
+  const { publicUrl } = supabase.storage.from('images').getPublicUrl(path);
+  return publicUrl;
+}
+
+// Charger toutes les créations et convertir path → URL
 async function loadCreations(){
   const { data, error } = await supabase
     .from("creations")
@@ -200,11 +206,7 @@ async function loadCreations(){
     return;
   }
 
-  creations = data.map(c => {
-    const { publicUrl } = supabase.storage.from('images').getPublicUrl(c.image_path);
-    return { name: c.name, imgUrl: publicUrl };
-  });
-
+  creations = data.map(c => ({ name: c.name, imgUrl: pathToPublicUrl(c.image_path) }));
   renderCreations();
 }
 
@@ -231,12 +233,9 @@ document.getElementById('add').addEventListener('click', async ()=>{
   const { error } = await supabase.storage.from("images").upload(path,file);
   if(error) return status.textContent=error.message;
 
-  const { data:{publicUrl} } = supabase.storage.from("images").getPublicUrl(path);
-
-  // Insérer seulement le path dans la table
   await supabase.from("creations").insert([{name,image_path:path}]);
 
-  creations.unshift({name,imgUrl:publicUrl});
+  creations.unshift({name,imgUrl:pathToPublicUrl(path)});
   renderCreations();
 
   nameInput.value='';
@@ -257,7 +256,6 @@ document.getElementById('btnList').onclick=()=>{currentView='list';renderCreatio
 // Thèmes
 function openThemeModal(){document.getElementById('themeModal').style.display='flex'}
 function closeThemeModal(){document.getElementById('themeModal').style.display='none'}
-
 function setTheme(t){
   if(t==='noel'){document.body.style.backgroundImage="url('noel.png')"}
   else if(t==='sweety'){document.body.style.backgroundImage="url('sweety-girly.png')"}
@@ -265,12 +263,11 @@ function setTheme(t){
   closeThemeModal();
 }
 
-/* 🔥 RENDRE ACCESSIBLE AU HTML */
 window.openThemeModal=openThemeModal;
 window.closeThemeModal=closeThemeModal;
 window.setTheme=setTheme;
 
-// Charger les images
+// Charger toutes les images au démarrage
 loadCreations();
 </script>
 
