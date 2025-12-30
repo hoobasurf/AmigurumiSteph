@@ -235,6 +235,7 @@ const list=document.getElementById('visitor-list');
 const nameInput=document.getElementById('name');
 const photoInput=document.getElementById('photo');
 
+// Charger les créations
 async function loadCreations(){
   const { data, error } = await supabase
     .from("creations")
@@ -262,12 +263,12 @@ function renderCreations(){
   });
 }
 
-// Ajouter image(s) simple
+// Ajouter image(s) ouvre le modal
 document.getElementById('add').addEventListener('click', ()=>{
   document.getElementById('photoModal').style.display='flex';
 });
 
-// SIDEBAR toggle
+// Sidebar toggle
 document.getElementById('toggleSidebar').onclick=()=>document.getElementById('sidebar').classList.toggle('sidebar-open');
 
 // Vues
@@ -299,24 +300,37 @@ const commentsList=document.getElementById('commentsList');
 const multiPhotoInput=document.getElementById('multiPhotoInput');
 
 let currentPhotos=[]; 
+let firstPhotoUrl=''; // garde la première photo sélectionnée
 let currentLikes=0;
 let currentComments=[];
 
+// Gestion multi-photos et upload
 multiPhotoInput.addEventListener('change', async (e)=>{
   const files=Array.from(e.target.files);
   if(!files.length) return;
-  currentPhotos=[];
+
   thumbsContainer.innerHTML='';
-  mainPhoto.src=URL.createObjectURL(files[0]);
+  currentPhotos=[];
+  firstPhotoUrl = URL.createObjectURL(files[0]);
+  mainPhoto.src = firstPhotoUrl;
   for(let i=0;i<files.length;i++){
     const f=files[i];
     const url=URL.createObjectURL(f);
     currentPhotos.push(url);
+
     const img=document.createElement('img');
     img.src=url;
-    img.onclick=()=>{mainPhoto.src=url;}
+    img.onclick=()=>{
+      const tmp = mainPhoto.src;
+      mainPhoto.src = url;
+      // échange miniature avec la principale
+      const idx = currentPhotos.indexOf(url);
+      if(idx>=0) currentPhotos[idx]=tmp;
+      img.src=tmp;
+    };
     thumbsContainer.appendChild(img);
-    // Upload chaque fichier
+
+    // Upload sur Supabase
     const path=`${Date.now()}_${f.name}`;
     const { error } = await supabase.storage.from("images").upload(path,f);
     if(error){console.error(error);}
@@ -332,7 +346,10 @@ function openPhotoModal(url){
   currentComments=[]; commentCount.textContent=0; commentsList.innerHTML='';
 }
 
-function closePhotoModal(){photoModal.style.display='none';}
+function closePhotoModal(){
+  mainPhoto.src = firstPhotoUrl; // revient à la première photo initiale
+  photoModal.style.display='none';
+}
 
 // Likes
 likeBtn.onclick=()=>{
