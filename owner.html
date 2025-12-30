@@ -170,8 +170,6 @@ body{
   </div>
 </div>
 
-<p id="status" style="text-align:center;margin:10px">📤 Prêt à uploader…</p>
-
 <script type="module">
 import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
 
@@ -186,7 +184,6 @@ let currentView='grid';
 const list=document.getElementById('visitor-list');
 const nameInput=document.getElementById('name');
 const photoInput=document.getElementById('photo');
-const status=document.getElementById('status');
 
 // Charger les créations avec les URL publiques correctes
 async function loadCreations(){
@@ -201,7 +198,6 @@ async function loadCreations(){
   }
 
   creations = data.map(c => {
-    // Ici on construit l'URL complète avec image_path
     const publicUrl = `https://jyhbamdcxmpveujjqjla.supabase.co/storage/v1/object/public/images/${c.image_path}`;
     return { name: c.name, imgUrl: publicUrl };
   });
@@ -226,13 +222,10 @@ document.getElementById('add').addEventListener('click', async ()=>{
   const file=photoInput.files[0];
   if(!name||!file) return alert("Nom + photo requis");
 
-  status.textContent="📤 Upload…";
-
   const path=`${Date.now()}_${file.name}`;
   const { error } = await supabase.storage.from("images").upload(path,file);
-  if(error) return status.textContent=error.message;
+  if(error) return console.error(error.message);
 
-  // Insérer seulement le nom du fichier dans la table
   await supabase.from("creations").insert([{name,image_path:path}]);
 
   const publicUrl = `https://jyhbamdcxmpveujjqjla.supabase.co/storage/v1/object/public/images/${path}`;
@@ -241,7 +234,6 @@ document.getElementById('add').addEventListener('click', async ()=>{
 
   nameInput.value='';
   photoInput.value='';
-  status.textContent="✅ Ajouté !";
 });
 
 // Sidebar toggle
