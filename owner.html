@@ -41,28 +41,54 @@ body{
   align-items:flex-start;
   width:100%;
   overflow:auto;
+  position:relative;
 }
 #visitor-list{
   display:flex;
   justify-content:center;
   gap:16px;
   max-width:1200px;
+  flex-wrap:wrap;
+  position:relative;
 }
 
 /* ITEMS */
-.visitor-item{text-align:center;position:relative;cursor:pointer}
+.visitor-item{
+  text-align:center;
+  position:relative;
+}
 .visitor-item img{
   width:220px;
   height:220px;
   object-fit:contain;
   border:4px solid #b67385;
   background:#ffe6f0;
+  cursor:pointer;
 }
 .visitor-item p{
   margin-top:8px;
   font-size:20px;
   color:#b84c6f;
   font-weight:bold;
+}
+
+/* Croix pour chaque photo */
+.close-img {
+  position:absolute;
+  top:5px;
+  right:5px;
+  width:20px;
+  height:20px;
+  background:pink;
+  color:black;
+  font-weight:bold;
+  font-size:16px;
+  border-radius:50%;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  cursor:pointer;
+  z-index:5;
 }
 
 /* VUES */
@@ -108,8 +134,8 @@ body{
   font-weight:bold;
 }
 
-/* MODAL AJOUT PHOTO */
-#addModal{
+/* MODAL GENERIQUE */
+.modal-bg{
   position:fixed;
   inset:0;
   background:rgba(0,0,0,.6);
@@ -118,83 +144,74 @@ body{
   align-items:center;
   z-index:9999;
 }
-#addModal .modal-box{
+.modal-box{
   background:#ffe6f0;
   padding:20px;
   border-radius:18px;
   border:4px solid #b67385;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-}
-#addModal input[type=file]{margin:10px 0;}
-#addModal button{margin-top:10px;padding:10px;border-radius:12px;border:none;background:#ffb6c1;cursor:pointer;font-weight:bold;}
-#addModal .close-btn{
-  position:absolute;
-  top:10px;
-  right:10px;
-  font-size:20px;
-  font-weight:bold;
-  color:#ff69b4;
-  cursor:pointer;
-}
-
-/* MODAL ZOOM IMAGE */
-#zoomModal{
-  position:fixed;
-  inset:0;
-  background:rgba(0,0,0,.7);
-  display:none;
-  justify-content:center;
-  align-items:center;
-  z-index:10000;
-}
-#zoomModal .zoom-box{
-  background:#ffe6f0;
-  padding:10px;
-  border-radius:18px;
-  border:4px solid #b67385;
   max-width:90%;
   max-height:90%;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  position:relative;
+  overflow:auto;
 }
-#zoomModal img{
-  max-width:600px;
-  max-height:400px;
+
+/* ZOOM */
+#zoomModal .main-img{
+  width:400px;
+  height:400px;
   object-fit:contain;
-  border:2px solid #b84c6f;
+  border:4px solid #b67385;
+  margin-bottom:10px;
 }
 #zoomModal .thumbnails{
   display:flex;
-  gap:10px;
-  margin-top:10px;
+  gap:8px;
+  justify-content:center;
 }
 #zoomModal .thumbnails img{
-  width:60px;
-  height:60px;
-  border:2px solid #b84c6f;
+  width:80px;
+  height:80px;
+  object-fit:contain;
+  border:2px solid #b67385;
+  cursor:pointer;
+  position:relative;
+}
+#zoomModal .thumbnails .close-img {
+  width:16px;
+  height:16px;
+  font-size:14px;
+  top:2px;
+  right:2px;
+}
+.like-comment{
+  display:flex;
+  justify-content:space-between;
+  margin-top:10px;
+}
+.like-comment button{
+  background:#ffb6c1;
+  border:none;
+  padding:6px 12px;
+  border-radius:12px;
   cursor:pointer;
 }
-#zoomModal .close-btn{
-  position:absolute;
-  top:10px;
-  right:10px;
-  font-size:20px;
-  font-weight:bold;
-  color:#ff69b4;
-  cursor:pointer;
+.comment-list{
+  margin-top:10px;
+  background:#fff0f7;
+  border:2px solid #b84c6f;
+  padding:8px;
+  border-radius:12px;
+  max-height:100px;
+  overflow:auto;
 }
 
+/* ANIMATION SNOW */
 .snow{position:fixed;inset:0;pointer-events:none;display:none}
 .snowflake{position:absolute;top:-10px;animation:snowFall linear infinite}
 @keyframes snowFall{100%{transform:translateY(110vh)}}
 </style>
 </head>
-<body>
 
+<body>
 <div id="snow" class="snow"></div>
 
 <div id="viewSelector">
@@ -210,26 +227,37 @@ body{
 <div id="sidebar">
   <div id="toggleSidebar">☰</div>
   <input id="name" placeholder="Nom">
-  <button id="openAddModal">Ajouter</button>
+  <button id="add">Ajouter</button>
   <button onclick="openThemeModal()">Thème</button>
 </div>
 
-<!-- Modal Ajout -->
-<div id="addModal" onclick="closeAddModal(event)">
-  <div class="modal-box" onclick="event.stopPropagation()">
-    <span class="close-btn" onclick="closeAddModal()">×</span>
-    <h3>Choisir des photos</h3>
-    <input id="photoFiles" type="file" accept="image/*" multiple>
-    <button id="validateAdd">Valider</button>
+<!-- MODAL AJOUT -->
+<div class="modal-bg" id="addModal">
+  <div class="modal-box" id="addBox">
+    <h3>Choisir photo(s)</h3>
+    <input type="file" id="multiPhoto" multiple accept="image/*"><br><br>
+    <button id="confirmAdd">Valider</button>
   </div>
 </div>
 
-<!-- Modal Zoom -->
-<div id="zoomModal" onclick="closeZoomModal(event)">
-  <div class="zoom-box" onclick="event.stopPropagation()">
-    <span class="close-btn" onclick="closeZoomModal()">×</span>
-    <img id="zoomMain" src="">
-    <div class="thumbnails" id="zoomThumbs"></div>
+<!-- MODAL ZOOM -->
+<div class="modal-bg" id="zoomModal">
+  <div class="modal-box" id="zoomBox">
+    <img src="" class="main-img" id="mainZoom">
+    <div class="thumbnails" id="thumbs"></div>
+    <div class="like-comment">
+      <button id="likeBtn">❤ Like</button>
+      <button id="commentBtn">💬 Commentaires</button>
+    </div>
+    <div class="comment-list" id="comments"></div>
+  </div>
+</div>
+
+<div class="modal-bg" id="themeModal" onclick="closeThemeModal(event)">
+  <div class="modal-box" onclick="event.stopPropagation()">
+    <button onclick="setTheme('noel')">🎄 Noël</button>
+    <button onclick="setTheme('default')">💠 Défaut</button>
+    <button onclick="setTheme('sweety')">🌸 Sweety</button>
   </div>
 </div>
 
@@ -247,109 +275,118 @@ let creations=[];
 let currentView='grid';
 
 const list=document.getElementById('visitor-list');
+const nameInput=document.getElementById('name');
 const status=document.getElementById('status');
 
-// -------------------- Load Creations --------------------
+const addModal=document.getElementById('addModal');
+const zoomModal=document.getElementById('zoomModal');
+const mainZoom=document.getElementById('mainZoom');
+const thumbs=document.getElementById('thumbs');
+const comments=document.getElementById('comments');
+
+let currentZoomData=null;
+
+// ------------------- Charger créations -------------------
 async function loadCreations(){
-  const { data, error } = await supabase
-    .from("creations")
-    .select("*")
-    .order("created_at",{ascending:false});
-  if(error){ console.error(error); return; }
-  creations = data.map(c => {
+  const { data, error } = await supabase.from("creations").select("*").order("created_at",{ascending:false});
+  if(error){console.error(error);return;}
+  creations = data.map(c=>{
     const publicUrl = `https://jyhbamdcxmpveujjqjla.supabase.co/storage/v1/object/public/images/${c.image_path}`;
-    return { id:c.id, name:c.name, imgUrl: publicUrl };
+    return { id:c.id, name:c.name, imgUrl:publicUrl };
   });
   renderCreations();
 }
 
-// -------------------- Render --------------------
 function renderCreations(){
   list.innerHTML='';
   list.className=currentView+'-view';
   creations.forEach(c=>{
-    const div = document.createElement('div');
-    div.className='visitor-item';
-    div.innerHTML = `<p>${c.name}</p><img src="${c.imgUrl}" data-id="${c.id}">`;
-    // Click to zoom
-    div.querySelector('img').onclick=()=>openZoomModal(c);
-    // Click to delete
-    div.querySelector('img').ondblclick=()=>deleteImage(c.id);
-    list.appendChild(div);
+    const d=document.createElement('div');
+    d.className='visitor-item';
+    d.innerHTML=`<p>${c.name}</p><img src="${c.imgUrl}">`;
+    // Croix pour suppression
+    const closeBtn=document.createElement('div');
+    closeBtn.className='close-img';
+    closeBtn.innerText='×';
+    closeBtn.onclick=(e)=>{
+      e.stopPropagation();
+      deleteImage(c.id);
+    };
+    d.appendChild(closeBtn);
+
+    // Zoom sur clic
+    d.querySelector('img').onclick=()=>{
+      openZoom(c);
+    };
+
+    list.appendChild(d);
   });
 }
 
-// -------------------- Modal Add --------------------
-const addModal = document.getElementById('addModal');
-document.getElementById('openAddModal').onclick=()=>{addModal.style.display='flex';};
-function closeAddModal(e){ if(!e||e.target===addModal)addModal.style.display='none'; }
+// ------------------- Ajouter images -------------------
+document.getElementById('add').onclick=()=>addModal.style.display='flex';
+addModal.onclick=(e)=>{if(e.target===addModal)addModal.style.display='none';};
 
-// -------------------- Modal Zoom --------------------
-const zoomModal=document.getElementById('zoomModal');
-const zoomMain=document.getElementById('zoomMain');
-const zoomThumbs=document.getElementById('zoomThumbs');
-function openZoomModal(c){
-  zoomMain.src=c.imgUrl;
-  zoomThumbs.innerHTML='';
-  zoomModal.style.display='flex';
-}
-function closeZoomModal(e){ if(!e||e.target===zoomModal)zoomModal.style.display='none'; }
+document.getElementById('confirmAdd').onclick=async ()=>{
+  const files=document.getElementById('multiPhoto').files;
+  if(!files.length)return alert("Choisir au moins une photo");
+  const name=nameInput.value.trim();
+  if(!name)return alert("Entrer un nom");
 
-// -------------------- Ajouter les images --------------------
-document.getElementById('validateAdd').onclick=async()=>{
-  const nameInput=document.getElementById('name').value.trim();
-  const files=document.getElementById('photoFiles').files;
-  if(!nameInput||files.length===0) return alert("Nom + photo requis");
-
-  status.textContent="📤 Upload…";
-
-  for(const file of files){
+  for(let i=0;i<files.length;i++){
+    const file=files[i];
     const path=`${Date.now()}_${file.name}`;
-    const { error } = await supabase.storage.from("images").upload(path,file);
-    if(error){ status.textContent=error.message; continue; }
-    await supabase.from("creations").insert([{name:nameInput,image_path:path}]);
-    const publicUrl = `https://jyhbamdcxmpveujjqjla.supabase.co/storage/v1/object/public/images/${path}`;
-    creations.unshift({id:null,name:nameInput,imgUrl:publicUrl});
+    const { error }=await supabase.storage.from('images').upload(path,file);
+    if(error){alert(error.message);continue;}
+    await supabase.from('creations').insert([{name,image_path:path}]);
   }
-
-  renderCreations();
-  closeAddModal();
-  document.getElementById('photoFiles').value='';
-  status.textContent="✅ Ajouté !";
+  addModal.style.display='none';
+  nameInput.value='';
+  document.getElementById('multiPhoto').value='';
+  loadCreations();
 };
 
-// -------------------- Supprimer --------------------
+// ------------------- Zoom -------------------
+function openZoom(c){
+  currentZoomData=c;
+  mainZoom.src=c.imgUrl;
+  thumbs.innerHTML='';
+  // Pour l'instant pas de miniatures multiples, tu pourras rajouter plus tard
+  zoomModal.style.display='flex';
+}
+zoomModal.onclick=(e)=>{if(e.target===zoomModal)zoomModal.style.display='none';};
+
+// ------------------- Supprimer image -------------------
 async function deleteImage(id){
-  if(!confirm("Supprimer cette image ?")) return;
-  await supabase.from("creations").delete().eq('id',id);
-  creations = creations.filter(c=>c.id!==id);
-  renderCreations();
+  await supabase.from('creations').delete().eq('id',id);
+  loadCreations();
 }
 
-// -------------------- Sidebar toggle --------------------
+// ------------------- Sidebar toggle -------------------
 document.getElementById('toggleSidebar').onclick=()=>document.getElementById('sidebar').classList.toggle('sidebar-open');
 
-// -------------------- Vues --------------------
+// ------------------- Vues -------------------
 document.getElementById('btnCarousel').onclick=()=>{currentView='carousel';renderCreations();}
 document.getElementById('btnGrid').onclick=()=>{currentView='grid';renderCreations();}
 document.getElementById('btnList').onclick=()=>{currentView='list';renderCreations();}
 
-// -------------------- Thèmes --------------------
+// ------------------- Thèmes -------------------
 function openThemeModal(){document.getElementById('themeModal').style.display='flex'}
 function closeThemeModal(){document.getElementById('themeModal').style.display='none'}
 function setTheme(t){
-  if(t==='noel'){document.body.style.backgroundImage="url('noel.png')"}
-  else if(t==='sweety'){document.body.style.backgroundImage="url('sweety-girly.png')"}
-  else{document.body.style.backgroundImage="url('Photoroom_20251212_143703.PNG')"}
+  if(t==='noel')document.body.style.backgroundImage="url('noel.png')";
+  else if(t==='sweety')document.body.style.backgroundImage="url('sweety-girly.png')";
+  else document.body.style.backgroundImage="url('Photoroom_20251212_143703.PNG')";
   closeThemeModal();
 }
+
+/* 🔥 Accessible au HTML */
 window.openThemeModal=openThemeModal;
 window.closeThemeModal=closeThemeModal;
 window.setTheme=setTheme;
 
-// -------------------- Initial load --------------------
+// ------------------- Initial -------------------
 loadCreations();
-
 </script>
 </body>
 </html>
