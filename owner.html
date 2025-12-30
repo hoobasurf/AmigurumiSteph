@@ -21,9 +21,8 @@ body{
   display:flex;
   justify-content:center;
   gap:12px;
-  margin:10px auto 20px auto; /* boutons en haut */
-  position: relative;
-  z-index: 2;
+  margin-top:20px;
+  margin-bottom:20px;
 }
 #viewSelector button{
   background:#fff0f7;
@@ -36,13 +35,12 @@ body{
 
 /* CONTENU */
 .center-zone{
-  flex: 1 1 auto;
+  flex:1;
   display:flex;
   justify-content:center;
   align-items:flex-start;
   width:100%;
-  overflow-y:auto;       /* scroll vertical si nécessaire */
-  padding: 10px 0 20px 0; /* marge en haut et bas */
+  overflow:auto;
 }
 #visitor-list{
   display:flex;
@@ -136,11 +134,9 @@ body{
   cursor:pointer;
 }
 
-/* NEIGE */
 .snow{position:fixed;inset:0;pointer-events:none;display:none}
 .snowflake{position:absolute;top:-10px;animation:snowFall linear infinite}
 @keyframes snowFall{100%{transform:translateY(110vh)}}
-
 </style>
 </head>
 
@@ -192,23 +188,39 @@ const nameInput=document.getElementById('name');
 const photoInput=document.getElementById('photo');
 const status=document.getElementById('status');
 
+// Charger les créations depuis Supabase
 async function loadCreations(){
-  const { data } = await supabase.from("creations").select("*").order("created_at",{ascending:false});
-  creations=data||[];
+  const { data, error } = await supabase
+    .from("creations")
+    .select("*")
+    .order("created_at",{ascending:false});
+
+  if(error){
+    console.error("Erreur Supabase:", error);
+    return;
+  }
+
+  creations = data.map(c => ({
+    name: c.name,
+    imgUrl: c.image_path // <-- utilisation de image_path
+  }));
+
   renderCreations();
 }
 
+// Afficher les créations
 function renderCreations(){
   list.innerHTML='';
   list.className=currentView+'-view';
   creations.forEach(c=>{
     const d=document.createElement('div');
     d.className='visitor-item';
-    d.innerHTML=`<p>${c.name}</p><img src="${c.image_url}">`;
+    d.innerHTML=`<p>${c.name}</p><img src="${c.imgUrl}">`;
     list.appendChild(d);
   });
 }
 
+// Ajouter une image
 document.getElementById('add').addEventListener('click', async ()=>{
   const name=nameInput.value.trim();
   const file=photoInput.files[0];
@@ -222,9 +234,10 @@ document.getElementById('add').addEventListener('click', async ()=>{
 
   const { data:{publicUrl} } = supabase.storage.from("images").getPublicUrl(path);
 
-  await supabase.from("creations").insert({name,image_url:publicUrl});
+  // Insert dans Supabase en utilisant image_path
+  await supabase.from("creations").insert({name,image_path:publicUrl});
 
-  creations.unshift({name,image_url:publicUrl});
+  creations.unshift({name,imgUrl:publicUrl});
   renderCreations();
 
   nameInput.value='';
@@ -232,14 +245,17 @@ document.getElementById('add').addEventListener('click', async ()=>{
   status.textContent="✅ Ajouté !";
 });
 
+// Sidebar toggle
 document.getElementById('toggleSidebar').onclick=()=>{
   document.getElementById('sidebar').classList.toggle('sidebar-open');
 };
 
+// Boutons vue
 document.getElementById('btnCarousel').onclick=()=>{currentView='carousel';renderCreations();}
 document.getElementById('btnGrid').onclick=()=>{currentView='grid';renderCreations();}
 document.getElementById('btnList').onclick=()=>{currentView='list';renderCreations();}
 
+// Modal thèmes
 function openThemeModal(){document.getElementById('themeModal').style.display='flex'}
 function closeThemeModal(){document.getElementById('themeModal').style.display='none'}
 
@@ -250,11 +266,12 @@ function setTheme(t){
   closeThemeModal();
 }
 
-/* 🔥 RENDRE ACCESSIBLE AU HTML */
+/* 🔥 Rendre accessible au HTML */
 window.openThemeModal=openThemeModal;
 window.closeThemeModal=closeThemeModal;
 window.setTheme=setTheme;
 
+// Charger au démarrage
 loadCreations();
 </script>
 
