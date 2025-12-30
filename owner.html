@@ -5,202 +5,37 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Gestion Amigurumi</title>
 <style>
+/* === Ton CSS existant === */
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{height:100%;font-family:'Comic Sans MS',cursive}
-
-/* BODY */
-body{
-  background:url('Photoroom_20251212_143703.PNG') center top / cover no-repeat fixed;
-  overflow:hidden;
-  display:flex;
-  flex-direction:column;
-}
-
-/* HEADER */
-header{text-align:center;padding:12px 0}
-header img{width:98px;height:98px;border-radius:20%;margin:auto}
-.title{display:none}
-
-/* BOUTONS VUE */
-#viewSelector{
-  display:flex;
-  justify-content:center;
-  gap:12px;
-  margin-top:500px;
-  margin-bottom:20px;
-}
-#viewSelector button{
-  background:#fff0f7;
-  border:2px solid #b84c6f;
-  color:#b84c6f;
-  padding:8px 16px;
-  border-radius:24px;
-  cursor:pointer;
-}
-
-/* CONTENU */
-.center-zone{
-  flex:1;
-  display:flex;
-  justify-content:center;
-  align-items:flex-start;
-  width:100%;
-  overflow:auto;
-}
-#visitor-list{
-  display:flex;
-  justify-content:center;
-  gap:16px;
-  max-width:1200px;
-}
-
-/* ITEMS */
-.visitor-item{text-align:center;cursor:pointer}
-.visitor-item img{
-  width:220px;
-  height:220px;
-  object-fit:contain;
-  border:4px solid #b67385;
-  background:#ffe6f0;
-}
-.visitor-item p{
-  margin-top:8px;
-  font-size:20px;
-  color:#b84c6f;
-  font-weight:bold;
-}
-
-/* VUES */
-.carousel-view{
-  flex-wrap:nowrap;
-  overflow-x:auto;
-  scroll-behavior:smooth;
-}
+body{background:url('Photoroom_20251212_143703.PNG') center top / cover no-repeat fixed; overflow:hidden; display:flex; flex-direction:column;}
+#viewSelector{display:flex; justify-content:center; gap:12px; margin-top:500px; margin-bottom:20px;}
+#viewSelector button{background:#fff0f7; border:2px solid #b84c6f; color:#b84c6f; padding:8px 16px; border-radius:24px; cursor:pointer;}
+.center-zone{flex:1; display:flex; justify-content:center; align-items:flex-start; width:100%; overflow:auto;}
+#visitor-list{display:flex; justify-content:center; gap:16px; max-width:1200px;}
+.visitor-item{text-align:center; cursor:pointer;}
+.visitor-item img{width:220px; height:220px; object-fit:contain; border:4px solid #b67385; background:#ffe6f0;}
+.visitor-item p{margin-top:8px; font-size:20px; color:#b84c6f; font-weight:bold;}
+.carousel-view{flex-wrap:nowrap; overflow-x:auto; scroll-behavior:smooth;}
 .carousel-view::-webkit-scrollbar{height:8px}
 .carousel-view::-webkit-scrollbar-thumb{background:#b84c6f88;border-radius:20px}
-
-.grid-view{
-  flex-wrap:wrap;
-}
-
-.list-view{
-  flex-direction:column;
-}
-.list-view .visitor-item{
-  display:flex;
-  align-items:center;
-  gap:16px;
-}
-.list-view .visitor-item img{
-  width:140px;
-  height:140px;
-}
-
-/* SIDEBAR */
-#sidebar{
-  position:fixed;
-  top:0;
-  left:-220px;
-  width:220px;
-  height:100vh;
-  background:rgba(255,230,240,0.15);
-  border-right:2px solid #b67385;
-  padding:20px;
-  transition:left .3s ease;
-  z-index:10;
-}
+.grid-view{flex-wrap:wrap;}
+.list-view{flex-direction:column;}
+.list-view .visitor-item{display:flex; align-items:center; gap:16px;}
+.list-view .visitor-item img{width:140px; height:140px;}
+#sidebar{position:fixed; top:0; left:-220px; width:220px; height:100vh; background:rgba(255,230,240,0.15); border-right:2px solid #b67385; padding:20px; transition:left .3s ease; z-index:10;}
 #sidebar.sidebar-open{left:0}
-#toggleSidebar{
-  position:absolute;
-  top:50%;
-  right:-30px;
-  width:30px;
-  height:60px;
-  background:#ffb6c1;
-  color:#8b3a3a;
-  border-radius:0 12px 12px 0;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  cursor:pointer;
-  border:1px solid #b67385;
-  font-weight:bold;
-}
-#sidebar button{
-  width:100%;
-  margin-bottom:10px;
-  padding:10px;
-  border:none;
-  border-radius:12px;
-  background:#ffb6c1;
-  color:#8b3a3a;
-  font-weight:bold;
-  cursor:pointer;
-}
-/* NEIGE */
-.snow{
-  position:fixed;
-  inset:0;
-  pointer-events:none;
-  z-index:5;
-  display:none;
-}
-
-/* MODAL THEME */
-.modal-bg{
-  position:fixed;
-  inset:0;
-  background:rgba(0,0,0,.6);
-  display:none;
-  justify-content:center;
-  align-items:center;
-  z-index:9999;
-}
-.modal-box{
-  background:#ffe6f0;
-  border:4px solid #b67385;
-  border-radius:18px;
-  padding:20px;
-  text-align:center;
-}
-.modal-box button{
-  width:100%;
-  margin:8px 0;
-  padding:10px;
-  border:none;
-  border-radius:12px;
-  background:#ffb6c1;
-  color:#8b3a3a;
-  font-weight:bold;
-}
-
-#sidebar,#sidebar *{pointer-events:auto}
-
-/* ❄️ FLOCONS */
-.snowflake{
-  position:absolute;
-  top:-10px;
-  color:white;
-  font-size:16px;
-  animation: snowFall linear infinite;
-  pointer-events:none;
-}
-@keyframes snowFall{
-  0%{transform:translateY(0)}
-  100%{transform:translateY(110vh)}
-}
-
-/* 🍬 BONBONS */
-.candy{
-  position:absolute;
-  top:-20px;
-  font-size:22px;
-  animation: candyFall linear infinite;
-  pointer-events:none;
-}
-@keyframes candyFall{
-  100%{transform:translateY(110vh) rotate(360deg)}
-}
+#toggleSidebar{position:absolute; top:50%; right:-30px; width:30px; height:60px; background:#ffb6c1; color:#8b3a3a; border-radius:0 12px 12px 0; display:flex; justify-content:center; align-items:center; cursor:pointer; border:1px solid #b67385; font-weight:bold;}
+#sidebar button{width:100%; margin-bottom:10px; padding:10px; border:none; border-radius:12px; background:#ffb6c1; color:#8b3a3a; font-weight:bold; cursor:pointer;}
+.snow{position:fixed; inset:0; pointer-events:none; z-index:5; display:none;}
+.modal-bg{position:fixed; inset:0; background:rgba(0,0,0,.6); display:none; justify-content:center; align-items:center; z-index:9999;}
+.modal-box{background:#ffe6f0; border:4px solid #b67385; border-radius:18px; padding:20px; text-align:center;}
+.modal-box button{width:100%; margin:8px 0; padding:10px; border:none; border-radius:12px; background:#ffb6c1; color:#8b3a3a; font-weight:bold;}
+#sidebar,#sidebar *{pointer-events:auto;}
+.snowflake{position:absolute; top:-10px; color:white; font-size:16px; animation:snowFall linear infinite; pointer-events:none;}
+@keyframes snowFall{0%{transform:translateY(0)}100%{transform:translateY(110vh)}}
+.candy{position:absolute; top:-20px; font-size:22px; animation:candyFall linear infinite; pointer-events:none;}
+@keyframes candyFall{100%{transform:translateY(110vh) rotate(360deg)}}
 </style>
 </head>
 <body>
@@ -222,7 +57,7 @@ header img{width:98px;height:98px;border-radius:20%;margin:auto}
   <input id="name" placeholder="Nom">
   <input id="photo" type="file" accept="image/*">
   <button id="add">Ajouter</button>
-  <button onclick="openThemeModal()">Thème</button>
+  <button id="themeBtn">Thème</button>
 </div>
 
 <div class="modal-bg" id="themeModal" onclick="closeThemeModal(event)">
@@ -242,22 +77,23 @@ const SUPABASE_URL = "https://jyhbamdcxmpveujjqjla.supabase.co";
 const SUPABASE_ANON_KEY = "sb_publishable_sqsxb-3Kl5o3-JQYv9kGFw_-g0EgwMa";
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
+let creations=[];
 let currentView='grid';
 const list=document.getElementById('visitor-list');
 const nameInput=document.getElementById('name');
 const photoInput=document.getElementById('photo');
 const addBtn=document.getElementById('add');
 const statusDiv=document.getElementById('status');
-let creations=[];
+const themeBtn=document.getElementById('themeBtn');
 
-// Charger les créations existantes
-async function loadCreations() {
-  const { data, error } = await supabase.from('creations').select('*').order('created_at', { ascending: false });
-  if (error) console.error(error);
-  else creations = data.map(c => ({ name: c.name, imgUrl: c.main_image }));
-  renderCreations();
-}
+// Événements UI attachés **avant** tout async
+document.getElementById('btnCarousel').onclick=()=>setView('carousel');
+document.getElementById('btnGrid').onclick=()=>setView('grid');
+document.getElementById('btnList').onclick=()=>setView('list');
+themeBtn.onclick=()=>openThemeModal();
+document.getElementById('toggleSidebar').onclick=()=>document.getElementById('sidebar').classList.toggle('sidebar-open');
 
+// Fonctions UI
 function renderCreations(){
   list.innerHTML='';
   list.className=currentView+'-view';
@@ -269,66 +105,10 @@ function renderCreations(){
   });
 }
 
-function setView(v){
-  currentView=v;
-  renderCreations();
-}
+function setView(v){ currentView=v; renderCreations(); }
+function openThemeModal(){ document.getElementById('themeModal').style.display='flex'; }
+function closeThemeModal(){ document.getElementById('themeModal').style.display='none'; }
 
-document.getElementById('btnCarousel').onclick=()=>setView('carousel');
-document.getElementById('btnGrid').onclick=()=>setView('grid');
-document.getElementById('btnList').onclick=()=>setView('list');
-
-/* AJOUTER UNE CRÉATION */
-addBtn.onclick=async()=>{
-  const name=nameInput.value.trim();
-  const file=photoInput.files[0];
-  if(!name || !file){ alert("Nom + photo requis"); return; }
-
-  const fileExt = file.name.split('.').pop();
-  const fileName = `${Date.now()}.${fileExt}`;
-  const filePath = `images/${fileName}`;
-
-  statusDiv.innerHTML = "📤 Upload en cours…";
-
-  const { data: uploadData, error: uploadError } = await supabase.storage
-    .from('images')
-    .upload(filePath, file);
-
-  if(uploadError){
-    statusDiv.innerHTML = `❌ Erreur upload: ${uploadError.message}`;
-    console.error(uploadError);
-    return;
-  }
-
-  const { publicURL, error: urlError } = supabase.storage
-    .from('images')
-    .getPublicUrl(filePath);
-
-  if(urlError){
-    statusDiv.innerHTML = `❌ Erreur URL: ${urlError.message}`;
-    console.error(urlError);
-    return;
-  }
-
-  // Insert dans la table
-  const { error: insertError } = await supabase.from('creations').insert([
-    { name, main_image: publicURL, image_urls: [publicURL], public: true }
-  ]);
-
-  if(insertError){
-    statusDiv.innerHTML = `❌ Erreur insertion: ${insertError.message}`;
-    console.error(insertError);
-    return;
-  }
-
-  creations.unshift({ name, imgUrl: publicURL });
-  renderCreations();
-  nameInput.value='';
-  photoInput.value='';
-  statusDiv.innerHTML = "✅ Création ajoutée !";
-};
-
-/* THEMES */
 const snow=document.getElementById('snow');
 const sweetRain=document.createElement('div');
 sweetRain.style.position='fixed';
@@ -343,41 +123,46 @@ function setTheme(t){
   if(t==='noel'){ document.body.style.backgroundImage="url('noel.png')"; snow.style.display='block'; createSnow(); }
   else if(t==='sweety'){ document.body.style.backgroundImage="url('sweety-girly.png')"; sweetRain.style.display='block'; createCandy(); }
   else{ document.body.style.backgroundImage="url('Photoroom_20251212_143703.PNG')"; }
-  document.getElementById('themeModal').style.display='none';
+  closeThemeModal();
 }
 
-/* SIDEBAR */
-const sidebar = document.getElementById('sidebar');
-const toggleSidebar = document.getElementById('toggleSidebar');
-toggleSidebar.onclick = ()=>{ sidebar.classList.toggle('sidebar-open'); };
+function createSnow(){ snow.innerHTML=''; for(let i=0;i<35;i++){ const f=document.createElement('div'); f.className='snowflake'; f.textContent='❄️'; f.style.left=Math.random()*100+'%'; f.style.animationDuration=4+Math.random()*6+'s'; f.style.fontSize=12+Math.random()*14+'px'; snow.appendChild(f); } }
+function createCandy(){ sweetRain.innerHTML=''; for(let i=0;i<35;i++){ const c=document.createElement('div'); c.className='candy'; c.textContent='🍬'; c.style.left=Math.random()*100+'%'; c.style.animationDuration=4+Math.random()*6+'s'; sweetRain.appendChild(c); } }
 
-function openThemeModal(){ document.getElementById('themeModal').style.display='flex'; }
-function closeThemeModal(e){ document.getElementById('themeModal').style.display='none'; }
-
-function createSnow(){
-  snow.innerHTML='';
-  for(let i=0;i<35;i++){
-    const f=document.createElement('div');
-    f.className='snowflake';
-    f.textContent='❄️';
-    f.style.left=Math.random()*100+'%';
-    f.style.animationDuration=4+Math.random()*6+'s';
-    f.style.fontSize=12+Math.random()*14+'px';
-    snow.appendChild(f);
-  }
+// Charger créations depuis Supabase
+async function loadCreations(){
+  const { data, error } = await supabase.from('creations').select('*').order('created_at',{ascending:false});
+  if(error){ console.error(error); return; }
+  creations = data.map(c=>({ name: c.name, imgUrl: c.main_image }));
+  renderCreations();
 }
 
-function createCandy(){
-  sweetRain.innerHTML='';
-  for(let i=0;i<35;i++){
-    const c=document.createElement('div');
-    c.className='candy';
-    c.textContent='🍬';
-    c.style.left=Math.random()*100+'%';
-    c.style.animationDuration=4+Math.random()*6+'s';
-    sweetRain.appendChild(c);
-  }
-}
+// Ajouter une création
+addBtn.onclick=async()=>{
+  const name=nameInput.value.trim();
+  const file=photoInput.files[0];
+  if(!name||!file){ alert("Nom + photo requis"); return; }
+
+  const fileExt = file.name.split('.').pop();
+  const fileName = `${Date.now()}.${fileExt}`;
+  const filePath = `images/${fileName}`;
+  statusDiv.textContent="📤 Upload en cours…";
+
+  const { data: uploadData, error: uploadError } = await supabase.storage.from('images').upload(filePath, file);
+  if(uploadError){ statusDiv.textContent=`❌ Upload: ${uploadError.message}`; console.error(uploadError); return; }
+
+  const { publicURL } = supabase.storage.from('images').getPublicUrl(filePath);
+  if(!publicURL){ statusDiv.textContent="❌ Erreur récupération URL"; return; }
+
+  const { error: insertError } = await supabase.from('creations').insert([{ name, main_image: publicURL, image_urls:[publicURL], public:true }]);
+  if(insertError){ statusDiv.textContent=`❌ Insertion: ${insertError.message}`; console.error(insertError); return; }
+
+  creations.unshift({ name, imgUrl: publicURL });
+  renderCreations();
+  nameInput.value='';
+  photoInput.value='';
+  statusDiv.textContent="✅ Création ajoutée !";
+};
 
 loadCreations();
 </script>
