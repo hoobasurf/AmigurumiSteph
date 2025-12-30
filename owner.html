@@ -10,18 +10,17 @@ html,body{height:100%;font-family:'Comic Sans MS',cursive}
 
 body{
   background:url('Photoroom_20251212_143703.PNG') center top / cover no-repeat fixed;
-  overflow:hidden;
   display:flex;
   flex-direction:column;
 }
 
-/* VUES */
 #viewSelector{
   display:flex;
   justify-content:center;
   gap:12px;
-  margin:20px 0;
+  margin:20px;
 }
+
 #viewSelector button{
   background:#fff0f7;
   border:2px solid #b84c6f;
@@ -31,13 +30,10 @@ body{
   cursor:pointer;
 }
 
-/* CONTENU */
 .center-zone{
   flex:1;
   display:flex;
   justify-content:center;
-  align-items:flex-start;
-  width:100%;
   overflow:auto;
 }
 
@@ -45,15 +41,9 @@ body{
   display:flex;
   gap:16px;
   max-width:1200px;
-  flex-wrap:wrap;
-  justify-content:center;
 }
 
-/* CARTES */
-.visitor-item{
-  text-align:center;
-  cursor:pointer;
-}
+.visitor-item{text-align:center;cursor:pointer}
 .visitor-item img{
   width:220px;
   height:220px;
@@ -63,74 +53,75 @@ body{
 }
 .visitor-item p{
   margin-top:8px;
-  font-size:18px;
+  font-size:20px;
   color:#b84c6f;
   font-weight:bold;
 }
 
+.carousel-view{flex-wrap:nowrap;overflow-x:auto}
+.grid-view{flex-wrap:wrap}
+.list-view{flex-direction:column}
+
 /* SIDEBAR */
 #sidebar{
   position:fixed;
-  top:0;
-  left:-220px;
-  width:220px;
-  height:100vh;
-  background:rgba(255,230,240,0.2);
+  top:0;left:-220px;
+  width:220px;height:100%;
+  background:rgba(255,230,240,.95);
   border-right:2px solid #b67385;
   padding:20px;
-  transition:left .3s;
-  z-index:10;
+  transition:.3s;
 }
-#sidebar.sidebar-open{left:0}
+#sidebar.open{left:0}
 #toggleSidebar{
   position:absolute;
-  top:50%;
-  right:-30px;
-  width:30px;
-  height:60px;
+  right:-30px;top:50%;
+  width:30px;height:60px;
   background:#ffb6c1;
+  display:flex;align-items:center;justify-content:center;
   border-radius:0 12px 12px 0;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  cursor:pointer;
-}
-#sidebar input,
-#sidebar button{
-  width:100%;
-  margin-top:10px;
-  padding:10px;
-  border-radius:12px;
-  border:none;
-}
-#sidebar button{
-  background:#ffb6c1;
-  font-weight:bold;
   cursor:pointer;
 }
 
 /* MODAL */
 .modal-bg{
-  position:fixed;
-  inset:0;
+  position:fixed;inset:0;
   background:rgba(0,0,0,.6);
   display:none;
-  justify-content:center;
   align-items:center;
+  justify-content:center;
   z-index:9999;
 }
-.modal-bg.active{display:flex}
-
 .modal-box{
   background:#ffe6f0;
   padding:20px;
   border-radius:18px;
-  border:4px solid #b67385;
+  max-width:90vw;
 }
 .modal-box img{
-  width:320px;
-  height:320px;
+  width:100%;
+  max-height:300px;
   object-fit:contain;
+}
+
+.thumbs{
+  display:flex;
+  gap:8px;
+  margin-top:10px;
+}
+.thumbs img{
+  width:60px;height:60px;
+  object-fit:cover;
+  border:2px solid #b67385;
+  cursor:pointer;
+}
+
+.actions{
+  display:flex;
+  justify-content:space-between;
+  margin-top:10px;
+  font-size:20px;
+  cursor:pointer;
 }
 </style>
 </head>
@@ -138,7 +129,9 @@ body{
 <body>
 
 <div id="viewSelector">
+  <button onclick="setView('carousel')">Carrousel</button>
   <button onclick="setView('grid')">Grille</button>
+  <button onclick="setView('list')">Liste</button>
 </div>
 
 <div class="center-zone">
@@ -148,14 +141,19 @@ body{
 <div id="sidebar">
   <div id="toggleSidebar">☰</div>
   <input id="name" placeholder="Nom">
-  <input id="photo" type="file" accept="image/*">
-  <button id="add">Ajouter</button>
+  <input id="photos" type="file" accept="image/*" multiple>
+  <button onclick="addCreation()">Ajouter</button>
 </div>
 
-<!-- MODAL IMAGE -->
-<div class="modal-bg" id="imgModal" onclick="closeModal(event)">
+<div class="modal-bg" id="viewModal" onclick="closeModal(event)">
   <div class="modal-box" onclick="event.stopPropagation()">
-    <img id="modalImg">
+    <img id="mainImg">
+    <div class="thumbs" id="thumbs"></div>
+    <div class="actions">
+      <div onclick="like()">❤️ <span id="likeCount">0</span></div>
+      <div onclick="comment()">💬 <span id="commentCount">0</span></div>
+    </div>
+    <div id="comments"></div>
   </div>
 </div>
 
@@ -167,69 +165,101 @@ const supabase = createClient(
   "sb_publishable_sqsxb-3Kl5o3-JQYv9kGFw_-g0EgwMa"
 );
 
-let creations=[];
-const list=document.getElementById('visitor-list');
+let creations=[],currentView='grid',active=null;
 
-async function loadCreations(){
-  const { data, error } = await supabase
-    .from("creations")
-    .select("*")
-    .order("created_at",{ascending:false});
-
-  if(error){
-    console.error(error);
-    return;
-  }
-
-  creations = data.map(c=>{
-    return {
-      name:c.name,
-      img:`https://jyhbamdcxmpveujjqjla.supabase.co/storage/v1/object/public/images/${c.image_path}`
-    }
-  });
-
+async function load(){
+  const {data}=await supabase.from("creations").select("*").order("created_at",{ascending:false});
+  creations=data||[];
   render();
 }
+load();
 
 function render(){
+  const list=document.getElementById("visitor-list");
+  list.className=currentView+"-view";
   list.innerHTML='';
   creations.forEach(c=>{
-    const d=document.createElement('div');
-    d.className='visitor-item';
-    d.innerHTML=`<img src="${c.img}"><p>${c.name}</p>`;
-    d.onclick=()=>openModal(c.img);
+    const url=`https://jyhbamdcxmpveujjqjla.supabase.co/storage/v1/object/public/images/${c.image_path}`;
+    const d=document.createElement("div");
+    d.className="visitor-item";
+    d.innerHTML=`<p>${c.name}</p><img src="${url}">`;
+    d.onclick=()=>openModal(c);
     list.appendChild(d);
   });
 }
 
-function openModal(src){
-  document.getElementById('modalImg').src=src;
-  document.getElementById('imgModal').classList.add('active');
+function setView(v){currentView=v;render();}
+
+async function addCreation(){
+  const name=document.getElementById("name").value;
+  const files=[...document.getElementById("photos").files];
+  if(!name||!files.length) return;
+
+  const paths=[];
+  for(const f of files){
+    const p=Date.now()+"_"+f.name;
+    await supabase.storage.from("images").upload(p,f);
+    paths.push(p);
+  }
+
+  await supabase.from("creations").insert({
+    name,
+    image_path:paths[0],
+    images:paths
+  });
+
+  load();
+}
+
+function openModal(c){
+  active=c;
+  document.getElementById("viewModal").style.display="flex";
+  showImage(c.image_path);
+  const thumbs=document.getElementById("thumbs");
+  thumbs.innerHTML='';
+  c.images.forEach(p=>{
+    const img=document.createElement("img");
+    img.src=`https://jyhbamdcxmpveujjqjla.supabase.co/storage/v1/object/public/images/${p}`;
+    img.onclick=()=>showImage(p);
+    thumbs.appendChild(img);
+  });
+  document.getElementById("likeCount").textContent=c.likes.length;
+  document.getElementById("commentCount").textContent=c.comments.length;
+}
+
+function showImage(p){
+  document.getElementById("mainImg").src=
+  `https://jyhbamdcxmpveujjqjla.supabase.co/storage/v1/object/public/images/${p}`;
 }
 
 function closeModal(e){
-  document.getElementById('imgModal').classList.remove('active');
+  if(e.target.id==="viewModal") e.target.style.display="none";
 }
 
-// AJOUT
-document.getElementById('add').onclick=async()=>{
-  const name=document.getElementById('name').value.trim();
-  const file=document.getElementById('photo').files[0];
-  if(!name||!file) return alert("Nom + photo");
+async function like(){
+  const name=prompt("Ton prénom ?");
+  if(!name) return;
+  active.likes.push(name);
+  await supabase.from("creations")
+    .update({likes:active.likes})
+    .eq("id",active.id);
+  document.getElementById("likeCount").textContent=active.likes.length;
+}
 
-  const path=`${Date.now()}_${file.name}`;
-  await supabase.storage.from("images").upload(path,file);
-  await supabase.from("creations").insert([{name,image_path:path}]);
+async function comment(){
+  const name=prompt("Ton prénom ?");
+  const text=prompt("Commentaire ?");
+  if(!name||!text) return;
+  active.comments.push({name,text});
+  await supabase.from("creations")
+    .update({comments:active.comments})
+    .eq("id",active.id);
+  document.getElementById("commentCount").textContent=active.comments.length;
+}
 
-  loadCreations();
+document.getElementById("toggleSidebar").onclick=()=>{
+  sidebar.classList.toggle("open");
 };
-
-// SIDEBAR
-document.getElementById('toggleSidebar').onclick=()=>{
-  document.getElementById('sidebar').classList.toggle('sidebar-open');
-};
-
-loadCreations();
 </script>
 
 </body>
