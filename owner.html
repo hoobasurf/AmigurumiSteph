@@ -21,8 +21,9 @@ body{
   display:flex;
   justify-content:center;
   gap:12px;
-  margin-top:500px;
-  margin-bottom:20px;
+  margin:10px auto 20px auto; /* boutons en haut */
+  position: relative;
+  z-index: 2;
 }
 #viewSelector button{
   background:#fff0f7;
@@ -35,21 +36,19 @@ body{
 
 /* CONTENU */
 .center-zone{
-  flex: 1 1 auto;      /* permet de prendre tout l'espace restant */
-  display: flex;
-  justify-content: center;
-  align-items: flex-start;
-  width: 100%;
-  overflow-y: auto;    /* scroll vertical si nécessaire */
-  padding-bottom: 20px; /* espace en bas pour ne pas tronquer les images */
+  flex: 1 1 auto;
+  display:flex;
+  justify-content:center;
+  align-items:flex-start;
+  width:100%;
+  overflow-y:auto;       /* scroll vertical si nécessaire */
+  padding: 10px 0 20px 0; /* marge en haut et bas */
 }
 #visitor-list{
   display:flex;
   justify-content:center;
   gap:16px;
   max-width:1200px;
-  flex-wrap: wrap;
-  align-items: flex-start;
 }
 
 /* ITEMS */
@@ -137,9 +136,11 @@ body{
   cursor:pointer;
 }
 
+/* NEIGE */
 .snow{position:fixed;inset:0;pointer-events:none;display:none}
 .snowflake{position:absolute;top:-10px;animation:snowFall linear infinite}
 @keyframes snowFall{100%{transform:translateY(110vh)}}
+
 </style>
 </head>
 
@@ -192,9 +193,8 @@ const photoInput=document.getElementById('photo');
 const status=document.getElementById('status');
 
 async function loadCreations(){
-  // ⚡ utiliser le bon nom de colonne 'image_path' si c'est ce que tu as dans ta table
   const { data } = await supabase.from("creations").select("*").order("created_at",{ascending:false});
-  creations = data.map(c => ({ name: c.name, image_path: c.image_path }));
+  creations=data||[];
   renderCreations();
 }
 
@@ -204,7 +204,7 @@ function renderCreations(){
   creations.forEach(c=>{
     const d=document.createElement('div');
     d.className='visitor-item';
-    d.innerHTML=`<p>${c.name}</p><img src="${c.image_path}">`;
+    d.innerHTML=`<p>${c.name}</p><img src="${c.image_url}">`;
     list.appendChild(d);
   });
 }
@@ -220,14 +220,11 @@ document.getElementById('add').addEventListener('click', async ()=>{
   const { error } = await supabase.storage.from("images").upload(path,file);
   if(error) return status.textContent=error.message;
 
-  // récupérer l'URL publique
-  const { data } = supabase.storage.from("images").getPublicUrl(path);
-  const publicUrl = data.publicUrl;
+  const { data:{publicUrl} } = supabase.storage.from("images").getPublicUrl(path);
 
-  // insert dans Supabase avec le nom correct de colonne
-  await supabase.from("creations").insert({ name, image_path: publicUrl });
+  await supabase.from("creations").insert({name,image_url:publicUrl});
 
-  creations.unshift({ name, image_path: publicUrl });
+  creations.unshift({name,image_url:publicUrl});
   renderCreations();
 
   nameInput.value='';
