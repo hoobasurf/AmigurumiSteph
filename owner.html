@@ -50,7 +50,7 @@ body{
 }
 
 /* ITEMS */
-.visitor-item{text-align:center;cursor:pointer;}
+.visitor-item{text-align:center}
 .visitor-item img{
   width:220px;
   height:220px;
@@ -123,51 +123,30 @@ body{
   padding:20px;
   border-radius:18px;
   border:4px solid #b67385;
-  max-width:500px;
-  width:90%;
   text-align:center;
 }
-.modal-box img.main-photo{
+.modal-box button{
   width:100%;
-  max-height:400px;
-  object-fit:contain;
+  margin:8px 0;
+  padding:10px;
+  border-radius:12px;
+  border:none;
+  background:#ffb6c1;
+  cursor:pointer;
+}
+
+/* MODAL AJOUTER PHOTOS */
+#addModal .file-label{
+  display:inline-block;
+  padding:10px 20px;
+  background:#ffb6c1;
+  color:#fff;
+  border-radius:12px;
+  cursor:pointer;
   margin-bottom:10px;
 }
-.modal-box .thumbs{
-  display:flex;
-  justify-content:center;
-  gap:8px;
-  flex-wrap:wrap;
-}
-.modal-box .thumbs img{
-  width:60px;
-  height:60px;
-  object-fit:cover;
-  cursor:pointer;
-  border:2px solid #b84c6f;
-  border-radius:8px;
-}
-.modal-box button{margin-top:10px;padding:10px;border-radius:12px;border:none;background:#ffb6c1;cursor:pointer; font-weight:bold;}
+#addModal input[type=file]{display:none;}
 
-/* Likes / commentaires */
-.likes-comments{
-  display:flex;
-  justify-content:space-between;
-  margin-top:10px;
-}
-.likes-comments .likes, .likes-comments .comments{
-  display:flex;
-  align-items:center;
-  gap:4px;
-  font-size:16px;
-}
-.comments-list{
-  margin-top:8px;
-  text-align:left;
-  max-height:150px;
-  overflow-y:auto;
-  font-size:14px;
-}
 .snow{position:fixed;inset:0;pointer-events:none;display:none}
 .snowflake{position:absolute;top:-10px;animation:snowFall linear infinite}
 @keyframes snowFall{100%{transform:translateY(110vh)}}
@@ -191,12 +170,11 @@ body{
 <div id="sidebar">
   <div id="toggleSidebar">☰</div>
   <input id="name" placeholder="Nom">
-  <input id="photo" type="file" accept="image/*">
   <button id="add">Ajouter</button>
   <button onclick="openThemeModal()">Thème</button>
 </div>
 
-<!-- MODAL THÈME -->
+<!-- Modal Thèmes -->
 <div class="modal-bg" id="themeModal" onclick="closeThemeModal(event)">
   <div class="modal-box" onclick="event.stopPropagation()">
     <button onclick="setTheme('noel')">🎄 Noël</button>
@@ -205,20 +183,17 @@ body{
   </div>
 </div>
 
-<!-- MODAL AJOUT / ZOOM -->
-<div class="modal-bg" id="photoModal">
-  <div class="modal-box" id="photoModalBox">
+<!-- Modal Ajouter Photos -->
+<div class="modal-bg" id="addModal" onclick="closeAddModal(event)">
+  <div class="modal-box" onclick="event.stopPropagation()">
+    <label class="file-label" for="multiPhotoInput">Choisir photo(s)</label>
     <input type="file" id="multiPhotoInput" multiple accept="image/*">
-    <img src="" class="main-photo" id="mainPhoto">
-    <div class="thumbs" id="thumbsContainer"></div>
-    <div class="likes-comments">
-      <div class="likes"><span id="likeBtn" style="cursor:pointer">❤️</span> <span id="likeCount">0</span></div>
-      <div class="comments">💬 <span id="commentCount">0</span></div>
-    </div>
-    <div class="comments-list" id="commentsList"></div>
-    <button onclick="closePhotoModal()">Fermer</button>
+    <button id="confirmAdd">Ajouter</button>
+    <button onclick="closeAddModal()">Fermer</button>
   </div>
 </div>
+
+<p id="status" style="text-align:center;margin:10px"></p>
 
 <script type="module">
 import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
@@ -233,16 +208,19 @@ let currentView='grid';
 
 const list=document.getElementById('visitor-list');
 const nameInput=document.getElementById('name');
-const photoInput=document.getElementById('photo');
+const status=document.getElementById('status');
 
-// Charger les créations
+// --- LOAD CREATIONS ---
 async function loadCreations(){
   const { data, error } = await supabase
     .from("creations")
     .select("*")
     .order("created_at",{ascending:false});
 
-  if(error){ console.error(error); return; }
+  if(error){
+    console.error(error);
+    return;
+  }
 
   creations = data.map(c => {
     const publicUrl = `https://jyhbamdcxmpveujjqjla.supabase.co/storage/v1/object/public/images/${c.image_path}`;
@@ -258,25 +236,22 @@ function renderCreations(){
   creations.forEach(c=>{
     const d=document.createElement('div');
     d.className='visitor-item';
-    d.innerHTML=`<p>${c.name}</p><img src="${c.imgUrl}" onclick="openPhotoModal('${c.imgUrl}')">`;
+    d.innerHTML=`<p>${c.name}</p><img src="${c.imgUrl}">`;
     list.appendChild(d);
   });
 }
 
-// Ajouter image(s) ouvre le modal
-document.getElementById('add').addEventListener('click', ()=>{
-  document.getElementById('photoModal').style.display='flex';
-});
+// --- SIDEBAR TOGGLE ---
+document.getElementById('toggleSidebar').onclick=()=>{
+  document.getElementById('sidebar').classList.toggle('sidebar-open');
+};
 
-// Sidebar toggle
-document.getElementById('toggleSidebar').onclick=()=>document.getElementById('sidebar').classList.toggle('sidebar-open');
-
-// Vues
+// --- VIEWS ---
 document.getElementById('btnCarousel').onclick=()=>{currentView='carousel';renderCreations();}
 document.getElementById('btnGrid').onclick=()=>{currentView='grid';renderCreations();}
 document.getElementById('btnList').onclick=()=>{currentView='list';renderCreations();}
 
-// Thèmes
+// --- THEMES ---
 function openThemeModal(){document.getElementById('themeModal').style.display='flex'}
 function closeThemeModal(){document.getElementById('themeModal').style.display='none'}
 function setTheme(t){
@@ -285,83 +260,46 @@ function setTheme(t){
   else{document.body.style.backgroundImage="url('Photoroom_20251212_143703.PNG')"}
   closeThemeModal();
 }
+
+// --- MODAL AJOUT ---
+const addModal=document.getElementById('addModal');
+function openAddModal(){addModal.style.display='flex'}
+function closeAddModal(e){addModal.style.display='none'}
+
+document.getElementById('add').addEventListener('click',openAddModal);
+
+// --- AJOUT PHOTOS ---
+const multiInput=document.getElementById('multiPhotoInput');
+document.getElementById('confirmAdd').addEventListener('click', async()=>{
+  const name=nameInput.value.trim();
+  const files=multiInput.files;
+  if(!name || files.length===0){return alert("Nom + photo requis");}
+
+  status.textContent="📤 Upload…";
+
+  for(let i=0;i<files.length;i++){
+    const file=files[i];
+    const path=`${Date.now()}_${file.name}`;
+    const { error } = await supabase.storage.from("images").upload(path,file);
+    if(error){status.textContent=error.message;return;}
+    await supabase.from("creations").insert([{name,image_path:path}]);
+    const publicUrl = `https://jyhbamdcxmpveujjqjla.supabase.co/storage/v1/object/public/images/${path}`;
+    creations.unshift({name,imgUrl:publicUrl});
+  }
+
+  renderCreations();
+  multiInput.value='';
+  status.textContent="✅ Ajouté !";
+  closeAddModal();
+});
+
+/* 🔥 RENDRE ACCESSIBLE AU HTML */
 window.openThemeModal=openThemeModal;
 window.closeThemeModal=closeThemeModal;
 window.setTheme=setTheme;
 
-// MODAL PHOTO
-const mainPhoto=document.getElementById('mainPhoto');
-const thumbsContainer=document.getElementById('thumbsContainer');
-const photoModal=document.getElementById('photoModal');
-const likeBtn=document.getElementById('likeBtn');
-const likeCount=document.getElementById('likeCount');
-const commentCount=document.getElementById('commentCount');
-const commentsList=document.getElementById('commentsList');
-const multiPhotoInput=document.getElementById('multiPhotoInput');
+window.loadCreations=loadCreations;
 
-let currentPhotos=[]; 
-let firstPhotoUrl=''; // garde la première photo sélectionnée
-let currentLikes=0;
-let currentComments=[];
-
-// Gestion multi-photos et upload
-multiPhotoInput.addEventListener('change', async (e)=>{
-  const files=Array.from(e.target.files);
-  if(!files.length) return;
-
-  thumbsContainer.innerHTML='';
-  currentPhotos=[];
-  firstPhotoUrl = URL.createObjectURL(files[0]);
-  mainPhoto.src = firstPhotoUrl;
-  for(let i=0;i<files.length;i++){
-    const f=files[i];
-    const url=URL.createObjectURL(f);
-    currentPhotos.push(url);
-
-    const img=document.createElement('img');
-    img.src=url;
-    img.onclick=()=>{
-      const tmp = mainPhoto.src;
-      mainPhoto.src = url;
-      // échange miniature avec la principale
-      const idx = currentPhotos.indexOf(url);
-      if(idx>=0) currentPhotos[idx]=tmp;
-      img.src=tmp;
-    };
-    thumbsContainer.appendChild(img);
-
-    // Upload sur Supabase
-    const path=`${Date.now()}_${f.name}`;
-    const { error } = await supabase.storage.from("images").upload(path,f);
-    if(error){console.error(error);}
-    else{ await supabase.from("creations").insert([{name:nameInput.value||'Anon',image_path:path}]); }
-  }
-  loadCreations();
-});
-
-function openPhotoModal(url){
-  mainPhoto.src=url;
-  photoModal.style.display='flex';
-  currentLikes=0; likeCount.textContent=currentLikes;
-  currentComments=[]; commentCount.textContent=0; commentsList.innerHTML='';
-}
-
-function closePhotoModal(){
-  mainPhoto.src = firstPhotoUrl; // revient à la première photo initiale
-  photoModal.style.display='none';
-}
-
-// Likes
-likeBtn.onclick=()=>{
-  const prenom=prompt("Ton prénom pour liker ?");
-  if(!prenom) return;
-  currentLikes++; likeCount.textContent=currentLikes;
-  const div=document.createElement('div');
-  div.textContent=prenom;
-  commentsList.appendChild(div);
-}
-
-// Charger images existantes
 loadCreations();
 </script>
 
