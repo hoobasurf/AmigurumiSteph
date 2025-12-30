@@ -53,10 +53,11 @@ body{
 .visitor-item img{
   width:220px;
   height:220px;
-  object-fit:contain;
+  object-fit:cover;
   border:4px solid #b67385;
   background:#ffe6f0;
   cursor:pointer;
+  border-radius:12px;
 }
 .visitor-item p{
   margin-top:8px;
@@ -64,27 +65,6 @@ body{
   color:#b84c6f;
   font-weight:bold;
 }
-.visitor-item .delete-btn{
-  position:absolute;
-  top:5px;
-  right:5px;
-  width:24px;
-  height:24px;
-  background:#ff69b4;
-  color:#fff;
-  border-radius:50%;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-weight:bold;
-  cursor:pointer;
-  z-index:5;
-}
-
-/* VUES */
-.carousel-view{flex-wrap:nowrap;overflow-x:auto}
-.grid-view{flex-wrap:wrap}
-.list-view{flex-direction:column}
 
 /* SIDEBAR */
 #sidebar{
@@ -125,51 +105,95 @@ body{
 }
 
 /* MODAL AJOUT */
-#addModal{
+#addModalBg{
   position:fixed; inset:0;
-  background:rgba(0,0,0,0.6);
+  background:rgba(0,0,0,.6);
   display:none;
   justify-content:center;
   align-items:center;
   z-index:9999;
 }
-#addModal .modal-box{
+#addModal{
   background:#ffe6f0;
   padding:20px;
   border-radius:18px;
   border:4px solid #b67385;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
+  max-width:600px;
+  width:90%;
+  text-align:center;
+  position:relative;
 }
-#addModal input[type=file]{margin:10px 0;}
-#addModal input[type=text]{padding:8px;width:80%;margin-bottom:10px;}
-#addModal button{padding:10px 20px;border:none;background:#ff69b4;color:#fff;border-radius:12px;cursor:pointer;}
+#addModal h2{margin-bottom:10px;color:#b84c6f;}
+#addModal input[type="file"]{margin:10px 0;}
+#addModal input[type="text"]{width:80%;padding:6px;margin:6px 0;border-radius:6px;border:1px solid #b67385;}
+#addModal button{
+  background:#ffb6c1;
+  border:none;
+  padding:8px 16px;
+  margin-top:10px;
+  border-radius:12px;
+  cursor:pointer;
+  font-weight:bold;
+}
+.close-modal{
+  position:absolute;
+  top:8px; right:8px;
+  width:24px; height:24px;
+  background:#ff69b4;
+  color:#000;
+  font-weight:bold;
+  border-radius:50%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+}
 
-/* MODAL ZOOM */
-#zoomModal{
+/* MODAL ZOOM IMAGE */
+#zoomModalBg{
   position:fixed; inset:0;
-  background:rgba(0,0,0,0.7);
+  background:rgba(0,0,0,.8);
   display:none;
   justify-content:center;
   align-items:center;
   z-index:10000;
-  flex-direction:column;
 }
-#zoomModal img{max-width:80%; max-height:60vh; border:4px solid #b67385; margin-bottom:10px; object-fit:contain;}
-#zoomModal .thumbs{display:flex;gap:10px;overflow-x:auto; max-width:80%;}
-#zoomModal .thumbs img{width:80px;height:80px;object-fit:cover;cursor:pointer; border:2px solid #b67385;}
-#zoomModal .closeZoom{
-  position:absolute;top:10px;right:10px;
-  width:30px;height:30px;background:#ff69b4;color:#fff;border-radius:50%;
-  display:flex;justify-content:center;align-items:center;cursor:pointer;font-weight:bold;
+#zoomModal{
+  position:relative;
+  max-width:90%;
+  max-height:90%;
+  background:#ffe6f0;
+  padding:10px;
+  border-radius:12px;
 }
+#zoomModal img{
+  max-width:100%;
+  max-height:70vh;
+  border-radius:12px;
+}
+#thumbnails{
+  display:flex;
+  gap:10px;
+  justify-content:center;
+  margin-top:10px;
+}
+#thumbnails img{
+  width:60px; height:60px;
+  object-fit:cover;
+  border:2px solid #b67385;
+  border-radius:8px;
+  cursor:pointer;
+  transition:0.2s;
+}
+#thumbnails img:hover{transform:scale(1.1);}
+#zoomModal .close-modal{top:-12px; right:-12px;background:#ff69b4;color:#000;z-index:10;}
 
-/* STATUS */
-#status{text-align:center;margin:10px;}
+/* VUES */
+.carousel-view{flex-wrap:nowrap;overflow-x:auto}
+.grid-view{flex-wrap:wrap}
+.list-view{flex-direction:column}
 </style>
 </head>
-
 <body>
 
 <div id="viewSelector">
@@ -188,138 +212,136 @@ body{
   <button onclick="openThemeModal()">Thème</button>
 </div>
 
-<!-- MODAL AJOUT -->
-<div id="addModal">
-  <div class="modal-box">
-    <h2>Ajouter des photos</h2>
-    <input type="text" id="modalName" placeholder="Nom">
-    <input type="file" id="multiPhoto" accept="image/*" multiple>
-    <button id="confirmAdd">Valider</button>
+<!-- Modal ajout -->
+<div id="addModalBg">
+  <div id="addModal">
+    <div class="close-modal" id="closeAddModal">×</div>
+    <h2>Ajouter des images</h2>
+    <input type="text" id="creatorName" placeholder="Votre prénom"><br>
+    <input type="file" id="photoInput" multiple accept="image/*"><br>
+    <button id="validateAdd">Valider</button>
   </div>
 </div>
 
-<!-- MODAL ZOOM -->
-<div id="zoomModal">
-  <div class="closeZoom">×</div>
-  <img id="mainZoom">
-  <div class="thumbs" id="thumbs"></div>
+<!-- Modal zoom -->
+<div id="zoomModalBg">
+  <div id="zoomModal">
+    <div class="close-modal" id="closeZoomModal">×</div>
+    <img id="zoomImg" src="">
+    <div id="thumbnails"></div>
+  </div>
 </div>
-
-<p id="status">📤 Prêt à uploader…</p>
 
 <script type="module">
 import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
+
 const supabase = createClient(
   "https://jyhbamdcxmpveujjqjla.supabase.co",
   "sb_publishable_sqsxb-3Kl5o3-JQYv9kGFw_-g0EgwMa"
 );
 
-let creations=[]; let currentView='grid'; let currentZoomData=null;
-const list=document.getElementById('visitor-list');
-const addModal=document.getElementById('addModal');
-const zoomModal=document.getElementById('zoomModal');
-const mainZoom=document.getElementById('mainZoom');
-const thumbs=document.getElementById('thumbs');
+let creations = [];
+let currentView = 'grid';
+let modalImages = [];
+let mainModalIndex = 0;
 
-// ------------------- LOAD -------------------
+const list = document.getElementById('visitor-list');
+const addBtn = document.getElementById('addBtn');
+const addModalBg = document.getElementById('addModalBg');
+const closeAddModal = document.getElementById('closeAddModal');
+const validateAdd = document.getElementById('validateAdd');
+const photoInput = document.getElementById('photoInput');
+const creatorName = document.getElementById('creatorName');
+
+const zoomModalBg = document.getElementById('zoomModalBg');
+const zoomImg = document.getElementById('zoomImg');
+const thumbnails = document.getElementById('thumbnails');
+const closeZoomModal = document.getElementById('closeZoomModal');
+
+// Ouvrir modal ajout
+addBtn.onclick = () => addModalBg.style.display = 'flex';
+closeAddModal.onclick = () => addModalBg.style.display = 'none';
+addModalBg.onclick = e => {if(e.target===addModalBg) addModalBg.style.display='none'};
+
+// Ouvrir modal zoom
+function openZoomModal(index){
+  mainModalIndex = index;
+  zoomImg.src = modalImages[index].imgUrl;
+  zoomModalBg.style.display = 'flex';
+  renderThumbnails();
+}
+closeZoomModal.onclick = () => zoomModalBg.style.display='none';
+zoomModalBg.onclick = e => {if(e.target===zoomModalBg) zoomModalBg.style.display='none'};
+
+function renderThumbnails(){
+  thumbnails.innerHTML='';
+  modalImages.forEach((img,i)=>{
+    const t = document.createElement('img');
+    t.src = img.imgUrl;
+    t.onclick = () => {zoomImg.src = img.imgUrl; mainModalIndex=i;};
+    thumbnails.appendChild(t);
+  });
+}
+
+// Charger créations
 async function loadCreations(){
   const { data, error } = await supabase.from("creations").select("*").order("created_at",{ascending:false});
-  if(error){ console.error(error); return; }
-  creations = data.map(c=>{
+  if(error){console.error(error); return;}
+
+  creations = data.map(c => {
     const publicUrl = `https://jyhbamdcxmpveujjqjla.supabase.co/storage/v1/object/public/images/${c.image_path}`;
-    return {id:c.id, name:c.name, imgUrl:publicUrl, zoomGroup:[publicUrl]};
+    return { id: c.id, name: c.name, imgUrl: publicUrl };
   });
   renderCreations();
 }
 
-// ------------------- RENDER -------------------
 function renderCreations(){
   list.innerHTML='';
   list.className=currentView+'-view';
-  creations.forEach(c=>{
-    const d=document.createElement('div');
+  creations.forEach((c,i)=>{
+    const d = document.createElement('div');
     d.className='visitor-item';
-    d.innerHTML = `
-      <div class="delete-btn">×</div>
-      <p>${c.name}</p>
-      <img src="${c.imgUrl}">
-    `;
+    d.innerHTML = `<p>${c.name}</p><img src="${c.imgUrl}">`;
+    d.onclick = () => {modalImages=[c]; openZoomModal(0);}
     list.appendChild(d);
-    d.querySelector('img').onclick=()=>openZoom(c);
-    d.querySelector('.delete-btn').onclick=()=>deleteImage(c.id);
   });
 }
 
-// ------------------- ADD -------------------
-document.getElementById('addBtn').onclick = ()=> addModal.style.display='flex';
-addModal.onclick=(e)=>{ if(e.target===addModal) addModal.style.display='none'; };
-document.getElementById('confirmAdd').onclick = async ()=>{
-  const files = document.getElementById('multiPhoto').files;
-  const name = document.getElementById('modalName').value.trim();
-  if(!files.length || !name) return alert("Nom + au moins une photo");
+// Validation ajout
+validateAdd.onclick = async () => {
+  const name = creatorName.value.trim();
+  const files = photoInput.files;
+  if(!name || !files.length) return alert("Prénom + image requis");
 
-  let firstPublicUrl=null; let firstId=null; const zoomGroup=[];
-  for(let i=0;i<files.length;i++){
-    const file = files[i];
+  addModalBg.style.display='none';
+
+  for(let file of files){
     const path = `${Date.now()}_${file.name}`;
     const { error } = await supabase.storage.from('images').upload(path,file);
-    if(error){ alert(error.message); continue; }
-    const { data:insertData, error:insertError } = await supabase.from('creations').insert([{name,image_path:path}]).select();
-    if(insertError){ alert(insertError.message); continue; }
-    const publicUrl=`https://jyhbamdcxmpveujjqjla.supabase.co/storage/v1/object/public/images/${path}`;
-    zoomGroup.push(publicUrl);
-    if(i===0){
-      firstPublicUrl=publicUrl;
-      firstId=insertData[0].id;
-      creations.unshift({id:firstId,name,imgUrl:firstPublicUrl,zoomGroup});
-    } else {
-      creations[0].zoomGroup.push(publicUrl);
-    }
+    if(error){console.error(error); continue;}
+
+    await supabase.from('creations').insert([{name,image_path:path}]);
+
+    const publicUrl = `https://jyhbamdcxmpveujjqjla.supabase.co/storage/v1/object/public/images/${path}`;
+    creations.unshift({id:null,name,imgUrl:publicUrl});
   }
-  addModal.style.display='none';
-  document.getElementById('modalName').value='';
-  document.getElementById('multiPhoto').value='';
+
+  creatorName.value='';
+  photoInput.value='';
   renderCreations();
+}
+
+// Sidebar toggle
+document.getElementById('toggleSidebar').onclick=()=>{
+  document.getElementById('sidebar').classList.toggle('sidebar-open');
 };
 
-// ------------------- ZOOM -------------------
-function openZoom(c){
-  currentZoomData=c;
-  mainZoom.src=c.imgUrl;
-  thumbs.innerHTML='';
-  if(c.zoomGroup.length>1){
-    c.zoomGroup.forEach(url=>{
-      const t=document.createElement('img');
-      t.src=url;
-      t.onclick=()=>{ mainZoom.src=url; };
-      thumbs.appendChild(t);
-    });
-  }
-  zoomModal.style.display='flex';
-}
-document.querySelector('#zoomModal .closeZoom').onclick = ()=> zoomModal.style.display='none';
-zoomModal.onclick=(e)=>{ if(e.target===zoomModal) zoomModal.style.display='none'; };
-
-// ------------------- DELETE -------------------
-async function deleteImage(id){
-  const toDelete = creations.find(c=>c.id===id);
-  if(!toDelete) return;
-  const imagePath = toDelete.imgUrl.split('/images/')[1];
-  await supabase.storage.from('images').remove([imagePath]);
-  await supabase.from('creations').delete().eq('id',id);
-  creations = creations.filter(c=>c.id!==id);
-  renderCreations();
-}
-
-// ------------------- SIDEBAR -------------------
-document.getElementById('toggleSidebar').onclick=()=> document.getElementById('sidebar').classList.toggle('sidebar-open');
-
-// ------------------- VUES -------------------
+// Vues
 document.getElementById('btnCarousel').onclick=()=>{currentView='carousel';renderCreations();}
 document.getElementById('btnGrid').onclick=()=>{currentView='grid';renderCreations();}
 document.getElementById('btnList').onclick=()=>{currentView='list';renderCreations();}
 
-// ------------------- THEME -------------------
+// Thèmes
 function openThemeModal(){document.getElementById('themeModal').style.display='flex'}
 function closeThemeModal(){document.getElementById('themeModal').style.display='none'}
 function setTheme(t){
@@ -332,8 +354,9 @@ window.openThemeModal=openThemeModal;
 window.closeThemeModal=closeThemeModal;
 window.setTheme=setTheme;
 
-// ------------------- LOAD -------------------
+// Charger au départ
 loadCreations();
+
 </script>
 </body>
 </html>
