@@ -164,7 +164,7 @@ body{
   align-items:center;
 }
 
-/* LIKE & COMMENT */
+/* LIKE & COMMENT (style validé) */
 .like-comment{
   display:flex;
   justify-content:space-between;
@@ -175,8 +175,15 @@ body{
   cursor:pointer;
   border:none;
   padding:6px 12px;
-  border-radius:12px;
-  font-size:16px;
+  border-radius:24px;
+  font-size:18px;
+  background:#ffb6c1;
+  color:#b84c6f;
+  font-weight:bold;
+  transition: transform 0.2s;
+}
+.like-comment button:hover{
+  transform: scale(1.1);
 }
 </style>
 </head>
@@ -263,7 +270,6 @@ function renderCreations(){
     const d=document.createElement('div');
     d.className='visitor-item';
     d.innerHTML=`<p>${c.name}</p><img src="${c.imgUrl}" data-id="${c.id}">`;
-    // click zoom
     d.querySelector('img').onclick=()=>openZoomModal(c);
     list.appendChild(d);
   });
@@ -298,12 +304,12 @@ document.getElementById('validateAdd').onclick=async()=>{
   const files=document.getElementById('photoInputModal').files;
   if(!name||files.length===0){alert("Nom + photo requis"); return;}
 
-  for(const file of files){
-    const path=`${Date.now()}_${file.name}`;
-    const { error } = await supabase.storage.from("images").upload(path,file);
-    if(error){alert(error.message); continue;}
-    await supabase.from("creations").insert([{name,image_path:path}]);
-  }
+  const firstFile = files[0]; // première principale
+  const path = `${Date.now()}_${firstFile.name}`;
+  const { error } = await supabase.storage.from("images").upload(path, firstFile);
+  if(error){alert(error.message); return;}
+  await supabase.from("creations").insert([{name,image_path:path}]);
+
   closeAddModal();
   document.getElementById('nameInputModal').value='';
   document.getElementById('photoInputModal').value='';
@@ -322,14 +328,11 @@ function openZoomModal(c){
   zoomMain.src=c.imgUrl;
   zoomThumbnails.innerHTML='';
 
-  // Miniatures si plusieurs images
-  const group=[c]; // ici tu peux ajouter d'autres images associées si tu gères les groupes
-  group.forEach(img=>{
-    const mini=document.createElement('img');
-    mini.src=img.imgUrl;
-    mini.onclick=()=>zoomMain.src=img.imgUrl;
-    zoomThumbnails.appendChild(mini);
-  });
+  // Miniatures (ici uniquement la principale pour simplifier comme avant)
+  const mini=document.createElement('img');
+  mini.src=c.imgUrl;
+  mini.onclick=()=>zoomMain.src=c.imgUrl;
+  zoomThumbnails.appendChild(mini);
 
   commentSection.innerHTML='';
   zoomModal.style.display='flex';
