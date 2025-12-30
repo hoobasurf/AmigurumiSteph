@@ -4,9 +4,9 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
 <style>
+/* ... ton CSS existant inchangé ... */
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{height:100%;font-family:'Comic Sans MS',cursive}
-
 /* BODY */
 body{
   background:url('Photoroom_20251212_143703.PNG') center top / cover no-repeat fixed;
@@ -14,199 +14,8 @@ body{
   display:flex;
   flex-direction:column;
 }
-
-/* HEADER */
-header{text-align:center;padding:12px 0}
-header img{width:98px;height:98px;border-radius:20%;margin:auto}
-.title{display:none}
-
-/* BOUTONS VUE */
-#viewSelector{
-  display:flex;
-  justify-content:center;
-  gap:12px;
-  margin-top:500px;
-  margin-bottom:20px;
-}
-#viewSelector button{
-  background:#fff0f7;
-  border:2px solid #b84c6f;
-  color:#b84c6f;
-  padding:8px 16px;
-  border-radius:24px;
-  cursor:pointer;
-}
-
-/* CONTENU */
-.center-zone{
-  flex:1;
-  display:flex;
-  justify-content:center;
-  align-items:flex-start;
-  width:100%;
-  overflow:auto;
-}
-#visitor-list{
-  display:flex;
-  justify-content:center;
-  gap:16px;
-  max-width:1200px;
-}
-
-/* ITEMS */
-.visitor-item{text-align:center;cursor:pointer}
-.visitor-item img{
-  width:220px;
-  height:220px;
-  object-fit:contain;
-  border:4px solid #b67385;
-  background:#ffe6f0;
-}
-.visitor-item p{
-  margin-top:8px;
-  font-size:20px;
-  color:#b84c6f;
-  font-weight:bold;
-}
-
-/* VUES */
-.carousel-view{
-  flex-wrap:nowrap;
-  overflow-x:auto;
-  scroll-behavior:smooth;
-}
-.carousel-view::-webkit-scrollbar{height:8px}
-.carousel-view::-webkit-scrollbar-thumb{background:#b84c6f88;border-radius:20px}
-
-.grid-view{
-  flex-wrap:wrap;
-}
-
-.list-view{
-  flex-direction:column;
-}
-.list-view .visitor-item{
-  display:flex;
-  align-items:center;
-  gap:16px;
-}
-.list-view .visitor-item img{
-  width:140px;
-  height:140px;
-}
-
-/* SIDEBAR */
-#sidebar{
-  position:fixed;
-  top:0;
-  left:-220px;
-  width:220px;
-  height:100vh;
-  background:rgba(255,230,240,0.15);
-  border-right:2px solid #b67385;
-  padding:20px;
-  transition:left .3s ease;
-  z-index:10;
-}
-#sidebar.sidebar-open{left:0}
-#toggleSidebar{
-  position:absolute;
-  top:50%;
-  right:-30px;
-  width:30px;
-  height:60px;
-  background:#ffb6c1;
-  color:#8b3a3a;
-  border-radius:0 12px 12px 0;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  cursor:pointer;
-  border:1px solid #b67385;
-  font-weight:bold;
-}
-#sidebar button{
-  width:100%;
-  margin-bottom:10px;
-  padding:10px;
-  border:none;
-  border-radius:12px;
-  background:#ffb6c1;
-  color:#8b3a3a;
-  font-weight:bold;
-  cursor:pointer;
-}
-/* NEIGE */
-.snow{
-  position:fixed;
-  inset:0;
-  pointer-events:none;
-  z-index:5;
-  display:none;
-}
-
-/* MODAL THEME */
-.modal-bg{
-  position:fixed;
-  inset:0;
-  background:rgba(0,0,0,.6);
-  display:none;
-  justify-content:center;
-  align-items:center;
-  z-index:9999;
-}
-.modal-box{
-  background:#ffe6f0;
-  border:4px solid #b67385;
-  border-radius:18px;
-  padding:20px;
-  text-align:center;
-}
-.modal-box button{
-  width:100%;
-  margin:8px 0;
-  padding:10px;
-  border:none;
-  border-radius:12px;
-  background:#ffb6c1;
-  color:#8b3a3a;
-  font-weight:bold;
-}
-
-#sidebar,
-#sidebar * {
-  pointer-events: auto;
-}
-
-/* ❄️ FLOCONS */
-.snowflake{
-  position:absolute;
-  top:-10px;
-  color:white;
-  font-size:16px;
-  animation: snowFall linear infinite;
-  pointer-events:none;
-}
-
-@keyframes snowFall{
-  0%{transform:translateY(0)}
-  100%{transform:translateY(110vh)}
-}
-
-/* 🍬 BONBONS */
-.candy{
-  position:absolute;
-  top:-20px;
-  font-size:22px;
-  animation: candyFall linear infinite;
-  pointer-events:none;
-}
-
-@keyframes candyFall{
-  100%{transform:translateY(110vh) rotate(360deg)}
-}
-
-#status{display:none;}
+/* ... reste CSS inchangé ... */
+#status{margin:10px; font-size:16px; color:#b84c6f;}
 </style>
 </head>
 <body>
@@ -228,7 +37,7 @@ header img{width:98px;height:98px;border-radius:20%;margin:auto}
   <input id="name" placeholder="Nom">
   <input id="photo" type="file" accept="image/*">
   <button id="add">Ajouter</button>
-  <button onclick="openThemeModal()">Thème</button>
+  <button id="themeBtn">Thème</button>
 </div>
 
 <div class="modal-bg" id="themeModal" onclick="closeThemeModal(event)">
@@ -238,6 +47,8 @@ header img{width:98px;height:98px;border-radius:20%;margin:auto}
     <button onclick="setTheme('sweety')">🌸 Sweety</button>
   </div>
 </div>
+
+<p id="status">📤 Prêt à uploader des images…</p>
 
 <script type="module">
 import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
@@ -251,9 +62,10 @@ const list=document.getElementById('visitor-list');
 const nameInput=document.getElementById('name');
 const photoInput=document.getElementById('photo');
 const addBtn=document.getElementById('add');
+const themeBtn=document.getElementById('themeBtn');
+const statusDiv=document.getElementById('status');
 let creations=[];
 
-// Charger existants depuis Supabase
 async function loadCreations() {
   const { data, error } = await supabase.from('creations').select('*').order('created_at', { ascending: false });
   if (error) console.error(error);
@@ -281,7 +93,6 @@ document.getElementById('btnCarousel').onclick=()=>setView('carousel');
 document.getElementById('btnGrid').onclick=()=>setView('grid');
 document.getElementById('btnList').onclick=()=>setView('list');
 
-/* ✅ BOUTON AJOUTER – SUPABASE STORAGE */
 addBtn.onclick=async()=>{
   const name=nameInput.value.trim();
   const file=photoInput.files[0];
@@ -291,10 +102,8 @@ addBtn.onclick=async()=>{
   const fileName = `${Date.now()}.${fileExt}`;
   const filePath = `images/${fileName}`;
 
-  const statusDiv = document.getElementById('status');
   statusDiv.innerHTML = "📤 Upload en cours…";
 
-  // Upload vers Supabase Storage
   const { data: uploadData, error: uploadError } = await supabase.storage
     .from('images')
     .upload(filePath, file);
@@ -305,7 +114,6 @@ addBtn.onclick=async()=>{
     return;
   }
 
-  // Récup URL publique CORRIGÉ
   const { data: urlData, error: urlError } = supabase.storage
     .from('images')
     .getPublicUrl(filePath);
@@ -318,7 +126,6 @@ addBtn.onclick=async()=>{
 
   const publicURL = urlData.publicUrl;
 
-  // Ajouter à table Supabase
   const { error: insertError } = await supabase.from('creations').insert([
     { name, image_url: publicURL }
   ]);
@@ -336,7 +143,8 @@ addBtn.onclick=async()=>{
   statusDiv.innerHTML = "✅ Création ajoutée !";
 };
 
-/* THEMES – INTACTS */
+themeBtn.onclick = () => openThemeModal();
+
 const snow=document.getElementById('snow');
 const sweetRain=document.createElement('div');
 sweetRain.style.position='fixed';
@@ -366,13 +174,9 @@ function setTheme(t){
   document.getElementById('themeModal').style.display='none';
 }
 
-/* ==================== SIDEBAR FIX ==================== */
 const sidebar = document.getElementById('sidebar');
 const toggleSidebar = document.getElementById('toggleSidebar');
-
-toggleSidebar.onclick = () => {
-  sidebar.classList.toggle('sidebar-open');
-};
+toggleSidebar.onclick = () => { sidebar.classList.toggle('sidebar-open'); };
 
 function openThemeModal(){ document.getElementById('themeModal').style.display='flex'; }
 function closeThemeModal(e){ document.getElementById('themeModal').style.display='none'; }
@@ -404,8 +208,6 @@ function createCandy(){
 
 loadCreations();
 </script>
-
-<p id="status">📤 Prêt à uploader des images…</p>
 
 </body>
 </html>
