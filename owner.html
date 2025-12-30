@@ -8,6 +8,7 @@
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{height:100%;font-family:'Comic Sans MS',cursive}
 
+/* BODY */
 body{
   background:url('Photoroom_20251212_143703.PNG') center top / cover no-repeat fixed;
   overflow:hidden;
@@ -15,12 +16,13 @@ body{
   flex-direction:column;
 }
 
-/* VUES */
+/* BOUTONS VUE */
 #viewSelector{
   display:flex;
   justify-content:center;
   gap:12px;
-  margin:20px 0;
+  margin-top:20px;
+  margin-bottom:20px;
 }
 #viewSelector button{
   background:#fff0f7;
@@ -40,20 +42,15 @@ body{
   width:100%;
   overflow:auto;
 }
-
 #visitor-list{
   display:flex;
+  justify-content:center;
   gap:16px;
   max-width:1200px;
-  flex-wrap:wrap;
-  justify-content:center;
 }
 
-/* CARTES */
-.visitor-item{
-  text-align:center;
-  cursor:pointer;
-}
+/* ITEMS */
+.visitor-item{text-align:center}
 .visitor-item img{
   width:220px;
   height:220px;
@@ -63,10 +60,15 @@ body{
 }
 .visitor-item p{
   margin-top:8px;
-  font-size:18px;
+  font-size:20px;
   color:#b84c6f;
   font-weight:bold;
 }
+
+/* VUES */
+.carousel-view{flex-wrap:nowrap;overflow-x:auto}
+.grid-view{flex-wrap:wrap}
+.list-view{flex-direction:column}
 
 /* SIDEBAR */
 #sidebar{
@@ -95,18 +97,15 @@ body{
   justify-content:center;
   cursor:pointer;
 }
-#sidebar input,
 #sidebar button{
   width:100%;
   margin-top:10px;
   padding:10px;
   border-radius:12px;
   border:none;
-}
-#sidebar button{
   background:#ffb6c1;
-  font-weight:bold;
   cursor:pointer;
+  font-weight:bold;
 }
 
 /* MODAL */
@@ -119,26 +118,36 @@ body{
   align-items:center;
   z-index:9999;
 }
-.modal-bg.active{display:flex}
-
 .modal-box{
   background:#ffe6f0;
   padding:20px;
   border-radius:18px;
   border:4px solid #b67385;
 }
-.modal-box img{
-  width:320px;
-  height:320px;
-  object-fit:contain;
+.modal-box button{
+  width:100%;
+  margin:8px 0;
+  padding:10px;
+  border-radius:12px;
+  border:none;
+  background:#ffb6c1;
+  cursor:pointer;
 }
+
+.snow{position:fixed;inset:0;pointer-events:none;display:none}
+.snowflake{position:absolute;top:-10px;animation:snowFall linear infinite}
+@keyframes snowFall{100%{transform:translateY(110vh)}}
 </style>
 </head>
 
 <body>
 
+<div id="snow" class="snow"></div>
+
 <div id="viewSelector">
-  <button onclick="setView('grid')">Grille</button>
+  <button id="btnCarousel">Carrousel</button>
+  <button id="btnGrid">Grille</button>
+  <button id="btnList">Liste</button>
 </div>
 
 <div class="center-zone">
@@ -150,14 +159,18 @@ body{
   <input id="name" placeholder="Nom">
   <input id="photo" type="file" accept="image/*">
   <button id="add">Ajouter</button>
+  <button onclick="openThemeModal()">Thème</button>
 </div>
 
-<!-- MODAL IMAGE -->
-<div class="modal-bg" id="imgModal" onclick="closeModal(event)">
+<div class="modal-bg" id="themeModal" onclick="closeThemeModal(event)">
   <div class="modal-box" onclick="event.stopPropagation()">
-    <img id="modalImg">
+    <button onclick="setTheme('noel')">🎄 Noël</button>
+    <button onclick="setTheme('default')">💠 Défaut</button>
+    <button onclick="setTheme('sweety')">🌸 Sweety</button>
   </div>
 </div>
+
+<p id="status" style="text-align:center;margin:10px">📤 Prêt à uploader…</p>
 
 <script type="module">
 import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
@@ -168,8 +181,14 @@ const supabase = createClient(
 );
 
 let creations=[];
-const list=document.getElementById('visitor-list');
+let currentView='grid';
 
+const list=document.getElementById('visitor-list');
+const nameInput=document.getElementById('name');
+const photoInput=document.getElementById('photo');
+const status=document.getElementById('status');
+
+// Charger les créations avec les URL publiques correctes
 async function loadCreations(){
   const { data, error } = await supabase
     .from("creations")
@@ -177,58 +196,81 @@ async function loadCreations(){
     .order("created_at",{ascending:false});
 
   if(error){
-    console.error(error);
+    console.error("Erreur Supabase:", error);
     return;
   }
 
-  creations = data.map(c=>{
-    return {
-      name:c.name,
-      img:`https://jyhbamdcxmpveujjqjla.supabase.co/storage/v1/object/public/images/${c.image_path}`
-    }
+  creations = data.map(c => {
+    // Ici on construit l'URL complète avec image_path
+    const publicUrl = `https://jyhbamdcxmpveujjqjla.supabase.co/storage/v1/object/public/images/${c.image_path}`;
+    return { name: c.name, imgUrl: publicUrl };
   });
 
-  render();
+  renderCreations();
 }
 
-function render(){
+function renderCreations(){
   list.innerHTML='';
+  list.className=currentView+'-view';
   creations.forEach(c=>{
     const d=document.createElement('div');
     d.className='visitor-item';
-    d.innerHTML=`<img src="${c.img}"><p>${c.name}</p>`;
-    d.onclick=()=>openModal(c.img);
+    d.innerHTML=`<p>${c.name}</p><img src="${c.imgUrl}">`;
     list.appendChild(d);
   });
 }
 
-function openModal(src){
-  document.getElementById('modalImg').src=src;
-  document.getElementById('imgModal').classList.add('active');
-}
+// Ajouter une image
+document.getElementById('add').addEventListener('click', async ()=>{
+  const name=nameInput.value.trim();
+  const file=photoInput.files[0];
+  if(!name||!file) return alert("Nom + photo requis");
 
-function closeModal(e){
-  document.getElementById('imgModal').classList.remove('active');
-}
-
-// AJOUT
-document.getElementById('add').onclick=async()=>{
-  const name=document.getElementById('name').value.trim();
-  const file=document.getElementById('photo').files[0];
-  if(!name||!file) return alert("Nom + photo");
+  status.textContent="📤 Upload…";
 
   const path=`${Date.now()}_${file.name}`;
-  await supabase.storage.from("images").upload(path,file);
+  const { error } = await supabase.storage.from("images").upload(path,file);
+  if(error) return status.textContent=error.message;
+
+  // Insérer seulement le nom du fichier dans la table
   await supabase.from("creations").insert([{name,image_path:path}]);
 
-  loadCreations();
-};
+  const publicUrl = `https://jyhbamdcxmpveujjqjla.supabase.co/storage/v1/object/public/images/${path}`;
+  creations.unshift({name,imgUrl:publicUrl});
+  renderCreations();
 
-// SIDEBAR
+  nameInput.value='';
+  photoInput.value='';
+  status.textContent="✅ Ajouté !";
+});
+
+// Sidebar toggle
 document.getElementById('toggleSidebar').onclick=()=>{
   document.getElementById('sidebar').classList.toggle('sidebar-open');
 };
 
+// Vues
+document.getElementById('btnCarousel').onclick=()=>{currentView='carousel';renderCreations();}
+document.getElementById('btnGrid').onclick=()=>{currentView='grid';renderCreations();}
+document.getElementById('btnList').onclick=()=>{currentView='list';renderCreations();}
+
+// Thèmes
+function openThemeModal(){document.getElementById('themeModal').style.display='flex'}
+function closeThemeModal(){document.getElementById('themeModal').style.display='none'}
+
+function setTheme(t){
+  if(t==='noel'){document.body.style.backgroundImage="url('noel.png')"}
+  else if(t==='sweety'){document.body.style.backgroundImage="url('sweety-girly.png')"}
+  else{document.body.style.backgroundImage="url('Photoroom_20251212_143703.PNG')"}
+  closeThemeModal();
+}
+
+/* 🔥 RENDRE ACCESSIBLE AU HTML */
+window.openThemeModal=openThemeModal;
+window.closeThemeModal=closeThemeModal;
+window.setTheme=setTheme;
+
+// Charger les images dès le chargement
 loadCreations();
 </script>
 
