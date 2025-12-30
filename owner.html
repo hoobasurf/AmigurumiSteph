@@ -2,6 +2,8 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{height:100%;font-family:'Comic Sans MS',cursive}
@@ -13,11 +15,6 @@ body{
   display:flex;
   flex-direction:column;
 }
-
-/* HEADER */
-header{text-align:center;padding:12px 0}
-header img{width:98px;height:98px;border-radius:20%;margin:auto}
-.title{display:none}
 
 /* BOUTONS VUE */
 #viewSelector{
@@ -53,7 +50,7 @@ header img{width:98px;height:98px;border-radius:20%;margin:auto}
 }
 
 /* ITEMS */
-.visitor-item{text-align:center;cursor:pointer}
+.visitor-item{text-align:center}
 .visitor-item img{
   width:220px;
   height:220px;
@@ -69,30 +66,9 @@ header img{width:98px;height:98px;border-radius:20%;margin:auto}
 }
 
 /* VUES */
-.carousel-view{
-  flex-wrap:nowrap;          
-  overflow-x:auto;
-  scroll-behavior:smooth;
-}
-.carousel-view::-webkit-scrollbar{height:8px}
-.carousel-view::-webkit-scrollbar-thumb{background:#b84c6f88;border-radius:20px}
-
-.grid-view{
-  flex-wrap:wrap;
-}
-
-.list-view{
-  flex-direction:column;
-}
-.list-view .visitor-item{
-  display:flex;
-  align-items:center;
-  gap:16px;
-}
-.list-view .visitor-item img{
-  width:140px;
-  height:140px;
-}
+.carousel-view{flex-wrap:nowrap;overflow-x:auto}
+.grid-view{flex-wrap:wrap}
+.list-view{flex-direction:column}
 
 /* SIDEBAR */
 #sidebar{
@@ -101,10 +77,10 @@ header img{width:98px;height:98px;border-radius:20%;margin:auto}
   left:-220px;
   width:220px;
   height:100vh;
-  background:rgba(255,230,240,0.15);
+  background:rgba(255,230,240,0.2);
   border-right:2px solid #b67385;
   padding:20px;
-  transition:left .3s ease;
+  transition:left .3s;
   z-index:10;
 }
 #sidebar.sidebar-open{left:0}
@@ -115,36 +91,24 @@ header img{width:98px;height:98px;border-radius:20%;margin:auto}
   width:30px;
   height:60px;
   background:#ffb6c1;
-  color:#8b3a3a;
   border-radius:0 12px 12px 0;
   display:flex;
-  justify-content:center;
   align-items:center;
+  justify-content:center;
   cursor:pointer;
-  border:1px solid #b67385;
-  font-weight:bold;
 }
 #sidebar button{
   width:100%;
-  margin-bottom:10px;
+  margin-top:10px;
   padding:10px;
-  border:none;
   border-radius:12px;
+  border:none;
   background:#ffb6c1;
-  color:#8b3a3a;
-  font-weight:bold;
   cursor:pointer;
-}
-/* NEIGE */
-.snow{
-  position:fixed;
-  inset:0;
-  pointer-events:none;
-  z-index:5;
-  display:none;
+  font-weight:bold;
 }
 
-/* MODAL THEME */
+/* MODAL */
 .modal-bg{
   position:fixed;
   inset:0;
@@ -156,57 +120,26 @@ header img{width:98px;height:98px;border-radius:20%;margin:auto}
 }
 .modal-box{
   background:#ffe6f0;
-  border:4px solid #b67385;
-  border-radius:18px;
   padding:20px;
-  text-align:center;
+  border-radius:18px;
+  border:4px solid #b67385;
 }
 .modal-box button{
   width:100%;
   margin:8px 0;
   padding:10px;
-  border:none;
   border-radius:12px;
+  border:none;
   background:#ffb6c1;
-  color:#8b3a3a;
-  font-weight:bold;
+  cursor:pointer;
 }
 
-#sidebar,
-#sidebar * {
-  pointer-events: auto;
-}
-
-/* ❄️ FLOCONS */
-.snowflake{
-  position:absolute;
-  top:-10px;
-  color:white;
-  font-size:16px;
-  animation: snowFall linear infinite;
-  pointer-events:none;
-}
-
-@keyframes snowFall{
-  0%{transform:translateY(0)}
-  100%{transform:translateY(110vh)}
-}
-
-/* 🍬 BONBONS */
-.candy{
-  position:absolute;
-  top:-20px;
-  font-size:22px;
-  animation: candyFall linear infinite;
-  pointer-events:none;
-}
-
-@keyframes candyFall{
-  100%{transform:translateY(110vh) rotate(360deg)}
-}
-  
+.snow{position:fixed;inset:0;pointer-events:none;display:none}
+.snowflake{position:absolute;top:-10px;animation:snowFall linear infinite}
+@keyframes snowFall{100%{transform:translateY(110vh)}}
 </style>
 </head>
+
 <body>
 
 <div id="snow" class="snow"></div>
@@ -237,28 +170,28 @@ header img{width:98px;height:98px;border-radius:20%;margin:auto}
   </div>
 </div>
 
-<p id="status">📤 Prêt à uploader des images…</p>
+<p id="status" style="text-align:center;margin:10px">📤 Prêt à uploader…</p>
 
 <script type="module">
 import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
 
-const SUPABASE_URL = "https://jyhbamdcxmpveujjqjla.supabase.co";
-const SUPABASE_ANON_KEY = "sb_publishable_sqsxb-3Kl5o3-JQYv9kGFw_-g0EgwMa";
-const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+const supabase = createClient(
+  "https://jyhbamdcxmpveujjqjla.supabase.co",
+  "sb_publishable_sqsxb-3Kl5o3-JQYv9kGFw_-g0EgwMa"
+);
 
+let creations=[];
 let currentView='grid';
+
 const list=document.getElementById('visitor-list');
 const nameInput=document.getElementById('name');
 const photoInput=document.getElementById('photo');
-const addBtn=document.getElementById('add');
-const statusDiv=document.getElementById('status');
-let creations=[];
+const status=document.getElementById('status');
 
-// Charger existants depuis Supabase
-async function loadCreations() {
-  const { data, error } = await supabase.from('creations').select('*').order('created_at', { ascending: false });
-  if (error) console.error(error);
-  else creations = data.map(c => ({ name: c.name, imgUrl: c.main_image }));
+async function loadCreations(){
+  // ⚡ utiliser le bon nom de colonne 'image_path' si c'est ce que tu as dans ta table
+  const { data } = await supabase.from("creations").select("*").order("created_at",{ascending:false});
+  creations = data.map(c => ({ name: c.name, image_path: c.image_path }));
   renderCreations();
 }
 
@@ -268,138 +201,59 @@ function renderCreations(){
   creations.forEach(c=>{
     const d=document.createElement('div');
     d.className='visitor-item';
-    d.innerHTML=`<p>${c.name}</p><img src="${c.imgUrl}">`;
+    d.innerHTML=`<p>${c.name}</p><img src="${c.image_path}">`;
     list.appendChild(d);
   });
 }
 
-function setView(v){
-  currentView=v;
-  renderCreations();
-}
-
-document.getElementById('btnCarousel').onclick=()=>setView('carousel');
-document.getElementById('btnGrid').onclick=()=>setView('grid');
-document.getElementById('btnList').onclick=()=>setView('list');
-
-/* ✅ BOUTON AJOUTER – SUPABASE STORAGE */
-addBtn.onclick=async()=>{
+document.getElementById('add').addEventListener('click', async ()=>{
   const name=nameInput.value.trim();
   const file=photoInput.files[0];
   if(!name||!file) return alert("Nom + photo requis");
 
-  const fileExt = file.name.split('.').pop();
-  const fileName = `${Date.now()}.${fileExt}`;
-  const filePath = `images/${fileName}`;
+  status.textContent="📤 Upload…";
 
-  statusDiv.innerHTML = "📤 Upload en cours…";
+  const path=`${Date.now()}_${file.name}`;
+  const { error } = await supabase.storage.from("images").upload(path,file);
+  if(error) return status.textContent=error.message;
 
-  // Upload vers Supabase Storage
-  const { data: uploadData, error: uploadError } = await supabase.storage
-    .from('images')
-    .upload(filePath, file, { cacheControl: '3600', upsert: false });
+  // récupérer l'URL publique
+  const { data } = supabase.storage.from("images").getPublicUrl(path);
+  const publicUrl = data.publicUrl;
 
-  if(uploadError){
-    statusDiv.innerHTML = `❌ Erreur upload: ${uploadError.message}`;
-    console.error(uploadError);
-    return;
-  }
+  // insert dans Supabase avec le nom correct de colonne
+  await supabase.from("creations").insert({ name, image_path: publicUrl });
 
-  // Récup URL publique
-  const { publicURL, error: urlError } = supabase.storage
-    .from('images')
-    .getPublicUrl(filePath);
-
-  if(urlError){
-    statusDiv.innerHTML = `❌ Erreur récupération URL: ${urlError.message}`;
-    console.error(urlError);
-    return;
-  }
-
-  // Ajouter à table Supabase
-  const { error: insertError } = await supabase.from('creations').insert([
-    { name, main_image: publicURL, image_urls: [publicURL], public: true }
-  ]);
-
-  if(insertError){
-    statusDiv.innerHTML = `❌ Erreur insertion: ${insertError.message}`;
-    console.error(insertError);
-    return;
-  }
-
-  // Ajouter localement
-  creations.unshift({ name, imgUrl: publicURL });
+  creations.unshift({ name, image_path: publicUrl });
   renderCreations();
+
   nameInput.value='';
   photoInput.value='';
-  statusDiv.innerHTML = "✅ Création ajoutée !";
+  status.textContent="✅ Ajouté !";
+});
+
+document.getElementById('toggleSidebar').onclick=()=>{
+  document.getElementById('sidebar').classList.toggle('sidebar-open');
 };
 
-/* THEMES – INTACTS */
-const snow=document.getElementById('snow');
-const sweetRain=document.createElement('div');
-sweetRain.style.position='fixed';
-sweetRain.style.inset='0';
-sweetRain.style.pointerEvents='none';
-sweetRain.style.display='none';
-document.body.appendChild(sweetRain);
+document.getElementById('btnCarousel').onclick=()=>{currentView='carousel';renderCreations();}
+document.getElementById('btnGrid').onclick=()=>{currentView='grid';renderCreations();}
+document.getElementById('btnList').onclick=()=>{currentView='list';renderCreations();}
+
+function openThemeModal(){document.getElementById('themeModal').style.display='flex'}
+function closeThemeModal(){document.getElementById('themeModal').style.display='none'}
 
 function setTheme(t){
-  snow.style.display='none';
-  sweetRain.style.display='none';
-
-  if(t==='noel'){
-    document.body.style.backgroundImage="url('noel.png')";
-    snow.style.display='block';
-    createSnow();
-  }
-  else if(t==='sweety'){
-    document.body.style.backgroundImage="url('sweety-girly.png')";
-    sweetRain.style.display='block';
-    createCandy();
-  }
-  else{
-    document.body.style.backgroundImage="url('Photoroom_20251212_143703.PNG')";
-  }
-
-  document.getElementById('themeModal').style.display='none';
+  if(t==='noel'){document.body.style.backgroundImage="url('noel.png')"}
+  else if(t==='sweety'){document.body.style.backgroundImage="url('sweety-girly.png')"}
+  else{document.body.style.backgroundImage="url('Photoroom_20251212_143703.PNG')"}
+  closeThemeModal();
 }
 
-/* ==================== SIDEBAR FIX ==================== */
-const sidebar = document.getElementById('sidebar');
-const toggleSidebar = document.getElementById('toggleSidebar');
-
-toggleSidebar.onclick = () => {
-  sidebar.classList.toggle('sidebar-open');
-};
-
-function openThemeModal(){ document.getElementById('themeModal').style.display='flex'; }
-function closeThemeModal(e){ document.getElementById('themeModal').style.display='none'; }
-
-function createSnow(){
-  snow.innerHTML='';
-  for(let i=0;i<35;i++){
-    const f=document.createElement('div');
-    f.className='snowflake';
-    f.textContent='❄️';
-    f.style.left=Math.random()*100+'%';
-    f.style.animationDuration=4+Math.random()*6+'s';
-    f.style.fontSize=12+Math.random()*14+'px';
-    snow.appendChild(f);
-  }
-}
-
-function createCandy(){
-  sweetRain.innerHTML='';
-  for(let i=0;i<35;i++){
-    const c=document.createElement('div');
-    c.className='candy';
-    c.textContent='🍬';
-    c.style.left=Math.random()*100+'%';
-    c.style.animationDuration=4+Math.random()*6+'s';
-    sweetRain.appendChild(c);
-  }
-}
+/* 🔥 RENDRE ACCESSIBLE AU HTML */
+window.openThemeModal=openThemeModal;
+window.closeThemeModal=closeThemeModal;
+window.setTheme=setTheme;
 
 loadCreations();
 </script>
