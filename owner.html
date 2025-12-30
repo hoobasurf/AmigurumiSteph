@@ -49,15 +49,14 @@ body{
 }
 
 /* ITEMS */
-.visitor-item{text-align:center;position:relative}
+.visitor-item{text-align:center;position:relative;}
 .visitor-item img{
   width:220px;
   height:220px;
-  object-fit:cover;
+  object-fit:contain;
   border:4px solid #b67385;
   background:#ffe6f0;
   cursor:pointer;
-  border-radius:12px;
 }
 .visitor-item p{
   margin-top:8px;
@@ -65,6 +64,11 @@ body{
   color:#b84c6f;
   font-weight:bold;
 }
+
+/* VUES */
+.carousel-view{flex-wrap:nowrap;overflow-x:auto}
+.grid-view{flex-wrap:wrap}
+.list-view{flex-direction:column}
 
 /* SIDEBAR */
 #sidebar{
@@ -104,94 +108,129 @@ body{
   font-weight:bold;
 }
 
-/* MODAL AJOUT */
-#addModalBg{
-  position:fixed; inset:0;
-  background:rgba(0,0,0,.6);
+/* MODAL ZOOM */
+.zoom-modal{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,0.7);
   display:none;
   justify-content:center;
   align-items:center;
   z-index:9999;
 }
-#addModal{
+.zoom-box{
   background:#ffe6f0;
   padding:20px;
   border-radius:18px;
   border:4px solid #b67385;
-  max-width:600px;
-  width:90%;
-  text-align:center;
   position:relative;
+  max-width:80%;
+  max-height:80%;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
 }
-#addModal h2{margin-bottom:10px;color:#b84c6f;}
-#addModal input[type="file"]{margin:10px 0;}
-#addModal input[type="text"]{width:80%;padding:6px;margin:6px 0;border-radius:6px;border:1px solid #b67385;}
-#addModal button{
+.zoom-box img.main{
+  width:400px;
+  height:400px;
+  object-fit:contain;
+  border:4px solid #b67385;
+  margin-bottom:10px;
+}
+.zoom-box .miniatures{
+  display:flex;
+  gap:8px;
+  margin-bottom:10px;
+}
+.zoom-box .miniatures img{
+  width:80px;
+  height:80px;
+  object-fit:contain;
+  border:2px solid #b67385;
+  cursor:pointer;
+}
+.zoom-box .close-modal{
+  position:absolute;
+  top:8px;
+  right:8px;
+  width:28px;
+  height:28px;
+  background:pink;
+  color:black;
+  font-weight:bold;
+  font-size:18px;
+  border-radius:50%;
+  text-align:center;
+  line-height:28px;
+  cursor:pointer;
+  z-index:100;
+}
+.zoom-box .actions{
+  display:flex;
+  gap:12px;
+  margin-bottom:8px;
+}
+.zoom-box button.action-btn{
   background:#ffb6c1;
   border:none;
-  padding:8px 16px;
-  margin-top:10px;
+  padding:6px 12px;
   border-radius:12px;
   cursor:pointer;
   font-weight:bold;
+  transition: transform 0.2s;
 }
-.close-modal{
-  position:absolute;
-  top:8px; right:8px;
-  width:24px; height:24px;
-  background:#ff69b4;
-  color:#000;
-  font-weight:bold;
-  border-radius:50%;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  cursor:pointer;
+.zoom-box button.action-btn:active{
+  transform: scale(1.2);
+}
+.zoom-box .comments{
+  width:100%;
+  max-height:120px;
+  overflow:auto;
+  background:#fff0f7;
+  border:1px solid #b67385;
+  border-radius:12px;
+  padding:6px;
 }
 
-/* MODAL ZOOM IMAGE */
-#zoomModalBg{
-  position:fixed; inset:0;
-  background:rgba(0,0,0,.8);
+/* MODAL AJOUT */
+.add-modal{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,0.7);
   display:none;
   justify-content:center;
   align-items:center;
-  z-index:10000;
+  z-index:9998;
 }
-#zoomModal{
-  position:relative;
-  max-width:90%;
-  max-height:90%;
+.add-box{
   background:#ffe6f0;
-  padding:10px;
-  border-radius:12px;
-}
-#zoomModal img{
-  max-width:100%;
-  max-height:70vh;
-  border-radius:12px;
-}
-#thumbnails{
+  padding:20px;
+  border-radius:18px;
+  border:4px solid #b67385;
+  position:relative;
   display:flex;
+  flex-direction:column;
   gap:10px;
-  justify-content:center;
-  margin-top:10px;
 }
-#thumbnails img{
-  width:60px; height:60px;
-  object-fit:cover;
-  border:2px solid #b67385;
-  border-radius:8px;
+.add-box input[type="file"]{
   cursor:pointer;
-  transition:0.2s;
 }
-#thumbnails img:hover{transform:scale(1.1);}
-#zoomModal .close-modal{top:-12px; right:-12px;background:#ff69b4;color:#000;z-index:10;}
-
-/* VUES */
-.carousel-view{flex-wrap:nowrap;overflow-x:auto}
-.grid-view{flex-wrap:wrap}
-.list-view{flex-direction:column}
+.add-box .close-modal{
+  position:absolute;
+  top:8px;
+  right:8px;
+  width:28px;
+  height:28px;
+  background:pink;
+  color:black;
+  font-weight:bold;
+  font-size:18px;
+  border-radius:50%;
+  text-align:center;
+  line-height:28px;
+  cursor:pointer;
+  z-index:100;
+}
 </style>
 </head>
 <body>
@@ -208,89 +247,52 @@ body{
 
 <div id="sidebar">
   <div id="toggleSidebar">☰</div>
-  <button id="addBtn">Ajouter</button>
+  <button id="add">Ajouter</button>
   <button onclick="openThemeModal()">Thème</button>
 </div>
 
-<!-- Modal ajout -->
-<div id="addModalBg">
-  <div id="addModal">
-    <div class="close-modal" id="closeAddModal">×</div>
-    <h2>Ajouter des images</h2>
-    <input type="text" id="creatorName" placeholder="Votre prénom"><br>
-    <input type="file" id="photoInput" multiple accept="image/*"><br>
-    <button id="validateAdd">Valider</button>
+<!-- MODAL AJOUT -->
+<div class="add-modal" id="addModal">
+  <div class="add-box">
+    <span class="close-modal" id="closeAddModal">×</span>
+    <input type="text" id="modalName" placeholder="Nom">
+    <input type="file" id="modalPhotos" multiple accept="image/*">
+    <button id="modalUpload">Valider</button>
   </div>
 </div>
 
-<!-- Modal zoom -->
-<div id="zoomModalBg">
-  <div id="zoomModal">
-    <div class="close-modal" id="closeZoomModal">×</div>
-    <img id="zoomImg" src="">
-    <div id="thumbnails"></div>
+<!-- MODAL ZOOM -->
+<div class="zoom-modal" id="zoomModal">
+  <div class="zoom-box">
+    <span class="close-modal" id="closeZoomModal">×</span>
+    <img src="" class="main" id="zoomMain">
+    <div class="miniatures" id="miniatures"></div>
+    <div class="actions">
+      <button class="action-btn" id="likeBtn">❤️ Like</button>
+      <button class="action-btn" id="commentBtn">💬 Commentaire</button>
+    </div>
+    <div class="comments" id="comments"></div>
   </div>
 </div>
 
 <script type="module">
 import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
-
 const supabase = createClient(
   "https://jyhbamdcxmpveujjqjla.supabase.co",
   "sb_publishable_sqsxb-3Kl5o3-JQYv9kGFw_-g0EgwMa"
 );
 
 let creations = [];
-let currentView = 'grid';
-let modalImages = [];
-let mainModalIndex = 0;
+let currentView='grid';
+const list=document.getElementById('visitor-list');
 
-const list = document.getElementById('visitor-list');
-const addBtn = document.getElementById('addBtn');
-const addModalBg = document.getElementById('addModalBg');
-const closeAddModal = document.getElementById('closeAddModal');
-const validateAdd = document.getElementById('validateAdd');
-const photoInput = document.getElementById('photoInput');
-const creatorName = document.getElementById('creatorName');
-
-const zoomModalBg = document.getElementById('zoomModalBg');
-const zoomImg = document.getElementById('zoomImg');
-const thumbnails = document.getElementById('thumbnails');
-const closeZoomModal = document.getElementById('closeZoomModal');
-
-// Ouvrir modal ajout
-addBtn.onclick = () => addModalBg.style.display = 'flex';
-closeAddModal.onclick = () => addModalBg.style.display = 'none';
-addModalBg.onclick = e => {if(e.target===addModalBg) addModalBg.style.display='none'};
-
-// Ouvrir modal zoom
-function openZoomModal(index){
-  mainModalIndex = index;
-  zoomImg.src = modalImages[index].imgUrl;
-  zoomModalBg.style.display = 'flex';
-  renderThumbnails();
-}
-closeZoomModal.onclick = () => zoomModalBg.style.display='none';
-zoomModalBg.onclick = e => {if(e.target===zoomModalBg) zoomModalBg.style.display='none'};
-
-function renderThumbnails(){
-  thumbnails.innerHTML='';
-  modalImages.forEach((img,i)=>{
-    const t = document.createElement('img');
-    t.src = img.imgUrl;
-    t.onclick = () => {zoomImg.src = img.imgUrl; mainModalIndex=i;};
-    thumbnails.appendChild(t);
-  });
-}
-
-// Charger créations
+// ------------------ LOAD ------------------
 async function loadCreations(){
   const { data, error } = await supabase.from("creations").select("*").order("created_at",{ascending:false});
   if(error){console.error(error); return;}
-
-  creations = data.map(c => {
+  creations = data.map(c=>{
     const publicUrl = `https://jyhbamdcxmpveujjqjla.supabase.co/storage/v1/object/public/images/${c.image_path}`;
-    return { id: c.id, name: c.name, imgUrl: publicUrl };
+    return { name:c.name, imgUrl:publicUrl, id:c.id };
   });
   renderCreations();
 }
@@ -298,65 +300,79 @@ async function loadCreations(){
 function renderCreations(){
   list.innerHTML='';
   list.className=currentView+'-view';
-  creations.forEach((c,i)=>{
-    const d = document.createElement('div');
+  creations.forEach(c=>{
+    const d=document.createElement('div');
     d.className='visitor-item';
-    d.innerHTML = `<p>${c.name}</p><img src="${c.imgUrl}">`;
-    d.onclick = () => {modalImages=[c]; openZoomModal(0);}
+    d.innerHTML=`<p>${c.name}</p><img src="${c.imgUrl}" data-id="${c.id}">`;
     list.appendChild(d);
   });
 }
 
-// Validation ajout
-validateAdd.onclick = async () => {
-  const name = creatorName.value.trim();
-  const files = photoInput.files;
-  if(!name || !files.length) return alert("Prénom + image requis");
+// ------------------ SIDEBAR ------------------
+document.getElementById('toggleSidebar').onclick = ()=>{document.getElementById('sidebar').classList.toggle('sidebar-open');};
+document.getElementById('btnCarousel').onclick = ()=>{currentView='carousel';renderCreations();};
+document.getElementById('btnGrid').onclick = ()=>{currentView='grid';renderCreations();};
+document.getElementById('btnList').onclick = ()=>{currentView='list';renderCreations();};
 
-  addModalBg.style.display='none';
+// ------------------ MODAL AJOUT ------------------
+const addModal=document.getElementById('addModal');
+document.getElementById('add').onclick = ()=>{addModal.style.display='flex';};
+document.getElementById('closeAddModal').onclick = ()=>{addModal.style.display='none';};
+addModal.onclick = (e)=>{if(e.target===addModal) addModal.style.display='none';};
 
-  for(let file of files){
-    const path = `${Date.now()}_${file.name}`;
-    const { error } = await supabase.storage.from('images').upload(path,file);
-    if(error){console.error(error); continue;}
+// ------------------ MODAL ZOOM ------------------
+const zoomModal=document.getElementById('zoomModal');
+const zoomMain=document.getElementById('zoomMain');
+const miniatures=document.getElementById('miniatures');
+const commentsDiv=document.getElementById('comments');
+let currentZoomPhotos=[];
 
-    await supabase.from('creations').insert([{name,image_path:path}]);
-
-    const publicUrl = `https://jyhbamdcxmpveujjqjla.supabase.co/storage/v1/object/public/images/${path}`;
-    creations.unshift({id:null,name,imgUrl:publicUrl});
+list.addEventListener('click', e=>{
+  if(e.target.tagName==='IMG'){
+    const id=e.target.dataset.id;
+    const item=creations.find(c=>c.id===id);
+    currentZoomPhotos=[item];
+    zoomMain.src=item.imgUrl;
+    miniatures.innerHTML='';
+    // Ici on peut ajouter d'autres images si tu veux en récupérer plusieurs depuis Supabase
+    zoomModal.style.display='flex';
+    commentsDiv.innerHTML='';
   }
+});
+document.getElementById('closeZoomModal').onclick = ()=>{zoomModal.style.display='none';};
+zoomModal.onclick = e=>{if(e.target===zoomModal) zoomModal.style.display='none';};
 
-  creatorName.value='';
-  photoInput.value='';
+// ------------------ AJOUTER PHOTOS ------------------
+document.getElementById('modalUpload').onclick = async ()=>{
+  const files = document.getElementById('modalPhotos').files;
+  const name = document.getElementById('modalName').value.trim();
+  if(!name || files.length===0){alert('Nom + photos requises'); return;}
+  
+  for(let f of files){
+    const path=`${Date.now()}_${f.name}`;
+    const { error } = await supabase.storage.from("images").upload(path,f);
+    if(error){alert(error.message); continue;}
+    await supabase.from("creations").insert([{name,image_path:path}]);
+    const publicUrl=`https://jyhbamdcxmpveujjqjla.supabase.co/storage/v1/object/public/images/${path}`;
+    creations.unshift({name,imgUrl:publicUrl, id:Date.now()}); // ID temporaire
+  }
   renderCreations();
-}
-
-// Sidebar toggle
-document.getElementById('toggleSidebar').onclick=()=>{
-  document.getElementById('sidebar').classList.toggle('sidebar-open');
+  addModal.style.display='none';
+  document.getElementById('modalPhotos').value='';
+  document.getElementById('modalName').value='';
 };
 
-// Vues
-document.getElementById('btnCarousel').onclick=()=>{currentView='carousel';renderCreations();}
-document.getElementById('btnGrid').onclick=()=>{currentView='grid';renderCreations();}
-document.getElementById('btnList').onclick=()=>{currentView='list';renderCreations();}
+// ------------------ LIKE & COMMENT ------------------
+document.getElementById('likeBtn').onclick = ()=>{
+  const prenom = prompt("Ton prénom pour le Like ?");
+  if(prenom) commentsDiv.innerHTML += `<p>❤️ ${prenom} a liké</p>`;
+};
+document.getElementById('commentBtn').onclick = ()=>{
+  const comment = prompt("Ton commentaire ?");
+  if(comment) commentsDiv.innerHTML += `<p>💬 ${comment}</p>`;
+};
 
-// Thèmes
-function openThemeModal(){document.getElementById('themeModal').style.display='flex'}
-function closeThemeModal(){document.getElementById('themeModal').style.display='none'}
-function setTheme(t){
-  if(t==='noel'){document.body.style.backgroundImage="url('noel.png')"}
-  else if(t==='sweety'){document.body.style.backgroundImage="url('sweety-girly.png')"}
-  else{document.body.style.backgroundImage="url('Photoroom_20251212_143703.PNG')"}
-  closeThemeModal();
-}
-window.openThemeModal=openThemeModal;
-window.closeThemeModal=closeThemeModal;
-window.setTheme=setTheme;
-
-// Charger au départ
 loadCreations();
-
 </script>
 </body>
 </html>
