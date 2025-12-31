@@ -19,18 +19,24 @@ body{
   display:flex;
   justify-content:center;
   align-items:center;
+  position:relative;
+}
+
+#visitor-list-container{
   overflow-x:auto;
   scroll-snap-type:x mandatory;
   padding:20px 0;
+  width:100%;
 }
 
 #visitor-list{
   display:grid;
-  grid-auto-flow: column;         /* scroll horizontal */
-  grid-template-rows: repeat(3, 120px);   /* 3 lignes */
-  grid-template-columns: repeat(2, 120px); /* 2 colonnes par “page” = 6 cartes */
+  grid-auto-flow: column;         
+  grid-template-rows: repeat(3, 120px);   
+  grid-template-columns: repeat(2, 120px); 
   gap:16px;
   justify-content:center;
+  scroll-behavior: smooth;
 }
 
 .visitor-item{
@@ -73,6 +79,28 @@ body{
   z-index:5;
 }
 .delete-btn:hover{background:#e94f9a;}
+
+/* FLÈCHES */
+.arrow{
+  position:absolute;
+  top:50%;
+  transform:translateY(-50%);
+  width:40px;
+  height:40px;
+  background:#ff69b4;
+  color:#fff;
+  border-radius:50%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:24px;
+  cursor:pointer;
+  z-index:5;
+  opacity:0.8;
+}
+.arrow:hover{opacity:1;}
+#arrow-left{left:10px;}
+#arrow-right{right:10px;}
 
 /* SIDEBAR */
 #sidebar{
@@ -211,7 +239,11 @@ body{
 
 <body>
 <div class="center-zone">
-  <div id="visitor-list"></div>
+  <div id="arrow-left" class="arrow">‹</div>
+  <div id="visitor-list-container">
+    <div id="visitor-list"></div>
+  </div>
+  <div id="arrow-right" class="arrow">›</div>
 </div>
 
 <div id="sidebar">
@@ -251,6 +283,7 @@ const supabase=createClient(
 let creations=[],currentZoom=null;
 
 const list=document.getElementById('visitor-list');
+const listContainer=document.getElementById('visitor-list-container');
 const addModal=document.getElementById('addModal');
 const zoomModal=document.getElementById('zoomModal');
 const mainZoom=document.getElementById('mainZoom');
@@ -337,6 +370,14 @@ async function deleteProject(name){
   creations=creations.filter(c=>c.name!==name);
   render();
 }
+
+/* FLÈCHES SCROLL */
+const arrowLeft=document.getElementById('arrow-left');
+const arrowRight=document.getElementById('arrow-right');
+const pageWidth=(120*2 + 16)*1; // 2 colonnes + gap
+
+arrowLeft.onclick=()=>{listContainer.scrollBy({left:-pageWidth*3,behavior:'smooth'})};
+arrowRight.onclick=()=>{listContainer.scrollBy({left:pageWidth*3,behavior:'smooth'})};
 
 const toggleSidebar=document.getElementById('toggleSidebar');
 toggleSidebar.onclick=()=>sidebar.classList.toggle('sidebar-open');
