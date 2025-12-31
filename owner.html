@@ -203,7 +203,7 @@ body{
     <button class="close-modal" onclick="closeAdd()">×</button>
     <h3>Ajouter des photos</h3><br>
     <input type="file" id="multiPhoto" multiple accept="image/*"><br><br>
-    <button onclick="confirmAdd()">Valider</button>
+    <button onclick="event.stopPropagation(); confirmAdd();">Valider</button>
   </div>
 </div>
 
