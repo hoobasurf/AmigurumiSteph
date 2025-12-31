@@ -7,7 +7,7 @@
 *{box-sizing:border-box;margin:0;padding:0;}
 html,body{height:100%;font-family:'Comic Sans MS',cursive;display:flex;flex-direction:column;}
 
-/* FOND FIXE */
+/* FOND ECRAN FIXE */
 body::before {
   content:"";
   position:fixed;
@@ -34,16 +34,25 @@ body::before {
   -webkit-overflow-scrolling: touch;
 }
 
-/* CONTENEUR CARDS */
+#visitor-list-container{
+  display:flex;
+  justify-content:center;
+  padding-left:1cm;
+}
+
+/* Chaque page = 2x3 cartes */
 .page{
   display:grid;
-  grid-template-columns: repeat(2, 200px);
-  grid-template-rows: repeat(3, 200px);
+  grid-template-columns: repeat(2, 1fr);
+  grid-template-rows: repeat(3, 1fr);
   column-gap:3mm;
   row-gap:4mm;
   flex:0 0 auto;
-  padding:4mm;
+  width: calc(2 * 200px + 3mm);
+  height: calc(3 * 200px + 8mm);
   scroll-snap-align:center;
+  padding:4mm;
+  margin-left:-0.5cm;
   justify-content:center;
 }
 
@@ -54,8 +63,8 @@ body::before {
   height:200px;
   border-radius:12px;
   overflow:hidden;
-  border:2px solid #fff;
-  box-shadow:0 4px 12px rgba(0,0,0,0.2);
+  border:4px solid #f6c2d1;
+  box-shadow:0 4px 12px rgba(0,0,0,0.3);
   background:#ffe6f0;
 }
 .visitor-item img{
@@ -65,11 +74,11 @@ body::before {
   border-radius:12px;
   cursor:pointer;
   display:block;
-  filter: brightness(1.1) saturate(0.85) opacity(0.8);
+  filter: brightness(1.1) saturate(0.85);
   transition: filter 0.3s, opacity 0.3s;
 }
 .visitor-item img:hover{
-  filter: brightness(1.2) saturate(0.9) opacity(0.9);
+  filter: brightness(1.2) saturate(0.9);
 }
 .visitor-item p{
   position:absolute;
@@ -81,23 +90,25 @@ body::before {
   text-align:center;
   text-shadow:1px 1px 2px rgba(255,255,255,0.8);
 }
+
+/* CROIX SUPPRIMER */
 .delete-btn{
   position:absolute;
-  top:2px;
-  right:2px;
-  width:24px;
-  height:24px;
-  background:#ff69b4;
-  color:#fff;
-  border-radius:50%;
-  display:flex;
-  align-items:center;
-  justify-content:center;
+  top:4px;
+  right:4px;
+  width:auto;
+  height:auto;
+  background:transparent;
+  color:#ff69b4;
+  font-size:20px;
   font-weight:bold;
   cursor:pointer;
   z-index:5;
 }
-.delete-btn:hover{background:#e94f9a;}
+.delete-btn:hover{
+  color:#e94f9a;
+  transform: scale(1.1);
+}
 
 /* SIDEBAR */
 #sidebar{
@@ -138,34 +149,39 @@ body::before {
 }
 
 /* MODAL AJOUT */
-#addModal, #deleteModal{
+#addModal{
   position:fixed; inset:0;
+  background:rgba(0,0,0,0.6);
   display:none;
   justify-content:center;
   align-items:center;
-  z-index:10000;
-}
-#addModal{
-  background:rgba(0,0,0,0.6);
+  z-index:9999;
 }
 #addModal .modal-box{
   background:#ffe6f0;
-  padding:20px;
+  padding:16px 20px;
   border-radius:24px;
   border:4px solid #b67385;
   display:flex;
   flex-direction:column;
   gap:12px;
   align-items:center;
-  min-width:200px;
-  max-width:280px;
-  box-shadow:0 4px 20px rgba(0,0,0,0.3);
+  min-width:220px;
+  max-width:260px;
+  box-shadow:0 6px 18px rgba(0,0,0,0.3);
+}
+#addModal h2{
+  font-size:20px;
+  color:#b84c6f;
 }
 #addModal input{
   padding:8px;
   border-radius:12px;
   border:2px solid #b67385;
   width:100%;
+  font-family:'Comic Sans MS',cursive;
+  font-size:14px;
+  color:#b84c6f;
 }
 #addModal button{
   padding:6px 16px;
@@ -175,11 +191,20 @@ body::before {
   border-radius:14px;
   cursor:pointer;
   font-weight:bold;
+  font-size:14px;
+}
+#addModal button:hover{
+  background:#e94f9a;
 }
 
 /* MODAL SUPPRESSION */
 #deleteModal{
+  position:fixed; inset:0;
   background:rgba(0,0,0,0.5);
+  display:none;
+  justify-content:center;
+  align-items:center;
+  z-index:10000;
 }
 #deleteModal .modal-box{
   background:#ffe6f0;
@@ -238,15 +263,22 @@ body::before {
   position:absolute;
   top:12px;
   right:12px;
-  width:28px;
-  height:28px;
-  background:#ff69b4;
+  width:32px;
+  height:32px;
+  background:#ffb6c1;
   color:#fff;
   border-radius:50%;
   display:flex;
   justify-content:center;
   align-items:center;
   cursor:pointer;
+  font-size:20px;
+  border:2px solid #b67385;
+  box-shadow:0 3px 8px rgba(0,0,0,0.3);
+}
+.closeZoom:hover{
+  background:#ff69b4;
+  transform: scale(1.1);
 }
 
 /* Actions like/comment */
@@ -265,17 +297,26 @@ body::before {
 .like-btn{background:#ff69b4}
 .comment-btn{background:#b84c6f}
 
+/* Responsive */
+@media(max-width:480px){
+  .page{grid-template-columns: repeat(2, 120px); grid-template-rows: repeat(3, 120px);}
+  .visitor-item{width:120px;height:120px;}
+  #addModal .modal-box{min-width:180px; max-width:220px;}
+}
 </style>
 </head>
 <body>
 
-<div class="center-zone" id="visitor-list-container"></div>
+<div class="center-zone">
+  <div id="visitor-list-container"></div>
+</div>
 
 <div id="sidebar">
   <div id="toggleSidebar">☰</div>
   <button id="addBtn">Ajouter</button>
 </div>
 
+<!-- MODAL AJOUT -->
 <div id="addModal">
   <div class="modal-box">
     <h2>Ajouter des photos</h2>
@@ -285,6 +326,7 @@ body::before {
   </div>
 </div>
 
+<!-- MODAL SUPPRESSION -->
 <div id="deleteModal">
   <div class="modal-box">
     <p>Supprimer définitivement cette image ?</p>
@@ -293,6 +335,7 @@ body::before {
   </div>
 </div>
 
+<!-- ZOOM -->
 <div id="zoomModal">
   <div class="closeZoom">×</div>
   <img id="mainZoom">
@@ -311,7 +354,7 @@ const supabase=createClient(
   "sb_publishable_sqsxb-3Kl5o3-JQYv9kGFw_-g0EgwMa"
 );
 
-let creations=[],currentZoom=null;
+let creations=[],currentZoom=null,itemToDelete=null;
 const container=document.getElementById('visitor-list-container');
 const addModal=document.getElementById('addModal');
 const zoomModal=document.getElementById('zoomModal');
@@ -322,7 +365,6 @@ const confirmDeleteBtn=document.querySelector('#deleteModal .confirm-btn');
 const cancelDeleteBtn=document.querySelector('#deleteModal .cancel-btn');
 const likeBtn=document.querySelector('.like-btn');
 const commentBtn=document.querySelector('.comment-btn');
-let itemToDelete=null;
 
 async function loadCreations(){
   const {data}=await supabase.from("creations").select("*").order("created_at",{ascending:false});
