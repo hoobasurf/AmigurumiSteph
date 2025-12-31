@@ -7,10 +7,10 @@
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{height:100%;font-family:'Comic Sans MS',cursive;}
 body{
-  background:url('Photoroom_20251212_143703.PNG') center top / cover no-repeat fixed;
   display:flex;
   flex-direction:column;
   overflow:hidden;
+  background:url('Photoroom_20251212_143703.PNG') center top / cover no-repeat fixed;
 }
 
 /* CENTER + SCROLL HORIZONTAL */
@@ -26,9 +26,9 @@ body{
 
 #visitor-list{
   display:grid;
-  grid-auto-flow: column;                  /* scroll horizontal */
-  grid-template-rows: repeat(3, 150px);    /* 3 lignes */
-  grid-template-columns: repeat(2, 150px); /* 2 colonnes par page */
+  grid-auto-flow: column;         /* scroll horizontal */
+  grid-template-rows: repeat(3, 120px);   /* 3 lignes */
+  grid-template-columns: repeat(2, 120px); /* 2 colonnes par “page” = 6 cartes */
   gap:16px;
   justify-content:center;
 }
@@ -36,14 +36,15 @@ body{
 .visitor-item{
   scroll-snap-align:center;
   text-align:center;
-  border-radius:16px;
+  border-radius:12px;
+  position:relative;
 }
 .visitor-item img{
   width:100%;
   height:100%;
   object-fit:cover;
-  border:3px solid #b67385;
-  border-radius:16px;
+  border:2px solid #b67385;
+  border-radius:12px;
   background:#ffe6f0;
   cursor:pointer;
 }
@@ -57,10 +58,10 @@ body{
 /* CROIX */
 .delete-btn{
   position:absolute;
-  top:4px;
-  right:4px;
-  width:20px;
-  height:20px;
+  top:2px;
+  right:2px;
+  width:18px;
+  height:18px;
   background:#ff69b4;
   color:#fff;
   border-radius:50%;
@@ -209,7 +210,6 @@ body{
 </head>
 
 <body>
-
 <div class="center-zone">
   <div id="visitor-list"></div>
 </div>
