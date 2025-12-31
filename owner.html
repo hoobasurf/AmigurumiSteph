@@ -8,17 +8,18 @@
 html,body{height:100%;font-family:'Comic Sans MS',cursive;}
 
 /* BODY AVEC FOND ZOOMÉ */
-body{
-  display:flex;
-  flex-direction:column;
-  overflow:hidden;
+body::before {
+  content:"";
+  position:fixed;
+  top:0;
+  left:0;
+  width:100vw;
+  height:100vh;
   background-image: url('Photoroom_20251223_114401.jpeg');
+  background-size: calc(100% + 5mm) calc(100% + 5mm); /* zoom de 5mm */
+  background-position: center calc(50% - 5mm);       /* remonte de 5mm */
   background-repeat: no-repeat;
-  background-size: 110% auto;           /* zoom léger */
-  background-position: center center;   /* centré horizontal/vertical */
-  background-color: #ffe6f0;
-  min-height: 100vh;
-  width: 100vw;
+  z-index:-1;
 }
 
 /* SCROLL HORIZONTAL */
