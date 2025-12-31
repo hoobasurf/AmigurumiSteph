@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style>
-*{box-sizing:border-box;margin:0;padding:0}
+*{box-sizing:border-box;margin:0;padding:0;}
 html,body{height:100%;font-family:'Comic Sans MS',cursive;}
 body{
   display:flex;
@@ -23,41 +23,55 @@ body{
 }
 
 #visitor-list-container{
-  overflow-x:hidden;
+  overflow-x:auto;
   width:100%;
+  padding:20px;
+  scroll-snap-type: x mandatory; /* snap horizontal */
 }
 
-#visitor-pages{
+#visitor-list{
   display:flex;
-  gap:20px;
-  scroll-behavior:smooth;
-}
-
-.page{
-  display:grid;
-  grid-template-columns: repeat(2, 120px);
-  grid-template-rows: repeat(3, 120px);
   gap:16px;
-  flex-shrink:0; /* pour que chaque page reste largeur fixe */
 }
 
 .visitor-item{
+  flex:0 0 auto; /* empêcher de rétrécir */
+  width:100px;
+  height:100px;
+  scroll-snap-align:start; /* chaque carte se cale au début */
   text-align:center;
   border-radius:12px;
   position:relative;
+  background:#ffe6f0; /* fond rose visible */
 }
+
+/* PLACEHOLDER */
+.visitor-item .placeholder{
+  position:absolute;
+  inset:0;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  font-size:24px;
+  color:#b84c6f;
+  font-weight:bold;
+}
+
+/* IMAGE */
 .visitor-item img{
   width:100%;
   height:100%;
   object-fit:cover;
   border:2px solid #b67385;
   border-radius:12px;
-  background:#ffe6f0;
   cursor:pointer;
+  display:block;
 }
+
+/* NOM */
 .visitor-item p{
   margin-top:4px;
-  font-size:14px;
+  font-size:12px;
   color:#b84c6f;
   font-weight:bold;
 }
@@ -80,28 +94,6 @@ body{
   z-index:5;
 }
 .delete-btn:hover{background:#e94f9a;}
-
-/* FLÈCHES */
-.arrow{
-  position:absolute;
-  top:50%;
-  transform:translateY(-50%);
-  width:40px;
-  height:40px;
-  background:#ff69b4;
-  color:#fff;
-  border-radius:50%;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-size:24px;
-  cursor:pointer;
-  z-index:5;
-  opacity:0.8;
-}
-.arrow:hover{opacity:1;}
-#arrow-left{left:10px;}
-#arrow-right{right:10px;}
 
 /* SIDEBAR */
 #sidebar{
@@ -131,11 +123,12 @@ body{
   cursor:pointer;
 }
 #sidebar button{
-  width:100%;
-  padding:12px;
+  width:auto;
+  padding:8px 16px;
   border-radius:16px;
   border:none;
-  background:#ffb6c1;
+  background:#ff69b4;
+  color:#fff;
   cursor:pointer;
   font-weight:bold;
 }
@@ -151,28 +144,29 @@ body{
 }
 #addModal .modal-box{
   background:#ffe6f0;
-  padding:24px;
+  padding:20px;
   border-radius:24px;
   border:4px solid #b67385;
   display:flex;
   flex-direction:column;
   gap:12px;
   align-items:center;
-  min-width:280px;
+  min-width:220px;
 }
 #addModal input{
-  padding:10px;
+  padding:8px;
   border-radius:12px;
   border:2px solid #b67385;
   width:100%;
 }
 #addModal button{
-  padding:10px 20px;
+  padding:6px 16px;
   border:none;
   background:#ff69b4;
   color:#fff;
   border-radius:14px;
   cursor:pointer;
+  font-weight:bold;
 }
 
 /* ZOOM */
@@ -194,13 +188,13 @@ body{
 }
 #zoomModal .thumbs{
   display:flex;
-  gap:10px;
+  gap:8px;
   max-width:80%;
   overflow-x:auto;
 }
 #zoomModal .thumbs img{
-  width:60px;
-  height:60px;
+  width:50px;
+  height:50px;
   object-fit:cover;
   border-radius:12px;
   border:2px solid #b67385;
@@ -210,8 +204,8 @@ body{
   position:absolute;
   top:12px;
   right:12px;
-  width:32px;
-  height:32px;
+  width:28px;
+  height:28px;
   background:#ff69b4;
   color:#fff;
   border-radius:50%;
@@ -223,11 +217,11 @@ body{
 
 .actions{
   display:flex;
-  gap:20px;
+  gap:16px;
   margin-top:10px;
 }
 .like-btn,.comment-btn{
-  padding:6px 12px;
+  padding:5px 12px;
   border-radius:12px;
   border:none;
   cursor:pointer;
@@ -235,16 +229,20 @@ body{
 }
 .like-btn{background:#ff69b4}
 .comment-btn{background:#b84c6f}
+
+/* Responsive : cartes plus petites sur mobile */
+@media(max-width:480px){
+  .visitor-item{width:80px;height:80px;}
+  #addModal .modal-box{min-width:180px;}
+}
 </style>
 </head>
 
 <body>
 <div class="center-zone">
-  <div id="arrow-left" class="arrow">‹</div>
   <div id="visitor-list-container">
-    <div id="visitor-pages"></div>
+    <div id="visitor-list"></div>
   </div>
-  <div id="arrow-right" class="arrow">›</div>
 </div>
 
 <div id="sidebar">
@@ -281,22 +279,15 @@ const supabase=createClient(
   "sb_publishable_sqsxb-3Kl5o3-JQYv9kGFw_-g0EgwMa"
 );
 
-let creations=[],currentZoom=null,currentPage=0;
+let creations=[],currentZoom=null;
 
-const visitorPages=document.getElementById('visitor-pages');
-const listContainer=document.getElementById('visitor-list-container');
+const list=document.getElementById('visitor-list');
 const addModal=document.getElementById('addModal');
 const zoomModal=document.getElementById('zoomModal');
 const mainZoom=document.getElementById('mainZoom');
 const thumbs=document.getElementById('thumbs');
 const likeBtn=document.querySelector('.like-btn');
 const commentBtn=document.querySelector('.comment-btn');
-
-function chunkArray(array,size){
-  const result=[];
-  for(let i=0;i<array.length;i+=size) result.push(array.slice(i,i+size));
-  return result;
-}
 
 async function loadCreations(){
   const {data}=await supabase.from("creations").select("*").order("created_at",{ascending:false});
@@ -307,24 +298,18 @@ async function loadCreations(){
     grouped[c.name].zoomGroup.push(url);
   });
   creations=Object.values(grouped);
-  renderPages();
+  render();
 }
 
-function renderPages(){
-  visitorPages.innerHTML='';
-  const pages=chunkArray(creations,6);
-  pages.forEach(pageItems=>{
-    const page=document.createElement('div');
-    page.className='page';
-    pageItems.forEach(c=>{
-      const d=document.createElement('div');
-      d.className='visitor-item';
-      d.innerHTML=`<div class="delete-btn">×</div><p>${c.name}</p><img src="${c.imgUrl}">`;
-      d.querySelector('img').onclick=()=>openZoom(c);
-      d.querySelector('.delete-btn').onclick=()=>deleteProject(c.name);
-      page.appendChild(d);
-    });
-    visitorPages.appendChild(page);
+function render(){
+  list.innerHTML='';
+  creations.forEach(c=>{
+    const d=document.createElement('div');
+    d.className='visitor-item';
+    d.innerHTML=`<div class="placeholder">?</div><div class="delete-btn">×</div><p>${c.name}</p><img src="${c.imgUrl}" onload="this.previousElementSibling.style.display='none'" onerror="this.style.display='none'">`;
+    d.querySelector('img').onclick=()=>openZoom(c);
+    d.querySelector('.delete-btn').onclick=()=>deleteProject(c.name);
+    list.appendChild(d);
   });
 }
 
@@ -367,7 +352,7 @@ document.getElementById('confirmAdd').onclick=async()=>{
     urls.push(`https://jyhbamdcxmpveujjqjla.supabase.co/storage/v1/object/public/images/${path}`);
   }
   creations.unshift({name,imgUrl:urls[0],zoomGroup:urls,likes:[],comments:[]});
-  renderPages();
+  render();
   addModal.style.display='none';
   document.getElementById('photoName').value='';
   document.getElementById('multiPhoto').value='';
@@ -381,19 +366,7 @@ async function deleteProject(name){
   }
   await supabase.from('creations').delete().eq('name',name);
   creations=creations.filter(c=>c.name!==name);
-  renderPages();
-}
-
-/* FLÈCHES SCROLL PAGE */
-const arrowLeft=document.getElementById('arrow-left');
-const arrowRight=document.getElementById('arrow-right');
-
-arrowLeft.onclick=()=>{currentPage=Math.max(currentPage-1,0); scrollToPage();}
-arrowRight.onclick=()=>{currentPage=Math.min(currentPage+1,Math.ceil(creations.length/6)-1); scrollToPage();}
-
-function scrollToPage(){
-  const pageWidth=visitorPages.querySelector('.page').offsetWidth + 20; // 20 = gap
-  listContainer.scrollTo({left: currentPage*pageWidth, behavior:'smooth'});
+  render();
 }
 
 const toggleSidebar=document.getElementById('toggleSidebar');
