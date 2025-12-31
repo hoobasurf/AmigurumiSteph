@@ -23,31 +23,28 @@ body{
   padding:20px 0;
 }
 
-#visitor-list-container{
-  display:flex;
-  overflow-x:auto;
-  scroll-snap-type:x mandatory;
-  -webkit-overflow-scrolling:touch;
-  justify-content:center; /* centre la page visible */
-  padding-bottom:10px;
+#visitor-list-container {
+  display: flex;
+  overflow-x: auto;
+  justify-content: center; /* centre la page visible */
+  padding-left: 2cm;       /* décale tout vers la droite */
 }
 
-/* Chaque page = 2x3 cartes */
-.page{
-  display:grid;
+.page {
+  display: grid;
   grid-template-columns: repeat(2, 1fr);
   grid-template-rows: repeat(3, 1fr);
-  column-gap:3mm; /* horizontal 3mm */
-  row-gap:4mm; /* vertical 4mm */
-  flex:0 0 auto; /* largeur automatique pour centrage */
-  width: calc(2 * 200px + 3mm); /* largeur de 2 images + gap */
-  height: calc(3 * 200px + 8mm); /* hauteur de 3 images + gaps */
-  scroll-snap-align:center; /* centre au scroll */
-  padding:4mm;
-  box-sizing:border-box;
-  justify-self:center;
-}
+  column-gap: 3mm;
+  row-gap: 4mm;
+  flex: 0 0 auto;
+  width: calc(2 * 200px + 3mm);
+  height: calc(3 * 200px + 8mm);
+  scroll-snap-align: center;
+  padding: 4mm;
 
+  /* Décalage vertical */
+  margin-top: 200px; /* descend d'une taille d'image */
+}
 /* VISITOR ITEM */
 .visitor-item{
   position:relative;
