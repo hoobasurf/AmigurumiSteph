@@ -13,47 +13,34 @@ body{
   overflow:hidden;
 }
 
-/* VUE */
-#viewSelector{
-  display:flex;
-  justify-content:center;
-  gap:12px;
-  margin:20px 0;
-}
-#viewSelector button{
-  background:#fff0f7;
-  border:2px solid #b84c6f;
-  color:#b84c6f;
-  padding:8px 16px;
-  border-radius:24px;
-  cursor:pointer;
-}
-
-/* CENTER + SCROLL GRILLE */
+/* CENTER + SCROLL HORIZONTAL */
 .center-zone{
   flex:1;
   display:flex;
   justify-content:center;
-  align-items:flex-start;
+  align-items:center;
   overflow-x:auto;
   scroll-snap-type:x mandatory;
   padding:20px 0;
 }
+
 #visitor-list{
   display:grid;
-  grid-auto-flow: column;
-  grid-auto-columns: calc(100vw / 6 - 16px); /* 6 cartes visibles */
+  grid-auto-flow: column;                  /* scroll horizontal */
+  grid-template-rows: repeat(3, 150px);    /* 3 lignes */
+  grid-template-columns: repeat(2, 150px); /* 2 colonnes par page */
   gap:16px;
-  scroll-snap-type: x mandatory;
+  justify-content:center;
 }
+
 .visitor-item{
-  scroll-snap-align: center;
+  scroll-snap-align:center;
   text-align:center;
   border-radius:16px;
 }
 .visitor-item img{
   width:100%;
-  height:120px; /* plus petite */
+  height:100%;
   object-fit:cover;
   border:3px solid #b67385;
   border-radius:16px;
@@ -61,8 +48,8 @@ body{
   cursor:pointer;
 }
 .visitor-item p{
-  margin-top:6px;
-  font-size:16px;
+  margin-top:4px;
+  font-size:14px;
   color:#b84c6f;
   font-weight:bold;
 }
@@ -84,9 +71,7 @@ body{
   cursor:pointer;
   z-index:5;
 }
-.delete-btn:hover{
-  background:#e94f9a;
-}
+.delete-btn:hover{background:#e94f9a;}
 
 /* SIDEBAR */
 #sidebar{
@@ -224,9 +209,6 @@ body{
 </head>
 
 <body>
-<div id="viewSelector">
-  <button id="btnGrid">Grille</button>
-</div>
 
 <div class="center-zone">
   <div id="visitor-list"></div>
