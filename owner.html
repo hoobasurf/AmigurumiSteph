@@ -7,7 +7,7 @@
 *{box-sizing:border-box;margin:0;padding:0;}
 html,body{height:100%;font-family:'Comic Sans MS',cursive;display:flex;flex-direction:column;}
 
-/* FOND ECRAN FIXE */
+/* FOND FIXE */
 body::before {
   content:"";
   position:fixed;
@@ -34,13 +34,7 @@ body::before {
   -webkit-overflow-scrolling: touch;
 }
 
-#visitor-list-container{
-  display:flex;
-  justify-content:center;
-  padding-left:1cm;
-}
-
-/* Chaque page = 2x3 cartes */
+/* CONTENEUR CARDS - GRILLE 2x3 */
 .page{
   display:grid;
   grid-template-columns: repeat(2, 1fr);
@@ -56,7 +50,7 @@ body::before {
   justify-content:center;
 }
 
-/* VISITOR ITEM */
+/* VISITOR ITEM - IMAGE 200x200 */
 .visitor-item{
   position:relative;
   width:200px;
@@ -74,11 +68,11 @@ body::before {
   border-radius:12px;
   cursor:pointer;
   display:block;
-  filter: brightness(1.1) saturate(0.85);
+  filter: brightness(1) saturate(0.95);
   transition: filter 0.3s, opacity 0.3s;
 }
 .visitor-item img:hover{
-  filter: brightness(1.2) saturate(0.9);
+  filter: brightness(1.05) saturate(1);
 }
 .visitor-item p{
   position:absolute;
@@ -149,13 +143,15 @@ body::before {
 }
 
 /* MODAL AJOUT */
-#addModal{
+#addModal, #deleteModal{
   position:fixed; inset:0;
-  background:rgba(0,0,0,0.6);
   display:none;
   justify-content:center;
   align-items:center;
-  z-index:9999;
+  z-index:10000;
+}
+#addModal{
+  background:rgba(0,0,0,0.6);
 }
 #addModal .modal-box{
   background:#ffe6f0;
@@ -170,18 +166,11 @@ body::before {
   max-width:260px;
   box-shadow:0 6px 18px rgba(0,0,0,0.3);
 }
-#addModal h2{
-  font-size:20px;
-  color:#b84c6f;
-}
 #addModal input{
   padding:8px;
   border-radius:12px;
   border:2px solid #b67385;
   width:100%;
-  font-family:'Comic Sans MS',cursive;
-  font-size:14px;
-  color:#b84c6f;
 }
 #addModal button{
   padding:6px 16px;
@@ -191,20 +180,11 @@ body::before {
   border-radius:14px;
   cursor:pointer;
   font-weight:bold;
-  font-size:14px;
-}
-#addModal button:hover{
-  background:#e94f9a;
 }
 
 /* MODAL SUPPRESSION */
 #deleteModal{
-  position:fixed; inset:0;
   background:rgba(0,0,0,0.5);
-  display:none;
-  justify-content:center;
-  align-items:center;
-  z-index:10000;
 }
 #deleteModal .modal-box{
   background:#ffe6f0;
@@ -316,7 +296,6 @@ body::before {
   <button id="addBtn">Ajouter</button>
 </div>
 
-<!-- MODAL AJOUT -->
 <div id="addModal">
   <div class="modal-box">
     <h2>Ajouter des photos</h2>
@@ -326,7 +305,6 @@ body::before {
   </div>
 </div>
 
-<!-- MODAL SUPPRESSION -->
 <div id="deleteModal">
   <div class="modal-box">
     <p>Supprimer définitivement cette image ?</p>
@@ -335,7 +313,6 @@ body::before {
   </div>
 </div>
 
-<!-- ZOOM -->
 <div id="zoomModal">
   <div class="closeZoom">×</div>
   <img id="mainZoom">
