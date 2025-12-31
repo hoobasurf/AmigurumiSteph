@@ -1,20 +1,33 @@
-
 <!DOCTYPE html>
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{height:100%;font-family:'Comic Sans MS',cursive}
 
-/* BODY */
 body{
-  background:url('Photoroom_20251223_114401.jpeg') center top / cover no-repeat fixed;
+  background:url('Photoroom_20251212_143703.PNG') center top / cover no-repeat fixed;
   overflow:hidden;
   display:flex;
   flex-direction:column;
+}
+
+/* BOUTONS VUE */
+#viewSelector{
+  display:flex;
+  justify-content:center;
+  gap:12px;
+  margin:20px 0;
+}
+#viewSelector button{
+  background:#fff0f7;
+  border:2px solid #b84c6f;
+  color:#b84c6f;
+  padding:8px 16px;
+  border-radius:24px;
+  cursor:pointer;
 }
 
 /* CONTENU */
@@ -22,34 +35,33 @@ body{
   flex:1;
   display:flex;
   justify-content:center;
-  width:100%;
-  overflow:hidden;
+  align-items:flex-start;
+  overflow:auto;
 }
-
 #visitor-list{
   display:flex;
-  gap:18px;
-  padding:20px;
-  overflow-x:auto;
+  gap:16px;
+  max-width:1200px;
 }
 
+/* CARTE */
 .visitor-item{
-  width:160px;
   text-align:center;
   position:relative;
+  border-radius:24px;
 }
 .visitor-item img{
-  width:160px;
-  height:160px;
+  width:220px;
+  height:220px;
   object-fit:contain;
   border:4px solid #b67385;
-  border-radius:22px;
+  border-radius:24px;
   background:#ffe6f0;
   cursor:pointer;
 }
 .visitor-item p{
   margin-top:8px;
-  font-size:18px;
+  font-size:20px;
   color:#b84c6f;
   font-weight:bold;
 }
@@ -69,7 +81,18 @@ body{
   justify-content:center;
   font-weight:bold;
   cursor:pointer;
+  z-index:5;
+  transition:transform .15s, background .15s;
 }
+.delete-btn:hover{
+  background:#e94f9a;
+  transform:scale(1.1);
+}
+
+/* VUES */
+.carousel-view{flex-wrap:nowrap;overflow-x:auto}
+.grid-view{flex-wrap:wrap}
+.list-view{flex-direction:column}
 
 /* SIDEBAR */
 #sidebar{
@@ -78,10 +101,11 @@ body{
   left:-220px;
   width:220px;
   height:100vh;
-  background:rgba(255,230,240,0.25);
+  background:rgba(255,230,240,0.2);
   border-right:2px solid #b67385;
   padding:20px;
   transition:left .3s;
+  z-index:10;
 }
 #sidebar.sidebar-open{left:0}
 #toggleSidebar{
@@ -97,52 +121,121 @@ body{
   justify-content:center;
   cursor:pointer;
 }
-#sidebar input,
 #sidebar button{
   width:100%;
-  margin-top:10px;
-  padding:10px;
-  border-radius:14px;
+  padding:12px;
+  border-radius:16px;
   border:none;
   background:#ffb6c1;
+  cursor:pointer;
   font-weight:bold;
 }
 
-/* MODALS */
-.modal-bg{
-  position:fixed;
-  inset:0;
-  background:rgba(0,0,0,.6);
+/* MODAL AJOUT */
+#addModal{
+  position:fixed; inset:0;
+  background:rgba(0,0,0,0.6);
   display:none;
   justify-content:center;
   align-items:center;
   z-index:9999;
 }
-.modal-box{
+#addModal .modal-box{
   background:#ffe6f0;
-  padding:20px;
-  border-radius:22px;
+  padding:24px;
+  border-radius:24px;
   border:4px solid #b67385;
-  position:relative;
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+  align-items:center;
+  min-width:280px;
 }
-.close-modal{
-  position:absolute;
-  top:8px;
-  right:8px;
-  width:30px;
-  height:30px;
-  border-radius:50%;
-  background:#ff69b4;
+#addModal input{
+  padding:10px;
+  border-radius:12px;
+  border:2px solid #b67385;
+  width:100%;
+}
+#addModal button{
+  padding:10px 20px;
   border:none;
-  font-size:18px;
+  background:#ff69b4;
+  color:#fff;
+  border-radius:14px;
   cursor:pointer;
 }
 
-#status{text-align:center;margin:10px;color:#b84c6f}
+/* ZOOM */
+#zoomModal{
+  position:fixed; inset:0;
+  background:rgba(0,0,0,0.7);
+  display:none;
+  justify-content:center;
+  align-items:center;
+  flex-direction:column;
+  z-index:10000;
+}
+#zoomModal img{
+  max-width:80%;
+  max-height:60vh;
+  border:4px solid #b67385;
+  border-radius:24px;
+  margin-bottom:10px;
+}
+#zoomModal .thumbs{
+  display:flex;
+  gap:10px;
+  max-width:80%;
+  overflow-x:auto;
+}
+#zoomModal .thumbs img{
+  width:80px;
+  height:80px;
+  object-fit:cover;
+  border-radius:14px;
+  border:2px solid #b67385;
+  cursor:pointer;
+}
+.closeZoom{
+  position:absolute;
+  top:12px;
+  right:12px;
+  width:32px;
+  height:32px;
+  background:#ff69b4;
+  color:#fff;
+  border-radius:50%;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  cursor:pointer;
+}
+
+.actions{
+  display:flex;
+  gap:20px;
+  margin-top:10px;
+}
+.like-btn,.comment-btn{
+  padding:8px 14px;
+  border-radius:14px;
+  border:none;
+  cursor:pointer;
+  color:#fff;
+}
+.like-btn{background:#ff69b4}
+.comment-btn{background:#b84c6f}
 </style>
 </head>
 
 <body>
+
+<div id="viewSelector">
+  <button id="btnCarousel">Carrousel</button>
+  <button id="btnGrid">Grille</button>
+  <button id="btnList">Liste</button>
+</div>
 
 <div class="center-zone">
   <div id="visitor-list"></div>
@@ -150,143 +243,135 @@ body{
 
 <div id="sidebar">
   <div id="toggleSidebar">☰</div>
-  <input id="name" placeholder="Prénom">
   <button id="addBtn">Ajouter</button>
 </div>
 
 <!-- MODAL AJOUT -->
-<div class="modal-bg" id="addModal" onclick="if(event.target===this) closeAdd()">
+<div id="addModal">
   <div class="modal-box">
-    <button class="close-modal" onclick="closeAdd()">×</button>
-    <h3>Ajouter des photos</h3><br>
-    <input type="file" id="multiPhoto" multiple accept="image/*"><br><br>
-    <button id="validateAdd">Valider</button>
+    <h2>Ajouter des photos</h2>
+    <input id="photoName" placeholder="Nom du projet">
+    <input type="file" id="multiPhoto" multiple>
+    <button id="confirmAdd">Valider</button>
   </div>
 </div>
 
-<!-- MODAL DELETE -->
-<div class="modal-bg" id="deleteModal" onclick="if(event.target===this) closeDelete()">
-  <div class="modal-box">
-    <h3>Supprimer cette photo ?</h3>
-    <p style="margin:10px 0;color:#b84c6f">
-      Cette action est définitive 💗
-    </p>
-    <button id="confirmDeleteBtn">Supprimer</button>
+<!-- ZOOM -->
+<div id="zoomModal">
+  <div class="closeZoom">×</div>
+  <img id="mainZoom">
+  <div class="thumbs" id="thumbs"></div>
+  <div class="actions">
+    <button class="like-btn">❤️ Like (0)</button>
+    <button class="comment-btn">💬 Commentaire (0)</button>
   </div>
 </div>
-
-<p id="status">📤 Prêt</p>
 
 <script type="module">
 import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
 
-const supabase = createClient(
+const supabase=createClient(
   "https://jyhbamdcxmpveujjqjla.supabase.co",
   "sb_publishable_sqsxb-3Kl5o3-JQYv9kGFw_-g0EgwMa"
 );
 
-let creations=[];
-let deleteTarget=null;
+let creations=[],currentZoom=null,currentView='grid';
 
 const list=document.getElementById('visitor-list');
 const addModal=document.getElementById('addModal');
-const deleteModal=document.getElementById('deleteModal');
-const status=document.getElementById('status');
+const zoomModal=document.getElementById('zoomModal');
+const mainZoom=document.getElementById('mainZoom');
+const thumbs=document.getElementById('thumbs');
+const likeBtn=document.querySelector('.like-btn');
+const commentBtn=document.querySelector('.comment-btn');
 
-/* LOAD */
-async function load(){
-  const { data } = await supabase
-    .from('creations')
-    .select('*')
-    .order('created_at',{ascending:false});
-
-  creations = data.map(c=>{
-    const safe=encodeURIComponent(c.image_path);
-    return {
-      id:c.id,
-      name:c.name,
-      path:c.image_path,
-      url:`https://jyhbamdcxmpveujjqjla.supabase.co/storage/v1/object/public/images/${safe}`
-    };
+async function loadCreations(){
+  const {data}=await supabase.from("creations").select("*").order("created_at",{ascending:false});
+  const grouped={};
+  data.forEach(c=>{
+    const url=`https://jyhbamdcxmpveujjqjla.supabase.co/storage/v1/object/public/images/${c.image_path}`;
+    if(!grouped[c.name]) grouped[c.name]={name:c.name,imgUrl:url,zoomGroup:[],likes:[],comments:[]};
+    grouped[c.name].zoomGroup.push(url);
   });
+  creations=Object.values(grouped);
   render();
 }
 
-/* RENDER */
 function render(){
   list.innerHTML='';
+  list.className=currentView+'-view';
   creations.forEach(c=>{
     const d=document.createElement('div');
     d.className='visitor-item';
-    d.innerHTML=`
-      <div class="delete-btn">×</div>
-      <p>${c.name}</p>
-      <img src="${c.url}">
-    `;
-    d.querySelector('.delete-btn').onclick=()=>{
-      deleteTarget=c;
-      deleteModal.style.display='flex';
-    };
+    d.innerHTML=`<div class="delete-btn">×</div><p>${c.name}</p><img src="${c.imgUrl}">`;
+    d.querySelector('img').onclick=()=>openZoom(c);
+    d.querySelector('.delete-btn').onclick=()=>deleteProject(c.name);
     list.appendChild(d);
   });
 }
 
-/* ADD */
-function openAdd(){addModal.style.display='flex'}
-function closeAdd(){addModal.style.display='none'}
-
-document.getElementById('validateAdd').onclick = async ()=>{
-  const name=document.getElementById('name').value.trim();
-  const files=document.getElementById('multiPhoto').files;
-
-  if(!name || !files.length){
-    alert('Nom + photo requis');
-    return;
-  }
-
-  status.textContent='📤 Upload…';
-
-  try{
-    for(const file of files){
-      const path=`${Date.now()}_${file.name}`;
-      await supabase.storage.from('images').upload(path,file);
-      await supabase.from('creations').insert([{name,image_path:path}]);
-    }
-    closeAdd();
-    await load();
-    status.textContent='✅ Ajouté';
-  }catch(e){
-    console.error(e);
-    status.textContent='❌ Erreur';
-  }
-};
-
-/* DELETE */
-function closeDelete(){
-  deleteModal.style.display='none';
-  deleteTarget=null;
+function openZoom(c){
+  currentZoom=c;
+  mainZoom.src=c.imgUrl;
+  thumbs.innerHTML='';
+  c.zoomGroup.forEach(u=>{
+    const t=document.createElement('img');
+    t.src=u;
+    t.onclick=()=>mainZoom.src=u;
+    thumbs.appendChild(t);
+  });
+  updateActions();
+  zoomModal.style.display='flex';
 }
 
-document.getElementById('confirmDeleteBtn').onclick = async ()=>{
-  if(!deleteTarget) return;
+function updateActions(){
+  likeBtn.textContent=`❤️ Like (${currentZoom.likes.length})`;
+  commentBtn.textContent=`💬 Commentaire (${currentZoom.comments.length})`;
+}
 
-  try{
-    await supabase.storage.from('images').remove([deleteTarget.path]);
-    await supabase.from('creations').delete().eq('id',deleteTarget.id);
-    closeDelete();
-    load();
-  }catch(e){
-    console.error(e);
+likeBtn.onclick=()=>{const p=prompt("Prénom ?");if(p){currentZoom.likes.push(p);updateActions();}};
+commentBtn.onclick=()=>{const c=prompt("Commentaire ?");if(c){currentZoom.comments.push(c);updateActions();}};
+
+document.getElementById('addBtn').onclick=()=>addModal.style.display='flex';
+addModal.onclick=e=>{if(e.target===addModal)addModal.style.display='none'};
+document.querySelector('.closeZoom').onclick=()=>zoomModal.style.display='none';
+zoomModal.onclick=e=>{if(e.target===zoomModal)zoomModal.style.display='none'};
+
+document.getElementById('confirmAdd').onclick=async()=>{
+  const name=document.getElementById('photoName').value.trim();
+  const files=document.getElementById('multiPhoto').files;
+  if(!name||!files.length)return;
+  const urls=[];
+  for(let f of files){
+    const path=`${Date.now()}_${f.name}`;
+    await supabase.storage.from('images').upload(path,f);
+    await supabase.from('creations').insert([{name,image_path:path}]);
+    urls.push(`https://jyhbamdcxmpveujjqjla.supabase.co/storage/v1/object/public/images/${path}`);
   }
+  creations.unshift({name,imgUrl:urls[0],zoomGroup:urls,likes:[],comments:[]});
+  render();
+  addModal.style.display='none';
+  document.getElementById('photoName').value='';
+  document.getElementById('multiPhoto').value='';
 };
 
-/* SIDEBAR */
-document.getElementById('addBtn').onclick=openAdd;
-document.getElementById('toggleSidebar').onclick=()=>{
-  sidebar.classList.toggle('sidebar-open');
-};
+async function deleteProject(name){
+  if(!confirm("Supprimer ce projet ?"))return;
+  const p=creations.find(c=>c.name===name);
+  for(let u of p.zoomGroup){
+    await supabase.storage.from('images').remove([u.split('/images/')[1]]);
+  }
+  await supabase.from('creations').delete().eq('name',name);
+  creations=creations.filter(c=>c.name!==name);
+  render();
+}
 
-load();
+toggleSidebar.onclick=()=>sidebar.classList.toggle('sidebar-open');
+btnCarousel.onclick=()=>{currentView='carousel';render()};
+btnGrid.onclick=()=>{currentView='grid';render()};
+btnList.onclick=()=>{currentView='list';render()};
+
+loadCreations();
 </script>
 </body>
 </html>
