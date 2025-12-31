@@ -162,18 +162,12 @@ body{
   border-radius:22px;
   margin-bottom:10px;
 }
+
 .thumbnail-container{
   display:flex;
   gap:10px;
   justify-content:center;
   margin-bottom:10px;
-}
-.thumbnail-container img{
-  width:70px;
-  height:70px;
-  border-radius:16px;
-  border:3px solid #b67385;
-  cursor:pointer;
 }
 
 .actions{
@@ -216,7 +210,8 @@ body{
     <button class="close-modal" onclick="closeAdd()">×</button>
     <h3>Ajouter des photos</h3><br>
     <input type="file" id="multiPhoto" multiple accept="image/*"><br><br>
-    <button onclick="confirmAdd()">Valider</button>
+    <!-- 🔧 FIX ICI -->
+    <button onclick="event.stopPropagation(); confirmAdd();">Valider</button>
   </div>
 </div>
 
@@ -224,7 +219,6 @@ body{
 <div class="modal-bg" id="zoomModal">
   <div class="modal-box">
     <img id="zoomMain">
-    <div class="thumbnail-container" id="zoomThumbs"></div>
     <div class="actions">
       <button class="like-btn">❤️ Like</button>
       <button class="comment-btn">💬 Commentaire</button>
@@ -251,7 +245,7 @@ async function load(){
   const { data }=await supabase.from('creations').select('*').order('created_at',{ascending:false});
   creations=data.map(c=>{
     const url=`https://jyhbamdcxmpveujjqjla.supabase.co/storage/v1/object/public/images/${c.image_path}`;
-    return {id:c.id,name:c.name,main:url,group:[url]};
+    return {id:c.id,name:c.name,main:url};
   });
   render();
 }
@@ -282,12 +276,14 @@ async function confirmAdd(){
   const name=document.getElementById('name').value.trim();
   const files=document.getElementById('multiPhoto').files;
   if(!name||!files.length) return alert('Nom + photo');
+
   for(const f of files){
     const path=`${Date.now()}_${f.name}`;
     await supabase.storage.from('images').upload(path,f);
-    const { data }=await supabase.from('creations').insert([{name,image_path:path}]).select();
+    const { data }=await supabase.from('creations')
+      .insert([{name,image_path:path}]).select();
     const url=`https://jyhbamdcxmpveujjqjla.supabase.co/storage/v1/object/public/images/${path}`;
-    creations.unshift({id:data[0].id,name,main:url,group:[url]});
+    creations.unshift({id:data[0].id,name,main:url});
   }
   closeAdd(); render();
 }
@@ -304,14 +300,8 @@ async function deleteImg(id,url){
 document.getElementById('addBtn').onclick=()=>addModal.style.display='flex';
 document.getElementById('toggleSidebar').onclick=()=>sidebar.classList.toggle('sidebar-open');
 
-/* CLICK DANS LE VIDE */
 addModal.onclick=e=>{if(e.target===addModal) closeAdd();}
 zoomModal.onclick=e=>{if(e.target===zoomModal) zoomModal.style.display='none';}
-
-/* EMPÊCHE FERMETURE SUR LA BOÎTE */
-document.querySelectorAll('.modal-box').forEach(b=>{
-  b.onclick=e=>e.stopPropagation();
-});
 
 load();
 </script>
