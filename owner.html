@@ -234,31 +234,79 @@ function render(){
 function openAdd(){addModal.style.display='flex'}
 function closeAdd(){addModal.style.display='none'}
 
-document.getElementById('validateAdd').onclick = async ()=>{
-  const name=document.getElementById('name').value.trim();
-  const files=document.getElementById('multiPhoto').files;
+/* NOUVELLE FONCTION confirmAdd() */
+async function confirmAdd(){
+  const name = document.getElementById('name').value.trim();
+  const files = document.getElementById('multiPhoto').files;
+  const btn = addModal.querySelector('#validateAdd');
 
   if(!name || !files.length){
-    alert('Nom + photo requis');
+    alert('Nom + photo obligatoire');
     return;
   }
 
-  status.textContent='📤 Upload…';
+  btn.disabled = true;
+  btn.textContent = 'Ajout en cours…';
 
   try{
-    for(const file of files){
-      const path=`${Date.now()}_${file.name}`;
-      await supabase.storage.from('images').upload(path,file);
-      await supabase.from('creations').insert([{name,image_path:path}]);
+    let firstId = null;
+    let firstIndex = null;
+
+    for(let i = 0; i < files.length; i++){
+      const safeName = files[i].name.replace(/[^a-zA-Z0-9._-]/g,'_');
+      const path = `${Date.now()}_${safeName}`;
+
+      const { error: uploadError } = await supabase
+        .storage
+        .from('images')
+        .upload(path, files[i]);
+
+      if(uploadError) throw uploadError;
+
+      const { data, error: insertError } = await supabase
+        .from('creations')
+        .insert([{ name, image_path: path }])
+        .select();
+
+      if(insertError) throw insertError;
+
+      const url = `https://jyhbamdcxmpveujjqjla.supabase.co/storage/v1/object/public/images/${path}`;
+
+      if(i === 0){
+        firstId = data[0].id;
+        creations.unshift({
+          id: firstId,
+          name,
+          main: url,
+          group: [url],
+          likes: 0,
+          comments: 0
+        });
+        firstIndex = 0;
+      }else{
+        creations[firstIndex].group.push(url);
+      }
     }
+
+    render();
     closeAdd();
-    await load();
+
+    document.getElementById('multiPhoto').value = '';
+    document.getElementById('name').value = '';
     status.textContent='✅ Ajouté';
+
   }catch(e){
     console.error(e);
+    alert('Erreur lors de l’ajout de la photo');
     status.textContent='❌ Erreur';
+  }finally{
+    btn.disabled = false;
+    btn.textContent = 'Valider';
   }
-};
+}
+
+/* Lien du bouton Valider au nouveau confirmAdd() */
+document.getElementById('validateAdd').onclick = confirmAdd;
 
 /* DELETE */
 function closeDelete(){
