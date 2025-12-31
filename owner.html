@@ -23,24 +23,25 @@ body{
 }
 
 #visitor-list-container{
-  overflow-x:auto;
-  scroll-snap-type:x mandatory;
-  padding:20px 0;
+  overflow-x:hidden;
   width:100%;
 }
 
-#visitor-list{
+#visitor-pages{
+  display:flex;
+  gap:20px;
+  scroll-behavior:smooth;
+}
+
+.page{
   display:grid;
-  grid-auto-flow: column;         
-  grid-template-rows: repeat(3, 120px);   
-  grid-template-columns: repeat(2, 120px); 
+  grid-template-columns: repeat(2, 120px);
+  grid-template-rows: repeat(3, 120px);
   gap:16px;
-  justify-content:center;
-  scroll-behavior: smooth;
+  flex-shrink:0; /* pour que chaque page reste largeur fixe */
 }
 
 .visitor-item{
-  scroll-snap-align:center;
   text-align:center;
   border-radius:12px;
   position:relative;
@@ -241,7 +242,7 @@ body{
 <div class="center-zone">
   <div id="arrow-left" class="arrow">‹</div>
   <div id="visitor-list-container">
-    <div id="visitor-list"></div>
+    <div id="visitor-pages"></div>
   </div>
   <div id="arrow-right" class="arrow">›</div>
 </div>
@@ -280,9 +281,9 @@ const supabase=createClient(
   "sb_publishable_sqsxb-3Kl5o3-JQYv9kGFw_-g0EgwMa"
 );
 
-let creations=[],currentZoom=null;
+let creations=[],currentZoom=null,currentPage=0;
 
-const list=document.getElementById('visitor-list');
+const visitorPages=document.getElementById('visitor-pages');
 const listContainer=document.getElementById('visitor-list-container');
 const addModal=document.getElementById('addModal');
 const zoomModal=document.getElementById('zoomModal');
@@ -290,6 +291,12 @@ const mainZoom=document.getElementById('mainZoom');
 const thumbs=document.getElementById('thumbs');
 const likeBtn=document.querySelector('.like-btn');
 const commentBtn=document.querySelector('.comment-btn');
+
+function chunkArray(array,size){
+  const result=[];
+  for(let i=0;i<array.length;i+=size) result.push(array.slice(i,i+size));
+  return result;
+}
 
 async function loadCreations(){
   const {data}=await supabase.from("creations").select("*").order("created_at",{ascending:false});
@@ -300,18 +307,24 @@ async function loadCreations(){
     grouped[c.name].zoomGroup.push(url);
   });
   creations=Object.values(grouped);
-  render();
+  renderPages();
 }
 
-function render(){
-  list.innerHTML='';
-  creations.forEach(c=>{
-    const d=document.createElement('div');
-    d.className='visitor-item';
-    d.innerHTML=`<div class="delete-btn">×</div><p>${c.name}</p><img src="${c.imgUrl}">`;
-    d.querySelector('img').onclick=()=>openZoom(c);
-    d.querySelector('.delete-btn').onclick=()=>deleteProject(c.name);
-    list.appendChild(d);
+function renderPages(){
+  visitorPages.innerHTML='';
+  const pages=chunkArray(creations,6);
+  pages.forEach(pageItems=>{
+    const page=document.createElement('div');
+    page.className='page';
+    pageItems.forEach(c=>{
+      const d=document.createElement('div');
+      d.className='visitor-item';
+      d.innerHTML=`<div class="delete-btn">×</div><p>${c.name}</p><img src="${c.imgUrl}">`;
+      d.querySelector('img').onclick=()=>openZoom(c);
+      d.querySelector('.delete-btn').onclick=()=>deleteProject(c.name);
+      page.appendChild(d);
+    });
+    visitorPages.appendChild(page);
   });
 }
 
@@ -354,7 +367,7 @@ document.getElementById('confirmAdd').onclick=async()=>{
     urls.push(`https://jyhbamdcxmpveujjqjla.supabase.co/storage/v1/object/public/images/${path}`);
   }
   creations.unshift({name,imgUrl:urls[0],zoomGroup:urls,likes:[],comments:[]});
-  render();
+  renderPages();
   addModal.style.display='none';
   document.getElementById('photoName').value='';
   document.getElementById('multiPhoto').value='';
@@ -368,16 +381,20 @@ async function deleteProject(name){
   }
   await supabase.from('creations').delete().eq('name',name);
   creations=creations.filter(c=>c.name!==name);
-  render();
+  renderPages();
 }
 
-/* FLÈCHES SCROLL */
+/* FLÈCHES SCROLL PAGE */
 const arrowLeft=document.getElementById('arrow-left');
 const arrowRight=document.getElementById('arrow-right');
-const pageWidth=(120*2 + 16)*1; // 2 colonnes + gap
 
-arrowLeft.onclick=()=>{listContainer.scrollBy({left:-pageWidth*3,behavior:'smooth'})};
-arrowRight.onclick=()=>{listContainer.scrollBy({left:pageWidth*3,behavior:'smooth'})};
+arrowLeft.onclick=()=>{currentPage=Math.max(currentPage-1,0); scrollToPage();}
+arrowRight.onclick=()=>{currentPage=Math.min(currentPage+1,Math.ceil(creations.length/6)-1); scrollToPage();}
+
+function scrollToPage(){
+  const pageWidth=visitorPages.querySelector('.page').offsetWidth + 20; // 20 = gap
+  listContainer.scrollTo({left: currentPage*pageWidth, behavior:'smooth'});
+}
 
 const toggleSidebar=document.getElementById('toggleSidebar');
 toggleSidebar.onclick=()=>sidebar.classList.toggle('sidebar-open');
