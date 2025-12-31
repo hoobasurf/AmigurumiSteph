@@ -7,18 +7,30 @@
 *{box-sizing:border-box;margin:0;padding:0;}
 html,body{height:100%;font-family:'Comic Sans MS',cursive;}
 
-/* BODY AVEC FOND ZOOMÉ */
+/* BODY AVEC FOND ZOOMÉ ET PLUS FONCÉ */
 body::before {
   content:"";
   position:fixed;
-  top:0;
+  top:1cm; /* haut redescendu de 1cm */
   left:0;
   width:100vw;
-  height:100vh;
+  height:calc(100vh - 1cm); /* bas remonté de 1cm */
   background-image: url('Photoroom_20251223_114401.jpeg');
-  background-size: calc(100% + 5mm) calc(100% + 5mm); /* zoom de 5mm */
-  background-position: center calc(50% - 20mm);       /* remontée totale 2cm */
+  background-size: calc(100% + 5mm) calc(100% + 5mm);
+  background-position: center;
   background-repeat: no-repeat;
+  z-index:-2;
+}
+
+/* Overlay sombre */
+body::after {
+  content:"";
+  position:fixed;
+  top:1cm;
+  left:0;
+  width:100vw;
+  height:calc(100vh - 1cm);
+  background: rgba(0,0,0,0.25); /* noir semi-transparent */
   z-index:-1;
 }
 
@@ -66,7 +78,7 @@ body::before {
   border-radius:12px;
   overflow:hidden;
   border:2px solid #fff;
-  box-shadow:0 4px 12px rgba(0,0,0,0.25), 0 0 0 2px #f6c2d1; /* ombre + liseré rose */
+  box-shadow:0 4px 12px rgba(0,0,0,0.3),0 0 0 2px #f6c2d1; /* ombre + liseré rose clair */
   background:#ffe6f0;
 }
 
@@ -88,13 +100,15 @@ body::before {
   border-radius:12px;
   cursor:pointer;
   display:block;
+
+  /* Filtre pastel léger */
   filter: brightness(1.5) saturate(0.6) opacity(0.7);
   transition: filter 0.3s, opacity 0.3s;
 }
 
 .visitor-item img:hover {
   filter: brightness(1.6) saturate(0.7) opacity(0.8);
-}
+}  
 
 .visitor-item p{
   position:absolute;
