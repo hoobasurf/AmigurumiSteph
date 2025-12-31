@@ -5,12 +5,12 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-html,body{height:100%;font-family:'Comic Sans MS',cursive}
+html,body{height:100%;font-family:'Comic Sans MS',cursive;}
 body{
   background:url('Photoroom_20251212_143703.PNG') center top / cover no-repeat fixed;
-  overflow:hidden;
   display:flex;
   flex-direction:column;
+  overflow:hidden;
 }
 
 /* VUE */
@@ -29,42 +29,40 @@ body{
   cursor:pointer;
 }
 
-/* CENTER + GRID */
+/* CENTER + SCROLL GRILLE */
 .center-zone{
   flex:1;
   display:flex;
   justify-content:center;
   align-items:flex-start;
   overflow-x:auto;
+  scroll-snap-type:x mandatory;
   padding:20px 0;
 }
-
 #visitor-list{
   display:grid;
-  grid-template-columns:repeat(auto-fill, minmax(180px, 1fr));
-  grid-auto-rows:auto;
+  grid-auto-flow: column;
+  grid-auto-columns: calc(100vw / 6 - 16px); /* 6 cartes visibles */
   gap:16px;
-  justify-content:center;
-  max-width:1200px;
+  scroll-snap-type: x mandatory;
 }
 .visitor-item{
+  scroll-snap-align: center;
   text-align:center;
-  position:relative;
-  border-radius:24px;
-  min-width:180px; /* garantit 6 cartes visibles */
+  border-radius:16px;
 }
 .visitor-item img{
   width:100%;
-  height:180px;
+  height:120px; /* plus petite */
   object-fit:cover;
-  border:4px solid #b67385;
-  border-radius:24px;
+  border:3px solid #b67385;
+  border-radius:16px;
   background:#ffe6f0;
   cursor:pointer;
 }
 .visitor-item p{
-  margin-top:8px;
-  font-size:20px;
+  margin-top:6px;
+  font-size:16px;
   color:#b84c6f;
   font-weight:bold;
 }
@@ -72,10 +70,10 @@ body{
 /* CROIX */
 .delete-btn{
   position:absolute;
-  top:6px;
-  right:6px;
-  width:26px;
-  height:26px;
+  top:4px;
+  right:4px;
+  width:20px;
+  height:20px;
   background:#ff69b4;
   color:#fff;
   border-radius:50%;
@@ -85,11 +83,9 @@ body{
   font-weight:bold;
   cursor:pointer;
   z-index:5;
-  transition:transform .15s, background .15s;
 }
 .delete-btn:hover{
   background:#e94f9a;
-  transform:scale(1.1);
 }
 
 /* SIDEBAR */
@@ -188,10 +184,10 @@ body{
   overflow-x:auto;
 }
 #zoomModal .thumbs img{
-  width:80px;
-  height:80px;
+  width:60px;
+  height:60px;
   object-fit:cover;
-  border-radius:14px;
+  border-radius:12px;
   border:2px solid #b67385;
   cursor:pointer;
 }
@@ -216,8 +212,8 @@ body{
   margin-top:10px;
 }
 .like-btn,.comment-btn{
-  padding:8px 14px;
-  border-radius:14px;
+  padding:6px 12px;
+  border-radius:12px;
   border:none;
   cursor:pointer;
   color:#fff;
@@ -228,11 +224,8 @@ body{
 </head>
 
 <body>
-
 <div id="viewSelector">
-  <button id="btnCarousel">Carrousel</button>
   <button id="btnGrid">Grille</button>
-  <button id="btnList">Liste</button>
 </div>
 
 <div class="center-zone">
@@ -273,7 +266,7 @@ const supabase=createClient(
   "sb_publishable_sqsxb-3Kl5o3-JQYv9kGFw_-g0EgwMa"
 );
 
-let creations=[],currentZoom=null,currentView='grid';
+let creations=[],currentZoom=null;
 
 const list=document.getElementById('visitor-list');
 const addModal=document.getElementById('addModal');
@@ -365,14 +358,6 @@ async function deleteProject(name){
 
 const toggleSidebar=document.getElementById('toggleSidebar');
 toggleSidebar.onclick=()=>sidebar.classList.toggle('sidebar-open');
-
-const btnCarousel=document.getElementById('btnCarousel');
-const btnGrid=document.getElementById('btnGrid');
-const btnList=document.getElementById('btnList');
-
-btnCarousel.onclick=()=>{currentView='carousel';render()};
-btnGrid.onclick=()=>{currentView='grid';render()};
-btnList.onclick=()=>{currentView='list';render()};
 
 loadCreations();
 </script>
