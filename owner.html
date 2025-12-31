@@ -289,40 +289,31 @@ document.getElementById('confirmAdd').onclick = async () => {
   const files = document.getElementById('multiPhoto').files;
   const name = nameInput.value.trim();
 
-  if (!name) {
-    alert("Entrer un nom");
-    return;
-  }
-
-  if (!files || files.length === 0) {
-    alert("Choisir au moins une photo");
-    return;
-  }
+  if (!name) return alert("Entrer un nom");
+  if (!files.length) return alert("Choisir au moins une photo");
 
   const zoomGroup = [];
-  let mainCreated = false;
+  let createdItem = null;
 
-  for (const file of files) {
+  for (let i = 0; i < files.length; i++) {
+    const file = files[i];
     const path = `${Date.now()}_${file.name}`;
 
-    const { error: uploadError } = await supabase
-      .storage
-      .from('images')
-      .upload(path, file);
-
+    const { error: uploadError } =
+      await supabase.storage.from('images').upload(path, file);
     if (uploadError) {
-      console.error(uploadError);
-      continue;
+      alert(uploadError.message);
+      return;
     }
 
-    const { data: insertData, error: insertError } = await supabase
-      .from('creations')
-      .insert([{ name, image_path: path }])
-      .select();
+    const { data: insertData, error: insertError } =
+      await supabase.from('creations')
+        .insert([{ name, image_path: path }])
+        .select();
 
     if (insertError) {
-      console.error(insertError);
-      continue;
+      alert(insertError.message);
+      return;
     }
 
     const publicUrl =
@@ -330,22 +321,21 @@ document.getElementById('confirmAdd').onclick = async () => {
 
     zoomGroup.push(publicUrl);
 
-    // 👉 SEULEMENT LA PREMIÈRE IMAGE VA SUR LA PAGE
-    if (!mainCreated) {
-      creations.unshift({
+    // 👉 création UNIQUE avec son propre zoomGroup
+    if (i === 0) {
+      createdItem = {
         id: insertData[0].id,
         name,
         imgUrl: publicUrl,
         zoomGroup
-      });
-      mainCreated = true;
+      };
+      creations.unshift(createdItem);
     }
   }
 
   addModal.style.display = 'none';
-  document.getElementById('multiPhoto').value = '';
   nameInput.value = '';
-
+  document.getElementById('multiPhoto').value = '';
   renderCreations();
 };
 
