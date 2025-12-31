@@ -49,7 +49,6 @@ body{
   overflow-x:auto;
   overflow-y:hidden;
   scroll-snap-type:x mandatory;
-  -webkit-overflow-scrolling:touch;
 }
 
 /* CARD */
@@ -58,7 +57,6 @@ body{
   width:160px;
   text-align:center;
   position:relative;
-  scroll-snap-align:center;
 }
 .visitor-item img{
   width:160px;
@@ -108,6 +106,7 @@ body{
   z-index:10;
 }
 #sidebar.sidebar-open{left:0}
+
 #toggleSidebar{
   position:absolute;
   top:50%;
@@ -121,6 +120,7 @@ body{
   justify-content:center;
   cursor:pointer;
 }
+
 #sidebar input,
 #sidebar button{
   width:100%;
@@ -132,7 +132,6 @@ body{
   font-weight:bold;
 }
 
-/* MODAL BASE */
 .modal-bg{
   position:fixed;
   inset:0;
@@ -163,7 +162,6 @@ body{
   cursor:pointer;
 }
 
-/* MODAL ZOOM */
 #zoomMain{
   max-width:100%;
   max-height:50vh;
@@ -171,6 +169,7 @@ body{
   border-radius:22px;
   margin-bottom:10px;
 }
+
 .thumbnail-container{
   display:flex;
   gap:10px;
@@ -185,10 +184,8 @@ body{
   cursor:pointer;
 }
 
-/* LIKE / COMMENT */
 .actions{
   display:flex;
-  justify-content:space-between;
   gap:20px;
 }
 .actions button{
@@ -197,12 +194,10 @@ body{
   border-radius:16px;
   padding:8px;
   font-weight:bold;
-  cursor:pointer;
 }
 .like-btn{background:#ff69b4;color:#fff}
 .comment-btn{background:#b84c6f;color:#fff}
 
-/* STATUS */
 #status{text-align:center;margin:10px;color:#b84c6f}
 </style>
 </head>
@@ -279,8 +274,16 @@ function render(){
     const d=document.createElement('div');
     d.className='visitor-item';
     d.innerHTML=`<div class="delete-btn">×</div><p>${c.name}</p><img src="${c.main}">`;
-    d.querySelector('img').onclick=()=>openZoom(c);
-    d.querySelector('.delete-btn').onclick=()=>deleteImg(c.id,c.main);
+
+    // clic sur l'image
+    d.querySelector('img').onclick = () => openZoom(c);
+
+    // clic sur la croix pour supprimer
+    d.querySelector('.delete-btn').onclick = e => {
+      e.stopPropagation(); // ESSENTIEL pour que le clic ne remonte pas
+      deleteImg(c.id,c.main);
+    };
+
     list.appendChild(d);
   });
 }
@@ -328,16 +331,17 @@ async function deleteImg(id,url){
 document.getElementById('addBtn').onclick=openAdd;
 document.getElementById('toggleSidebar').onclick=()=>sidebar.classList.toggle('sidebar-open');
 
-// Clic dans le vide ferme les modales
+// clic dans le vide ferme les modales
 addModal.onclick=e=>{if(e.target===addModal) closeAdd();}
 zoomModal.onclick=e=>{if(e.target===zoomModal) closeZoom();}
 
-// ✅ Expose les fonctions au HTML pour type="module"
+// exposer les fonctions au HTML pour module
 window.confirmAdd = confirmAdd;
 window.closeAdd = closeAdd;
 window.closeZoom = closeZoom;
 
 load();
 </script>
+
 </body>
 </html>
