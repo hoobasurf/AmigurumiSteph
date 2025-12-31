@@ -7,7 +7,7 @@
 *{box-sizing:border-box;margin:0;padding:0;}
 html,body{height:100%;font-family:'Comic Sans MS',cursive;}
 
-/* BODY AVEC FOND */
+/* BODY AVEC FOND PLUS VIF */
 body::before {
   content:"";
   position:fixed;
@@ -19,6 +19,7 @@ body::before {
   background-size: cover;
   background-position: center center;
   background-repeat: no-repeat;
+  filter: brightness(1.2) saturate(1.2); /* fond plus vif */
   z-index:-1;
 }
 
@@ -81,6 +82,7 @@ body::before {
   font-weight:bold;
 }
 
+/* IMAGES GRILLE LÉGÈREMENT MOINS VIVES */
 .visitor-item img{
   width:100%;
   height:100%;
@@ -88,12 +90,12 @@ body::before {
   border-radius:12px;
   cursor:pointer;
   display:block;
-  filter: brightness(1.1) saturate(1.1); /* image légèrement plus vive */
+  filter: brightness(1) saturate(0.95); /* légèrement moins vif */
   transition: filter 0.3s, opacity 0.3s;
 }
 
 .visitor-item img:hover {
-  filter: brightness(1.2) saturate(1.2);
+  filter: brightness(1.05) saturate(1); /* effet léger au hover */
 }
 
 .visitor-item p{
