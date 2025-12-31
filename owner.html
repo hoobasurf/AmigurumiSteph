@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
-html,body{height:100%;font-family:'Comic Sans MS',cursive; background:#fff;}
+html,body{height:100%;font-family:'Comic Sans MS',cursive;}
 
 body{
   display:flex;
@@ -14,31 +14,31 @@ body{
   background:url('Photoroom_20251212_143703.PNG') center top / cover no-repeat fixed;
 }
 
-/* CENTER + SCROLL HORIZONTAL */
+/* SCROLL HORIZONTAL + PAGES */
 .center-zone{
   flex:1;
   display:flex;
   justify-content:center;
   align-items:center;
   position:relative;
+  padding:20px 0;
 }
 
 #visitor-list-container{
-  overflow-x:auto;
-  overflow-y:hidden;
-  width:100%;
   display:flex;
-  justify-content:center;
-  scroll-snap-type: x mandatory; /* snap horizontal */
-  padding:20px;
+  overflow-x:auto;
+  scroll-snap-type: x mandatory;
+  gap:10px;
+  padding-bottom:10px;
 }
 
-#visitor-list{
+.page{
   display:grid;
-  grid-template-columns: repeat(auto-fill, 150px);
+  grid-template-columns: repeat(2, 150px);
   grid-template-rows: repeat(3, 150px);
-  grid-gap:16px;
-  justify-content:center;
+  gap:2px;
+  flex:0 0 auto;
+  scroll-snap-align:start;
 }
 
 /* VISITOR ITEM */
@@ -46,9 +46,8 @@ body{
   position:relative;
   width:150px;
   height:150px;
-  border-radius:12px;
   background:#ffe6f0;
-  scroll-snap-align:start; /* snap par bloc */
+  border-radius:12px;
 }
 
 /* PLACEHOLDER */
@@ -76,7 +75,7 @@ body{
 
 /* NOM */
 .visitor-item p{
-  margin-top:4px;
+  margin-top:2px;
   font-size:14px;
   color:#b84c6f;
   font-weight:bold;
@@ -240,6 +239,7 @@ body{
 
 /* Responsive */
 @media(max-width:480px){
+  .page{grid-template-columns: repeat(2, 100px); grid-template-rows: repeat(3, 100px);}
   .visitor-item{width:100px;height:100px;}
   #addModal .modal-box{min-width:180px;}
 }
@@ -248,9 +248,7 @@ body{
 
 <body>
 <div class="center-zone">
-  <div id="visitor-list-container">
-    <div id="visitor-list"></div>
-  </div>
+  <div id="visitor-list-container"></div>
 </div>
 
 <div id="sidebar">
@@ -289,7 +287,7 @@ const supabase=createClient(
 
 let creations=[],currentZoom=null;
 
-const list=document.getElementById('visitor-list');
+const container=document.getElementById('visitor-list-container');
 const addModal=document.getElementById('addModal');
 const zoomModal=document.getElementById('zoomModal');
 const mainZoom=document.getElementById('mainZoom');
@@ -310,8 +308,14 @@ async function loadCreations(){
 }
 
 function render(){
-  list.innerHTML='';
-  creations.forEach(c=>{
+  container.innerHTML='';
+  let page=null;
+  creations.forEach((c,i)=>{
+    if(i%6===0){ // chaque 6 images = nouvelle page
+      page=document.createElement('div');
+      page.className='page';
+      container.appendChild(page);
+    }
     const d=document.createElement('div');
     d.className='visitor-item';
     d.innerHTML=`<div class="placeholder">?</div>
@@ -320,7 +324,7 @@ function render(){
                  <img src="${c.imgUrl}" onload="this.previousElementSibling.style.display='none'" onerror="this.style.display='none'">`;
     d.querySelector('img').onclick=()=>openZoom(c);
     d.querySelector('.delete-btn').onclick=()=>deleteProject(c.name);
-    list.appendChild(d);
+    page.appendChild(d);
   });
 }
 
