@@ -7,16 +7,15 @@
 *{box-sizing:border-box;margin:0;padding:0;}
 html,body{height:100%;font-family:'Comic Sans MS',cursive;}
 
+/* BODY AVEC FOND ZOOMÉ */
 body{
   display:flex;
   flex-direction:column;
   overflow:hidden;
-
-  /* FOND ADAPTÉ */
   background-image: url('Photoroom_20251223_114401.jpeg');
   background-repeat: no-repeat;
-  background-size: cover;           /* Remplit tout l’écran */
-  background-position: center center; /* Centré horizontalement et verticalement */
+  background-size: 110% auto;           /* zoom léger */
+  background-position: center center;   /* centré horizontal/vertical */
   background-color: #ffe6f0;
   min-height: 100vh;
   width: 100vw;
@@ -52,8 +51,8 @@ body{
   height: calc(3 * 200px + 8mm);
   scroll-snap-align:center;
   padding:4mm;
-  margin-left:-0.5cm;
-  margin-top: calc(-1cm + 200px);
+  margin-left:-0.5cm; /* décalage horizontal supplémentaire */
+  margin-top: calc(-1cm + 200px); /* décale verticalement pour centrer */
   justify-content:center;
 }
 
