@@ -3,121 +3,135 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
-html,body{height:100%;font-family:'Comic Sans MS',cursive;display:flex;flex-direction:column;}
+html,body{
+  height:100%;
+  font-family:'Comic Sans MS',cursive;
+  overflow:hidden; /* ❌ aucun scroll vertical */
+}
 
-/* FOND FIXE */
-body::before {
+/* ===== FOND ÉCRAN FIXE ===== */
+body::before{
   content:"";
   position:fixed;
-  top:0;
-  left:0;
-  width:100vw;
-  height:100vh;
-  background-image: url('Photoroom_20251223_114401.jpeg');
-  background-size: cover;
-  background-position: center center;
-  background-repeat: no-repeat;
+  inset:0;
+  background:url('Photoroom_20251223_114401.jpeg') center/cover no-repeat;
   z-index:-1;
 }
 
-/* SCROLL HORIZONTAL */
-.center-zone {
-  flex:1;
+/* ===== ZONE CENTRALE ===== */
+.center-zone{
+  width:100vw;
+  height:100vh;
   display:flex;
   justify-content:center;
   align-items:center;
-  padding:20px 0;
-  overflow-x:auto;
-  scroll-snap-type:x mandatory;
-  -webkit-overflow-scrolling: touch;
+  overflow-x:hidden;
+  overflow-y:hidden;
 }
 
-/* CONTENEUR CARDS - GRILLE 2x3 */
+/* ===== SCROLL HORIZONTAL ===== */
+#visitor-list-container{
+  display:flex;
+  gap:0;
+  overflow-x:auto;
+  overflow-y:hidden;
+  scroll-snap-type:x mandatory;
+  -webkit-overflow-scrolling:touch;
+  padding:0;
+}
+
+/* ===== PAGE = 2x3 ===== */
 .page{
+  flex:0 0 auto;
   display:grid;
-  grid-template-columns: repeat(2, 1fr);
-  grid-template-rows: repeat(3, 1fr);
+  grid-template-columns:repeat(2,200px);
+  grid-template-rows:repeat(3,200px);
   column-gap:3mm;
   row-gap:4mm;
-  flex:0 0 auto;
-  width: calc(2 * 200px + 3mm);
-  height: calc(3 * 200px + 8mm);
-  scroll-snap-align:center;
   padding:4mm;
-  margin-left:-0.5cm;
-  justify-content:center;
+  scroll-snap-align:center;
 }
 
-/* VISITOR ITEM - IMAGE 200x200 */
+/* ===== CARD IMAGE ===== */
 .visitor-item{
   position:relative;
   width:200px;
   height:200px;
-  border-radius:12px;
+  border-radius:14px;
   overflow:hidden;
   border:4px solid #f6c2d1;
-  box-shadow:0 4px 12px rgba(0,0,0,0.3);
+  box-shadow:0 6px 14px rgba(0,0,0,0.28);
   background:#ffe6f0;
 }
+
+/* fusion douce avec le fond */
+.visitor-item::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  background:rgba(255,230,240,0.12);
+  pointer-events:none;
+}
+
 .visitor-item img{
   width:100%;
   height:100%;
   object-fit:cover;
-  border-radius:12px;
-  cursor:pointer;
   display:block;
-  filter: brightness(1) saturate(0.95);
-  transition: filter 0.3s, opacity 0.3s;
+  cursor:pointer;
+  filter:brightness(1.05) contrast(1.05) saturate(0.95);
+  transition:filter .3s;
 }
+
 .visitor-item img:hover{
-  filter: brightness(1.05) saturate(1);
+  filter:brightness(1.1) contrast(1.1) saturate(1);
 }
+
 .visitor-item p{
   position:absolute;
   bottom:2px;
   width:100%;
-  font-size:14px;
-  color:#b84c6f;
-  font-weight:bold;
   text-align:center;
-  text-shadow:1px 1px 2px rgba(255,255,255,0.8);
+  font-size:14px;
+  font-weight:bold;
+  color:#b84c6f;
+  text-shadow:1px 1px 2px rgba(255,255,255,.8);
 }
 
-/* CROIX SUPPRIMER */
+/* ===== CROIX SUPPRESSION ===== */
 .delete-btn{
   position:absolute;
-  top:4px;
-  right:4px;
-  width:auto;
-  height:auto;
-  background:transparent;
-  color:#ff69b4;
+  top:6px;
+  right:6px;
   font-size:20px;
   font-weight:bold;
+  color:#ff69b4;
   cursor:pointer;
   z-index:5;
 }
 .delete-btn:hover{
   color:#e94f9a;
-  transform: scale(1.1);
+  transform:scale(1.1);
 }
 
-/* SIDEBAR */
+/* ===== SIDEBAR ===== */
 #sidebar{
   position:fixed;
   top:0;
   left:-220px;
   width:220px;
   height:100vh;
-  background:rgba(255,230,240,0.2);
+  background:rgba(255,230,240,.25);
   border-right:2px solid #b67385;
   padding:20px;
   transition:left .3s;
   z-index:10;
 }
 #sidebar.sidebar-open{left:0}
+
 #toggleSidebar{
   position:absolute;
   top:50%;
@@ -127,164 +141,110 @@ body::before {
   background:#ffb6c1;
   border-radius:0 12px 12px 0;
   display:flex;
-  align-items:center;
   justify-content:center;
+  align-items:center;
   cursor:pointer;
-}
-#sidebar button{
-  width:auto;
-  padding:8px 16px;
-  border-radius:16px;
-  border:none;
-  background:#ff69b4;
-  color:#fff;
-  cursor:pointer;
-  font-weight:bold;
 }
 
-/* MODAL AJOUT */
-#addModal, #deleteModal{
-  position:fixed; inset:0;
+#sidebar button{
+  padding:8px 16px;
+  border:none;
+  border-radius:16px;
+  background:#ff69b4;
+  color:#fff;
+  font-weight:bold;
+  cursor:pointer;
+}
+
+/* ===== MODAL AJOUT ===== */
+#addModal{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.6);
   display:none;
   justify-content:center;
   align-items:center;
-  z-index:10000;
+  z-index:9999;
 }
-#addModal{
-  background:rgba(0,0,0,0.6);
-}
+
 #addModal .modal-box{
   background:#ffe6f0;
   padding:16px 20px;
   border-radius:24px;
   border:4px solid #b67385;
+  min-width:220px;
+  box-shadow:0 6px 18px rgba(0,0,0,.35);
   display:flex;
   flex-direction:column;
   gap:12px;
-  align-items:center;
-  min-width:220px;
-  max-width:260px;
-  box-shadow:0 6px 18px rgba(0,0,0,0.3);
 }
+
 #addModal input{
   padding:8px;
   border-radius:12px;
   border:2px solid #b67385;
-  width:100%;
+  font-family:'Comic Sans MS',cursive;
 }
+
 #addModal button{
   padding:6px 16px;
   border:none;
+  border-radius:14px;
   background:#ff69b4;
   color:#fff;
-  border-radius:14px;
-  cursor:pointer;
   font-weight:bold;
 }
 
-/* MODAL SUPPRESSION */
-#deleteModal{
-  background:rgba(0,0,0,0.5);
-}
-#deleteModal .modal-box{
-  background:#ffe6f0;
-  padding:20px;
-  border-radius:24px;
-  border:4px solid #b67385;
-  display:flex;
-  flex-direction:column;
-  gap:12px;
-  align-items:center;
-  box-shadow:0 6px 25px rgba(0,0,0,0.4);
-  text-align:center;
-}
-#deleteModal button{
-  padding:6px 16px;
-  border:none;
-  border-radius:14px;
-  font-weight:bold;
-  cursor:pointer;
-}
-#deleteModal .confirm-btn{background:#ff69b4;color:#fff;margin-top:10px;}
-#deleteModal .cancel-btn{background:#b67385;color:#fff;margin-top:5px;}
-
-/* ZOOM */
+/* ===== ZOOM ===== */
 #zoomModal{
-  position:fixed; inset:0;
-  background:rgba(0,0,0,0.7);
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,.75);
   display:none;
   justify-content:center;
   align-items:center;
   flex-direction:column;
-  z-index:10001;
+  z-index:10000;
 }
+
 #zoomModal img{
   max-width:80%;
   max-height:60vh;
   border:4px solid #b67385;
   border-radius:24px;
-  margin-bottom:10px;
+  filter:none; /* image normale */
 }
-#zoomModal .thumbs{
-  display:flex;
-  gap:8px;
-  max-width:80%;
-  overflow-x:auto;
-}
-#zoomModal .thumbs img{
-  width:50px;
-  height:50px;
-  object-fit:cover;
-  border-radius:12px;
-  border:2px solid #b67385;
-  cursor:pointer;
-}
+
 .closeZoom{
   position:absolute;
-  top:12px;
-  right:12px;
+  top:14px;
+  right:14px;
   width:32px;
   height:32px;
+  border-radius:50%;
   background:#ffb6c1;
   color:#fff;
-  border-radius:50%;
   display:flex;
   justify-content:center;
   align-items:center;
-  cursor:pointer;
   font-size:20px;
-  border:2px solid #b67385;
-  box-shadow:0 3px 8px rgba(0,0,0,0.3);
-}
-.closeZoom:hover{
-  background:#ff69b4;
-  transform: scale(1.1);
-}
-
-/* Actions like/comment */
-.actions{
-  display:flex;
-  gap:16px;
-  margin-top:10px;
-}
-.like-btn,.comment-btn{
-  padding:5px 12px;
-  border-radius:12px;
-  border:none;
   cursor:pointer;
-  color:#fff;
 }
-.like-btn{background:#ff69b4}
-.comment-btn{background:#b84c6f}
 
-/* Responsive */
+/* ===== RESPONSIVE ===== */
 @media(max-width:480px){
-  .page{grid-template-columns: repeat(2, 120px); grid-template-rows: repeat(3, 120px);}
-  .visitor-item{width:120px;height:120px;}
-  #addModal .modal-box{min-width:180px; max-width:220px;}
+  .page{
+    grid-template-columns:repeat(2,120px);
+    grid-template-rows:repeat(3,120px);
+  }
+  .visitor-item{
+    width:120px;
+    height:120px;
+  }
 }
 </style>
 </head>
+
 <body>
 
 <div class="center-zone">
@@ -305,22 +265,9 @@ body::before {
   </div>
 </div>
 
-<div id="deleteModal">
-  <div class="modal-box">
-    <p>Supprimer définitivement cette image ?</p>
-    <button class="confirm-btn">Supprimer</button>
-    <button class="cancel-btn">Annuler</button>
-  </div>
-</div>
-
 <div id="zoomModal">
   <div class="closeZoom">×</div>
   <img id="mainZoom">
-  <div class="thumbs" id="thumbs"></div>
-  <div class="actions">
-    <button class="like-btn">❤️ Like (0)</button>
-    <button class="comment-btn">💬 Commentaire (0)</button>
-  </div>
 </div>
 
 <script type="module">
@@ -331,118 +278,62 @@ const supabase=createClient(
   "sb_publishable_sqsxb-3Kl5o3-JQYv9kGFw_-g0EgwMa"
 );
 
-let creations=[],currentZoom=null,itemToDelete=null;
 const container=document.getElementById('visitor-list-container');
 const addModal=document.getElementById('addModal');
 const zoomModal=document.getElementById('zoomModal');
 const mainZoom=document.getElementById('mainZoom');
-const thumbs=document.getElementById('thumbs');
-const deleteModal=document.getElementById('deleteModal');
-const confirmDeleteBtn=document.querySelector('#deleteModal .confirm-btn');
-const cancelDeleteBtn=document.querySelector('#deleteModal .cancel-btn');
-const likeBtn=document.querySelector('.like-btn');
-const commentBtn=document.querySelector('.comment-btn');
+let creations=[];
 
-async function loadCreations(){
+async function load(){
   const {data}=await supabase.from("creations").select("*").order("created_at",{ascending:false});
   const grouped={};
   data.forEach(c=>{
     const url=`https://jyhbamdcxmpveujjqjla.supabase.co/storage/v1/object/public/images/${c.image_path}`;
-    if(!grouped[c.name]) grouped[c.name]={name:c.name,imgUrl:url,zoomGroup:[],likes:[],comments:[]};
-    grouped[c.name].zoomGroup.push(url);
+    if(!grouped[c.name]) grouped[c.name]={name:c.name,urls:[]};
+    grouped[c.name].urls.push(url);
   });
   creations=Object.values(grouped);
   render();
 }
 
 function render(){
-  container.innerHTML='';
-  let page=null;
+  container.innerHTML="";
+  let page;
   creations.forEach((c,i)=>{
     if(i%6===0){
-      page=document.createElement('div');
-      page.className='page';
+      page=document.createElement("div");
+      page.className="page";
       container.appendChild(page);
     }
-    const d=document.createElement('div');
-    d.className='visitor-item';
-    d.innerHTML=`<div class="placeholder">?</div>
-                 <div class="delete-btn">×</div>
-                 <p>${c.name}</p>
-                 <img src="${c.imgUrl}" onload="this.previousElementSibling.style.display='none'" onerror="this.style.display='none'">`;
-    d.querySelector('img').onclick=()=>openZoom(c);
-    d.querySelector('.delete-btn').onclick=()=>openDeleteModal(c);
+    const d=document.createElement("div");
+    d.className="visitor-item";
+    d.innerHTML=`
+      <div class="delete-btn">×</div>
+      <p>${c.name}</p>
+      <img src="${c.urls[0]}">
+    `;
+    d.querySelector("img").onclick=()=>{
+      mainZoom.src=c.urls[0];
+      zoomModal.style.display="flex";
+    };
+    d.querySelector(".delete-btn").onclick=()=>deleteProject(c.name);
     page.appendChild(d);
   });
 }
 
-function openZoom(c){
-  currentZoom=c;
-  mainZoom.src=c.imgUrl;
-  thumbs.innerHTML='';
-  c.zoomGroup.forEach(u=>{
-    const t=document.createElement('img');
-    t.src=u;
-    t.onclick=()=>mainZoom.src=u;
-    thumbs.appendChild(t);
-  });
-  updateActions();
-  zoomModal.style.display='flex';
+async function deleteProject(name){
+  if(!confirm("Supprimer ce projet définitivement ?"))return;
+  await supabase.from("creations").delete().eq("name",name);
+  load();
 }
 
-function updateActions(){
-  likeBtn.textContent=`❤️ Like (${currentZoom.likes.length})`;
-  commentBtn.textContent=`💬 Commentaire (${currentZoom.comments.length})`;
-}
+document.getElementById("addBtn").onclick=()=>addModal.style.display="flex";
+addModal.onclick=e=>{if(e.target===addModal)addModal.style.display="none"};
+document.querySelector(".closeZoom").onclick=()=>zoomModal.style.display="none";
+document.getElementById("toggleSidebar").onclick=()=>sidebar.classList.toggle("sidebar-open");
 
-likeBtn.onclick=()=>{const p=prompt("Prénom ?");if(p){currentZoom.likes.push(p);updateActions();}};
-commentBtn.onclick=()=>{const c=prompt("Commentaire ?");if(c){currentZoom.comments.push(c);updateActions();}};
-
-document.getElementById('addBtn').onclick=()=>addModal.style.display='flex';
-addModal.onclick=e=>{if(e.target===addModal)addModal.style.display='none'};
-zoomModal.onclick=e=>{if(e.target===zoomModal) zoomModal.style.display='none'};
-document.querySelector('.closeZoom').onclick=()=>zoomModal.style.display='none';
-
-/* MODAL DELETE */
-function openDeleteModal(c){
-  itemToDelete=c;
-  deleteModal.style.display='flex';
-}
-confirmDeleteBtn.onclick=async()=>{
-  if(!itemToDelete) return;
-  const c=itemToDelete;
-  for(let u of c.zoomGroup){
-    await supabase.storage.from('images').remove([u.split('/images/')[1]]);
-  }
-  await supabase.from('creations').delete().eq('name',c.name);
-  creations=creations.filter(x=>x.name!==c.name);
-  render();
-  deleteModal.style.display='none';
-  itemToDelete=null;
-};
-cancelDeleteBtn.onclick=()=>{deleteModal.style.display='none'; itemToDelete=null;};
-
-document.getElementById('confirmAdd').onclick=async()=>{
-  const name=document.getElementById('photoName').value.trim();
-  const files=document.getElementById('multiPhoto').files;
-  if(!name||!files.length)return;
-  const urls=[];
-  for(let f of files){
-    const path=`${Date.now()}_${f.name}`;
-    await supabase.storage.from('images').upload(path,f);
-    await supabase.from('creations').insert([{name,image_path:path}]);
-    urls.push(`https://jyhbamdcxmpveujjqjla.supabase.co/storage/v1/object/public/images/${path}`);
-  }
-  creations.unshift({name,imgUrl:urls[0],zoomGroup:urls,likes:[],comments:[]});
-  render();
-  addModal.style.display='none';
-  document.getElementById('photoName').value='';
-  document.getElementById('multiPhoto').value='';
-};
-
-document.getElementById('toggleSidebar').onclick=()=>sidebar.classList.toggle('sidebar-open');
-
-loadCreations();
+load();
 </script>
+
 </body>
 </html>
