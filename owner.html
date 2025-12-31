@@ -163,13 +163,6 @@ body{
   margin-bottom:10px;
 }
 
-.thumbnail-container{
-  display:flex;
-  gap:10px;
-  justify-content:center;
-  margin-bottom:10px;
-}
-
 .actions{
   display:flex;
   gap:20px;
@@ -210,12 +203,11 @@ body{
     <button class="close-modal" onclick="closeAdd()">×</button>
     <h3>Ajouter des photos</h3><br>
     <input type="file" id="multiPhoto" multiple accept="image/*"><br><br>
-    <!-- 🔧 FIX ICI -->
-    <button onclick="event.stopPropagation(); confirmAdd();">Valider</button>
+    <button onclick="confirmAdd()">Valider</button>
   </div>
 </div>
 
-<!-- MODAL ZOOM (SANS CROIX) -->
+<!-- MODAL ZOOM -->
 <div class="modal-bg" id="zoomModal">
   <div class="modal-box">
     <img id="zoomMain">
@@ -242,10 +234,14 @@ const addModal=document.getElementById('addModal');
 const zoomModal=document.getElementById('zoomModal');
 
 async function load(){
-  const { data }=await supabase.from('creations').select('*').order('created_at',{ascending:false});
+  const { data }=await supabase
+    .from('creations')
+    .select('*')
+    .order('created_at',{ascending:false});
+
   creations=data.map(c=>{
     const url=`https://jyhbamdcxmpveujjqjla.supabase.co/storage/v1/object/public/images/${c.image_path}`;
-    return {id:c.id,name:c.name,main:url};
+    return {id:c.id,name:c.name,main:url,group:[url],likes:0,comments:0};
   });
   render();
 }
@@ -277,15 +273,24 @@ async function confirmAdd(){
   const files=document.getElementById('multiPhoto').files;
   if(!name||!files.length) return alert('Nom + photo');
 
-  for(const f of files){
-    const path=`${Date.now()}_${f.name}`;
-    await supabase.storage.from('images').upload(path,f);
-    const { data }=await supabase.from('creations')
-      .insert([{name,image_path:path}]).select();
+  for(let i=0;i<files.length;i++){
+    const path=`${Date.now()}_${files[i].name}`;
+    await supabase.storage.from('images').upload(path,files[i]);
+    const { data }=await supabase
+      .from('creations')
+      .insert([{name,image_path:path}])
+      .select();
+
     const url=`https://jyhbamdcxmpveujjqjla.supabase.co/storage/v1/object/public/images/${path}`;
-    creations.unshift({id:data[0].id,name,main:url});
+
+    if(i===0)
+      creations.unshift({id:data[0].id,name,main:url,group:[url],likes:0,comments:0});
+    else
+      creations[0].group.push(url);
   }
-  closeAdd(); render();
+
+  closeAdd();
+  render();
 }
 
 async function deleteImg(id,url){
@@ -305,5 +310,6 @@ zoomModal.onclick=e=>{if(e.target===zoomModal) zoomModal.style.display='none';}
 
 load();
 </script>
+
 </body>
 </html>
