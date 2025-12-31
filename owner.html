@@ -26,7 +26,7 @@ body::before {
   z-index:-1;
 }
 
-/* CENTRAGE GRILLE DESCENDUE DE 2CM */
+/* CENTRAGE GRILLE DESCENDUE DE 1CM */
 .center-zone {
   flex:1;
   display:flex;
@@ -34,7 +34,7 @@ body::before {
   align-items:flex-start;
   height:100vh;
   padding:20px 0;
-  margin-top:2cm;
+  margin-top:1cm;
 }
 
 #visitor-list-container{
@@ -150,6 +150,41 @@ body::before {
   background:#ff69b4;
   color:#fff;
 }
+.delete-btn:active{
+  background:#e94f9a;
+}
+
+/* MODAL CONFIRMATION SUPPRESSION */
+#confirmDeleteModal{
+  position:fixed; inset:0;
+  background:rgba(0,0,0,0.6);
+  display:none;
+  justify-content:center;
+  align-items:center;
+  z-index:10001;
+}
+#confirmDeleteModal .modal-box{
+  background:#ffe6f0;
+  padding:16px 24px;
+  border-radius:20px;
+  border:3px solid #b67385;
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+  align-items:center;
+  min-width:220px;
+  font-family:'Comic Sans MS',cursive;
+  text-align:center;
+}
+#confirmDeleteModal button{
+  padding:6px 14px;
+  border:none;
+  border-radius:12px;
+  cursor:pointer;
+  font-weight:bold;
+}
+#confirmDeleteModal .cancel-btn{background:#b84c6f;color:#fff;margin-top:8px;}
+#confirmDeleteModal .ok-btn{background:#ff69b4;color:#fff;}
 
 /* SIDEBAR */
 #sidebar{
@@ -320,6 +355,15 @@ body::before {
   </div>
 </div>
 
+<!-- MODAL CONFIRM SUPPRESSION -->
+<div id="confirmDeleteModal">
+  <div class="modal-box">
+    <p>Supprimer définitivement ce projet ?</p>
+    <button class="ok-btn">Oui</button>
+    <button class="cancel-btn">Annuler</button>
+  </div>
+</div>
+
 <!-- ZOOM -->
 <div id="zoomModal">
   <div class="closeZoom">×</div>
@@ -339,7 +383,7 @@ const supabase=createClient(
   "sb_publishable_sqsxb-3Kl5o3-JQYv9kGFw_-g0EgwMa"
 );
 
-let creations=[],currentZoom=null;
+let creations=[],currentZoom=null,deleteTarget=null;
 const container=document.getElementById('visitor-list-container');
 const addModal=document.getElementById('addModal');
 const zoomModal=document.getElementById('zoomModal');
@@ -347,6 +391,9 @@ const mainZoom=document.getElementById('mainZoom');
 const thumbs=document.getElementById('thumbs');
 const likeBtn=document.querySelector('.like-btn');
 const commentBtn=document.querySelector('.comment-btn');
+const confirmModal=document.getElementById('confirmDeleteModal');
+const okBtn=confirmModal.querySelector('.ok-btn');
+const cancelBtn=confirmModal.querySelector('.cancel-btn');
 
 async function loadCreations(){
   const {data}=await supabase.from("creations").select("*").order("created_at",{ascending:false});
@@ -376,7 +423,7 @@ function render(){
                  <p>${c.name}</p>
                  <img src="${c.imgUrl}" onload="this.previousElementSibling.style.display='none'" onerror="this.style.display='none'">`;
     d.querySelector('img').onclick=()=>openZoom(c);
-    d.querySelector('.delete-btn').onclick=()=>deleteProject(c.name);
+    d.querySelector('.delete-btn').onclick=()=>{ deleteTarget=c; confirmModal.style.display='flex'; };
     page.appendChild(d);
   });
 }
@@ -426,16 +473,21 @@ document.getElementById('confirmAdd').onclick=async()=>{
   document.getElementById('multiPhoto').value='';
 };
 
-async function deleteProject(name){
-  if(!confirm("Supprimer définitivement ce projet ?")) return;
-  const p=creations.find(c=>c.name===name);
+/* SUPPRESSION */
+okBtn.onclick=async()=>{
+  if(!deleteTarget) return;
+  const p=deleteTarget;
   for(let u of p.zoomGroup){
     await supabase.storage.from('images').remove([u.split('/images/')[1]]);
   }
-  await supabase.from('creations').delete().eq('name',name);
-  creations=creations.filter(c=>c.name!==name);
+  await supabase.from('creations').delete().eq('name',p.name);
+  creations=creations.filter(c=>c.name!==p.name);
+  deleteTarget=null;
+  confirmModal.style.display='none';
   render();
-}
+};
+cancelBtn.onclick=()=>{ deleteTarget=null; confirmModal.style.display='none'; };
+confirmModal.onclick=e=>{ if(e.target===confirmModal) { deleteTarget=null; confirmModal.style.display='none'; } };
 
 document.getElementById('toggleSidebar').onclick=()=>sidebar.classList.toggle('sidebar-open');
 
