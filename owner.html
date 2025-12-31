@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="UTF-8" />
+<meta charset="UTF-8">
 <title>Owner</title>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -13,7 +13,7 @@ body{
   background:url("Photoroom_20251223_114401.jpeg") center/cover fixed;
 }
 
-/* ================= CARDS ================= */
+/* GALLERY */
 #gallery{
   display:flex;
   gap:16px;
@@ -21,8 +21,9 @@ body{
   overflow-x:auto;
 }
 
+/* CARD */
 .card{
-  min-width:220px;
+  min-width:200px;
   background:#fff;
   border-radius:18px;
   padding:10px;
@@ -33,12 +34,12 @@ body{
 
 .card img{
   width:100%;
-  height:160px;
+  height:140px;
   object-fit:cover;
   border-radius:14px;
 }
 
-/* CROIX ROSE */
+/* CROIX */
 .delete-btn{
   position:absolute;
   top:8px;
@@ -55,7 +56,7 @@ body{
   cursor:pointer;
 }
 
-/* ================= MODALS ================= */
+/* MODALS */
 .modal-bg{
   position:fixed;
   inset:0;
@@ -85,7 +86,7 @@ body{
   cursor:pointer;
 }
 
-/* ================= ZOOM ================= */
+/* ZOOM */
 #zoomImg{
   width:100%;
   height:260px;
@@ -106,30 +107,21 @@ body{
   object-fit:cover;
   border-radius:10px;
   cursor:pointer;
-  opacity:.7;
+  opacity:.6;
 }
 
 #thumbs img.active{
   opacity:1;
   outline:2px solid #ff69b4;
 }
-
-/* ================= BUTTONS ================= */
-button{
-  border:none;
-  border-radius:14px;
-  padding:10px 16px;
-  cursor:pointer;
-}
 </style>
 </head>
 
 <body>
 
-<!-- GALLERY -->
 <div id="gallery"></div>
 
-<!-- ZOOM MODAL -->
+<!-- ZOOM -->
 <div id="zoomModal" class="modal-bg" onclick="closeZoom(event)">
   <div class="modal-box" onclick="event.stopPropagation()">
     <button class="close-modal" onclick="closeZoom()">×</button>
@@ -138,12 +130,12 @@ button{
   </div>
 </div>
 
-<!-- DELETE MODAL -->
+<!-- DELETE -->
 <div id="deleteModal" class="modal-bg" onclick="closeDelete(event)">
   <div class="modal-box" onclick="event.stopPropagation()">
     <button class="close-modal" onclick="closeDelete()">×</button>
-    <h3>Supprimer cette photo ?</h3>
-    <p>Cette action est définitive 💔</p>
+    <h3>Supprimer cette image ?</h3>
+    <p>Suppression définitive</p>
     <div style="display:flex;gap:12px;margin-top:16px">
       <button id="confirmDelete" style="background:#ff69b4;color:#fff">Supprimer</button>
       <button onclick="closeDelete()">Annuler</button>
@@ -152,7 +144,6 @@ button{
 </div>
 
 <script>
-/* ================= SUPABASE ================= */
 const supabase = supabase.createClient(
   "https://jyhbamdcxmpveujjqjla.supabase.co",
   "sb_publishable_sqsxb-3Kl5o3-JQYv9kGFw_-g0EgwMa"
@@ -162,37 +153,47 @@ const gallery = document.getElementById("gallery");
 const zoomModal = document.getElementById("zoomModal");
 const zoomImg = document.getElementById("zoomImg");
 const thumbs = document.getElementById("thumbs");
-
 const deleteModal = document.getElementById("deleteModal");
 const confirmDelete = document.getElementById("confirmDelete");
 
-let currentGroup = [];
 let deleteTarget = null;
 
-/* ================= LOAD ================= */
+/* LOAD */
 async function load(){
   gallery.innerHTML = "";
 
-  const { data } = await supabase
+  const { data, error } = await supabase
     .from("creations")
     .select("*")
     .order("created_at",{ascending:false});
 
+  if(error || !data || data.length===0){
+    gallery.innerHTML="<p style='color:white'>Aucune image</p>";
+    return;
+  }
+
   data.forEach(c=>{
+    if(!c.image_path) return;
+
+    const url =
+      "https://jyhbamdcxmpveujjqjla.supabase.co/storage/v1/object/public/images/"
+      + c.image_path;
+
     const card = document.createElement("div");
     card.className="card";
 
     const img = document.createElement("img");
-    img.src = `https://jyhbamdcxmpveujjqjla.supabase.co/storage/v1/object/public/images/${c.image_path}`;
+    img.src = url;
+    img.onerror = ()=>card.remove();
 
-    img.onclick = ()=>openZoom([img.src]);
+    img.onclick = ()=>openZoom(url);
 
     const del = document.createElement("div");
     del.className="delete-btn";
-    del.innerHTML="×";
+    del.textContent="×";
     del.onclick=(e)=>{
       e.stopPropagation();
-      deleteTarget = c;
+      deleteTarget=c;
       deleteModal.style.display="flex";
     };
 
@@ -202,24 +203,10 @@ async function load(){
   });
 }
 
-/* ================= ZOOM ================= */
-function openZoom(images){
-  currentGroup = images;
-  zoomImg.src = images[0];
-  thumbs.innerHTML = "";
-
-  images.forEach((src,i)=>{
-    const t=document.createElement("img");
-    t.src=src;
-    if(i===0)t.classList.add("active");
-    t.onclick=()=>{
-      zoomImg.src=src;
-      [...thumbs.children].forEach(x=>x.classList.remove("active"));
-      t.classList.add("active");
-    };
-    thumbs.appendChild(t);
-  });
-
+/* ZOOM */
+function openZoom(src){
+  zoomImg.src=src;
+  thumbs.innerHTML="";
   zoomModal.style.display="flex";
 }
 
@@ -228,10 +215,9 @@ function closeZoom(e){
     zoomModal.style.display="none";
 }
 
-/* ================= DELETE ================= */
+/* DELETE */
 confirmDelete.onclick = async ()=>{
-  const path = deleteTarget.image_path;
-  await supabase.storage.from("images").remove([path]);
+  await supabase.storage.from("images").remove([deleteTarget.image_path]);
   await supabase.from("creations").delete().eq("id",deleteTarget.id);
   deleteModal.style.display="none";
   load();
