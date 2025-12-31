@@ -26,8 +26,8 @@ body{
 #visitor-list-container {
   display: flex;
   overflow-x: auto;
-  justify-content: center; /* centre la page visible */
-  padding-left: 1cm;       /* décale horizontalement de 1 cm */
+  justify-content: center; 
+  padding-left: 0; /* on n’ajoute pas de décalage à gauche du conteneur */
 }
 
 .page {
@@ -42,8 +42,9 @@ body{
   scroll-snap-align: center;
   padding: 4mm;
 
-  /* Décalage vertical vers le haut */
-  margin-top: -2cm; /* négatif = remonte */
+  /* Décalage */
+  margin-left: -0.5cm; /* décalage vers la gauche */
+  margin-top: -1cm;    /* décalage vers le haut */
 }
 /* VISITOR ITEM */
 .visitor-item{
