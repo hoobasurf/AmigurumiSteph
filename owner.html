@@ -7,27 +7,29 @@
 *{box-sizing:border-box;margin:0;padding:0;}
 html,body{height:100%;font-family:'Comic Sans MS',cursive;}
 
-body{
-  display:flex;
-  flex-direction:column;
-  overflow:hidden;
-  background: #ffe6f0 url('Photoroom_20251223_114401.jpeg') center top / contain no-repeat fixed;
-
-  /* Ajustement pour remonter le bas de 1cm */
-  background-position: center calc(0% - 1cm);
-
-  /* léger contraste pour le fond et bordure photo */
-  background-blend-mode: multiply;
-  filter: contrast(1.2) brightness(1.1);
+/* BODY AVEC FOND ZOOMÉ */
+body::before {
+  content:"";
+  position:fixed;
+  top:0;
+  left:0;
+  width:100vw;
+  height:100vh;
+  background-image: url('Photoroom_20251223_114401.jpeg');
+  background-size: calc(100% + 5mm) calc(100% + 5mm); /* zoom de 5mm */
+  background-position: center calc(50% + 2mm);       /* remonte de 2mm par rapport à la dernière position */
+  background-repeat: no-repeat;
+  z-index:-1;
 }
 
 /* SCROLL HORIZONTAL */
-.center-zone{
+.center-zone {
   flex:1;
   display:flex;
   justify-content:center;
   align-items:center;
   padding:20px 0;
+  margin-top: -1cm; /* remonte la grille de 1cm */
 }
 
 #visitor-list-container{
@@ -51,8 +53,8 @@ body{
   height: calc(3 * 200px + 8mm);
   scroll-snap-align:center;
   padding:4mm;
-  margin-left:-0.5cm; 
-  margin-top: calc(-1cm + 200px); 
+  margin-left:-0.5cm; /* décalage horizontal supplémentaire */
+  margin-top: calc(-1cm + 200px); /* décale verticalement pour centrer */
   justify-content:center;
 }
 
@@ -66,11 +68,6 @@ body{
   border:2px solid #fff;
   box-shadow:0 0 0 2px #f6c2d1;
   background:#ffe6f0;
-  opacity:0.8; /* images plus claires pastel */
-  transition: opacity 0.3s;
-}
-.visitor-item:hover{
-  opacity:1; /* normal au survol ou clic */
 }
 
 .visitor-item .placeholder{
@@ -264,6 +261,23 @@ body{
   .visitor-item{width:120px;height:120px;}
   #addModal .modal-box{min-width:180px;}
 }
+/* Grille : images plus claires / pastel */
+.visitor-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 12px;
+  cursor: pointer;
+  display: block;
+
+  /* Filtre pastel plus visible */
+  filter: brightness(1.5) saturate(0.6) opacity(0.7);
+  transition: filter 0.3s, opacity 0.3s;
+}
+
+.visitor-item img:hover {
+  filter: brightness(1.6) saturate(0.7) opacity(0.8);
+}  
 </style>
 </head>
 <body>
