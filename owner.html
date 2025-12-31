@@ -5,9 +5,9 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
-html,body{height:100%;font-family:'Comic Sans MS',cursive;}
+html,body{height:100%;font-family:'Comic Sans MS',cursive;display:flex;flex-direction:column;}
 
-/* BODY AVEC FOND FIXE */
+/* FOND FIXE */
 body::before {
   content:"";
   position:fixed;
@@ -16,7 +16,7 @@ body::before {
   width:100vw;
   height:100vh;
   background-image: url('Photoroom_20251223_114401.jpeg');
-  background-size: cover; /* fond plein écran, jamais coupé */
+  background-size: cover;
   background-position: center center;
   background-repeat: no-repeat;
   z-index:-1;
@@ -29,18 +29,12 @@ body::before {
   justify-content:center;
   align-items:center;
   padding:20px 0;
-}
-
-#visitor-list-container{
-  display:flex;
   overflow-x:auto;
   scroll-snap-type:x mandatory;
   -webkit-overflow-scrolling: touch;
-  justify-content:center;
-  padding-left:1cm;
 }
 
-/* Chaque page = 2x3 cartes */
+/* CONTENEUR CARDS */
 .page{
   display:grid;
   grid-template-columns: repeat(2, 1fr);
@@ -63,21 +57,9 @@ body::before {
   border-radius:12px;
   overflow:hidden;
   border:2px solid #fff;
-  box-shadow:0 0 0 4px #f6c2d1; /* liseré rose plus épais */
+  box-shadow:0 0 0 4px #f6c2d1;
   background:#ffe6f0;
 }
-
-.visitor-item .placeholder{
-  position:absolute;
-  inset:0;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  font-size:24px;
-  color:#b84c6f;
-  font-weight:bold;
-}
-
 .visitor-item img{
   width:100%;
   height:100%;
@@ -85,14 +67,12 @@ body::before {
   border-radius:12px;
   cursor:pointer;
   display:block;
-  filter: brightness(1.2) saturate(0.8) opacity(0.75); /* léger pastel */
+  filter: brightness(1.2) saturate(0.8) opacity(0.75);
   transition: filter 0.3s, opacity 0.3s;
 }
-.visitor-item img:hover {
+.visitor-item img:hover{
   filter: brightness(1.3) saturate(0.9) opacity(0.85);
 }
-
-/* NOM */
 .visitor-item p{
   position:absolute;
   bottom:2px;
@@ -103,8 +83,6 @@ body::before {
   text-align:center;
   text-shadow:1px 1px 2px rgba(255,255,255,0.8);
 }
-
-/* CROIX */
 .delete-btn{
   position:absolute;
   top:2px;
@@ -162,13 +140,15 @@ body::before {
 }
 
 /* MODAL AJOUT */
-#addModal{
+#addModal, #deleteModal{
   position:fixed; inset:0;
-  background:rgba(0,0,0,0.6);
   display:none;
   justify-content:center;
   align-items:center;
-  z-index:9999;
+  z-index:10000;
+}
+#addModal{
+  background:rgba(0,0,0,0.6);
 }
 #addModal .modal-box{
   background:#ffe6f0;
@@ -181,7 +161,7 @@ body::before {
   align-items:center;
   min-width:200px;
   max-width:280px;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+  box-shadow:0 4px 20px rgba(0,0,0,0.3);
 }
 #addModal input{
   padding:8px;
@@ -201,12 +181,7 @@ body::before {
 
 /* MODAL SUPPRESSION */
 #deleteModal{
-  position:fixed; inset:0;
   background:rgba(0,0,0,0.5);
-  display:none;
-  justify-content:center;
-  align-items:center;
-  z-index:10000;
 }
 #deleteModal .modal-box{
   background:#ffe6f0;
@@ -238,7 +213,7 @@ body::before {
   justify-content:center;
   align-items:center;
   flex-direction:column;
-  z-index:10000;
+  z-index:10001;
 }
 #zoomModal img{
   max-width:80%;
@@ -292,26 +267,17 @@ body::before {
 .like-btn{background:#ff69b4}
 .comment-btn{background:#b84c6f}
 
-/* Responsive */
-@media(max-width:480px){
-  .page{grid-template-columns: repeat(2, 120px); grid-template-rows: repeat(3, 120px);}
-  .visitor-item{width:120px;height:120px;}
-  #addModal .modal-box{min-width:180px;}
-}
 </style>
 </head>
 <body>
 
-<div class="center-zone">
-  <div id="visitor-list-container"></div>
-</div>
+<div class="center-zone" id="visitor-list-container"></div>
 
 <div id="sidebar">
   <div id="toggleSidebar">☰</div>
   <button id="addBtn">Ajouter</button>
 </div>
 
-<!-- MODAL AJOUT -->
 <div id="addModal">
   <div class="modal-box">
     <h2>Ajouter des photos</h2>
@@ -321,7 +287,6 @@ body::before {
   </div>
 </div>
 
-<!-- MODAL SUPPRESSION -->
 <div id="deleteModal">
   <div class="modal-box">
     <p>Supprimer définitivement cette image ?</p>
@@ -330,7 +295,6 @@ body::before {
   </div>
 </div>
 
-<!-- ZOOM -->
 <div id="zoomModal">
   <div class="closeZoom">×</div>
   <img id="mainZoom">
@@ -390,7 +354,7 @@ function render(){
                  <p>${c.name}</p>
                  <img src="${c.imgUrl}" onload="this.previousElementSibling.style.display='none'" onerror="this.style.display='none'">`;
     d.querySelector('img').onclick=()=>openZoom(c);
-    d.querySelector('.delete-btn').onclick=()=>openDeleteModal(c,d);
+    d.querySelector('.delete-btn').onclick=()=>openDeleteModal(c);
     page.appendChild(d);
   });
 }
@@ -420,16 +384,16 @@ commentBtn.onclick=()=>{const c=prompt("Commentaire ?");if(c){currentZoom.commen
 document.getElementById('addBtn').onclick=()=>addModal.style.display='flex';
 addModal.onclick=e=>{if(e.target===addModal)addModal.style.display='none'};
 zoomModal.onclick=e=>{if(e.target===zoomModal) zoomModal.style.display='none'};
-document.querySelector('.closeZoom').onclick=()=>zoomModal.style.display='none'};
+document.querySelector('.closeZoom').onclick=()=>zoomModal.style.display='none';
 
-/* SUPPRESSION MODAL */
-function openDeleteModal(c,item){
-  itemToDelete={c,c,item};
+/* MODAL DELETE */
+function openDeleteModal(c){
+  itemToDelete=c;
   deleteModal.style.display='flex';
 }
 confirmDeleteBtn.onclick=async()=>{
   if(!itemToDelete) return;
-  const {c,item}=itemToDelete;
+  const c=itemToDelete;
   for(let u of c.zoomGroup){
     await supabase.storage.from('images').remove([u.split('/images/')[1]]);
   }
