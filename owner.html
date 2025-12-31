@@ -2,234 +2,285 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<title>Owner</title>
-
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;font-family:'Comic Sans MS',cursive}
+
+/* BODY */
 body{
-  margin:0;
-  font-family:system-ui;
-  background:url("Photoroom_20251223_114401.jpeg") center/cover fixed;
-}
-
-/* GALLERY */
-#gallery{
+  background:url('Photoroom_20251223_114401.jpeg') center top / cover no-repeat fixed;
+  overflow:hidden;
   display:flex;
-  gap:16px;
-  padding:20px;
-  overflow-x:auto;
+  flex-direction:column;
 }
 
-/* CARD */
-.card{
-  min-width:200px;
-  background:#fff;
-  border-radius:18px;
-  padding:10px;
-  position:relative;
-  box-shadow:0 10px 25px rgba(0,0,0,.15);
+/* BOUTONS VUE */
+#viewSelector{
+  display:flex;
+  justify-content:center;
+  gap:12px;
+  margin:20px 0;
+}
+#viewSelector button{
+  background:#fff0f7;
+  border:2px solid #b84c6f;
+  color:#b84c6f;
+  padding:8px 16px;
+  border-radius:24px;
   cursor:pointer;
 }
 
-.card img{
+/* CONTENU */
+.center-zone{
+  flex:1;
+  display:flex;
+  justify-content:center;
   width:100%;
-  height:140px;
-  object-fit:cover;
-  border-radius:14px;
+  overflow:hidden;
 }
 
-/* CROIX */
+/* LISTE – SCROLL HORIZONTAL */
+#visitor-list{
+  display:flex;
+  gap:18px;
+  padding:20px;
+  overflow-x:auto;
+  overflow-y:hidden;
+}
+
+/* CARD */
+.visitor-item{
+  flex:0 0 auto;
+  width:160px;
+  text-align:center;
+  position:relative;
+}
+.visitor-item img{
+  width:160px;
+  height:160px;
+  object-fit:contain;
+  border:4px solid #b67385;
+  border-radius:22px;
+  background:#ffe6f0;
+  cursor:pointer;
+}
+.visitor-item p{
+  margin-top:8px;
+  font-size:18px;
+  color:#b84c6f;
+  font-weight:bold;
+}
+
+/* CROIX SUPPRESSION */
 .delete-btn{
   position:absolute;
-  top:8px;
-  right:8px;
+  top:6px;
+  right:6px;
   width:26px;
   height:26px;
-  border-radius:50%;
   background:#ff69b4;
   color:#fff;
-  font-size:18px;
+  border-radius:50%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-weight:bold;
+  cursor:pointer;
+  z-index:5;
+}
+
+/* SIDEBAR */
+#sidebar{
+  position:fixed;
+  top:0;
+  left:-220px;
+  width:220px;
+  height:100vh;
+  background:rgba(255,230,240,0.25);
+  border-right:2px solid #b67385;
+  padding:20px;
+  transition:left .3s;
+  z-index:10;
+}
+#sidebar.sidebar-open{left:0}
+#toggleSidebar{
+  position:absolute;
+  top:50%;
+  right:-30px;
+  width:30px;
+  height:60px;
+  background:#ffb6c1;
+  border-radius:0 12px 12px 0;
   display:flex;
   align-items:center;
   justify-content:center;
   cursor:pointer;
 }
+#sidebar input,
+#sidebar button{
+  width:100%;
+  margin-top:10px;
+  padding:10px;
+  border-radius:14px;
+  border:none;
+  background:#ffb6c1;
+  font-weight:bold;
+}
 
-/* MODALS */
+/* MODAL BASE */
 .modal-bg{
   position:fixed;
   inset:0;
   background:rgba(0,0,0,.6);
   display:none;
-  align-items:center;
   justify-content:center;
-  z-index:1000;
+  align-items:center;
+  z-index:9999;
 }
-
 .modal-box{
-  background:#fff;
-  border-radius:20px;
+  background:#ffe6f0;
   padding:20px;
-  width:90%;
-  max-width:420px;
+  border-radius:22px;
+  border:4px solid #b67385;
+  max-width:90%;
   position:relative;
 }
-
 .close-modal{
   position:absolute;
-  top:10px;
-  right:14px;
+  top:8px;
+  right:8px;
+  width:30px;
+  height:30px;
+  border-radius:50%;
+  background:#ff69b4;
   border:none;
-  background:none;
-  font-size:22px;
+  font-size:18px;
   cursor:pointer;
 }
 
-/* ZOOM */
-#zoomImg{
-  width:100%;
-  height:260px;
-  object-fit:contain;
-  border-radius:14px;
-}
-
-#thumbs{
-  display:flex;
-  gap:10px;
-  margin-top:10px;
-  overflow-x:auto;
-}
-
-#thumbs img{
-  width:60px;
-  height:60px;
-  object-fit:cover;
-  border-radius:10px;
-  cursor:pointer;
-  opacity:.6;
-}
-
-#thumbs img.active{
-  opacity:1;
-  outline:2px solid #ff69b4;
-}
+/* STATUS */
+#status{text-align:center;margin:10px;color:#b84c6f}
 </style>
 </head>
 
 <body>
 
-<div id="gallery"></div>
+<div class="center-zone">
+  <div id="visitor-list"></div>
+</div>
 
-<!-- ZOOM -->
-<div id="zoomModal" class="modal-bg" onclick="closeZoom(event)">
-  <div class="modal-box" onclick="event.stopPropagation()">
-    <button class="close-modal" onclick="closeZoom()">×</button>
-    <img id="zoomImg">
-    <div id="thumbs"></div>
+<div id="sidebar">
+  <div id="toggleSidebar">☰</div>
+  <input id="name" placeholder="Prénom">
+  <button id="addBtn">Ajouter</button>
+</div>
+
+<!-- MODAL AJOUT -->
+<div class="modal-bg" id="addModal" onclick="if(event.target===this) closeAdd()">
+  <div class="modal-box">
+    <button class="close-modal" onclick="closeAdd()">×</button>
+    <h3>Ajouter des photos</h3><br>
+    <input type="file" id="multiPhoto" multiple accept="image/*"><br><br>
+    <button onclick="confirmAdd()">Valider</button>
   </div>
 </div>
 
-<!-- DELETE -->
-<div id="deleteModal" class="modal-bg" onclick="closeDelete(event)">
-  <div class="modal-box" onclick="event.stopPropagation()">
-    <button class="close-modal" onclick="closeDelete()">×</button>
-    <h3>Supprimer cette image ?</h3>
-    <p>Suppression définitive</p>
-    <div style="display:flex;gap:12px;margin-top:16px">
-      <button id="confirmDelete" style="background:#ff69b4;color:#fff">Supprimer</button>
-      <button onclick="closeDelete()">Annuler</button>
-    </div>
+<!-- MODAL DELETE -->
+<div class="modal-bg" id="deleteModal" onclick="closeDelete(event)">
+  <div class="modal-box">
+    <h3>Supprimer cette photo ?</h3>
+    <p style="margin:10px 0;color:#b84c6f">
+      Cette action est définitive 💗
+    </p>
+    <button onclick="confirmDelete()">Supprimer</button>
   </div>
 </div>
 
-<script>
-const supabase = supabase.createClient(
+<p id="status">📤 Prêt</p>
+
+<script type="module">
+import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
+
+const supabase = createClient(
   "https://jyhbamdcxmpveujjqjla.supabase.co",
   "sb_publishable_sqsxb-3Kl5o3-JQYv9kGFw_-g0EgwMa"
 );
 
-const gallery = document.getElementById("gallery");
-const zoomModal = document.getElementById("zoomModal");
-const zoomImg = document.getElementById("zoomImg");
-const thumbs = document.getElementById("thumbs");
-const deleteModal = document.getElementById("deleteModal");
-const confirmDelete = document.getElementById("confirmDelete");
+let creations=[], deleteTarget=null;
 
-let deleteTarget = null;
+const list=document.getElementById('visitor-list');
+const addModal=document.getElementById('addModal');
+const deleteModal=document.getElementById('deleteModal');
 
-/* LOAD */
 async function load(){
-  gallery.innerHTML = "";
+  const { data } = await supabase.from('creations').select('*').order('created_at',{ascending:false});
+  creations = data.map(c=>{
+    const safe = encodeURIComponent(c.image_path);
+    const url=`https://jyhbamdcxmpveujjqjla.supabase.co/storage/v1/object/public/images/${safe}`;
+    return {id:c.id,name:c.name,url};
+  });
+  render();
+}
 
-  const { data, error } = await supabase
-    .from("creations")
-    .select("*")
-    .order("created_at",{ascending:false});
-
-  if(error || !data || data.length===0){
-    gallery.innerHTML="<p style='color:white'>Aucune image</p>";
-    return;
-  }
-
-  data.forEach(c=>{
-    if(!c.image_path) return;
-
-    const url =
-      "https://jyhbamdcxmpveujjqjla.supabase.co/storage/v1/object/public/images/"
-      + c.image_path;
-
-    const card = document.createElement("div");
-    card.className="card";
-
-    const img = document.createElement("img");
-    img.src = url;
-    img.onerror = ()=>card.remove();
-
-    img.onclick = ()=>openZoom(url);
-
-    const del = document.createElement("div");
-    del.className="delete-btn";
-    del.textContent="×";
-    del.onclick=(e)=>{
-      e.stopPropagation();
+function render(){
+  list.innerHTML='';
+  creations.forEach(c=>{
+    const d=document.createElement('div');
+    d.className='visitor-item';
+    d.innerHTML=`
+      <div class="delete-btn">×</div>
+      <p>${c.name}</p>
+      <img src="${c.url}">
+    `;
+    d.querySelector('.delete-btn').onclick=()=>{
       deleteTarget=c;
-      deleteModal.style.display="flex";
+      deleteModal.style.display='flex';
     };
-
-    card.appendChild(img);
-    card.appendChild(del);
-    gallery.appendChild(card);
+    list.appendChild(d);
   });
 }
 
-/* ZOOM */
-function openZoom(src){
-  zoomImg.src=src;
-  thumbs.innerHTML="";
-  zoomModal.style.display="flex";
-}
+function openAdd(){addModal.style.display='flex'}
+function closeAdd(){addModal.style.display='none'}
 
-function closeZoom(e){
-  if(!e || e.target===zoomModal)
-    zoomModal.style.display="none";
-}
+async function confirmAdd(){
+  const name=document.getElementById('name').value.trim();
+  const files=document.getElementById('multiPhoto').files;
+  if(!name||!files.length) return alert('Nom + photo');
 
-/* DELETE */
-confirmDelete.onclick = async ()=>{
-  await supabase.storage.from("images").remove([deleteTarget.image_path]);
-  await supabase.from("creations").delete().eq("id",deleteTarget.id);
-  deleteModal.style.display="none";
+  for(const file of files){
+    try{
+      const path=`${Date.now()}_${file.name}`;
+      await supabase.storage.from('images').upload(path,file,{upsert:false});
+      await supabase.from('creations').insert([{name,image_path:path}]);
+    }catch(e){
+      console.error(e);
+    }
+  }
+  closeAdd();
   load();
-};
+}
 
 function closeDelete(e){
-  if(!e || e.target===deleteModal)
-    deleteModal.style.display="none";
+  if(e.target===deleteModal) deleteModal.style.display='none';
 }
+
+async function confirmDelete(){
+  if(!deleteTarget) return;
+  const path=decodeURIComponent(deleteTarget.url.split('/images/')[1]);
+  await supabase.storage.from('images').remove([path]);
+  await supabase.from('creations').delete().eq('id',deleteTarget.id);
+  deleteModal.style.display='none';
+  deleteTarget=null;
+  load();
+}
+
+document.getElementById('addBtn').onclick=openAdd;
+document.getElementById('toggleSidebar').onclick=()=>sidebar.classList.toggle('sidebar-open');
 
 load();
 </script>
-
 </body>
 </html>
