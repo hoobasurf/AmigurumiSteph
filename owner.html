@@ -275,13 +275,18 @@ function render(){
     d.className='visitor-item';
     d.innerHTML=`<div class="delete-btn">×</div><p>${c.name}</p><img src="${c.main}">`;
 
-    // clic sur l'image
+    // clic sur image = zoom
     d.querySelector('img').onclick = () => openZoom(c);
 
-    // clic sur la croix pour supprimer
-    d.querySelector('.delete-btn').onclick = e => {
-      e.stopPropagation(); // ESSENTIEL pour que le clic ne remonte pas
-      deleteImg(c.id,c.main);
+    // clic sur la croix = suppression
+    d.querySelector('.delete-btn').onclick = async (e) => {
+      e.stopPropagation(); // essentiel pour ne pas déclencher le zoom
+      if(!confirm('Supprimer cette image ?')) return;
+      const path = c.main.split('/images/')[1];
+      await supabase.storage.from('images').remove([path]);
+      await supabase.from('creations').delete().eq('id', c.id);
+      creations = creations.filter(item => item.id !== c.id);
+      render();
     };
 
     list.appendChild(d);
@@ -308,23 +313,19 @@ async function confirmAdd(){
   const name=document.getElementById('name').value.trim();
   const files=document.getElementById('multiPhoto').files;
   if(!name||!files.length) return alert('Nom + photo');
+
   for(let i=0;i<files.length;i++){
     const path=`${Date.now()}_${files[i].name}`;
     await supabase.storage.from('images').upload(path,files[i]);
-    const { data }=await supabase.from('creations').insert([{name,image_path:path}]).select();
+    const { data } = await supabase.from('creations').insert([{name,image_path:path}]).select();
     const url=`https://jyhbamdcxmpveujjqjla.supabase.co/storage/v1/object/public/images/${path}`;
-    if(i===0) creations.unshift({id:data[0].id,name,main:url,group:[url],likes:0,comments:0});
-    else creations[0].group.push(url);
+    if(i===0)
+      creations.unshift({id:data[0].id,name,main:url,group:[url],likes:0,comments:0});
+    else
+      creations[0].group.push(url);
   }
-  closeAdd(); render();
-}
 
-async function deleteImg(id,url){
-  if(!confirm('Supprimer ?')) return;
-  const path=url.split('/images/')[1];
-  await supabase.storage.from('images').remove([path]);
-  await supabase.from('creations').delete().eq('id',id);
-  creations=creations.filter(c=>c.id!==id);
+  closeAdd();
   render();
 }
 
@@ -335,7 +336,7 @@ document.getElementById('toggleSidebar').onclick=()=>sidebar.classList.toggle('s
 addModal.onclick=e=>{if(e.target===addModal) closeAdd();}
 zoomModal.onclick=e=>{if(e.target===zoomModal) closeZoom();}
 
-// exposer les fonctions au HTML pour module
+// exposer les fonctions pour HTML
 window.confirmAdd = confirmAdd;
 window.closeAdd = closeAdd;
 window.closeZoom = closeZoom;
