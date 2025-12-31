@@ -5,24 +5,21 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
-html,body{height:100%;font-family:'Comic Sans MS',cursive;}
+html, body{height:100%; font-family:'Comic Sans MS',cursive;}
 
+/* FOND D'ÉCRAN ADAPTÉ */
 body{
   display:flex;
   flex-direction:column;
   overflow:hidden;
 
-  background-color: #ffe6f0;
   background-image: url('Photoroom_20251223_114401.jpeg');
   background-repeat: no-repeat;
-
-  /* adapter largeur à l'écran, hauteur auto */
-  background-size: 100% auto;
-
-  /* aligner le haut de l'image en haut de l'écran */
-  background-position: top center;
-
-  background-attachment: scroll;
+  background-size: contain;          /* L'image entière visible */
+  background-position: center center; /* Centrée horizontalement et verticalement */
+  background-color: #ffe6f0;         /* Couleur de fond si bandes */
+  min-height: 100vh;
+  width: 100vw;
 }
 
 /* SCROLL HORIZONTAL */
