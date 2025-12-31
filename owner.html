@@ -11,7 +11,7 @@ body{
   display:flex;
   flex-direction:column;
   overflow:hidden;
-  background: url('Photoroom_20251223_114401.jpeg') center top / cover no-repeat fixed;
+  background: #ffe6f0 url('Photoroom_20251223_114401.jpeg') center top / contain no-repeat fixed;
 }
 
 /* SCROLL HORIZONTAL */
@@ -23,42 +23,44 @@ body{
   padding:20px 0;
 }
 
-#visitor-list-container {
-  display: flex;
-  overflow-x: auto;
-  justify-content: center; /* centre la page visible */
-  padding-left: 1cm;       /* décale horizontalement de 1 cm */
+#visitor-list-container{
+  display:flex;
+  overflow-x:auto;
+  scroll-snap-type:x mandatory;
+  -webkit-overflow-scrolling: touch;
+  justify-content:center;
+  padding-left:1cm; /* décalage horizontal */
 }
 
-.page {
-  display: grid;
+/* Chaque page = 2x3 cartes */
+.page{
+  display:grid;
   grid-template-columns: repeat(2, 1fr);
   grid-template-rows: repeat(3, 1fr);
-  column-gap: 3mm;
-  row-gap: 4mm;
-  flex: 0 0 auto;
+  column-gap:3mm;
+  row-gap:4mm;
+  flex:0 0 auto;
   width: calc(2 * 200px + 3mm);
   height: calc(3 * 200px + 8mm);
-  scroll-snap-align: center;
-  padding: 4mm;
-
-  /* Décalage horizontal/vertical */
-  margin-left: -0.5cm; /* 0,5 cm vers la gauche */
-  margin-top: calc(-1cm + 200px); /* remonter 1 cm puis descendre d’une image */
+  scroll-snap-align:center;
+  padding:4mm;
+  margin-left:-0.5cm; /* décalage horizontal supplémentaire */
+  margin-top: calc(-1cm + 200px); /* décale verticalement pour centrer */
+  justify-content:center;
 }
+
 /* VISITOR ITEM */
 .visitor-item{
   position:relative;
-  width:200px; /* double taille */
-  height:200px; /* double taille */
+  width:200px;
+  height:200px;
   border-radius:12px;
   overflow:hidden;
-  border:2px solid #fff; /* bordure blanche */
-  box-shadow:0 0 0 2px #f6c2d1; /* liseré rose clair */
+  border:2px solid #fff;
+  box-shadow:0 0 0 2px #f6c2d1;
   background:#ffe6f0;
 }
 
-/* PLACEHOLDER */
 .visitor-item .placeholder{
   position:absolute;
   inset:0;
@@ -70,7 +72,6 @@ body{
   font-weight:bold;
 }
 
-/* IMAGE */
 .visitor-item img{
   width:100%;
   height:100%;
@@ -80,7 +81,6 @@ body{
   display:block;
 }
 
-/* NOM */
 .visitor-item p{
   position:absolute;
   bottom:2px;
@@ -92,7 +92,6 @@ body{
   text-shadow:1px 1px 2px rgba(255,255,255,0.8);
 }
 
-/* CROIX */
 .delete-btn{
   position:absolute;
   top:2px;
