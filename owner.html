@@ -326,37 +326,6 @@ document.getElementById('confirmAdd').onclick = async () => {
   renderCreations();
 };
 
-// ------------------- ZOOM -------------------
-function openZoom(c){
-  currentZoomData=c;
-  mainZoom.src=c.imgUrl;
-  thumbs.innerHTML='';
-  if(c.zoomGroup.length>1){
-    c.zoomGroup.forEach(url=>{
-      const t=document.createElement('img');
-      t.src=url;
-      t.onclick=()=>{ mainZoom.src=url; };
-      thumbs.appendChild(t);
-    });
-  }
-  updateLikeComment();
-  zoomModal.style.display='flex';
-}
-
-document.querySelector('#zoomModal .closeZoom').onclick = ()=> zoomModal.style.display='none';
-zoomModal.onclick=(e)=>{ if(e.target===zoomModal) zoomModal.style.display='none'; };
-
-// ------------------- DELETE -------------------
-async function deleteImage(id){
-  const toDelete = creations.find(c=>c.id===id);
-  if(!toDelete) return;
-  const imagePath = toDelete.imgUrl.split('/images/')[1];
-  await supabase.storage.from('images').remove([imagePath]);
-  await supabase.from('creations').delete().eq('id',id);
-  creations = creations.filter(c=>c.id!==id);
-  renderCreations();
-}
-
 // ------------------- LIKE & COMMENT -------------------
 function updateLikeComment(){
   if(!currentZoomData) return;
