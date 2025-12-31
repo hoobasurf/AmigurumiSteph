@@ -16,27 +16,30 @@ body::before {
   width:100vw;
   height:100vh;
   background-image: url('Photoroom_20251223_114401.jpeg');
-  background-size: cover;
+  background-size: cover; 
   background-position: center center;
   background-repeat: no-repeat;
   z-index:-1;
 }
 
-/* SCROLL HORIZONTAL */
+/* CENTRAGE GRILLE */
 .center-zone {
   flex:1;
   display:flex;
   justify-content:center;
   align-items:center;
+  height:100vh;
   padding:20px 0;
 }
 
 #visitor-list-container{
   display:flex;
   overflow-x:auto;
+  overflow-y:hidden;
   scroll-snap-type:x mandatory;
   -webkit-overflow-scrolling: touch;
   justify-content:center;
+  align-items:center;
   padding-left:1cm;
 }
 
@@ -53,6 +56,7 @@ body::before {
   scroll-snap-align:center;
   padding:4mm;
   justify-content:center;
+  align-items:center;
 }
 
 /* VISITOR ITEM */
@@ -62,10 +66,9 @@ body::before {
   height:200px;
   border-radius:12px;
   overflow:hidden;
-
+  border:3px solid #fff; /* bordure blanche */
+  box-shadow:0 0 0 3px #f6c2d1; /* liseré rose */
   background:transparent;
-  box-shadow: 0 6px 14px rgba(0,0,0,0.25),
-              inset 0 0 0 1px rgba(255,255,255,0.4);
 }
 
 /* Overlay léger pour fond */
@@ -75,18 +78,6 @@ body::before {
   inset:0;
   background:rgba(255,230,240,0.12);
   pointer-events:none;
-}
-
-/* Placeholder */
-.visitor-item .placeholder{
-  position:absolute;
-  inset:0;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  font-size:24px;
-  color:#b84c6f;
-  font-weight:bold;
 }
 
 /* Images */
@@ -116,7 +107,7 @@ body::before {
   text-shadow:1px 1px 2px rgba(255,255,255,0.8);
 }
 
-/* CROIX */
+/* CROIX SUPPRESSION */
 .delete-btn{
   position:absolute;
   top:4px;
@@ -230,7 +221,7 @@ body::before {
   border:4px solid #b67385;
   border-radius:24px;
   margin-bottom:10px;
-  filter:none; /* IMAGE ORIGINALE */
+  filter:none; /* image originale au zoom */
 }
 #zoomModal .thumbs{
   display:flex;
