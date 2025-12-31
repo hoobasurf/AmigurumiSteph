@@ -1,339 +1,153 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Galerie Projets – Amigurumi</title>
+  <link rel="stylesheet" href="style.css" />
+  
+  <style>
+    body {
+      margin: 0;
+      padding: 0;
+      background: #f5f5f5;
+      font-family: Arial, sans-serif;
+      overflow-x: hidden;
+    }
 
-<style>
-*{box-sizing:border-box;margin:0;padding:0}
-html,body{height:100%;font-family:'Comic Sans MS',cursive}
+    /* Bouton Owner */
+    #ownerBtn {
+      position: fixed;
+      top: 12px;
+      right: 12px;
+      padding: 12px 18px;
+      background: #ff7f50;
+      color: white;
+      font-size: 18px;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      z-index: 1000;
+      box-shadow: 0px 4px 15px rgba(0,0,0,0.2);
+    }
 
-/* BODY */
-body{
-  background:url('Photoroom_20251223_114401.jpeg') center top / cover no-repeat fixed;
-  overflow:hidden;
-  display:flex;
-  flex-direction:column;
-}
+    #ownerBtn:hover {
+      background: #ff5f26;
+    }
 
-/* CONTENU */
-.center-zone{
-  flex:1;
-  display:flex;
-  justify-content:center;
-  width:100%;
-  overflow:hidden;
-}
+    /* Galerie horizontale */
+    .gallery-scroll {
+      display: flex;
+      gap: 20px;
+      overflow-x: auto;
+      padding: 20px;
+      scroll-snap-type: x mandatory;
+      -webkit-overflow-scrolling: touch;
+    }
 
-#visitor-list{
-  display:flex;
-  gap:18px;
-  padding:20px;
-  overflow-x:auto;
-}
+    .gallery-scroll img {
+      height: 240px;
+      border-radius: 12px;
+      scroll-snap-align: start;
+      cursor: pointer;
+      box-shadow: 0px 4px 15px rgba(0,0,0,0.25);
+      transition: transform .2s;
+    }
 
-.visitor-item{
-  width:160px;
-  text-align:center;
-  position:relative;
-}
-.visitor-item img{
-  width:160px;
-  height:160px;
-  object-fit:contain;
-  border:4px solid #b67385;
-  border-radius:22px;
-  background:#ffe6f0;
-  cursor:pointer;
-}
-.visitor-item p{
-  margin-top:8px;
-  font-size:18px;
-  color:#b84c6f;
-  font-weight:bold;
-}
+    .gallery-scroll img:hover {
+      transform: scale(1.05);
+    }
 
-/* CROIX */
-.delete-btn{
-  position:absolute;
-  top:6px;
-  right:6px;
-  width:26px;
-  height:26px;
-  background:#ff69b4;
-  color:#fff;
-  border-radius:50%;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-weight:bold;
-  cursor:pointer;
-}
+    /* Modal zoom */
+    #imageModal {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.8);
+      justify-content: center;
+      align-items: center;
+      z-index: 2000;
+    }
 
-/* SIDEBAR */
-#sidebar{
-  position:fixed;
-  top:0;
-  left:-220px;
-  width:220px;
-  height:100vh;
-  background:rgba(255,230,240,0.25);
-  border-right:2px solid #b67385;
-  padding:20px;
-  transition:left .3s;
-}
-#sidebar.sidebar-open{left:0}
-#toggleSidebar{
-  position:absolute;
-  top:50%;
-  right:-30px;
-  width:30px;
-  height:60px;
-  background:#ffb6c1;
-  border-radius:0 12px 12px 0;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  cursor:pointer;
-}
-#sidebar input,
-#sidebar button{
-  width:100%;
-  margin-top:10px;
-  padding:10px;
-  border-radius:14px;
-  border:none;
-  background:#ffb6c1;
-  font-weight:bold;
-}
+    #imageModal img {
+      width: 90%;
+      max-width: 600px;
+      border-radius: 12px;
+    }
 
-/* MODALS */
-.modal-bg{
+    #intro-video{
   position:fixed;
   inset:0;
-  background:rgba(0,0,0,.6);
-  display:none;
+  background:#000;
+  z-index:100000;
+  display:flex;
   justify-content:center;
   align-items:center;
-  z-index:9999;
-}
-.modal-box{
-  background:#ffe6f0;
-  padding:20px;
-  border-radius:22px;
-  border:4px solid #b67385;
-  position:relative;
-}
-.close-modal{
-  position:absolute;
-  top:8px;
-  right:8px;
-  width:30px;
-  height:30px;
-  border-radius:50%;
-  background:#ff69b4;
-  border:none;
-  font-size:18px;
-  cursor:pointer;
 }
 
-#status{text-align:center;margin:10px;color:#b84c6f}
-</style>
+#intro-video video{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+}
+
+#skipIntro{
+  position:absolute;
+  bottom:30px;
+  right:30px;
+  padding:10px 16px;
+  border-radius:12px;
+  border:none;
+  background:rgba(255,182,193,0.9);
+  color:#8b3a3a;
+  font-weight:bold;
+  cursor:pointer;
+}
+    
+  </style>
 </head>
 
 <body>
 
-<div class="center-zone">
-  <div id="visitor-list"></div>
+  <!-- INTRO VIDEO -->
+<div id="intro-video">
+  <video autoplay muted playsinline>
+    <source src="chat.mp4" type="video/mp4">
+    Ton navigateur ne supporte pas la vidéo.
+  </video>
+
+  <button id="skipIntro">Passer</button>
 </div>
 
-<div id="sidebar">
-  <div id="toggleSidebar">☰</div>
-  <input id="name" placeholder="Prénom">
-  <button id="addBtn">Ajouter</button>
-</div>
+  <!-- Bouton Owner -->
+  <button id="ownerBtn" onclick="location.href='owner.html'">👑 Owner</button>
 
-<!-- MODAL AJOUT -->
-<div class="modal-bg" id="addModal" onclick="if(event.target===this) closeAdd()">
-  <div class="modal-box">
-    <button class="close-modal" onclick="closeAdd()">×</button>
-    <h3>Ajouter des photos</h3><br>
-    <input type="file" id="multiPhoto" multiple accept="image/*"><br><br>
-    <button id="validateAdd">Valider</button>
+  <h1 style="padding-left: 20px;">✨ Projets réalisés</h1>
+
+  <!-- Galerie horizontale -->
+  <div id="gallery" class="gallery-scroll"></div>
+
+  <!-- Zoom modal -->
+  <div id="imageModal" onclick="this.style.display='none'">
+    <img id="modalImg" src="">
   </div>
-</div>
 
-<!-- MODAL DELETE -->
-<div class="modal-bg" id="deleteModal" onclick="if(event.target===this) closeDelete()">
-  <div class="modal-box">
-    <h3>Supprimer cette photo ?</h3>
-    <p style="margin:10px 0;color:#b84c6f">
-      Cette action est définitive 💗
-    </p>
-    <button id="confirmDeleteBtn">Supprimer</button>
-  </div>
-</div>
+  <script type="module" src="visitor.js"></script>
+<script>
+const intro = document.getElementById("intro-video");
+const video = intro.querySelector("video");
+const skip = document.getElementById("skipIntro");
 
-<p id="status">📤 Prêt</p>
+// fin automatique
+video.onended = () => intro.remove();
 
-<script type="module">
-import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
+// bouton passer
+skip.onclick = () => intro.remove();
 
-const supabase = createClient(
-  "https://jyhbamdcxmpveujjqjla.supabase.co",
-  "sb_publishable_sqsxb-3Kl5o3-JQYv9kGFw_-g0EgwMa"
-);
-
-let creations=[];
-let deleteTarget=null;
-
-const list=document.getElementById('visitor-list');
-const addModal=document.getElementById('addModal');
-const deleteModal=document.getElementById('deleteModal');
-const status=document.getElementById('status');
-
-/* LOAD */
-async function load(){
-  const { data } = await supabase
-    .from('creations')
-    .select('*')
-    .order('created_at',{ascending:false});
-
-  creations = data.map(c=>{
-    const safe=encodeURIComponent(c.image_path);
-    return {
-      id:c.id,
-      name:c.name,
-      path:c.image_path,
-      url:`https://jyhbamdcxmpveujjqjla.supabase.co/storage/v1/object/public/images/${safe}`
-    };
-  });
-  render();
-}
-
-/* RENDER */
-function render(){
-  list.innerHTML='';
-  creations.forEach(c=>{
-    const d=document.createElement('div');
-    d.className='visitor-item';
-    d.innerHTML=`
-      <div class="delete-btn">×</div>
-      <p>${c.name}</p>
-      <img src="${c.url}">
-    `;
-    d.querySelector('.delete-btn').onclick=()=>{
-      deleteTarget=c;
-      deleteModal.style.display='flex';
-    };
-    list.appendChild(d);
-  });
-}
-
-/* ADD */
-function openAdd(){addModal.style.display='flex'}
-function closeAdd(){addModal.style.display='none'}
-
-/* NOUVELLE FONCTION confirmAdd() */
-async function confirmAdd(){
-  const name = document.getElementById('name').value.trim();
-  const files = document.getElementById('multiPhoto').files;
-  const btn = addModal.querySelector('#validateAdd');
-
-  if(!name || !files.length){
-    alert('Nom + photo obligatoire');
-    return;
-  }
-
-  btn.disabled = true;
-  btn.textContent = 'Ajout en cours…';
-
-  try{
-    let firstId = null;
-    let firstIndex = null;
-
-    for(let i = 0; i < files.length; i++){
-      const safeName = files[i].name.replace(/[^a-zA-Z0-9._-]/g,'_');
-      const path = `${Date.now()}_${safeName}`;
-
-      const { error: uploadError } = await supabase
-        .storage
-        .from('images')
-        .upload(path, files[i]);
-
-      if(uploadError) throw uploadError;
-
-      const { data, error: insertError } = await supabase
-        .from('creations')
-        .insert([{ name, image_path: path }])
-        .select();
-
-      if(insertError) throw insertError;
-
-      const url = `https://jyhbamdcxmpveujjqjla.supabase.co/storage/v1/object/public/images/${path}`;
-
-      if(i === 0){
-        firstId = data[0].id;
-        creations.unshift({
-          id: firstId,
-          name,
-          main: url,
-          group: [url],
-          likes: 0,
-          comments: 0
-        });
-        firstIndex = 0;
-      }else{
-        creations[firstIndex].group.push(url);
-      }
-    }
-
-    render();
-    closeAdd();
-
-    document.getElementById('multiPhoto').value = '';
-    document.getElementById('name').value = '';
-    status.textContent='✅ Ajouté';
-
-  }catch(e){
-    console.error(e);
-    alert('Erreur lors de l’ajout de la photo');
-    status.textContent='❌ Erreur';
-  }finally{
-    btn.disabled = false;
-    btn.textContent = 'Valider';
-  }
-}
-
-/* Lien du bouton Valider au nouveau confirmAdd() */
-document.getElementById('validateAdd').onclick = confirmAdd;
-
-/* DELETE */
-function closeDelete(){
-  deleteModal.style.display='none';
-  deleteTarget=null;
-}
-
-document.getElementById('confirmDeleteBtn').onclick = async ()=>{
-  if(!deleteTarget) return;
-
-  try{
-    await supabase.storage.from('images').remove([deleteTarget.path]);
-    await supabase.from('creations').delete().eq('id',deleteTarget.id);
-    closeDelete();
-    load();
-  }catch(e){
-    console.error(e);
-  }
-};
-
-/* SIDEBAR */
-document.getElementById('addBtn').onclick=openAdd;
-document.getElementById('toggleSidebar').onclick=()=>{
-  sidebar.classList.toggle('sidebar-open');
-};
-
-load();
+// sécurité si autoplay bloqué
+setTimeout(()=>{
+  if(intro) intro.remove();
+}, 8000);
 </script>
 </body>
 </html>
