@@ -3,12 +3,15 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <style>
+/* RESET */
 *{box-sizing:border-box;margin:0;padding:0;}
 html,body{
+  width:100%;
   height:100%;
   font-family:'Comic Sans MS',cursive;
-  overflow:hidden;
+  overflow:hidden; /* 🔒 AUCUN SCROLL VERTICAL */
 }
 
 /* FOND FIXE IMMOBILE */
@@ -20,10 +23,9 @@ body::before{
   z-index:-1;
 }
 
-/* ZONE SCROLL HORIZONTAL */
+/* ZONE CENTRALE — SCROLL HORIZONTAL SEUL */
 .center-zone{
-  width:100vw;
-  height:100%;
+  height:100vh;
   display:flex;
   align-items:center;
   overflow-x:auto;
@@ -38,7 +40,7 @@ body::before{
   padding-left:1cm;
 }
 
-/* PAGE = 2x3 */
+/* PAGE = 2 x 3 (TAILLE ORIGINALE) */
 .page{
   display:grid;
   grid-template-columns:repeat(2,200px);
@@ -50,56 +52,52 @@ body::before{
   scroll-snap-align:center;
 }
 
-/* CARD IMAGE */
+/* CARD */
 .visitor-item{
   position:relative;
   width:200px;
   height:200px;
-  border-radius:14px;
+  border-radius:12px;
   overflow:hidden;
-  background:#ffe6f0;
   border:4px solid #f6c2d1;
-  box-shadow:0 6px 14px rgba(0,0,0,0.3);
+  box-shadow:0 4px 12px rgba(0,0,0,.3);
+  background:#ffe6f0;
 }
 
-/* IMAGE */
 .visitor-item img{
   width:100%;
   height:100%;
   object-fit:cover;
-  pointer-events:none;
+  filter:brightness(1.1) saturate(.9);
+  transition:.25s;
+}
+.visitor-item img:hover{
+  filter:brightness(1.2) saturate(1);
 }
 
-/* TITRE */
 .visitor-item p{
   position:absolute;
-  bottom:4px;
+  bottom:2px;
   width:100%;
   text-align:center;
   font-size:14px;
-  color:#b84c6f;
   font-weight:bold;
-  text-shadow:1px 1px 2px rgba(255,255,255,.8);
+  color:#b84c6f;
+  text-shadow:1px 1px 2px #fff;
 }
 
-/* CROIX SUPPRESSION (CLIQUABLE) */
+/* CROIX */
 .delete-btn{
   position:absolute;
   top:6px;
   right:6px;
-  width:22px;
-  height:22px;
-  border-radius:50%;
-  background:rgba(255,255,255,0.9);
-  color:#d94b8a;
-  font-size:16px;
+  font-size:20px;
   font-weight:bold;
-  display:flex;
-  align-items:center;
-  justify-content:center;
+  color:#ff69b4;
   cursor:pointer;
-  z-index:10;
+  z-index:5;
 }
+.delete-btn:hover{color:#e94f9a;}
 
 /* SIDEBAR */
 #sidebar{
@@ -108,13 +106,14 @@ body::before{
   left:-220px;
   width:220px;
   height:100%;
-  background:rgba(255,230,240,0.25);
+  background:rgba(255,230,240,.25);
   border-right:2px solid #b67385;
   padding:20px;
   transition:.3s;
-  z-index:20;
+  z-index:10;
 }
-#sidebar.sidebar-open{left:0;}
+#sidebar.sidebar-open{left:0}
+
 #toggleSidebar{
   position:absolute;
   top:50%;
@@ -128,6 +127,7 @@ body::before{
   justify-content:center;
   cursor:pointer;
 }
+
 #sidebar button{
   padding:8px 16px;
   border:none;
@@ -135,83 +135,65 @@ body::before{
   background:#ff69b4;
   color:#fff;
   font-weight:bold;
+  cursor:pointer;
 }
 
 /* MODAL AJOUT */
-#addModal,
-#deleteModal,
-#zoomModal{
+#addModal,#deleteModal,#zoomModal{
   position:fixed;
   inset:0;
   display:none;
   justify-content:center;
   align-items:center;
-  z-index:1000;
+  z-index:10000;
 }
 
-#addModal,
-#deleteModal{background:rgba(0,0,0,0.6);}
-
-.modal-box{
+#addModal{
+  background:rgba(0,0,0,.6);
+}
+#addModal .modal-box{
   background:#ffe6f0;
-  padding:18px;
+  padding:16px;
   border-radius:24px;
   border:4px solid #b67385;
   display:flex;
   flex-direction:column;
-  gap:12px;
-  align-items:center;
-  box-shadow:0 6px 25px rgba(0,0,0,.4);
+  gap:10px;
+  width:240px;
 }
 
-.modal-box input{
-  width:100%;
-  padding:8px;
-  border-radius:12px;
-  border:2px solid #b67385;
+/* MODAL DELETE */
+#deleteModal{
+  background:rgba(0,0,0,.5);
 }
-
-.modal-box button{
-  padding:6px 16px;
-  border:none;
-  border-radius:14px;
-  background:#ff69b4;
-  color:#fff;
-  font-weight:bold;
+#deleteModal .modal-box{
+  background:#ffe6f0;
+  padding:20px;
+  border-radius:24px;
+  border:4px solid #b67385;
+  text-align:center;
 }
 
 /* ZOOM */
 #zoomModal{
-  background:rgba(0,0,0,0.7);
+  background:rgba(0,0,0,.7);
   flex-direction:column;
 }
 #zoomModal img{
   max-width:80%;
   max-height:60vh;
-  border-radius:24px;
   border:4px solid #b67385;
-}
-.thumbs{
-  display:flex;
-  gap:8px;
-  margin-top:10px;
-  overflow-x:auto;
-}
-.thumbs img{
-  width:50px;
-  height:50px;
-  border-radius:10px;
-  border:2px solid #b67385;
-  cursor:pointer;
+  border-radius:24px;
 }
 .closeZoom{
   position:absolute;
-  top:12px;
-  right:12px;
-  width:30px;
-  height:30px;
+  top:15px;
+  right:15px;
+  font-size:22px;
   background:#ff69b4;
   color:#fff;
+  width:32px;
+  height:32px;
   border-radius:50%;
   display:flex;
   align-items:center;
@@ -234,7 +216,7 @@ body::before{
 
 <div id="addModal">
   <div class="modal-box">
-    <input id="photoName" placeholder="Nom du projet">
+    <input id="photoName" placeholder="Nom">
     <input type="file" id="multiPhoto" multiple>
     <button id="confirmAdd">Valider</button>
   </div>
@@ -251,87 +233,71 @@ body::before{
 <div id="zoomModal">
   <div class="closeZoom">×</div>
   <img id="mainZoom">
-  <div class="thumbs" id="thumbs"></div>
 </div>
 
 <script type="module">
 import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
 
 const supabase=createClient(
- "https://jyhbamdcxmpveujjqjla.supabase.co",
- "sb_publishable_sqsxb-3Kl5o3-JQYv9kGFw_-g0EgwMa"
+  "https://jyhbamdcxmpveujjqjla.supabase.co",
+  "sb_publishable_sqsxb-3Kl5o3-JQYv9kGFw_-g0EgwMa"
 );
 
-let creations=[],toDelete=null;
 const container=document.getElementById('visitor-list-container');
+let creations=[],toDelete=null;
 
 async function load(){
- const {data}=await supabase.from("creations").select("*").order("created_at",{ascending:false});
- const g={};
- data.forEach(c=>{
-  const u=`https://jyhbamdcxmpveujjqjla.supabase.co/storage/v1/object/public/images/${c.image_path}`;
-  if(!g[c.name]) g[c.name]={name:c.name,imgs:[]};
-  g[c.name].imgs.push(u);
- });
- creations=Object.values(g);
- render();
+  const {data}=await supabase.from("creations").select("*");
+  const g={};
+  data.forEach(c=>{
+    const u=`https://jyhbamdcxmpveujjqjla.supabase.co/storage/v1/object/public/images/${c.image_path}`;
+    if(!g[c.name]) g[c.name]={name:c.name,imgs:[]};
+    g[c.name].imgs.push(u);
+  });
+  creations=Object.values(g);
+  render();
 }
 
 function render(){
- container.innerHTML='';
- let page;
- creations.forEach((c,i)=>{
-  if(i%6===0){
-    page=document.createElement('div');
-    page.className='page';
-    container.appendChild(page);
+  container.innerHTML='';
+  let page;
+  creations.forEach((c,i)=>{
+    if(i%6===0){
+      page=document.createElement('div');
+      page.className='page';
+      container.appendChild(page);
+    }
+    const d=document.createElement('div');
+    d.className='visitor-item';
+    d.innerHTML=`<div class="delete-btn">×</div><p>${c.name}</p><img src="${c.imgs[0]}">`;
+    d.querySelector('img').onclick=()=>openZoom(c.imgs[0]);
+    d.querySelector('.delete-btn').onclick=()=>{toDelete=c;deleteModal.style.display='flex';};
+    page.appendChild(d);
+  });
+}
+
+function openZoom(src){
+  mainZoom.src=src;
+  zoomModal.style.display='flex';
+}
+
+confirmDelete.onclick=async()=>{
+  for(let u of toDelete.imgs){
+    await supabase.storage.from('images').remove([u.split('/images/')[1]]);
   }
-  const d=document.createElement('div');
-  d.className='visitor-item';
-  d.innerHTML=`
-    <div class="delete-btn">×</div>
-    <p>${c.name}</p>
-    <img src="${c.imgs[0]}">
-  `;
-  d.querySelector('.delete-btn').onclick=()=>openDelete(c);
-  d.querySelector('img').onclick=()=>openZoom(c);
-  page.appendChild(d);
- });
-}
-
-function openZoom(c){
- document.getElementById('mainZoom').src=c.imgs[0];
- const t=document.getElementById('thumbs');
- t.innerHTML='';
- c.imgs.forEach(u=>{
-  const i=document.createElement('img');
-  i.src=u;
-  i.onclick=()=>document.getElementById('mainZoom').src=u;
-  t.appendChild(i);
- });
- document.getElementById('zoomModal').style.display='flex';
-}
-
-function openDelete(c){
- toDelete=c;
- document.getElementById('deleteModal').style.display='flex';
-}
-
-document.getElementById('confirmDelete').onclick=async()=>{
- for(let u of toDelete.imgs){
-  await supabase.storage.from('images').remove([u.split('/images/')[1]]);
- }
- await supabase.from('creations').delete().eq('name',toDelete.name);
- load();
- document.getElementById('deleteModal').style.display='none';
+  await supabase.from('creations').delete().eq('name',toDelete.name);
+  deleteModal.style.display='none';
+  load();
 };
 
-document.getElementById('cancelDelete').onclick=()=>deleteModal.style.display='none';
-document.getElementById('toggleSidebar').onclick=()=>sidebar.classList.toggle('sidebar-open');
-document.getElementById('addBtn').onclick=()=>addModal.style.display='flex';
-document.querySelector('.closeZoom').onclick=()=>zoomModal.style.display='none';
+toggleSidebar.onclick=()=>sidebar.classList.toggle('sidebar-open');
+closeZoom.onclick=()=>zoomModal.style.display='none';
+cancelDelete.onclick=()=>deleteModal.style.display='none';
+addBtn.onclick=()=>addModal.style.display='flex';
+addModal.onclick=e=>{if(e.target===addModal)addModal.style.display='none'};
 
 load();
 </script>
+
 </body>
 </html>
