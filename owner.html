@@ -14,42 +14,40 @@ body{
   background: url('Photoroom_20251223_114401.jpeg') center top / cover no-repeat fixed;
 }
 
-/* SCROLL HORIZONTAL + PAGES */
+/* SCROLL HORIZONTAL */
 .center-zone{
   flex:1;
   display:flex;
   justify-content:center;
   align-items:center;
-  position:relative;
   padding:20px 0;
 }
 
 #visitor-list-container{
   display:flex;
   overflow-x:auto;
-  scroll-snap-type: x mandatory;
-  padding-bottom:10px;
+  scroll-snap-type:x mandatory;
+  -webkit-overflow-scrolling:touch;
 }
 
 /* Chaque page = 2x3 cartes */
 .page{
   display:grid;
-  grid-template-columns: repeat(2, minmax(100px,1fr));
-  grid-template-rows: repeat(3, minmax(100px,1fr));
-  column-gap:3px; /* horizontal */
-  row-gap:4px; /* vertical */
-  flex:0 0 auto; /* largeur fixe */
+  grid-template-columns: repeat(2, 1fr);
+  grid-template-rows: repeat(3, 1fr);
+  column-gap:3mm; /* horizontal 3mm */
+  row-gap:4mm; /* vertical 4mm */
+  flex:0 0 100%; /* une page par écran */
   scroll-snap-align:start;
-  margin-right:10px; /* espace entre pages */
-  padding:5px;
+  padding:4mm;
+  box-sizing:border-box;
 }
 
 /* VISITOR ITEM */
 .visitor-item{
   position:relative;
   width:100%;
-  height:0;
-  padding-bottom:100%; /* carré responsive */
+  padding-bottom:100%; /* carré */
   border-radius:12px;
   overflow:hidden;
   border:2px solid #fff; /* bordure blanche */
@@ -86,11 +84,11 @@ body{
   position:absolute;
   bottom:2px;
   width:100%;
-  font-size:12px;
+  font-size:14px;
   color:#b84c6f;
   font-weight:bold;
   text-align:center;
-  text-shadow: 1px 1px 2px rgba(255,255,255,0.8);
+  text-shadow:1px 1px 2px rgba(255,255,255,0.8);
 }
 
 /* CROIX */
@@ -250,14 +248,14 @@ body{
 
 /* Responsive */
 @media(max-width:480px){
-  .page{grid-template-columns: repeat(2, 80px); grid-template-rows: repeat(3, 80px);}
+  .page{grid-template-columns: repeat(2, 90px); grid-template-rows: repeat(3, 90px);}
   .visitor-item{padding-bottom:100%;}
   #addModal .modal-box{min-width:180px;}
 }
 </style>
 </head>
-
 <body>
+
 <div class="center-zone">
   <div id="visitor-list-container"></div>
 </div>
@@ -297,7 +295,6 @@ const supabase=createClient(
 );
 
 let creations=[],currentZoom=null;
-
 const container=document.getElementById('visitor-list-container');
 const addModal=document.getElementById('addModal');
 const zoomModal=document.getElementById('zoomModal');
@@ -322,7 +319,7 @@ function render(){
   container.innerHTML='';
   let page=null;
   creations.forEach((c,i)=>{
-    if(i%6===0){ // nouvelle page chaque 6 cartes
+    if(i%6===0){
       page=document.createElement('div');
       page.className='page';
       container.appendChild(page);
@@ -395,8 +392,7 @@ async function deleteProject(name){
   render();
 }
 
-const toggleSidebar=document.getElementById('toggleSidebar');
-toggleSidebar.onclick=()=>sidebar.classList.toggle('sidebar-open');
+document.getElementById('toggleSidebar').onclick=()=>sidebar.classList.toggle('sidebar-open');
 
 loadCreations();
 </script>
