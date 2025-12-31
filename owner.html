@@ -7,19 +7,18 @@
 *{box-sizing:border-box;margin:0;padding:0;}
 html,body{height:100%;font-family:'Comic Sans MS',cursive;}
 
-/* FOND ECRAN : léger zoom pour cacher bord */
+/* BODY AVEC FOND FIXE */
 body::before {
   content:"";
   position:fixed;
   top:0;
   left:0;
-  width:calc(100% + 5mm);
-  height:calc(100% + 5mm);
+  width:100vw;
+  height:100vh;
   background-image: url('Photoroom_20251223_114401.jpeg');
-  background-size:cover;
-  background-position:center center;
-  background-repeat:no-repeat;
-  filter: brightness(0.95) contrast(1.1);
+  background-size: cover; /* Remplit sans couper */
+  background-position: center center;
+  background-repeat: no-repeat;
   z-index:-1;
 }
 
@@ -30,7 +29,6 @@ body::before {
   justify-content:center;
   align-items:center;
   padding:20px 0;
-  margin-top:-1cm; 
 }
 
 #visitor-list-container{
@@ -39,7 +37,7 @@ body::before {
   scroll-snap-type:x mandatory;
   -webkit-overflow-scrolling: touch;
   justify-content:center;
-  padding-left:1cm;
+  padding-left:1cm; 
 }
 
 /* Chaque page = 2x3 cartes */
@@ -54,8 +52,6 @@ body::before {
   height: calc(3 * 200px + 8mm);
   scroll-snap-align:center;
   padding:4mm;
-  margin-left:-0.5cm;
-  margin-top: calc(-1cm + 200px);
   justify-content:center;
 }
 
@@ -66,26 +62,41 @@ body::before {
   height:200px;
   border-radius:12px;
   overflow:hidden;
-  border:4px solid #f6c2d1;
-  box-shadow:0 4px 12px rgba(0,0,0,0.3);
+  border:3px solid #fff; /* bordure plus épaisse */
+  box-shadow:0 0 0 3px #f6c2d1; /* liseré rose plus épais */
   background:#ffe6f0;
 }
 
-.visitor-item img{
+/* Placeholder */
+.visitor-item .placeholder{
+  position:absolute;
+  inset:0;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  font-size:24px;
+  color:#b84c6f;
+  font-weight:bold;
+}
+
+/* Images avec couleurs pastel légèrement vives */
+.visitor-item img {
   width:100%;
   height:100%;
   object-fit:cover;
   border-radius:12px;
   cursor:pointer;
   display:block;
-  filter: brightness(1) saturate(0.95);
-  transition: filter 0.3s, opacity 0.3s;
+  filter: brightness(1.1) saturate(0.85) opacity(0.85);
+  transition: filter 0.3s, transform 0.3s;
 }
 
 .visitor-item img:hover {
-  filter: brightness(1.05) saturate(1);
+  filter: brightness(1.2) saturate(1) opacity(1);
+  transform: scale(1.03);
 }
 
+/* NOM */
 .visitor-item p{
   position:absolute;
   bottom:2px;
@@ -97,24 +108,25 @@ body::before {
   text-shadow:1px 1px 2px rgba(255,255,255,0.8);
 }
 
-/* CROIX SUPPRIMER */
+/* CROIX */
 .delete-btn{
   position:absolute;
-  top:4px;
-  right:4px;
-  width:auto;
-  height:auto;
-  background:transparent;
-  color:#ff69b4;
-  font-size:20px;
+  top:2px;
+  right:2px;
+  width:24px;
+  height:24px;
+  background:#ff69b4;
+  color:#fff;
+  border-radius:50%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
   font-weight:bold;
   cursor:pointer;
   z-index:5;
+  font-size:16px;
 }
-.delete-btn:hover{
-  color:#e94f9a;
-  transform: scale(1.1);
-}
+.delete-btn:hover{background:#e94f9a;}
 
 /* SIDEBAR */
 #sidebar{
@@ -142,6 +154,7 @@ body::before {
   align-items:center;
   justify-content:center;
   cursor:pointer;
+  font-weight:bold;
 }
 #sidebar button{
   width:auto;
@@ -154,7 +167,7 @@ body::before {
   font-weight:bold;
 }
 
-/* MODAL AJOUT : taille réduite */
+/* MODAL AJOUT STYLÉ */
 #addModal{
   position:fixed; inset:0;
   background:rgba(0,0,0,0.6);
@@ -165,42 +178,31 @@ body::before {
 }
 #addModal .modal-box{
   background:#ffe6f0;
-  padding:16px 20px;
-  border-radius:24px;
-  border:4px solid #b67385;
+  padding:16px 24px;
+  border-radius:20px;
+  border:3px solid #b67385;
   display:flex;
   flex-direction:column;
-  gap:12px;
+  gap:10px;
   align-items:center;
-  min-width:220px;
-  max-width:260px;
-  box-shadow:0 6px 18px rgba(0,0,0,0.3);
-}
-#addModal h2{
-  font-size:20px;
-  color:#b84c6f;
+  min-width:200px;
+  font-family:'Comic Sans MS',cursive;
 }
 #addModal input{
-  padding:8px;
-  border-radius:12px;
+  padding:6px 12px;
+  border-radius:10px;
   border:2px solid #b67385;
   width:100%;
-  font-family:'Comic Sans MS',cursive;
-  font-size:14px;
-  color:#b84c6f;
 }
 #addModal button{
-  padding:6px 16px;
+  padding:6px 14px;
   border:none;
   background:#ff69b4;
   color:#fff;
-  border-radius:14px;
+  border-radius:12px;
   cursor:pointer;
   font-weight:bold;
-  font-size:14px;
-}
-#addModal button:hover{
-  background:#e94f9a;
+  width:100%;
 }
 
 /* ZOOM */
@@ -238,22 +240,15 @@ body::before {
   position:absolute;
   top:12px;
   right:12px;
-  width:32px;
-  height:32px;
-  background:#ffb6c1;
+  width:28px;
+  height:28px;
+  background:#ff69b4;
   color:#fff;
   border-radius:50%;
   display:flex;
   justify-content:center;
   align-items:center;
   cursor:pointer;
-  font-size:20px;
-  border:2px solid #b67385;
-  box-shadow:0 3px 8px rgba(0,0,0,0.3);
-}
-.closeZoom:hover{
-  background:#ff69b4;
-  transform: scale(1.1);
 }
 
 /* Actions like/comment */
@@ -276,7 +271,7 @@ body::before {
 @media(max-width:480px){
   .page{grid-template-columns: repeat(2, 120px); grid-template-rows: repeat(3, 120px);}
   .visitor-item{width:120px;height:120px;}
-  #addModal .modal-box{min-width:180px; max-width:220px;}
+  #addModal .modal-box{min-width:180px;}
 }
 </style>
 </head>
@@ -408,15 +403,14 @@ document.getElementById('confirmAdd').onclick=async()=>{
 };
 
 async function deleteProject(name){
-  if(confirm("Supprimer ce projet définitivement ?")){
-    const p=creations.find(c=>c.name===name);
-    for(let u of p.zoomGroup){
-      await supabase.storage.from('images').remove([u.split('/images/')[1]]);
-    }
-    await supabase.from('creations').delete().eq('name',name);
-    creations=creations.filter(c=>c.name!==name);
-    render();
+  if(!confirm("Supprimer définitivement ce projet ?")) return;
+  const p=creations.find(c=>c.name===name);
+  for(let u of p.zoomGroup){
+    await supabase.storage.from('images').remove([u.split('/images/')[1]]);
   }
+  await supabase.from('creations').delete().eq('name',name);
+  creations=creations.filter(c=>c.name!==name);
+  render();
 }
 
 document.getElementById('toggleSidebar').onclick=()=>sidebar.classList.toggle('sidebar-open');
