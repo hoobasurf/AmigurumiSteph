@@ -7,11 +7,22 @@
 *{box-sizing:border-box;margin:0;padding:0;}
 html,body{height:100%;font-family:'Comic Sans MS',cursive;}
 
+/* FOND D'ÉCRAN ADAPTÉ */
 body{
   display:flex;
   flex-direction:column;
   overflow:hidden;
-  background: #ffe6f0 url('Photoroom_20251223_114401.jpeg') center top / contain no-repeat fixed;
+
+  background-color: #ffe6f0;
+  background-image: url('Photoroom_20251223_114401.jpeg');
+  background-repeat: no-repeat;
+
+  /* adapter l'image à la taille de l'écran */
+  background-size: contain;
+  background-position: center center;
+
+  /* plus fiable que fixed */
+  background-attachment: scroll;
 }
 
 /* SCROLL HORIZONTAL */
