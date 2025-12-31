@@ -5,7 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
-html,body{height:100%;font-family:'Comic Sans MS',cursive;}
+html,body{height:100%;font-family:'Comic Sans MS',cursive; background:#fff;}
+
 body{
   display:flex;
   flex-direction:column;
@@ -24,25 +25,30 @@ body{
 
 #visitor-list-container{
   overflow-x:auto;
+  overflow-y:hidden;
   width:100%;
-  padding:20px;
+  display:flex;
+  justify-content:center;
   scroll-snap-type: x mandatory; /* snap horizontal */
+  padding:20px;
 }
 
 #visitor-list{
-  display:flex;
-  gap:16px;
+  display:grid;
+  grid-template-columns: repeat(auto-fill, 150px);
+  grid-template-rows: repeat(3, 150px);
+  grid-gap:16px;
+  justify-content:center;
 }
 
+/* VISITOR ITEM */
 .visitor-item{
-  flex:0 0 auto; /* empêcher de rétrécir */
-  width:100px;
-  height:100px;
-  scroll-snap-align:start; /* chaque carte se cale au début */
-  text-align:center;
-  border-radius:12px;
   position:relative;
-  background:#ffe6f0; /* fond rose visible */
+  width:150px;
+  height:150px;
+  border-radius:12px;
+  background:#ffe6f0;
+  scroll-snap-align:start; /* snap par bloc */
 }
 
 /* PLACEHOLDER */
@@ -71,9 +77,10 @@ body{
 /* NOM */
 .visitor-item p{
   margin-top:4px;
-  font-size:12px;
+  font-size:14px;
   color:#b84c6f;
   font-weight:bold;
+  text-align:center;
 }
 
 /* CROIX */
@@ -81,8 +88,8 @@ body{
   position:absolute;
   top:2px;
   right:2px;
-  width:18px;
-  height:18px;
+  width:20px;
+  height:20px;
   background:#ff69b4;
   color:#fff;
   border-radius:50%;
@@ -215,6 +222,7 @@ body{
   cursor:pointer;
 }
 
+/* Actions like/comment */
 .actions{
   display:flex;
   gap:16px;
@@ -230,9 +238,9 @@ body{
 .like-btn{background:#ff69b4}
 .comment-btn{background:#b84c6f}
 
-/* Responsive : cartes plus petites sur mobile */
+/* Responsive */
 @media(max-width:480px){
-  .visitor-item{width:80px;height:80px;}
+  .visitor-item{width:100px;height:100px;}
   #addModal .modal-box{min-width:180px;}
 }
 </style>
@@ -306,7 +314,10 @@ function render(){
   creations.forEach(c=>{
     const d=document.createElement('div');
     d.className='visitor-item';
-    d.innerHTML=`<div class="placeholder">?</div><div class="delete-btn">×</div><p>${c.name}</p><img src="${c.imgUrl}" onload="this.previousElementSibling.style.display='none'" onerror="this.style.display='none'">`;
+    d.innerHTML=`<div class="placeholder">?</div>
+                 <div class="delete-btn">×</div>
+                 <p>${c.name}</p>
+                 <img src="${c.imgUrl}" onload="this.previousElementSibling.style.display='none'" onerror="this.style.display='none'">`;
     d.querySelector('img').onclick=()=>openZoom(c);
     d.querySelector('.delete-btn').onclick=()=>deleteProject(c.name);
     list.appendChild(d);
