@@ -287,42 +287,65 @@ addModal.onclick=(e)=>{ if(e.target===addModal) addModal.style.display='none'; }
 
 document.getElementById('confirmAdd').onclick = async () => {
   const files = document.getElementById('multiPhoto').files;
-  if (!files.length) return alert("Choisir au moins une photo");
   const name = nameInput.value.trim();
-  if (!name) return alert("Entrer un nom");
 
-  let firstPublicUrl = null;
-  let firstId = null;
+  if (!name) {
+    alert("Entrer un nom");
+    return;
+  }
+
+  if (!files || files.length === 0) {
+    alert("Choisir au moins une photo");
+    return;
+  }
+
   const zoomGroup = [];
+  let mainCreated = false;
 
-  for (let i = 0; i < files.length; i++) {
-    const file = files[i];
+  for (const file of files) {
     const path = `${Date.now()}_${file.name}`;
-    
-    const { error } = await supabase.storage.from('images').upload(path, file);
-    if (error) { alert(error.message); continue; }
+
+    const { error: uploadError } = await supabase
+      .storage
+      .from('images')
+      .upload(path, file);
+
+    if (uploadError) {
+      console.error(uploadError);
+      continue;
+    }
 
     const { data: insertData, error: insertError } = await supabase
       .from('creations')
       .insert([{ name, image_path: path }])
       .select();
-    if (insertError) { alert(insertError.message); continue; }
 
-    const publicUrl = `https://jyhbamdcxmpveujjqjla.supabase.co/storage/v1/object/public/images/${path}`;
+    if (insertError) {
+      console.error(insertError);
+      continue;
+    }
+
+    const publicUrl =
+      `https://jyhbamdcxmpveujjqjla.supabase.co/storage/v1/object/public/images/${path}`;
+
     zoomGroup.push(publicUrl);
 
-    if (i === 0) {
-      firstPublicUrl = publicUrl;
-      firstId = insertData[0].id;
-      creations.unshift({ id: firstId, name, imgUrl: firstPublicUrl, zoomGroup });
-    } else {
-      creations[0].zoomGroup.push(publicUrl);
+    // 👉 SEULEMENT LA PREMIÈRE IMAGE VA SUR LA PAGE
+    if (!mainCreated) {
+      creations.unshift({
+        id: insertData[0].id,
+        name,
+        imgUrl: publicUrl,
+        zoomGroup
+      });
+      mainCreated = true;
     }
   }
 
   addModal.style.display = 'none';
-  nameInput.value = '';
   document.getElementById('multiPhoto').value = '';
+  nameInput.value = '';
+
   renderCreations();
 };
 
