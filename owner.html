@@ -16,22 +16,6 @@ body{
   flex-direction:column;
 }
 
-/* BOUTONS VUE */
-#viewSelector{
-  display:flex;
-  justify-content:center;
-  gap:12px;
-  margin:20px 0;
-}
-#viewSelector button{
-  background:#fff0f7;
-  border:2px solid #b84c6f;
-  color:#b84c6f;
-  padding:8px 16px;
-  border-radius:24px;
-  cursor:pointer;
-}
-
 /* CONTENU */
 .center-zone{
   flex:1;
@@ -41,18 +25,14 @@ body{
   overflow:hidden;
 }
 
-/* LISTE – SCROLL HORIZONTAL */
 #visitor-list{
   display:flex;
   gap:18px;
   padding:20px;
   overflow-x:auto;
-  overflow-y:hidden;
 }
 
-/* CARD */
 .visitor-item{
-  flex:0 0 auto;
   width:160px;
   text-align:center;
   position:relative;
@@ -73,7 +53,7 @@ body{
   font-weight:bold;
 }
 
-/* CROIX SUPPRESSION */
+/* CROIX */
 .delete-btn{
   position:absolute;
   top:6px;
@@ -88,7 +68,6 @@ body{
   justify-content:center;
   font-weight:bold;
   cursor:pointer;
-  z-index:5;
 }
 
 /* SIDEBAR */
@@ -102,7 +81,6 @@ body{
   border-right:2px solid #b67385;
   padding:20px;
   transition:left .3s;
-  z-index:10;
 }
 #sidebar.sidebar-open{left:0}
 #toggleSidebar{
@@ -129,7 +107,7 @@ body{
   font-weight:bold;
 }
 
-/* MODAL BASE */
+/* MODALS */
 .modal-bg{
   position:fixed;
   inset:0;
@@ -144,7 +122,6 @@ body{
   padding:20px;
   border-radius:22px;
   border:4px solid #b67385;
-  max-width:90%;
   position:relative;
 }
 .close-modal{
@@ -160,7 +137,6 @@ body{
   cursor:pointer;
 }
 
-/* STATUS */
 #status{text-align:center;margin:10px;color:#b84c6f}
 </style>
 </head>
@@ -183,18 +159,18 @@ body{
     <button class="close-modal" onclick="closeAdd()">×</button>
     <h3>Ajouter des photos</h3><br>
     <input type="file" id="multiPhoto" multiple accept="image/*"><br><br>
-    <button onclick="confirmAdd()">Valider</button>
+    <button id="validateAdd">Valider</button>
   </div>
 </div>
 
 <!-- MODAL DELETE -->
-<div class="modal-bg" id="deleteModal" onclick="closeDelete(event)">
+<div class="modal-bg" id="deleteModal" onclick="if(event.target===this) closeDelete()">
   <div class="modal-box">
     <h3>Supprimer cette photo ?</h3>
     <p style="margin:10px 0;color:#b84c6f">
       Cette action est définitive 💗
     </p>
-    <button onclick="confirmDelete()">Supprimer</button>
+    <button id="confirmDeleteBtn">Supprimer</button>
   </div>
 </div>
 
@@ -208,22 +184,34 @@ const supabase = createClient(
   "sb_publishable_sqsxb-3Kl5o3-JQYv9kGFw_-g0EgwMa"
 );
 
-let creations=[], deleteTarget=null;
+let creations=[];
+let deleteTarget=null;
 
 const list=document.getElementById('visitor-list');
 const addModal=document.getElementById('addModal');
 const deleteModal=document.getElementById('deleteModal');
+const status=document.getElementById('status');
 
+/* LOAD */
 async function load(){
-  const { data } = await supabase.from('creations').select('*').order('created_at',{ascending:false});
+  const { data } = await supabase
+    .from('creations')
+    .select('*')
+    .order('created_at',{ascending:false});
+
   creations = data.map(c=>{
-    const safe = encodeURIComponent(c.image_path);
-    const url=`https://jyhbamdcxmpveujjqjla.supabase.co/storage/v1/object/public/images/${safe}`;
-    return {id:c.id,name:c.name,url};
+    const safe=encodeURIComponent(c.image_path);
+    return {
+      id:c.id,
+      name:c.name,
+      path:c.image_path,
+      url:`https://jyhbamdcxmpveujjqjla.supabase.co/storage/v1/object/public/images/${safe}`
+    };
   });
   render();
 }
 
+/* RENDER */
 function render(){
   list.innerHTML='';
   creations.forEach(c=>{
@@ -242,43 +230,60 @@ function render(){
   });
 }
 
+/* ADD */
 function openAdd(){addModal.style.display='flex'}
 function closeAdd(){addModal.style.display='none'}
 
-async function confirmAdd(){
+document.getElementById('validateAdd').onclick = async ()=>{
   const name=document.getElementById('name').value.trim();
   const files=document.getElementById('multiPhoto').files;
-  if(!name||!files.length) return alert('Nom + photo');
 
-  for(const file of files){
-    try{
-      const path=`${Date.now()}_${file.name}`;
-      await supabase.storage.from('images').upload(path,file,{upsert:false});
-      await supabase.from('creations').insert([{name,image_path:path}]);
-    }catch(e){
-      console.error(e);
-    }
+  if(!name || !files.length){
+    alert('Nom + photo requis');
+    return;
   }
-  closeAdd();
-  load();
-}
 
-function closeDelete(e){
-  if(e.target===deleteModal) deleteModal.style.display='none';
-}
+  status.textContent='📤 Upload…';
 
-async function confirmDelete(){
-  if(!deleteTarget) return;
-  const path=decodeURIComponent(deleteTarget.url.split('/images/')[1]);
-  await supabase.storage.from('images').remove([path]);
-  await supabase.from('creations').delete().eq('id',deleteTarget.id);
+  try{
+    for(const file of files){
+      const path=`${Date.now()}_${file.name}`;
+      await supabase.storage.from('images').upload(path,file);
+      await supabase.from('creations').insert([{name,image_path:path}]);
+    }
+    closeAdd();
+    await load();
+    status.textContent='✅ Ajouté';
+  }catch(e){
+    console.error(e);
+    status.textContent='❌ Erreur';
+  }
+};
+
+/* DELETE */
+function closeDelete(){
   deleteModal.style.display='none';
   deleteTarget=null;
-  load();
 }
 
+document.getElementById('confirmDeleteBtn').onclick = async ()=>{
+  if(!deleteTarget) return;
+
+  try{
+    await supabase.storage.from('images').remove([deleteTarget.path]);
+    await supabase.from('creations').delete().eq('id',deleteTarget.id);
+    closeDelete();
+    load();
+  }catch(e){
+    console.error(e);
+  }
+};
+
+/* SIDEBAR */
 document.getElementById('addBtn').onclick=openAdd;
-document.getElementById('toggleSidebar').onclick=()=>sidebar.classList.toggle('sidebar-open');
+document.getElementById('toggleSidebar').onclick=()=>{
+  sidebar.classList.toggle('sidebar-open');
+};
 
 load();
 </script>
