@@ -7,18 +7,19 @@
 *{box-sizing:border-box;margin:0;padding:0;}
 html,body{height:100%;font-family:'Comic Sans MS',cursive;}
 
-/* BODY FOND ZOOMÉ CLAIR - REMONTÉ DE 1CM */
+/* BODY FOND ZOOMÉ CLAIR ET PLUS VIF */
 body::before {
   content:"";
   position:fixed;
-  top:0; /* haut remonté de 1cm */
+  top:-1cm; /* remonte le fond de 1cm */
   left:0;
   width:100vw;
-  height:calc(100vh - 2cm); /* bas inchangé, total déplacé 1cm */
+  height:calc(100vh + 1cm); /* total hauteur ajustée */
   background-image: url('Photoroom_20251223_114401.jpeg');
   background-size: calc(100% + 5mm) calc(100% + 5mm);
   background-position: center;
   background-repeat: no-repeat;
+  filter: brightness(1.15) saturate(1.1); /* plus vif */
   z-index:-1;
 }
 
@@ -65,8 +66,8 @@ body::before {
   height:200px;
   border-radius:12px;
   overflow:hidden;
-  border:2px solid #fff;
-  box-shadow:0 4px 12px rgba(0,0,0,0.25),0 0 0 2px #f6c2d1;
+  border:4px solid #ff69b4; /* liseré rose plus épais */
+  box-shadow:0 6px 12px rgba(0,0,0,0.3); /* ombre */
   background:#ffe6f0;
 }
 
@@ -81,7 +82,7 @@ body::before {
   font-weight:bold;
 }
 
-/* Images pastel/vif intermédiaire mais claires */
+/* Images plus vives */
 .visitor-item img{
   width:100%;
   height:100%;
@@ -89,12 +90,12 @@ body::before {
   border-radius:12px;
   cursor:pointer;
   display:block;
-  filter: brightness(1.5) saturate(1.1) opacity(0.85);
+  filter: brightness(1.6) saturate(1.2) opacity(0.9);
   transition: filter 0.3s, opacity 0.3s;
 }
 
 .visitor-item img:hover {
-  filter: brightness(1.6) saturate(1.2) opacity(0.95);
+  filter: brightness(1.7) saturate(1.25) opacity(1);
 }  
 
 .visitor-item p{
@@ -278,139 +279,4 @@ body::before {
 
 <div id="sidebar">
   <div id="toggleSidebar">☰</div>
-  <button id="addBtn">Ajouter</button>
-</div>
-
-<!-- MODAL AJOUT -->
-<div id="addModal">
-  <div class="modal-box">
-    <h2>Ajouter des photos</h2>
-    <input id="photoName" placeholder="Nom du projet">
-    <input type="file" id="multiPhoto" multiple>
-    <button id="confirmAdd">Valider</button>
-  </div>
-</div>
-
-<!-- ZOOM -->
-<div id="zoomModal">
-  <div class="closeZoom">×</div>
-  <img id="mainZoom">
-  <div class="thumbs" id="thumbs"></div>
-  <div class="actions">
-    <button class="like-btn">❤️ Like (0)</button>
-    <button class="comment-btn">💬 Commentaire (0)</button>
-  </div>
-</div>
-
-<script type="module">
-import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
-
-const supabase=createClient(
-  "https://jyhbamdcxmpveujjqjla.supabase.co",
-  "sb_publishable_sqsxb-3Kl5o3-JQYv9kGFw_-g0EgwMa"
-);
-
-let creations=[],currentZoom=null;
-const container=document.getElementById('visitor-list-container');
-const addModal=document.getElementById('addModal');
-const zoomModal=document.getElementById('zoomModal');
-const mainZoom=document.getElementById('mainZoom');
-const thumbs=document.getElementById('thumbs');
-const likeBtn=document.querySelector('.like-btn');
-const commentBtn=document.querySelector('.comment-btn');
-
-async function loadCreations(){
-  const {data}=await supabase.from("creations").select("*").order("created_at",{ascending:false});
-  const grouped={};
-  data.forEach(c=>{
-    const url=`https://jyhbamdcxmpveujjqjla.supabase.co/storage/v1/object/public/images/${c.image_path}`;
-    if(!grouped[c.name]) grouped[c.name]={name:c.name,imgUrl:url,zoomGroup:[],likes:[],comments:[]};
-    grouped[c.name].zoomGroup.push(url);
-  });
-  creations=Object.values(grouped);
-  render();
-}
-
-function render(){
-  container.innerHTML='';
-  let page=null;
-  creations.forEach((c,i)=>{
-    if(i%6===0){
-      page=document.createElement('div');
-      page.className='page';
-      container.appendChild(page);
-    }
-    const d=document.createElement('div');
-    d.className='visitor-item';
-    d.innerHTML=`<div class="placeholder">?</div>
-                 <div class="delete-btn">×</div>
-                 <p>${c.name}</p>
-                 <img src="${c.imgUrl}" onload="this.previousElementSibling.style.display='none'" onerror="this.style.display='none'">`;
-    d.querySelector('img').onclick=()=>openZoom(c);
-    d.querySelector('.delete-btn').onclick=()=>deleteProject(c.name);
-    page.appendChild(d);
-  });
-}
-
-function openZoom(c){
-  currentZoom=c;
-  mainZoom.src=c.imgUrl;
-  thumbs.innerHTML='';
-  c.zoomGroup.forEach(u=>{
-    const t=document.createElement('img');
-    t.src=u;
-    t.onclick=()=>mainZoom.src=u;
-    thumbs.appendChild(t);
-  });
-  updateActions();
-  zoomModal.style.display='flex';
-}
-
-function updateActions(){
-  likeBtn.textContent=`❤️ Like (${currentZoom.likes.length})`;
-  commentBtn.textContent=`💬 Commentaire (${currentZoom.comments.length})`;
-}
-
-likeBtn.onclick=()=>{const p=prompt("Prénom ?");if(p){currentZoom.likes.push(p);updateActions();}};
-commentBtn.onclick=()=>{const c=prompt("Commentaire ?");if(c){currentZoom.comments.push(c);updateActions();}};
-
-document.getElementById('addBtn').onclick=()=>addModal.style.display='flex';
-addModal.onclick=e=>{if(e.target===addModal)addModal.style.display='none'};
-document.querySelector('.closeZoom').onclick=()=>zoomModal.style.display='none';
-zoomModal.onclick=e=>{if(e.target===zoomModal)zoomModal.style.display='none'};
-
-document.getElementById('confirmAdd').onclick=async()=>{
-  const name=document.getElementById('photoName').value.trim();
-  const files=document.getElementById('multiPhoto').files;
-  if(!name||!files.length)return;
-  const urls=[];
-  for(let f of files){
-    const path=`${Date.now()}_${f.name}`;
-    await supabase.storage.from('images').upload(path,f);
-    await supabase.from('creations').insert([{name,image_path:path}]);
-    urls.push(`https://jyhbamdcxmpveujjqjla.supabase.co/storage/v1/object/public/images/${path}`);
-  }
-  creations.unshift({name,imgUrl:urls[0],zoomGroup:urls,likes:[],comments:[]});
-  render();
-  addModal.style.display='none';
-  document.getElementById('photoName').value='';
-  document.getElementById('multiPhoto').value='';
-};
-
-async function deleteProject(name){
-  if(!confirm("Supprimer ce projet ?"))return;
-  const p=creations.find(c=>c.name===name);
-  for(let u of p.zoomGroup){
-    await supabase.storage.from('images').remove([u.split('/images/')[1]]);
-  }
-  await supabase.from('creations').delete().eq('name',name);
-  creations=creations.filter(c=>c.name!==name);
-  render();
-}
-
-document.getElementById('toggleSidebar').onclick=()=>sidebar.classList.toggle('sidebar-open');
-
-loadCreations();
-</script>
-</body>
-</html>
+  <button
