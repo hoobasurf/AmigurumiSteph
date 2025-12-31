@@ -7,7 +7,7 @@
 *{box-sizing:border-box;margin:0;padding:0;}
 html,body{height:100%;font-family:'Comic Sans MS',cursive;}
 
-/* BODY AVEC FOND PLUS VIF */
+/* FOND ECRAN : moins lumineux + plus de contraste */
 body::before {
   content:"";
   position:fixed;
@@ -19,7 +19,7 @@ body::before {
   background-size: cover;
   background-position: center center;
   background-repeat: no-repeat;
-  filter: brightness(1.2) saturate(1.2); /* fond plus vif */
+  filter: brightness(0.9) contrast(1.2); /* moins lumineux, plus contrasté */
   z-index:-1;
 }
 
@@ -30,7 +30,7 @@ body::before {
   justify-content:center;
   align-items:center;
   padding:20px 0;
-  margin-top: -1cm; /* grille remontée */
+  margin-top: -1cm; 
 }
 
 #visitor-list-container{
@@ -66,23 +66,11 @@ body::before {
   height:200px;
   border-radius:12px;
   overflow:hidden;
-  border:4px solid #f6c2d1; /* liserai rose plus épais */
-  box-shadow:0 4px 12px rgba(0,0,0,0.2); /* ombre légère */
+  border:4px solid #f6c2d1; 
+  box-shadow:0 4px 12px rgba(0,0,0,0.3); 
   background:#ffe6f0;
 }
 
-.visitor-item .placeholder{
-  position:absolute;
-  inset:0;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  font-size:24px;
-  color:#b84c6f;
-  font-weight:bold;
-}
-
-/* IMAGES GRILLE LÉGÈREMENT MOINS VIVES */
 .visitor-item img{
   width:100%;
   height:100%;
@@ -90,12 +78,12 @@ body::before {
   border-radius:12px;
   cursor:pointer;
   display:block;
-  filter: brightness(1) saturate(0.95); /* légèrement moins vif */
+  filter: brightness(1) saturate(0.95); 
   transition: filter 0.3s, opacity 0.3s;
 }
 
 .visitor-item img:hover {
-  filter: brightness(1.05) saturate(1); /* effet léger au hover */
+  filter: brightness(1.05) saturate(1); 
 }
 
 .visitor-item p{
@@ -109,7 +97,7 @@ body::before {
   text-shadow:1px 1px 2px rgba(255,255,255,0.8);
 }
 
-/* BOUTON SUPPRIMER PLUS JOLI */
+/* CROIX SUPPRIMER */
 .delete-btn{
   position:absolute;
   top:4px;
@@ -172,7 +160,7 @@ body::before {
   font-weight:bold;
 }
 
-/* MODAL AJOUT STYLÉ */
+/* MODAL AJOUT */
 #addModal{
   position:fixed; inset:0;
   background:rgba(0,0,0,0.6);
@@ -311,7 +299,7 @@ body::before {
   <button id="addBtn">Ajouter</button>
 </div>
 
-<!-- MODAL AJOUT STYLÉ -->
+<!-- MODAL AJOUT -->
 <div id="addModal">
   <div class="modal-box">
     <h2>Ajouter des photos</h2>
@@ -373,7 +361,7 @@ function render(){
     const d=document.createElement('div');
     d.className='visitor-item';
     d.innerHTML=`<div class="placeholder">?</div>
-                 <div class="delete-btn">×</div>
+                 <div class="delete-btn"></div>
                  <p>${c.name}</p>
                  <img src="${c.imgUrl}" onload="this.previousElementSibling.style.display='none'" onerror="this.style.display='none'">`;
     d.querySelector('img').onclick=()=>openZoom(c);
@@ -428,14 +416,15 @@ document.getElementById('confirmAdd').onclick=async()=>{
 };
 
 async function deleteProject(name){
-  if(!confirm("Supprimer ce projet définitivement ?"))return;
-  const p=creations.find(c=>c.name===name);
-  for(let u of p.zoomGroup){
-    await supabase.storage.from('images').remove([u.split('/images/')[1]]);
+  if(confirm("Supprimer ce projet définitivement ?")){
+    const p=creations.find(c=>c.name===name);
+    for(let u of p.zoomGroup){
+      await supabase.storage.from('images').remove([u.split('/images/')[1]]);
+    }
+    await supabase.from('creations').delete().eq('name',name);
+    creations=creations.filter(c=>c.name!==name);
+    render();
   }
-  await supabase.from('creations').delete().eq('name',name);
-  creations=creations.filter(c=>c.name!==name);
-  render();
 }
 
 document.getElementById('toggleSidebar').onclick=()=>sidebar.classList.toggle('sidebar-open');
