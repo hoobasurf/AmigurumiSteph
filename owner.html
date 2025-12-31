@@ -280,7 +280,10 @@ function render(){
     d.className='visitor-item';
     d.innerHTML=`<div class="delete-btn">×</div><p>${c.name}</p><img src="${c.main}">`;
     d.querySelector('img').onclick=()=>openZoom(c);
-    d.querySelector('.delete-btn').onclick=()=>deleteImg(c.id,c.main);
+    d.querySelector('.delete-btn').onclick=(e)=>{
+      e.stopPropagation();
+      deleteImg(c.id,c.main);
+    };
     list.appendChild(d);
   });
 }
@@ -327,6 +330,14 @@ async function deleteImg(id,url){
 
 document.getElementById('addBtn').onclick=openAdd;
 document.getElementById('toggleSidebar').onclick=()=>sidebar.classList.toggle('sidebar-open');
+
+// CLICK DANS LE VIDE = FERMETURE MODALES
+addModal.addEventListener('click',e=>{
+  if(e.target===addModal) closeAdd();
+});
+zoomModal.addEventListener('click',e=>{
+  if(e.target===zoomModal) closeZoom();
+});
 
 load();
 </script>
