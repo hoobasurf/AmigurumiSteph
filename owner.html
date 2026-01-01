@@ -53,7 +53,7 @@ body::before {
   scroll-snap-align:center;
   padding:4mm;
   justify-content:center;
-  margin-top:3cm;
+  margin-top:3cm; /* descente de 1 cm */
 }
 
 /* VISITOR ITEM */
@@ -67,7 +67,6 @@ body::before {
   box-shadow:0 0 0 3px #f6c2d1, 0 6px 14px rgba(0,0,0,0.25), inset 0 0 0 1px rgba(255,255,255,0.4);
   background:#ffe6f0;
 }
-
 .visitor-item .placeholder{
   position:absolute;
   inset:0;
@@ -78,7 +77,6 @@ body::before {
   color:#b84c6f;
   font-weight:bold;
 }
-
 .visitor-item img {
   width:100%;
   height:100%;
@@ -91,11 +89,7 @@ body::before {
   position: relative;
   z-index: 2;
 }
-
-.visitor-item img:hover {
-  transform: scale(1.03);
-}
-
+.visitor-item img:hover { transform: scale(1.03); }
 .visitor-item::after{
   content:"";
   position:absolute;
@@ -104,7 +98,6 @@ body::before {
   pointer-events:none;
   z-index:1;
 }
-
 .visitor-item p{
   position:absolute;
   bottom:2px;
@@ -116,7 +109,6 @@ body::before {
   text-shadow:1px 1px 2px rgba(255,255,255,0.8);
   z-index:3;
 }
-
 .delete-btn{
   position:absolute;
   top:2px;
@@ -137,6 +129,7 @@ body::before {
 }
 .delete-btn:hover{background:#e94f9a;}
 
+/* SIDEBAR */
 #sidebar{
   position:fixed;
   top:0;
@@ -175,7 +168,8 @@ body::before {
   font-weight:bold;
 }
 
-.modal {
+/* MODAL */
+.modal{
   position:fixed; inset:0;
   background:rgba(0,0,0,0.6);
   display:none;
@@ -193,7 +187,6 @@ body::before {
   gap:10px;
   align-items:center;
   min-width:200px;
-  font-family:'Comic Sans MS',cursive;
 }
 .modal input{
   padding:6px 12px;
@@ -212,6 +205,7 @@ body::before {
   width:100%;
 }
 
+/* ZOOM */
 #zoomModal{
   position:fixed; inset:0;
   background:rgba(0,0,0,0.7);
@@ -258,6 +252,7 @@ body::before {
   cursor:pointer;
 }
 
+/* BUBBLES HORIZONTALES */
 .bubble-container{
   display:flex;
   gap:8px;
@@ -273,6 +268,7 @@ body::before {
   white-space:nowrap;
 }
 
+/* Responsive */
 @media(max-width:480px){
   .page{grid-template-columns: repeat(2, 120px); grid-template-rows: repeat(3, 120px);}
   .visitor-item{width:120px;height:120px;}
@@ -291,7 +287,7 @@ body::before {
   <button id="addBtn">Ajouter</button>
 </div>
 
-<!-- MODAL AJOUT -->
+<!-- MODALS AJOUT / DELETE / LIKE / COMMENT -->
 <div id="addModal" class="modal">
   <div class="modal-box">
     <h2>Ajouter des photos</h2>
@@ -301,7 +297,6 @@ body::before {
   </div>
 </div>
 
-<!-- MODAL SUPPRIMER -->
 <div id="deleteModal" class="modal">
   <div class="modal-box">
     <p>Supprimer définitivement ce projet ?</p>
@@ -310,7 +305,6 @@ body::before {
   </div>
 </div>
 
-<!-- MODAL LIKE -->
 <div id="likeModal" class="modal">
   <div class="modal-box">
     <h3>Like ❤️</h3>
@@ -320,7 +314,6 @@ body::before {
   </div>
 </div>
 
-<!-- MODAL COMMENTAIRE -->
 <div id="commentModal" class="modal">
   <div class="modal-box">
     <h3>Commentaire 💬</h3>
@@ -331,7 +324,6 @@ body::before {
   </div>
 </div>
 
-<!-- ZOOM -->
 <div id="zoomModal">
   <div class="closeZoom">×</div>
   <img id="mainZoom">
@@ -369,25 +361,35 @@ const commentBubbles=document.getElementById('commentBubbles');
 
 const sidebar=document.getElementById('sidebar');
 
-// --- LOAD ---
+// LOAD
 async function loadCreations(){
   const {data} = await supabase.from("creations").select("*").order("created_at",{ascending:false});
-  const grouped={};
+  const grouped = {};
   data.forEach(c=>{
-    const url=`https://jyhbamdcxmpveujjqjla.supabase.co/storage/v1/object/public/images/${c.image_path}`;
-    if(!grouped[c.name]) grouped[c.name]={name:c.name,imgUrl:url,zoomGroup:[],likes:c.likes||[],comments:c.comments||[]};
+    const url = `https://jyhbamdcxmpveujjqjla.supabase.co/storage/v1/object/public/images/${c.image_path}`;
+    if(!grouped[c.name]) grouped[c.name] = {
+      name: c.name,
+      imgUrl: url,
+      zoomGroup: [],
+      likes: c.likes || [],
+      comments: c.comments || []
+    };
     grouped[c.name].zoomGroup.push(url);
   });
-  creations=Object.values(grouped);
+  creations = Object.values(grouped);
   render();
 }
 
-// --- RENDER ---
+// RENDER
 function render(){
   container.innerHTML='';
   let page=null;
   creations.forEach((c,i)=>{
-    if(i%6===0){page=document.createElement('div'); page.className='page'; container.appendChild(page);}
+    if(i%6===0){
+      page=document.createElement('div');
+      page.className='page';
+      container.appendChild(page);
+    }
     const d=document.createElement('div');
     d.className='visitor-item';
     d.innerHTML=`
@@ -402,7 +404,7 @@ function render(){
   });
 }
 
-// --- ZOOM ---
+// ZOOM
 function openZoom(c){
   currentZoom=c;
   mainZoom.src=c.imgUrl;
@@ -416,20 +418,19 @@ function openZoom(c){
   updateActions();
   zoomModal.style.display='flex';
 }
-
 function updateActions(){
   likeCount.textContent=currentZoom.likes.length;
   commentCount.textContent=currentZoom.comments.length;
 }
 
-// --- MODAL ---
 document.querySelector('.closeZoom').onclick=()=>zoomModal.style.display='none';
-zoomModal.onclick=e=>{if(e.target===zoomModal) zoomModal.style.display='none';};
+zoomModal.onclick=e=>{if(e.target===zoomModal) zoomModal.style.display='none'};
+
 document.getElementById('toggleSidebar').onclick=()=>sidebar.classList.toggle('sidebar-open');
 
-// --- ADD ---
+// AJOUT
 document.getElementById('addBtn').onclick=()=>addModal.style.display='flex';
-addModal.onclick=e=>{if(e.target===addModal)addModal.style.display='none';};
+addModal.onclick=e=>{if(e.target===addModal)addModal.style.display='none'};
 document.getElementById('confirmAdd').onclick=async()=>{
   const name=document.getElementById('photoName').value.trim();
   const files=document.getElementById('multiPhoto').files;
@@ -448,9 +449,12 @@ document.getElementById('confirmAdd').onclick=async()=>{
   document.getElementById('multiPhoto').value='';
 };
 
-// --- DELETE ---
-function openDeleteModal(c){currentDelete=c; deleteModal.style.display='flex';}
-deleteModal.onclick=e=>{if(e.target===deleteModal)deleteModal.style.display='none';};
+// DELETE
+function openDeleteModal(c){
+  currentDelete=c;
+  deleteModal.style.display='flex';
+}
+deleteModal.onclick=e=>{if(e.target===deleteModal) deleteModal.style.display='none'};
 document.getElementById('cancelDelete').onclick=()=>deleteModal.style.display='none';
 document.getElementById('confirmDelete').onclick=async()=>{
   if(!currentDelete) return;
@@ -463,7 +467,7 @@ document.getElementById('confirmDelete').onclick=async()=>{
   deleteModal.style.display='none';
 };
 
-// --- LIKE ---
+// LIKE
 document.querySelector('.like-btn').onclick=()=>{
   likeModal.style.display='flex';
   likeBubbles.innerHTML='';
@@ -474,10 +478,10 @@ document.querySelector('.like-btn').onclick=()=>{
     likeBubbles.appendChild(b);
   });
 };
-likeModal.onclick=e=>{if(e.target===likeModal) likeModal.style.display='none';};
+likeModal.onclick=e=>{if(e.target===likeModal) likeModal.style.display='none'};
 document.getElementById('confirmLike').onclick=async()=>{
   const name=document.getElementById('likeName').value.trim();
-  if(name && !currentZoom.likes.includes(name)){
+  if(name){
     currentZoom.likes.push(name);
     await supabase.from('creations').update({likes: currentZoom.likes}).eq('name',currentZoom.name);
     const b=document.createElement('div');
@@ -489,7 +493,7 @@ document.getElementById('confirmLike').onclick=async()=>{
   }
 };
 
-// --- COMMENT ---
+// COMMENT
 document.querySelector('.comment-btn').onclick=()=>{
   commentModal.style.display='flex';
   commentBubbles.innerHTML='';
@@ -500,7 +504,7 @@ document.querySelector('.comment-btn').onclick=()=>{
     commentBubbles.appendChild(b);
   });
 };
-commentModal.onclick=e=>{if(e.target===commentModal) commentModal.style.display='none';};
+commentModal.onclick=e=>{if(e.target===commentModal) commentModal.style.display='none'};
 document.getElementById('confirmComment').onclick=async()=>{
   const name=document.getElementById('commentName').value.trim();
   const text=document.getElementById('commentText').value.trim();
@@ -518,7 +522,6 @@ document.getElementById('confirmComment').onclick=async()=>{
   }
 };
 
-// --- INIT ---
 loadCreations();
 </script>
 </body>
