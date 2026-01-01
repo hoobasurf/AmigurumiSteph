@@ -441,26 +441,32 @@ const commentBubbles=document.getElementById('commentBubbles');
 
 const sidebar=document.getElementById('sidebar');
 
-// RENDER
 function render(){
   container.innerHTML='';
-  let page=null;
-  creations.forEach((c,i)=>{
-    if(i%6===0){
-      page=document.createElement('div');
-      page.className='page';
+  creations.forEach((c, i) => {
+    // chaque page = 6 images
+    let page;
+    if (i % 6 === 0){
+      page = document.createElement('div');
+      page.className = 'page';
       container.appendChild(page);
+    } else {
+      page = container.lastElementChild;
     }
-    const d=document.createElement('div');
-    d.className='visitor-item';
-    d.innerHTML=`
+
+    const d = document.createElement('div');
+    d.className = 'visitor-item';
+    d.innerHTML = `
       <div class="placeholder">?</div>
       <div class="delete-btn">×</div>
       <p>${c.name}</p>
       <img src="${c.imgUrl}" onload="this.previousElementSibling.style.display='none'" onerror="this.style.display='none'">
     `;
-    d.querySelector('img').onclick=()=>openZoom(c);
-    d.querySelector('.delete-btn').onclick=()=>openDeleteModal(c);
+
+    // handlers corrigés pour prendre en compte l'objet c
+    d.querySelector('img').onclick = () => openZoom(c);
+    d.querySelector('.delete-btn').onclick = () => openDeleteModal(c);
+
     page.appendChild(d);
   });
 }
