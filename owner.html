@@ -483,16 +483,28 @@ document.getElementById('confirmAdd').onclick = async () => {
   const name = document.getElementById('photoName').value.trim();
   const files = document.getElementById('multiPhoto').files;
   if (!name || !files.length) return;
-  const urls = [];
+
   for (let f of files) {
     const path = `${Date.now()}_${f.name}`;
     await supabase.storage.from('images').upload(path, f);
-    const { data: insertData } = await supabase.from('creations').insert([{ name, image_path: path, likes: [], comments: [] }]).select();
-    const newItem = insertData[0];
+    const { data } = await supabase.from('creations').insert([{ 
+      name, 
+      image_path: path,
+      likes: [],
+      comments: []
+    }]).select().single();
+
     const url = `https://jyhbamdcxmpveujjqjla.supabase.co/storage/v1/object/public/images/${path}`;
-    creations.unshift({ id: newItem.id, name, imgUrl: url, zoomGroup: [url], likes: [], comments: [] });
-    urls.push(url);
+    creations.unshift({
+      id: data.id,
+      name: data.name,
+      imgUrl: url,
+      zoomGroup: [url],
+      likes: [],
+      comments: []
+    });
   }
+
   render();
   addModal.style.display = 'none';
   document.getElementById('photoName').value = '';
@@ -524,13 +536,10 @@ document.getElementById('cancelDelete').onclick = () => deleteModal.style.displa
 
 document.getElementById('confirmDelete').onclick = async () => {
   if (!currentDelete) return;
-
   for (let u of currentDelete.zoomGroup) {
     await supabase.storage.from('images').remove([u.split('/images/')[1]]);
   }
-
   await supabase.from('creations').delete().eq('id', currentDelete.id);
-
   creations = creations.filter(c => c.id !== currentDelete.id);
   render();
   deleteModal.style.display = 'none';
@@ -540,7 +549,7 @@ document.getElementById('confirmDelete').onclick = async () => {
 document.querySelector('.like-btn').onclick = () => {
   likeModal.style.display = 'flex';
   likeBubbles.innerHTML = '';
-  currentZoom.likes.forEach(p => {
+  (currentZoom.likes || []).forEach(p => {
     const b = document.createElement('div');
     b.className = 'bubble';
     b.innerHTML = `<strong>${p}</strong>`;
@@ -565,7 +574,6 @@ document.getElementById('confirmLike').onclick = async () => {
   updateActions();
   document.getElementById('likeName').value = '';
 
-  // Étoiles
   const rect = mainZoom.getBoundingClientRect();
   for (let i = 0; i < 5; i++) {
     const star = document.createElement('div');
@@ -583,7 +591,7 @@ document.getElementById('confirmLike').onclick = async () => {
 document.querySelector('.comment-btn').onclick = () => {
   commentModal.style.display = 'flex';
   commentBubbles.innerHTML = '';
-  currentZoom.comments.forEach(c => {
+  (currentZoom.comments || []).forEach(c => {
     const b = document.createElement('div');
     b.className = 'bubble';
     b.innerHTML = `<strong>${c.name}:</strong> ${c.text}`;
@@ -612,7 +620,7 @@ document.getElementById('confirmComment').onclick = async () => {
   document.getElementById('commentText').value = '';
 };
 
-// ---------------------- LOAD ON START ----------------------
+// ---------------------- START ----------------------
 loadCreations();
 </script>
 </body>
