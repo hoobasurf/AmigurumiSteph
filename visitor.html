@@ -119,11 +119,11 @@ body::before {
   z-index:3;
 }
 
-/* MODAL */
+/* MODALS */
 .modal {
   position:fixed; inset:0;
   background:rgba(0,0,0,0.6);
-  display:none;
+  display:none; /* IMPORTANT : ne pas afficher par défaut */
   justify-content:center;
   align-items:center;
   z-index:10001;
@@ -161,7 +161,7 @@ body::before {
 #zoomModal{
   position:fixed; inset:0;
   background:rgba(0,0,0,0.7);
-  display:flex;
+  display:none;
   justify-content:center;
   align-items:center;
   flex-direction:column;
@@ -254,6 +254,7 @@ body::before {
   .modal .modal-box{min-width:180px;}
 }
 
+/* Sparkles */
 .star {
   position: absolute;
   width: 8px;
@@ -264,7 +265,6 @@ body::before {
   animation: sparkle 0.8s forwards;
   z-index: 20;
 }
-
 @keyframes sparkle {
   to {
     transform: translate(var(--dx), var(--dy)) scale(0);
@@ -329,7 +329,6 @@ const mainZoom = document.getElementById('mainZoom');
 const thumbs = document.getElementById('thumbs');
 const likeCount = document.getElementById('likeCount');
 const commentCount = document.getElementById('commentCount');
-
 const likeBubbles = document.getElementById('likeBubbles');
 const commentBubbles = document.getElementById('commentBubbles');
 
@@ -388,68 +387,48 @@ zoomModal.onclick = e => { if (e.target === zoomModal) zoomModal.style.display =
 document.querySelector('.like-btn').onclick = () => {
   likeModal.style.display = 'flex';
   likeBubbles.innerHTML = '';
-  currentZoom.likes.forEach(p => {
+  currentZoom.likes?.forEach(p => {
     const b = document.createElement('div');
     b.className = 'bubble';
     b.innerHTML = `<strong>${p}</strong>`;
     likeBubbles.appendChild(b);
   });
 };
-
 likeModal.onclick = e => { if (e.target === likeModal) likeModal.style.display = 'none'; };
-
 document.getElementById('confirmLike').onclick = async () => {
   const name = document.getElementById('likeName').value.trim();
   if (!name) return;
-
+  currentZoom.likes = currentZoom.likes || [];
   currentZoom.likes.push(name);
   await supabase.from('creations').update({ likes: currentZoom.likes }).eq('id', currentZoom.id);
-
   const b = document.createElement('div');
   b.className = 'bubble';
   b.innerHTML = `<strong>${name}</strong>`;
   likeBubbles.appendChild(b);
   updateActions();
   document.getElementById('likeName').value = '';
-
-  // Étoiles
-  const rect = mainZoom.getBoundingClientRect();
-  for (let i = 0; i < 5; i++) {
-    const star = document.createElement('div');
-    star.className = 'star';
-    star.style.left = `${Math.random() * rect.width}px`;
-    star.style.top = `${Math.random() * rect.height}px`;
-    star.style.setProperty('--dx', `${(Math.random() - 0.5) * 100}px`);
-    star.style.setProperty('--dy', `${(Math.random() - 0.5) * 100}px`);
-    mainZoom.parentElement.appendChild(star);
-    setTimeout(() => star.remove(), 800);
-  }
 };
 
 // ---------------------- COMMENT ----------------------
 document.querySelector('.comment-btn').onclick = () => {
   commentModal.style.display = 'flex';
   commentBubbles.innerHTML = '';
-  currentZoom.comments.forEach(c => {
+  currentZoom.comments?.forEach(c => {
     const b = document.createElement('div');
     b.className = 'bubble';
     b.innerHTML = `<strong>${c.name}:</strong> ${c.text}`;
     commentBubbles.appendChild(b);
   });
 };
-
 commentModal.onclick = e => { if (e.target === commentModal) commentModal.style.display = 'none'; };
-
 document.getElementById('confirmComment').onclick = async () => {
   const name = document.getElementById('commentName').value.trim();
   const text = document.getElementById('commentText').value.trim();
   if (!name || !text) return;
-
+  currentZoom.comments = currentZoom.comments || [];
   const commentObj = { name, text };
   currentZoom.comments.push(commentObj);
-
   await supabase.from('creations').update({ comments: currentZoom.comments }).eq('id', currentZoom.id);
-
   const b = document.createElement('div');
   b.className = 'bubble';
   b.innerHTML = `<strong>${name}:</strong> ${text}`;
@@ -472,7 +451,6 @@ async function loadCreations() {
   }));
   render();
 }
-
 loadCreations();
 </script>
 </body>
