@@ -487,10 +487,10 @@ document.getElementById('confirmAdd').onclick = async () => {
   for (let f of files) {
     const path = `${Date.now()}_${f.name}`;
     await supabase.storage.from('images').upload(path, f);
-    await supabase.from('creations').insert([{ name, image_path: path, likes: [], comments: [] }]);
+    const { data } = await supabase.from('creations').insert([{ name, image_path: path, likes: [], comments: [] }]).select();
     urls.push(`https://jyhbamdcxmpveujjqjla.supabase.co/storage/v1/object/public/images/${path}`);
+    creations.unshift({ id: data[0].id, name, imgUrl: urls[0], zoomGroup: urls, likes: [], comments: [] });
   }
-  creations.unshift({ name, imgUrl: urls[0], zoomGroup: urls, likes: [], comments: [], image_path: urls[0].split('/images/')[1] });
   render();
   addModal.style.display = 'none';
   document.getElementById('photoName').value = '';
@@ -506,8 +506,7 @@ async function loadCreations() {
     imgUrl: `https://jyhbamdcxmpveujjqjla.supabase.co/storage/v1/object/public/images/${c.image_path}`,
     zoomGroup: [`https://jyhbamdcxmpveujjqjla.supabase.co/storage/v1/object/public/images/${c.image_path}`],
     likes: c.likes || [],
-    comments: c.comments || [],
-    image_path: c.image_path
+    comments: c.comments || []
   }));
   render();
 }
@@ -523,7 +522,9 @@ document.getElementById('cancelDelete').onclick = () => deleteModal.style.displa
 
 document.getElementById('confirmDelete').onclick = async () => {
   if (!currentDelete) return;
-  await supabase.storage.from('images').remove([currentDelete.image_path]);
+  for (let u of currentDelete.zoomGroup) {
+    await supabase.storage.from('images').remove([u.split('/images/')[1]]);
+  }
   await supabase.from('creations').delete().eq('id', currentDelete.id);
   creations = creations.filter(c => c.id !== currentDelete.id);
   render();
@@ -549,6 +550,7 @@ document.getElementById('confirmLike').onclick = async () => {
   if (!name) return;
 
   currentZoom.likes.push(name);
+
   await supabase.from('creations').update({ likes: currentZoom.likes }).eq('id', currentZoom.id);
 
   const b = document.createElement('div');
