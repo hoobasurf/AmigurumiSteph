@@ -27,20 +27,10 @@ body::before {
   flex:1;
   display:flex;
   justify-content:center;
-  align-items:flex-start;
-  padding:20px 0;
+  align-items:flex-start; /* pour descendre la grille */
+  padding: 3.5cm 0 0 0; /* ← ici le top padding fixe */
 }
 
-#visitor-list-container{
-  display:flex;
-  overflow-x:auto;
-  scroll-snap-type:x mandatory;
-  -webkit-overflow-scrolling: touch;
-  justify-content:center;
-  padding-left:1cm; 
-}
-
-/* Chaque page = 2x3 cartes */
 .page{
   display:grid;
   grid-template-columns: repeat(2, 1fr);
@@ -53,9 +43,18 @@ body::before {
   scroll-snap-align:center;
   padding:4mm;
   justify-content:center;
-  margin-top:4cm; /* descente de la grille */
+  margin-top:0; /* ← supprime la marge qui fait remonter la grille */
 }
 
+#visitor-list-container{
+  display:flex;
+  overflow-x:auto;
+  scroll-snap-type:x mandatory;
+  -webkit-overflow-scrolling: touch;
+  justify-content:center;
+  padding-left:1cm; 
+}
+  
 /* VISITOR ITEM */
 .visitor-item{
   position:relative;
