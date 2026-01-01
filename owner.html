@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
-html,body{height:100%;font-family:'Comic Sans MS',cursive;display:flex;flex-direction:column;}
+html,body{height:100%;font-family:'Comic Sans MS',cursive;}
 
 /* FOND FIXE */
 body::before {
@@ -24,11 +24,10 @@ body::before {
 
 /* SCROLL HORIZONTAL */
 .center-zone {
-  flex:1;
   display:flex;
   justify-content:center;
-  align-items:center;
-  padding:20px 0;
+  align-items:flex-start;
+  padding-top:140px; /* descente grille */
 }
 
 #visitor-list-container{
@@ -38,7 +37,6 @@ body::before {
   -webkit-overflow-scrolling: touch;
   justify-content:center;
   padding-left:1cm;
-  margin-top:3cm; /* Grille redescendue */
 }
 
 /* Chaque page = 2x3 cartes */
@@ -64,12 +62,9 @@ body::before {
   border-radius:12px;
   overflow:hidden;
   border:3px solid #fff;
-  box-shadow:0 6px 14px rgba(0,0,0,0.25),
-             inset 0 0 0 1px rgba(255,255,255,0.4);
+  box-shadow:0 0 0 3px #f6c2d1;
   background:#ffe6f0;
 }
-
-/* Overlay léger pour harmoniser avec fond */
 .visitor-item::after{
   content:"";
   position:absolute;
@@ -90,7 +85,7 @@ body::before {
   font-weight:bold;
 }
 
-/* Images avec harmonie couleurs */
+/* Images */
 .visitor-item img {
   width:100%;
   height:100%;
@@ -99,14 +94,11 @@ body::before {
   cursor:pointer;
   display:block;
   filter: brightness(1.05) contrast(1.05) saturate(0.95);
-  transition: transform 0.3s;
+  transition: filter 0.3s, transform 0.3s;
 }
+.visitor-item img:hover{transform: scale(1.03);}
 
-.visitor-item img:hover{
-  transform: scale(1.03);
-}
-
-/* Nom */
+/* NOM */
 .visitor-item p{
   position:absolute;
   bottom:2px;
@@ -118,15 +110,15 @@ body::before {
   text-shadow:1px 1px 2px rgba(255,255,255,0.8);
 }
 
-/* Croix suppression */
+/* CROIX */
 .delete-btn{
   position:absolute;
-  top:4px;
-  right:4px;
-  width:20px;
-  height:20px;
-  background:rgba(255,105,180,0.6);
-  color:#fff;
+  top:2px;
+  right:2px;
+  width:24px;
+  height:24px;
+  background:#fff8f8;
+  color:#ff69b4;
   border-radius:50%;
   display:flex;
   align-items:center;
@@ -134,14 +126,12 @@ body::before {
   font-weight:bold;
   cursor:pointer;
   z-index:5;
-  font-size:14px;
-  transition:background 0.2s;
+  font-size:16px;
+  border:1px solid #ffb6c1;
 }
-.delete-btn:hover{
-  background:rgba(233,79,154,0.8);
-}
+.delete-btn:hover{background:#ffdee7;}
 
-/* Sidebar */
+/* SIDEBAR */
 #sidebar{
   position:fixed;
   top:0;
@@ -180,22 +170,20 @@ body::before {
   font-weight:bold;
 }
 
-/* Modal Ajout */
-#addModal, #deleteModal, #likeModal, #commentModal{
+/* MODAL STYLE */
+.modal{
   position:fixed; inset:0;
   display:none;
   justify-content:center;
   align-items:center;
+  background:rgba(0,0,0,0.5);
   z-index:9999;
 }
-#addModal, #deleteModal, #likeModal, #commentModal{
-  background:rgba(0,0,0,0.5);
-}
-.modal-box{
+.modal .modal-box{
   background:#ffe6f0;
   padding:16px 24px;
   border-radius:20px;
-  border:3px solid #b67385;
+  border:2px solid #b67385;
   display:flex;
   flex-direction:column;
   gap:10px;
@@ -203,13 +191,13 @@ body::before {
   min-width:220px;
   font-family:'Comic Sans MS',cursive;
 }
-.modal-box input, .modal-box textarea{
+.modal input{
   padding:6px 12px;
   border-radius:10px;
   border:2px solid #b67385;
   width:100%;
 }
-.modal-box button{
+.modal button{
   padding:6px 14px;
   border:none;
   background:#ffb6c1;
@@ -220,7 +208,7 @@ body::before {
   width:100%;
 }
 
-/* Zoom */
+/* ZOOM */
 #zoomModal{
   position:fixed; inset:0;
   background:rgba(0,0,0,0.7);
@@ -236,7 +224,10 @@ body::before {
   border:4px solid #b67385;
   border-radius:24px;
   margin-bottom:10px;
+  filter:none;
 }
+
+/* Miniatures */
 #zoomModal .thumbs{
   display:flex;
   gap:8px;
@@ -251,64 +242,52 @@ body::before {
   border:2px solid #b67385;
   cursor:pointer;
 }
-.closeZoom{
-  position:absolute;
-  top:12px;
-  right:12px;
-  width:28px;
-  height:28px;
-  background:#ffb6c1;
-  color:#fff;
-  border-radius:50%;
+
+/* Actions Like / Comment sous miniatures */
+.actions{
   display:flex;
+  gap:16px;
+  margin-top:10px;
+  align-items:center;
+}
+.like-btn,.comment-btn{
+  display:flex;
+  align-items:center;
   justify-content:center;
-  align-items:center;
-  cursor:pointer;
-}
-
-/* Bulles likes/comments sous zoom */
-.likes-bubbles, .comments-bubbles{
-  display:flex;
-  flex-direction:column;
   gap:6px;
-  max-height:150px;
-  overflow-y:auto;
-  width:45%;
-}
-.likes-bubbles .bubble, .comments-bubbles .bubble{
-  background:rgba(255,192,203,0.3);
-  padding:4px 8px;
+  padding:4px 10px;
   border-radius:12px;
-  font-size:14px;
-  color:#b84c6f;
-}
-.comments-bubbles .bubble{
-  background:rgba(255,230,240,0.4);
-}
-
-/* Actions résumé sous miniature */
-.actions-summary{
-  position:absolute;
-  bottom:4px;
-  left:4px;
-  display:flex;
-  gap:8px;
-  align-items:center;
+  border:2px solid #ffc0cb;
+  cursor:pointer;
   font-weight:bold;
   font-size:14px;
-  color:#b84c6f;
+  color:#ff69b4;
+  background:rgba(255,192,203,0.2);
 }
-.actions-summary span{
-  display:flex;
-  align-items:center;
-  gap:4px;
+.comment-btn{
+  border-color:#d0b0e0;
+  color:#b84c6f;
+  background:rgba(208,176,224,0.2);
 }
 
-/* Responsive */
-@media(max-width:480px){
-  .page{grid-template-columns: repeat(2, 120px); grid-template-rows: repeat(3, 120px);}
-  .visitor-item{width:120px;height:120px;}
-  .modal-box{min-width:180px;}
+/* Bulles des prénoms et commentaires */
+.bulles-container{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  margin-top:10px;
+  width:80%;
+  justify-content:flex-start;
+}
+.bulle{
+  background:rgba(255,230,240,0.8);
+  border:1px solid #b67385;
+  padding:4px 8px;
+  border-radius:12px;
+  font-size:12px;
+  max-width:150px;
+  word-wrap:break-word;
+  box-shadow:1px 1px 5px rgba(0,0,0,0.1);
 }
 </style>
 </head>
@@ -324,7 +303,7 @@ body::before {
 </div>
 
 <!-- MODAL AJOUT -->
-<div id="addModal">
+<div id="addModal" class="modal">
   <div class="modal-box">
     <h2>Ajouter des photos</h2>
     <input id="photoName" placeholder="Nom du projet">
@@ -333,30 +312,21 @@ body::before {
   </div>
 </div>
 
-<!-- MODAL DELETE -->
-<div id="deleteModal">
-  <div class="modal-box">
-    <p>Supprimer définitivement cette image ?</p>
-    <button id="confirmDelete">Supprimer</button>
-    <button id="cancelDelete">Annuler</button>
-  </div>
-</div>
-
 <!-- MODAL LIKE -->
-<div id="likeModal">
+<div id="likeModal" class="modal">
   <div class="modal-box">
-    <h3>Ajouter un Like</h3>
-    <input id="likeName" placeholder="Prénom">
+    <h3>Qui a liké ?</h3>
+    <input id="likeName" placeholder="Ton prénom">
     <button id="confirmLike">Valider</button>
   </div>
 </div>
 
 <!-- MODAL COMMENT -->
-<div id="commentModal">
+<div id="commentModal" class="modal">
   <div class="modal-box">
-    <h3>Ajouter un Commentaire</h3>
-    <input id="commentName" placeholder="Prénom">
-    <textarea id="commentText" placeholder="Commentaire"></textarea>
+    <h3>Ajouter un commentaire</h3>
+    <input id="commentName" placeholder="Ton prénom">
+    <input id="commentText" placeholder="Ton commentaire">
     <button id="confirmComment">Valider</button>
   </div>
 </div>
@@ -365,29 +335,35 @@ body::before {
 <div id="zoomModal">
   <div class="closeZoom">×</div>
   <img id="mainZoom">
-  <div style="display:flex;gap:12px;width:90%;margin-top:10px;">
-    <div class="likes-bubbles"></div>
-    <div class="comments-bubbles"></div>
+  <div class="thumbs" id="thumbs"></div>
+
+  <div class="actions">
+    <button class="like-btn" id="likeBtn">🤍 0</button>
+    <button class="comment-btn" id="commentBtn">💬 0</button>
   </div>
+
+  <div class="bulles-container" id="likeBubbles"></div>
+  <div class="bulles-container" id="commentBubbles"></div>
 </div>
 
 <script type="module">
 import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
-
 const supabase=createClient(
   "https://jyhbamdcxmpveujjqjla.supabase.co",
   "sb_publishable_sqsxb-3Kl5o3-JQYv9kGFw_-g0EgwMa"
 );
 
-let creations=[],currentZoom=null,itemToDelete=null;
+let creations=[],currentZoom=null;
 const container=document.getElementById('visitor-list-container');
 const addModal=document.getElementById('addModal');
-const zoomModal=document.getElementById('zoomModal');
-const mainZoom=document.getElementById('mainZoom');
-const thumbs=document.getElementById('thumbs');
-const deleteModal=document.getElementById('deleteModal');
 const likeModal=document.getElementById('likeModal');
 const commentModal=document.getElementById('commentModal');
+const mainZoom=document.getElementById('mainZoom');
+const thumbs=document.getElementById('thumbs');
+const likeBtn=document.getElementById('likeBtn');
+const commentBtn=document.getElementById('commentBtn');
+const likeBubbles=document.getElementById('likeBubbles');
+const commentBubbles=document.getElementById('commentBubbles');
 
 async function loadCreations(){
   const {data}=await supabase.from("creations").select("*").order("created_at",{ascending:false});
@@ -415,15 +391,9 @@ function render(){
     d.innerHTML=`<div class="placeholder">?</div>
                  <div class="delete-btn">×</div>
                  <p>${c.name}</p>
-                 <img src="${c.imgUrl}" onload="this.previousElementSibling.style.display='none'" onerror="this.style.display='none'">
-                 <div class="actions-summary">
-                    <span>❤️ ${c.likes.length}</span>
-                    <span>💬 ${c.comments.length}</span>
-                 </div>`;
-    // Click image zoom
+                 <img src="${c.imgUrl}" onload="this.previousElementSibling.style.display='none'" onerror="this.style.display='none'">`;
     d.querySelector('img').onclick=()=>openZoom(c);
-    // Click delete
-    d.querySelector('.delete-btn').onclick=()=>openDeleteModal(c);
+    d.querySelector('.delete-btn').onclick=()=>deleteProject(c.name);
     page.appendChild(d);
   });
 }
@@ -431,48 +401,68 @@ function render(){
 function openZoom(c){
   currentZoom=c;
   mainZoom.src=c.imgUrl;
-  // afficher bulles
+  thumbs.innerHTML='';
+  c.zoomGroup.forEach(u=>{
+    const t=document.createElement('img');
+    t.src=u;
+    t.onclick=()=>mainZoom.src=u;
+    thumbs.appendChild(t);
+  });
+  updateActions();
   updateBubbles();
   zoomModal.style.display='flex';
 }
 
+function updateActions(){
+  likeBtn.textContent=`🤍 ${currentZoom.likes.length}`;
+  commentBtn.textContent=`💬 ${currentZoom.comments.length}`;
+}
+
 function updateBubbles(){
-  const likesContainer=zoomModal.querySelector('.likes-bubbles');
-  const commentsContainer=zoomModal.querySelector('.comments-bubbles');
-  likesContainer.innerHTML='';
-  commentsContainer.innerHTML='';
+  likeBubbles.innerHTML='';
   currentZoom.likes.forEach(n=>{
-    const b=document.createElement('div'); b.className='bubble'; b.textContent=n;
-    likesContainer.appendChild(b);
+    const b=document.createElement('div');
+    b.className='bulle';
+    b.textContent=n;
+    likeBubbles.appendChild(b);
   });
-  currentZoom.comments.forEach(obj=>{
-    const b=document.createElement('div'); b.className='bubble'; b.textContent=`${obj.name}: ${obj.text}`;
-    commentsContainer.appendChild(b);
+  commentBubbles.innerHTML='';
+  currentZoom.comments.forEach(c=>{
+    const b=document.createElement('div');
+    b.className='bulle';
+    b.textContent=c.name + ': ' + c.text;
+    commentBubbles.appendChild(b);
   });
 }
 
-function openDeleteModal(c){
-  itemToDelete=c;
-  deleteModal.style.display='flex';
-}
+likeBtn.onclick=()=>{likeModal.style.display='flex';document.getElementById('likeName').value='';};
+commentBtn.onclick=()=>{commentModal.style.display='flex';document.getElementById('commentName').value='';document.getElementById('commentText').value='';};
 
-document.getElementById('confirmDelete').onclick=async()=>{
-  if(!itemToDelete) return;
-  const c=itemToDelete;
-  for(let u of c.zoomGroup){
-    await supabase.storage.from('images').remove([u.split('/images/')[1]]);
-  }
-  await supabase.from('creations').delete().eq('name',c.name);
-  creations=creations.filter(x=>x.name!==c.name);
-  render();
-  deleteModal.style.display='none';
-  itemToDelete=null;
+document.getElementById('confirmLike').onclick=()=>{
+  const n=document.getElementById('likeName').value.trim();
+  if(n){currentZoom.likes.push(n);}
+  likeModal.style.display='none';
+  updateActions();
+  updateBubbles();
 };
-document.getElementById('cancelDelete').onclick=()=>{deleteModal.style.display='none'; itemToDelete=null;};
 
-// Add photo
-document.getElementById('addBtn').onclick=()=>addModal.style.display='flex';
+document.getElementById('confirmComment').onclick=()=>{
+  const n=document.getElementById('commentName').value.trim();
+  const t=document.getElementById('commentText').value.trim();
+  if(n && t){currentZoom.comments.push({name:n,text:t});}
+  commentModal.style.display='none';
+  updateActions();
+  updateBubbles();
+};
+
 addModal.onclick=e=>{if(e.target===addModal)addModal.style.display='none'};
+likeModal.onclick=e=>{if(e.target===likeModal)likeModal.style.display='none'};
+commentModal.onclick=e=>{if(e.target===commentModal)commentModal.style.display='none'};
+document.querySelector('.closeZoom').onclick=()=>zoomModal.style.display='none';
+zoomModal.onclick=e=>{if(e.target===zoomModal) zoomModal.style.display='none'};
+
+document.getElementById('addBtn').onclick=()=>addModal.style.display='flex';
+
 document.getElementById('confirmAdd').onclick=async()=>{
   const name=document.getElementById('photoName').value.trim();
   const files=document.getElementById('multiPhoto').files;
@@ -491,46 +481,18 @@ document.getElementById('confirmAdd').onclick=async()=>{
   document.getElementById('multiPhoto').value='';
 };
 
-// Toggle sidebar
+async function deleteProject(name){
+  if(!confirm("Supprimer définitivement ce projet ?")) return;
+  const p=creations.find(c=>c.name===name);
+  for(let u of p.zoomGroup){
+    await supabase.storage.from('images').remove([u.split('/images/')[1]]);
+  }
+  await supabase.from('creations').delete().eq('name',name);
+  creations=creations.filter(c=>c.name!==name);
+  render();
+}
+
 document.getElementById('toggleSidebar').onclick=()=>sidebar.classList.toggle('sidebar-open');
-
-// Zoom close
-document.querySelector('.closeZoom').onclick=()=>zoomModal.style.display='none';
-zoomModal.onclick=e=>{if(e.target===zoomModal) zoomModal.style.display='none'};
-
-// Like / Comment modals
-let pendingAction=null; // 'like' or 'comment'
-function openLikeModal(){likeModal.style.display='flex'; pendingAction='like';}
-function openCommentModal(){commentModal.style.display='flex'; pendingAction='comment';}
-
-document.getElementById('confirmLike').onclick=()=>{
-  const val=document.getElementById('likeName').value.trim();
-  if(val){currentZoom.likes.push(val);}
-  document.getElementById('likeName').value='';
-  likeModal.style.display='none';
-  updateBubbles(); render();
-};
-
-document.getElementById('confirmComment').onclick=()=>{
-  const name=document.getElementById('commentName').value.trim();
-  const text=document.getElementById('commentText').value.trim();
-  if(name && text){currentZoom.comments.push({name,text});}
-  document.getElementById('commentName').value='';
-  document.getElementById('commentText').value='';
-  commentModal.style.display='none';
-  updateBubbles(); render();
-};
-
-// Ajouter boutons like/comment sous zoom
-// Click like
-document.addEventListener('click',e=>{
-  if(e.target.classList.contains('like-btn')) openLikeModal();
-  if(e.target.classList.contains('comment-btn')) openCommentModal();
-});
-
-// Close modals on click background
-likeModal.onclick=e=>{if(e.target===likeModal) likeModal.style.display='none';}
-commentModal.onclick=e=>{if(e.target===commentModal) commentModal.style.display='none';}
 
 loadCreations();
 </script>
