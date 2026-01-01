@@ -29,6 +29,7 @@ body::before {
   align-items:center;
   padding:20px 0;
   margin-left:2cm; /* Décalage 2cm à droite */
+  margin-top: calc(50px + 2cm); /* Descend de 2cm */
 }
 
 #visitor-list-container{
@@ -136,7 +137,7 @@ body::before {
   font-size:14px;
   transition:background 0.2s;
 }
-.delete-btn:hover{background:rgba(255,182,193,0.7);}
+.delete-btn:hover{background:rgba(255,182,193,0.5);}
 
 /* SIDEBAR */
 #sidebar{
@@ -171,7 +172,7 @@ body::before {
   padding:8px 16px;
   border-radius:16px;
   border:none;
-  background:#ff69b4;
+  background:#ffc0cb; /* rose pastel */
   color:#fff;
   cursor:pointer;
   font-weight:bold;
@@ -185,7 +186,7 @@ body::before {
   display:none;
   justify-content:center;
   align-items:center;
-  z-index:10000;
+  z-index:10010; /* devant le zoom */
 }
 .modal-box{
   background:#ffe6f0;
@@ -208,7 +209,7 @@ body::before {
 .modal-box button{
   padding:6px 14px;
   border:none;
-  background:#ffb6c1;
+  background:#ffc0cb; /* pastel rose doux */
   color:#fff;
   border-radius:12px;
   cursor:pointer;
@@ -225,7 +226,7 @@ body::before {
   justify-content:center;
   align-items:center;
   flex-direction:column;
-  z-index:10001;
+  z-index:10000; /* inférieur aux modals */
 }
 #zoomModal img{
   max-width:80%;
@@ -306,7 +307,7 @@ body::before {
   <button id="addBtn">Ajouter</button>
 </div>
 
-<!-- MODAL AJOUT -->
+<!-- MODALS -->
 <div class="modal-overlay" id="addModal">
   <div class="modal-box">
     <h2>Ajouter des photos</h2>
@@ -316,7 +317,6 @@ body::before {
   </div>
 </div>
 
-<!-- MODAL SUPPRESSION -->
 <div class="modal-overlay" id="deleteModal">
   <div class="modal-box">
     <h3>Supprimer ce projet ?</h3>
@@ -325,7 +325,6 @@ body::before {
   </div>
 </div>
 
-<!-- MODAL LIKE -->
 <div class="modal-overlay" id="likeModal">
   <div class="modal-box">
     <h3>Ajouter un Like</h3>
@@ -335,7 +334,6 @@ body::before {
   </div>
 </div>
 
-<!-- MODAL COMMENTAIRE -->
 <div class="modal-overlay" id="commentModal">
   <div class="modal-box">
     <h3>Ajouter un Commentaire</h3>
@@ -346,7 +344,6 @@ body::before {
   </div>
 </div>
 
-<!-- ZOOM -->
 <div id="zoomModal">
   <div class="closeZoom">×</div>
   <img id="mainZoom">
@@ -373,14 +370,15 @@ const supabase=createClient(
 
 let creations=[],currentZoom=null,currentDelete=null;
 const container=document.getElementById('visitor-list-container');
-const addModal=document.getElementById('addModal');
-const zoomModal=document.getElementById('zoomModal');
-const mainZoom=document.getElementById('mainZoom');
-const thumbs=document.getElementById('thumbs');
 
+const addModal=document.getElementById('addModal');
 const deleteModal=document.getElementById('deleteModal');
 const likeModal=document.getElementById('likeModal');
 const commentModal=document.getElementById('commentModal');
+
+const zoomModal=document.getElementById('zoomModal');
+const mainZoom=document.getElementById('mainZoom');
+const thumbs=document.getElementById('thumbs');
 
 const likeBtn=document.getElementById('likeBtn');
 const commentBtn=document.getElementById('commentBtn');
@@ -416,13 +414,11 @@ function render(){
                  <img src="${c.imgUrl}" onload="this.previousElementSibling.style.display='none'" onerror="this.style.display='none'">`;
     page.appendChild(d);
 
-    // CROIX
     d.querySelector('.delete-btn').onclick=()=>{
       currentDelete=c;
       deleteModal.style.display='flex';
     };
 
-    // ZOOM
     d.querySelector('img').onclick=()=>openZoom(c);
   });
 }
@@ -441,23 +437,15 @@ function openZoom(c){
   zoomModal.style.display='flex';
 }
 
-// UPDATE LIKE / COMMENT COUNT
 function updateCounts(){
   likeCountSpan.textContent=currentZoom.likes.length;
   commentCountSpan.textContent=currentZoom.comments.length;
 }
 
-// CLICK LIKE
-likeBtn.onclick=()=>{
-  likeModal.style.display='flex';
-  renderLikeList();
-};
-commentBtn.onclick=()=>{
-  commentModal.style.display='flex';
-  renderCommentList();
-};
+// LIKE / COMMENT MODAL
+likeBtn.onclick=()=>{likeModal.style.display='flex'; renderLikeList();}
+commentBtn.onclick=()=>{commentModal.style.display='flex'; renderCommentList();}
 
-// RENDER MODAL LISTS
 function renderLikeList(){
   const list=document.getElementById('likeList');
   list.innerHTML=currentZoom.likes.map(n=>`<div style="padding:2px 6px;background:rgba(255,182,193,0.3);margin:2px;border-radius:8px;">${n}</div>`).join('');
@@ -491,7 +479,7 @@ document.getElementById('confirmComment').onclick=()=>{
   commentModal.style.display='none';
 };
 
-// ADD PHOTOS
+// ADD PHOTO
 document.getElementById('addBtn').onclick=()=>addModal.style.display='flex';
 addModal.onclick=e=>{if(e.target===addModal)addModal.style.display='none'};
 deleteModal.onclick=e=>{if(e.target===deleteModal)deleteModal.style.display='none'};
@@ -510,8 +498,6 @@ document.getElementById('confirmDelete').onclick=async()=>{
   render();
   deleteModal.style.display='none';
 };
-
-// CANCEL DELETE
 document.getElementById('cancelDelete').onclick=()=>deleteModal.style.display='none';
 
 // ADD PHOTO CONFIRM
@@ -529,15 +515,4 @@ document.getElementById('confirmAdd').onclick=async()=>{
   creations.unshift({name,imgUrl:urls[0],zoomGroup:urls,likes:[],comments:[]});
   render();
   addModal.style.display='none';
-  document.getElementById('photoName').value='';
-  document.getElementById('multiPhoto').value='';
-};
-
-// SIDEBAR
-const sidebar=document.getElementById('sidebar');
-document.getElementById('toggleSidebar').onclick=()=>sidebar.classList.toggle('sidebar-open');
-
-loadCreations();
-</script>
-</body>
-</html>
+  document.getElementById
