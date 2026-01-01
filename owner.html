@@ -181,7 +181,7 @@ body::before {
   font-weight:bold;
 }
 
-/* MODALS (ajout, delete, like, comment) */
+/* MODALS */
 .modal {
   position:fixed; inset:0;
   background:rgba(0,0,0,0.6);
@@ -541,4 +541,32 @@ document.getElementById('confirmLike').onclick=()=>{
 // COMMENT
 document.querySelector('.comment-btn').onclick=()=>{
   commentModal.style.display='flex';
-  commentB
+  commentBubbles.innerHTML='';
+  currentZoom.comments.forEach(c=>{
+    const b=document.createElement('div');
+    b.className='bubble';
+    b.innerHTML=`<strong>${c.name}:</strong> ${c.text}`;
+    commentBubbles.appendChild(b);
+  });
+};
+commentModal.onclick=e=>{if(e.target===commentModal) commentModal.style.display='none'};
+document.getElementById('confirmComment').onclick=()=>{
+  const name=document.getElementById('commentName').value.trim();
+  const text=document.getElementById('commentText').value.trim();
+  if(name && text){
+    currentZoom.comments.push({name,text});
+    const b=document.createElement('div');
+    b.className='bubble';
+    b.innerHTML=`<strong>${name}:</strong> ${text}`;
+    commentBubbles.appendChild(b);
+    updateActions();
+    document.getElementById('commentName').value='';
+    document.getElementById('commentText').value='';
+  }
+};
+
+// INIT
+loadCreations();
+</script>
+</body>
+</html>
