@@ -483,28 +483,14 @@ document.getElementById('confirmAdd').onclick = async () => {
   const name = document.getElementById('photoName').value.trim();
   const files = document.getElementById('multiPhoto').files;
   if (!name || !files.length) return;
-
+  const urls = [];
   for (let f of files) {
     const path = `${Date.now()}_${f.name}`;
     await supabase.storage.from('images').upload(path, f);
-    const { data } = await supabase.from('creations').insert([{ 
-      name, 
-      image_path: path,
-      likes: [],
-      comments: []
-    }]).select().single();
-
-    const url = `https://jyhbamdcxmpveujjqjla.supabase.co/storage/v1/object/public/images/${path}`;
-    creations.unshift({
-      id: data.id,
-      name: data.name,
-      imgUrl: url,
-      zoomGroup: [url],
-      likes: [],
-      comments: []
-    });
+    await supabase.from('creations').insert([{ name, image_path: path, likes: [], comments: [] }]);
+    urls.push(`https://jyhbamdcxmpveujjqjla.supabase.co/storage/v1/object/public/images/${path}`);
   }
-
+  creations.unshift({ name, imgUrl: urls[0], zoomGroup: urls, likes: [], comments: [], image_path: urls[0].split('/images/')[1] });
   render();
   addModal.style.display = 'none';
   document.getElementById('photoName').value = '';
@@ -520,7 +506,8 @@ async function loadCreations() {
     imgUrl: `https://jyhbamdcxmpveujjqjla.supabase.co/storage/v1/object/public/images/${c.image_path}`,
     zoomGroup: [`https://jyhbamdcxmpveujjqjla.supabase.co/storage/v1/object/public/images/${c.image_path}`],
     likes: c.likes || [],
-    comments: c.comments || []
+    comments: c.comments || [],
+    image_path: c.image_path
   }));
   render();
 }
@@ -536,9 +523,7 @@ document.getElementById('cancelDelete').onclick = () => deleteModal.style.displa
 
 document.getElementById('confirmDelete').onclick = async () => {
   if (!currentDelete) return;
-  for (let u of currentDelete.zoomGroup) {
-    await supabase.storage.from('images').remove([u.split('/images/')[1]]);
-  }
+  await supabase.storage.from('images').remove([currentDelete.image_path]);
   await supabase.from('creations').delete().eq('id', currentDelete.id);
   creations = creations.filter(c => c.id !== currentDelete.id);
   render();
@@ -549,7 +534,7 @@ document.getElementById('confirmDelete').onclick = async () => {
 document.querySelector('.like-btn').onclick = () => {
   likeModal.style.display = 'flex';
   likeBubbles.innerHTML = '';
-  (currentZoom.likes || []).forEach(p => {
+  currentZoom.likes.forEach(p => {
     const b = document.createElement('div');
     b.className = 'bubble';
     b.innerHTML = `<strong>${p}</strong>`;
@@ -564,7 +549,6 @@ document.getElementById('confirmLike').onclick = async () => {
   if (!name) return;
 
   currentZoom.likes.push(name);
-
   await supabase.from('creations').update({ likes: currentZoom.likes }).eq('id', currentZoom.id);
 
   const b = document.createElement('div');
@@ -574,6 +558,7 @@ document.getElementById('confirmLike').onclick = async () => {
   updateActions();
   document.getElementById('likeName').value = '';
 
+  // Étoiles
   const rect = mainZoom.getBoundingClientRect();
   for (let i = 0; i < 5; i++) {
     const star = document.createElement('div');
@@ -591,7 +576,7 @@ document.getElementById('confirmLike').onclick = async () => {
 document.querySelector('.comment-btn').onclick = () => {
   commentModal.style.display = 'flex';
   commentBubbles.innerHTML = '';
-  (currentZoom.comments || []).forEach(c => {
+  currentZoom.comments.forEach(c => {
     const b = document.createElement('div');
     b.className = 'bubble';
     b.innerHTML = `<strong>${c.name}:</strong> ${c.text}`;
@@ -620,7 +605,7 @@ document.getElementById('confirmComment').onclick = async () => {
   document.getElementById('commentText').value = '';
 };
 
-// ---------------------- START ----------------------
+// ---------------------- LOAD ON START ----------------------
 loadCreations();
 </script>
 </body>
