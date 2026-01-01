@@ -7,22 +7,28 @@
 *{box-sizing:border-box;margin:0;padding:0;}
 html,body{height:100%;font-family:'Comic Sans MS',cursive;}
 
-/* FOND FIXE */
-body::before{
+/* BODY FOND FIXE */
+body::before {
   content:"";
-  position:fixed;top:0;left:0;
-  width:100vw;height:100vh;
-  background:url('Photoroom_20251223_114401.jpeg') center/cover no-repeat;
+  position:fixed;
+  top:0;
+  left:0;
+  width:100vw;
+  height:100vh;
+  background-image: url('Photoroom_20251223_114401.jpeg');
+  background-size: cover;
+  background-position: center center;
+  background-repeat: no-repeat;
   z-index:-1;
 }
 
 /* SCROLL HORIZONTAL */
-.center-zone{
+.center-zone {
   flex:1;
   display:flex;
   justify-content:center;
-  align-items:flex-start; /* descendre la grille */
-  padding-top:6cm; /* ajuste pour descendre la grille 2+1 cm */
+  align-items:flex-start; /* descendue */
+  padding:calc(20px + 3cm) 0 20px 0; /* descendue de 2+1 cm */
 }
 
 #visitor-list-container{
@@ -31,11 +37,9 @@ body::before{
   scroll-snap-type:x mandatory;
   -webkit-overflow-scrolling: touch;
   justify-content:center;
-  gap:10px;
-  padding-left:1cm;
 }
 
-/* Page 2x3 cards */
+/* Chaque page = 2x3 cartes */
 .page{
   display:grid;
   grid-template-columns: repeat(2, 1fr);
@@ -43,8 +47,8 @@ body::before{
   column-gap:3mm;
   row-gap:4mm;
   flex:0 0 auto;
-  width: calc(2*200px + 3mm);
-  height: calc(3*200px + 8mm);
+  width: calc(2 * 200px + 3mm);
+  height: calc(3 * 200px + 8mm);
   scroll-snap-align:center;
   padding:4mm;
   justify-content:center;
@@ -53,122 +57,242 @@ body::before{
 /* VISITOR ITEM */
 .visitor-item{
   position:relative;
-  width:200px;height:200px;
+  width:200px;
+  height:200px;
   border-radius:12px;
   overflow:hidden;
   border:3px solid #fff;
-  box-shadow:0 6px 14px rgba(0,0,0,0.25), inset 0 0 0 1px rgba(255,255,255,0.4);
+  box-shadow: 0 6px 14px rgba(0,0,0,0.25),
+              inset 0 0 0 1px rgba(255,255,255,0.4);
   background:#ffe6f0;
+  z-index:1;
 }
 
-/* Placeholder */
+/* placeholder */
 .visitor-item .placeholder{
-  position:absolute;inset:0;
-  display:flex;justify-content:center;align-items:center;
-  font-size:24px;color:#b84c6f;font-weight:bold;
+  position:absolute;
+  inset:0;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  font-size:24px;
+  color:#b84c6f;
+  font-weight:bold;
 }
 
-/* Image */
-.visitor-item img{
-  width:100%;height:100%;
-  object-fit:cover;border-radius:12px;
-  cursor:pointer;display:block;
-  filter:brightness(1.05) contrast(1.05) saturate(0.95);
-  transition:transform 0.3s,filter 0.3s;
+/* Images */
+.visitor-item img {
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  border-radius:12px;
+  cursor:pointer;
+  display:block;
+  filter: brightness(1.05) contrast(1.05) saturate(0.95);
+  transition: filter 0.3s, transform 0.3s;
 }
-.visitor-item img:hover{transform:scale(1.03);filter:brightness(1.1) contrast(1.05) saturate(1);}
+.visitor-item img:hover {
+  transform: scale(1.03);
+}
 
-/* Overlay subtil pour “épouser le fond” */
+/* Overlay léger pour intégrer image au fond */
 .visitor-item::after{
-  content:"";position:absolute;inset:0;
+  content:"";
+  position:absolute;
+  inset:0;
   background:rgba(255,230,240,0.12);
   pointer-events:none;
 }
 
-/* Nom */
+/* NOM */
 .visitor-item p{
-  position:absolute;bottom:2px;width:100%;
-  font-size:14px;color:#b84c6f;
-  font-weight:bold;text-align:center;
+  position:absolute;
+  bottom:2px;
+  width:100%;
+  font-size:14px;
+  color:#b84c6f;
+  font-weight:bold;
+  text-align:center;
   text-shadow:1px 1px 2px rgba(255,255,255,0.8);
+  z-index:2;
 }
 
-/* Croix supprimer */
+/* CROIX */
 .delete-btn{
-  position:absolute;top:4px;right:4px;
-  width:22px;height:22px;
-  background:#ffe6f0;color:#b84c6f;
+  position:absolute;
+  top:4px;
+  right:4px;
+  width:22px;
+  height:22px;
+  background:rgba(255,182,193,0.7);
+  color:#fff;
   border-radius:50%;
-  display:flex;justify-content:center;align-items:center;
-  font-weight:bold;font-size:16px;
-  cursor:pointer;z-index:10;
-  border:1px solid #b84c6f;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-weight:bold;
+  cursor:pointer;
+  z-index:10;
+  font-size:14px;
+  border:1px solid #fff;
 }
-.delete-btn:hover{background:#f9d6e0;}
+.delete-btn:hover{background:#ffb6c1;}
 
 /* SIDEBAR */
 #sidebar{
-  position:fixed;top:0;left:-220px;
-  width:220px;height:100vh;
+  position:fixed;
+  top:0;
+  left:-220px;
+  width:220px;
+  height:100vh;
   background:rgba(255,230,240,0.2);
   border-right:2px solid #b67385;
   padding:20px;
-  transition:left .3s;z-index:15;
+  transition:left .3s;
+  z-index:15;
 }
 #sidebar.sidebar-open{left:0}
 #toggleSidebar{
-  position:absolute;top:50%;right:-30px;width:30px;height:60px;
-  background:#ffb6c1;border-radius:0 12px 12px 0;
-  display:flex;align-items:center;justify-content:center;cursor:pointer;font-weight:bold;
+  position:absolute;
+  top:50%;
+  right:-30px;
+  width:30px;
+  height:60px;
+  background:#ffb6c1;
+  border-radius:0 12px 12px 0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+  font-weight:bold;
 }
 #sidebar button{
-  width:auto;padding:8px 16px;border-radius:16px;border:none;
-  background:#ffb6c1;color:#b84c6f;cursor:pointer;font-weight:bold;
+  width:auto;
+  padding:8px 16px;
+  border-radius:16px;
+  border:none;
+  background:#ff69b4;
+  color:#fff;
+  cursor:pointer;
+  font-weight:bold;
 }
 
-/* MODAL BASE */
+/* MODAL */
 .modal{
-  position:fixed;inset:0;
-  display:none;justify-content:center;align-items:center;
-  background:rgba(0,0,0,0.5);z-index:50;
+  position:fixed; inset:0;
+  background:rgba(0,0,0,0.5);
+  display:none;
+  justify-content:center;
+  align-items:center;
+  z-index:60;
 }
 .modal .modal-box{
-  background:#ffe6f0;padding:16px 20px;border-radius:20px;
-  border:2px solid #b67385;display:flex;flex-direction:column;
-  gap:10px;align-items:center;min-width:200px;
+  background:#ffe6f0;
+  padding:16px 24px;
+  border-radius:20px;
+  border:3px solid #b67385;
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+  align-items:center;
+  min-width:220px;
+}
+
+/* Inputs et boutons modal */
+.modal input, .modal textarea{
+  width:100%;
+  padding:6px 12px;
+  border-radius:10px;
+  border:2px solid #b67385;
+}
+.modal button{
+  padding:6px 14px;
+  border:none;
+  background:#ffb6c1;
+  color:#fff;
+  border-radius:12px;
+  cursor:pointer;
+  font-weight:bold;
+  width:100%;
 }
 
 /* ZOOM */
-#zoomModal .modal-box{
-  width:auto;max-width:90%;background:none;border:none;gap:4px;align-items:center;
+#zoomModal{
+  position:fixed; inset:0;
+  background:rgba(0,0,0,0.7);
+  display:none;
+  justify-content:center;
+  align-items:center;
+  flex-direction:column;
+  z-index:50;
 }
 #zoomModal img{
-  max-width:80%;max-height:60vh;
-  border:4px solid #b67385;border-radius:20px;margin-bottom:10px;
+  max-width:80%;
+  max-height:60vh;
+  border:4px solid #b67385;
+  border-radius:24px;
+  margin-bottom:10px;
+  filter:none;
 }
 #zoomModal .thumbs{
-  display:flex;gap:8px;max-width:80%;overflow-x:auto;margin-bottom:4px;
+  display:flex;
+  gap:8px;
+  max-width:80%;
+  overflow-x:auto;
 }
 #zoomModal .thumbs img{
-  width:50px;height:50px;object-fit:cover;border-radius:12px;
-  border:2px solid #b67385;cursor:pointer;
+  width:50px;
+  height:50px;
+  object-fit:cover;
+  border-radius:12px;
+  border:2px solid #b67385;
+  cursor:pointer;
 }
-#zoomModal .actions{
-  display:flex;gap:16px;margin-top:4px;
+
+/* Actions sous miniatures */
+.actions{
+  display:flex;
+  gap:10px;
+  margin-top:6px;
 }
-.like-btn,.comment-btn{
-  display:flex;align-items:center;gap:4px;padding:4px 10px;
-  border-radius:12px;border:none;font-weight:bold;
-  cursor:pointer;color:#b84c6f;background:#ffe6f0;
+.like-btn, .comment-btn{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  font-weight:bold;
+  cursor:pointer;
+  background:none;
+  border:none;
+  font-size:16px;
+  color:#b84c6f;
+}
+.like-btn svg, .comment-btn svg{
+  width:18px; height:18px;
+  stroke:#ffb6c1;
+  fill:none;
+}
+
+/* Affichage prénoms et commentaires */
+#likeList, #commentList{
+  display:flex;
+  flex-direction:column;
+  gap:4px;
+  margin-top:6px;
+  max-height:100px;
+  overflow-y:auto;
+}
+#likeList div{
+  background:rgba(255,182,193,0.2);
+  padding:4px 8px;
+  border-radius:12px;
   font-size:14px;
 }
-.like-btn:hover{background:#f9d6e0;}
-.comment-btn:hover{background:#f9d6e0;}
-
-/* BULLS sous miniatures */
-.bubbles{display:flex;gap:10px;margin-top:4px;}
-.bubble{padding:4px 6px;background:rgba(255,230,240,0.7);
-border:1px solid #b84c6f;border-radius:12px;font-size:12px;color:#b84c6f;max-width:90%;word-wrap:break-word;}
+#commentList div{
+  background:rgba(184,76,111,0.2);
+  padding:4px 8px;
+  border-radius:12px;
+  font-size:14px;
+}
 
 /* Responsive */
 @media(max-width:480px){
@@ -189,7 +313,7 @@ border:1px solid #b84c6f;border-radius:12px;font-size:12px;color:#b84c6f;max-wid
   <button id="addBtn">Ajouter</button>
 </div>
 
-<!-- MODALS -->
+<!-- MODAL AJOUT -->
 <div id="addModal" class="modal">
   <div class="modal-box">
     <h2>Ajouter des photos</h2>
@@ -199,53 +323,63 @@ border:1px solid #b84c6f;border-radius:12px;font-size:12px;color:#b84c6f;max-wid
   </div>
 </div>
 
+<!-- MODAL SUPPRIMER -->
 <div id="deleteModal" class="modal">
   <div class="modal-box">
-    <p>Supprimer définitivement cette image ?</p>
+    <p id="deleteText"></p>
     <button id="confirmDelete">Supprimer</button>
     <button id="cancelDelete">Annuler</button>
   </div>
 </div>
 
+<!-- MODAL LIKE -->
 <div id="likeModal" class="modal">
   <div class="modal-box">
-    <h3>Ajouter un Like 💖</h3>
-    <input id="likeName" placeholder="Prénom">
-    <button id="confirmLike">Valider</button>
+    <h3>Like</h3>
+    <input id="likeName" placeholder="Votre prénom">
+    <button id="submitLike">Valider</button>
+    <div id="likeList"></div>
   </div>
 </div>
 
+<!-- MODAL COMMENTAIRE -->
 <div id="commentModal" class="modal">
   <div class="modal-box">
-    <h3>Ajouter un Commentaire 💬</h3>
-    <input id="commentName" placeholder="Prénom">
-    <input id="commentText" placeholder="Commentaire">
-    <button id="confirmComment">Valider</button>
+    <h3>Commentaire</h3>
+    <input id="commentName" placeholder="Votre prénom">
+    <textarea id="commentText" placeholder="Votre commentaire"></textarea>
+    <button id="submitComment">Valider</button>
+    <div id="commentList"></div>
   </div>
 </div>
 
-<div id="zoomModal" class="modal">
-  <div class="modal-box">
-    <img id="mainZoom">
-    <div class="thumbs" id="thumbs"></div>
-    <div class="actions">
-      <button class="like-btn"><span>♡</span> <span id="likeCount">0</span></button>
-      <button class="comment-btn"><span>💬</span> <span id="commentCount">0</span></button>
-    </div>
-    <div class="bubbles" id="bubblesContainer"></div>
+<!-- ZOOM -->
+<div id="zoomModal">
+  <img id="mainZoom">
+  <div class="thumbs" id="thumbs"></div>
+  <div class="actions">
+    <button class="like-btn" id="zoomLike">
+      <svg viewBox="0 0 24 24"><path d="M12 21C12 21 4 13.5 4 8.5C4 5.4 6.5 3 9.5 3C11 3 12 4 12 4C12 4 13 3 14.5 3C17.5 3 20 5.4 20 8.5C20 13.5 12 21 12 21Z"/></svg>
+      <span id="likeCount">0</span>
+    </button>
+    <button class="comment-btn" id="zoomComment">
+      <svg viewBox="0 0 24 24"><path d="M2 2H22V16H6L2 20V2Z"/></svg>
+      <span id="commentCount">0</span>
+    </button>
   </div>
+  <div id="likeList"></div>
+  <div id="commentList"></div>
 </div>
 
 <script type="module">
 import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
-const supabase = createClient(
+const supabase=createClient(
   "https://jyhbamdcxmpveujjqjla.supabase.co",
   "sb_publishable_sqsxb-3Kl5o3-JQYv9kGFw_-g0EgwMa"
 );
 
 let creations=[],currentZoom=null;
 const container=document.getElementById('visitor-list-container');
-
 const addModal=document.getElementById('addModal');
 const deleteModal=document.getElementById('deleteModal');
 const likeModal=document.getElementById('likeModal');
@@ -253,13 +387,12 @@ const commentModal=document.getElementById('commentModal');
 const zoomModal=document.getElementById('zoomModal');
 const mainZoom=document.getElementById('mainZoom');
 const thumbs=document.getElementById('thumbs');
-const bubblesContainer=document.getElementById('bubblesContainer');
-const likeBtn=document.querySelector('.like-btn');
-const commentBtn=document.querySelector('.comment-btn');
-const likeCountEl=document.getElementById('likeCount');
-const commentCountEl=document.getElementById('commentCount');
+const likeCountSpan=document.getElementById('likeCount');
+const commentCountSpan=document.getElementById('commentCount');
+const likeListDiv=likeModal.querySelector('#likeList');
+const commentListDiv=commentModal.querySelector('#commentList');
 
-let itemToDelete=null;
+let pendingDelete=null;
 
 async function loadCreations(){
   const {data}=await supabase.from("creations").select("*").order("created_at",{ascending:false});
@@ -275,122 +408,108 @@ async function loadCreations(){
 
 function render(){
   container.innerHTML='';
+  let page=null;
   creations.forEach((c,i)=>{
-    let page=null;
     if(i%6===0){
       page=document.createElement('div');
       page.className='page';
       container.appendChild(page);
-    } else {
-      page=container.lastChild;
     }
     const d=document.createElement('div');
     d.className='visitor-item';
     d.innerHTML=`<div class="placeholder">?</div>
                  <div class="delete-btn">×</div>
                  <p>${c.name}</p>
-                 <img src="${c.imgUrl}" onload="this.previousElementSibling.style.display='none'" onerror="this.style.display='none'">
-                 <div class="bubbles"></div>`;
+                 <img src="${c.imgUrl}" onload="this.previousElementSibling.style.display='none'" onerror="this.style.display='none'">`;
     d.querySelector('img').onclick=()=>openZoom(c);
-    d.querySelector('.delete-btn').onclick=()=>openDeleteModal(c);
+    d.querySelector('.delete-btn').onclick=()=>openDelete(c);
     page.appendChild(d);
   });
 }
 
-/* OPEN ZOOM */
 function openZoom(c){
   currentZoom=c;
   mainZoom.src=c.imgUrl;
   thumbs.innerHTML='';
   c.zoomGroup.forEach(u=>{
-    const t=document.createElement('img'); t.src=u;
+    const t=document.createElement('img');
+    t.src=u;
     t.onclick=()=>mainZoom.src=u;
     thumbs.appendChild(t);
   });
-  updateBubbles();
   updateActions();
   zoomModal.style.display='flex';
 }
 
-function updateBubbles(){
-  bubblesContainer.innerHTML='';
-  // Likes
-  cLikes= currentZoom.likes || [];
-  if(cLikes.length>0){
-    cLikes.forEach(n=>{
-      const b=document.createElement('div');b.className='bubble';b.textContent=n;
-      bubblesContainer.appendChild(b);
-    });
-  }
-  // Comments
-  cComments=currentZoom.comments || [];
-  if(cComments.length>0){
-    cComments.forEach(c=>{
-      const b=document.createElement('div');b.className='bubble';
-      b.textContent=`${c.name}: ${c.text}`;b.style.background='rgba(255,230,240,0.7)';
-      bubblesContainer.appendChild(b);
-    });
-  }
-}
-
-/* Update compteur */
 function updateActions(){
-  likeCountEl.textContent=currentZoom.likes.length;
-  commentCountEl.textContent=currentZoom.comments.length;
+  likeCountSpan.textContent=currentZoom.likes.length;
+  commentCountSpan.textContent=currentZoom.comments.length;
+  // update lists below miniatures
+  likeListDiv.innerHTML='';
+  currentZoom.likes.forEach(n=>{const d=document.createElement('div'); d.textContent=n; likeListDiv.appendChild(d);});
+  commentListDiv.innerHTML='';
+  currentZoom.comments.forEach(c=>{const d=document.createElement('div'); d.textContent=c.name + ': '+c.comment; commentListDiv.appendChild(d);});
 }
 
-/* LIKE MODAL */
-likeBtn.onclick=()=>{
-  likeModal.style.display='flex';
-  document.getElementById('likeName').value='';
+function openDelete(c){
+  pendingDelete=c;
+  deleteModal.querySelector('#deleteText').textContent=`Supprimer le projet "${c.name}" ?`;
+  deleteModal.style.display='flex';
+}
+
+/* Event Modal Delete */
+document.getElementById('confirmDelete').onclick=async()=>{
+  if(!pendingDelete) return;
+  for(let u of pendingDelete.zoomGroup){
+    await supabase.storage.from('images').remove([u.split('/images/')[1]]);
+  }
+  await supabase.from('creations').delete().eq('name',pendingDelete.name);
+  creations=creations.filter(c=>c.name!==pendingDelete.name);
+  deleteModal.style.display='none';
+  render();
 };
-document.getElementById('confirmLike').onclick=()=>{
-  const n=document.getElementById('likeName').value.trim();
-  if(!n) return;
-  if(!currentZoom.likes) currentZoom.likes=[];
-  currentZoom.likes.push(n);
-  updateActions(); updateBubbles();
+document.getElementById('cancelDelete').onclick=()=>deleteModal.style.display='none';
+
+/* Sidebar */
+document.getElementById('toggleSidebar').onclick=()=>document.getElementById('sidebar').classList.toggle('sidebar-open');
+document.getElementById('addBtn').onclick=()=>addModal.style.display='flex';
+addModal.onclick=e=>{if(e.target===addModal)addModal.style.display='none'};
+deleteModal.onclick=e=>{if(e.target===deleteModal)deleteModal.style.display='none'};
+zoomModal.onclick=e=>{if(e.target===zoomModal) zoomModal.style.display='none'};
+likeModal.onclick=e=>{if(e.target===likeModal) likeModal.style.display='none'};
+commentModal.onclick=e=>{if(e.target===commentModal) commentModal.style.display='none'};
+
+/* Like et Commentaire */
+document.getElementById('zoomLike').onclick=()=>{
+  likeModal.style.display='flex';
+  likeModal.querySelector('#likeName').value='';
+  likeListDiv.innerHTML='';
+};
+document.getElementById('submitLike').onclick=()=>{
+  const val=likeModal.querySelector('#likeName').value.trim();
+  if(val && !currentZoom.likes.includes(val)){
+    currentZoom.likes.push(val);
+    updateActions();
+  }
   likeModal.style.display='none';
 };
-
-/* COMMENT MODAL */
-commentBtn.onclick=()=>{
+document.getElementById('zoomComment').onclick=()=>{
   commentModal.style.display='flex';
-  document.getElementById('commentName').value='';
-  document.getElementById('commentText').value='';
+  commentModal.querySelector('#commentName').value='';
+  commentModal.querySelector('#commentText').value='';
+  commentListDiv.innerHTML='';
 };
-document.getElementById('confirmComment').onclick=()=>{
-  const n=document.getElementById('commentName').value.trim();
-  const t=document.getElementById('commentText').value.trim();
-  if(!n||!t) return;
-  if(!currentZoom.comments) currentZoom.comments=[];
-  currentZoom.comments.push({name:n,text:t});
-  updateActions(); updateBubbles();
+document.getElementById('submitComment').onclick=()=>{
+  const name=commentModal.querySelector('#commentName').value.trim();
+  const txt=commentModal.querySelector('#commentText').value.trim();
+  if(name && txt){
+    currentZoom.comments.push({name:name,comment:txt});
+    updateActions();
+  }
   commentModal.style.display='none';
 };
 
-/* DELETE MODAL */
-function openDeleteModal(c){
-  itemToDelete=c;
-  deleteModal.style.display='flex';
-}
-document.getElementById('confirmDelete').onclick=async()=>{
-  const c=itemToDelete;
-  if(!c) return;
-  for(let u of c.zoomGroup){
-    await supabase.storage.from('images').remove([u.split('/images/')[1]]);
-  }
-  await supabase.from('creations').delete().eq('name',c.name);
-  creations=creations.filter(x=>x.name!==c.name);
-  render();
-  deleteModal.style.display='none';
-  itemToDelete=null;
-};
-document.getElementById('cancelDelete').onclick=()=>{deleteModal.style.display='none';itemToDelete=null;};
-
-/* ADD MODAL */
-document.getElementById('addBtn').onclick=()=>addModal.style.display='flex';
-addModal.onclick=e=>{if(e.target===addModal)addModal.style.display='none'};
+/* Ajouter photos */
 document.getElementById('confirmAdd').onclick=async()=>{
   const name=document.getElementById('photoName').value.trim();
   const files=document.getElementById('multiPhoto').files;
@@ -406,17 +525,4 @@ document.getElementById('confirmAdd').onclick=async()=>{
   render();
   addModal.style.display='none';
   document.getElementById('photoName').value='';
-  document.getElementById('multiPhoto').value='';
-};
-
-/* CLOSE ZOOM */
-document.querySelector('.closeZoom').onclick=()=>zoomModal.style.display='none';
-zoomModal.onclick=e=>{if(e.target===zoomModal) zoomModal.style.display='none'};
-
-/* SIDEBAR */
-document.getElementById('toggleSidebar').onclick=()=>sidebar.classList.toggle('sidebar-open');
-
-loadCreations();
-</script>
-</body>
-</html>
+  document.getElementById('
