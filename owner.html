@@ -27,7 +27,7 @@ body::before {
   flex:1;
   display:flex;
   justify-content:center;
-  align-items:flex-start;
+  align-items:flex-start; /* pour descendre la grille */
   padding:20px 0;
 }
 
@@ -53,7 +53,7 @@ body::before {
   scroll-snap-align:center;
   padding:4mm;
   justify-content:center;
-  margin-top:2cm;
+  margin-top:3cm; /* descente de la grille de 1cm en plus */
 }
 
 /* VISITOR ITEM */
@@ -98,7 +98,7 @@ body::before {
   transform: scale(1.03);
 }
 
-/* Overlay léger */
+/* Overlay */
 .visitor-item::after{
   content:"";
   position:absolute;
@@ -181,14 +181,14 @@ body::before {
   font-weight:bold;
 }
 
-/* MODALS */
+/* MODAL */
 .modal {
   position:fixed; inset:0;
   background:rgba(0,0,0,0.6);
   display:none;
   justify-content:center;
   align-items:center;
-  z-index:11000; /* supérieur au zoom */
+  z-index:10001; /* au-dessus du zoom */
 }
 .modal .modal-box{
   background:#ffe6f0;
@@ -219,27 +219,6 @@ body::before {
   width:100%;
 }
 
-/* Scroll horizontal dans like/comment bubbles */
-.bubble-container{
-  display:flex;
-  gap:12px;
-  margin-top:8px;
-  overflow-x:auto;
-  padding:4px;
-  max-width:100%;
-}
-.bubble{
-  background:rgba(255,182,193,0.3);
-  border-radius:16px;
-  padding:4px 8px;
-  font-size:12px;
-  max-width:150px;
-  word-wrap: break-word;
-}
-.bubble strong{
-  font-weight:bold;
-}
-
 /* ZOOM */
 #zoomModal{
   position:fixed; inset:0;
@@ -248,7 +227,7 @@ body::before {
   justify-content:center;
   align-items:center;
   flex-direction:column;
-  z-index:10000; /* en dessous des modals */
+  z-index:10000;
 }
 #zoomModal img{
   max-width:80%;
@@ -287,31 +266,20 @@ body::before {
   cursor:pointer;
 }
 
-/* ACTIONS SOUS MINIATURES */
-.actions{
+/* BUBBLES HORIZONTALES */
+.bubble-container{
   display:flex;
-  gap:16px;
-  margin-top:6px;
-  justify-content:center;
+  gap:8px;
+  overflow-x:auto;
+  padding:4px 0;
+  max-width:100%;
 }
-.like-btn,.comment-btn{
-  display:flex;
-  align-items:center;
-  gap:6px;
-  padding:4px 10px;
-  border-radius:12px;
-  border:none;
-  cursor:pointer;
-  font-weight:bold;
-  background:transparent;
-  color:#b84c6f;
-  font-size:14px;
-}
-.like-btn svg,.comment-btn svg{
-  width:16px;
-  height:16px;
-  stroke:#ffb6c1;
-  fill:none;
+.bubble{
+  background:rgba(255,182,193,0.3);
+  border-radius:16px;
+  padding:4px 8px;
+  font-size:12px;
+  white-space:nowrap;
 }
 
 /* Responsive */
@@ -395,38 +363,42 @@ const supabase=createClient(
 let creations=[],currentZoom=null,currentDelete=null;
 const container=document.getElementById('visitor-list-container');
 
-// MODALS
 const addModal=document.getElementById('addModal');
 const deleteModal=document.getElementById('deleteModal');
 const likeModal=document.getElementById('likeModal');
 const commentModal=document.getElementById('commentModal');
 
-// ZOOM
 const zoomModal=document.getElementById('zoomModal');
 const mainZoom=document.getElementById('mainZoom');
 const thumbs=document.getElementById('thumbs');
 const likeCount=document.getElementById('likeCount');
 const commentCount=document.getElementById('commentCount');
 
-// Bubbles
 const likeBubbles=document.getElementById('likeBubbles');
 const commentBubbles=document.getElementById('commentBubbles');
 
-// SIDEBAR
 const sidebar=document.getElementById('sidebar');
 
+// LOAD
 async function loadCreations(){
-  const {data}=await supabase.from("creations").select("*").order("created_at",{ascending:false});
-  const grouped={};
+  const {data} = await supabase.from("creations").select("*").order("created_at",{ascending:false});
+  const grouped = {};
   data.forEach(c=>{
-    const url=`https://jyhbamdcxmpveujjqjla.supabase.co/storage/v1/object/public/images/${c.image_path}`;
-    if(!grouped[c.name]) grouped[c.name]={name:c.name,imgUrl:url,zoomGroup:[],likes:[],comments:[]};
+    const url = `https://jyhbamdcxmpveujjqjla.supabase.co/storage/v1/object/public/images/${c.image_path}`;
+    if(!grouped[c.name]) grouped[c.name] = {
+      name: c.name,
+      imgUrl: url,
+      zoomGroup: [],
+      likes: c.likes || [],
+      comments: c.comments || []
+    };
     grouped[c.name].zoomGroup.push(url);
   });
-  creations=Object.values(grouped);
+  creations = Object.values(grouped);
   render();
 }
 
+// RENDER
 function render(){
   container.innerHTML='';
   let page=null;
@@ -450,6 +422,7 @@ function render(){
   });
 }
 
+// ZOOM
 function openZoom(c){
   currentZoom=c;
   mainZoom.src=c.imgUrl;
@@ -463,7 +436,6 @@ function openZoom(c){
   updateActions();
   zoomModal.style.display='flex';
 }
-
 function updateActions(){
   likeCount.textContent=currentZoom.likes.length;
   commentCount.textContent=currentZoom.comments.length;
@@ -525,10 +497,11 @@ document.querySelector('.like-btn').onclick=()=>{
   });
 };
 likeModal.onclick=e=>{if(e.target===likeModal) likeModal.style.display='none'};
-document.getElementById('confirmLike').onclick=()=>{
+document.getElementById('confirmLike').onclick=async()=>{
   const name=document.getElementById('likeName').value.trim();
   if(name){
     currentZoom.likes.push(name);
+    await supabase.from('creations').update({likes: currentZoom.likes}).eq('name',currentZoom.name);
     const b=document.createElement('div');
     b.className='bubble';
     b.innerHTML=`<strong>${name}</strong>`;
@@ -550,11 +523,13 @@ document.querySelector('.comment-btn').onclick=()=>{
   });
 };
 commentModal.onclick=e=>{if(e.target===commentModal) commentModal.style.display='none'};
-document.getElementById('confirmComment').onclick=()=>{
+document.getElementById('confirmComment').onclick=async()=>{
   const name=document.getElementById('commentName').value.trim();
   const text=document.getElementById('commentText').value.trim();
   if(name && text){
-    currentZoom.comments.push({name,text});
+    const commentObj={name,text};
+    currentZoom.comments.push(commentObj);
+    await supabase.from('creations').update({comments: currentZoom.comments}).eq('name',currentZoom.name);
     const b=document.createElement('div');
     b.className='bubble';
     b.innerHTML=`<strong>${name}:</strong> ${text}`;
@@ -565,7 +540,6 @@ document.getElementById('confirmComment').onclick=()=>{
   }
 };
 
-// INIT
 loadCreations();
 </script>
 </body>
