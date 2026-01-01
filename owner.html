@@ -441,25 +441,6 @@ const commentBubbles=document.getElementById('commentBubbles');
 
 const sidebar=document.getElementById('sidebar');
 
-// LOAD
-async function loadCreations(){
-  const {data} = await supabase.from("creations").select("*").order("created_at",{ascending:false});
-  const grouped = {};
-  data.forEach(c=>{
-    const url = `https://jyhbamdcxmpveujjqjla.supabase.co/storage/v1/object/public/images/${c.image_path}`;
-   if(!grouped[c.name]) grouped[c.name] = {
-  name: c.name,
-  imgUrl: url,
-  zoomGroup: [],
-  likes: c.likes ? [...c.likes] : [],
-  comments: c.comments ? [...c.comments] : []
-};
-grouped[c.name].zoomGroup.push(url);
-  });
-  creations = Object.values(grouped);
-  render();
-}
-
 // RENDER
 function render(){
   container.innerHTML='';
@@ -528,11 +509,30 @@ document.getElementById('confirmAdd').onclick=async()=>{
   document.getElementById('multiPhoto').value='';
 };
 
-// DELETE
-function openDeleteModal(c){
-  currentDelete=c;
-  deleteModal.style.display='flex';
+
+// LOAD
+async function loadCreations(){
+  const {data} = await supabase.from("creations").select("*").order("created_at",{ascending:false});
+  creations = data.map(c => ({
+    id: c.id,            // <-- ID unique
+    name: c.name,
+    imgUrl: `https://jyhbamdcxmpveujjqjla.supabase.co/storage/v1/object/public/images/${c.image_path}`,
+    likes: c.likes || [],
+    comments: c.comments || []
+  }));
+  render();
 }
+
+// DELETE
+document.getElementById('confirmDelete').onclick=async()=>{
+  if(!currentDelete) return;
+  await supabase.storage.from('images').remove([currentDelete.imgUrl.split('/images/')[1]]);
+  await supabase.from('creations').delete().eq('id', currentDelete.id); // <-- supprimer par ID unique
+  creations = creations.filter(c => c.id !== currentDelete.id);
+  render();
+  deleteModal.style.display='none';
+};
+  
 deleteModal.onclick=e=>{if(e.target===deleteModal) deleteModal.style.display='none'};
 document.getElementById('cancelDelete').onclick=()=>deleteModal.style.display='none';
 document.getElementById('confirmDelete').onclick=async()=>{
