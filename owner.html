@@ -28,7 +28,7 @@ body::before {
   display:flex;
   justify-content:center;
   align-items:flex-start;
-  padding-top:100px; /* Déplacement grille 2cm environ */
+  padding-top:120px; /* Redescendue totale 120px (~2cm + 1cm) */
 }
 
 #visitor-list-container{
@@ -66,16 +66,6 @@ body::before {
   box-shadow:0 0 0 3px #f6c2d1; /* liseré rose */
   background:#ffe6f0;
 }
-.visitor-item .placeholder{
-  position:absolute;
-  inset:0;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  font-size:24px;
-  color:#b84c6f;
-  font-weight:bold;
-}
 .visitor-item img {
   width:100%;
   height:100%;
@@ -84,7 +74,7 @@ body::before {
   cursor:pointer;
   display:block;
   filter: brightness(1.05) contrast(1.05) saturate(0.95);
-  transition: filter 0.3s, transform 0.3s;
+  transition: transform 0.3s;
 }
 .visitor-item img:hover{
   transform: scale(1.03);
@@ -115,52 +105,12 @@ body::before {
   justify-content:center;
   font-weight:bold;
   cursor:pointer;
-  z-index:5;
   font-size:14px;
   transition:background 0.3s;
 }
 .delete-btn:hover{background:rgba(255,105,180,1);}
 
-/* SIDEBAR */
-#sidebar{
-  position:fixed;
-  top:0;
-  left:-220px;
-  width:220px;
-  height:100vh;
-  background:rgba(255,230,240,0.2);
-  border-right:2px solid #b67385;
-  padding:20px;
-  transition:left .3s;
-  z-index:10;
-}
-#sidebar.sidebar-open{left:0}
-#toggleSidebar{
-  position:absolute;
-  top:50%;
-  right:-30px;
-  width:30px;
-  height:60px;
-  background:#ffb6c1;
-  border-radius:0 12px 12px 0;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  cursor:pointer;
-  font-weight:bold;
-}
-#sidebar button{
-  width:auto;
-  padding:8px 16px;
-  border-radius:16px;
-  border:none;
-  background:#ff69b4;
-  color:#fff;
-  cursor:pointer;
-  font-weight:bold;
-}
-
-/* MODAL AJOUT / DELETE / LIKE / COMMENT */
+/* MODALS */
 .modal{
   position:fixed; inset:0;
   background:rgba(0,0,0,0.6);
@@ -227,7 +177,7 @@ body::before {
   cursor:pointer;
 }
 
-/* Like / Comment sous les miniatures */
+/* Like / Comment sous miniatures */
 .likes-comments{
   display:flex;
   justify-content:center;
@@ -242,7 +192,7 @@ body::before {
   display:flex;
   align-items:center;
   gap:4px;
-  color:#ffb6c1; /* coeur pastel */
+  color:#ffb6c1; /* pastel */
 }
 .like-btn svg,.comment-btn svg{
   width:20px;
@@ -252,7 +202,7 @@ body::before {
   fill:none;
 }
 
-/* Bubbles affichage nombres sous miniatures */
+/* Bubbles nombres */
 .bubbles{
   display:flex;
   justify-content:center;
@@ -337,7 +287,6 @@ const supabase=createClient(
 );
 
 let creations=[],currentZoom=null;
-
 const container=document.getElementById('visitor-list-container');
 const addModal=document.getElementById('addModal');
 const likeModal=document.getElementById('likeModal');
@@ -347,15 +296,6 @@ const mainZoom=document.getElementById('mainZoom');
 const thumbs=document.getElementById('thumbs');
 const likeCount=document.getElementById('likeCount');
 const commentCount=document.getElementById('commentCount');
-
-const likeNameInput=document.getElementById('likeName');
-const confirmLike=document.getElementById('confirmLike');
-const likeList=document.getElementById('likeList');
-
-const commentNameInput=document.getElementById('commentName');
-const commentTextInput=document.getElementById('commentText');
-const confirmComment=document.getElementById('confirmComment');
-const commentList=document.getElementById('commentList');
 
 async function loadCreations(){
   const {data}=await supabase.from("creations").select("*").order("created_at",{ascending:false});
@@ -371,13 +311,52 @@ async function loadCreations(){
 
 function render(){
   container.innerHTML='';
+  let page=null;
   creations.forEach((c,i)=>{
     if(i%6===0){
-      const page=document.createElement('div');
+      page=document.createElement('div');
       page.className='page';
       container.appendChild(page);
     }
+    const d=document.createElement('div');
+    d.className='visitor-item';
+    d.innerHTML=`<div class="delete-btn">×</div>
+                 <p>${c.name}</p>
+                 <img src="${c.imgUrl}" onload="this.style.display='block'" onerror="this.style.display='none'">`;
+    d.querySelector('img').onclick=()=>openZoom(c);
+    d.querySelector('.delete-btn').onclick=()=>deleteProject(c.name);
+    page.appendChild(d);
   });
+}
+
+function openZoom(c){
+  currentZoom=c;
+  mainZoom.src=c.imgUrl;
+  thumbs.innerHTML='';
+  c.zoomGroup.forEach(u=>{
+    const t=document.createElement('img');
+    t.src=u;
+    t.onclick=()=>mainZoom.src=u;
+    thumbs.appendChild(t);
+  });
+  likeCount.textContent=c.likes.length;
+  commentCount.textContent=c.comments.length;
+  zoomModal.style.display='flex';
+}
+
+document.querySelector('.closeZoom').onclick=()=>zoomModal.style.display='none';
+document.getElementById('addBtn').onclick=()=>addModal.style.display='flex';
+addModal.onclick=e=>{if(e.target===addModal)addModal.style.display='none'};
+
+async function deleteProject(name){
+  if(!confirm("Supprimer définitivement ce projet ?")) return;
+  const p=creations.find(c=>c.name===name);
+  for(let u of p.zoomGroup){
+    await supabase.storage.from('images').remove([u.split('/images/')[1]]);
+  }
+  await supabase.from('creations').delete().eq('name',name);
+  creations=creations.filter(c=>c.name!==name);
+  render();
 }
 
 loadCreations();
