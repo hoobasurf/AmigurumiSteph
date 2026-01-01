@@ -20,9 +20,8 @@ body::before {
 /* CENTER ZONE */
 .center-zone{
   display:flex;
-  justify-content:center; /* centre horizontalement */
-  align-items:flex-start; 
-  padding-top:calc(2cm); /* décalage 2cm bas */
+  justify-content:center;
+  padding-top:2cm; /* décalage 2cm bas */
 }
 
 /* SCROLL HORIZONTAL */
@@ -32,6 +31,7 @@ body::before {
   scroll-snap-type:x mandatory;
   -webkit-overflow-scrolling:touch;
   gap:10px;
+  padding-bottom:20px;
 }
 
 /* PAGE = 2x3 CARDS */
@@ -39,7 +39,8 @@ body::before {
   display:grid;
   grid-template-columns:repeat(2,200px);
   grid-template-rows:repeat(3,200px);
-  gap:8px;
+  column-gap:8px;
+  row-gap:8px;
   flex:0 0 auto;
   scroll-snap-align:center;
 }
@@ -64,11 +65,7 @@ body::before {
   filter: brightness(1.05) contrast(1.05) saturate(0.95);
   transition:transform 0.3s;
 }
-.visitor-item img:hover{
-  transform:scale(1.03);
-}
-
-/* OVERLAY POUR FOND */
+.visitor-item img:hover{ transform:scale(1.03); }
 .visitor-item::after{
   content:"";
   position:absolute;
