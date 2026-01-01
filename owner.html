@@ -556,8 +556,30 @@ document.querySelector('.like-btn').onclick = () => {
     b.innerHTML = `<strong>${p}</strong>`;
     likeBubbles.appendChild(b);
   });
+};
+likeModal.onclick = e => { if (e.target === likeModal) likeModal.style.display = 'none'; };
 
-  // Effet étoiles
+document.getElementById('confirmLike').onclick = async () => {
+  const name = document.getElementById('likeName').value.trim();
+  if (!name) return;
+
+  currentZoom.likes.push(name); // Met à jour localement
+
+  // Sauvegarde persistante
+  await supabase
+    .from('creations')
+    .update({ likes: currentZoom.likes })
+    .eq('name', currentZoom.name);
+
+  // Ajout bulle
+  const b = document.createElement('div');
+  b.className = 'bubble';
+  b.innerHTML = `<strong>${name}</strong>`;
+  likeBubbles.appendChild(b);
+  updateActions();
+  document.getElementById('likeName').value = '';
+
+  // Effet étoiles autour de l'image
   const rect = mainZoom.getBoundingClientRect();
   for (let i = 0; i < 5; i++) {
     const star = document.createElement('div');
@@ -568,27 +590,6 @@ document.querySelector('.like-btn').onclick = () => {
     star.style.setProperty('--dy', `${(Math.random() - 0.5) * 100}px`);
     mainZoom.parentElement.appendChild(star);
     setTimeout(() => star.remove(), 800);
-  }
-};
-likeModal.onclick = e => { if (e.target === likeModal) likeModal.style.display = 'none'; };
-document.getElementById('confirmLike').onclick = async () => {
-  const name = document.getElementById('likeName').value.trim();
-  if (!name) return;
-
-  // Sauvegarde persistante
-  const { error } = await supabase
-    .from('creations')
-    .update({ likes: [...currentZoom.likes, name] })
-    .eq('name', currentZoom.name);
-
-  if (!error) {
-    currentZoom.likes.push(name);
-    const b = document.createElement('div');
-    b.className = 'bubble';
-    b.innerHTML = `<strong>${name}</strong>`;
-    likeBubbles.appendChild(b);
-    updateActions();
-    document.getElementById('likeName').value = '';
   }
 };
 
@@ -604,29 +605,29 @@ document.querySelector('.comment-btn').onclick = () => {
   });
 };
 commentModal.onclick = e => { if (e.target === commentModal) commentModal.style.display = 'none'; };
+
 document.getElementById('confirmComment').onclick = async () => {
   const name = document.getElementById('commentName').value.trim();
   const text = document.getElementById('commentText').value.trim();
   if (!name || !text) return;
 
   const commentObj = { name, text };
+  currentZoom.comments.push(commentObj); // Met à jour localement
 
   // Sauvegarde persistante
-  const { error } = await supabase
+  await supabase
     .from('creations')
-    .update({ comments: [...currentZoom.comments, commentObj] })
+    .update({ comments: currentZoom.comments })
     .eq('name', currentZoom.name);
 
-  if (!error) {
-    currentZoom.comments.push(commentObj);
-    const b = document.createElement('div');
-    b.className = 'bubble';
-    b.innerHTML = `<strong>${name}:</strong> ${text}`;
-    commentBubbles.appendChild(b);
-    updateActions();
-    document.getElementById('commentName').value = '';
-    document.getElementById('commentText').value = '';
-  }
+  // Ajout bulle
+  const b = document.createElement('div');
+  b.className = 'bubble';
+  b.innerHTML = `<strong>${name}:</strong> ${text}`;
+  commentBubbles.appendChild(b);
+  updateActions();
+  document.getElementById('commentName').value = '';
+  document.getElementById('commentText').value = '';
 };
 
 loadCreations();
