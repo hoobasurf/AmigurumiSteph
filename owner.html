@@ -20,9 +20,9 @@ body::before {
 /* CENTER ZONE */
 .center-zone{
   display:flex;
-  justify-content:flex-start; /* gauche */
-  align-items:flex-start; /* haut */
-  padding:2cm 0 0 2cm; /* décalage 2cm bas et 2cm droite */
+  justify-content:center; /* centre horizontalement */
+  align-items:flex-start; 
+  padding-top:calc(2cm); /* décalage 2cm bas */
 }
 
 /* SCROLL HORIZONTAL */
@@ -327,8 +327,6 @@ const likeBtn=document.querySelector('.like-btn');
 const commentBtn=document.querySelector('.comment-btn');
 const likeCount=document.getElementById('likeCount');
 const commentCount=document.getElementById('commentCount');
-
-let deleteTarget=null;
 
 async function loadCreations(){
   const {data}=await supabase.from("creations").select("*").order("created_at",{ascending:false});
