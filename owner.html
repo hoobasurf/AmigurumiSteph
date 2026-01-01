@@ -3,10 +3,12 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<style>
-*{box-sizing:border-box;margin:0;padding:0;}
-html,body{height:100%;font-family:'Comic Sans MS',cursive;}
 
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;font-family:'Comic Sans MS',cursive}
+
+/* ===== FOND FIXE ===== */
 body::before{
   content:"";
   position:fixed;
@@ -15,38 +17,30 @@ body::before{
   z-index:-1;
 }
 
+/* ===== ZONE CENTRALE ===== */
 .center-zone{
-  flex:1;
   display:flex;
   justify-content:center;
-  align-items:flex-start;
-  padding:20px 0;
 }
 
 #visitor-list-container{
   display:flex;
   overflow-x:auto;
   scroll-snap-type:x mandatory;
-  -webkit-overflow-scrolling:touch;
-  justify-content:center;
   padding-left:1cm;
 }
 
+/* ===== PAGE 6 CARDS ===== */
 .page{
   display:grid;
-  grid-template-columns:repeat(2,1fr);
-  grid-template-rows:repeat(3,1fr);
-  column-gap:3mm;
-  row-gap:4mm;
-  flex:0 0 auto;
-  width:calc(2 * 200px + 3mm);
-  height:calc(3 * 200px + 8mm);
+  grid-template-columns:repeat(2,200px);
+  grid-template-rows:repeat(3,200px);
+  gap:4mm;
+  margin-top:4cm;
   scroll-snap-align:center;
-  padding:4mm;
-  justify-content:center;
-  margin-top:4cm; /* DESCENTE +1cm */
 }
 
+/* ===== CARD ===== */
 .visitor-item{
   position:relative;
   width:200px;
@@ -54,37 +48,20 @@ body::before{
   border-radius:12px;
   overflow:hidden;
   border:3px solid #fff;
-  box-shadow:0 0 0 3px #f6c2d1,0 6px 14px rgba(0,0,0,.25),inset 0 0 0 1px rgba(255,255,255,.4);
+  box-shadow:0 0 0 3px #f6c2d1;
   background:#ffe6f0;
-  z-index:1; /* FIX CLICK */
-}
-
-.visitor-item .placeholder{
-  position:absolute;
-  inset:0;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  font-size:24px;
-  color:#b84c6f;
-  font-weight:bold;
 }
 
 .visitor-item img{
   width:100%;
   height:100%;
   object-fit:cover;
-  border-radius:12px;
   cursor:pointer;
-  display:block;
-  filter:brightness(1.05) contrast(1.05) saturate(.95);
-  transition:transform .3s;
   position:relative;
   z-index:2;
 }
 
-.visitor-item img:hover{transform:scale(1.03);}
-
+/* IMPORTANT : ne bloque PAS le clic */
 .visitor-item::after{
   content:"";
   position:absolute;
@@ -96,26 +73,26 @@ body::before{
 
 .visitor-item p{
   position:absolute;
-  bottom:2px;
+  bottom:4px;
   width:100%;
+  text-align:center;
   font-size:14px;
   color:#b84c6f;
   font-weight:bold;
-  text-align:center;
-  text-shadow:1px 1px 2px rgba(255,255,255,.8);
   z-index:3;
-  pointer-events:none; /* FIX iOS */
+  pointer-events:none;
 }
 
+/* ===== CROIX ===== */
 .delete-btn{
   position:absolute;
-  top:2px;
-  right:2px;
+  top:4px;
+  right:4px;
   width:20px;
   height:20px;
+  border-radius:50%;
   background:#ffb6c1;
   color:#fff;
-  border-radius:50%;
   display:flex;
   align-items:center;
   justify-content:center;
@@ -124,17 +101,18 @@ body::before{
   z-index:5;
 }
 
+/* ===== SIDEBAR ===== */
 #sidebar{
   position:fixed;
   top:0;
   left:-220px;
   width:220px;
   height:100vh;
-  background:rgba(255,230,240,.2);
+  background:rgba(255,230,240,.25);
   border-right:2px solid #b67385;
   padding:20px;
-  transition:left .3s;
-  z-index:10;
+  transition:.3s;
+  z-index:1000;
 }
 #sidebar.sidebar-open{left:0}
 
@@ -147,12 +125,23 @@ body::before{
   background:#ffb6c1;
   border-radius:0 12px 12px 0;
   display:flex;
-  align-items:center;
   justify-content:center;
+  align-items:center;
   cursor:pointer;
-  font-weight:bold;
 }
 
+#sidebar button{
+  margin-top:20px;
+  padding:8px 16px;
+  border:none;
+  border-radius:16px;
+  background:#ffb6c1;
+  color:#fff;
+  font-weight:bold;
+  cursor:pointer;
+}
+
+/* ===== MODALS ===== */
 .modal{
   position:fixed;
   inset:0;
@@ -160,20 +149,21 @@ body::before{
   display:none;
   justify-content:center;
   align-items:center;
-  z-index:9999;
+  z-index:20000;
 }
 
-.modal .modal-box{
+.modal-box{
   background:#ffe6f0;
-  padding:16px 24px;
   border-radius:20px;
   border:3px solid #b67385;
+  padding:16px;
+  min-width:220px;
   display:flex;
   flex-direction:column;
   gap:10px;
-  align-items:center;
 }
 
+/* ===== ZOOM ===== */
 #zoomModal{
   position:fixed;
   inset:0;
@@ -182,37 +172,48 @@ body::before{
   justify-content:center;
   align-items:center;
   flex-direction:column;
-  z-index:10000;
+  z-index:15000;
 }
 
 #zoomModal img{
   max-width:80%;
-  max-height:60vh;
-  border:4px solid #b67385;
+  max-height:70vh;
   border-radius:24px;
+  border:4px solid #b67385;
 }
 
 .closeZoom{
   position:absolute;
-  top:12px;
-  right:12px;
-  width:28px;
-  height:28px;
+  top:20px;
+  right:20px;
+  width:30px;
+  height:30px;
+  border-radius:50%;
   background:#ffb6c1;
   color:#fff;
-  border-radius:50%;
   display:flex;
   justify-content:center;
   align-items:center;
   cursor:pointer;
+  font-size:18px;
 }
 
-@media(max-width:480px){
-  .page{grid-template-columns:repeat(2,120px);grid-template-rows:repeat(3,120px);}
-  .visitor-item{width:120px;height:120px;}
+/* ===== ACTIONS ===== */
+.actions{
+  display:flex;
+  gap:20px;
+  margin-top:10px;
+}
+.like-btn,.comment-btn{
+  background:none;
+  border:none;
+  cursor:pointer;
+  font-weight:bold;
+  color:#b84c6f;
 }
 </style>
 </head>
+
 <body>
 
 <div class="center-zone">
@@ -224,6 +225,139 @@ body::before{
   <button id="addBtn">Ajouter</button>
 </div>
 
-<!-- le JS Supabase + zoom reste STRICTEMENT identique à ton code -->
+<!-- MODALS -->
+<div id="addModal" class="modal">
+  <div class="modal-box">
+    <input id="photoName" placeholder="Nom">
+    <input type="file" id="multiPhoto" multiple>
+    <button id="confirmAdd">Valider</button>
+  </div>
+</div>
+
+<div id="deleteModal" class="modal">
+  <div class="modal-box">
+    <p>Supprimer ?</p>
+    <button id="confirmDelete">Oui</button>
+    <button id="cancelDelete">Annuler</button>
+  </div>
+</div>
+
+<div id="zoomModal">
+  <div class="closeZoom">×</div>
+  <img id="mainZoom">
+  <div class="actions">
+    <button class="like-btn">❤️ <span id="likeCount">0</span></button>
+    <button class="comment-btn">💬 <span id="commentCount">0</span></button>
+  </div>
+</div>
+
+<script type="module">
+import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
+
+const supabase = createClient(
+  "https://jyhbamdcxmpveujjqjla.supabase.co",
+  "sb_publishable_sqsxb-3Kl5o3-JQYv9kGFw_-g0EgwMa"
+);
+
+let creations=[],currentZoom=null,currentDelete=null;
+const container=document.getElementById("visitor-list-container");
+
+/* ===== LOAD ===== */
+async function loadCreations(){
+  const {data}=await supabase.from("creations").select("*").order("created_at",{ascending:false});
+  const grouped={};
+
+  data.forEach(c=>{
+    const url=`https://jyhbamdcxmpveujjqjla.supabase.co/storage/v1/object/public/images/${c.image_path}`;
+    if(!grouped[c.name]) grouped[c.name]={name:c.name,img:url,zoom:[url],likes:[],comments:[]};
+    else grouped[c.name].zoom.push(url);
+  });
+
+  creations=Object.values(grouped);
+  render();
+}
+
+function render(){
+  container.innerHTML="";
+  let page;
+
+  creations.forEach((c,i)=>{
+    if(i%6===0){
+      page=document.createElement("div");
+      page.className="page";
+      container.appendChild(page);
+    }
+
+    const d=document.createElement("div");
+    d.className="visitor-item";
+    d.innerHTML=`
+      <div class="delete-btn">×</div>
+      <img src="${c.img}">
+      <p>${c.name}</p>
+    `;
+
+    d.querySelector("img").onclick=()=>openZoom(c);
+    d.querySelector(".delete-btn").onclick=()=>openDelete(c);
+
+    page.appendChild(d);
+  });
+}
+
+/* ===== ZOOM ===== */
+const zoomModal=document.getElementById("zoomModal");
+const mainZoom=document.getElementById("mainZoom");
+
+function openZoom(c){
+  currentZoom=c;
+  mainZoom.src=c.img;
+  zoomModal.style.display="flex";
+}
+
+document.querySelector(".closeZoom").onclick=()=>zoomModal.style.display="none";
+zoomModal.onclick=e=>{if(e.target===zoomModal) zoomModal.style.display="none"};
+
+/* ===== SIDEBAR ===== */
+document.getElementById("toggleSidebar").onclick=()=>{
+  document.getElementById("sidebar").classList.toggle("sidebar-open");
+};
+
+/* ===== DELETE ===== */
+function openDelete(c){
+  currentDelete=c;
+  document.getElementById("deleteModal").style.display="flex";
+}
+
+document.getElementById("cancelDelete").onclick=()=>{
+  document.getElementById("deleteModal").style.display="none";
+};
+
+document.getElementById("confirmDelete").onclick=async()=>{
+  await supabase.from("creations").delete().eq("name",currentDelete.name);
+  creations=creations.filter(x=>x!==currentDelete);
+  render();
+  document.getElementById("deleteModal").style.display="none";
+};
+
+/* ===== ADD ===== */
+document.getElementById("addBtn").onclick=()=>{
+  document.getElementById("addModal").style.display="flex";
+};
+
+document.getElementById("confirmAdd").onclick=async()=>{
+  const name=document.getElementById("photoName").value;
+  const files=document.getElementById("multiPhoto").files;
+  if(!name||!files.length)return;
+
+  const f=files[0];
+  const path=Date.now()+"_"+f.name;
+  await supabase.storage.from("images").upload(path,f);
+  await supabase.from("creations").insert([{name,image_path:path}]);
+
+  loadCreations();
+  document.getElementById("addModal").style.display="none";
+};
+
+loadCreations();
+</script>
 </body>
 </html>
