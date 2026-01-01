@@ -315,6 +315,24 @@ body::before {
   .visitor-item{width:120px;height:120px;}
   .modal .modal-box{min-width:180px;}
 }
+
+.star {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  background: #ffb6c1;
+  border-radius: 50%;
+  pointer-events: none;
+  animation: sparkle 0.8s forwards;
+  z-index: 20;
+}
+
+@keyframes sparkle {
+  0% { transform: translate(0,0) scale(1); opacity:1; }
+  50% { transform: translate(var(--dx), var(--dy)) scale(1.5); opacity:0.8; }
+  100% { transform: translate(var(--dx), var(--dy)) scale(0); opacity:0; }
+}
+  
 </style>
 </head>
 <body>
@@ -412,14 +430,14 @@ async function loadCreations(){
   const grouped = {};
   data.forEach(c=>{
     const url = `https://jyhbamdcxmpveujjqjla.supabase.co/storage/v1/object/public/images/${c.image_path}`;
-    if(!grouped[c.name]) grouped[c.name] = {
-      name: c.name,
-      imgUrl: url,
-      zoomGroup: [],
-      likes: c.likes || [],
-      comments: c.comments || []
-    };
-    grouped[c.name].zoomGroup.push(url);
+   if(!grouped[c.name]) grouped[c.name] = {
+  name: c.name,
+  imgUrl: url,
+  zoomGroup: [],
+  likes: c.likes ? [...c.likes] : [],
+  comments: c.comments ? [...c.comments] : []
+};
+grouped[c.name].zoomGroup.push(url);
   });
   creations = Object.values(grouped);
   render();
@@ -512,15 +530,28 @@ document.getElementById('confirmDelete').onclick=async()=>{
 };
 
 // LIKE
-document.querySelector('.like-btn').onclick=()=>{
-  likeModal.style.display='flex';
-  likeBubbles.innerHTML='';
-  currentZoom.likes.forEach(p=>{
-    const b=document.createElement('div');
-    b.className='bubble';
-    b.innerHTML=`<strong>${p}</strong>`;
+document.querySelector('.like-btn').onclick = async () => {
+  likeModal.style.display = 'flex';
+  likeBubbles.innerHTML = '';
+  currentZoom.likes.forEach(p => {
+    const b = document.createElement('div');
+    b.className = 'bubble';
+    b.innerHTML = `<strong>${p}</strong>`;
     likeBubbles.appendChild(b);
   });
+
+  // Effet étoiles
+  const rect = mainZoom.getBoundingClientRect();
+  for (let i = 0; i < 5; i++) {
+    const star = document.createElement('div');
+    star.className = 'star';
+    star.style.left = `${Math.random() * rect.width}px`;
+    star.style.top = `${Math.random() * rect.height}px`;
+    star.style.setProperty('--dx', `${(Math.random() - 0.5) * 100}px`);
+    star.style.setProperty('--dy', `${(Math.random() - 0.5) * 100}px`);
+    mainZoom.parentElement.appendChild(star);
+    setTimeout(() => star.remove(), 800);
+  }
 };
 likeModal.onclick=e=>{if(e.target===likeModal) likeModal.style.display='none'};
 document.getElementById('confirmLike').onclick=async()=>{
