@@ -28,7 +28,7 @@ body::before {
   display:flex;
   justify-content:center;
   align-items:center;
-  padding:40px 0 0 0; /* descente grille validée */
+  padding:60px 0 0 0; /* +2cm descente de la grille */
 }
 
 #visitor-list-container{
@@ -395,7 +395,7 @@ function render(){
                  <div class="delete-btn">×</div>
                  <p>${c.name}</p>
                  <img src="${c.imgUrl}" onload="this.previousElementSibling.style.display='none'" onerror="this.style.display='none'">`;
-    d.querySelector('img').onclick=()=>openZoom(c);
+    d.querySelector('img').onclick=()=>openZoom(c); // zoom actif
     d.querySelector('.delete-btn').onclick=()=>openDeleteModal(c);
     page.appendChild(d);
   });
