@@ -28,7 +28,7 @@ body::before {
   display:flex;
   justify-content:center;
   align-items:flex-start;
-  padding-top:130px; /* Grille redescendue 130px */
+  padding-top:140px; /* Grille redescendue */
 }
 
 #visitor-list-container{
@@ -168,7 +168,7 @@ body::before {
   flex-direction:column;
   gap:10px;
   align-items:center;
-  min-width:200px;
+  min-width:220px;
 }
 
 /* ZOOM */
@@ -242,7 +242,7 @@ body::before {
   fill:none;
 }
 
-/* Bubbles nombres */
+/* Bubble counts */
 .bubbles{
   display:flex;
   justify-content:center;
@@ -287,6 +287,27 @@ body::before {
   </div>
 </div>
 
+<!-- MODAL LIKE -->
+<div class="modal" id="likeModal">
+  <div class="modal-box">
+    <h3>Qui a liké ?</h3>
+    <input id="likeName" placeholder="Prénom">
+    <button id="likeValider">Valider</button>
+    <div id="likeList" style="margin-top:10px;width:100%;display:flex;flex-wrap:wrap;gap:4px;"></div>
+  </div>
+</div>
+
+<!-- MODAL COMMENT -->
+<div class="modal" id="commentModal">
+  <div class="modal-box">
+    <h3>Commentaire</h3>
+    <input id="commentName" placeholder="Prénom">
+    <input id="commentText" placeholder="Commentaire">
+    <button id="commentValider">Valider</button>
+    <div id="commentList" style="margin-top:10px;width:100%;display:flex;flex-direction:column;gap:4px;"></div>
+  </div>
+</div>
+
 <!-- ZOOM -->
 <div id="zoomModal">
   <div class="closeZoom">×</div>
@@ -311,9 +332,15 @@ const addModal=document.getElementById('addModal');
 const zoomModal=document.getElementById('zoomModal');
 const mainZoom=document.getElementById('mainZoom');
 const thumbs=document.getElementById('thumbs');
-const likeCount=document.getElementById('likeCount');
-const commentCount=document.getElementById('commentCount');
 const sidebar=document.getElementById('sidebar');
+
+// Like / Comment Modals
+const likeModal=document.getElementById('likeModal');
+const commentModal=document.getElementById('commentModal');
+const likeList=document.getElementById('likeList');
+const commentList=document.getElementById('commentList');
+const likeCountEl=document.getElementById('likeCount');
+const commentCountEl=document.getElementById('commentCount');
 
 async function loadCreations(){
   const {data}=await supabase.from("creations").select("*").order("created_at",{ascending:false});
@@ -340,7 +367,7 @@ function render(){
     d.className='visitor-item';
     d.innerHTML=`<div class="delete-btn">×</div>
                  <p>${c.name}</p>
-                 <img src="${c.imgUrl}" onload="this.style.display='block'" onerror="this.style.display='none'">`;
+                 <img src="${c.imgUrl}">`;
     d.querySelector('img').onclick=()=>openZoom(c);
     d.querySelector('.delete-btn').onclick=()=>deleteProject(c.name);
     page.appendChild(d);
@@ -357,17 +384,18 @@ function openZoom(c){
     t.onclick=()=>mainZoom.src=u;
     thumbs.appendChild(t);
   });
-  likeCount.textContent=c.likes.length;
-  commentCount.textContent=c.comments.length;
+  likeCountEl.textContent=c.likes.length;
+  commentCountEl.textContent=c.comments.length;
   zoomModal.style.display='flex';
 }
 
-// EVENTS
+// Events
 document.querySelector('.closeZoom').onclick=()=>zoomModal.style.display='none';
 document.getElementById('addBtn').onclick=()=>addModal.style.display='flex';
 addModal.onclick=e=>{if(e.target===addModal)addModal.style.display='none'};
 document.getElementById('toggleSidebar').onclick=()=>sidebar.classList.toggle('sidebar-open');
 
+// Delete
 async function deleteProject(name){
   if(!confirm("Supprimer définitivement ce projet ?")) return;
   const p=creations.find(c=>c.name===name);
@@ -377,6 +405,42 @@ async function deleteProject(name){
   await supabase.from('creations').delete().eq('name',name);
   creations=creations.filter(c=>c.name!==name);
   render();
+}
+
+// Like Modal
+document.querySelector('.like-btn').onclick=()=>{
+  likeList.innerHTML='';
+  currentZoom.likes.forEach(n=>{
+    const b=document.createElement('div'); b.className='bubble'; b.textContent=n;
+    likeList.appendChild(b);
+  });
+  likeModal.style.display='flex';
+};
+document.getElementById('likeValider').onclick=()=>{
+  const val=document.getElementById('likeName').value.trim();
+  if(val){currentZoom.likes.push(val);document.getElementById('likeName').value='';likeModal.style.display='none';renderZoomBubbles();}
+};
+likeModal.onclick=e=>{if(e.target===likeModal)likeModal.style.display='none';}
+
+// Comment Modal
+document.querySelector('.comment-btn').onclick=()=>{
+  commentList.innerHTML='';
+  currentZoom.comments.forEach(c=>{
+    const b=document.createElement('div'); b.className='bubble'; b.textContent=c.name+': '+c.text;
+    commentList.appendChild(b);
+  });
+  commentModal.style.display='flex';
+};
+document.getElementById('commentValider').onclick=()=>{
+  const name=document.getElementById('commentName').value.trim();
+  const text=document.getElementById('commentText').value.trim();
+  if(name && text){currentZoom.comments.push({name,text});document.getElementById('commentName').value='';document.getElementById('commentText').value='';commentModal.style.display='none';renderZoomBubbles();}
+};
+commentModal.onclick=e=>{if(e.target===commentModal)commentModal.style.display='none';}
+
+function renderZoomBubbles(){
+  likeCountEl.textContent=currentZoom.likes.length;
+  commentCountEl.textContent=currentZoom.comments.length;
 }
 
 loadCreations();
