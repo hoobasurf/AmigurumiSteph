@@ -28,7 +28,7 @@ body::before {
   display:flex;
   justify-content:center;
   align-items:flex-start;
-  padding-top:120px; /* Redescendue totale 120px (~2cm + 1cm) */
+  padding-top:130px; /* Grille redescendue 130px */
 }
 
 #visitor-list-container{
@@ -66,6 +66,7 @@ body::before {
   box-shadow:0 0 0 3px #f6c2d1; /* liseré rose */
   background:#ffe6f0;
 }
+
 .visitor-item img {
   width:100%;
   height:100%;
@@ -109,6 +110,45 @@ body::before {
   transition:background 0.3s;
 }
 .delete-btn:hover{background:rgba(255,105,180,1);}
+
+/* SIDEBAR */
+#sidebar{
+  position:fixed;
+  top:0;
+  left:-220px;
+  width:220px;
+  height:100vh;
+  background:rgba(255,230,240,0.2);
+  border-right:2px solid #b67385;
+  padding:20px;
+  transition:left .3s;
+  z-index:10;
+}
+#sidebar.sidebar-open{left:0}
+#toggleSidebar{
+  position:absolute;
+  top:50%;
+  right:-30px;
+  width:30px;
+  height:60px;
+  background:#ffb6c1;
+  border-radius:0 12px 12px 0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+  font-weight:bold;
+}
+#sidebar button{
+  width:auto;
+  padding:8px 16px;
+  border-radius:16px;
+  border:none;
+  background:#ff69b4;
+  color:#fff;
+  cursor:pointer;
+  font-weight:bold;
+}
 
 /* MODALS */
 .modal{
@@ -247,27 +287,6 @@ body::before {
   </div>
 </div>
 
-<!-- MODAL LIKE -->
-<div class="modal" id="likeModal">
-  <div class="modal-box">
-    <h3>Aimez ce projet 💖</h3>
-    <input type="text" id="likeName" placeholder="Votre prénom">
-    <button id="confirmLike">Valider</button>
-    <div id="likeList" style="margin-top:8px;display:flex;flex-wrap:wrap;gap:4px;"></div>
-  </div>
-</div>
-
-<!-- MODAL COMMENTAIRE -->
-<div class="modal" id="commentModal">
-  <div class="modal-box">
-    <h3>Commentaire 💬</h3>
-    <input type="text" id="commentName" placeholder="Votre prénom">
-    <input type="text" id="commentText" placeholder="Votre commentaire">
-    <button id="confirmComment">Valider</button>
-    <div id="commentList" style="margin-top:8px;display:flex;flex-direction:column;gap:4px;"></div>
-  </div>
-</div>
-
 <!-- ZOOM -->
 <div id="zoomModal">
   <div class="closeZoom">×</div>
@@ -289,13 +308,12 @@ const supabase=createClient(
 let creations=[],currentZoom=null;
 const container=document.getElementById('visitor-list-container');
 const addModal=document.getElementById('addModal');
-const likeModal=document.getElementById('likeModal');
-const commentModal=document.getElementById('commentModal');
 const zoomModal=document.getElementById('zoomModal');
 const mainZoom=document.getElementById('mainZoom');
 const thumbs=document.getElementById('thumbs');
 const likeCount=document.getElementById('likeCount');
 const commentCount=document.getElementById('commentCount');
+const sidebar=document.getElementById('sidebar');
 
 async function loadCreations(){
   const {data}=await supabase.from("creations").select("*").order("created_at",{ascending:false});
@@ -344,9 +362,11 @@ function openZoom(c){
   zoomModal.style.display='flex';
 }
 
+// EVENTS
 document.querySelector('.closeZoom').onclick=()=>zoomModal.style.display='none';
 document.getElementById('addBtn').onclick=()=>addModal.style.display='flex';
 addModal.onclick=e=>{if(e.target===addModal)addModal.style.display='none'};
+document.getElementById('toggleSidebar').onclick=()=>sidebar.classList.toggle('sidebar-open');
 
 async function deleteProject(name){
   if(!confirm("Supprimer définitivement ce projet ?")) return;
