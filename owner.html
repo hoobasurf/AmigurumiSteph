@@ -500,15 +500,26 @@ document.getElementById('confirmAdd').onclick=async()=>{
 
 // ---------------------- LOAD ----------------------
 async function loadCreations(){
-  const {data}=await supabase.from("creations").select("*").order("created_at",{ascending:false});
-  creations=data.map(c=>({
-    id:c.id,
-    name:c.name,
-    imgUrl:supabase.storage.from('images').getPublicUrl(c.image_path).data.publicUrl,
-    zoomGroup:[supabase.storage.from('images').getPublicUrl(c.image_path).data.publicUrl],
-    likes:c.likes||[],
-    comments:c.comments||[]
-  }));
+  const { data } = await supabase
+    .from("creations")
+    .select("*")
+    .order("created_at", { ascending: false });
+
+  creations = data.map(c => {
+    // Récupère toutes les images du zoomGroup si elles existent
+    const zoomUrls = c.zoomGroup?.map(p => supabase.storage.from('images').getPublicUrl(p).data.publicUrl)
+                     || [supabase.storage.from('images').getPublicUrl(c.image_path).data.publicUrl];
+
+    return {
+      id: c.id,
+      name: c.name,
+      imgUrl: zoomUrls[0],   // image principale
+      zoomGroup: zoomUrls,
+      likes: c.likes || [],
+      comments: c.comments || []
+    };
+  });
+
   render();
 }
 
