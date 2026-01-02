@@ -346,53 +346,43 @@ const mainZoom = document.getElementById('mainZoom');
 const thumbs = document.getElementById('thumbs');
 const sidebar = document.getElementById('sidebar');
 
-// 🔹 Suppression avec confirmation + Supabase
+// ---------------------- SUPPRESSION ----------------------
 function openDeleteModal(c) {
   if (!c) return;
-  if (!confirm(`Supprimer "${c.name}" ?`)) return;
-
-  // Supprimer côté client
-  creations = creations.filter(x => x.id !== c.id);
+  if (!confirm(`Supprimer "${c.name}" ?`)) return; // demande confirmation
+  supabase.from('creations').delete().eq('id', c.id); // supprime dans Supabase
+  creations = creations.filter(x => x.id !== c.id); // supprime localement
   render();
-
-  // Supprimer côté Supabase
-  supabase.from('creations').delete().eq('id', c.id)
-    .then(({ error }) => { if (error) console.error('Erreur suppression Supabase :', error); });
 }
 
-// 🔹 Like modal
+// ---------------------- LIKE ----------------------
 function openLikeModal(c) {
-  if (!c.likes) c.likes = [];
-  c.likes.push('❤️');
+  if (!c) return;
+  if (!c.likes) c.likes = 0;
+  c.likes++;
+  // update Supabase
+  supabase.from('creations').update({ likes: c.likes }).eq('id', c.id);
   render();
-  // Mise à jour Supabase
-  supabase.from('creations').update({ likes: c.likes }).eq('id', c.id)
-    .then(({ error }) => { if (error) console.error('Erreur like Supabase :', error); });
 }
 
-// 🔹 Comment modal
+// ---------------------- COMMENTAIRE ----------------------
 function openCommentModal(c) {
+  if (!c) return;
+  const comment = prompt("Ajouter un commentaire :");
+  if (!comment) return;
   if (!c.comments) c.comments = [];
-  c.comments.push('💬');
+  c.comments.push(comment);
+  supabase.from('creations').update({ comments: c.comments }).eq('id', c.id);
   render();
-  // Mise à jour Supabase
-  supabase.from('creations').update({ comments: c.comments }).eq('id', c.id)
-    .then(({ error }) => { if (error) console.error('Erreur commentaire Supabase :', error); });
 }
 
 // ---------------------- RENDER ----------------------
 function render() {
   container.innerHTML = '';
   let page = null;
-
-  creations.forEach((c, i) => {
-    if (i % 6 === 0) {
-      page = document.createElement('div');
-      page.className = 'page';
-      container.appendChild(page);
-    } else {
-      page = container.lastElementChild;
-    }
+  creations.forEach((c,i)=>{
+    if(i%6===0){ page = document.createElement('div'); page.className='page'; container.appendChild(page); }
+    else { page = container.lastElementChild; }
 
     const d = document.createElement('div');
     d.className = 'visitor-item';
@@ -402,16 +392,8 @@ function render() {
       <p>${c.name}</p>
       <img src="${c.imgUrl}" onload="this.previousElementSibling.style.display='none'" onerror="this.style.display='none'">
       <div class="actions" style="position:absolute; bottom:24px; width:100%; justify-content:center;">
-        <button class="like-btn" title="Like ❤️">
-          <svg viewBox="0 0 24 24">
-            <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"></path>
-          </svg>
-        </button>
-        <button class="comment-btn" title="Commentaire 💬">
-          <svg viewBox="0 0 24 24">
-            <path d="M21 6h-18v12h18v-12zm0-2c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2h-18c-1.1 0-2-.9-2-2v-12c0-1.1.9-2 2-2h18z"></path>
-          </svg>
-        </button>
+        <button class="like-btn" title="Like ❤️">${c.likes||0} ❤️</button>
+        <button class="comment-btn" title="Commentaire 💬">${c.comments?.length||0} 💬</button>
       </div>
     `;
 
@@ -429,17 +411,19 @@ function openZoom(c) {
   currentZoom = c;
   mainZoom.src = c.imgUrl;
   thumbs.innerHTML = '';
-  (c.zoomGroup || [c.imgUrl]).forEach(u => {
-    const t = document.createElement('img');
-    t.src = u;
-    t.onclick = () => mainZoom.src = u;
-    thumbs.appendChild(t);
-  });
+  if (c.zoomGroup) {
+    c.zoomGroup.forEach(u => {
+      const t = document.createElement('img');
+      t.src = u;
+      t.onclick = () => mainZoom.src = u;
+      thumbs.appendChild(t);
+    });
+  }
   zoomModal.style.display = 'flex';
 }
 
 // ---------------------- EVENTS ----------------------
-document.querySelector('.closeZoom').onclick = () => zoomModal.style.display = 'none';
+document.querySelector('.closeZoom').onclick = () => zoomModal.style.display='none';
 document.getElementById('toggleSidebar').onclick = () => sidebar.classList.toggle('sidebar-open');
 addModal.onclick = e => { if (e.target === addModal) addModal.style.display='none'; };
 document.getElementById('addBtn').onclick = () => addModal.style.display='flex';
@@ -461,13 +445,7 @@ document.getElementById('confirmAdd').onclick = async () => {
   }
 
   const { data } = await supabase.from('creations')
-    .insert([{
-      name,
-      image_path: paths[0],
-      images: paths,
-      likes: [],
-      comments: []
-    }])
+    .insert([{ name, image_path: paths[0], images: paths, likes: 0, comments: [] }])
     .select();
 
   creations.unshift({
@@ -475,19 +453,19 @@ document.getElementById('confirmAdd').onclick = async () => {
     name,
     imgUrl: urls[0],
     zoomGroup: urls,
-    likes: [],
+    likes: 0,
     comments: []
   });
 
   render();
-  addModal.style.display = 'none';
-  document.getElementById('photoName').value = '';
-  document.getElementById('multiPhoto').value = '';
+  addModal.style.display='none';
+  document.getElementById('photoName').value='';
+  document.getElementById('multiPhoto').value='';
 };
 
 // ---------------------- LOAD ----------------------
 async function loadCreations() {
-  const { data } = await supabase.from("creations").select("*").order("created_at", { ascending: false });
+  const { data } = await supabase.from("creations").select("*").order("created_at",{ascending:false});
   creations = data.map(c => {
     const zoomGroup = (c.images || [c.image_path]).map(p => supabase.storage.from('images').getPublicUrl(p).data.publicUrl);
     return {
@@ -495,7 +473,7 @@ async function loadCreations() {
       name: c.name,
       imgUrl: zoomGroup[0],
       zoomGroup,
-      likes: c.likes || [],
+      likes: c.likes || 0,
       comments: c.comments || []
     };
   });
