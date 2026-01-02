@@ -500,7 +500,7 @@ for (let f of files) {
 
 // On insère **une seule création** pour toutes les images
 const { data, error: insertError } = await supabase.from('creations')
-  .insert([{ name, image_path: files[0].name, likes: [], comments: [] }])
+  .insert([{ name, image_path: path, likes: [], comments: [] }])
   .select();
 if (insertError) { console.error('Insert failed', insertError); return; }
 
