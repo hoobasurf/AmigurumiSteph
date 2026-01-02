@@ -182,19 +182,24 @@ body::before{
 <script type="module">
 import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
 
-const supabase=createClient(
+const supabase = createClient(
  "https://jyhbamdcxmpveujjqjla.supabase.co",
  "sb_publishable_sqsxb-3Kl5o3-JQYv9kGFw_-g0EgwMa"
 );
 
-let creations=[],current=null;
+let creations = [];
+let current = null;
 
-const container=document.getElementById('visitor-list-container');
-const zoom=document.getElementById('zoomModal');
-const main=document.getElementById('mainZoom');
-const thumbs=document.getElementById('thumbs');
-
-toggleSidebar.onclick=()=>sidebar.classList.toggle('sidebar-open');
+/* DOM */
+const container = document.getElementById('visitor-list-container');
+const zoom = document.getElementById('zoomModal');
+const main = document.getElementById('mainZoom');
+const likeModal = document.getElementById('likeModal');
+const commentModal = document.getElementById('commentModal');
+const likeBubbles = document.getElementById('likeBubbles');
+const commentBubbles = document.getElementById('commentBubbles');
+const likeCount = document.getElementById('likeCount');
+const commentCount = document.getElementById('commentCount');
 
 /* RENDER */
 function render(){
@@ -221,27 +226,86 @@ function render(){
 
 /* ZOOM */
 function openZoom(c){
-  current=c;
-  main.src=c.images[0];
-  thumbs.innerHTML='';
+  current = c;
+  main.src = c.images[0];
+  likeCount.textContent = c.likes.length;
+  commentCount.textContent = c.comments.length;
+
+  document.querySelectorAll('.thumbs').forEach(e=>e.remove());
+
+  const thumbs = document.createElement('div');
+  thumbs.className = 'thumbs';
+  thumbs.style.display='flex';
+  thumbs.style.gap='8px';
+  thumbs.style.marginTop='12px';
+
   c.images.forEach(img=>{
-    const t=document.createElement('img');
-    t.src=img;
-    t.onclick=()=>main.src=img;
+    const t = document.createElement('img');
+    t.src = img;
+    t.style.width='60px';
+    t.style.height='60px';
+    t.style.objectFit='cover';
+    t.style.borderRadius='8px';
+    t.style.cursor='pointer';
+    t.onclick = e => {
+      e.stopPropagation();
+      main.src = img;
+    };
     thumbs.appendChild(t);
   });
-  likeCount.textContent=c.likes.length;
-  commentCount.textContent=c.comments.length;
+
+  zoom.appendChild(thumbs);
   zoom.style.display='flex';
 }
 
 /* CLOSE */
 document.querySelector('.closeZoom').onclick=()=>zoom.style.display='none';
 zoom.onclick=e=>{if(e.target===zoom)zoom.style.display='none'};
+likeModal.onclick=e=>{if(e.target===likeModal)likeModal.style.display='none'};
+commentModal.onclick=e=>{if(e.target===commentModal)commentModal.style.display='none'};
 
-/* ADD */
-addBtn.onclick=()=>addModal.style.display='flex';
-addModal.onclick=e=>{if(e.target===addModal)addModal.style.display='none'};
+/* LIKE / COMMENT */
+document.querySelector('.like-btn').onclick=e=>{
+  e.stopPropagation();
+  likeBubbles.innerHTML='';
+  current.likes.forEach(n=>{
+    likeBubbles.innerHTML+=`<div class="bubble"><strong>${n}</strong></div>`;
+  });
+  likeModal.style.display='flex';
+};
+
+document.querySelector('.comment-btn').onclick=e=>{
+  e.stopPropagation();
+  commentBubbles.innerHTML='';
+  current.comments.forEach(c=>{
+    commentBubbles.innerHTML+=`<div class="bubble"><strong>${c.name}:</strong> ${c.text}</div>`;
+  });
+  commentModal.style.display='flex';
+};
+
+/* CONFIRM */
+confirmLike.onclick=async()=>{
+  const n=likeName.value.trim();
+  if(!n)return;
+  current.likes.push(n);
+  await supabase.from('creations').update({likes:current.likes}).eq('id',current.id);
+  likeCount.textContent=current.likes.length;
+  likeBubbles.innerHTML+=`<div class="bubble"><strong>${n}</strong></div>`;
+  likeName.value='';
+};
+
+confirmComment.onclick=async()=>{
+  const n=commentName.value.trim();
+  const t=commentText.value.trim();
+  if(!n||!t)return;
+  current.comments.push({name:n,text:t});
+  await supabase.from('creations').update({comments:current.comments}).eq('id',current.id);
+  commentCount.textContent=current.comments.length;
+  commentBubbles.innerHTML+=`<div class="bubble"><strong>${n}:</strong> ${t}</div>`;
+  commentName.value='';commentText.value='';
+};
+
+/* ADD MULTI */
 confirmAdd.onclick=async()=>{
   const name=photoName.value.trim();
   const files=[...multiPhoto.files];
@@ -258,11 +322,19 @@ confirmAdd.onclick=async()=>{
     .insert([{name,images:urls,likes:[],comments:[]}])
     .select();
 
-  creations.unshift({id:data[0].id,name,images:urls,likes:[],comments:[]});
+  creations.unshift({
+    id:data[0].id,
+    name,
+    images:urls,
+    likes:[],
+    comments:[]
+  });
+
   render();
   addModal.style.display='none';
 };
 
+/* LOAD */
 async function load(){
   const {data}=await supabase.from('creations').select('*').order('created_at',{ascending:false});
   creations=data.map(c=>({
@@ -276,6 +348,5 @@ async function load(){
 }
 load();
 </script>
-
 </body>
 </html>
