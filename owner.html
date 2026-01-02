@@ -483,36 +483,45 @@ confirmDelete.onclick=async()=>{
 };
 
 // ---------------------- AJOUT ----------------------
-document.getElementById('addBtn').onclick = () => addModal.style.display = 'flex';
-addModal.onclick = e => { if (e.target === addModal) addModal.style.display = 'none'; };
 document.getElementById('confirmAdd').onclick = async () => {
   const name = document.getElementById('photoName').value.trim();
   const files = document.getElementById('multiPhoto').files;
   if (!name || !files.length) return;
+
   const urls = [];
-for (let f of files) {
-  const path = `${Date.now()}_${f.name}`;
-  const { error: uploadError } = await supabase.storage.from('images').upload(path, f);
-  if (uploadError) { console.error('Upload failed', uploadError); continue; }
-  const publicUrl = supabase.storage.from('images').getPublicUrl(path).data.publicUrl;
-  urls.push(publicUrl);
-}
+  for (let f of files) {
+    const path = `${Date.now()}_${f.name}`;
+    const { error: uploadError } = await supabase.storage.from('images').upload(path, f);
+    if (uploadError) { console.error('Upload failed', uploadError); continue; }
+    const publicUrl = supabase.storage.from('images').getPublicUrl(path).data.publicUrl;
+    urls.push(publicUrl);
+  }
 
-// On insère **une seule création** pour toutes les images
-const { data, error: insertError } = await supabase.from('creations')
-  .insert([{ name, image_path: files[0].name, likes: [], comments: [] }])
-  .select();
-if (insertError) { console.error('Insert failed', insertError); return; }
+  if (!urls.length) return;
 
-// On ajoute dans le tableau local avec toutes les images dans zoomGroup
-creations.unshift({
-  id: data[0].id,
-  name,
-  imgUrl: urls[0],     // image principale
-  zoomGroup: urls,     // toutes les images uploadées
-  likes: [],
-  comments: []
-});
+  // ✅ On insère une seule création avec toutes les images
+  const { data, error: insertError } = await supabase.from('creations')
+    .insert([{
+      name,
+      image_path: urls[0], // première image comme image principale
+      zoomGroup: urls,     // toutes les images pour les miniatures/zoom
+      likes: [],
+      comments: []
+    }])
+    .select();
+
+  if (insertError) { console.error('Insert failed', insertError); return; }
+
+  // Ajouter localement pour que les miniatures fonctionnent
+  creations.unshift({
+    id: data[0].id,
+    name,
+    imgUrl: urls[0],
+    zoomGroup: urls,
+    likes: [],
+    comments: []
+  });
+
   render();
   addModal.style.display = 'none';
   document.getElementById('photoName').value = '';
