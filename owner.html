@@ -483,41 +483,38 @@ document.getElementById('confirmAdd').onclick = async () => {
   const files = document.getElementById('multiPhoto').files;
   if (!name || !files.length) return;
 
-  const urls = [];
+  const zoomGroup = [];
 
-  // Upload de toutes les images
-  for (let i = 0; i < files.length; i++) {
-    const f = files[i];
-    const path = `${Date.now()}_${i}_${f.name}`; // index ajouté pour éviter doublons
+  for (let f of files) {
+    const path = `${Date.now()}_${f.name}`;
+
     const { error: uploadError } = await supabase.storage.from('images').upload(path, f);
     if (uploadError) { console.error('Upload failed', uploadError); continue; }
 
+    const { data, error: insertError } = await supabase.from('creations')
+      .insert([{ name, image_path: path, likes: [], comments: [] }])
+      .select();
+    if (insertError) { console.error('Insert failed', insertError); continue; }
+
     const publicUrl = supabase.storage.from('images').getPublicUrl(path).data.publicUrl;
-    urls.push(publicUrl);
+    zoomGroup.push(publicUrl);
+
+    creations.unshift({
+      id: data[0].id,
+      name,
+      imgUrl: publicUrl,
+      zoomGroup: [], // temporaire vide, on remplira après
+      likes: [],
+      comments: []
+    });
   }
 
-  if (!urls.length) return; // aucun fichier uploadé
-
-  // Insert dans Supabase
-  const { data, error } = await supabase.from('creations').insert([{
-    name,
-    image_path: urls[0],
-    zoomGroup: urls,
-    likes: [],
-    comments: []
-  }]).select();
-
-  if (error) { console.error('Insert failed', error); return; }
-
-  // Ajouter en local
-  creations.unshift({
-    id: data[0].id,
-    name,
-    imgUrl: urls[0],
-    zoomGroup: urls,
-    likes: [],
-    comments: []
-  });
+  // On met toutes les images dans le zoomGroup du premier élément ajouté
+  if (creations.length && zoomGroup.length > 1) {
+    creations[0].zoomGroup = zoomGroup;
+  } else if (zoomGroup.length === 1) {
+    creations[0].zoomGroup = [zoomGroup[0]];
+  }
 
   render();
   addModal.style.display = 'none';
