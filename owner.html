@@ -512,12 +512,20 @@ async function refreshCreations() {
   if (error) { console.error(error); return; }
 
   creations = data.map(c => {
-    const zoomUrls = c.zoomGroup?.map(p => supabase.storage.from('images').getPublicUrl(p).data.publicUrl)
-                     || [supabase.storage.from('images').getPublicUrl(c.image_path).data.publicUrl];
+    // Vérifie que zoomGroup existe et que c'est un tableau
+    let zoomUrls = [];
+    if (Array.isArray(c.zoomGroup) && c.zoomGroup.length > 0) {
+      zoomUrls = c.zoomGroup.map(p => supabase.storage.from('images').getPublicUrl(p).data.publicUrl);
+    } else if (c.image_path) {
+      zoomUrls = [supabase.storage.from('images').getPublicUrl(c.image_path).data.publicUrl];
+    } else {
+      zoomUrls = []; // Pas d'image
+    }
+
     return {
       id: c.id,
       name: c.name,
-      imgUrl: zoomUrls[0],
+      imgUrl: zoomUrls[0] || '', // évite undefined
       zoomGroup: zoomUrls,
       likes: c.likes || [],
       comments: c.comments || []
@@ -525,7 +533,6 @@ async function refreshCreations() {
   });
 
   render();
-}
 }
 
 // ---------------------- DELETE ----------------------
