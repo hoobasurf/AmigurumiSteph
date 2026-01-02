@@ -392,26 +392,22 @@ body::before {
 <script type="module">
 import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
 
-/* ================= SUPABASE ================= */
 const supabase = createClient(
   "https://jyhbamdcxmpveujjqjla.supabase.co",
   "sb_publishable_sqsxb-3Kl5o3-JQYv9kGFw_-g0EgwMa"
 );
 
-/* ================= GLOBAL ================= */
 let creations = [];
-let currentDelete = null;
 let currentZoom = null;
+let currentDelete = null;
 
-/* ================= DOM READY ================= */
+// ================= DOM READY =================
 window.addEventListener("DOMContentLoaded", () => {
 
   const container = document.getElementById("visitor-list-container");
-
   const addModal = document.getElementById("addModal");
   const deleteModal = document.getElementById("deleteModal");
   const zoomModal = document.getElementById("zoomModal");
-
   const sidebar = document.getElementById("sidebar");
 
   const mainZoom = document.getElementById("mainZoom");
@@ -419,12 +415,11 @@ window.addEventListener("DOMContentLoaded", () => {
   const likeCount = document.getElementById("likeCount");
   const commentCount = document.getElementById("commentCount");
 
-  /* ================= SIDEBAR ================= */
+  // ================= SIDEBAR =================
   document.getElementById("toggleSidebar").onclick = () => {
     sidebar.classList.toggle("sidebar-open");
   };
 
-  /* ================= AJOUT MODAL ================= */
   document.getElementById("addBtn").onclick = () => {
     addModal.style.display = "flex";
   };
@@ -433,45 +428,84 @@ window.addEventListener("DOMContentLoaded", () => {
     if (e.target === addModal) addModal.style.display = "none";
   };
 
-  /* ================= CONFIRM AJOUT ================= */
+  // ================= RENDER =================
+  function render() {
+    container.innerHTML = "";
+    let page;
+
+    creations.forEach((c, i) => {
+      if (i % 6 === 0) {
+        page = document.createElement("div");
+        page.className = "page";
+        container.appendChild(page);
+      }
+
+      const d = document.createElement("div");
+      d.className = "visitor-item";
+      d.innerHTML = `
+        <div class="placeholder">?</div>
+        <div class="delete-btn">×</div>
+        <p>${c.name}</p>
+        <img src="${c.imgUrl}">
+      `;
+
+      const img = d.querySelector("img");
+      img.onload = () => d.querySelector(".placeholder").style.display = "none";
+      img.onclick = () => openZoom(c);
+
+      d.querySelector(".delete-btn").onclick = () => {
+        currentDelete = c;
+        deleteModal.style.display = "flex";
+      };
+
+      page.appendChild(d);
+    });
+  }
+
+  // ================= ZOOM =================
+  function openZoom(c) {
+    currentZoom = c;
+    mainZoom.src = c.imgUrl;
+    thumbs.innerHTML = "";
+
+    c.zoomGroup.forEach(u => {
+      const t = document.createElement("img");
+      t.src = u;
+      t.onclick = () => mainZoom.src = u;
+      thumbs.appendChild(t);
+    });
+
+    likeCount.textContent = c.likes.length;
+    commentCount.textContent = c.comments.length;
+    zoomModal.style.display = "flex";
+  }
+
+  document.querySelector(".closeZoom").onclick = () => {
+    zoomModal.style.display = "none";
+  };
+
+  // ================= ADD =================
   document.getElementById("confirmAdd").onclick = async () => {
     const name = document.getElementById("photoName").value.trim();
     const files = document.getElementById("multiPhoto").files;
-
     if (!name || !files.length) return;
 
     const urls = [];
 
-    for (let f of files) {
+    for (const f of files) {
       const path = `${Date.now()}_${f.name}`;
+      const { error } = await supabase.storage.from("images").upload(path, f);
+      if (error) continue;
 
-      const { error } = await supabase
-        .storage
-        .from("creations")
-        .upload(path, f);
-
-      if (error) {
-        console.error("UPLOAD ERROR", error);
-        return;
-      }
-
-      const { data } = supabase
-        .storage
-        .from("creations")
-        .getPublicUrl(path);
-
+      const { data } = supabase.storage.from("images").getPublicUrl(path);
       urls.push(data.publicUrl);
     }
 
-    const { data, error } = await supabase
-      .from("creations")
+    if (!urls.length) return;
+
+    const { data } = await supabase.from("creations")
       .insert([{ name, image_path: urls[0], likes: [], comments: [] }])
       .select();
-
-    if (error) {
-      console.error("INSERT ERROR", error);
-      return;
-    }
 
     creations.unshift({
       id: data[0].id,
@@ -488,110 +522,16 @@ window.addEventListener("DOMContentLoaded", () => {
     document.getElementById("multiPhoto").value = "";
   };
 
-  /* ================= RENDER ================= */
-  function render() {
-    container.innerHTML = "";
-    let page = null;
-
-    creations.forEach((c, i) => {
-      if (i % 6 === 0) {
-        page = document.createElement("div");
-        page.className = "page";
-        container.appendChild(page);
-      }
-
-      const d = document.createElement("div");
-      d.className = "visitor-item";
-      d.innerHTML = `
-        <div class="placeholder">?</div>
-        <div class="delete-btn">×</div>
-        <p>${c.name}</p>
-        <img src="${c.imgUrl}">
-        <div class="actions">
-          <button class="like-btn">❤️</button>
-          <button class="comment-btn">💬</button>
-        </div>
-      `;
-
-      d.querySelector("img").onload = () => {
-        d.querySelector(".placeholder").style.display = "none";
-      };
-
-      d.querySelector("img").onclick = () => openZoom(c);
-      d.querySelector(".delete-btn").onclick = () => openDelete(c);
-      d.querySelector(".like-btn").onclick = () => openZoom(c);
-      d.querySelector(".comment-btn").onclick = () => openZoom(c);
-
-      page.appendChild(d);
-    });
-  }
-
-  /* ================= ZOOM ================= */
-  function openZoom(c) {
-    currentZoom = c;
-    mainZoom.src = c.imgUrl;
-    thumbs.innerHTML = "";
-
-    c.zoomGroup.forEach(url => {
-      const t = document.createElement("img");
-      t.src = url;
-      t.onclick = () => mainZoom.src = url;
-      thumbs.appendChild(t);
-    });
-
-    likeCount.textContent = c.likes.length;
-    commentCount.textContent = c.comments.length;
-    zoomModal.style.display = "flex";
-  }
-
-  document.querySelector(".closeZoom").onclick = () => zoomModal.style.display = "none";
-  zoomModal.onclick = e => {
-    if (e.target === zoomModal) zoomModal.style.display = "none";
-  };
-
-  /* ================= DELETE ================= */
-  function openDelete(c) {
-    currentDelete = c;
-    deleteModal.style.display = "flex";
-  }
-
-  deleteModal.onclick = e => {
-    if (e.target === deleteModal) deleteModal.style.display = "none";
-  };
-
-  document.getElementById("cancelDelete").onclick = () => {
-    deleteModal.style.display = "none";
-  };
-
-  document.getElementById("confirmDelete").onclick = async () => {
-    if (!currentDelete) return;
-
-    const file = currentDelete.imgUrl.split("/creations/")[1];
-
-    await supabase.storage.from("creations").remove([file]);
-    await supabase.from("creations").delete().eq("id", currentDelete.id);
-
-    creations = creations.filter(c => c.id !== currentDelete.id);
-    render();
-    deleteModal.style.display = "none";
-  };
-
-  /* ================= LOAD ================= */
+  // ================= LOAD =================
   async function loadCreations() {
-    const { data, error } = await supabase
+    const { data } = await supabase
       .from("creations")
       .select("*")
       .order("created_at", { ascending: false });
 
-    if (error) {
-      console.error(error);
-      return;
-    }
-
     creations = data.map(c => {
-      const { data: pub } = supabase
-        .storage
-        .from("creations")
+      const { data: pub } = supabase.storage
+        .from("images")
         .getPublicUrl(c.image_path);
 
       return {
@@ -607,9 +547,7 @@ window.addEventListener("DOMContentLoaded", () => {
     render();
   }
 
-  /* ================= START ================= */
   loadCreations();
-
 });
 </script>
 </body>
