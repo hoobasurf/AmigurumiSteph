@@ -478,7 +478,17 @@ confirmDelete.onclick=async()=>{
   deleteModal.style.display='none';
 };
 
-// ---------------------- ADD ----------------------
+// ---------------------- ADD ----------------------// ---------------------- ADD ----------------------
+// Ouvre le modal au clic sur Ajouter
+addBtn.onclick = () => {
+  addModal.style.display = 'flex';
+  console.log("Bouton Ajouter cliqué !"); // juste pour vérifier
+};
+
+// Ferme le modal si clic sur l’arrière-plan
+addModal.onclick = e => { if(e.target === addModal) addModal.style.display='none'; };
+
+// Valider l’ajout des images (aucune modification ici, garde ton code)
 confirmAdd.onclick = async () => {
   const name = document.getElementById('photoName').value.trim();
   const files = document.getElementById('multiPhoto').files;
@@ -488,7 +498,7 @@ confirmAdd.onclick = async () => {
 
   for (let i = 0; i < files.length; i++) {
     const f = files[i];
-    const path = `${Date.now()}_${i}_${f.name}`; // index pour éviter doublons
+    const path = `${Date.now()}_${i}_${f.name}`;
     const { error: uploadError } = await supabase.storage.from('images').upload(path, f);
     if (uploadError) {
       console.error("Erreur upload:", uploadError);
@@ -498,13 +508,12 @@ confirmAdd.onclick = async () => {
     urls.push(publicUrl);
   }
 
-  if (!urls.length) return; // aucun fichier uploadé
+  if (!urls.length) return;
 
-  // Insert dans Supabase avec TOUTES les images dans zoomGroup
   const { data, error } = await supabase.from('creations').insert([{
     name: name,
-    image_path: urls[0],   // première image affichée sur la grille
-    zoomGroup: urls,       // toutes les images stockées pour le zoom
+    image_path: urls[0],
+    zoomGroup: urls,
     likes: [],
     comments: []
   }]).select();
@@ -514,7 +523,6 @@ confirmAdd.onclick = async () => {
     return;
   }
 
-  // Ajouter localement dans le tableau creations
   creations.unshift({
     id: data[0].id,
     name: name,
