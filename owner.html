@@ -472,6 +472,8 @@ zoomModal.onclick=e=>{if(e.target===zoomModal)zoomModal.style.display='none';};
 document.getElementById('toggleSidebar').onclick=()=>sidebar.classList.toggle('sidebar-open');
 
 // ---------------------- AJOUT ----------------------
+document.getElementById('addBtn').onclick=()=>addModal.style.display='flex';
+addModal.onclick=e=>{if(e.target===addModal)addModal.style.display='none';};
 document.getElementById('confirmAdd').onclick = async () => {
   const name = document.getElementById('photoName').value.trim();
   const files = document.getElementById('multiPhoto').files;
@@ -491,14 +493,15 @@ document.getElementById('confirmAdd').onclick = async () => {
 
   if (error) { console.error(error); return; }
 
-  // ----> Appelle refreshCreations() au lieu de manipuler manuellement
+  // Rafraîchissement après ajout
   await refreshCreations();
 
   addModal.style.display = 'none';
   document.getElementById('photoName').value = '';
   document.getElementById('multiPhoto').value = '';
 };
-// ---------------------- LOAD ----------------------
+
+// ---------------------- REFRESH ----------------------
 async function refreshCreations() {
   const { data, error } = await supabase
     .from("creations")
@@ -508,20 +511,17 @@ async function refreshCreations() {
   if (error) { console.error(error); return; }
 
   creations = data.map(c => {
-    // Vérifie que zoomGroup existe et que c'est un tableau
     let zoomUrls = [];
-    if (Array.isArray(c.zoomGroup) && c.zoomGroup.length > 0) {
+    if (c.zoomGroup && c.zoomGroup.length) {
       zoomUrls = c.zoomGroup.map(p => supabase.storage.from('images').getPublicUrl(p).data.publicUrl);
     } else if (c.image_path) {
       zoomUrls = [supabase.storage.from('images').getPublicUrl(c.image_path).data.publicUrl];
-    } else {
-      zoomUrls = []; // Pas d'image
     }
 
     return {
       id: c.id,
       name: c.name,
-      imgUrl: zoomUrls[0] || '', // évite undefined
+      imgUrl: zoomUrls[0] || '',
       zoomGroup: zoomUrls,
       likes: c.likes || [],
       comments: c.comments || []
@@ -531,6 +531,9 @@ async function refreshCreations() {
   render();
 }
 
+// ---------------------- LOAD ----------------------
+refreshCreations();
+
 // ---------------------- DELETE ----------------------
 function openDeleteModal(c){currentDelete=c;deleteModal.style.display='flex';}
 deleteModal.onclick=e=>{if(e.target===deleteModal)deleteModal.style.display='none';};
@@ -539,13 +542,9 @@ document.getElementById('confirmDelete').onclick=async()=>{
   if(!currentDelete)return;
   for(let u of currentDelete.zoomGroup)await supabase.storage.from('images').remove([u.split('/images/')[1]]);
   await supabase.from('creations').delete().eq('id',currentDelete.id);
-  creations = creations.filter(c => c.id !== currentDelete.id);
-render(); // mise à jour immédiate locale
-
-// Optionnel : recharger depuis Supabase pour être sûr
-// await refreshCreations();
-
-deleteModal.style.display='none';
+  creations=creations.filter(c=>c.id!==currentDelete.id);
+  render();
+  deleteModal.style.display='none';
 };
 
 // ---------------------- LIKE ----------------------
@@ -596,9 +595,6 @@ document.getElementById('confirmComment').onclick=async()=>{
   document.getElementById('commentName').value='';
   document.getElementById('commentText').value='';
 };
-
-// ---------------------- START ----------------------
-refreshCreations();
 
 </script>
 </body>
