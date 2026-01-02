@@ -472,64 +472,48 @@ zoomModal.onclick=e=>{if(e.target===zoomModal)zoomModal.style.display='none';};
 document.getElementById('toggleSidebar').onclick=()=>sidebar.classList.toggle('sidebar-open');
 
 // ---------------------- AJOUT ----------------------
-document.getElementById('addBtn').onclick=()=>addModal.style.display='flex';
-addModal.onclick=e=>{if(e.target===addModal)addModal.style.display='none';};
 document.getElementById('confirmAdd').onclick = async () => {
   const name = document.getElementById('photoName').value.trim();
   const files = document.getElementById('multiPhoto').files;
   if (!name || !files.length) return;
 
   const urls = [];
+
   for (let f of files) {
     const path = `${Date.now()}_${f.name}`;
-    await supabase.storage.from('images').upload(path, f);
-    const publicUrl = supabase.storage.from('images').getPublicUrl(path).data.publicUrl;
-    urls.push(publicUrl);
+
+    // Upload
+    const { error: uploadError } = await supabase.storage.from('images').upload(path, f);
+    if (uploadError) { console.error(uploadError); continue; }
+
+    // Récupère l'URL publique
+    const { data: publicData } = supabase.storage.from('images').getPublicUrl(path);
+    urls.push(publicData.publicUrl);
   }
 
+  if (!urls.length) return;
+
+  // Insert dans la table
   const { data, error } = await supabase.from('creations')
     .insert([{ name, image_path: urls[0], likes: [], comments: [] }])
     .select();
-
   if (error) { console.error(error); return; }
 
-  // Rafraîchissement après ajout
-  await refreshCreations();
+  // Met à jour le tableau local
+  creations.unshift({
+    id: data[0].id,
+    name: name,
+    imgUrl: urls[0],
+    zoomGroup: urls,
+    likes: [],
+    comments: []
+  });
 
+  render();
   addModal.style.display = 'none';
   document.getElementById('photoName').value = '';
   document.getElementById('multiPhoto').value = '';
 };
-
-// ---------------------- REFRESH ----------------------
-async function refreshCreations() {
-  const { data, error } = await supabase
-    .from("creations")
-    .select("*")
-    .order("created_at", { ascending: false });
-
-  if (error) { console.error(error); return; }
-
-  creations = data.map(c => {
-    let zoomUrls = [];
-    if (c.zoomGroup && c.zoomGroup.length) {
-      zoomUrls = c.zoomGroup.map(p => supabase.storage.from('images').getPublicUrl(p).data.publicUrl);
-    } else if (c.image_path) {
-      zoomUrls = [supabase.storage.from('images').getPublicUrl(c.image_path).data.publicUrl];
-    }
-
-    return {
-      id: c.id,
-      name: c.name,
-      imgUrl: zoomUrls[0] || '',
-      zoomGroup: zoomUrls,
-      likes: c.likes || [],
-      comments: c.comments || []
-    };
-  });
-
-  render();
-}
 
 // ---------------------- LOAD ----------------------
 refreshCreations();
