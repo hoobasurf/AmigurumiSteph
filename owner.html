@@ -472,6 +472,8 @@ zoomModal.onclick=e=>{if(e.target===zoomModal)zoomModal.style.display='none';};
 document.getElementById('toggleSidebar').onclick=()=>sidebar.classList.toggle('sidebar-open');
 
 // ---------------------- AJOUT ----------------------
+document.getElementById('addBtn').onclick=()=>addModal.style.display='flex';
+addModal.onclick=e=>{if(e.target===addModal)addModal.style.display='none';};
 document.getElementById('confirmAdd').onclick = async () => {
   const name = document.getElementById('photoName').value.trim();
   const files = document.getElementById('multiPhoto').files;
@@ -493,7 +495,7 @@ document.getElementById('confirmAdd').onclick = async () => {
 
   if (!urls.length) return;
 
-  // Insert dans la table
+  // Insert dans la table Supabase
   const { data, error } = await supabase.from('creations')
     .insert([{ name, image_path: urls[0], likes: [], comments: [] }])
     .select();
@@ -515,8 +517,30 @@ document.getElementById('confirmAdd').onclick = async () => {
   document.getElementById('multiPhoto').value = '';
 };
 
-// ---------------------- LOAD ----------------------
-refreshCreations();
+// ---------------------- LOAD / REFRESH ----------------------
+async function refreshCreations() {
+  const { data, error } = await supabase
+    .from("creations")
+    .select("*")
+    .order("created_at", { ascending: false });
+
+  if (error) { console.error(error); return; }
+
+  creations = data.map(c => {
+    const zoomUrls = c.zoomGroup?.map(p => supabase.storage.from('images').getPublicUrl(p).data.publicUrl)
+                     || [supabase.storage.from('images').getPublicUrl(c.image_path).data.publicUrl];
+    return {
+      id: c.id,
+      name: c.name,
+      imgUrl: zoomUrls[0],
+      zoomGroup: zoomUrls,
+      likes: c.likes || [],
+      comments: c.comments || []
+    };
+  });
+
+  render();
+}
 
 // ---------------------- DELETE ----------------------
 function openDeleteModal(c){currentDelete=c;deleteModal.style.display='flex';}
@@ -532,20 +556,23 @@ document.getElementById('confirmDelete').onclick=async()=>{
 };
 
 // ---------------------- LIKE ----------------------
-document.querySelector('.like-btn').onclick=()=>{
-  likeModal.style.display='flex';
-  likeBubbles.innerHTML='';
-  currentZoom.likes.forEach(p=>{
-    const b=document.createElement('div');
-    b.className='bubble';
-    b.innerHTML=`<strong>${p}</strong>`;
-    likeBubbles.appendChild(b);
-  });
-};
+document.querySelectorAll('.like-btn').forEach(btn=>{
+  btn.onclick=()=>{
+    if(!currentZoom) return;
+    likeModal.style.display='flex';
+    likeBubbles.innerHTML='';
+    currentZoom.likes.forEach(p=>{
+      const b=document.createElement('div');
+      b.className='bubble';
+      b.innerHTML=`<strong>${p}</strong>`;
+      likeBubbles.appendChild(b);
+    });
+  };
+});
 likeModal.onclick=e=>{if(e.target===likeModal)likeModal.style.display='none';};
 document.getElementById('confirmLike').onclick=async()=>{
   const name=document.getElementById('likeName').value.trim();
-  if(!name)return;
+  if(!name || !currentZoom) return;
   currentZoom.likes.push(name);
   await supabase.from('creations').update({likes:currentZoom.likes}).eq('id',currentZoom.id);
   const b=document.createElement('div');b.className='bubble';b.innerHTML=`<strong>${name}</strong>`;
@@ -555,21 +582,24 @@ document.getElementById('confirmLike').onclick=async()=>{
 };
 
 // ---------------------- COMMENT ----------------------
-document.querySelector('.comment-btn').onclick=()=>{
-  commentModal.style.display='flex';
-  commentBubbles.innerHTML='';
-  currentZoom.comments.forEach(c=>{
-    const b=document.createElement('div');
-    b.className='bubble';
-    b.innerHTML=`<strong>${c.name}:</strong> ${c.text}`;
-    commentBubbles.appendChild(b);
-  });
-};
+document.querySelectorAll('.comment-btn').forEach(btn=>{
+  btn.onclick=()=>{
+    if(!currentZoom) return;
+    commentModal.style.display='flex';
+    commentBubbles.innerHTML='';
+    currentZoom.comments.forEach(c=>{
+      const b=document.createElement('div');
+      b.className='bubble';
+      b.innerHTML=`<strong>${c.name}:</strong> ${c.text}`;
+      commentBubbles.appendChild(b);
+    });
+  };
+});
 commentModal.onclick=e=>{if(e.target===commentModal)commentModal.style.display='none';};
 document.getElementById('confirmComment').onclick=async()=>{
   const name=document.getElementById('commentName').value.trim();
   const text=document.getElementById('commentText').value.trim();
-  if(!name||!text)return;
+  if(!name || !text || !currentZoom) return;
   const commentObj={name,text};
   currentZoom.comments.push(commentObj);
   await supabase.from('creations').update({comments:currentZoom.comments}).eq('id',currentZoom.id);
@@ -580,6 +610,8 @@ document.getElementById('confirmComment').onclick=async()=>{
   document.getElementById('commentText').value='';
 };
 
+// ---------------------- START ----------------------
+refreshCreations();
 </script>
 </body>
 </html>
