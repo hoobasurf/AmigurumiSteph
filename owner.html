@@ -340,46 +340,51 @@ const supabase = createClient(
 
 let creations = [], currentZoom = null;
 const container = document.getElementById('visitor-list-container');
-
 const addModal = document.getElementById('addModal');
 const zoomModal = document.getElementById('zoomModal');
 const mainZoom = document.getElementById('mainZoom');
 const thumbs = document.getElementById('thumbs');
-
 const sidebar = document.getElementById('sidebar');
 
-// 🔹 Fonction suppression
+// 🔹 Suppression avec confirmation + Supabase
 function openDeleteModal(c) {
   if (!c) return;
-  // Supprime directement de la liste et du DOM
+  if (!confirm(`Supprimer "${c.name}" ?`)) return;
+
+  // Supprimer côté client
   creations = creations.filter(x => x.id !== c.id);
   render();
 
-  // Optionnel : supprimer aussi dans Supabase
-  supabase.from('creations').delete().eq('id', c.id);
+  // Supprimer côté Supabase
+  supabase.from('creations').delete().eq('id', c.id)
+    .then(({ error }) => { if (error) console.error('Erreur suppression Supabase :', error); });
 }
 
 // 🔹 Like modal
 function openLikeModal(c) {
-  currentZoom = c;
-  // Par exemple, incrémente directement le compteur (simple)
   if (!c.likes) c.likes = [];
-  c.likes.push('❤️'); // ajoute un like fictif
-  render(); // rafraîchit le compteur si tu l’affiches quelque part
+  c.likes.push('❤️');
+  render();
+  // Mise à jour Supabase
+  supabase.from('creations').update({ likes: c.likes }).eq('id', c.id)
+    .then(({ error }) => { if (error) console.error('Erreur like Supabase :', error); });
 }
 
 // 🔹 Comment modal
 function openCommentModal(c) {
-  currentZoom = c;
   if (!c.comments) c.comments = [];
-  c.comments.push('💬'); // ajoute un commentaire fictif
-  render(); // rafraîchit l’affichage si nécessaire
+  c.comments.push('💬');
+  render();
+  // Mise à jour Supabase
+  supabase.from('creations').update({ comments: c.comments }).eq('id', c.id)
+    .then(({ error }) => { if (error) console.error('Erreur commentaire Supabase :', error); });
 }
-  
+
 // ---------------------- RENDER ----------------------
 function render() {
   container.innerHTML = '';
   let page = null;
+
   creations.forEach((c, i) => {
     if (i % 6 === 0) {
       page = document.createElement('div');
@@ -410,25 +415,21 @@ function render() {
       </div>
     `;
 
-    // 🔹 Image zoom
     d.querySelector('img').onclick = () => openZoom(c);
-
-    // 🔹 Croix suppression
     d.querySelector('.delete-btn').onclick = () => openDeleteModal(c);
-
-    // 🔹 Like & Comment
     d.querySelector('.like-btn').onclick = () => openLikeModal(c);
     d.querySelector('.comment-btn').onclick = () => openCommentModal(c);
 
     page.appendChild(d);
   });
 }
+
 // ---------------------- ZOOM ----------------------
 function openZoom(c) {
   currentZoom = c;
   mainZoom.src = c.imgUrl;
   thumbs.innerHTML = '';
-  c.zoomGroup.forEach(u => {
+  (c.zoomGroup || [c.imgUrl]).forEach(u => {
     const t = document.createElement('img');
     t.src = u;
     t.onclick = () => mainZoom.src = u;
