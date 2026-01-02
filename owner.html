@@ -418,47 +418,68 @@ function render(){
   container.innerHTML='';
   let page=null;
   creations.forEach((c,i)=>{
-    if(i%6===0){page=document.createElement('div');page.className='page';container.appendChild(page);}
-    else{page=container.lastElementChild;}
+    // Créer une nouvelle page tous les 6 items
+    if(i % 6 === 0){
+      page = document.createElement('div');
+      page.className = 'page';
+      container.appendChild(page);
+    } else {
+      page = container.lastElementChild;
+    }
 
-    const d=document.createElement('div');
-    d.className='visitor-item';
-    const placeholder=document.createElement('div');
-    placeholder.className='placeholder';
-    placeholder.textContent='?';
+    // Créer l'élément visitor-item
+    const d = document.createElement('div');
+    d.className = 'visitor-item';
+
+    // Placeholder "?"
+    const placeholder = document.createElement('div');
+    placeholder.className = 'placeholder';
+    placeholder.textContent = '?';
     d.appendChild(placeholder);
 
-    const img=new Image();
-    img.src=c.imgUrl;
-    img.onload=()=>{placeholder.style.display='none'; img.style.display='block';};
-    img.onerror=()=>{img.style.display='none'; placeholder.textContent='❌';};
-    img.style.width='100%';
-    img.style.height='100%';
-    img.style.objectFit='cover';
-    img.style.borderRadius='12px';
-    img.style.cursor='pointer';
-    img.style.position='relative';
-    img.style.zIndex='1';
-    img.onclick=()=>openZoom(c);
+    // Image
+    const img = new Image();
+    img.src = c.imgUrl;
+    img.style.width = '100%';
+    img.style.height = '100%';
+    img.style.objectFit = 'cover';
+    img.style.borderRadius = '12px';
+    img.style.cursor = 'pointer';
+    img.style.position = 'relative';
+    img.style.zIndex = '1';
+    img.onclick = () => openZoom(c);
+
+    // ✅ Vérifie si l'image est déjà chargée (cache)
+    if(img.complete && img.naturalWidth > 0){
+      placeholder.style.display = 'none';
+      img.style.display = 'block';
+    } else {
+      img.onload = () => { placeholder.style.display='none'; img.style.display='block'; };
+      img.onerror = () => { img.style.display='none'; placeholder.textContent='❌'; };
+    }
+
     d.appendChild(img);
 
-    const p=document.createElement('p');
-    p.textContent=c.name;
+    // Nom
+    const p = document.createElement('p');
+    p.textContent = c.name;
     d.appendChild(p);
 
-    const deleteBtn=document.createElement('div');
-    deleteBtn.className='delete-btn';
-    deleteBtn.textContent='×';
-    deleteBtn.onclick=()=>openDeleteModal(c);
+    // Delete button
+    const deleteBtn = document.createElement('div');
+    deleteBtn.className = 'delete-btn';
+    deleteBtn.textContent = '×';
+    deleteBtn.onclick = () => openDeleteModal(c);
     d.appendChild(deleteBtn);
 
-    const actionsDiv=document.createElement('div');
-    actionsDiv.className='actions';
-    actionsDiv.style.position='absolute';
-    actionsDiv.style.bottom='24px';
-    actionsDiv.style.width='100%';
-    actionsDiv.style.justifyContent='center';
-    actionsDiv.innerHTML=`
+    // Actions (like/comment)
+    const actionsDiv = document.createElement('div');
+    actionsDiv.className = 'actions';
+    actionsDiv.style.position = 'absolute';
+    actionsDiv.style.bottom = '24px';
+    actionsDiv.style.width = '100%';
+    actionsDiv.style.justifyContent = 'center';
+    actionsDiv.innerHTML = `
       <button class="like-btn" title="Like ❤️">
         <svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"></path></svg>
       </button>
@@ -466,10 +487,11 @@ function render(){
         <svg viewBox="0 0 24 24"><path d="M21 6h-18v12h18v-12zm0-2c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2h-18c-1.1 0-2-.9-2-2v-12c0-1.1.9-2 2-2h18z"></path></svg>
       </button>
     `;
-    actionsDiv.querySelector('.like-btn').onclick=()=>openZoom(c);
-    actionsDiv.querySelector('.comment-btn').onclick=()=>openZoom(c);
+    actionsDiv.querySelector('.like-btn').onclick = () => openZoom(c);
+    actionsDiv.querySelector('.comment-btn').onclick = () => openZoom(c);
     d.appendChild(actionsDiv);
 
+    // Ajouter à la page
     page.appendChild(d);
   });
 }
