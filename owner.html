@@ -7,20 +7,23 @@
 *{box-sizing:border-box;margin:0;padding:0;}
 html,body{height:100%;font-family:'Comic Sans MS',cursive;overflow-x:hidden;}
 
-/* BODY FIXE */
+/* BODY AVEC FOND FIXE */
 body::before {
   content:"";
   position:fixed;
-  top:0; left:0;
-  width:100vw; height:100vh;
-  background-image:url('Photoroom_20251223_114401.jpeg');
-  background-size:cover;
-  background-position:center;
+  top:0;
+  left:0;
+  width:100vw;
+  height:100vh;
+  background-image: url('Photoroom_20251223_114401.jpeg');
+  background-size: cover;
+  background-position: center center;
+  background-repeat: no-repeat;
   z-index:-1;
 }
 
-/* GRILLE HORIZONTALE */
-.center-zone{
+/* SCROLL HORIZONTAL GRILLE */
+.center-zone {
   display:flex;
   justify-content:center;
   align-items:flex-start;
@@ -78,19 +81,19 @@ body::before {
 }
 
 /* Images */
-.visitor-item img{
+.visitor-item img {
   width:100%;
   height:100%;
   object-fit:cover;
   border-radius:12px;
   cursor:pointer;
   display:block;
-  filter:brightness(1.05) contrast(1.05) saturate(0.95);
-  transition:filter 0.3s, transform 0.3s;
+  filter: brightness(1.05) contrast(1.05) saturate(0.95);
+  transition: filter 0.3s, transform 0.3s;
   position: relative;
   z-index: 2;
 }
-.visitor-item img:hover{transform:scale(1.03);}
+.visitor-item img:hover { transform: scale(1.03); }
 
 /* Overlay */
 .visitor-item::after{
@@ -102,7 +105,7 @@ body::before {
   z-index:1;
 }
 
-/* NOM SOUS L’IMAGE */
+/* NOM */
 .visitor-item p{
   position:absolute;
   bottom:2px;
@@ -120,7 +123,8 @@ body::before {
   position:absolute;
   top:2px;
   right:2px;
-  width:20px; height:20px;
+  width:20px;
+  height:20px;
   background:#ffb6c1;
   color:#fff;
   border-radius:50%;
@@ -131,14 +135,17 @@ body::before {
   cursor:pointer;
   z-index:5;
   font-size:14px;
+  transition: background 0.2s;
 }
 .delete-btn:hover{background:#e94f9a;}
 
 /* SIDEBAR */
 #sidebar{
   position:fixed;
-  top:0; left:-220px;
-  width:220px; height:100vh;
+  top:0;
+  left:-220px;
+  width:220px;
+  height:100vh;
   background:rgba(255,230,240,0.2);
   border-right:2px solid #b67385;
   padding:20px;
@@ -148,8 +155,10 @@ body::before {
 #sidebar.sidebar-open{left:0}
 #toggleSidebar{
   position:absolute;
-  top:50%; right:-30px;
-  width:30px; height:60px;
+  top:50%;
+  right:-30px;
+  width:30px;
+  height:60px;
   background:#ffb6c1;
   border-radius:0 12px 12px 0;
   display:flex;
@@ -159,7 +168,8 @@ body::before {
   font-weight:bold;
 }
 #sidebar button{
-  width:auto; padding:8px 16px;
+  width:auto;
+  padding:8px 16px;
   border-radius:16px;
   border:none;
   background:#ffb6c1;
@@ -169,7 +179,7 @@ body::before {
 }
 
 /* MODAL */
-.modal{
+.modal {
   position:fixed; inset:0;
   background:rgba(0,0,0,0.6);
   display:none;
@@ -187,6 +197,7 @@ body::before {
   gap:10px;
   align-items:center;
   min-width:200px;
+  font-family:'Comic Sans MS',cursive;
 }
 .modal input{
   padding:6px 12px;
@@ -216,18 +227,22 @@ body::before {
   z-index:10000;
 }
 #zoomModal img{
-  max-width:80%; max-height:60vh;
+  max-width:80%;
+  max-height:60vh;
   border:4px solid #b67385;
   border-radius:24px;
   margin-bottom:10px;
   filter:none;
 }
 #zoomModal .thumbs{
-  display:flex; gap:8px;
-  max-width:80%; overflow-x:auto;
+  display:flex;
+  gap:8px;
+  max-width:80%;
+  overflow-x:auto;
 }
 #zoomModal .thumbs img{
-  width:50px; height:50px;
+  width:50px;
+  height:50px;
   object-fit:cover;
   border-radius:12px;
   border:2px solid #b67385;
@@ -235,8 +250,10 @@ body::before {
 }
 .closeZoom{
   position:absolute;
-  top:12px; right:12px;
-  width:28px; height:28px;
+  top:12px;
+  right:12px;
+  width:28px;
+  height:28px;
   background:#ffb6c1;
   color:#fff;
   border-radius:50%;
@@ -248,20 +265,32 @@ body::before {
 
 /* ACTIONS LIKE/COMMENT */
 .actions{
-  display:flex; gap:16px;
-  margin-top:6px; justify-content:center;
+  display:flex;
+  gap:16px;
+  margin-top:6px;
+  justify-content:center;
 }
 .like-btn,.comment-btn{
-  display:flex; align-items:center;
-  gap:6px; padding:4px 10px;
-  border-radius:12px; border:none;
-  cursor:pointer; font-weight:bold;
-  background:transparent; color:#b84c6f; font-size:14px;
+  display:flex;
+  align-items:center;
+  gap:6px;
+  padding:4px 10px;
+  border-radius:12px;
+  border:none;
+  cursor:pointer;
+  font-weight:bold;
+  background:transparent;
+  color:#b84c6f;
+  font-size:14px;
 }
 .like-btn svg,.comment-btn svg{
-  width:16px; height:16px; stroke:#ffb6c1; fill:none;
+  width:16px;
+  height:16px;
+  stroke:#ffb6c1;
+  fill:none;
 }
 
+/* Responsive */
 @media(max-width:480px){
   .page{grid-template-columns: repeat(2, 120px); grid-template-rows: repeat(3, 120px);}
   .visitor-item{width:120px;height:120px;}
@@ -296,20 +325,18 @@ body::before {
   <img id="mainZoom">
   <div class="thumbs" id="thumbs"></div>
   <div class="actions">
-    <button class="like-btn">
-      <svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"></path></svg>
-      <span id="likeCount">0</span>
-    </button>
-    <button class="comment-btn">
-      <svg viewBox="0 0 24 24"><path d="M21 6h-18v12h18v-12zm0-2c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2h-18c-1.1 0-2-.9-2-2v-12c0-1.1.9-2 2-2h18z"></path></svg>
-      <span id="commentCount">0</span>
-    </button>
+    <button class="like-btn"><svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"></path></svg></button>
+    <button class="comment-btn"><svg viewBox="0 0 24 24"><path d="M21 6h-18v12h18v-12zm0-2c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2h-18c-1.1 0-2-.9-2-2v-12c0-1.1.9-2 2-2h18z"></path></svg></button>
   </div>
 </div>
 
 <script type="module">
 import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
-const supabase = createClient("https://jyhbamdcxmpveujjqjla.supabase.co","sb_publishable_sqsxb-3Kl5o3-JQYv9kGFw_-g0EgwMa");
+
+const supabase = createClient(
+  "https://jyhbamdcxmpveujjqjla.supabase.co",
+  "sb_publishable_sqsxb-3Kl5o3-JQYv9kGFw_-g0EgwMa"
+);
 
 let creations = [], currentZoom = null;
 const container = document.getElementById('visitor-list-container');
@@ -318,116 +345,114 @@ const addModal = document.getElementById('addModal');
 const zoomModal = document.getElementById('zoomModal');
 const mainZoom = document.getElementById('mainZoom');
 const thumbs = document.getElementById('thumbs');
-const likeCount = document.getElementById('likeCount');
-const commentCount = document.getElementById('commentCount');
+
 const sidebar = document.getElementById('sidebar');
 
 // ---------------------- RENDER ----------------------
 function render() {
-  container.innerHTML='';
-  let page=null;
-  creations.forEach((c,i)=>{
-    if(i%6===0){page=document.createElement('div');page.className='page';container.appendChild(page);}
-    else page=container.lastElementChild;
+  container.innerHTML = '';
+  let page = null;
+  creations.forEach((c, i) => {
+    if (i % 6 === 0) {
+      page = document.createElement('div');
+      page.className = 'page';
+      container.appendChild(page);
+    } else {
+      page = container.lastElementChild;
+    }
 
-    const d=document.createElement('div');
-    d.className='visitor-item';
-    d.innerHTML=`
+    const d = document.createElement('div');
+    d.className = 'visitor-item';
+    d.innerHTML = `
       <div class="placeholder">?</div>
       <div class="delete-btn">×</div>
       <p>${c.name}</p>
       <img src="${c.imgUrl}" onload="this.previousElementSibling.style.display='none'" onerror="this.style.display='none'">
     `;
-    d.querySelector('img').onclick=()=>openZoom(c);
-    d.querySelector('.delete-btn').onclick=()=>deleteCreation(c);
+    d.querySelector('img').onclick = () => openZoom(c);
     page.appendChild(d);
   });
 }
 
 // ---------------------- ZOOM ----------------------
-function openZoom(c){
-  currentZoom=c;
-  mainZoom.src=c.imgUrl;
-  thumbs.innerHTML='';
-  c.zoomGroup.forEach(u=>{
-    const t=document.createElement('img');
-    t.src=u;
-    t.onclick=()=>mainZoom.src=u;
+function openZoom(c) {
+  currentZoom = c;
+  mainZoom.src = c.imgUrl;
+  thumbs.innerHTML = '';
+  c.zoomGroup.forEach(u => {
+    const t = document.createElement('img');
+    t.src = u;
+    t.onclick = () => mainZoom.src = u;
     thumbs.appendChild(t);
   });
-  likeCount.textContent=c.likes.length;
-  commentCount.textContent=c.comments.length;
-  zoomModal.style.display='flex';
+  zoomModal.style.display = 'flex';
 }
 
 // ---------------------- EVENTS ----------------------
-document.querySelector('.closeZoom').onclick=()=>zoomModal.style.display='none';
-zoomModal.onclick=e=>{if(e.target===zoomModal) zoomModal.style.display='none';};
-document.getElementById('toggleSidebar').onclick=()=>sidebar.classList.toggle('sidebar-open');
+document.querySelector('.closeZoom').onclick = () => zoomModal.style.display = 'none';
+document.getElementById('toggleSidebar').onclick = () => sidebar.classList.toggle('sidebar-open');
+addModal.onclick = e => { if (e.target === addModal) addModal.style.display='none'; };
+document.getElementById('addBtn').onclick = () => addModal.style.display='flex';
 
 // ---------------------- AJOUT ----------------------
-document.getElementById('addBtn').onclick=()=>addModal.style.display='flex';
-addModal.onclick=e=>{if(e.target===addModal)addModal.style.display='none';};
-document.getElementById('confirmAdd').onclick=async()=>{
-  const name=document.getElementById('photoName').value.trim();
-  const files=document.getElementById('multiPhoto').files;
-  if(!name||!files.length)return;
+document.getElementById('confirmAdd').onclick = async () => {
+  const name = document.getElementById('photoName').value.trim();
+  const files = document.getElementById('multiPhoto').files;
+  if (!name || !files.length) return;
 
-  const urls=[];
-  for(let f of files){
-    const path=`${Date.now()}_${f.name}`;
-    await supabase.storage.from('images').upload(path,f);
-    const publicUrl=supabase.storage.from('images').getPublicUrl(path).data.publicUrl;
-    urls.push(publicUrl);
+  const urls = [];
+  const paths = [];
+
+  for (let f of files) {
+    const path = `${Date.now()}_${f.name}`;
+    await supabase.storage.from('images').upload(path, f);
+    urls.push(supabase.storage.from('images').getPublicUrl(path).data.publicUrl);
+    paths.push(path);
   }
 
-  const { data }=await supabase.from('creations').insert([{
-    name,
-    image_path: urls[0],
-    images: urls,
-    likes: [],
-    comments: []
-  }]).select();
+  const { data } = await supabase.from('creations')
+    .insert([{
+      name,
+      image_path: paths[0],
+      images: paths,
+      likes: [],
+      comments: []
+    }])
+    .select();
 
   creations.unshift({
-    id:data[0].id,
+    id: data[0].id,
     name,
     imgUrl: urls[0],
     zoomGroup: urls,
     likes: [],
     comments: []
   });
+
   render();
-  addModal.style.display='none';
-  document.getElementById('photoName').value='';
-  document.getElementById('multiPhoto').value='';
+  addModal.style.display = 'none';
+  document.getElementById('photoName').value = '';
+  document.getElementById('multiPhoto').value = '';
 };
 
-// ---------------------- DELETE ----------------------
-async function deleteCreation(c){
-  for(let u of c.zoomGroup){
-    await supabase.storage.from('images').remove([u.split('/images/')[1]]);
-  }
-  await supabase.from('creations').delete().eq('id',c.id);
-  creations=creations.filter(x=>x.id!==c.id);
-  render();
-}
-
 // ---------------------- LOAD ----------------------
-async function loadCreations(){
-  const { data }=await supabase.from("creations").select("*").order("created_at",{ascending:false});
-  creations=data.map(c=>({
-    id:c.id,
-    name:c.name,
-    imgUrl:c.images?.[0]||'',
-    zoomGroup:c.images||[],
-    likes:c.likes||[],
-    comments:c.comments||[]
-  }));
+async function loadCreations() {
+  const { data } = await supabase.from("creations").select("*").order("created_at", { ascending: false });
+  creations = data.map(c => {
+    const zoomGroup = (c.images || [c.image_path]).map(p => supabase.storage.from('images').getPublicUrl(p).data.publicUrl);
+    return {
+      id: c.id,
+      name: c.name,
+      imgUrl: zoomGroup[0],
+      zoomGroup,
+      likes: c.likes || [],
+      comments: c.comments || []
+    };
+  });
   render();
 }
 
-// ---------------------- LOAD START ----------------------
+// ---------------------- START ----------------------
 loadCreations();
 </script>
 </body>
