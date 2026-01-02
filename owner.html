@@ -3,79 +3,48 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Galerie</title>
+
 <style>
-/* ====== STYLE IDENTIQUE À TON CODE ====== */
+/* === CSS IDENTIQUE À TON CODE QUI MARCHE === */
 *{box-sizing:border-box;margin:0;padding:0;}
 html,body{height:100%;font-family:'Comic Sans MS',cursive;overflow-x:hidden;}
 body::before{
-  content:"";position:fixed;inset:0;
+  content:"";
+  position:fixed;inset:0;
   background:url('Photoroom_20251223_114401.jpeg') center/cover no-repeat;
   z-index:-1;
 }
-.center-zone{display:flex;justify-content:center;padding-top:3.5cm;}
-#visitor-list-container{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;padding-left:1cm;}
-.page{
-  display:grid;grid-template-columns:repeat(2,1fr);grid-template-rows:repeat(3,1fr);
-  gap:4mm;width:410px;height:610px;scroll-snap-align:center;padding:4mm;
-}
-.visitor-item{
-  position:relative;width:200px;height:200px;border-radius:12px;overflow:hidden;
-  border:3px solid #fff;background:#ffe6f0;
-}
-.visitor-item img{width:100%;height:100%;object-fit:cover;cursor:pointer;}
-.delete-btn{
-  position:absolute;top:4px;right:4px;width:20px;height:20px;
-  background:#ffb6c1;color:#fff;border-radius:50%;
-  display:flex;align-items:center;justify-content:center;cursor:pointer;
-}
-.visitor-item p{
-  position:absolute;bottom:4px;width:100%;text-align:center;
-  color:#b84c6f;font-weight:bold;font-size:14px;
-}
-.actions{
-  position:absolute;bottom:28px;width:100%;
-  display:flex;justify-content:center;gap:14px;
-}
-.like-btn,.comment-btn{
-  background:none;border:none;cursor:pointer;
-  display:flex;align-items:center;gap:6px;
-  color:#b84c6f;font-weight:bold;
-}
+.center-zone{display:flex;justify-content:center;padding-top:3.5cm}
+#visitor-list-container{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;padding-left:1cm}
+.page{display:grid;grid-template-columns:repeat(2,200px);grid-template-rows:repeat(3,200px);gap:4mm;padding:4mm;scroll-snap-align:center}
+.visitor-item{position:relative;border-radius:12px;overflow:hidden;border:3px solid #fff;background:#ffe6f0}
+.visitor-item img{width:100%;height:100%;object-fit:cover;cursor:pointer}
+.delete-btn{position:absolute;top:4px;right:4px;background:#ffb6c1;color:#fff;width:20px;height:20px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:5}
+.visitor-item p{position:absolute;bottom:2px;width:100%;text-align:center;font-size:14px;font-weight:bold;color:#b84c6f}
+.actions{position:absolute;bottom:26px;width:100%;display:flex;justify-content:center;gap:16px}
+.like-btn,.comment-btn{background:none;border:none;cursor:pointer;display:flex;align-items:center;gap:6px;color:#b84c6f}
 .like-btn svg,.comment-btn svg{width:16px;height:16px;stroke:#ffb6c1;fill:none}
 
 /* SIDEBAR */
-#sidebar{position:fixed;top:0;left:-220px;width:220px;height:100vh;
-  background:rgba(255,230,240,.9);transition:.3s;padding:20px;z-index:10;}
+#sidebar{position:fixed;left:-220px;top:0;width:220px;height:100%;background:rgba(255,230,240,.25);padding:20px;transition:.3s;z-index:10}
 #sidebar.sidebar-open{left:0}
-#toggleSidebar{
-  position:absolute;right:-30px;top:50%;
-  width:30px;height:60px;background:#ffb6c1;
-  display:flex;align-items:center;justify-content:center;cursor:pointer;
-}
+#toggleSidebar{position:absolute;right:-30px;top:50%;width:30px;height:60px;background:#ffb6c1;display:flex;align-items:center;justify-content:center;border-radius:0 12px 12px 0;cursor:pointer}
+#sidebar button{padding:8px 16px;border:none;border-radius:16px;background:#ffb6c1;color:#fff;font-weight:bold}
 
 /* MODALS */
-.modal{position:fixed;inset:0;background:rgba(0,0,0,.6);
-  display:none;justify-content:center;align-items:center;z-index:10000;}
-.modal-box{
-  background:#ffe6f0;border-radius:20px;padding:16px;
-  display:flex;flex-direction:column;gap:10px;min-width:220px;
-}
-.modal input, .modal button{
-  padding:6px;border-radius:10px;border:2px solid #b67385;
-}
-.modal button{background:#ffb6c1;color:#fff;font-weight:bold;cursor:pointer}
-
-/* BUBBLES */
-.bubble-container{display:flex;gap:6px;flex-wrap:wrap}
-.bubble{background:#ffd6e4;padding:4px 8px;border-radius:12px;font-size:12px}
+.modal{position:fixed;inset:0;background:rgba(0,0,0,.6);display:none;align-items:center;justify-content:center;z-index:10001}
+.modal-box{background:#ffe6f0;padding:16px;border-radius:20px;border:3px solid #b67385;display:flex;flex-direction:column;gap:10px;min-width:220px}
+.modal input{padding:6px;border-radius:10px;border:2px solid #b67385}
+.modal button{padding:6px;border:none;border-radius:12px;background:#ffb6c1;color:#fff;font-weight:bold}
 
 /* ZOOM */
-#zoomModal{position:fixed;inset:0;background:rgba(0,0,0,.7);
-  display:none;flex-direction:column;align-items:center;justify-content:center;}
-#zoomModal img{max-width:80%;max-height:60vh;border-radius:20px;}
-.closeZoom{position:absolute;top:12px;right:12px;background:#ffb6c1;
-  width:28px;height:28px;border-radius:50%;display:flex;align-items:center;
-  justify-content:center;cursor:pointer;color:#fff;font-size:18px}
+#zoomModal{position:fixed;inset:0;background:rgba(0,0,0,.7);display:none;flex-direction:column;align-items:center;justify-content:center;z-index:10000}
+#zoomModal img{max-width:80%;max-height:60vh;border-radius:20px;border:4px solid #b67385}
+.closeZoom{position:absolute;top:12px;right:12px;width:28px;height:28px;background:#ffb6c1;color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer}
+
+.bubble-container{display:flex;gap:8px;overflow-x:auto}
+.bubble{background:rgba(255,182,193,.3);padding:4px 8px;border-radius:16px;font-size:12px}
 </style>
 </head>
 
@@ -121,10 +90,12 @@ body::before{
   <img id="mainZoom">
   <div class="actions">
     <button class="like-btn">
-      ❤️ <span id="likeCount">0</span>
+      <svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5"/></svg>
+      <span id="likeCount">0</span>
     </button>
     <button class="comment-btn">
-      💬 <span id="commentCount">0</span>
+      <svg viewBox="0 0 24 24"><path d="M21 6h-18v12h18z"/></svg>
+      <span id="commentCount">0</span>
     </button>
   </div>
 </div>
@@ -140,7 +111,6 @@ const supabase = createClient(
 let creations=[], currentZoom=null, currentDelete=null;
 const container=document.getElementById('visitor-list-container');
 
-/* ===== RENDER ===== */
 function render(){
  container.innerHTML='';
  let page;
@@ -153,58 +123,56 @@ function render(){
    <img src="${c.imgUrl}">
    <p>${c.name}</p>
    <div class="actions">
-    <button class="like-btn">❤️</button>
-    <button class="comment-btn">💬</button>
+     <button class="like-btn">${document.querySelector('.like-btn')?.innerHTML||''}</button>
+     <button class="comment-btn">${document.querySelector('.comment-btn')?.innerHTML||''}</button>
    </div>`;
   d.querySelector('img').onclick=()=>openZoom(c);
   d.querySelector('.delete-btn').onclick=()=>{currentDelete=c;deleteModal.style.display='flex'};
-  d.querySelector('.like-btn').onclick=e=>{e.stopPropagation();openLike(c)};
-  d.querySelector('.comment-btn').onclick=e=>{e.stopPropagation();openComment(c)};
   page.appendChild(d);
  });
 }
 
-/* ===== ZOOM ===== */
 function openZoom(c){
  currentZoom=c;
  mainZoom.src=c.imgUrl;
- updateCounts();
+ likeCount.textContent=c.likes.length;
+ commentCount.textContent=c.comments.length;
  zoomModal.style.display='flex';
 }
 
-/* ===== LIKE / COMMENT ===== */
-function updateCounts(){
- likeCount.textContent=currentZoom.likes.length;
- commentCount.textContent=currentZoom.comments.length;
-}
+zoomModal.onclick=e=>{if(e.target===zoomModal)zoomModal.style.display='none'}
+document.querySelector('.closeZoom').onclick=()=>zoomModal.style.display='none';
 
-function openLike(c){
- currentZoom=c;
- likeBubbles.innerHTML='';
- c.likes.forEach(n=>likeBubbles.innerHTML+=`<div class="bubble">${n}</div>`);
+document.querySelector('#zoomModal .like-btn').onclick=e=>{
+ e.stopPropagation();
  likeModal.style.display='flex';
-}
+ likeBubbles.innerHTML='';
+ currentZoom.likes.forEach(n=>{
+  const b=document.createElement('div');
+  b.className='bubble';b.textContent=n;
+  likeBubbles.appendChild(b);
+ });
+};
 
-function openComment(c){
- currentZoom=c;
- commentBubbles.innerHTML='';
- c.comments.forEach(o=>commentBubbles.innerHTML+=`<div class="bubble"><b>${o.name}</b> ${o.text}</div>`);
+document.querySelector('#zoomModal .comment-btn').onclick=e=>{
+ e.stopPropagation();
  commentModal.style.display='flex';
-}
+ commentBubbles.innerHTML='';
+ currentZoom.comments.forEach(c=>{
+  const b=document.createElement('div');
+  b.className='bubble';b.textContent=`${c.name}: ${c.text}`;
+  commentBubbles.appendChild(b);
+ });
+};
 
-/* ===== EVENTS ===== */
-toggleSidebar.onclick=()=>sidebar.classList.toggle('sidebar-open');
-closeZoom.onclick=()=>zoomModal.style.display='none';
-zoomModal.onclick=e=>e.target===zoomModal&&(zoomModal.style.display='none');
-likeModal.onclick=e=>e.target===likeModal&&(likeModal.style.display='none');
-commentModal.onclick=e=>e.target===commentModal&&(commentModal.style.display='none');
-
-/* ===== CONFIRM ===== */
 confirmLike.onclick=async()=>{
- const n=likeName.value.trim(); if(!n)return;
- currentZoom.likes.push(n);
+ const name=likeName.value.trim();
+ if(!name)return;
+ currentZoom.likes.push(name);
  await supabase.from('creations').update({likes:currentZoom.likes}).eq('id',currentZoom.id);
- openLike(currentZoom); updateCounts(); likeName.value='';
+ likeCount.textContent=currentZoom.likes.length;
+ likeBubbles.innerHTML+=`<div class="bubble">${name}</div>`;
+ likeName.value='';
 };
 
 confirmComment.onclick=async()=>{
@@ -212,20 +180,26 @@ confirmComment.onclick=async()=>{
  if(!n||!t)return;
  currentZoom.comments.push({name:n,text:t});
  await supabase.from('creations').update({comments:currentZoom.comments}).eq('id',currentZoom.id);
- openComment(currentZoom); updateCounts(); commentName.value=''; commentText.value='';
+ commentCount.textContent=currentZoom.comments.length;
+ commentBubbles.innerHTML+=`<div class="bubble">${n}: ${t}</div>`;
+ commentName.value='';commentText.value='';
 };
 
-/* ===== LOAD ===== */
+toggleSidebar.onclick=()=>sidebar.classList.toggle('sidebar-open');
+
 async function load(){
  const {data}=await supabase.from('creations').select('*').order('created_at',{ascending:false});
  creations=data.map(c=>({
-  id:c.id,name:c.name,
+  id:c.id,
+  name:c.name,
   imgUrl:supabase.storage.from('images').getPublicUrl(c.image_path).data.publicUrl,
-  likes:c.likes||[],comments:c.comments||[]
+  likes:c.likes||[],
+  comments:c.comments||[]
  }));
  render();
 }
 load();
 </script>
+
 </body>
 </html>
