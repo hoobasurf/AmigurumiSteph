@@ -319,6 +319,15 @@ body::before {
   </div>
 </div>
 
+<!-- MODAL DELETE -->
+<div id="deleteModal" class="modal">
+  <div class="modal-box">
+    <p>Supprimer définitivement ce projet ?</p>
+    <button id="confirmDelete">Oui</button>
+    <button id="cancelDelete">Annuler</button>
+  </div>
+</div>
+
 <!-- ZOOM -->
 <div id="zoomModal">
   <div class="closeZoom">×</div>
@@ -338,43 +347,14 @@ const supabase = createClient(
   "sb_publishable_sqsxb-3Kl5o3-JQYv9kGFw_-g0EgwMa"
 );
 
-let creations = [], currentZoom = null;
+let creations = [], currentZoom = null, currentDelete = null;
 const container = document.getElementById('visitor-list-container');
 const addModal = document.getElementById('addModal');
+const deleteModal = document.getElementById('deleteModal');
 const zoomModal = document.getElementById('zoomModal');
 const mainZoom = document.getElementById('mainZoom');
 const thumbs = document.getElementById('thumbs');
 const sidebar = document.getElementById('sidebar');
-
-// ---------------------- SUPPRESSION ----------------------
-function openDeleteModal(c) {
-  if (!c) return;
-  if (!confirm(`Supprimer "${c.name}" ?`)) return; // demande confirmation
-  supabase.from('creations').delete().eq('id', c.id); // supprime dans Supabase
-  creations = creations.filter(x => x.id !== c.id); // supprime localement
-  render();
-}
-
-// ---------------------- LIKE ----------------------
-function openLikeModal(c) {
-  if (!c) return;
-  if (!c.likes) c.likes = 0;
-  c.likes++;
-  // update Supabase
-  supabase.from('creations').update({ likes: c.likes }).eq('id', c.id);
-  render();
-}
-
-// ---------------------- COMMENTAIRE ----------------------
-function openCommentModal(c) {
-  if (!c) return;
-  const comment = prompt("Ajouter un commentaire :");
-  if (!comment) return;
-  if (!c.comments) c.comments = [];
-  c.comments.push(comment);
-  supabase.from('creations').update({ comments: c.comments }).eq('id', c.id);
-  render();
-}
 
 // ---------------------- RENDER ----------------------
 function render() {
@@ -406,57 +386,85 @@ function render() {
   });
 }
 
+// ---------------------- DELETE ----------------------
+function openDeleteModal(c){
+  currentDelete = c;
+  deleteModal.style.display = 'flex';
+}
+deleteModal.onclick = e => { if(e.target === deleteModal) deleteModal.style.display='none'; };
+document.getElementById('cancelDelete').onclick = () => deleteModal.style.display='none';
+document.getElementById('confirmDelete').onclick = async () => {
+  if(!currentDelete) return;
+  for(let u of currentDelete.zoomGroup)
+    await supabase.storage.from('images').remove([u.split('/images/')[1]]);
+  await supabase.from('creations').delete().eq('id', currentDelete.id);
+  creations = creations.filter(c => c.id !== currentDelete.id);
+  render();
+  deleteModal.style.display='none';
+};
+
 // ---------------------- ZOOM ----------------------
-function openZoom(c) {
+function openZoom(c){
   currentZoom = c;
   mainZoom.src = c.imgUrl;
   thumbs.innerHTML = '';
-  if (c.zoomGroup) {
-    c.zoomGroup.forEach(u => {
-      const t = document.createElement('img');
-      t.src = u;
-      t.onclick = () => mainZoom.src = u;
+  if(c.zoomGroup){
+    c.zoomGroup.forEach(u=>{
+      const t=document.createElement('img');
+      t.src=u;
+      t.onclick=()=>mainZoom.src=u;
       thumbs.appendChild(t);
     });
   }
-  zoomModal.style.display = 'flex';
+  zoomModal.style.display='flex';
+}
+
+// ---------------------- LIKE / COMMENT ----------------------
+function openLikeModal(c){
+  if(!c.likes) c.likes = 0;
+  c.likes++;
+  supabase.from('creations').update({likes:c.likes}).eq('id',c.id);
+  render();
+}
+function openCommentModal(c){
+  const comment = prompt("Ajouter un commentaire :");
+  if(!comment) return;
+  if(!c.comments) c.comments = [];
+  c.comments.push(comment);
+  supabase.from('creations').update({comments:c.comments}).eq('id',c.id);
+  render();
 }
 
 // ---------------------- EVENTS ----------------------
 document.querySelector('.closeZoom').onclick = () => zoomModal.style.display='none';
 document.getElementById('toggleSidebar').onclick = () => sidebar.classList.toggle('sidebar-open');
-addModal.onclick = e => { if (e.target === addModal) addModal.style.display='none'; };
+addModal.onclick = e => { if(e.target===addModal) addModal.style.display='none'; };
 document.getElementById('addBtn').onclick = () => addModal.style.display='flex';
 
 // ---------------------- AJOUT ----------------------
-document.getElementById('confirmAdd').onclick = async () => {
+document.getElementById('confirmAdd').onclick = async()=>{
   const name = document.getElementById('photoName').value.trim();
   const files = document.getElementById('multiPhoto').files;
-  if (!name || !files.length) return;
-
+  if(!name || !files.length) return;
   const urls = [];
   const paths = [];
-
-  for (let f of files) {
-    const path = `${Date.now()}_${f.name}`;
-    await supabase.storage.from('images').upload(path, f);
+  for(let f of files){
+    const path=`${Date.now()}_${f.name}`;
+    await supabase.storage.from('images').upload(path,f);
     urls.push(supabase.storage.from('images').getPublicUrl(path).data.publicUrl);
     paths.push(path);
   }
-
-  const { data } = await supabase.from('creations')
-    .insert([{ name, image_path: paths[0], images: paths, likes: 0, comments: [] }])
+  const {data} = await supabase.from('creations')
+    .insert([{name,image_path:paths[0],images:paths,likes:0,comments:[]}])
     .select();
-
   creations.unshift({
-    id: data[0].id,
+    id:data[0].id,
     name,
-    imgUrl: urls[0],
-    zoomGroup: urls,
-    likes: 0,
-    comments: []
+    imgUrl:urls[0],
+    zoomGroup:urls,
+    likes:0,
+    comments:[]
   });
-
   render();
   addModal.style.display='none';
   document.getElementById('photoName').value='';
@@ -464,17 +472,17 @@ document.getElementById('confirmAdd').onclick = async () => {
 };
 
 // ---------------------- LOAD ----------------------
-async function loadCreations() {
-  const { data } = await supabase.from("creations").select("*").order("created_at",{ascending:false});
-  creations = data.map(c => {
-    const zoomGroup = (c.images || [c.image_path]).map(p => supabase.storage.from('images').getPublicUrl(p).data.publicUrl);
+async function loadCreations(){
+  const {data} = await supabase.from("creations").select("*").order("created_at",{ascending:false});
+  creations = data.map(c=>{
+    const zoomGroup = (c.images||[c.image_path]).map(p=>supabase.storage.from('images').getPublicUrl(p).data.publicUrl);
     return {
-      id: c.id,
-      name: c.name,
-      imgUrl: zoomGroup[0],
+      id:c.id,
+      name:c.name,
+      imgUrl:zoomGroup[0],
       zoomGroup,
-      likes: c.likes || 0,
-      comments: c.comments || []
+      likes:c.likes||0,
+      comments:c.comments||[]
     };
   });
   render();
