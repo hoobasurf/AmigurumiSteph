@@ -14,12 +14,19 @@ body::before{
 
 .center-zone{display:flex;justify-content:center;padding-top:3.5cm;}
 #visitor-list-container{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;padding-left:1cm;}
+
 .page{
-  display:grid;grid-template-columns:repeat(2,1fr);grid-template-rows:repeat(3,1fr);
-  gap:4mm;width:calc(2*200px);scroll-snap-align:center;padding:4mm;
+  display:grid;
+  grid-template-columns:repeat(2,200px);
+  grid-template-rows:repeat(3,200px);
+  gap:4mm;
+  scroll-snap-align:center;
+  padding:4mm;
 }
+
 .visitor-item{
-  position:relative;width:200px;height:200px;border-radius:12px;border:3px solid #fff;
+  position:relative;width:200px;height:200px;
+  border-radius:12px;border:3px solid #fff;
   background:#ffe6f0;overflow:hidden;cursor:pointer;
 }
 .visitor-item img{width:100%;height:100%;object-fit:cover;}
@@ -57,6 +64,12 @@ body::before{
 .modal-box{
   background:#ffe6f0;padding:16px;border-radius:20px;border:3px solid #b67385;
   display:flex;flex-direction:column;gap:8px;min-width:200px;
+  position:relative;
+}
+.modal-box .closeModal{
+  position:absolute;top:8px;right:8px;width:24px;height:24px;border-radius:50%;
+  background:#ffb6c1;color:#fff;font-weight:bold;display:flex;align-items:center;
+  justify-content:center;cursor:pointer;
 }
 .modal input,.modal button{padding:6px;border-radius:10px;border:2px solid #b67385;}
 .modal button{background:#ffb6c1;color:#fff;font-weight:bold;cursor:pointer;}
@@ -67,6 +80,8 @@ body::before{
   justify-content:center;align-items:center;background:rgba(0,0,0,.7);z-index:10000;
 }
 #zoomModal img{max-width:80%;max-height:60vh;border-radius:24px;}
+.thumbs{display:flex;gap:6px;margin-top:8px;overflow-x:auto;}
+.thumbs img{width:50px;height:50px;object-fit:cover;border-radius:12px;cursor:pointer;}
 .actions{display:flex;gap:16px;margin-top:8px;}
 .like-btn,.comment-btn{
   background:none;border:none;display:flex;gap:6px;align-items:center;
@@ -80,8 +95,6 @@ body::before{
 }
 .bubble-container{display:flex;gap:6px;overflow-x:auto;}
 .bubble{background:rgba(255,182,193,.3);border-radius:12px;padding:4px 8px;font-size:12px;}
-.thumbs{display:flex;gap:6px;margin-top:8px;overflow-x:auto;}
-.thumbs img{width:50px;height:50px;object-fit:cover;border-radius:12px;cursor:pointer;}
 </style>
 </head>
 <body>
@@ -99,6 +112,7 @@ body::before{
 <!-- MODAL AJOUT -->
 <div id="addModal" class="modal">
   <div class="modal-box">
+    <div class="closeModal">×</div>
     <h3>Ajouter</h3>
     <input id="photoName" placeholder="Nom">
     <input id="multiPhoto" type="file" multiple>
@@ -109,6 +123,7 @@ body::before{
 <!-- MODAL LIKE -->
 <div id="likeModal" class="modal">
   <div class="modal-box">
+    <div class="closeModal">×</div>
     <h3>Like ❤️</h3>
     <input id="likeName" placeholder="Prénom">
     <button id="confirmLike">Valider</button>
@@ -119,6 +134,7 @@ body::before{
 <!-- MODAL COMMENT -->
 <div id="commentModal" class="modal">
   <div class="modal-box">
+    <div class="closeModal">×</div>
     <h3>Commentaire 💬</h3>
     <input id="commentName" placeholder="Prénom">
     <input id="commentText" placeholder="Commentaire">
@@ -183,6 +199,11 @@ const multiPhoto=document.getElementById('multiPhoto');
 /* SIDEBAR */
 toggleSidebar.onclick=()=>sidebar.classList.toggle('sidebar-open');
 
+/* MODAL CLOSE */
+document.querySelectorAll('.closeModal').forEach(btn=>{
+  btn.onclick=e=>btn.parentElement.parentElement.style.display='none';
+});
+
 /* RENDER */
 function render(){
   container.innerHTML='';
@@ -224,8 +245,7 @@ function openZoom(c){
   zoom.style.display='flex';
 }
 
-/* MODAL CLOSE */
-document.querySelector('.closeZoom').onclick=()=>zoom.style.display='none';
+/* MODAL CLOSE BY CLICK OUTSIDE */
 zoom.onclick=e=>{if(e.target===zoom)zoom.style.display='none'};
 likeModal.onclick=e=>{if(e.target===likeModal)likeModal.style.display='none'};
 commentModal.onclick=e=>{if(e.target===commentModal)commentModal.style.display='none'};
