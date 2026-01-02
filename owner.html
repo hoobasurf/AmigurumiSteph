@@ -379,8 +379,11 @@ function render() {
 
     d.querySelector('img').onclick = () => openZoom(c);
     d.querySelector('.delete-btn').onclick = () => openDeleteModal(c);
-    d.querySelector('.like-btn').onclick = () => openLikeModal(c);
-    d.querySelector('.comment-btn').onclick = () => openCommentModal(c);
+const likeBtn = d.querySelector('.like-btn');
+const commentBtn = d.querySelector('.comment-btn');
+
+likeBtn.addEventListener('click', (e) => { e.stopPropagation(); openLikeModal(c); });
+commentBtn.addEventListener('click', (e) => { e.stopPropagation(); openCommentModal(c); });
 
     page.appendChild(d);
   });
