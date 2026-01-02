@@ -472,36 +472,32 @@ zoomModal.onclick=e=>{if(e.target===zoomModal)zoomModal.style.display='none';};
 document.getElementById('toggleSidebar').onclick=()=>sidebar.classList.toggle('sidebar-open');
 
 // ---------------------- AJOUT ----------------------
-document.getElementById('addBtn').onclick=()=>addModal.style.display='flex';
-addModal.onclick=e=>{if(e.target===addModal)addModal.style.display='none';};
-document.getElementById('confirmAdd').onclick=async()=>{
-  const name=document.getElementById('photoName').value.trim();
-  const files=document.getElementById('multiPhoto').files;
-  if(!name||!files.length)return;
-  const urls=[];
-  for(let f of files){
-    const path=`${Date.now()}_${f.name}`;
-    await supabase.storage.from('images').upload(path,f);
-    const publicUrl=supabase.storage.from('images').getPublicUrl(path).data.publicUrl;
+document.getElementById('confirmAdd').onclick = async () => {
+  const name = document.getElementById('photoName').value.trim();
+  const files = document.getElementById('multiPhoto').files;
+  if (!name || !files.length) return;
+
+  const urls = [];
+  for (let f of files) {
+    const path = `${Date.now()}_${f.name}`;
+    await supabase.storage.from('images').upload(path, f);
+    const publicUrl = supabase.storage.from('images').getPublicUrl(path).data.publicUrl;
     urls.push(publicUrl);
   }
 
-  const {data,error}=await supabase.from('creations')
-    .insert([{name,image_path:urls[0],likes:[],comments:[]}])
+  const { data, error } = await supabase.from('creations')
+    .insert([{ name, image_path: urls[0], likes: [], comments: [] }])
     .select();
-  if(error){console.error(error);return;}
 
-  creations.unshift({id:data[0].id,name,imgUrl:urls[0],zoomGroup:urls,likes:[],comments:[]});
-render(); // mise à jour immédiate locale
+  if (error) { console.error(error); return; }
 
-// Optionnel : recharger depuis Supabase pour être sûr
-// await refreshCreations();
+  // ----> Appelle refreshCreations() au lieu de manipuler manuellement
+  await refreshCreations();
 
-addModal.style.display='none';
-document.getElementById('photoName').value='';
-document.getElementById('multiPhoto').value='';
+  addModal.style.display = 'none';
+  document.getElementById('photoName').value = '';
+  document.getElementById('multiPhoto').value = '';
 };
-
 // ---------------------- LOAD ----------------------
 async function refreshCreations() {
   const { data, error } = await supabase
