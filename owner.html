@@ -478,10 +478,8 @@ confirmDelete.onclick=async()=>{
   deleteModal.style.display='none';
 };
 
-// ---------------------- ADD ----------------------// ---------------------- // Remplace
-confirmAdd.onclick = async () => { ... }
-// Par
-document.getElementById('confirmAdd').addEventListener('click', async () => {
+// ---------------------- ADD (fix bouton Valider) ----------------------
+confirmAdd.addEventListener('click', async () => {
   const name = document.getElementById('photoName').value.trim();
   const files = document.getElementById('multiPhoto').files;
   if (!name || !files.length) return;
@@ -518,6 +516,7 @@ document.getElementById('confirmAdd').addEventListener('click', async () => {
   document.getElementById('photoName').value = '';
   document.getElementById('multiPhoto').value = '';
 });
+
 // ---------------------- LOAD ----------------------
 async function loadCreations(){
   const {data}=await supabase.from("creations").select("*").order("created_at",{ascending:false});
