@@ -508,8 +508,9 @@ if (insertError) { console.error('Insert failed', insertError); return; }
 creations.unshift({
   id: data[0].id,
   name,
+  imgUrl: urls[0],                         // <-- AJOUTE CETTE LIGNE
   image_path: urls[0].split('/images/')[1],
-  zoomGroup: urls,     // toutes les images uploadées
+  zoomGroup: urls,
   likes: [],
   comments: []
 });
