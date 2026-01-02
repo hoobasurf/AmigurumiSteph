@@ -478,50 +478,32 @@ confirmDelete.onclick=async()=>{
   deleteModal.style.display='none';
 };
 
-// ---------------------- ADD ----------------------// ---------------------- ADD ----------------------
-// Ouvre le modal au clic sur Ajouter
-addBtn.onclick = () => {
-  addModal.style.display = 'flex';
-  console.log("Bouton Ajouter cliqué !"); // juste pour vérifier
-};
-
-// Ferme le modal si clic sur l’arrière-plan
-addModal.onclick = e => { if(e.target === addModal) addModal.style.display='none'; };
-
-// Valider l’ajout des images (aucune modification ici, garde ton code)
-confirmAdd.onclick = async () => {
+// ---------------------- ADD ----------------------// ---------------------- // Remplace
+confirmAdd.onclick = async () => { ... }
+// Par
+document.getElementById('confirmAdd').addEventListener('click', async () => {
   const name = document.getElementById('photoName').value.trim();
   const files = document.getElementById('multiPhoto').files;
   if (!name || !files.length) return;
 
   const urls = [];
-
   for (let i = 0; i < files.length; i++) {
     const f = files[i];
     const path = `${Date.now()}_${i}_${f.name}`;
     const { error: uploadError } = await supabase.storage.from('images').upload(path, f);
-    if (uploadError) {
-      console.error("Erreur upload:", uploadError);
-      continue;
-    }
+    if (uploadError) continue;
     const publicUrl = supabase.storage.from('images').getPublicUrl(path).data.publicUrl;
     urls.push(publicUrl);
   }
-
   if (!urls.length) return;
 
-  const { data, error } = await supabase.from('creations').insert([{
+  const { data } = await supabase.from('creations').insert([{
     name: name,
     image_path: urls[0],
     zoomGroup: urls,
     likes: [],
     comments: []
   }]).select();
-
-  if (error) {
-    console.error("Erreur insert:", error);
-    return;
-  }
 
   creations.unshift({
     id: data[0].id,
@@ -531,12 +513,11 @@ confirmAdd.onclick = async () => {
     likes: [],
     comments: []
   });
-
   render();
   addModal.style.display = 'none';
   document.getElementById('photoName').value = '';
   document.getElementById('multiPhoto').value = '';
-};
+});
 // ---------------------- LOAD ----------------------
 async function loadCreations(){
   const {data}=await supabase.from("creations").select("*").order("created_at",{ascending:false});
