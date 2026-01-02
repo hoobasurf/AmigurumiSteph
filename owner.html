@@ -63,10 +63,10 @@ body::before{
   justify-content:center;align-items:center;background:rgba(0,0,0,.7);z-index:10000
 }
 #zoomModal img{max-width:80%;max-height:60vh;border-radius:24px}
-.actions{display:flex;gap:16px;margin-top:8px}
+.actions{display:flex;gap:16px;margin-top:8px;justify-content:center}
 .like-btn,.comment-btn{
   background:none;border:none;display:flex;gap:6px;
-  font-weight:bold;color:#b84c6f;cursor:pointer
+  font-weight:bold;color:#b84c6f;cursor:pointer;align-items:center
 }
 .like-btn svg,.comment-btn svg{width:16px;height:16px;stroke:#ffb6c1;fill:none}
 .bubble-container{display:flex;gap:6px;overflow-x:auto}
@@ -125,8 +125,14 @@ body::before{
   <div class="closeZoom">×</div>
   <img id="mainZoom">
   <div class="actions">
-    <button class="like-btn" id="zoomLike">❤️ <span id="likeCount">0</span></button>
-    <button class="comment-btn" id="zoomComment">💬 <span id="commentCount">0</span></button>
+    <button class="like-btn" id="zoomLike">
+      <svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"></path></svg>
+      <span id="likeCount">0</span>
+    </button>
+    <button class="comment-btn" id="zoomComment">
+      <svg viewBox="0 0 24 24"><path d="M21 6h-18v12h18v-12zm0-2c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2h-18c-1.1 0-2-.9-2-2v-12c0-1.1.9-2 2-2h18z"></path></svg>
+      <span id="commentCount">0</span>
+    </button>
   </div>
 </div>
 
@@ -140,7 +146,7 @@ const supabase = createClient(
 
 let creations=[], current=null;
 
-// Éléments DOM
+// DOM
 const container=document.getElementById('visitor-list-container');
 const zoom=document.getElementById('zoomModal');
 const main=document.getElementById('mainZoom');
@@ -156,6 +162,9 @@ const toggleSidebar=document.getElementById('toggleSidebar');
 const addBtn=document.getElementById('addBtn');
 const addModal=document.getElementById('addModal');
 const confirmAdd=document.getElementById('confirmAdd');
+
+const confirmLike=document.getElementById('confirmLike');
+const confirmComment=document.getElementById('confirmComment');
 
 // ---------------------- SIDEBAR ----------------------
 toggleSidebar.onclick=()=>sidebar.classList.toggle('sidebar-open');
@@ -199,8 +208,11 @@ function openZoom(c){
   zoom.style.display='flex';
 }
 
+// ---------------------- FERMETURE MODALS ----------------------
 document.querySelector('.closeZoom').onclick=()=>zoom.style.display='none';
-zoom.onclick=e=>{if(e.target===zoom)zoom.style.display='none'};
+zoom.onclick=e=>{if(e.target===zoom)zoom.style.display='none';};
+likeModal.onclick=e=>{if(e.target===likeModal)likeModal.style.display='none';};
+commentModal.onclick=e=>{if(e.target===commentModal)commentModal.style.display='none';};
 
 // ---------------------- LIKE / COMMENT ----------------------
 document.getElementById('zoomLike').onclick=e=>{
@@ -213,16 +225,17 @@ document.getElementById('zoomComment').onclick=e=>{
   commentModal.style.display='flex';
 };
 
-document.getElementById('confirmLike').onclick=async()=>{
+confirmLike.onclick=async()=>{
   const name=document.getElementById('likeName').value.trim();
   if(!name)return;
   current.likes.push(name);
   await supabase.from('creations').update({likes:current.likes}).eq('id',current.id);
   likeCount.textContent=current.likes.length;
   document.getElementById('likeName').value='';
+  likeModal.style.display='none'; // fermeture après validation
 };
 
-document.getElementById('confirmComment').onclick=async()=>{
+confirmComment.onclick=async()=>{
   const n=document.getElementById('commentName').value.trim();
   const t=document.getElementById('commentText').value.trim();
   if(!n||!t)return;
@@ -231,6 +244,7 @@ document.getElementById('confirmComment').onclick=async()=>{
   commentCount.textContent=current.comments.length;
   document.getElementById('commentName').value='';
   document.getElementById('commentText').value='';
+  commentModal.style.display='none'; // fermeture après validation
 };
 
 // ---------------------- AJOUT ----------------------
