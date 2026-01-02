@@ -101,22 +101,24 @@ body::before{
   </div>
 </div>
 
-<!-- LIKE MODAL -->
+<!-- MODAL LIKE -->
 <div id="likeModal" class="modal">
   <div class="modal-box">
+    <h3>Like ❤️</h3>
     <input id="likeName" placeholder="Votre prénom">
     <button id="confirmLike">Valider</button>
-    <div id="likeBubbles" class="bubble-container"></div>
+    <div class="bubble-container" id="likeBubbles"></div>
   </div>
 </div>
 
-<!-- COMMENT MODAL -->
+<!-- MODAL COMMENT -->
 <div id="commentModal" class="modal">
   <div class="modal-box">
+    <h3>Commentaire 💬</h3>
     <input id="commentName" placeholder="Votre prénom">
-    <input id="commentText" placeholder="Commentaire">
+    <input id="commentText" placeholder="Votre commentaire">
     <button id="confirmComment">Valider</button>
-    <div id="commentBubbles" class="bubble-container"></div>
+    <div class="bubble-container" id="commentBubbles"></div>
   </div>
 </div>
 
@@ -124,12 +126,13 @@ body::before{
 <div id="zoomModal">
   <div class="closeZoom">×</div>
   <img id="mainZoom">
+  <div class="thumbs" id="thumbs"></div>
   <div class="actions">
-    <button class="like-btn" id="zoomLike">
+    <button class="like-btn">
       <svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"></path></svg>
       <span id="likeCount">0</span>
     </button>
-    <button class="comment-btn" id="zoomComment">
+    <button class="comment-btn">
       <svg viewBox="0 0 24 24"><path d="M21 6h-18v12h18v-12zm0-2c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2h-18c-1.1 0-2-.9-2-2v-12c0-1.1.9-2 2-2h18z"></path></svg>
       <span id="commentCount">0</span>
     </button>
@@ -215,36 +218,63 @@ likeModal.onclick=e=>{if(e.target===likeModal)likeModal.style.display='none';};
 commentModal.onclick=e=>{if(e.target===commentModal)commentModal.style.display='none';};
 
 // ---------------------- LIKE / COMMENT ----------------------
-document.getElementById('zoomLike').onclick=e=>{
-  e.stopPropagation();
-  likeModal.style.display='flex';
-};
-
-document.getElementById('zoomComment').onclick=e=>{
-  e.stopPropagation();
-  commentModal.style.display='flex';
-};
-
-confirmLike.onclick=async()=>{
+// ---------------------- LIKE ----------------------
+document.querySelectorAll('.like-btn').forEach(btn=>{
+  btn.onclick=e=>{
+    e.stopPropagation();
+    likeModal.style.display='flex';
+    likeBubbles.innerHTML='';
+    currentZoom.likes.forEach(p=>{
+      const b=document.createElement('div');
+      b.className='bubble';
+      b.innerHTML=`<strong>${p}</strong>`;
+      likeBubbles.appendChild(b);
+    });
+  }
+});
+likeModal.onclick=e=>{if(e.target===likeModal)likeModal.style.display='none';};
+document.getElementById('confirmLike').onclick=async()=>{
   const name=document.getElementById('likeName').value.trim();
-  if(!name)return;
-  current.likes.push(name);
-  await supabase.from('creations').update({likes:current.likes}).eq('id',current.id);
-  likeCount.textContent=current.likes.length;
+  if(!name) return;
+  currentZoom.likes.push(name);
+  await supabase.from('creations').update({likes:currentZoom.likes}).eq('id',currentZoom.id);
+  const b=document.createElement('div');
+  b.className='bubble';
+  b.innerHTML=`<strong>${name}</strong>`;
+  likeBubbles.appendChild(b);
+  likeCount.textContent=currentZoom.likes.length;
   document.getElementById('likeName').value='';
-  likeModal.style.display='none'; // fermeture après validation
 };
 
-confirmComment.onclick=async()=>{
-  const n=document.getElementById('commentName').value.trim();
-  const t=document.getElementById('commentText').value.trim();
-  if(!n||!t)return;
-  current.comments.push({name:n,text:t});
-  await supabase.from('creations').update({comments:current.comments}).eq('id',current.id);
-  commentCount.textContent=current.comments.length;
+// ---------------------- COMMENT ----------------------
+document.querySelectorAll('.comment-btn').forEach(btn=>{
+  btn.onclick=e=>{
+    e.stopPropagation();
+    commentModal.style.display='flex';
+    commentBubbles.innerHTML='';
+    currentZoom.comments.forEach(c=>{
+      const b=document.createElement('div');
+      b.className='bubble';
+      b.innerHTML=`<strong>${c.name}:</strong> ${c.text}`;
+      commentBubbles.appendChild(b);
+    });
+  }
+});
+commentModal.onclick=e=>{if(e.target===commentModal)commentModal.style.display='none';};
+document.getElementById('confirmComment').onclick=async()=>{
+  const name=document.getElementById('commentName').value.trim();
+  const text=document.getElementById('commentText').value.trim();
+  if(!name||!text) return;
+  const commentObj={name,text};
+  currentZoom.comments.push(commentObj);
+  await supabase.from('creations').update({comments:currentZoom.comments}).eq('id',currentZoom.id);
+  const b=document.createElement('div');
+  b.className='bubble';
+  b.innerHTML=`<strong>${name}:</strong> ${text}`;
+  commentBubbles.appendChild(b);
+  commentCount.textContent=currentZoom.comments.length;
   document.getElementById('commentName').value='';
   document.getElementById('commentText').value='';
-  commentModal.style.display='none'; // fermeture après validation
 };
 
 // ---------------------- AJOUT ----------------------
