@@ -430,46 +430,37 @@ function render() {
       <div class="placeholder">?</div>
       <div class="delete-btn">×</div>
       <p>${c.name}</p>
-      <img src="${c.imgUrl}" onload="this.previousElementSibling.style.display='none'" onerror="this.style.display='none'">
+      <img src="${c.imgUrl}">
       <div class="actions" style="position:absolute; bottom:24px; width:100%; justify-content:center;">
-        <button class="like-btn" title="Like ❤️"><svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"></path></svg></button>
-        <button class="comment-btn" title="Commentaire 💬"><svg viewBox="0 0 24 24"><path d="M21 6h-18v12h18v-12zm0-2c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2h-18c-1.1 0-2-.9-2-2v-12c0-1.1.9-2 2-2h18z"></path></svg></button>
+        <button class="like-btn"><svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"></path></svg></button>
+        <button class="comment-btn"><svg viewBox="0 0 24 24"><path d="M21 6h-18v12h18v-12zm0-2c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2h-18c-1.1 0-2-.9-2-2v-12c0-1.1.9-2 2-2h18z"></path></svg></button>
       </div>
     `;
 
     d.querySelector('img').onclick=()=>openZoom(c);
     d.querySelector('.delete-btn').onclick=()=>openDeleteModal(c);
-
-    d.querySelector('.like-btn').onclick=()=>{
-      currentZoom = c;
-      likeModal.style.display='flex';
-      likeBubbles.innerHTML='';
-      c.likes.forEach(p=>{
-        const b=document.createElement('div');
-        b.className='bubble';
-        b.innerHTML=`<strong>${p}</strong>`;
-        likeBubbles.appendChild(b);
-      });
-      updateActions();
-    };
-
-    d.querySelector('.comment-btn').onclick=()=>{
-      currentZoom = c;
-      commentModal.style.display='flex';
-      commentBubbles.innerHTML='';
-      c.comments.forEach(cm=>{
-        const b=document.createElement('div');
-        b.className='bubble';
-        b.innerHTML=`<strong>${cm.name}:</strong> ${cm.text}`;
-        commentBubbles.appendChild(b);
-      });
-      updateActions();
-    };
+    d.querySelector('.like-btn').onclick=()=>openZoom(c);
+    d.querySelector('.comment-btn').onclick=()=>openZoom(c);
 
     page.appendChild(d);
   });
 
-  fixPlaceholders(); // 🔹 garde pour enlever les "?" sur images déjà chargées
+  fixPlaceholders(); // 🔹 CORRECTION DES "?" AU RAFRAÎCHISSEMENT
+}
+
+function fixPlaceholders() {
+  document.querySelectorAll('.visitor-item img').forEach(img => {
+    const placeholder = img.closest('.visitor-item').querySelector('.placeholder');
+    if (!placeholder) return;
+
+    if (img.complete && img.naturalWidth > 0) {
+      placeholder.style.display = 'none';
+    } else {
+      placeholder.style.display = 'flex';
+      img.addEventListener('load', () => placeholder.style.display = 'none', { once: true });
+      img.addEventListener('error', () => placeholder.textContent = '?', { once: true });
+    }
+  });
 }
 
 // ---------------------- ZOOM ----------------------
@@ -535,8 +526,7 @@ async function loadCreations(){
     likes:c.likes||[],
     comments:c.comments||[]
   }));
-  render();           // ton render existant
-  fixPlaceholders();  // 🔹 ajoute cette ligne pour enlever les "?" sur images déjà chargées
+  render();           // 🔹 Appelle fixPlaceholders automatiquement
 }
 
 // ---------------------- DELETE ----------------------
@@ -552,22 +542,18 @@ document.getElementById('confirmDelete').onclick=async()=>{
   deleteModal.style.display='none';
 };
 
-function fixPlaceholders() {
-  document.querySelectorAll('.visitor-item img').forEach(img => {
-    const placeholder = img.closest('.visitor-item').querySelector('.placeholder');
-
-    if (!placeholder) return;
-
-    if (img.complete && img.naturalWidth > 0) {
-      placeholder.style.display = 'none';
-    } else {
-      img.addEventListener('load', () => placeholder.style.display = 'none', { once: true });
-      img.addEventListener('error', () => placeholder.textContent = '?', { once: true });
-    }
-  });
-}
-  
 // ---------------------- LIKE ----------------------
+document.querySelector('.like-btn').onclick=()=>{
+  likeModal.style.display='flex';
+  likeBubbles.innerHTML='';
+  currentZoom.likes.forEach(p=>{
+    const b=document.createElement('div');
+    b.className='bubble';
+    b.innerHTML=`<strong>${p}</strong>`;
+    likeBubbles.appendChild(b);
+  });
+};
+likeModal.onclick=e=>{if(e.target===likeModal)likeModal.style.display='none';};
 document.getElementById('confirmLike').onclick=async()=>{
   const name=document.getElementById('likeName').value.trim();
   if(!name)return;
@@ -580,6 +566,17 @@ document.getElementById('confirmLike').onclick=async()=>{
 };
 
 // ---------------------- COMMENT ----------------------
+document.querySelector('.comment-btn').onclick=()=>{
+  commentModal.style.display='flex';
+  commentBubbles.innerHTML='';
+  currentZoom.comments.forEach(c=>{
+    const b=document.createElement('div');
+    b.className='bubble';
+    b.innerHTML=`<strong>${c.name}:</strong> ${c.text}`;
+    commentBubbles.appendChild(b);
+  });
+};
+commentModal.onclick=e=>{if(e.target===commentModal)commentModal.style.display='none';};
 document.getElementById('confirmComment').onclick=async()=>{
   const name=document.getElementById('commentName').value.trim();
   const text=document.getElementById('commentText').value.trim();
