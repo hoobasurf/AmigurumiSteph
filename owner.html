@@ -320,15 +320,14 @@ body::before {
   <div class="thumbs" id="thumbs"></div>
 </div>
 
-<script type="module">
 import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
 
 const supabase = createClient(
   "https://jyhbamdcxmpveujjqjla.supabase.co",
-  "sb_publishable_sqsxb-3Kl5o3-JQYv9d0gK... (ton token)"
+  "sb_publishable_sqsxb-3Kl5o3-JQYv9d0gK..." // ton token
 );
 
-let creations = [], currentZoom = null;
+let creations = [];
 const container = document.getElementById('visitor-list-container');
 const addModal = document.getElementById('addModal');
 const zoomModal = document.getElementById('zoomModal');
@@ -347,7 +346,7 @@ function openDeleteModal(c){
 
 // ---------------------- LIKE ----------------------
 function openLikeModal(c){
-  if(!c.likes) c.likes = 0;
+  if(!c.likes) c.likes=0;
   c.likes++;
   supabase.from('creations').update({likes:c.likes}).eq('id',c.id);
   render();
@@ -366,58 +365,64 @@ function openCommentModal(c){
 // ---------------------- RENDER ----------------------
 function render(){
   container.innerHTML='';
-  let page=null;
+  let page = null;
+
   creations.forEach((c,i)=>{
     if(i%6===0){
-      page=document.createElement('div');
+      page = document.createElement('div');
       page.className='page';
       container.appendChild(page);
-    }else{
-      page=container.lastElementChild;
+    } else {
+      page = container.lastElementChild;
     }
 
-    const d=document.createElement('div');
+    const d = document.createElement('div');
     d.className='visitor-item';
 
-    const placeholder=document.createElement('div');
+    // Placeholder
+    const placeholder = document.createElement('div');
     placeholder.className='placeholder';
     placeholder.textContent='?';
     d.appendChild(placeholder);
 
-    const deleteBtn=document.createElement('div');
+    // Delete
+    const deleteBtn = document.createElement('div');
     deleteBtn.className='delete-btn';
     deleteBtn.textContent='×';
-    deleteBtn.addEventListener('click',e=>{e.stopPropagation(); openDeleteModal(c);});
+    deleteBtn.addEventListener('click', e=>{ e.stopPropagation(); openDeleteModal(c); });
     d.appendChild(deleteBtn);
 
-    const nameP=document.createElement('p');
-    nameP.textContent=c.name;
+    // Name
+    const nameP = document.createElement('p');
+    nameP.textContent = c.name;
     d.appendChild(nameP);
 
-    const img=document.createElement('img');
-    img.src=c.imgUrl;
-    img.onload=()=>placeholder.style.display='none';
-    img.onerror=()=>img.style.display='none';
+    // Image
+    const img = document.createElement('img');
+    img.src = c.imgUrl || '';
+    img.onload = ()=>placeholder.style.display='none';
+    img.onerror = ()=>img.style.display='none';
     img.addEventListener('click',()=>openZoom(c));
     d.appendChild(img);
 
-    const actions=document.createElement('div');
+    // Actions
+    const actions = document.createElement('div');
     actions.className='actions';
     actions.style.position='absolute';
     actions.style.bottom='24px';
     actions.style.width='100%';
     actions.style.justifyContent='center';
 
-    const likeBtn=document.createElement('button');
+    const likeBtn = document.createElement('button');
     likeBtn.className='like-btn';
     likeBtn.textContent=`${c.likes||0} ❤️`;
-    likeBtn.addEventListener('click',e=>{ e.stopPropagation(); openLikeModal(c); });
+    likeBtn.addEventListener('click', e=>{ e.stopPropagation(); openLikeModal(c); });
     actions.appendChild(likeBtn);
 
-    const commentBtn=document.createElement('button');
+    const commentBtn = document.createElement('button');
     commentBtn.className='comment-btn';
     commentBtn.textContent=`${c.comments?.length||0} 💬`;
-    commentBtn.addEventListener('click',e=>{ e.stopPropagation(); openCommentModal(c); });
+    commentBtn.addEventListener('click', e=>{ e.stopPropagation(); openCommentModal(c); });
     actions.appendChild(commentBtn);
 
     d.appendChild(actions);
@@ -427,12 +432,11 @@ function render(){
 
 // ---------------------- ZOOM ----------------------
 function openZoom(c){
-  currentZoom=c;
-  mainZoom.src=c.imgUrl;
+  mainZoom.src=c.imgUrl || '';
   thumbs.innerHTML='';
   if(c.zoomGroup){
     c.zoomGroup.forEach(u=>{
-      const t=document.createElement('img');
+      const t = document.createElement('img');
       t.src=u;
       t.addEventListener('click',()=>mainZoom.src=u);
       thumbs.appendChild(t);
@@ -444,27 +448,24 @@ function openZoom(c){
 // ---------------------- EVENTS ----------------------
 document.querySelector('.closeZoom').addEventListener('click',()=>zoomModal.style.display='none');
 document.getElementById('toggleSidebar').addEventListener('click',()=>sidebar.classList.toggle('sidebar-open'));
-addModal.addEventListener('click',e=>{ if(e.target===addModal) addModal.style.display='none'; });
-document.getElementById('addBtn').addEventListener('click',()=>addModal.style.display='flex');
+addModal.addEventListener('click', e=>{ if(e.target===addModal) addModal.style.display='none'; });
+document.getElementById('addBtn').addEventListener('click', ()=>addModal.style.display='flex');
 
 // ---------------------- AJOUT ----------------------
-document.getElementById('confirmAdd').addEventListener('click',async()=>{
-  const name=document.getElementById('photoName').value.trim();
-  const files=document.getElementById('multiPhoto').files;
-  if(!name||!files.length) return;
+document.getElementById('confirmAdd').addEventListener('click', async ()=>{
+  const name = document.getElementById('photoName').value.trim();
+  const files = document.getElementById('multiPhoto').files;
+  if(!name || !files.length) return;
 
   const urls=[], paths=[];
   for(let f of files){
-    const path=`${Date.now()}_${f.name}`;
+    const path = `${Date.now()}_${f.name}`;
     await supabase.storage.from('images').upload(path,f);
     urls.push(supabase.storage.from('images').getPublicUrl(path).data.publicUrl);
     paths.push(path);
   }
 
-  const {data} = await supabase.from('creations')
-    .insert([{name,image_path:paths[0],images:paths,likes:0,comments:[]}])
-    .select();
-
+  const {data} = await supabase.from('creations').insert([{name,image_path:paths[0],images:paths,likes:0,comments:[]}]).select();
   creations.unshift({id:data[0].id,name,imgUrl:urls[0],zoomGroup:urls,likes:0,comments:[]});
   render();
   addModal.style.display='none';
@@ -476,7 +477,7 @@ document.getElementById('confirmAdd').addEventListener('click',async()=>{
 async function loadCreations(){
   const {data} = await supabase.from("creations").select("*").order("created_at",{ascending:false});
   creations = data.map(c=>{
-    const zoomGroup=(c.images||[c.image_path]).map(p=>supabase.storage.from('images').getPublicUrl(p).data.publicUrl);
+    const zoomGroup = (c.images||[c.image_path]).map(p=>supabase.storage.from('images').getPublicUrl(p).data.publicUrl);
     return {id:c.id,name:c.name,imgUrl:zoomGroup[0],zoomGroup,likes:c.likes||0,comments:c.comments||[]};
   });
   render();
@@ -484,6 +485,5 @@ async function loadCreations(){
 
 // ---------------------- START ----------------------
 loadCreations();
-</script>
 </body>
 </html>
