@@ -490,6 +490,7 @@ document.getElementById('confirmAdd').onclick = async () => {
 
   const urls = [];
 
+  // Upload de toutes les images
   for (let i = 0; i < files.length; i++) {
     const f = files[i];
     const path = `${Date.now()}_${i}_${f.name}`;
@@ -502,11 +503,11 @@ document.getElementById('confirmAdd').onclick = async () => {
 
   if (!urls.length) return;
 
-  // **Insérer en une seule création avec toutes les images**
+  // Insert en une seule création
   const { data, error } = await supabase.from('creations')
     .insert([{
       name,
-      image_path: urls[0].split('/images/')[1],
+      image_path: urls.map(u => u.split('/images/')[1]), // **on stocke TOUS les paths**
       zoomGroup: urls,
       likes: [],
       comments: []
@@ -515,12 +516,12 @@ document.getElementById('confirmAdd').onclick = async () => {
 
   if (error) { console.error('Insert failed', error); return; }
 
-  // Ajouter localement pour que render() fonctionne tout de suite
+  // Ajouter localement
   creations.unshift({
     id: data[0].id,
     name,
     imgUrl: urls[0],
-    image_path: urls[0].split('/images/')[1],
+    image_path: urls.map(u => u.split('/images/')[1]),
     zoomGroup: urls,
     likes: [],
     comments: []
@@ -531,21 +532,24 @@ document.getElementById('confirmAdd').onclick = async () => {
   document.getElementById('photoName').value = '';
   document.getElementById('multiPhoto').value = '';
 };
+
 // ---------------------- LOAD ----------------------
-async function loadCreations(){
-  const {data}=await supabase.from("creations").select("*").order("created_at",{ascending:false});
-  creations=data.map(c=>({
-    id:c.id,
-    name:c.name,
-    imgUrl:supabase.storage.from('images').getPublicUrl(c.image_path).data.publicUrl,
-    zoomGroup:c.zoomGroup || [supabase.storage.from('images').getPublicUrl(c.image_path).data.publicUrl],
-    likes:c.likes||[],
-    comments:c.comments||[]
+async function loadCreations() {
+  const { data } = await supabase.from("creations").select("*").order("created_at", { ascending: false });
+
+  creations = data.map(c => ({
+    id: c.id,
+    name: c.name,
+    // si image_path est un tableau, on prend le premier
+    imgUrl: Array.isArray(c.image_path) ? supabase.storage.from('images').getPublicUrl(c.image_path[0]).data.publicUrl : supabase.storage.from('images').getPublicUrl(c.image_path).data.publicUrl,
+    zoomGroup: Array.isArray(c.image_path) ? c.image_path.map(p => supabase.storage.from('images').getPublicUrl(p).data.publicUrl) : [supabase.storage.from('images').getPublicUrl(c.image_path).data.publicUrl],
+    likes: c.likes || [],
+    comments: c.comments || []
   }));
+
   render();
 }
 loadCreations();
-
 </script>
 </body>
 </html>
