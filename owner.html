@@ -348,6 +348,34 @@ const thumbs = document.getElementById('thumbs');
 
 const sidebar = document.getElementById('sidebar');
 
+// 🔹 Fonction suppression
+function openDeleteModal(c) {
+  if (!c) return;
+  // Supprime directement de la liste et du DOM
+  creations = creations.filter(x => x.id !== c.id);
+  render();
+
+  // Optionnel : supprimer aussi dans Supabase
+  supabase.from('creations').delete().eq('id', c.id);
+}
+
+// 🔹 Like modal
+function openLikeModal(c) {
+  currentZoom = c;
+  // Par exemple, incrémente directement le compteur (simple)
+  if (!c.likes) c.likes = [];
+  c.likes.push('❤️'); // ajoute un like fictif
+  render(); // rafraîchit le compteur si tu l’affiches quelque part
+}
+
+// 🔹 Comment modal
+function openCommentModal(c) {
+  currentZoom = c;
+  if (!c.comments) c.comments = [];
+  c.comments.push('💬'); // ajoute un commentaire fictif
+  render(); // rafraîchit l’affichage si nécessaire
+}
+  
 // ---------------------- RENDER ----------------------
 function render() {
   container.innerHTML = '';
