@@ -162,7 +162,7 @@ body::before {
   justify-content:center;
   cursor:pointer;
   font-weight:bold;
-  z-index:20; /* assuré cliquable */
+  z-index:20;
 }
 #sidebar button{
   width:auto;
@@ -420,6 +420,10 @@ const sidebar = document.getElementById('sidebar');
 // ---------------------- SIDEBAR TOGGLE ----------------------
 document.getElementById('toggleSidebar').onclick = () => sidebar.classList.toggle('sidebar-open');
 
+// ---------------------- AJOUT MODAL ----------------------
+document.getElementById('addBtn').onclick = () => addModal.style.display = 'flex';
+addModal.onclick = e => { if(e.target===addModal) addModal.style.display='none'; };
+
 // ---------------------- RENDER ----------------------
 function render() {
   container.innerHTML = '';
@@ -509,14 +513,12 @@ function updateActions(){
   commentCount.textContent=currentZoom.comments?.length||0;
 }
 
-// ---------------------- EVENTS ----------------------
+// ---------------------- CLOSE ZOOM ----------------------
 document.querySelector('.closeZoom').onclick=()=>zoomModal.style.display='none';
 zoomModal.onclick=e=>{if(e.target===zoomModal)zoomModal.style.display='none';};
 
-// Le reste du code (ajout, load, delete, like, comment) reste identique à l’original
 // ---------------------- START ----------------------
 loadCreations();
-
 </script>
 </body>
 </html>
