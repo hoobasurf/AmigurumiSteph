@@ -398,58 +398,56 @@ const supabase = createClient(
   "sb_publishable_sqsxb-3Kl5o3-JQYv9kGFw_-g0EgwMa"
 );
 
-let creations = [], currentZoom = null, currentDelete = null;
-const container = document.getElementById('visitor-list-container');
+let creations=[], currentZoom=null, currentDelete=null;
+const container=document.getElementById('visitor-list-container');
 
-const addModal = document.getElementById('addModal');
-const deleteModal = document.getElementById('deleteModal');
-const likeModal = document.getElementById('likeModal');
-const commentModal = document.getElementById('commentModal');
+const addModal=document.getElementById('addModal');
+const deleteModal=document.getElementById('deleteModal');
+const likeModal=document.getElementById('likeModal');
+const commentModal=document.getElementById('commentModal');
 
-const zoomModal = document.getElementById('zoomModal');
-const mainZoom = document.getElementById('mainZoom');
-const thumbs = document.getElementById('thumbs');
-const likeCount = document.getElementById('likeCount');
-const commentCount = document.getElementById('commentCount');
+const zoomModal=document.getElementById('zoomModal');
+const mainZoom=document.getElementById('mainZoom');
+const thumbs=document.getElementById('thumbs');
+const likeCount=document.getElementById('likeCount');
+const commentCount=document.getElementById('commentCount');
 
-const likeBubbles = document.getElementById('likeBubbles');
-const commentBubbles = document.getElementById('commentBubbles');
+const likeBubbles=document.getElementById('likeBubbles');
+const commentBubbles=document.getElementById('commentBubbles');
 
-const sidebar = document.getElementById('sidebar');
+const sidebar=document.getElementById('sidebar');
 
-// ---------------------- SIDEBAR TOGGLE ----------------------
-document.getElementById('toggleSidebar').onclick = () => sidebar.classList.toggle('sidebar-open');
+// ---------------------- SIDEBAR ----------------------
+document.getElementById('toggleSidebar').onclick=()=>sidebar.classList.toggle('sidebar-open');
 
-// ---------------------- AJOUT MODAL ----------------------
-document.getElementById('addBtn').onclick = () => addModal.style.display = 'flex';
-addModal.onclick = e => { if(e.target===addModal) addModal.style.display='none'; };
+// ---------------------- MODALS ----------------------
+document.getElementById('addBtn').onclick=()=>addModal.style.display='flex';
+addModal.onclick=e=>{if(e.target===addModal)addModal.style.display='none';};
+deleteModal.onclick=e=>{if(e.target===deleteModal)deleteModal.style.display='none';};
+likeModal.onclick=e=>{if(e.target===likeModal)likeModal.style.display='none';};
+commentModal.onclick=e=>{if(e.target===commentModal)commentModal.style.display='none';};
+document.querySelector('.closeZoom').onclick=()=>zoomModal.style.display='none';
+zoomModal.onclick=e=>{if(e.target===zoomModal)zoomModal.style.display='none';};
 
 // ---------------------- RENDER ----------------------
-function render() {
-  container.innerHTML = '';
-  let page = null;
+function render(){
+  container.innerHTML='';
+  let page=null;
+  creations.forEach((c,i)=>{
+    if(i%6===0){page=document.createElement('div');page.className='page';container.appendChild(page);}
+    else{page=container.lastElementChild;}
 
-  creations.forEach((c, i) => {
-    if (i % 6 === 0) {
-      page = document.createElement('div');
-      page.className = 'page';
-      container.appendChild(page);
-    } else {
-      page = container.lastElementChild;
-    }
-
-    const d = document.createElement('div');
-    d.className = 'visitor-item';
-
-    const placeholder = document.createElement('div');
-    placeholder.className = 'placeholder';
-    placeholder.textContent = '?';
+    const d=document.createElement('div');
+    d.className='visitor-item';
+    const placeholder=document.createElement('div');
+    placeholder.className='placeholder';
+    placeholder.textContent='?';
     d.appendChild(placeholder);
 
-    const img = new Image();
-    img.src = c.imgUrl;
-    img.onload = () => { placeholder.style.display = 'none'; img.style.display = 'block'; };
-    img.onerror = () => { img.style.display = 'none'; placeholder.textContent='❌'; };
+    const img=new Image();
+    img.src=c.imgUrl;
+    img.onload=()=>{placeholder.style.display='none'; img.style.display='block';};
+    img.onerror=()=>{img.style.display='none'; placeholder.textContent='❌';};
     img.style.width='100%';
     img.style.height='100%';
     img.style.objectFit='cover';
@@ -457,25 +455,26 @@ function render() {
     img.style.cursor='pointer';
     img.style.position='relative';
     img.style.zIndex='2';
+    img.onclick=()=>openZoom(c);
     d.appendChild(img);
 
-    const p = document.createElement('p');
-    p.textContent = c.name;
+    const p=document.createElement('p');
+    p.textContent=c.name;
     d.appendChild(p);
 
-    const deleteBtn = document.createElement('div');
-    deleteBtn.className = 'delete-btn';
-    deleteBtn.textContent = '×';
-    deleteBtn.onclick = () => openDeleteModal(c);
+    const deleteBtn=document.createElement('div');
+    deleteBtn.className='delete-btn';
+    deleteBtn.textContent='×';
+    deleteBtn.onclick=()=>openDeleteModal(c);
     d.appendChild(deleteBtn);
 
-    const actionsDiv = document.createElement('div');
-    actionsDiv.className = 'actions';
+    const actionsDiv=document.createElement('div');
+    actionsDiv.className='actions';
     actionsDiv.style.position='absolute';
     actionsDiv.style.bottom='24px';
     actionsDiv.style.width='100%';
     actionsDiv.style.justifyContent='center';
-    actionsDiv.innerHTML = `
+    actionsDiv.innerHTML=`
       <button class="like-btn" title="Like ❤️">
         <svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"></path></svg>
       </button>
@@ -483,42 +482,28 @@ function render() {
         <svg viewBox="0 0 24 24"><path d="M21 6h-18v12h18v-12zm0-2c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2h-18c-1.1 0-2-.9-2-2v-12c0-1.1.9-2 2-2h18z"></path></svg>
       </button>
     `;
-    actionsDiv.querySelector('.like-btn').onclick = () => openZoom(c);
-    actionsDiv.querySelector('.comment-btn').onclick = () => openZoom(c);
+    actionsDiv.querySelector('.like-btn').onclick=()=>openZoom(c);
+    actionsDiv.querySelector('.comment-btn').onclick=()=>openZoom(c);
     d.appendChild(actionsDiv);
-
-    img.onclick = () => openZoom(c);
 
     page.appendChild(d);
   });
 }
 
-// ---------------------- ZOOM ----------------------
-function openZoom(c){
-  currentZoom=c;
-  mainZoom.src=c.imgUrl;
-  thumbs.innerHTML='';
-  c.zoomGroup.forEach(u=>{
-    const t=document.createElement('img');
-    t.src=u;
-    t.onclick=()=>mainZoom.src=u;
-    thumbs.appendChild(t);
-  });
-  updateActions();
-  zoomModal.style.display='flex';
+// ---------------------- LOAD ----------------------
+async function loadCreations(){
+  const {data}=await supabase.from("creations").select("*").order("created_at",{ascending:false});
+  creations=data.map(c=>({
+    id:c.id,
+    name:c.name,
+    imgUrl:supabase.storage.from('images').getPublicUrl(c.image_path).data.publicUrl,
+    zoomGroup:[supabase.storage.from('images').getPublicUrl(c.image_path).data.publicUrl],
+    likes:c.likes||[],
+    comments:c.comments||[]
+  }));
+  render();
 }
 
-function updateActions(){
-  likeCount.textContent=currentZoom.likes?.length||0;
-  commentCount.textContent=currentZoom.comments?.length||0;
-}
-
-// ---------------------- CLOSE ZOOM ----------------------
-document.querySelector('.closeZoom').onclick=()=>zoomModal.style.display='none';
-zoomModal.onclick=e=>{if(e.target===zoomModal)zoomModal.style.display='none';};
-
-// ---------------------- START ----------------------
-loadCreations();
-</script>
-</body>
-</html>
+// ---------------------- ADD ----------------------
+document.getElementById('confirmAdd').onclick=async()=>{
+  const name
