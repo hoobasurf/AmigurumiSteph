@@ -445,31 +445,17 @@ function render() {
     page.appendChild(d);
   });
 
-  // 🔹 CORRECTION DES "?" AU RAFRAÎCHISSEMENT
-  document.querySelectorAll('.visitor-item img').forEach(img => {
+  // 🔹 FIX PLACEHOLDERS AU RAFRAÎCHISSEMENT
+  document.querySelectorAll('.visitor-item img').forEach(img=>{
     const placeholder = img.closest('.visitor-item').querySelector('.placeholder');
     if(!placeholder) return;
 
-    if(img.complete && img.naturalWidth > 0){
-      placeholder.style.display = 'none';
+    if(img.complete && img.naturalWidth>0){
+      placeholder.style.display='none';
     } else {
-      placeholder.style.display = 'flex';
-      img.addEventListener('load', ()=> placeholder.style.display='none', {once:true});
-      img.addEventListener('error', ()=> placeholder.textContent='?', {once:true});
-    }
-  });
-}
-function fixPlaceholders() {
-  document.querySelectorAll('.visitor-item img').forEach(img => {
-    const placeholder = img.closest('.visitor-item').querySelector('.placeholder');
-    if (!placeholder) return;
-
-    if (img.complete && img.naturalWidth > 0) {
-      placeholder.style.display = 'none';
-    } else {
-      placeholder.style.display = 'flex';
-      img.addEventListener('load', () => placeholder.style.display = 'none', { once: true });
-      img.addEventListener('error', () => placeholder.textContent = '?', { once: true });
+      placeholder.style.display='flex';
+      img.addEventListener('load', ()=>placeholder.style.display='none', {once:true});
+      img.addEventListener('error', ()=>placeholder.textContent='?', {once:true});
     }
   });
 }
@@ -537,7 +523,7 @@ async function loadCreations(){
     likes:c.likes||[],
     comments:c.comments||[]
   }));
-  render();           // 🔹 Appelle fixPlaceholders automatiquement
+  render();
 }
 
 // ---------------------- DELETE ----------------------
