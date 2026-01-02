@@ -492,28 +492,32 @@ document.getElementById('confirmAdd').onclick=async()=>{
   if(error){console.error(error);return;}
 
   creations.unshift({id:data[0].id,name,imgUrl:urls[0],zoomGroup:urls,likes:[],comments:[]});
-  render();
-  addModal.style.display='none';
-  document.getElementById('photoName').value='';
-  document.getElementById('multiPhoto').value='';
+render(); // mise à jour immédiate locale
+
+// Optionnel : recharger depuis Supabase pour être sûr
+// await refreshCreations();
+
+addModal.style.display='none';
+document.getElementById('photoName').value='';
+document.getElementById('multiPhoto').value='';
 };
 
 // ---------------------- LOAD ----------------------
-async function loadCreations(){
-  const { data } = await supabase
+async function refreshCreations() {
+  const { data, error } = await supabase
     .from("creations")
     .select("*")
     .order("created_at", { ascending: false });
 
+  if (error) { console.error(error); return; }
+
   creations = data.map(c => {
-    // Récupère toutes les images du zoomGroup si elles existent
     const zoomUrls = c.zoomGroup?.map(p => supabase.storage.from('images').getPublicUrl(p).data.publicUrl)
                      || [supabase.storage.from('images').getPublicUrl(c.image_path).data.publicUrl];
-
     return {
       id: c.id,
       name: c.name,
-      imgUrl: zoomUrls[0],   // image principale
+      imgUrl: zoomUrls[0],
       zoomGroup: zoomUrls,
       likes: c.likes || [],
       comments: c.comments || []
@@ -521,6 +525,7 @@ async function loadCreations(){
   });
 
   render();
+}
 }
 
 // ---------------------- DELETE ----------------------
@@ -531,9 +536,13 @@ document.getElementById('confirmDelete').onclick=async()=>{
   if(!currentDelete)return;
   for(let u of currentDelete.zoomGroup)await supabase.storage.from('images').remove([u.split('/images/')[1]]);
   await supabase.from('creations').delete().eq('id',currentDelete.id);
-  creations=creations.filter(c=>c.id!==currentDelete.id);
-  render();
-  deleteModal.style.display='none';
+  creations = creations.filter(c => c.id !== currentDelete.id);
+render(); // mise à jour immédiate locale
+
+// Optionnel : recharger depuis Supabase pour être sûr
+// await refreshCreations();
+
+deleteModal.style.display='none';
 };
 
 // ---------------------- LIKE ----------------------
@@ -586,7 +595,7 @@ document.getElementById('confirmComment').onclick=async()=>{
 };
 
 // ---------------------- START ----------------------
-loadCreations();
+refreshCreations();
 
 </script>
 </body>
