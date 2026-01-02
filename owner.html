@@ -488,7 +488,7 @@ confirmAdd.onclick = async () => {
 
   for (let i = 0; i < files.length; i++) {
     const f = files[i];
-    const path = `${Date.now()}_${i}_${f.name}`; // index ajouté pour éviter doublons
+    const path = `${Date.now()}_${i}_${f.name}`; // index pour éviter doublons
     const { error: uploadError } = await supabase.storage.from('images').upload(path, f);
     if (uploadError) {
       console.error("Erreur upload:", uploadError);
@@ -498,12 +498,13 @@ confirmAdd.onclick = async () => {
     urls.push(publicUrl);
   }
 
-  if (!urls.length) return; // si aucun fichier uploadé, ne rien faire
+  if (!urls.length) return; // aucun fichier uploadé
 
+  // Insert dans Supabase avec TOUTES les images dans zoomGroup
   const { data, error } = await supabase.from('creations').insert([{
     name: name,
-    image_path: urls[0],
-    zoomGroup: urls,
+    image_path: urls[0],   // première image affichée sur la grille
+    zoomGroup: urls,       // toutes les images stockées pour le zoom
     likes: [],
     comments: []
   }]).select();
@@ -513,6 +514,7 @@ confirmAdd.onclick = async () => {
     return;
   }
 
+  // Ajouter localement dans le tableau creations
   creations.unshift({
     id: data[0].id,
     name: name,
@@ -527,7 +529,6 @@ confirmAdd.onclick = async () => {
   document.getElementById('photoName').value = '';
   document.getElementById('multiPhoto').value = '';
 };
-
 // ---------------------- LOAD ----------------------
 async function loadCreations(){
   const {data}=await supabase.from("creations").select("*").order("created_at",{ascending:false});
