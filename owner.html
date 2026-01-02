@@ -479,27 +479,53 @@ confirmDelete.onclick=async()=>{
 };
 
 // ---------------------- ADD ----------------------
-addBtn.onclick=()=>addModal.style.display='flex';
-addModal.onclick=e=>{if(e.target===addModal)addModal.style.display='none';};
-confirmAdd.onclick=async()=>{
-  const name=document.getElementById('photoName').value.trim();
-  const files=document.getElementById('multiPhoto').files;
-  if(!name||!files.length) return;
+confirmAdd.onclick = async () => {
+  const name = document.getElementById('photoName').value.trim();
+  const files = document.getElementById('multiPhoto').files;
+  if (!name || !files.length) return;
 
-  const urls=[];
-  for(let f of files){
-    const path=`${Date.now()}_${f.name}`;
-    await supabase.storage.from('images').upload(path,f);
+  const urls = [];
+
+  for (let i = 0; i < files.length; i++) {
+    const f = files[i];
+    const path = `${Date.now()}_${i}_${f.name}`; // index ajouté pour éviter doublons
+    const { error: uploadError } = await supabase.storage.from('images').upload(path, f);
+    if (uploadError) {
+      console.error("Erreur upload:", uploadError);
+      continue;
+    }
     const publicUrl = supabase.storage.from('images').getPublicUrl(path).data.publicUrl;
     urls.push(publicUrl);
   }
 
-  const {data}=await supabase.from('creations').insert([{name,image_path:urls[0],zoomGroup:urls,likes:[],comments:[]}]).select();
-  creations.unshift({id:data[0].id,name,imgUrl:urls[0],zoomGroup:urls,likes:[],comments:[]});
+  if (!urls.length) return; // si aucun fichier uploadé, ne rien faire
+
+  const { data, error } = await supabase.from('creations').insert([{
+    name: name,
+    image_path: urls[0],
+    zoomGroup: urls,
+    likes: [],
+    comments: []
+  }]).select();
+
+  if (error) {
+    console.error("Erreur insert:", error);
+    return;
+  }
+
+  creations.unshift({
+    id: data[0].id,
+    name: name,
+    imgUrl: urls[0],
+    zoomGroup: urls,
+    likes: [],
+    comments: []
+  });
+
   render();
-  addModal.style.display='none';
-  document.getElementById('photoName').value='';
-  document.getElementById('multiPhoto').value='';
+  addModal.style.display = 'none';
+  document.getElementById('photoName').value = '';
+  document.getElementById('multiPhoto').value = '';
 };
 
 // ---------------------- LOAD ----------------------
