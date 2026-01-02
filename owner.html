@@ -338,15 +338,33 @@ const supabase = createClient(
   "sb_publishable_sqsxb-3Kl5o3-JQYv9kGFw_-g0EgwMa"
 );
 
-let creations = [], currentZoom = null;
+let creations = [], currentZoom = null, currentDelete = null;
 const container = document.getElementById('visitor-list-container');
 
 const addModal = document.getElementById('addModal');
+const deleteModal = document.getElementById('deleteModal');
+const likeModal = document.getElementById('likeModal');
+const commentModal = document.getElementById('commentModal');
+
 const zoomModal = document.getElementById('zoomModal');
 const mainZoom = document.getElementById('mainZoom');
 const thumbs = document.getElementById('thumbs');
+const likeCount = document.getElementById('likeCount');
+const commentCount = document.getElementById('commentCount');
+const likeBubbles = document.getElementById('likeBubbles');
+const commentBubbles = document.getElementById('commentBubbles');
 
 const sidebar = document.getElementById('sidebar');
+
+// ---------------------- SIDEBAR ----------------------
+document.getElementById('toggleSidebar').onclick = () => sidebar.classList.toggle('sidebar-open');
+
+// ---------------------- MODALS ----------------------
+[addModal, deleteModal, likeModal, commentModal].forEach(m => {
+  m.onclick = e => { if(e.target === m) m.style.display = 'none'; }
+});
+document.querySelector('.closeZoom').onclick = () => zoomModal.style.display='none';
+zoomModal.onclick = e => { if(e.target===zoomModal) zoomModal.style.display='none'; };
 
 // ---------------------- RENDER ----------------------
 function render() {
@@ -395,83 +413,108 @@ function render() {
     page.appendChild(d);
   });
 }
-// ---------------------- ZOOM ----------------------
-function openZoom(c) {
-  currentZoom = c;
-  mainZoom.src = c.imgUrl;
-  thumbs.innerHTML = '';
-  c.zoomGroup.forEach(u => {
-    const t = document.createElement('img');
-    t.src = u;
-    t.onclick = () => mainZoom.src = u;
-    thumbs.appendChild(t);
-  });
-  zoomModal.style.display = 'flex';
-}
-
-// ---------------------- EVENTS ----------------------
-document.querySelector('.closeZoom').onclick = () => zoomModal.style.display = 'none';
-document.getElementById('toggleSidebar').onclick = () => sidebar.classList.toggle('sidebar-open');
-addModal.onclick = e => { if (e.target === addModal) addModal.style.display='none'; };
-document.getElementById('addBtn').onclick = () => addModal.style.display='flex';
-
-// ---------------------- AJOUT ----------------------
-document.getElementById('confirmAdd').onclick = async () => {
-  const name = document.getElementById('photoName').value.trim();
-  const files = document.getElementById('multiPhoto').files;
-  if (!name || !files.length) return;
-
-  const urls = [];
-  const paths = [];
-
-  for (let f of files) {
-    const path = `${Date.now()}_${f.name}`;
-    await supabase.storage.from('images').upload(path, f);
-    urls.push(supabase.storage.from('images').getPublicUrl(path).data.publicUrl);
-    paths.push(path);
-  }
-
-  const { data } = await supabase.from('creations')
-    .insert([{
-      name,
-      image_path: paths[0],
-      images: paths,
-      likes: [],
-      comments: []
-    }])
-    .select();
-
-  creations.unshift({
-    id: data[0].id,
-    name,
-    imgUrl: urls[0],
-    zoomGroup: urls,
-    likes: [],
-    comments: []
-  });
-
-  render();
-  addModal.style.display = 'none';
-  document.getElementById('photoName').value = '';
-  document.getElementById('multiPhoto').value = '';
-};
 
 // ---------------------- LOAD ----------------------
 async function loadCreations() {
-  const { data } = await supabase.from("creations").select("*").order("created_at", { ascending: false });
-  creations = data.map(c => {
-    const zoomGroup = (c.images || [c.image_path]).map(p => supabase.storage.from('images').getPublicUrl(p).data.publicUrl);
-    return {
-      id: c.id,
-      name: c.name,
-      imgUrl: zoomGroup[0],
-      zoomGroup,
-      likes: c.likes || [],
-      comments: c.comments || []
-    };
-  });
+  const { data, error } = await supabase.from("creations").select("*").order("created_at",{ ascending:false });
+  if(error){ console.error(error); return; }
+  creations = data.map(c => ({
+    id: c.id,
+    name: c.name,
+    imgUrl: supabase.storage.from('images').getPublicUrl(c.image_path).data.publicUrl,
+    zoomGroup: [supabase.storage.from('images').getPublicUrl(c.image_path).data.publicUrl],
+    likes: c.likes || [],
+    comments: c.comments || []
+  }));
   render();
 }
+
+// ---------------------- ZOOM ----------------------
+function openZoom(c){
+  currentZoom = c;
+  mainZoom.src = c.imgUrl;
+  thumbs.innerHTML = '';
+  c.zoomGroup.forEach(u=>{
+    const t = document.createElement('img');
+    t.src = u;
+    t.onclick = ()=> mainZoom.src = u;
+    thumbs.appendChild(t);
+  });
+  likeCount.textContent = c.likes.length;
+  commentCount.textContent = c.comments.length;
+  zoomModal.style.display = 'flex';
+}
+
+// ---------------------- DELETE ----------------------
+function openDeleteModal(c){
+  currentDelete = c;
+  deleteModal.style.display='flex';
+}
+document.getElementById('confirmDelete').onclick = async ()=>{
+  if(!currentDelete) return;
+  // Supprime l'image du storage
+  for(let u of currentDelete.zoomGroup){
+    await supabase.storage.from('images').remove([u.split('/images/')[1]]);
+  }
+  await supabase.from('creations').delete().eq('id', currentDelete.id);
+  creations = creations.filter(x=>x.id !== currentDelete.id);
+  render();
+  deleteModal.style.display='none';
+};
+document.getElementById('cancelDelete').onclick = ()=>deleteModal.style.display='none';
+
+// ---------------------- LIKE ----------------------
+function openLikeModal(c){
+  currentZoom = c;
+  likeModal.style.display='flex';
+  likeBubbles.innerHTML='';
+  c.likes.forEach(p=>{
+    const b = document.createElement('div');
+    b.className='bubble';
+    b.innerHTML=`<strong>${p}</strong>`;
+    likeBubbles.appendChild(b);
+  });
+}
+document.getElementById('confirmLike').onclick = async ()=>{
+  const name = document.getElementById('likeName').value.trim();
+  if(!name || !currentZoom) return;
+  currentZoom.likes.push(name);
+  await supabase.from('creations').update({likes: currentZoom.likes}).eq('id', currentZoom.id);
+  const b = document.createElement('div');
+  b.className='bubble';
+  b.innerHTML=`<strong>${name}</strong>`;
+  likeBubbles.appendChild(b);
+  likeCount.textContent = currentZoom.likes.length;
+  document.getElementById('likeName').value='';
+};
+
+// ---------------------- COMMENT ----------------------
+function openCommentModal(c){
+  currentZoom = c;
+  commentModal.style.display='flex';
+  commentBubbles.innerHTML='';
+  c.comments.forEach(cm=>{
+    const b = document.createElement('div');
+    b.className='bubble';
+    b.innerHTML=`<strong>${cm.name}:</strong> ${cm.text}`;
+    commentBubbles.appendChild(b);
+  });
+}
+document.getElementById('confirmComment').onclick = async ()=>{
+  const name = document.getElementById('commentName').value.trim();
+  const text = document.getElementById('commentText').value.trim();
+  if(!name || !text || !currentZoom) return;
+  const commentObj = {name, text};
+  currentZoom.comments.push(commentObj);
+  await supabase.from('creations').update({comments: currentZoom.comments}).eq('id', currentZoom.id);
+  const b = document.createElement('div');
+  b.className='bubble';
+  b.innerHTML=`<strong>${name}:</strong> ${text}`;
+  commentBubbles.appendChild(b);
+  commentCount.textContent = currentZoom.comments.length;
+  document.getElementById('commentName').value='';
+  document.getElementById('commentText').value='';
+};
 
 // ---------------------- START ----------------------
 loadCreations();
