@@ -503,7 +503,7 @@ document.getElementById('confirmAdd').onclick = async () => {
   const { data, error: insertError } = await supabase.from('creations')
     .insert([{
       name,
-      image_path: urls[0], // première image comme image principale
+      image_path: urls[0].split('/images/')[1],
       zoomGroup: urls,     // toutes les images pour les miniatures/zoom
       likes: [],
       comments: []
