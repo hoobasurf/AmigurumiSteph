@@ -76,6 +76,7 @@ body::before {
   font-size:24px;
   color:#b84c6f;
   font-weight:bold;
+  z-index:2;
 }
 
 .visitor-item img {
@@ -88,7 +89,7 @@ body::before {
   filter: brightness(1.05) contrast(1.05) saturate(0.95);
   transition: filter 0.3s, transform 0.3s;
   position: relative;
-  z-index: 2;
+  z-index:1;
 }
 .visitor-item img:hover { transform: scale(1.03); }
 
@@ -146,7 +147,7 @@ body::before {
   border-right:2px solid #b67385;
   padding:20px;
   transition:left .3s;
-  z-index:10;
+  z-index:1000;
 }
 #sidebar.sidebar-open{left:0}
 #toggleSidebar{
@@ -162,7 +163,7 @@ body::before {
   justify-content:center;
   cursor:pointer;
   font-weight:bold;
-  z-index:20;
+  z-index:1001;
 }
 #sidebar button{
   width:auto;
@@ -310,22 +311,6 @@ body::before {
   .modal .modal-box{min-width:180px;}
 }
 
-.star {
-  position: absolute;
-  width: 8px;
-  height: 8px;
-  background: gold;
-  border-radius: 50%;
-  pointer-events: none;
-  animation: sparkle 0.8s forwards;
-  z-index: 20;
-}
-@keyframes sparkle {
-  to {
-    transform: translate(var(--dx), var(--dy)) scale(0);
-    opacity: 0;
-  }
-}
 </style>
 </head>
 <body>
@@ -392,8 +377,7 @@ body::before {
 
 <script type="module">
 import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
-
-const supabase = createClient(
+const supabase=createClient(
   "https://jyhbamdcxmpveujjqjla.supabase.co",
   "sb_publishable_sqsxb-3Kl5o3-JQYv9kGFw_-g0EgwMa"
 );
@@ -454,7 +438,7 @@ function render(){
     img.style.borderRadius='12px';
     img.style.cursor='pointer';
     img.style.position='relative';
-    img.style.zIndex='2';
+    img.style.zIndex='1';
     img.onclick=()=>openZoom(c);
     d.appendChild(img);
 
@@ -506,4 +490,127 @@ async function loadCreations(){
 
 // ---------------------- ADD ----------------------
 document.getElementById('confirmAdd').onclick=async()=>{
-  const name
+  const name=document.getElementById('photoName').value.trim();
+  const files=document.getElementById('multiPhoto').files;
+  if(!name||!files.length)return;
+  const urls=[];
+  for(let f of files){
+    const path=`${Date.now()}_${f.name}`;
+    await supabase.storage.from('images').upload(path,f);
+        const publicUrl = supabase.storage.from('images').getPublicUrl(path).data.publicUrl;
+    urls.push(publicUrl);
+  }
+
+  const {data, error} = await supabase.from('creations')
+    .insert([{name, image_path: urls[0], likes: [], comments: []}])
+    .select();
+  
+  if (error) { console.error(error); return; }
+
+  creations.unshift({
+    id: data[0].id,
+    name,
+    imgUrl: urls[0],
+    zoomGroup: urls,
+    likes: [],
+    comments: []
+  });
+
+  render();
+  addModal.style.display = 'none';
+  document.getElementById('photoName').value = '';
+  document.getElementById('multiPhoto').value = '';
+};
+
+// ---------------------- DELETE ----------------------
+function openDeleteModal(c){ currentDelete = c; deleteModal.style.display='flex'; }
+document.getElementById('cancelDelete').onclick = () => deleteModal.style.display='none';
+document.getElementById('confirmDelete').onclick = async () => {
+  if(!currentDelete) return;
+  for(let u of currentDelete.zoomGroup)
+    await supabase.storage.from('images').remove([u.split('/images/')[1]]);
+  await supabase.from('creations').delete().eq('id', currentDelete.id);
+  creations = creations.filter(c => c.id !== currentDelete.id);
+  render();
+  deleteModal.style.display='none';
+};
+
+// ---------------------- ZOOM ----------------------
+function openZoom(c){
+  currentZoom = c;
+  mainZoom.src = c.imgUrl;
+  thumbs.innerHTML = '';
+  c.zoomGroup.forEach(u => {
+    const t = document.createElement('img');
+    t.src = u;
+    t.onclick = () => mainZoom.src = u;
+    thumbs.appendChild(t);
+  });
+  updateActions();
+  zoomModal.style.display='flex';
+}
+
+function updateActions(){
+  likeCount.textContent = currentZoom.likes?.length || 0;
+  commentCount.textContent = currentZoom.comments?.length || 0;
+}
+
+// ---------------------- LIKE ----------------------
+document.querySelectorAll('.like-btn').forEach(btn => btn.onclick = () => {
+  if(!currentZoom) return;
+  likeModal.style.display='flex';
+  likeBubbles.innerHTML = '';
+  currentZoom.likes.forEach(p => {
+    const b = document.createElement('div');
+    b.className='bubble';
+    b.innerHTML = `<strong>${p}</strong>`;
+    likeBubbles.appendChild(b);
+  });
+});
+document.getElementById('confirmLike').onclick = async () => {
+  const name = document.getElementById('likeName').value.trim();
+  if(!name) return;
+  currentZoom.likes.push(name);
+  await supabase.from('creations').update({likes: currentZoom.likes}).eq('id', currentZoom.id);
+  const b = document.createElement('div');
+  b.className = 'bubble';
+  b.innerHTML = `<strong>${name}</strong>`;
+  likeBubbles.appendChild(b);
+  updateActions();
+  document.getElementById('likeName').value='';
+};
+
+// ---------------------- COMMENT ----------------------
+document.querySelectorAll('.comment-btn').forEach(btn => btn.onclick = () => {
+  if(!currentZoom) return;
+  commentModal.style.display='flex';
+  commentBubbles.innerHTML='';
+  currentZoom.comments.forEach(c => {
+    const b = document.createElement('div');
+    b.className = 'bubble';
+    b.innerHTML = `<strong>${c.name}:</strong> ${c.text}`;
+    commentBubbles.appendChild(b);
+  });
+});
+document.getElementById('confirmComment').onclick = async () => {
+  const name = document.getElementById('commentName').value.trim();
+  const text = document.getElementById('commentText').value.trim();
+  if(!name || !text) return;
+  const commentObj = {name, text};
+  currentZoom.comments.push(commentObj);
+  await supabase.from('creations').update({comments: currentZoom.comments}).eq('id', currentZoom.id);
+  const b = document.createElement('div');
+  b.className = 'bubble';
+  b.innerHTML = `<strong>${name}:</strong> ${text}`;
+  commentBubbles.appendChild(b);
+  updateActions();
+  document.getElementById('commentName').value='';
+  document.getElementById('commentText').value='';
+};
+
+// ---------------------- START ----------------------
+loadCreations();
+</script>
+</body>
+</html>
+                                                                 
