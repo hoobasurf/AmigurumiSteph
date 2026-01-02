@@ -439,11 +439,37 @@ function render() {
 
     d.querySelector('img').onclick=()=>openZoom(c);
     d.querySelector('.delete-btn').onclick=()=>openDeleteModal(c);
-    d.querySelector('.like-btn').onclick=()=>openZoom(c);
-    d.querySelector('.comment-btn').onclick=()=>openZoom(c);
+
+    d.querySelector('.like-btn').onclick=()=>{
+      currentZoom = c;
+      likeModal.style.display='flex';
+      likeBubbles.innerHTML='';
+      c.likes.forEach(p=>{
+        const b=document.createElement('div');
+        b.className='bubble';
+        b.innerHTML=`<strong>${p}</strong>`;
+        likeBubbles.appendChild(b);
+      });
+      updateActions();
+    };
+
+    d.querySelector('.comment-btn').onclick=()=>{
+      currentZoom = c;
+      commentModal.style.display='flex';
+      commentBubbles.innerHTML='';
+      c.comments.forEach(cm=>{
+        const b=document.createElement('div');
+        b.className='bubble';
+        b.innerHTML=`<strong>${cm.name}:</strong> ${cm.text}`;
+        commentBubbles.appendChild(b);
+      });
+      updateActions();
+    };
 
     page.appendChild(d);
   });
+
+  fixPlaceholders(); // 🔹 garde pour enlever les "?" sur images déjà chargées
 }
 
 // ---------------------- ZOOM ----------------------
@@ -509,7 +535,8 @@ async function loadCreations(){
     likes:c.likes||[],
     comments:c.comments||[]
   }));
-  render();
+  render();           // ton render existant
+  fixPlaceholders();  // 🔹 ajoute cette ligne pour enlever les "?" sur images déjà chargées
 }
 
 // ---------------------- DELETE ----------------------
@@ -525,18 +552,22 @@ document.getElementById('confirmDelete').onclick=async()=>{
   deleteModal.style.display='none';
 };
 
-// ---------------------- LIKE ----------------------
-document.querySelector('.like-btn').onclick=()=>{
-  likeModal.style.display='flex';
-  likeBubbles.innerHTML='';
-  currentZoom.likes.forEach(p=>{
-    const b=document.createElement('div');
-    b.className='bubble';
-    b.innerHTML=`<strong>${p}</strong>`;
-    likeBubbles.appendChild(b);
+function fixPlaceholders() {
+  document.querySelectorAll('.visitor-item img').forEach(img => {
+    const placeholder = img.closest('.visitor-item').querySelector('.placeholder');
+
+    if (!placeholder) return;
+
+    if (img.complete && img.naturalWidth > 0) {
+      placeholder.style.display = 'none';
+    } else {
+      img.addEventListener('load', () => placeholder.style.display = 'none', { once: true });
+      img.addEventListener('error', () => placeholder.textContent = '?', { once: true });
+    }
   });
-};
-likeModal.onclick=e=>{if(e.target===likeModal)likeModal.style.display='none';};
+}
+  
+// ---------------------- LIKE ----------------------
 document.getElementById('confirmLike').onclick=async()=>{
   const name=document.getElementById('likeName').value.trim();
   if(!name)return;
@@ -549,17 +580,6 @@ document.getElementById('confirmLike').onclick=async()=>{
 };
 
 // ---------------------- COMMENT ----------------------
-document.querySelector('.comment-btn').onclick=()=>{
-  commentModal.style.display='flex';
-  commentBubbles.innerHTML='';
-  currentZoom.comments.forEach(c=>{
-    const b=document.createElement('div');
-    b.className='bubble';
-    b.innerHTML=`<strong>${c.name}:</strong> ${c.text}`;
-    commentBubbles.appendChild(b);
-  });
-};
-commentModal.onclick=e=>{if(e.target===commentModal)commentModal.style.display='none';};
 document.getElementById('confirmComment').onclick=async()=>{
   const name=document.getElementById('commentName').value.trim();
   const text=document.getElementById('commentText').value.trim();
