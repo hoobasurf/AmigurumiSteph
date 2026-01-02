@@ -26,6 +26,11 @@ body::before{
   position:absolute;bottom:2px;width:100%;text-align:center;
   font-weight:bold;color:#b84c6f;z-index:3
 }
+.visitor-item .placeholder{
+  position:absolute;inset:0;display:flex;
+  justify-content:center;align-items:center;
+  font-size:24px;color:#b84c6f;font-weight:bold;z-index:2;
+}
 .modal{position:fixed;inset:0;display:none;justify-content:center;align-items:center;
   background:rgba(0,0,0,.6);z-index:10001}
 .modal-box{
@@ -123,7 +128,22 @@ function render(){
     }
     const d=document.createElement('div');
     d.className='visitor-item';
-    d.innerHTML=`<p>${c.name}</p><img src="${c.imgUrl}">`;
+
+    // 🔹 ajout du placeholder “?” avant chargement de l'image
+    d.innerHTML=`<p>${c.name}</p>
+                 <div class="placeholder">?</div>
+                 <img src="${c.imgUrl}">`;
+
+    const img = d.querySelector('img');
+    const placeholder = d.querySelector('.placeholder');
+
+    if(img.complete && img.naturalWidth>0){
+      placeholder.style.display='none';
+    } else {
+      img.addEventListener('load',()=>placeholder.style.display='none',{once:true});
+      img.addEventListener('error',()=>placeholder.textContent='?',{once:true});
+    }
+
     d.onclick=()=>openZoom(c);
     page.appendChild(d);
   });
