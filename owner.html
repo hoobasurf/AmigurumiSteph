@@ -378,17 +378,20 @@ function render() {
     img.onload = () => d.querySelector('.placeholder').style.display = 'none';
     img.onerror = () => img.style.display = 'none';
 
+    // 🔹 CLIC SUR IMAGE POUR ZOOM
     img.onclick = () => openZoom(c);
+
     d.querySelector('.delete-btn').onclick = () => openDeleteModal(c);
 
     page.appendChild(d);
   });
 }
 
-/* ================= ZOOM ================= */
 function openZoom(c){
+  if (!c.zoomGroup || !c.zoomGroup.length) return; // protection
+
   currentZoom = c;
-  mainZoom.src = c.zoomGroup[0] || '';
+  mainZoom.src = c.zoomGroup[0];
 
   thumbs.innerHTML = '';
   c.zoomGroup.forEach(u => {
@@ -397,6 +400,10 @@ function openZoom(c){
     t.onclick = () => mainZoom.src = u;
     thumbs.appendChild(t);
   });
+
+  updateActions();
+  zoomModal.style.display = 'flex';
+}
 
   updateActions();
   zoomModal.style.display = 'flex';
