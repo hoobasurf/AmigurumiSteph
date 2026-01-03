@@ -613,24 +613,22 @@ document.getElementById('confirmAdd').onclick = async () => {
   const files = document.getElementById('multiPhoto').files;
   if (!name || !files.length) return;
 
-  const file = files[0];
+  const files = document.getElementById('multiPhoto').files;
+const paths = [];
+
+for (const file of files) {
   const path = `${Date.now()}_${file.name}`;
+  const { error } = await supabase.storage.from('images').upload(path, file);
+  if (!error) paths.push(path);
+}
 
-  const { error: uploadError } = await supabase.storage
-    .from('images')
-    .upload(path, file);
-
-  if (uploadError) {
-    console.error(uploadError);
-    return;
-  }
-
-  const { error } = await supabase.from('creations').insert([{
-    name,
-    image_path: path,
-    likes: [],
-    comments: []
-  }]);
+await supabase.from('creations').insert([{
+  name,
+  image_path: paths[0], // image principale
+  zoomGroup: paths,     // ✅ pour les miniatures
+  likes: [],
+  comments: []
+}]);
 
   if (error) {
     console.error(error);
@@ -657,18 +655,24 @@ async function refreshCreations() {
   }
 
   creations = data.map(c => {
-    const { data: pub } = supabase.storage
-      .from('images')
-      .getPublicUrl(c.image_path);
+  const zoomUrls = (c.zoomGroup && c.zoomGroup.length)
+    ? c.zoomGroup.map(p =>
+        supabase.storage.from('images').getPublicUrl(p).data.publicUrl
+      )
+    : [
+        supabase.storage.from('images')
+          .getPublicUrl(c.image_path).data.publicUrl
+      ];
 
-    return {
-      id: c.id,
-      name: c.name,
-      imgUrl: pub.publicUrl,
-      likes: c.likes || [],
-      comments: c.comments || []
-    };
-  });
+  return {
+    id: c.id,
+    name: c.name,
+    imgUrl: zoomUrls[0],   // image principale
+    zoomGroup: zoomUrls,   // ✅ miniatures
+    likes: c.likes || [],
+    comments: c.comments || []
+  };
+});
 
   render();
 }
