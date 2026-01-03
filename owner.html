@@ -580,6 +580,7 @@ function render() {
 }
 
 /* ================= ZOOM ================= */
+// ================= ZOOM =================
 function openZoom(c){
   currentZoom = c;
 
@@ -589,16 +590,35 @@ function openZoom(c){
   // reset miniatures
   thumbs.innerHTML = '';
 
-  // miniature basée sur l’image principale
-  const t = document.createElement('img');
-  t.src = c.imgUrl;
-  t.onclick = () => mainZoom.src = c.imgUrl;
-  thumbs.appendChild(t);
+  // on s'assure que zoomGroup existe (array des images du zoom)
+  if(!c.zoomGroup) c.zoomGroup = [c.imgUrl];
 
+  // création des miniatures
+  c.zoomGroup.forEach(u => {
+    const t = document.createElement('img');
+    t.src = u;
+    t.onclick = () => mainZoom.src = u;
+    thumbs.appendChild(t);
+  });
+
+  // update likes / comments
   updateActions();
+
+  // afficher le modal
   zoomModal.style.display = 'flex';
 }
 
+// fermer le zoom
+document.querySelector('.closeZoom').onclick = () => zoomModal.style.display = 'none';
+zoomModal.onclick = e => {
+  if(e.target === zoomModal) zoomModal.style.display = 'none';
+};
+
+// ================= ACTIONS ZOOM =================
+function updateActions(){
+  likeCount.textContent = currentZoom.likes?.length || 0;
+  commentCount.textContent = currentZoom.comments?.length || 0;
+}
 /* ================= SIDEBAR ================= */
 document.getElementById('toggleSidebar').onclick = () => {
   sidebar.classList.toggle('sidebar-open');
