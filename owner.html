@@ -583,16 +583,24 @@ function render() {
 }
 
 /* ================= ZOOM ================= */
-function openZoom(c) {
+function openZoom(c){
   currentZoom = c;
-  mainZoom.src = c.imgUrl || '';
+
+  // image principale
+  mainZoom.src = c.imgUrl;
+
+  // reset miniatures
   thumbs.innerHTML = '';
+
+  // miniature basée sur l’image principale
+  const t = document.createElement('img');
+  t.src = c.imgUrl;
+  t.onclick = () => mainZoom.src = c.imgUrl;
+  thumbs.appendChild(t);
+
+  updateActions();
   zoomModal.style.display = 'flex';
 }
-
-document.querySelector('.closeZoom').onclick = () => {
-  zoomModal.style.display = 'none';
-};
 
 /* ================= SIDEBAR ================= */
 document.getElementById('toggleSidebar').onclick = () => {
