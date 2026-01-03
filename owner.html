@@ -447,23 +447,28 @@ function render() {
 }
 
 // ---------------------- ZOOM ----------------------
-function openZoom(c){
-  currentZoom=c;
-  mainZoom.src=c.imgUrl;
-  thumbs.innerHTML='';
-  c.zoomGroup.forEach(u=>{
-    const t=document.createElement('img');
-    t.src=u;
-    t.onclick=()=>mainZoom.src=u;
+function openZoom(c) {
+  currentZoom = c;
+
+  // image principale
+  mainZoom.src = c.imgUrl;
+
+  // reset miniatures
+  thumbs.innerHTML = '';
+
+  // MINIATURES : si c.zoomGroup existe, on les affiche
+  // sinon, on met juste l'image principale
+  const miniatures = c.zoomGroup && c.zoomGroup.length ? c.zoomGroup : [c.imgUrl];
+
+  miniatures.forEach(u => {
+    const t = document.createElement('img');
+    t.src = u;
+    t.onclick = () => mainZoom.src = u;
     thumbs.appendChild(t);
   });
-  updateActions();
-  zoomModal.style.display='flex';
-}
 
-function updateActions(){
-  likeCount.textContent=currentZoom.likes?.length||0;
-  commentCount.textContent=currentZoom.comments?.length||0;
+  updateActions();
+  zoomModal.style.display = 'flex';
 }
 
 // ---------------------- EVENTS ----------------------
