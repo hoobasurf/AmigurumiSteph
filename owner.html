@@ -174,6 +174,12 @@ body::before {
   font-weight:bold;
 }
 
+#sidebar{
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+  
 /* MODAL */
 .modal {
   position:fixed; inset:0;
@@ -323,12 +329,6 @@ body::before {
   to {
     transform: translate(var(--dx), var(--dy)) scale(0);
     opacity: 0;
-  }
-  #sidebar{
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
   }
   
 </style>
