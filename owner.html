@@ -442,76 +442,39 @@ addModal.onclick = e => { if (e.target === addModal) addModal.style.display='non
 document.getElementById('addBtn').onclick = () => addModal.style.display='flex';
 
 // ---------------------- AJOUT ----------------------
-document.getElementById('addBtn').onclick = () => addModal.style.display = 'flex';
-addModal.onclick = e => { if(e.target === addModal) addModal.style.display = 'none'; };
-
 document.getElementById('confirmAdd').onclick = async () => {
   const name = document.getElementById('photoName').value.trim();
   const files = document.getElementById('multiPhoto').files;
-  if(!name || !files.length) return;
+  if (!name || !files.length) return;
 
-  const file = files[0];
-  const path = `${Date.now()}_${file.name}`;
+  const urls = [];
+  const paths = [];
 
-  const { error: uploadError } = await supabase.storage
-    .from('images')
-    .upload(path, file);
-
-  if(uploadError) {
-    console.error(uploadError);
-    return;
+  for (let f of files) {
+    const path = `${Date.now()}_${f.name}`;
+    await supabase.storage.from('images').upload(path, f);
+    urls.push(supabase.storage.from('images').getPublicUrl(path).data.publicUrl);
+    paths.push(path);
   }
 
-  const { error } = await supabase.from('creations').insert([{
+  const { data } = await supabase.from('creations')
+    .insert([{ name, image_path: paths[0], images: paths, likes: 0, comments: [] }])
+    .select();
+
+  creations.unshift({
+    id: data[0].id,
     name,
-    image_path: path,
-    likes: [],
+    imgUrl: urls[0],
+    zoomGroup: urls,
+    likes: 0,
     comments: []
-  }]);
-
-  if(error) {
-    console.error(error);
-    return;
-  }
-
-  addModal.style.display = 'none';
-  document.getElementById('photoName').value = '';
-  document.getElementById('multiPhoto').value = '';
-
-  await refreshCreations();
-};
-
-/* ================= REFRESH ================= */
-async function refreshCreations() {
-  const { data, error } = await supabase
-    .from("creations")
-    .select("*")
-    .order('created_at', { ascending: false });
-
-  if(error){
-    console.error(error);
-    return;
-  }
-
-  creations = data.map(c => {
-    const { data: pub } = supabase.storage
-      .from('images')
-      .getPublicUrl(c.image_path);
-
-    return {
-      id: c.id,
-      name: c.name,
-      imgUrl: pub.publicUrl,
-      likes: c.likes || [],
-      comments: c.comments || [],
-      zoomGroup: [pub.publicUrl]  // <-- important pour le zoom
-    };
   });
 
   render();
-}
-
-/* ==============
+  addModal.style.display='none';
+  document.getElementById('photoName').value='';
+  document.getElementById('multiPhoto').value='';
+};
 
 // ---------------------- LOAD ----------------------
 async function loadCreations() {
