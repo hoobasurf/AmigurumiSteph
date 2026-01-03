@@ -378,15 +378,17 @@ function render() {
     img.onload = () => d.querySelector('.placeholder').style.display = 'none';
     img.onerror = () => img.style.display = 'none';
 
-    // 🔹 CLIC SUR IMAGE POUR ZOOM
+    // clic sur l'image pour zoom
     img.onclick = () => openZoom(c);
 
+    // suppression
     d.querySelector('.delete-btn').onclick = () => openDeleteModal(c);
 
     page.appendChild(d);
   });
 }
 
+/* ================= ZOOM ================= */
 function openZoom(c){
   if (!c.zoomGroup || !c.zoomGroup.length) return; // protection
 
@@ -400,10 +402,6 @@ function openZoom(c){
     t.onclick = () => mainZoom.src = u;
     thumbs.appendChild(t);
   });
-
-  updateActions();
-  zoomModal.style.display = 'flex';
-}
 
   updateActions();
   zoomModal.style.display = 'flex';
@@ -424,10 +422,7 @@ document.getElementById('toggleSidebar').onclick = () => {
 };
 
 /* ================= AJOUT ================= */
-document.getElementById('addBtn').onclick = () => {
-  addModal.style.display = 'flex';
-};
-
+document.getElementById('addBtn').onclick = () => { addModal.style.display = 'flex'; };
 addModal.onclick = e => { if (e.target === addModal) addModal.style.display = 'none'; };
 
 document.getElementById('confirmAdd').onclick = async () => {
@@ -453,10 +448,8 @@ document.getElementById('confirmAdd').onclick = async () => {
   if (urls.length === 0) return;
 
   // insertion dans Supabase
-  const { data, error } = await supabase.from('creations')
-    .insert([{ name, image_path: paths[0], images: paths, likes: [], comments: [] }])
-    .select();
-
+  const { error } = await supabase.from('creations')
+    .insert([{ name, image_path: paths[0], images: paths, likes: [], comments: [] }]);
   if (error) { console.error(error); return; }
 
   // reset modal
@@ -488,7 +481,10 @@ async function refreshCreations() {
 
   creations = data.map(c => {
     const paths = c.images || [c.image_path];
-    const zoomGroup = paths.map(p => supabase.storage.from('images').getPublicUrl(p).data.publicUrl);
+    const zoomGroup = paths.map(p => {
+      const { data } = supabase.storage.from('images').getPublicUrl(p);
+      return data?.publicUrl || '';
+    });
 
     return {
       id: c.id,
