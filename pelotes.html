@@ -4,18 +4,51 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style>
-html,body{margin:0;padding:0;font-family:'Comic Sans MS',cursive;height:100%;background:#ffe6f0;transition:opacity 0.5s;}
+html,body{
+  margin:0;
+  padding:0;
+  font-family:'Comic Sans MS',cursive;
+  height:100%;
+  transition:opacity 0.5s;
+  opacity:0; /* pour fade-in */
+}
+
+/* Fond image */
+body::before {
+  content:"";
+  position:fixed;
+  top:0;
+  left:0;
+  width:100vw;
+  height:100vh;
+  background-image: url('IMG_1722.jpeg');
+  background-size: cover;
+  background-position: center center;
+  background-repeat: no-repeat;
+  z-index:-1;
+}
+
 #sidebar{
-  position:fixed; top:0; left:-220px; width:220px; height:100vh; background:rgba(255,230,240,0.2); border-right:2px solid #b67385; padding:20px; transition:left .3s; z-index:10;
+  position:fixed; top:0; left:-220px; width:220px; height:100vh;
+  background:rgba(255,230,240,0.2); border-right:2px solid #b67385;
+  padding:20px; transition:left .3s; z-index:10;
 }
 #sidebar.sidebar-open{left:0}
 #toggleSidebar{
-  position:absolute; top:50%; right:-30px; width:30px; height:60px; background:#ffb6c1; border-radius:0 12px 12px 0; display:flex; align-items:center; justify-content:center; cursor:pointer; font-weight:bold;
+  position:absolute; top:50%; right:-30px; width:30px; height:60px;
+  background:#ffb6c1; border-radius:0 12px 12px 0;
+  display:flex; align-items:center; justify-content:center; cursor:pointer; font-weight:bold;
 }
+
 #backBtn{
-  width:auto; padding:8px 16px; border-radius:16px; border:none; background:#ffb6c1; color:#fff; cursor:pointer; font-weight:bold; margin-top:10px;
+  width:auto; padding:8px 16px; border-radius:16px; border:none;
+  background:#ffb6c1; color:#fff; cursor:pointer; font-weight:bold; margin-top:10px;
 }
-.center-zone{display:flex;justify-content:center;align-items:center;height:100vh;font-size:2rem;color:#b84c6f;}
+
+.center-zone{
+  display:flex; justify-content:center; align-items:center;
+  height:100vh; font-size:2rem; color:#b84c6f; text-shadow: 1px 1px 2px rgba(255,255,255,0.8);
+}
 </style>
 </head>
 <body>
@@ -30,20 +63,19 @@ html,body{margin:0;padding:0;font-family:'Comic Sans MS',cursive;height:100%;bac
 </div>
 
 <script>
+// Fade-in au chargement
+window.onload = () => { document.body.style.opacity = '1'; };
+
 // Bouton Retour avec fondu
 document.getElementById('backBtn').onclick = () => {
   document.body.style.opacity = '0';
-  setTimeout(() => {
-    window.location.href = 'owner.html';
-  }, 500);
+  setTimeout(() => { window.location.href = 'owner.html'; }, 500);
 };
 
+// Sidebar toggle
 document.getElementById('toggleSidebar').onclick = () => {
   document.getElementById('sidebar').classList.toggle('sidebar-open');
 };
-
-// Fade-in à l'ouverture
-window.onload = () => { document.body.style.opacity = '1'; };
 </script>
 
 </body>
