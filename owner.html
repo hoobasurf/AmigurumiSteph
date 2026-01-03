@@ -572,13 +572,10 @@ document.getElementById('confirmDelete').onclick = async () => {
 };
 
 // ================== AJOUT ==================
-document.getElementById('addBtn').onclick = () => addModal.style.display = 'flex';
-addModal.onclick = e => { if(e.target === addModal) addModal.style.display = 'none'; };
-
 document.getElementById('confirmAdd').onclick = async () => {
   const name = document.getElementById('photoName').value.trim();
   const files = document.getElementById('multiPhoto').files;
-  if (!name || !files.length) return;
+  if (!name || !files.length) return alert("Veuillez mettre un nom et sélectionner au moins une photo");
 
   const paths = [];
   const urls = [];
@@ -587,13 +584,18 @@ document.getElementById('confirmAdd').onclick = async () => {
     const path = `${Date.now()}_${file.name}`;
     const { error: uploadError } = await supabase.storage.from('images').upload(path, file);
     if (uploadError) { console.error(uploadError); continue; }
-    const { data: pub } = supabase.storage.from('images').getPublicUrl(path);
-    urls.push(pub.publicUrl);
+
+    // Correction ici : récupérer l'URL publique correctement
+    const { data: pubData, error: pubError } = supabase.storage.from('images').getPublicUrl(path);
+    if (pubError || !pubData?.publicUrl) { console.error(pubError); continue; }
+
+    urls.push(pubData.publicUrl);
     paths.push(path);
   }
 
-  if (urls.length === 0) return;
+  if (urls.length === 0) return alert("Aucune photo n'a pu être ajoutée");
 
+  // Insérer dans Supabase
   const { data, error } = await supabase.from('creations').insert([{
     name,
     image_path: paths[0],
@@ -602,7 +604,7 @@ document.getElementById('confirmAdd').onclick = async () => {
     comments: []
   }]).select();
 
-  if (error) { console.error(error); return; }
+  if (error) { console.error(error); return alert("Erreur lors de l'ajout du projet"); }
 
   addModal.style.display = 'none';
   document.getElementById('photoName').value = '';
