@@ -588,17 +588,9 @@ function render() {
 // ================= ZOOM =================
 function openZoom(c){
   currentZoom = c;
-
-  // image principale
-  mainZoom.src = c.imgUrl;
-
-  // reset miniatures
+  mainZoom.src = c.zoomGroup[0];  // image principale
   thumbs.innerHTML = '';
-
-  // on s'assure que zoomGroup existe (array des images du zoom)
-  if(!c.zoomGroup) c.zoomGroup = [c.imgUrl];
-
-  // création des miniatures
+  
   c.zoomGroup.forEach(u => {
     const t = document.createElement('img');
     t.src = u;
@@ -606,10 +598,7 @@ function openZoom(c){
     thumbs.appendChild(t);
   });
 
-  // update likes / comments
   updateActions();
-
-  // afficher le modal
   zoomModal.style.display = 'flex';
 }
 
