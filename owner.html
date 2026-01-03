@@ -482,6 +482,7 @@ document.getElementById('confirmAdd').onclick = async () => {
   const paths = [];
   const urls = [];
 
+  // Upload des fichiers
   for (let file of files) {
     const path = `${Date.now()}_${file.name}`;
     const { error: uploadError } = await supabase.storage.from('images').upload(path, file);
@@ -493,21 +494,33 @@ document.getElementById('confirmAdd').onclick = async () => {
 
   if (urls.length === 0) return;
 
-  const { error } = await supabase.from('creations').insert([{
+  // Création immédiate dans le tableau local
+  const newProject = {
+    id: Date.now(),           // temporaire avant que Supabase renvoie l'id
     name,
-    image_path: paths[0],  // image principale
-    images: paths,          // toutes les images
+    imgUrl: urls[0],          // miniature principale
+    zoomGroup: urls,          // toutes les images
     likes: [],
     comments: []
-  }]);
+  };
 
-  if (error) { console.error(error); return; }
+  creations.unshift(newProject); // ajout en début de liste
+  render();                     // mise à jour immédiate de la grille
 
+  // Reset modal
   addModal.style.display = 'none';
   document.getElementById('photoName').value = '';
   document.getElementById('multiPhoto').value = '';
 
-  await refreshCreations();
+  // Insert dans Supabase
+  const { error } = await supabase.from('creations').insert([{
+    name,
+    image_path: paths[0],
+    images: paths,
+    likes: [],
+    comments: []
+  }]);
+  if (error) console.error(error);
 };
 
 // ================== REFRESH ==================
