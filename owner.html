@@ -358,32 +358,21 @@ function openDeleteModal(c) {
 // ---------------------- LIKE ----------------------
 function openLikeModal(c) {
   if (!c) return;
-
-  if (typeof c.likes !== 'number') c.likes = 0;
+  if (!c.likes) c.likes = 0;
   c.likes++;
-
-  supabase
-    .from('creations')
-    .update({ likes: c.likes })
-    .eq('id', c.id);
-
+  // update Supabase
+  supabase.from('creations').update({ likes: c.likes }).eq('id', c.id);
   render();
 }
+
 // ---------------------- COMMENTAIRE ----------------------
 function openCommentModal(c) {
   if (!c) return;
-
   const comment = prompt("Ajouter un commentaire :");
   if (!comment) return;
-
-  if (!Array.isArray(c.comments)) c.comments = [];
+  if (!c.comments) c.comments = [];
   c.comments.push(comment);
-
-  supabase
-    .from('creations')
-    .update({ comments: c.comments })
-    .eq('id', c.id);
-
+  supabase.from('creations').update({ comments: c.comments }).eq('id', c.id);
   render();
 }
 
@@ -422,8 +411,7 @@ function openZoom(c) {
   currentZoom = c;
   mainZoom.src = c.imgUrl;
   thumbs.innerHTML = '';
-
-  if (c.zoomGroup && c.zoomGroup.length) {
+  if (c.zoomGroup) {
     c.zoomGroup.forEach(u => {
       const t = document.createElement('img');
       t.src = u;
@@ -431,7 +419,6 @@ function openZoom(c) {
       thumbs.appendChild(t);
     });
   }
-
   zoomModal.style.display = 'flex';
 }
 
@@ -451,50 +438,19 @@ document.getElementById('confirmAdd').onclick = async () => {
   const paths = [];
 
   for (let f of files) {
-    const path = `${Date.now()}_${Math.random()}_${f.name}`;
-
-    const { error: uploadError } = await supabase
-      .storage
-      .from('images')
-      .upload(path, f);
-
-    if (uploadError) {
-      alert("Erreur upload image");
-      console.error(uploadError);
-      return;
-    }
-
-    const { data: pub } = supabase
-      .storage
-      .from('images')
-      .getPublicUrl(path);
-
-    urls.push(pub.publicUrl);
+    const path = `${Date.now()}_${f.name}`;
+    await supabase.storage.from('images').upload(path, f);
+    urls.push(supabase.storage.from('images').getPublicUrl(path).data.publicUrl);
     paths.push(path);
   }
 
-  const { data, error } = await supabase
-    .from('creations')
-    .insert([{
-      name,
-      image_path: paths[0],
-      images: paths,
-      likes: 0,
-      comments: []
-    }])
-    .select()
-    .single();
+  const { data } = await supabase.from('creations')
+    .insert([{ name, image_path: paths[0], images: paths, likes: 0, comments: [] }])
+    .select();
 
-  if (error || !data) {
-    alert("Erreur création");
-    console.error(error);
-    return;
-  }
-
-  // 🔥 AJOUT LOCAL IMMÉDIAT (clé du bug)
   creations.unshift({
-    id: data.id,
-    name: data.name,
+    id: data[0].id,
+    name,
     imgUrl: urls[0],
     zoomGroup: urls,
     likes: 0,
@@ -502,11 +458,11 @@ document.getElementById('confirmAdd').onclick = async () => {
   });
 
   render();
-
-  addModal.style.display = 'none';
-  document.getElementById('photoName').value = '';
-  document.getElementById('multiPhoto').value = '';
+  addModal.style.display='none';
+  document.getElementById('photoName').value='';
+  document.getElementById('multiPhoto').value='';
 };
+
 // ---------------------- LOAD ----------------------
 async function loadCreations() {
   const { data } = await supabase.from("creations").select("*").order("created_at",{ascending:false});
