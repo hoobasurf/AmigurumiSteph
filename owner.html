@@ -472,7 +472,84 @@ function updateActions(){
 document.querySelector('.closeZoom').onclick = () => zoomModal.style.display = 'none';
 zoomModal.onclick = e => { if(e.target === zoomModal) zoomModal.style.display = 'none'; };
 document.getElementById('toggleSidebar').onclick = () => sidebar.classList.toggle('sidebar-open');
+// ================= LIKE / COMMENT =================
 
+// Bouton like dans zoom
+document.querySelector('.like-btn').onclick = async () => {
+  if (!currentZoom) return;
+
+  // Ajouter un like fictif (tu peux demander le prénom si besoin)
+  const newLike = "❤️"; 
+
+  // Mettre à jour localement
+  if (!currentZoom.likes) currentZoom.likes = [];
+  currentZoom.likes.push(newLike);
+
+  // Mettre à jour Supabase
+  const { error } = await supabase
+    .from('creations')
+    .update({ likes: currentZoom.likes })
+    .eq('id', currentZoom.id);
+  if (error) { console.error(error); return; }
+
+  // Mettre à jour le compteur
+  updateActions();
+};
+
+// Bouton commentaire dans zoom
+document.querySelector('.comment-btn').onclick = () => {
+  if (!currentZoom) return;
+  document.getElementById('commentModal').style.display = 'flex';
+  document.getElementById('commentName').value = '';
+  document.getElementById('commentText').value = '';
+  // Afficher les commentaires existants
+  const commentBubbles = document.getElementById('commentBubbles');
+  commentBubbles.innerHTML = '';
+  currentZoom.comments.forEach(c => {
+    const b = document.createElement('div');
+    b.className = 'bubble';
+    b.textContent = `${c.name}: ${c.text}`;
+    commentBubbles.appendChild(b);
+  });
+};
+
+// Valider commentaire
+document.getElementById('confirmComment').onclick = async () => {
+  const name = document.getElementById('commentName').value.trim();
+  const text = document.getElementById('commentText').value.trim();
+  if (!name || !text || !currentZoom) return;
+
+  const newComment = { name, text };
+  if (!currentZoom.comments) currentZoom.comments = [];
+  currentZoom.comments.push(newComment);
+
+  // Mettre à jour Supabase
+  const { error } = await supabase
+    .from('creations')
+    .update({ comments: currentZoom.comments })
+    .eq('id', currentZoom.id);
+  if (error) { console.error(error); return; }
+
+  // Rafraîchir l'affichage des bulles et compteur
+  const commentBubbles = document.getElementById('commentBubbles');
+  const b = document.createElement('div');
+  b.className = 'bubble';
+  b.textContent = `${name}: ${text}`;
+  commentBubbles.appendChild(b);
+
+  document.getElementById('commentName').value = '';
+  document.getElementById('commentText').value = '';
+
+  updateActions();
+  document.getElementById('commentModal').style.display = 'none';
+};
+
+// Fermer modal commentaire si clic à l'extérieur
+document.getElementById('commentModal').onclick = e => {
+  if (e.target === document.getElementById('commentModal')) {
+    document.getElementById('commentModal').style.display = 'none';
+  }
+};
 // ================= DELETE =================
 function openDeleteModal(project) {
   currentDelete = project;
