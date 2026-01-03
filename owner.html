@@ -638,14 +638,14 @@ async function refreshCreations() {
 // Création du bouton
 const pelotesBtn = document.createElement('button');
 pelotesBtn.textContent = "Pelotes";
-document.getElementById('sidebar').appendChild(pelotesBtn);
 
-// Changer le fond d'écran au clic
+// Insérer le bouton juste après le bouton Ajouter
+const addBtn = document.getElementById('addBtn');
+addBtn.insertAdjacentElement('afterend', pelotesBtn);
+
+// Cliquer sur Pelotes => ouvrir nouvelle page avec l'image
 pelotesBtn.onclick = () => {
-  document.body.style.backgroundImage = "url('CF0690A1-F02D-4E49-9CC7-2C0F0C12F062.png')";
-  document.body.style.backgroundSize = "cover";
-  document.body.style.backgroundPosition = "center center";
-  document.body.style.backgroundRepeat = "no-repeat";
+  window.open('CF0690A1-F02D-4E49-9CC7-2C0F0C12F062.png', '_blank');
 };
   
 // ================== EVENTS ==================
