@@ -644,26 +644,51 @@ document.getElementById('confirmAdd').onclick = async () => {
 };
 
 // ================== REFRESH ==================
+// ================== REFRESH ==================
 async function refreshCreations() {
-  const { data, error } = await supabase.from('creations').select('*').order('created_at', { ascending: false });
-  if (error) { console.error(error); return; }
+  try {
+    // Récupérer toutes les créations depuis Supabase
+    const { data, error } = await supabase
+      .from('creations')
+      .select('*')
+      .order('created_at', { ascending: false });
 
-  creations = data.map(c => {
-    const zoomGroup = (c.images && c.images.length) ? 
-      c.images.map(p => supabase.storage.from('images').getPublicUrl(p).data.publicUrl)
-      : [supabase.storage.from('images').getPublicUrl(c.image_path).data.publicUrl];
+    if (error) {
+      console.error('Erreur Supabase:', error);
+      return;
+    }
 
-    return {
-      id: c.id,
-      name: c.name,
-      imgUrl: zoomGroup[0],
-      zoomGroup,
-      likes: c.likes || [],
-      comments: c.comments || []
-    };
-  });
+    // Transformer les données pour l'affichage
+    creations = data.map(c => {
+      let zoomGroup = [];
 
-  render();
+      if (c.images && c.images.length > 0) {
+        // Récupérer les URLs publiques de chaque image
+        zoomGroup = c.images.map(p => {
+          const { data: pub } = supabase.storage.from('images').getPublicUrl(p);
+          return pub?.publicUrl || '';
+        }).filter(url => url); // filtrer les URLs invalides
+      } else if (c.image_path) {
+        // Cas où il n'y a qu'une seule image
+        const { data: pub } = supabase.storage.from('images').getPublicUrl(c.image_path);
+        if (pub?.publicUrl) zoomGroup.push(pub.publicUrl);
+      }
+
+      return {
+        id: c.id,
+        name: c.name,
+        imgUrl: zoomGroup[0] || '', // première image comme card principale
+        zoomGroup: zoomGroup,
+        likes: c.likes || [],
+        comments: c.comments || []
+      };
+    });
+
+    // Appeler le render pour mettre à jour l'affichage
+    render();
+  } catch (err) {
+    console.error('Erreur lors du rafraîchissement des créations:', err);
+  }
 }
 
 // ================== BOUTON PELOTES ==================
