@@ -573,20 +573,14 @@ document.getElementById('confirmDelete').onclick = async () => {
 
 // ================== AJOUT ==================
 // Ouvrir modal Ajouter
-const addBtn = document.getElementById('addBtn');
-addBtn.onclick = () => addModal.style.display = 'flex';
-
-// Fermer modal si clic en dehors
-addModal.onclick = (e) => {
-  if (e.target === addModal) addModal.style.display = 'none';
-};
-
-// Valider ajout
 document.getElementById('confirmAdd').onclick = async () => {
   const name = document.getElementById('photoName').value.trim();
   const files = document.getElementById('multiPhoto').files;
 
-  if (!name || !files.length) return alert("Veuillez mettre un nom et sélectionner au moins une photo");
+  if (!name || !files.length) {
+    alert("Veuillez mettre un nom et sélectionner au moins une photo");
+    return;
+  }
 
   const paths = [];
   const urls = [];
@@ -594,17 +588,25 @@ document.getElementById('confirmAdd').onclick = async () => {
   for (let file of files) {
     const path = `${Date.now()}_${file.name}`;
     const { error: uploadError } = await supabase.storage.from('images').upload(path, file);
-    if (uploadError) { console.error(uploadError); continue; }
+    if (uploadError) {
+      console.error(uploadError);
+      alert("Erreur lors de l'upload d'une photo");
+      continue;
+    }
 
     const { data: pubData } = supabase.storage.from('images').getPublicUrl(path);
-    if (!pubData?.publicUrl) continue;
+    if (!pubData || !pubData.publicUrl) continue;
 
     urls.push(pubData.publicUrl);
     paths.push(path);
   }
 
-  if (urls.length === 0) return alert("Aucune photo n'a pu être ajoutée");
+  if (urls.length === 0) {
+    alert("Aucune photo n'a pu être ajoutée");
+    return;
+  }
 
+  // On crée le projet dans la table
   const { data, error } = await supabase.from('creations').insert([{
     name,
     image_path: paths[0],
@@ -613,14 +615,18 @@ document.getElementById('confirmAdd').onclick = async () => {
     comments: []
   }]).select();
 
-  if (error) { console.error(error); return alert("Erreur lors de l'ajout du projet"); }
+  if (error) {
+    console.error(error);
+    alert("Erreur lors de l'ajout du projet");
+    return;
+  }
 
-  // Réinitialiser le formulaire
+  // On ferme et réinitialise la modal
   addModal.style.display = 'none';
   document.getElementById('photoName').value = '';
   document.getElementById('multiPhoto').value = '';
 
-  await refreshCreations();
+  await refreshCreations(); // Met à jour l'affichage
 };
 
 // ================== REFRESH ==================
