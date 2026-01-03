@@ -4,64 +4,21 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style>
-*{box-sizing:border-box;margin:0;padding:0;}
-html,body{height:100%;font-family:'Comic Sans MS',cursive;overflow-x:hidden;}
-
-/* SIDEBAR */
+html,body{margin:0;padding:0;font-family:'Comic Sans MS',cursive;height:100%;background:#ffe6f0;transition:opacity 0.5s;}
 #sidebar{
-  position:fixed;
-  top:0;
-  left:-220px;
-  width:220px;
-  height:100vh;
-  background:rgba(255,230,240,0.2);
-  border-right:2px solid #b67385;
-  padding:20px;
-  transition:left .3s;
-  z-index:10;
+  position:fixed; top:0; left:-220px; width:220px; height:100vh; background:rgba(255,230,240,0.2); border-right:2px solid #b67385; padding:20px; transition:left .3s; z-index:10;
 }
 #sidebar.sidebar-open{left:0}
 #toggleSidebar{
-  position:absolute;
-  top:50%;
-  right:-30px;
-  width:30px;
-  height:60px;
-  background:#ffb6c1;
-  border-radius:0 12px 12px 0;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  cursor:pointer;
-  font-weight:bold;
+  position:absolute; top:50%; right:-30px; width:30px; height:60px; background:#ffb6c1; border-radius:0 12px 12px 0; display:flex; align-items:center; justify-content:center; cursor:pointer; font-weight:bold;
 }
-
-/* BOUTON RETOUR */
-#backBtn {
-  width:auto;
-  padding:8px 16px;
-  border-radius:16px;
-  border:none;
-  background:#ffb6c1;
-  color:#fff;
-  cursor:pointer;
-  font-weight:bold;
-  margin-top:10px;
+#backBtn{
+  width:auto; padding:8px 16px; border-radius:16px; border:none; background:#ffb6c1; color:#fff; cursor:pointer; font-weight:bold; margin-top:10px;
 }
-
-/* FONDU */
-.fade-out {
-  animation: fadeOut 0.5s forwards;
-}
-.fade-in {
-  animation: fadeIn 0.5s forwards;
-}
-@keyframes fadeOut { to { opacity:0; } }
-@keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
-
+.center-zone{display:flex;justify-content:center;align-items:center;height:100vh;font-size:2rem;color:#b84c6f;}
 </style>
 </head>
-<body class="fade-in">
+<body>
 
 <div id="sidebar">
   <div id="toggleSidebar">☰</div>
@@ -69,12 +26,13 @@ html,body{height:100%;font-family:'Comic Sans MS',cursive;overflow-x:hidden;}
 </div>
 
 <div class="center-zone">
-  <h2>Page Pelotes</h2>
+  Page Pelotes
 </div>
 
 <script>
+// Bouton Retour avec fondu
 document.getElementById('backBtn').onclick = () => {
-  document.body.classList.add('fade-out');
+  document.body.style.opacity = '0';
   setTimeout(() => {
     window.location.href = 'owner.html';
   }, 500);
@@ -83,6 +41,9 @@ document.getElementById('backBtn').onclick = () => {
 document.getElementById('toggleSidebar').onclick = () => {
   document.getElementById('sidebar').classList.toggle('sidebar-open');
 };
+
+// Fade-in à l'ouverture
+window.onload = () => { document.body.style.opacity = '1'; };
 </script>
 
 </body>
