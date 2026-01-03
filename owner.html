@@ -358,21 +358,32 @@ function openDeleteModal(c) {
 // ---------------------- LIKE ----------------------
 function openLikeModal(c) {
   if (!c) return;
-  if (!c.likes) c.likes = 0;
+
+  if (typeof c.likes !== 'number') c.likes = 0;
   c.likes++;
-  // update Supabase
-  supabase.from('creations').update({ likes: c.likes }).eq('id', c.id);
+
+  supabase
+    .from('creations')
+    .update({ likes: c.likes })
+    .eq('id', c.id);
+
   render();
 }
-
 // ---------------------- COMMENTAIRE ----------------------
 function openCommentModal(c) {
   if (!c) return;
+
   const comment = prompt("Ajouter un commentaire :");
   if (!comment) return;
-  if (!c.comments) c.comments = [];
+
+  if (!Array.isArray(c.comments)) c.comments = [];
   c.comments.push(comment);
-  supabase.from('creations').update({ comments: c.comments }).eq('id', c.id);
+
+  supabase
+    .from('creations')
+    .update({ comments: c.comments })
+    .eq('id', c.id);
+
   render();
 }
 
@@ -411,7 +422,8 @@ function openZoom(c) {
   currentZoom = c;
   mainZoom.src = c.imgUrl;
   thumbs.innerHTML = '';
-  if (c.zoomGroup) {
+
+  if (c.zoomGroup && c.zoomGroup.length) {
     c.zoomGroup.forEach(u => {
       const t = document.createElement('img');
       t.src = u;
@@ -419,6 +431,7 @@ function openZoom(c) {
       thumbs.appendChild(t);
     });
   }
+
   zoomModal.style.display = 'flex';
 }
 
