@@ -371,7 +371,7 @@ function render() {
       <div class="placeholder">?</div>
       <div class="delete-btn">×</div>
       <p>${c.name}</p>
-      <img src="${c.imgUrl || ''}">
+      <img src="${c.zoomGroup[0] || ''}">
     `;
 
     const img = d.querySelector('img');
@@ -388,10 +388,9 @@ function render() {
 /* ================= ZOOM ================= */
 function openZoom(c){
   currentZoom = c;
-  mainZoom.src = c.imgUrl;
+  mainZoom.src = c.zoomGroup[0] || '';
 
   thumbs.innerHTML = '';
-  if(!c.zoomGroup) c.zoomGroup = [c.imgUrl];
   c.zoomGroup.forEach(u => {
     const t = document.createElement('img');
     t.src = u;
@@ -429,19 +428,28 @@ document.getElementById('confirmAdd').onclick = async () => {
   const files = document.getElementById('multiPhoto').files;
   if (!name || !files.length) return;
 
-  const file = files[0];
-  const path = `${Date.now()}_${file.name}`;
+  const urls = [];
+  const paths = [];
 
-  // upload vers Supabase Storage
-  const { error: uploadError } = await supabase.storage
-    .from('images')
-    .upload(path, file);
-  if (uploadError) { console.error(uploadError); return; }
+  // upload toutes les images
+  for (let file of files) {
+    const path = `${Date.now()}_${file.name}`;
+    const { error: uploadError } = await supabase.storage
+      .from('images')
+      .upload(path, file);
+    if (uploadError) { console.error(uploadError); continue; }
+    const { data: pub } = supabase.storage.from('images').getPublicUrl(path);
+    urls.push(pub.publicUrl);
+    paths.push(path);
+  }
 
-  // insertion dans la table
+  if (urls.length === 0) return;
+
+  // insertion dans Supabase
   const { data, error } = await supabase.from('creations')
-    .insert([{ name, image_path: path, likes: [], comments: [] }])
+    .insert([{ name, image_path: paths[0], images: paths, likes: [], comments: [] }])
     .select();
+
   if (error) { console.error(error); return; }
 
   // reset modal
@@ -449,7 +457,7 @@ document.getElementById('confirmAdd').onclick = async () => {
   document.getElementById('photoName').value = '';
   document.getElementById('multiPhoto').value = '';
 
-  // rafraîchir les créations pour mettre à jour la grille
+  // rafraîchir la grille
   await refreshCreations();
 };
 
@@ -472,12 +480,14 @@ async function refreshCreations() {
   if (error) { console.error(error); return; }
 
   creations = data.map(c => {
-    const { data: pub } = supabase.storage.from('images').getPublicUrl(c.image_path);
+    const paths = c.images || [c.image_path];
+    const zoomGroup = paths.map(p => supabase.storage.from('images').getPublicUrl(p).data.publicUrl);
+
     return {
       id: c.id,
       name: c.name,
-      imgUrl: pub?.publicUrl || '',
-      zoomGroup: [pub?.publicUrl || ''],
+      imgUrl: zoomGroup[0],
+      zoomGroup,
       likes: c.likes || [],
       comments: c.comments || []
     };
