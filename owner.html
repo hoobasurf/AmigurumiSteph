@@ -412,7 +412,7 @@ const thumbs = document.getElementById('thumbs');
 const likeCount = document.getElementById('likeCount');
 const commentCount = document.getElementById('commentCount');
 
-/* ================= RENDER ================= */
+// ================= RENDER =================
 function render() {
   container.innerHTML = '';
   let page = null;
@@ -438,18 +438,14 @@ function render() {
     img.onerror = () => img.style.display = 'none';
     img.onclick = () => openZoom(c);
 
-    // SUPPRESSION : ouvre le modal et garde l'objet exact
-    d.querySelector('.delete-btn').onclick = () => {
-      const projectToDelete = creations.find(item => item.id === c.id);
-      openDeleteModal(projectToDelete);
-    };
+    d.querySelector('.delete-btn').onclick = () => openDeleteModal(c);
 
     page.appendChild(d);
   });
 }
 
-/* ================= ZOOM ================= */
-function openZoom(c) {
+// ================= ZOOM =================
+function openZoom(c){
   currentZoom = c;
   mainZoom.src = c.imgUrl;
   thumbs.innerHTML = '';
@@ -467,45 +463,41 @@ function openZoom(c) {
   zoomModal.style.display = 'flex';
 }
 
-function updateActions() {
+function updateActions(){
   likeCount.textContent = currentZoom.likes?.length || 0;
   commentCount.textContent = currentZoom.comments?.length || 0;
 }
 
-/* ================= EVENTS ================= */
+// ================= EVENTS =================
 document.querySelector('.closeZoom').onclick = () => zoomModal.style.display = 'none';
 zoomModal.onclick = e => { if(e.target === zoomModal) zoomModal.style.display = 'none'; };
 document.getElementById('toggleSidebar').onclick = () => sidebar.classList.toggle('sidebar-open');
 
-/* ================= DELETE ================= */
+// ================= DELETE =================
 function openDeleteModal(project) {
   currentDelete = project;
   deleteModal.style.display = 'flex';
 }
 
-// Annuler
 document.getElementById('cancelDelete').onclick = () => {
   currentDelete = null;
   deleteModal.style.display = 'none';
 };
 
-// Confirmer suppression
 document.getElementById('confirmDelete').onclick = async () => {
-  if (!currentDelete) return;
+  if (!currentDelete || !currentDelete.id) return;
 
-  // Supprimer depuis Supabase
+  // Supprimer dans Supabase
   const { error } = await supabase.from('creations').delete().eq('id', currentDelete.id);
-  if (error) console.error(error);
+  if (error) { console.error(error); return; }
 
-  // Supprimer localement
-  creations = creations.filter(c => c.id !== currentDelete.id);
-  render();
+  // Rafraîchir les créations locales
+  await refreshCreations();
 
   deleteModal.style.display = 'none';
   currentDelete = null;
 };
 
-// Fermer le modal si clic en dehors
 deleteModal.onclick = e => {
   if (e.target === deleteModal) {
     deleteModal.style.display = 'none';
@@ -513,7 +505,7 @@ deleteModal.onclick = e => {
   }
 };
 
-/* ================= AJOUT ================= */
+// ================= AJOUT =================
 document.getElementById('addBtn').onclick = () => addModal.style.display = 'flex';
 addModal.onclick = e => { if(e.target === addModal) addModal.style.display = 'none'; };
 
@@ -525,7 +517,6 @@ document.getElementById('confirmAdd').onclick = async () => {
   const paths = [];
   const urls = [];
 
-  // Upload des fichiers
   for (let file of files) {
     const path = `${Date.now()}_${file.name}`;
     const { error: uploadError } = await supabase.storage.from('images').upload(path, file);
@@ -537,49 +528,34 @@ document.getElementById('confirmAdd').onclick = async () => {
 
   if (urls.length === 0) return;
 
-  // Création locale immédiate
-  const newProject = {
-    id: Date.now(), // temporaire
-    name,
-    imgUrl: urls[0],
-    zoomGroup: urls,
-    likes: [],
-    comments: []
-  };
-
-  creations.unshift(newProject);
-  render();
-
-  addModal.style.display = 'none';
-  document.getElementById('photoName').value = '';
-  document.getElementById('multiPhoto').value = '';
-
-  // Insert dans Supabase
-  const { error } = await supabase.from('creations').insert([{
+  // Insérer dans Supabase et récupérer l'ID réel
+  const { data, error } = await supabase.from('creations').insert([{
     name,
     image_path: paths[0],
     images: paths,
     likes: [],
     comments: []
-  }]);
-  if (error) console.error(error);
+  }]).select();
 
-  // Rafraîchissement pour récupérer ID réel
+  if (error) { console.error(error); return; }
+
+  // Reset modal
+  addModal.style.display = 'none';
+  document.getElementById('photoName').value = '';
+  document.getElementById('multiPhoto').value = '';
+
+  // Rafraîchir pour récupérer ID réel
   await refreshCreations();
 };
 
-/* ================= REFRESH ================= */
+// ================= REFRESH =================
 async function refreshCreations() {
-  const { data, error } = await supabase
-    .from('creations')
-    .select('*')
-    .order('created_at', { ascending: false });
-
+  const { data, error } = await supabase.from('creations').select('*').order('created_at', { ascending: false });
   if (error) { console.error(error); return; }
 
   creations = data.map(c => {
     const zoomGroup = (c.images && c.images.length) ? 
-      c.images.map(p => supabase.storage.from('images').getPublicUrl(p).data.publicUrl)
+      c.images.map(p => supabase.storage.from('images').getPublicUrl(p).data.publicUrl) 
       : [supabase.storage.from('images').getPublicUrl(c.image_path).data.publicUrl];
 
     return {
@@ -595,7 +571,7 @@ async function refreshCreations() {
   render();
 }
 
-/* ================= START ================= */
+// ================= START =================
 refreshCreations();
 </script>
 </body>
