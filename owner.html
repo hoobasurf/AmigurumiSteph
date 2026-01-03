@@ -634,17 +634,17 @@ async function refreshCreations() {
   render();
 }
 
-// Création du bouton Pelotes
+// ================== BOUTON PELOTES ==================
 const pelotesBtn = document.createElement('button');
 pelotesBtn.textContent = "Pelotes";
 
-// Insérer le bouton juste après le bouton Ajouter
-const addBtn = document.getElementById('addBtn');
-addBtn.insertAdjacentElement('afterend', pelotesBtn);
+// juste sous le bouton Ajouter
+document.getElementById('addBtn')
+  .insertAdjacentElement('afterend', pelotesBtn);
 
-// Cliquer sur Pelotes => ouvrir nouvelle page avec l'image
+// redirection vers la page pelotes
 pelotesBtn.onclick = () => {
-  window.open('DA8DA417-8810-42B5-BBE2-479FDD0D49A4.png', '_blank');
+  window.location.href = 'pelotes.html';
 };
   
 // ================== EVENTS ==================
