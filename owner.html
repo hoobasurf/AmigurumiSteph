@@ -442,65 +442,38 @@ addModal.onclick = e => { if (e.target === addModal) addModal.style.display='non
 document.getElementById('addBtn').onclick = () => addModal.style.display='flex';
 
 // ---------------------- AJOUT ----------------------
+document.getElementById('addBtn').onclick = () => {
+  addModal.style.display = 'flex'; // ouvre le modal
+};
+
+addModal.onclick = e => {
+  if (e.target === addModal) addModal.style.display = 'none'; // clique en dehors ferme le modal
+};
+
 document.getElementById('confirmAdd').onclick = async () => {
   const name = document.getElementById('photoName').value.trim();
   const files = document.getElementById('multiPhoto').files;
   if (!name || !files.length) return;
 
-  const urls = [];
-  const paths = [];
+  const file = files[0];
+  const path = `${Date.now()}_${file.name}`;
 
-  for (let f of files) {
-    const path = `${Date.now()}_${Math.random()}_${f.name}`;
+  const { error: uploadError } = await supabase.storage
+    .from('images')
+    .upload(path, file);
+  if (uploadError) { console.error(uploadError); return; }
 
-    // Upload
-    const { error: uploadError } = await supabase.storage.from('images').upload(path, f);
-    if (uploadError) {
-      alert("Erreur upload image");
-      console.error(uploadError);
-      return;
-    }
+  const { error } = await supabase.from('creations')
+    .insert([{ name, image_path: path, likes: [], comments: [] }]);
+  if (error) { console.error(error); return; }
 
-    // Public URL
-    const { data: pub, error: urlError } = supabase.storage.from('images').getPublicUrl(path);
-    if (urlError || !pub?.publicUrl) {
-      alert("Erreur récupération URL");
-      console.error(urlError);
-      return;
-    }
-
-    urls.push(pub.publicUrl);
-    paths.push(path);
-  }
-
-  // Création dans Supabase
-  const { data, error } = await supabase.from('creations')
-    .insert([{ name, image_path: paths[0], images: paths, likes: 0, comments: [] }])
-    .select()
-    .single(); // important : pour récupérer un seul objet
-
-  if (error || !data) {
-    alert("Erreur création");
-    console.error(error);
-    return;
-  }
-
-  // Ajout local immédiat
-  creations.unshift({
-    id: data.id,
-    name: data.name,
-    imgUrl: urls[0],
-    zoomGroup: urls,
-    likes: 0,
-    comments: []
-  });
-
-  render();
-
-  // Reset modal
+  // reset modal
   addModal.style.display = 'none';
   document.getElementById('photoName').value = '';
   document.getElementById('multiPhoto').value = '';
+
+  // rafraîchir les créations pour mettre à jour la grille
+  await refreshCreations();
 };
 
 // ---------------------- LOAD ----------------------
