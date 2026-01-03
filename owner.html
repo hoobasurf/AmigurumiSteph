@@ -406,13 +406,21 @@ const addModal = document.getElementById('addModal');
 const deleteModal = document.getElementById('deleteModal');
 const zoomModal = document.getElementById('zoomModal');
 const sidebar = document.getElementById('sidebar');
-
 const mainZoom = document.getElementById('mainZoom');
 const thumbs = document.getElementById('thumbs');
 const likeCount = document.getElementById('likeCount');
 const commentCount = document.getElementById('commentCount');
 
-// ================= RENDER =================
+// Modals like/comment
+const likeModal = document.getElementById('likeModal');
+const likeBubbles = document.getElementById('likeBubbles');
+const confirmLike = document.getElementById('confirmLike');
+const likeNameInput = document.getElementById('likeName');
+
+const commentModal = document.getElementById('commentModal');
+const confirmComment = document.getElementById('confirmComment');
+
+// ================== RENDER ==================
 function render() {
   container.innerHTML = '';
   let page = null;
@@ -444,7 +452,7 @@ function render() {
   });
 }
 
-// ================= ZOOM =================
+// ================== ZOOM ==================
 function openZoom(c){
   currentZoom = c;
   mainZoom.src = c.imgUrl;
@@ -467,130 +475,82 @@ function updateActions(){
   likeCount.textContent = currentZoom.likes?.length || 0;
   commentCount.textContent = currentZoom.comments?.length || 0;
 }
+
 // ================== LIKE ==================
-const likeModal = document.getElementById('likeModal');
-const likeBubbles = document.getElementById('likeBubbles');
-const confirmLike = document.getElementById('confirmLike');
-const likeNameInput = document.getElementById('likeName');
+document.querySelector('.like-btn').onclick = () => {
+  if (!currentZoom) return;
+  likeBubbles.innerHTML = '';
+  currentZoom.likes?.forEach(name => {
+    const bubble = document.createElement('div');
+    bubble.className = 'bubble';
+    bubble.textContent = name;
+    likeBubbles.appendChild(bubble);
+  });
+  likeNameInput.value = '';
+  likeModal.style.display = 'flex';
+};
 
-// Ouvrir modal like depuis le zoom
-document.querySelectorAll('.like-btn').forEach(btn => {
-  btn.onclick = () => {
-    if(!currentZoom) return;
-    likeNameInput.value = '';
-    likeModal.style.display = 'flex';
-  }
-});
-
-// Confirmer like
 confirmLike.onclick = async () => {
   const name = likeNameInput.value.trim();
-  if(!name || !currentZoom) return;
+  if (!name || !currentZoom) return;
 
-  if(!currentZoom.likes) currentZoom.likes = [];
+  if (!currentZoom.likes) currentZoom.likes = [];
   currentZoom.likes.push(name);
 
-  const bubble = document.createElement('div');
-  bubble.className = 'bubble';
-  bubble.textContent = name;
-  likeBubbles.appendChild(bubble);
+  // Mise à jour dans Supabase
+  const { error } = await supabase.from('creations')
+    .update({ likes: currentZoom.likes })
+    .eq('id', currentZoom.id);
+  if (error) console.error(error);
 
+  updateActions();
   likeModal.style.display = 'none';
-  updateActions();
-
-  await supabase.from('creations')
-    .update({ likes: currentZoom.likes })
-    .eq('id', currentZoom.id);
-}
-
-// Fermer modal si clic en dehors
-likeModal.onclick = e => {
-  if(e.target === likeModal) likeModal.style.display = 'none';
-};
-// ================= EVENTS =================
-document.querySelector('.closeZoom').onclick = () => zoomModal.style.display = 'none';
-zoomModal.onclick = e => { if(e.target === zoomModal) zoomModal.style.display = 'none'; };
-document.getElementById('toggleSidebar').onclick = () => sidebar.classList.toggle('sidebar-open');
-// ================= LIKE / COMMENT =================
-
-// Bouton like dans zoom
-document.querySelector('.like-btn').onclick = async () => {
-  if (!currentZoom) return;
-
-  // Ajouter un like fictif (tu peux demander le prénom si besoin)
-  const newLike = "❤️"; 
-
-  // Mettre à jour localement
-  if (!currentZoom.likes) currentZoom.likes = [];
-  currentZoom.likes.push(newLike);
-
-  // Mettre à jour Supabase
-  const { error } = await supabase
-    .from('creations')
-    .update({ likes: currentZoom.likes })
-    .eq('id', currentZoom.id);
-  if (error) { console.error(error); return; }
-
-  // Mettre à jour le compteur
-  updateActions();
 };
 
-// Bouton commentaire dans zoom
+// ================== COMMENT ==================
 document.querySelector('.comment-btn').onclick = () => {
   if (!currentZoom) return;
-  document.getElementById('commentModal').style.display = 'flex';
-  document.getElementById('commentName').value = '';
-  document.getElementById('commentText').value = '';
-  // Afficher les commentaires existants
+
   const commentBubbles = document.getElementById('commentBubbles');
   commentBubbles.innerHTML = '';
-  currentZoom.comments.forEach(c => {
+  (currentZoom.comments || []).forEach(c => {
     const b = document.createElement('div');
     b.className = 'bubble';
     b.textContent = `${c.name}: ${c.text}`;
     commentBubbles.appendChild(b);
   });
+
+  document.getElementById('commentName').value = '';
+  document.getElementById('commentText').value = '';
+  commentModal.style.display = 'flex';
 };
 
-// Valider commentaire
-document.getElementById('confirmComment').onclick = async () => {
+confirmComment.onclick = async () => {
   const name = document.getElementById('commentName').value.trim();
   const text = document.getElementById('commentText').value.trim();
   if (!name || !text || !currentZoom) return;
 
-  const newComment = { name, text };
   if (!currentZoom.comments) currentZoom.comments = [];
-  currentZoom.comments.push(newComment);
+  currentZoom.comments.push({ name, text });
 
-  // Mettre à jour Supabase
-  const { error } = await supabase
-    .from('creations')
+  const { error } = await supabase.from('creations')
     .update({ comments: currentZoom.comments })
     .eq('id', currentZoom.id);
-  if (error) { console.error(error); return; }
+  if (error) console.error(error);
 
-  // Rafraîchir l'affichage des bulles et compteur
+  // Rafraîchir affichage bulles et compteur
   const commentBubbles = document.getElementById('commentBubbles');
   const b = document.createElement('div');
   b.className = 'bubble';
   b.textContent = `${name}: ${text}`;
   commentBubbles.appendChild(b);
 
-  document.getElementById('commentName').value = '';
-  document.getElementById('commentText').value = '';
-
   updateActions();
-  document.getElementById('commentModal').style.display = 'none';
+  commentModal.style.display = 'none';
 };
 
-// Fermer modal commentaire si clic à l'extérieur
-document.getElementById('commentModal').onclick = e => {
-  if (e.target === document.getElementById('commentModal')) {
-    document.getElementById('commentModal').style.display = 'none';
-  }
-};
-// ================= DELETE =================
-function openDeleteModal(project) {
+// ================== DELETE ==================
+function openDeleteModal(project){
   currentDelete = project;
   deleteModal.style.display = 'flex';
 }
@@ -601,27 +561,17 @@ document.getElementById('cancelDelete').onclick = () => {
 };
 
 document.getElementById('confirmDelete').onclick = async () => {
-  if (!currentDelete || !currentDelete.id) return;
+  if (!currentDelete?.id) return;
 
-  // Supprimer dans Supabase
   const { error } = await supabase.from('creations').delete().eq('id', currentDelete.id);
   if (error) { console.error(error); return; }
 
-  // Rafraîchir les créations locales
   await refreshCreations();
-
   deleteModal.style.display = 'none';
   currentDelete = null;
 };
 
-deleteModal.onclick = e => {
-  if (e.target === deleteModal) {
-    deleteModal.style.display = 'none';
-    currentDelete = null;
-  }
-};
-
-// ================= AJOUT =================
+// ================== AJOUT ==================
 document.getElementById('addBtn').onclick = () => addModal.style.display = 'flex';
 addModal.onclick = e => { if(e.target === addModal) addModal.style.display = 'none'; };
 
@@ -644,7 +594,6 @@ document.getElementById('confirmAdd').onclick = async () => {
 
   if (urls.length === 0) return;
 
-  // Insérer dans Supabase et récupérer l'ID réel
   const { data, error } = await supabase.from('creations').insert([{
     name,
     image_path: paths[0],
@@ -655,23 +604,21 @@ document.getElementById('confirmAdd').onclick = async () => {
 
   if (error) { console.error(error); return; }
 
-  // Reset modal
   addModal.style.display = 'none';
   document.getElementById('photoName').value = '';
   document.getElementById('multiPhoto').value = '';
 
-  // Rafraîchir pour récupérer ID réel
   await refreshCreations();
 };
 
-// ================= REFRESH =================
+// ================== REFRESH ==================
 async function refreshCreations() {
   const { data, error } = await supabase.from('creations').select('*').order('created_at', { ascending: false });
   if (error) { console.error(error); return; }
 
   creations = data.map(c => {
     const zoomGroup = (c.images && c.images.length) ? 
-      c.images.map(p => supabase.storage.from('images').getPublicUrl(p).data.publicUrl) 
+      c.images.map(p => supabase.storage.from('images').getPublicUrl(p).data.publicUrl)
       : [supabase.storage.from('images').getPublicUrl(c.image_path).data.publicUrl];
 
     return {
@@ -687,7 +634,15 @@ async function refreshCreations() {
   render();
 }
 
-// ================= START =================
+// ================== EVENTS ==================
+document.querySelector('.closeZoom').onclick = () => zoomModal.style.display = 'none';
+zoomModal.onclick = e => { if(e.target === zoomModal) zoomModal.style.display = 'none'; };
+likeModal.onclick = e => { if(e.target === likeModal) likeModal.style.display = 'none'; };
+commentModal.onclick = e => { if(e.target === commentModal) commentModal.style.display = 'none'; };
+deleteModal.onclick = e => { if(e.target === deleteModal) deleteModal.style.display = 'none'; currentDelete=null; };
+document.getElementById('toggleSidebar').onclick = () => sidebar.classList.toggle('sidebar-open');
+
+// ================== START ==================
 refreshCreations();
 </script>
 </body>
