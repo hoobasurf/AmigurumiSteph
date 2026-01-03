@@ -451,19 +451,44 @@ document.getElementById('confirmAdd').onclick = async () => {
   const paths = [];
 
   for (let f of files) {
-    const path = `${Date.now()}_${f.name}`;
-    await supabase.storage.from('images').upload(path, f);
-    urls.push(supabase.storage.from('images').getPublicUrl(path).data.publicUrl);
+    const path = `${Date.now()}_${Math.random()}_${f.name}`;
+
+    // Upload
+    const { error: uploadError } = await supabase.storage.from('images').upload(path, f);
+    if (uploadError) {
+      alert("Erreur upload image");
+      console.error(uploadError);
+      return;
+    }
+
+    // Public URL
+    const { data: pub, error: urlError } = supabase.storage.from('images').getPublicUrl(path);
+    if (urlError || !pub?.publicUrl) {
+      alert("Erreur récupération URL");
+      console.error(urlError);
+      return;
+    }
+
+    urls.push(pub.publicUrl);
     paths.push(path);
   }
 
-  const { data } = await supabase.from('creations')
+  // Création dans Supabase
+  const { data, error } = await supabase.from('creations')
     .insert([{ name, image_path: paths[0], images: paths, likes: 0, comments: [] }])
-    .select();
+    .select()
+    .single(); // important : pour récupérer un seul objet
 
+  if (error || !data) {
+    alert("Erreur création");
+    console.error(error);
+    return;
+  }
+
+  // Ajout local immédiat
   creations.unshift({
-    id: data[0].id,
-    name,
+    id: data.id,
+    name: data.name,
     imgUrl: urls[0],
     zoomGroup: urls,
     likes: 0,
@@ -471,9 +496,11 @@ document.getElementById('confirmAdd').onclick = async () => {
   });
 
   render();
-  addModal.style.display='none';
-  document.getElementById('photoName').value='';
-  document.getElementById('multiPhoto').value='';
+
+  // Reset modal
+  addModal.style.display = 'none';
+  document.getElementById('photoName').value = '';
+  document.getElementById('multiPhoto').value = '';
 };
 
 // ---------------------- LOAD ----------------------
