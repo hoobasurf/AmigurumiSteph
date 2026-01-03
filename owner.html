@@ -676,18 +676,20 @@ async function refreshCreations() {
   }
 
   creations = data.map(c => {
-    const { data: pub } = supabase.storage
-      .from('images')
-      .getPublicUrl(c.image_path);
+  // créer zoomGroup si ça existe déjà sinon avec image_path
+  const zoomGroup = c.zoomGroup && c.zoomGroup.length
+    ? c.zoomGroup
+    : [supabase.storage.from('images').getPublicUrl(c.image_path).data.publicUrl];
 
-    return {
-      id: c.id,
-      name: c.name,
-      imgUrl: pub.publicUrl,
-      likes: c.likes || [],
-      comments: c.comments || []
-    };
-  });
+  return {
+    id: c.id,
+    name: c.name,
+    imgUrl: zoomGroup[0], // image principale
+    zoomGroup,             // toutes les miniatures
+    likes: c.likes || [],
+    comments: c.comments || []
+  };
+});
 
   render();
 }
