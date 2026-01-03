@@ -660,7 +660,13 @@ document.getElementById('addBtn')
 
 // redirection vers la page pelotes
 pelotesBtn.onclick = () => {
-  window.location.href = 'pelotes.html';
+  // Ajouter la classe fade-out
+  document.body.style.transition = 'opacity 0.5s';
+  document.body.style.opacity = '0';
+  // Après 500ms, rediriger
+  setTimeout(() => {
+    window.location.href = 'pelotes.html';
+  }, 500);
 };
   pelotesBtn.style.marginTop = "10px";
   
