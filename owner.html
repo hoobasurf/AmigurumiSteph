@@ -467,7 +467,46 @@ function updateActions(){
   likeCount.textContent = currentZoom.likes?.length || 0;
   commentCount.textContent = currentZoom.comments?.length || 0;
 }
+// ================== LIKE ==================
+const likeModal = document.getElementById('likeModal');
+const likeBubbles = document.getElementById('likeBubbles');
+const confirmLike = document.getElementById('confirmLike');
+const likeNameInput = document.getElementById('likeName');
 
+// Ouvrir modal like depuis le zoom
+document.querySelectorAll('.like-btn').forEach(btn => {
+  btn.onclick = () => {
+    if(!currentZoom) return;
+    likeNameInput.value = '';
+    likeModal.style.display = 'flex';
+  }
+});
+
+// Confirmer like
+confirmLike.onclick = async () => {
+  const name = likeNameInput.value.trim();
+  if(!name || !currentZoom) return;
+
+  if(!currentZoom.likes) currentZoom.likes = [];
+  currentZoom.likes.push(name);
+
+  const bubble = document.createElement('div');
+  bubble.className = 'bubble';
+  bubble.textContent = name;
+  likeBubbles.appendChild(bubble);
+
+  likeModal.style.display = 'none';
+  updateActions();
+
+  await supabase.from('creations')
+    .update({ likes: currentZoom.likes })
+    .eq('id', currentZoom.id);
+}
+
+// Fermer modal si clic en dehors
+likeModal.onclick = e => {
+  if(e.target === likeModal) likeModal.style.display = 'none';
+};
 // ================= EVENTS =================
 document.querySelector('.closeZoom').onclick = () => zoomModal.style.display = 'none';
 zoomModal.onclick = e => { if(e.target === zoomModal) zoomModal.style.display = 'none'; };
