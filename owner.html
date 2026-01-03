@@ -469,7 +469,38 @@ function updateActions(){
 document.querySelector('.closeZoom').onclick = () => zoomModal.style.display = 'none';
 zoomModal.onclick = e => { if(e.target === zoomModal) zoomModal.style.display = 'none'; };
 document.getElementById('toggleSidebar').onclick = () => sidebar.classList.toggle('sidebar-open');
+function openDeleteModal(project) {
+  currentDelete = project;          
+  deleteModal.style.display = 'flex';
+}
 
+// Annuler
+document.getElementById('cancelDelete').onclick = () => {
+  currentDelete = null;
+  deleteModal.style.display = 'none';
+};
+
+// Confirmer suppression
+document.getElementById('confirmDelete').onclick = async () => {
+  if (!currentDelete) return;
+
+  const { error } = await supabase.from('creations').delete().eq('id', currentDelete.id);
+  if (error) console.error(error);
+
+  creations = creations.filter(c => c.id !== currentDelete.id);
+  render();
+
+  deleteModal.style.display = 'none';
+  currentDelete = null;
+};
+
+// Fermer le modal si click à l’extérieur
+deleteModal.onclick = e => {
+  if (e.target === deleteModal) {
+    deleteModal.style.display = 'none';
+    currentDelete = null;
+  }
+};
 // ================== AJOUT ==================
 document.getElementById('addBtn').onclick = () => addModal.style.display = 'flex';
 addModal.onclick = e => { if(e.target === addModal) addModal.style.display = 'none'; };
