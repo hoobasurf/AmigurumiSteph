@@ -634,6 +634,20 @@ async function refreshCreations() {
   render();
 }
 
+// ================== BOUTON PELOTES ==================
+// Création du bouton
+const pelotesBtn = document.createElement('button');
+pelotesBtn.textContent = "Pelotes";
+document.getElementById('sidebar').appendChild(pelotesBtn);
+
+// Changer le fond d'écran au clic
+pelotesBtn.onclick = () => {
+  document.body.style.backgroundImage = "url('CF0690A1-F02D-4E49-9CC7-2C0F0C12F062.png')";
+  document.body.style.backgroundSize = "cover";
+  document.body.style.backgroundPosition = "center center";
+  document.body.style.backgroundRepeat = "no-repeat";
+};
+  
 // ================== EVENTS ==================
 document.querySelector('.closeZoom').onclick = () => zoomModal.style.display = 'none';
 zoomModal.onclick = e => { if(e.target === zoomModal) zoomModal.style.display = 'none'; };
