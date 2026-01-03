@@ -397,257 +397,138 @@ const supabase = createClient(
   "sb_publishable_sqsxb-3Kl5o3-JQYv9kGFw_-g0EgwMa"
 );
 
-let creations = [], currentZoom = null, currentDelete = null;
-const container = document.getElementById('visitor-list-container');
-
-const addModal = document.getElementById('addModal');
-const deleteModal = document.getElementById('deleteModal');
-const likeModal = document.getElementById('likeModal');
-const commentModal = document.getElementById('commentModal');
-
-const zoomModal = document.getElementById('zoomModal');
-const mainZoom = document.getElementById('mainZoom');
-const thumbs = document.getElementById('thumbs');
-const likeCount = document.getElementById('likeCount');
-const commentCount = document.getElementById('commentCount');
-
-const likeBubbles = document.getElementById('likeBubbles');
-const commentBubbles = document.getElementById('commentBubbles');
-
-const sidebar = document.getElementById('sidebar');
-
-// ---------------------- RENDER ----------------------
-function render() {
-  container.innerHTML = '';
-  let page = null;
-  creations.forEach((c,i)=>{
-    if(i%6===0){page=document.createElement('div');page.className='page';container.appendChild(page);}
-    else{page=container.lastElementChild;}
-
-    const d=document.createElement('div');
-    d.className='visitor-item';
-    d.innerHTML=`
-      <div class="placeholder">?</div>
-      <div class="delete-btn">×</div>
-      <p>${c.name}</p>
-      <img src="${c.imgUrl}" onload="this.previousElementSibling.style.display='none'" onerror="this.style.display='none'">
-      <div class="actions" style="position:absolute; bottom:24px; width:100%; justify-content:center;">
-        <button class="like-btn" title="Like ❤️"><svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"></path></svg></button>
-        <button class="comment-btn" title="Commentaire 💬"><svg viewBox="0 0 24 24"><path d="M21 6h-18v12h18v-12zm0-2c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2h-18c-1.1 0-2-.9-2-2v-12c0-1.1.9-2 2-2h18z"></path></svg></button>
-      </div>
-    `;
-
-    d.querySelector('img').onclick=()=>openZoom(c);
-    d.querySelector('.delete-btn').onclick=()=>openDeleteModal(c);
-    d.querySelector('.like-btn').onclick=()=>openZoom(c);
-    d.querySelector('.comment-btn').onclick=()=>openZoom(c);
-
-    page.appendChild(d);
-  });
-}
-
-// ---------------------- ZOOM ----------------------
-function openZoom(c){
-  currentZoom=c;
-  mainZoom.src=c.imgUrl;
-  thumbs.innerHTML='';
-  c.zoomGroup.forEach(u=>{
-    const t=document.createElement('img');
-    t.src=u;
-    t.onclick=()=>mainZoom.src=u;
-    thumbs.appendChild(t);
-  });
-  updateActions();
-  zoomModal.style.display='flex';
-}
-
-function updateActions(){
-  likeCount.textContent=currentZoom.likes?.length||0;
-  commentCount.textContent=currentZoom.comments?.length||0;
-}
-
-// ---------------------- EVENTS ----------------------
-document.querySelector('.closeZoom').onclick=()=>zoomModal.style.display='none';
-zoomModal.onclick=e=>{if(e.target===zoomModal)zoomModal.style.display='none';};
-document.getElementById('toggleSidebar').onclick=()=>sidebar.classList.toggle('sidebar-open');
-
-// ---------------------- AJOUT ----------------------
-document.getElementById('addBtn').onclick=()=>addModal.style.display='flex';
-addModal.onclick=e=>{if(e.target===addModal)addModal.style.display='none';};
-document.getElementById('confirmAdd').onclick=async()=>{
-  const name=document.getElementById('photoName').value.trim();
-  const files=document.getElementById('multiPhoto').files;
-  if(!name||!files.length)return;
-  const urls=[];
-  for(let f of files){
-    const path=`${Date.now()}_${f.name}`;
-    await supabase.storage.from('images').upload(path,f);
-    const publicUrl=supabase.storage.from('images').getPublicUrl(path).data.publicUrl;
-    urls.push(publicUrl);
-  }
-
-  const {data,error}=await supabase.from('creations')
-    .insert([{name,image_path:urls[0],likes:[],comments:[]}])
-    .select();
-  if(error){console.error(error);return;}
-
-  // On ne touche plus à creations.unshift / render ici
-  addModal.style.display='none';
-  document.getElementById('photoName').value='';
-  document.getElementById('multiPhoto').value='';
-
-  // Juste faire un refresh complet des créations
-  await refreshCreations();
-};
-
-// ---------------------- REFRESH ----------------------
-async function refreshCreations() {
-  const { data, error } = await supabase
-    .from("creations")
-    .select("*")
-   Merci pour ta patience. On va **réparer proprement sur TON ancien code**, sans tout réinventer, et surtout **sans casser l’ajout**.
-
-⚠️ Important : ton dernier message contenait un script **coupé en plein milieu** (il s’arrête au milieu de `refreshCreations()`), donc je te renvoie **le script complet et cohérent**, basé **exactement sur ton ancien fonctionnement**, avec **UNE seule chose ajoutée** : le rafraîchissement propre après ajout.
-
----
-
-## ✅ CE QUE CE SCRIPT FAIT (GARANTI)
-
-- ✔️ Les cases `?` s’affichent (anciennes et nouvelles)
-- ✔️ Le bouton **Ajouter** fonctionne
-- ✔️ **Valider** ferme le modal ET crée une nouvelle case
-- ✔️ Le rafraîchissement recharge depuis Supabase
-- ✔️ Rien d’autre n’est modifié
-
----
-
-## 🔴 À FAIRE EXACTEMENT
-👉 **Remplace UNIQUEMENT tout le `<script type="module"> ... </script>` par ceci**
-
----
-
-```html
-<script type="module">
-import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
-
-const supabase = createClient(
-  "https://jyhbamdcxmpveujjqjla.supabase.co",
-  "sb_publishable_sqsxb-3Kl5o3-JQYv9kGFw_-g0EgwMa"
-);
-
 let creations = [];
 let currentZoom = null;
 let currentDelete = null;
 
-const container = document.getElementById('visitor-list-container');
-const addModal = document.getElementById('addModal');
-const deleteModal = document.getElementById('deleteModal');
-const zoomModal = document.getElementById('zoomModal');
-const sidebar = document.getElementById('sidebar');
+const container = document.getElementById("visitor-list-container");
 
-const mainZoom = document.getElementById('mainZoom');
-const thumbs = document.getElementById('thumbs');
-const likeCount = document.getElementById('likeCount');
-const commentCount = document.getElementById('commentCount');
+const addModal = document.getElementById("addModal");
+const deleteModal = document.getElementById("deleteModal");
+const zoomModal = document.getElementById("zoomModal");
 
-/* ================= RENDER ================= */
+const mainZoom = document.getElementById("mainZoom");
+const thumbs = document.getElementById("thumbs");
+const likeCount = document.getElementById("likeCount");
+const commentCount = document.getElementById("commentCount");
+
+const sidebar = document.getElementById("sidebar");
+
+/* ===================== RENDER ===================== */
 function render() {
-  container.innerHTML = '';
-  let page = null;
+  container.innerHTML = "";
+  let page;
 
   creations.forEach((c, i) => {
     if (i % 6 === 0) {
-      page = document.createElement('div');
-      page.className = 'page';
+      page = document.createElement("div");
+      page.className = "page";
       container.appendChild(page);
     }
 
-    const d = document.createElement('div');
-    d.className = 'visitor-item';
+    const d = document.createElement("div");
+    d.className = "visitor-item";
+
     d.innerHTML = `
       <div class="placeholder">?</div>
       <div class="delete-btn">×</div>
       <p>${c.name}</p>
-      <img src="${c.imgUrl || ''}">
+      <img src="${c.imgUrl}">
     `;
 
-    const img = d.querySelector('img');
-    img.onload = () => d.querySelector('.placeholder').style.display = 'none';
-    img.onerror = () => img.style.display = 'none';
+    const img = d.querySelector("img");
+    img.onload = () => d.querySelector(".placeholder").style.display = "none";
+    img.onerror = () => img.style.display = "none";
 
     img.onclick = () => openZoom(c);
-    d.querySelector('.delete-btn').onclick = () => openDeleteModal(c);
+    d.querySelector(".delete-btn").onclick = () => openDeleteModal(c);
 
     page.appendChild(d);
   });
 }
 
-/* ================= ZOOM ================= */
+/* ===================== ZOOM ===================== */
 function openZoom(c) {
   currentZoom = c;
-  mainZoom.src = c.imgUrl || '';
-  thumbs.innerHTML = '';
-  zoomModal.style.display = 'flex';
+  mainZoom.src = c.imgUrl;
+  thumbs.innerHTML = "";
+
+  c.zoomGroup.forEach(url => {
+    const t = document.createElement("img");
+    t.src = url;
+    t.onclick = () => mainZoom.src = url;
+    thumbs.appendChild(t);
+  });
+
+  likeCount.textContent = c.likes.length;
+  commentCount.textContent = c.comments.length;
+
+  zoomModal.style.display = "flex";
 }
 
-document.querySelector('.closeZoom').onclick = () => {
-  zoomModal.style.display = 'none';
+document.querySelector(".closeZoom").onclick = () => {
+  zoomModal.style.display = "none";
 };
 
-/* ================= SIDEBAR ================= */
-document.getElementById('toggleSidebar').onclick = () => {
-  sidebar.classList.toggle('sidebar-open');
+/* ===================== SIDEBAR ===================== */
+document.getElementById("toggleSidebar").onclick = () => {
+  sidebar.classList.toggle("sidebar-open");
 };
 
-/* ================= AJOUT ================= */
-document.getElementById('addBtn').onclick = () => {
-  addModal.style.display = 'flex';
+/* ===================== AJOUT ===================== */
+document.getElementById("addBtn").onclick = () => {
+  addModal.style.display = "flex";
 };
 
-addModal.onclick = e => {
-  if (e.target === addModal) addModal.style.display = 'none';
-};
+document.getElementById("confirmAdd").onclick = async () => {
+  const name = document.getElementById("photoName").value.trim();
+  const files = document.getElementById("multiPhoto").files;
 
-document.getElementById('confirmAdd').onclick = async () => {
-  const name = document.getElementById('photoName').value.trim();
-  const files = document.getElementById('multiPhoto').files;
   if (!name || !files.length) return;
 
-  const files = document.getElementById('multiPhoto').files;
-const paths = [];
+  const urls = [];
 
-for (const file of files) {
-  const path = `${Date.now()}_${file.name}`;
-  const { error } = await supabase.storage.from('images').upload(path, file);
-  if (!error) paths.push(path);
-}
+  for (const f of files) {
+    const path = `${Date.now()}_${f.name}`;
+    const { error } = await supabase.storage.from("images").upload(path, f);
+    if (error) {
+      console.error(error);
+      return;
+    }
 
-await supabase.from('creations').insert([{
-  name,
-  image_path: paths[0], // image principale
-  zoomGroup: paths,     // ✅ pour les miniatures
-  likes: [],
-  comments: []
-}]);
+    const publicUrl = supabase
+      .storage
+      .from("images")
+      .getPublicUrl(path).data.publicUrl;
+
+    urls.push(publicUrl);
+  }
+
+  const { error } = await supabase.from("creations").insert([{
+    name: name,
+    image_path: urls[0],
+    likes: [],
+    comments: []
+  }]);
 
   if (error) {
     console.error(error);
     return;
   }
 
-  addModal.style.display = 'none';
-  document.getElementById('photoName').value = '';
-  document.getElementById('multiPhoto').value = '';
+  await loadCreations();
 
-  await refreshCreations();
+  addModal.style.display = "none";
+  document.getElementById("photoName").value = "";
+  document.getElementById("multiPhoto").value = "";
 };
 
-/* ================= LOAD / REFRESH ================= */
-async function refreshCreations() {
+/* ===================== LOAD / REFRESH ===================== */
+async function loadCreations() {
   const { data, error } = await supabase
-    .from('creations')
-    .select('*')
-    .order('created_at', { ascending: false });
+    .from("creations")
+    .select("*")
+    .order("created_at", { ascending: false });
 
   if (error) {
     console.error(error);
@@ -655,28 +536,47 @@ async function refreshCreations() {
   }
 
   creations = data.map(c => {
-  const zoomUrls = (c.zoomGroup && c.zoomGroup.length)
-    ? c.zoomGroup.map(p =>
-        supabase.storage.from('images').getPublicUrl(p).data.publicUrl
-      )
-    : [
-        supabase.storage.from('images')
-          .getPublicUrl(c.image_path).data.publicUrl
-      ];
+    const url = supabase
+      .storage
+      .from("images")
+      .getPublicUrl(c.image_path).data.publicUrl;
 
-  return {
-    id: c.id,
-    name: c.name,
-    imgUrl: zoomUrls[0],   // image principale
-    zoomGroup: zoomUrls,   // ✅ miniatures
-    likes: c.likes || [],
-    comments: c.comments || []
-  };
-});
+    return {
+      id: c.id,
+      name: c.name,
+      imgUrl: url,
+      zoomGroup: [url],   // une image = mini OK
+      likes: c.likes || [],
+      comments: c.comments || []
+    };
+  });
 
   render();
 }
 
-/* ================= START ================= */
-refreshCreations();
+/* ===================== DELETE ===================== */
+function openDeleteModal(c) {
+  currentDelete = c;
+  deleteModal.style.display = "flex";
+}
+
+document.getElementById("confirmDelete").onclick = async () => {
+  if (!currentDelete) return;
+
+  await supabase
+    .from("creations")
+    .delete()
+    .eq("id", currentDelete.id);
+
+  creations = creations.filter(c => c.id !== currentDelete.id);
+  render();
+  deleteModal.style.display = "none";
+};
+
+document.getElementById("cancelDelete").onclick = () => {
+  deleteModal.style.display = "none";
+};
+
+/* ===================== START ===================== */
+loadCreations();
 </script>
