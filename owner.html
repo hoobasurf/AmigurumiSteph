@@ -1,5 +1,3 @@
-Ou régler le bouton ajouter qui fonctionne dans ce code :
-
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -581,7 +579,6 @@ function render() {
   });
 }
 
-/* ================= ZOOM ================= */
 // ================= ZOOM =================
 function openZoom(c){
   currentZoom = c;
@@ -627,47 +624,43 @@ document.getElementById('toggleSidebar').onclick = () => {
 };
 
 /* ================= AJOUT ================= */
-document.getElementById('addBtn').onclick = () => {
-  addModal.style.display = 'flex';
-};
-
-addModal.onclick = e => {
-  if (e.target === addModal) addModal.style.display = 'none';
-};
-
 document.getElementById('confirmAdd').onclick = async () => {
   const name = document.getElementById('photoName').value.trim();
   const files = document.getElementById('multiPhoto').files;
   if (!name || !files.length) return;
 
-  const file = files[0];
-  const path = `${Date.now()}_${file.name}`;
+  const paths = [];
+  const urls = [];
 
-  const { error: uploadError } = await supabase.storage
-    .from('images')
-    .upload(path, file);
-
-  if (uploadError) {
-    console.error(uploadError);
-    return;
+  // upload toutes les images
+  for (let file of files) {
+    const path = `${Date.now()}_${file.name}`;
+    const { error: uploadError } = await supabase.storage.from('images').upload(path, file);
+    if (uploadError) { console.error(uploadError); continue; }
+    const { data: pub } = supabase.storage.from('images').getPublicUrl(path);
+    urls.push(pub.publicUrl);
+    paths.push(path);
   }
 
+  if (urls.length === 0) return;
+
+  // insertion dans Supabase
   const { error } = await supabase.from('creations').insert([{
     name,
-    image_path: path,
+    image_path: paths[0],   // image principale pour la grille
+    images: paths,           // toutes les images pour le zoom
     likes: [],
     comments: []
   }]);
 
-  if (error) {
-    console.error(error);
-    return;
-  }
+  if (error) { console.error(error); return; }
 
+  // reset modal
   addModal.style.display = 'none';
   document.getElementById('photoName').value = '';
   document.getElementById('multiPhoto').value = '';
 
+  // rafraîchir la grille
   await refreshCreations();
 };
 
