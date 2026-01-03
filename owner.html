@@ -573,7 +573,20 @@ document.getElementById('confirmDelete').onclick = async () => {
 
 // ================== AJOUT ==================
 // Ouvrir modal Ajouter
-document.getElementById('confirmAdd').onclick = async () => {
+// Ouvrir la modal
+document.getElementById('addBtn').onclick = () => {
+  addModal.style.display = 'flex';
+};
+
+// Fermer la modal uniquement si on clique sur le fond, PAS sur les inputs ou bouton
+addModal.addEventListener('click', e => {
+  if (e.target === addModal) addModal.style.display = 'none';
+});
+
+// Bouton Valider (corrigé)
+document.getElementById('confirmAdd').onclick = async (e) => {
+  e.stopPropagation(); // empêche la fermeture par le click sur le modal
+
   const name = document.getElementById('photoName').value.trim();
   const files = document.getElementById('multiPhoto').files;
 
@@ -588,25 +601,15 @@ document.getElementById('confirmAdd').onclick = async () => {
   for (let file of files) {
     const path = `${Date.now()}_${file.name}`;
     const { error: uploadError } = await supabase.storage.from('images').upload(path, file);
-    if (uploadError) {
-      console.error(uploadError);
-      alert("Erreur lors de l'upload d'une photo");
-      continue;
-    }
-
+    if (uploadError) { console.error(uploadError); continue; }
     const { data: pubData } = supabase.storage.from('images').getPublicUrl(path);
     if (!pubData || !pubData.publicUrl) continue;
-
     urls.push(pubData.publicUrl);
     paths.push(path);
   }
 
-  if (urls.length === 0) {
-    alert("Aucune photo n'a pu être ajoutée");
-    return;
-  }
+  if (urls.length === 0) return;
 
-  // On crée le projet dans la table
   const { data, error } = await supabase.from('creations').insert([{
     name,
     image_path: paths[0],
@@ -615,18 +618,13 @@ document.getElementById('confirmAdd').onclick = async () => {
     comments: []
   }]).select();
 
-  if (error) {
-    console.error(error);
-    alert("Erreur lors de l'ajout du projet");
-    return;
-  }
+  if (error) { console.error(error); return; }
 
-  // On ferme et réinitialise la modal
   addModal.style.display = 'none';
   document.getElementById('photoName').value = '';
   document.getElementById('multiPhoto').value = '';
 
-  await refreshCreations(); // Met à jour l'affichage
+  await refreshCreations();
 };
 
 // ================== REFRESH ==================
