@@ -174,12 +174,6 @@ body::before {
   font-weight:bold;
 }
 
-#sidebar{
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
-  
 /* MODAL */
 .modal {
   position:fixed; inset:0;
@@ -330,32 +324,12 @@ body::before {
     transform: translate(var(--dx), var(--dy)) scale(0);
     opacity: 0;
   }
-
-#cloudTransition{
-  position:fixed;
-  inset:0;
-  background:
-    radial-gradient(circle at 20% 30%, #fff 20%, transparent 21%),
-    radial-gradient(circle at 60% 40%, #fff 22%, transparent 23%),
-    radial-gradient(circle at 40% 70%, #fff 25%, transparent 26%),
-    radial-gradient(circle at 80% 60%, #fff 20%, transparent 21%);
-  background-size: 300px 300px;
-  background-repeat: repeat;
-  opacity:0;
-  pointer-events:none;
-  z-index:20000;
-  animation:none;
+  #sidebar{
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
-
-@keyframes cloudIn {
-  from { opacity:0; transform:scale(1); }
-  to   { opacity:1; transform:scale(1.05); }
-}
-
-@keyframes cloudOut {
-  from { opacity:1; filter:blur(0); }
-  to   { opacity:0; filter:blur(12px); }
-}
+  }
   
 </style>
 </head>
@@ -644,66 +618,41 @@ document.getElementById('confirmAdd').onclick = async () => {
 };
 
 // ================== REFRESH ==================
-// ================== REFRESH ==================
 async function refreshCreations() {
-  try {
-    // Récupérer toutes les créations depuis Supabase
-    const { data, error } = await supabase
-      .from('creations')
-      .select('*')
-      .order('created_at', { ascending: false });
+  const { data, error } = await supabase.from('creations').select('*').order('created_at', { ascending: false });
+  if (error) { console.error(error); return; }
 
-    if (error) {
-      console.error('Erreur Supabase:', error);
-      return;
-    }
+  creations = data.map(c => {
+    const zoomGroup = (c.images && c.images.length) ? 
+      c.images.map(p => supabase.storage.from('images').getPublicUrl(p).data.publicUrl)
+      : [supabase.storage.from('images').getPublicUrl(c.image_path).data.publicUrl];
 
-    // Transformer les données pour l'affichage
-    creations = data.map(c => {
-      let zoomGroup = [];
+    return {
+      id: c.id,
+      name: c.name,
+      imgUrl: zoomGroup[0],
+      zoomGroup,
+      likes: c.likes || [],
+      comments: c.comments || []
+    };
+  });
 
-      if (c.images && c.images.length > 0) {
-        // Récupérer les URLs publiques de chaque image
-        zoomGroup = c.images.map(p => {
-          const { data: pub } = supabase.storage.from('images').getPublicUrl(p);
-          return pub?.publicUrl || '';
-        }).filter(url => url); // filtrer les URLs invalides
-      } else if (c.image_path) {
-        // Cas où il n'y a qu'une seule image
-        const { data: pub } = supabase.storage.from('images').getPublicUrl(c.image_path);
-        if (pub?.publicUrl) zoomGroup.push(pub.publicUrl);
-      }
-
-      return {
-        id: c.id,
-        name: c.name,
-        imgUrl: zoomGroup[0] || '', // première image comme card principale
-        zoomGroup: zoomGroup,
-        likes: c.likes || [],
-        comments: c.comments || []
-      };
-    });
-
-    // Appeler le render pour mettre à jour l'affichage
-    render();
-  } catch (err) {
-    console.error('Erreur lors du rafraîchissement des créations:', err);
-  }
+  render();
 }
 
 // ================== BOUTON PELOTES ==================
+const pelotesBtn = document.createElement('button');
+pelotesBtn.textContent = "Pelotes";
+
+// juste sous le bouton Ajouter
+document.getElementById('addBtn')
+  .insertAdjacentElement('afterend', pelotesBtn);
+
+// redirection vers la page pelotes
 pelotesBtn.onclick = () => {
-  const clouds = document.getElementById('cloudTransition');
-  clouds.style.animation = 'cloudIn 0.6s ease-out forwards';
-
-  setTimeout(() => {
-    clouds.style.animation = 'cloudOut 0.8s ease-in forwards';
-  }, 600);
-
-  setTimeout(() => {
-    window.location.href = 'pelotes.html';
-  }, 1200);
+  window.location.href = 'pelotes.html';
 };
+  pelotesBtn.style.marginTop = "10px";
   
 // ================== EVENTS ==================
 document.querySelector('.closeZoom').onclick = () => zoomModal.style.display = 'none';
