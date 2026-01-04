@@ -666,59 +666,6 @@ confirmLike.onclick = async () => {
 };
 
 // ================== COMMENT ==================
-document.querySelector('.comment-btn').onclick = () => {
-  if (!currentZoom) return;
-
-  commentBubbles.innerHTML = '';
-
-  (currentZoom.comments || []).forEach((c, index) => {
-    const item = document.createElement('div');
-    item.className = 'comment-item';
-
-    const text = document.createElement('span');
-    text.innerHTML = `<strong>${c.name}</strong>: <span style="font-size:14px">${c.text}</span>`;
-
-    const actions = document.createElement('div');
-    actions.style.display = 'flex';
-    actions.style.gap = '6px';
-
-    // Like bouton
-    const likeBtn = document.createElement('button');
-    likeBtn.innerHTML = `
-      <svg viewBox="0 0 24 24" width="18" height="18" style="stroke:#ffb6c1; fill:none">
-        <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5
-                 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09
-                 C13.09 3.81 14.76 3 16.5 3
-                 19.58 3 22 5.42 22 8.5
-                 c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
-      </svg> ${c.likes || 0}`;
-    likeBtn.onclick = () => openLikeListModal(c);
-    actions.appendChild(likeBtn);
-
-    item.appendChild(text);
-    item.appendChild(actions);
-    commentBubbles.appendChild(item);
-  });
-
-  // reset inputs
-  document.getElementById('commentName').value = '';
-  document.getElementById('commentText').value = '';
-  commentModal.style.display = 'flex';
-};
-
-// ================== MINI-MODAL LIKE ==================
-function openLikeListModal(comment){
-  let modal = document.getElementById('likeListModal');
-  const list = modal.querySelector('#likeListContainer');
-  list.innerHTML = '';
-  (comment.likes || []).forEach(name => {
-    const div = document.createElement('div');
-    div.className = 'bubble';
-    div.textContent = name;
-    list.appendChild(div);
-  });
-  modal.style.display = 'flex';
-}
 
 // ================== DELETE ==================
 function openDeleteModal(project){
