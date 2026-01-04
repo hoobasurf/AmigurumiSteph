@@ -379,27 +379,30 @@ body::before {
 }
 
 .comment-input-bar {
-  width:100%;
-  display:flex;
-  gap:6px;
-  margin-top:8px;
+  width: 100%;
+  display: flex;
+  gap: 6px;
+  margin-top: 8px;
 }
+
 .comment-input-bar .comment-input {
-  flex:1;
-  padding:8px 12px;
-  border-radius:12px;
-  border:2px solid #b67385;
-  font-size:14px;
-  outline:none;
+  flex: 1;
+  padding: 10px 14px;
+  border-radius: 12px;
+  border: 2px solid #b67385;
+  font-size: 16px;
+  outline: none;
+  background: #fff0f5;
+  color: #b84c6f;
 }
 .comment-input-bar button {
-  padding:8px 16px;
-  border:none;
-  background:#ffb6c1;
-  color:#fff;
-  border-radius:12px;
-  cursor:pointer;
-  font-weight:bold;
+  padding: 10px 16px;
+  border: none;
+  background: #ffb6c1;
+  color: #fff;
+  border-radius: 12px;
+  cursor: pointer;
+  font-weight: bold;
 }
   
 </style>
@@ -610,6 +613,7 @@ confirmLike.onclick = async () => {
 };
 
 // ================== COMMENT ==================
+// Ouvrir modal commentaire uniquement au clic
 document.querySelector('.comment-btn').onclick = () => {
   if (!currentZoom) return;
 
@@ -644,6 +648,13 @@ document.querySelector('.comment-btn').onclick = () => {
   document.getElementById('commentName').value = '';
   document.getElementById('commentText').value = '';
   commentModal.style.display = 'flex';
+};
+
+// fermer modal si clic en dehors
+document.getElementById('commentModal').onclick = e => {
+  if (e.target === document.getElementById('commentModal')) {
+    document.getElementById('commentModal').style.display = 'none';
+  }
 };
 
   // réinitialiser les champs d'entrée
