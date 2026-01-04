@@ -931,20 +931,23 @@ async function refreshCreations() {
   const { data, error } = await supabase.from('creations').select('*').order('created_at', { ascending: false });
   if (error) { console.error(error); return; }
 
-  creations = await Promise.all(data.map(async c => {
-    const zoomGroup = (c.images && c.images.length) ? 
-      await Promise.all(c.images.map(async p => supabase.storage.from('images').getPublicUrl(p).data.publicUrl))
-      : [supabase.storage.from('images').getPublicUrl(c.image_path).data.publicUrl];
+  creations = data.map(c => {
+    let zoomGroup = [];
+    if (c.images && c.images.length) {
+      zoomGroup = c.images.map(p => supabase.storage.from('images').getPublicUrl(p).data.publicUrl);
+    } else if (c.image_path) {
+      zoomGroup = [supabase.storage.from('images').getPublicUrl(c.image_path).data.publicUrl];
+    }
 
     return {
       id: c.id,
       name: c.name,
-      imgUrl: zoomGroup[0],
+      imgUrl: zoomGroup[0] || '',
       zoomGroup,
       likes: c.likes || [],
       comments: c.comments || []
     };
-  }));
+  });
 
   render();
 }
