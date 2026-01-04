@@ -378,13 +378,29 @@ body::before {
   align-items:center;
 }
 
-/* barre écriture fixée en bas */
-.comment-input-bar{
+.comment-input-bar {
   width:100%;
   display:flex;
   gap:6px;
+  margin-top:8px;
 }
-.comment-input-bar input{flex:1}
+.comment-input-bar .comment-input {
+  flex:1;
+  padding:8px 12px;
+  border-radius:12px;
+  border:2px solid #b67385;
+  font-size:14px;
+  outline:none;
+}
+.comment-input-bar button {
+  padding:8px 16px;
+  border:none;
+  background:#ffb6c1;
+  color:#fff;
+  border-radius:12px;
+  cursor:pointer;
+  font-weight:bold;
+}
   
 </style>
 </head>
@@ -440,11 +456,26 @@ body::before {
     <div class="comment-list" id="commentBubbles"></div>
 
     <!-- barre écriture toujours en bas -->
+    <div id="commentModal" class="modal">
+  <div class="modal-box comment-box">
+
+    <!-- bouton agrandir -->
+    <div class="expand-btn" id="expandComment">⤢</div>
+
+    <h3>Commentaire 💬</h3>
+
+    <!-- liste commentaires -->
+    <div class="comment-list" id="commentBubbles"></div>
+
+    <!-- barre écriture fixée en bas -->
     <div class="comment-input-bar">
-      <input id="commentName" placeholder="Votre prénom">
-      <input id="commentText" placeholder="Votre commentaire">
-      <button id="confirmComment">Valider</button>
+      <input id="commentName" placeholder="Votre prénom" class="comment-input">
+      <input id="commentText" placeholder="Votre commentaire" class="comment-input">
+      <button id="confirmComment">Envoyer</button>
     </div>
+
+  </div>
+</div>
 
   </div>
 </div>
@@ -594,17 +625,26 @@ document.querySelector('.comment-btn').onclick = () => {
 
     const like = document.createElement('div');
     like.className = 'comment-like';
-    like.innerHTML = `❤️ ${c.likes || 0}`;
+    like.textContent = `❤️ ${c.likes || 0}`;
 
     like.onclick = () => {
+      const liker = prompt("Votre prénom pour liker ce commentaire ?");
+      if (!liker) return;
+
       c.likes = (c.likes || 0) + 1;
-      like.innerHTML = `❤️ ${c.likes}`;
+      like.textContent = `❤️ ${c.likes} (${liker})`;
     };
 
     item.appendChild(text);
     item.appendChild(like);
     commentBubbles.appendChild(item);
   });
+
+  // reset inputs
+  document.getElementById('commentName').value = '';
+  document.getElementById('commentText').value = '';
+  commentModal.style.display = 'flex';
+};
 
   // réinitialiser les champs d'entrée
   document.getElementById('commentName').value = '';
