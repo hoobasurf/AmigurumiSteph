@@ -874,7 +874,27 @@ async function refreshCreations() {
   render();
 }
 
-// ================== EVENTS ==================
+// ================== BOUTON PELOTES ==================
+const pelotesBtn = document.createElement('button');
+pelotesBtn.textContent = "Pelotes";
+
+// juste sous le bouton Ajouter
+document.getElementById('addBtn')
+  .insertAdjacentElement('afterend', pelotesBtn);
+
+// redirection vers la page pelotes
+pelotesBtn.onclick = () => {
+  // Ajouter la classe fade-out
+  document.body.style.transition = 'opacity 0.5s';
+  document.body.style.opacity = '0';
+  // Après 500ms, rediriger
+  setTimeout(() => {
+    window.location.href = 'pelotes.html';
+  }, 500);
+};
+  pelotesBtn.style.marginTop = "10px";
+
+  // ================== EVENTS ==================
 document.querySelector('.closeZoom').onclick = () => zoomModal.style.display = 'none';
 zoomModal.onclick = e => { if(e.target === zoomModal) zoomModal.style.display = 'none'; };
 likeModal.onclick = e => { if(e.target === likeModal) likeModal.style.display = 'none'; };
