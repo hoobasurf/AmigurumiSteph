@@ -4,6 +4,57 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style>
+
+/* OVERLAY TIROIRS */
+#drawer-overlay{
+  position:fixed;
+  inset:0;
+  display:grid;
+  grid-template-columns:repeat(4, 1fr);
+  grid-template-rows:repeat(4, 1fr);
+  z-index:5;
+}
+
+/* BOUTONS INVISIBLES */
+.drawer-btn{
+  background:transparent;
+  border:none;
+  cursor:pointer;
+}
+
+/* (OPTIONNEL debug visuel)
+.drawer-btn{ outline:1px dashed rgba(255,0,0,0.2); }
+*/
+
+/* MODAL */
+.modal{
+  position:fixed;
+  inset:0;
+  background:rgba(255,240,245,0.92);
+  display:none;
+  align-items:center;
+  justify-content:center;
+  z-index:20;
+}
+
+.modal-content{
+  background:#fff;
+  padding:20px;
+  border-radius:20px;
+  max-width:90%;
+  text-align:center;
+}
+
+.modal button{
+  margin-top:15px;
+  padding:8px 16px;
+  border:none;
+  border-radius:16px;
+  background:#ffb6c1;
+  color:white;
+  cursor:pointer;
+}
+  
 html, body {
   margin: 0;
   padding: 0;
@@ -55,6 +106,38 @@ body::before {
 </head>
 <body>
 
+<!-- OVERLAY 16 TIROIRS -->
+<div id="drawer-overlay">
+  <button class="drawer-btn" onclick="openModal(1)"></button>
+  <button class="drawer-btn" onclick="openModal(2)"></button>
+  <button class="drawer-btn" onclick="openModal(3)"></button>
+  <button class="drawer-btn" onclick="openModal(4)"></button>
+
+  <button class="drawer-btn" onclick="openModal(5)"></button>
+  <button class="drawer-btn" onclick="openModal(6)"></button>
+  <button class="drawer-btn" onclick="openModal(7)"></button>
+  <button class="drawer-btn" onclick="openModal(8)"></button>
+
+  <button class="drawer-btn" onclick="openModal(9)"></button>
+  <button class="drawer-btn" onclick="openModal(10)"></button>
+  <button class="drawer-btn" onclick="openModal(11)"></button>
+  <button class="drawer-btn" onclick="openModal(12)"></button>
+
+  <button class="drawer-btn" onclick="openModal(13)"></button>
+  <button class="drawer-btn" onclick="openModal(14)"></button>
+  <button class="drawer-btn" onclick="openModal(15)"></button>
+  <button class="drawer-btn" onclick="openModal(16)"></button>
+</div>
+
+<!-- MODAL -->
+<div id="modal" class="modal">
+  <div class="modal-content">
+    <h2 id="modalTitle"></h2>
+    <p>Contenu du tiroir ✨</p>
+    <button onclick="closeModal()">Fermer</button>
+  </div>
+</div>
+  
 <script>
 // Dimensions et positions des tiroirs (4 colonnes x 4 lignes)
 const rows = 4;
@@ -104,6 +187,18 @@ for (let r = 0; r < rows; r++) {
     };
   }
 }
+
+<script>
+function openModal(num){
+  document.getElementById('modalTitle').innerText = 'Tiroir ' + num;
+  document.getElementById('modal').style.display = 'flex';
+}
+
+function closeModal(){
+  document.getElementById('modal').style.display = 'none';
+}
+</script>
+  
 </script>
 </body>
 </html>
