@@ -390,6 +390,17 @@ body::before {
   from{opacity:0;transform:translateY(-4px)}
   to{opacity:1;transform:none}
 }
+
+  /* ================= COMMENT FULLSCREEN ================= */
+.comment-box.fullscreen {
+  width: 95vw;
+  height: 90vh;
+  max-width: none;
+  max-height: none;
+  border-radius: 16px;
+  display: flex;
+  flex-direction: column;
+}
   
 </style>
 </head>
@@ -766,16 +777,18 @@ commentModal.onclick = e => { if(e.target === commentModal) commentModal.style.d
 deleteModal.onclick = e => { if(e.target === deleteModal) deleteModal.style.display = 'none'; currentDelete=null; };
 document.getElementById('toggleSidebar').onclick = () => sidebar.classList.toggle('sidebar-open');
 
-// ================== COMMENT FULLSCREEN ==================
+// ================== COMMENT FULLSCREEN (SAFE) ==================
 const expandBtn = document.getElementById('expandComment');
 const commentBox = document.querySelector('#commentModal .comment-box');
 
-expandBtn.onclick = (e) => {
-  e.stopPropagation();
-  commentBox.classList.toggle('fullscreen');
-  expandBtn.textContent =
-    commentBox.classList.contains('fullscreen') ? '⤡' : '⤢';
-};
+if (expandBtn && commentBox) {
+  expandBtn.onclick = (e) => {
+    e.stopPropagation();
+    commentBox.classList.toggle('fullscreen');
+    expandBtn.textContent =
+      commentBox.classList.contains('fullscreen') ? '⤡' : '⤢';
+  };
+}
   
 // ================== START ==================
 refreshCreations();
