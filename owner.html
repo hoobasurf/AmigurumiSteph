@@ -843,9 +843,12 @@ async function refreshCreations() {
   if (error) { console.error(error); return; }
 
   creations = data.map(c => {
-    const zoomGroup = (c.images && c.images.length) ? 
-      c.images.map(p => supabase.storage.from('images').getPublicUrl(p).data.publicUrl)
-      : [supabase.storage.from('images').getPublicUrl(c.image_path).data.publicUrl];
+    const zoomGroup = (c.images && c.images.length) 
+  ? c.images.map(p => {
+      const { data } = supabase.storage.from('images').getPublicUrl(p);
+      return data?.publicUrl || '';
+    })
+  : [supabase.storage.from('images').getPublicUrl(c.image_path).data?.publicUrl || ''];
 
     return {
       id: c.id,
