@@ -386,22 +386,23 @@ body::before {
   align-items:center;
 }
 
-.comment-input-bar {
-  width: 100%;
-  display: flex;
-  gap: 6px;
-  margin-top: 8px;
-}
-
 .comment-input-bar .comment-input {
   flex: 1;
-  padding: 10px 14px;
-  border-radius: 12px;
-  border: 2px solid #b67385;
-  font-size: 16px;
+  padding: 12px 16px;          /* plus de padding pour un champ plus grand */
+  border-radius: 16px;          /* coins arrondis plus visibles */
+  border: 2px solid #b67385;    /* couleur bordure rose douce */
+  font-size: 16px;              /* texte plus lisible */
   outline: none;
-  background: #fff0f5;
-  color: #b84c6f;
+  background: #fff0f5;          /* fond rose très clair */
+  color: #b84c6f;               /* texte rose foncé */
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1); /* légère ombre */
+  transition: all 0.3s ease;    /* transition sur focus */
+}
+
+/* effet focus : border + légère ombre */
+.comment-input-bar .comment-input:focus {
+  border-color: #e94f9a;
+  box-shadow: 0 2px 12px rgba(233,79,154,0.3);
 }
 .comment-input-bar button {
   padding: 10px 16px;
@@ -411,6 +412,28 @@ body::before {
   border-radius: 12px;
   cursor: pointer;
   font-weight: bold;
+}
+
+#likeListModal .modal-box {
+  min-width: 220px;
+  max-width: 80%;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: center;
+}
+#likeListModal .bubble-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  max-height: 200px;
+  overflow-y: auto;
+  width: 100%;
+  padding: 4px;
+}
+#likeListModal button {
+  margin-top: 8px;
+  width: 80px;
 }
   
 </style>
@@ -477,6 +500,15 @@ body::before {
   </div>
 </div>
 
+<!-- MODAL LISTE PRÉNOMS PAR COMMENTAIRE -->
+<div id="likeListModal" class="modal">
+  <div class="modal-box">
+    <h3>Prénoms ❤️</h3>
+    <div id="likeListContainer" class="bubble-container"></div>
+    <button onclick="document.getElementById('likeListModal').style.display='none'">Fermer</button>
+  </div>
+</div>
+  
 <!-- ZOOM -->
 <div id="zoomModal">
   <div class="closeZoom">×</div>
@@ -614,28 +646,37 @@ document.querySelector('.comment-btn').onclick = () => {
   commentBubbles.innerHTML = '';
 
   (currentZoom.comments || []).forEach((c, index) => {
-    const item = document.createElement('div');
-    item.className = 'comment-item';
+  const item = document.createElement('div');
+  item.className = 'comment-item';
 
-    const text = document.createElement('span');
-    text.textContent = `${c.name} : ${c.text}`;
+  const text = document.createElement('span');
+  text.textContent = `${c.name} : ${c.text}`;
 
-    const like = document.createElement('div');
-    like.className = 'comment-like';
-    like.textContent = `❤️ ${c.likes || 0}`;
+  const likeContainer = document.createElement('div');
+  likeContainer.style.display = 'flex';
+  likeContainer.style.alignItems = 'center';
+  likeContainer.style.gap = '4px';
 
-    like.onclick = () => {
-      const liker = prompt("Votre prénom pour liker ce commentaire ?");
-      if (!liker) return;
+  const like = document.createElement('div');
+  like.className = 'comment-like';
+  like.textContent = `❤️ ${c.likes || 0}`;
 
-      c.likes = (c.likes || 0) + 1;
-      like.textContent = `❤️ ${c.likes} (${liker})`;
-    };
+  const viewBtn = document.createElement('button');
+  viewBtn.textContent = '👁';
+  viewBtn.style.fontSize = '12px';
+  viewBtn.style.padding = '2px 6px';
+  viewBtn.style.borderRadius = '8px';
+  viewBtn.style.border = 'none';
+  viewBtn.style.cursor = 'pointer';
+  viewBtn.onclick = () => openLikeListModal(c);
 
-    item.appendChild(text);
-    item.appendChild(like);
-    commentBubbles.appendChild(item);
-  });
+  likeContainer.appendChild(like);
+  likeContainer.appendChild(viewBtn);
+
+  item.appendChild(text);
+  item.appendChild(likeContainer);
+  commentBubbles.appendChild(item);
+});
 
   document.getElementById('commentName').value = '';
   document.getElementById('commentText').value = '';
@@ -740,6 +781,18 @@ document.getElementById('confirmAdd').onclick = async (e) => {
   await refreshCreations();
 };
 
+function openLikeListModal(comment){
+  const container = document.getElementById('likeListContainer');
+  container.innerHTML = '';
+  (comment.likes || []).forEach(name => {
+    const bubble = document.createElement('div');
+    bubble.className = 'bubble';
+    bubble.textContent = name;
+    container.appendChild(bubble);
+  });
+  document.getElementById('likeListModal').style.display = 'flex';
+}
+    
 // ================== REFRESH ==================
 async function refreshCreations() {
   const { data, error } = await supabase.from('creations').select('*').order('created_at', { ascending: false });
