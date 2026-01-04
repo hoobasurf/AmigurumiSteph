@@ -4,121 +4,106 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <style>
-html,body{
-  margin:0;
-  padding:0;
+html, body {
+  margin: 0;
+  padding: 0;
   font-family:'Comic Sans MS',cursive;
-  height:100%;
-  transition:opacity 0.5s;
+  height: 100%;
 }
 
-/* Fond avec ton image IMG_1722.jpeg */
+/* Fond image */
 body::before {
   content:"";
-  position:fixed;
+  position: fixed;
   top:0;
   left:0;
   width:100vw;
   height:100vh;
-  background-image: url('IMG_1722.jpeg'); /* <-- ton image ici */
+  background-image: url('IMG_1722.jpeg');
   background-size: cover;
   background-position: center center;
   background-repeat: no-repeat;
-  z-index:-1;
-}
-/* FOND DE LA PAGE PELOTES */
-body::before {
-  content:"";
-  position:fixed;
-  top:0;
-  left:0;
-  width:100vw;
-  height:100vh;
-  background-image: url('IMG_1722.jpeg'); /* <-- ici tu mets ton image */
-  background-size: cover;
-  background-position: center center;
-  background-repeat: no-repeat;
-  z-index:-1;
+  z-index: -1;
 }
 
-/* SIDEBAR */
-#sidebar{
-  position:fixed;
-  top:0;
-  left:-220px;
-  width:220px;
-  height:100vh;
-  background:rgba(255,230,240,0.2);
-  border-right:2px solid #b67385;
-  padding:20px;
-  transition:left .3s;
-  z-index:10;
-}
-#sidebar.sidebar-open{left:0}
-#toggleSidebar{
-  position:absolute;
-  top:50%;
-  right:-30px;
-  width:30px;
-  height:60px;
-  background:#ffb6c1;
-  border-radius:0 12px 12px 0;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  cursor:pointer;
-  font-weight:bold;
-}
-#backBtn{
-  width:auto;
-  padding:8px 16px;
-  border-radius:16px;
-  border:none;
-  background:#ffb6c1;
-  color:#fff;
-  cursor:pointer;
-  font-weight:bold;
-  margin-top:10px;
+/* Tiroirs */
+.drawer {
+  position: absolute;
+  border: 2px dashed rgba(255,0,0,0.3); /* juste pour visualiser */
+  cursor: pointer;
 }
 
-/* CONTENU */
-.center-zone{
-  display:flex;
+/* Modal */
+.modal {
+  position: fixed;
+  inset:0;
+  display: none;
   justify-content:center;
   align-items:center;
-  height:100vh;
-  font-size:2rem;
-  color:#b84c6f;
-  text-shadow:1px 1px 2px rgba(255,255,255,0.8);
+  background: rgba(0,0,0,0.6);
+  z-index: 100;
+}
+.modal-box {
+  background: #ffe6f0;
+  padding: 16px 24px;
+  border-radius: 20px;
+  border: 3px solid #b67385;
+  min-width: 200px;
+  text-align:center;
 }
 </style>
 </head>
 <body>
 
-<div id="sidebar">
-  <div id="toggleSidebar">☰</div>
-  <button id="backBtn">Retour</button>
-</div>
-
-<div class="center-zone">
-  Page Pelotes
-</div>
-
 <script>
-// Fade-in à l'ouverture
-window.onload = () => { document.body.style.opacity = '1'; };
+// Dimensions et positions des tiroirs (4 colonnes x 4 lignes)
+const rows = 4;
+const cols = 4;
 
-// Bouton Retour avec fondu
-document.getElementById('backBtn').onclick = () => {
-  document.body.style.opacity = '0';
-  setTimeout(() => { window.location.href = 'owner.html'; }, 500);
-};
+// Largeur et hauteur approximatives d’un tiroir (en pixels)
+const drawerWidth = 120;
+const drawerHeight = 80;
 
-// Toggle sidebar
-document.getElementById('toggleSidebar').onclick = () => {
-  document.getElementById('sidebar').classList.toggle('sidebar-open');
-};
+// Décalage initial depuis le coin supérieur gauche
+const offsetX = 50;
+const offsetY = 80;
+
+// Espacement horizontal et vertical entre tiroirs
+const gapX = 150;
+const gapY = 120;
+
+for (let r = 0; r < rows; r++) {
+  for (let c = 0; c < cols; c++) {
+    const index = r*cols + c + 1;
+
+    // Création du div tiroir
+    const drawer = document.createElement('div');
+    drawer.className = 'drawer';
+    drawer.style.width = drawerWidth + 'px';
+    drawer.style.height = drawerHeight + 'px';
+    drawer.style.top = (offsetY + r*gapY) + 'px';
+    drawer.style.left = (offsetX + c*gapX) + 'px';
+    document.body.appendChild(drawer);
+
+    // Création du modal correspondant
+    const modal = document.createElement('div');
+    modal.className = 'modal';
+    modal.id = 'modal' + index;
+    modal.innerHTML = `
+      <div class="modal-box">
+        <h3>Tiroir ${index}</h3>
+        <p>Contenu du tiroir ${index}</p>
+        <button onclick="document.getElementById('modal${index}').style.display='none'">Fermer</button>
+      </div>
+    `;
+    document.body.appendChild(modal);
+
+    // Clic sur le tiroir = ouvre le modal
+    drawer.onclick = () => {
+      modal.style.display = 'flex';
+    };
+  }
+}
 </script>
-
 </body>
 </html>
