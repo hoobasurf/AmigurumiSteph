@@ -404,6 +404,13 @@ body::before {
   cursor: pointer;
   font-weight: bold;
 }
+
+.comment-box {
+  width: 400px;      /* taille par défaut */
+  height: 400px;
+  max-width: 90vw;
+  max-height: 80vh;
+}
   
 </style>
 </head>
@@ -448,18 +455,8 @@ body::before {
 </div>
 
 <!-- MODAL COMMENT -->
+<!-- MODAL COMMENT -->
 <div id="commentModal" class="modal">
-  <div class="modal-box comment-box">
-
-    <!-- bouton agrandir -->
-    <div class="expand-btn" id="expandComment">⤢</div>
-
-    <h3>Commentaire 💬</h3>
-
-    <div class="comment-list" id="commentBubbles"></div>
-
-    <!-- barre écriture toujours en bas -->
-    <div id="commentModal" class="modal">
   <div class="modal-box comment-box">
 
     <!-- bouton agrandir -->
@@ -483,7 +480,7 @@ body::before {
 <!-- ZOOM -->
 <div id="zoomModal">
   <div class="closeZoom">×</div>
-  <img id="mainZoom">
+  <img id="mainZoom">https://github.com/hoobasurf/AmigurumiSteph/edit/main/owner.html
   <div class="thumbs" id="thumbs"></div>
   <div class="actions">
     <button class="like-btn"><svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"></path></svg> <span id="likeCount">0</span></button>
