@@ -388,18 +388,17 @@ body::before {
 
 .comment-input-bar .comment-input {
   flex: 1;
-  padding: 12px 16px;          /* plus de padding pour un champ plus grand */
-  border-radius: 16px;          /* coins arrondis plus visibles */
-  border: 2px solid #b67385;    /* couleur bordure rose douce */
-  font-size: 16px;              /* texte plus lisible */
+  padding: 12px 16px;          
+  border-radius: 16px;          
+  border: 2px solid #b67385;    
+  font-size: 16px;              
   outline: none;
-  background: #fff0f5;          /* fond rose très clair */
-  color: #b84c6f;               /* texte rose foncé */
-  box-shadow: 0 2px 6px rgba(0,0,0,0.1); /* légère ombre */
-  transition: all 0.3s ease;    /* transition sur focus */
+  background: #fff0f5;          
+  color: #b84c6f;               
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1); 
+  transition: all 0.3s ease;    
 }
 
-/* effet focus : border + légère ombre */
 .comment-input-bar .comment-input:focus {
   border-color: #e94f9a;
   box-shadow: 0 2px 12px rgba(233,79,154,0.3);
@@ -548,7 +547,7 @@ body::before {
   </div>
 </div>
 
-  <script type="module">
+<script type="module">
 import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
 
 const supabase = createClient(
@@ -666,7 +665,6 @@ confirmLike.onclick = async () => {
 };
 
 // ================== COMMENT ==================
-    // ================== COMMENT ==================
 document.querySelector('.comment-btn').onclick = () => {
   if (!currentZoom) return;
 
@@ -684,79 +682,26 @@ document.querySelector('.comment-btn').onclick = () => {
     actions.style.gap = '6px';
 
     // Bouton Like pour ce commentaire
-    document.querySelector('.comment-btn').onclick = () => {
-  if (!currentZoom) return;
-
-  commentBubbles.innerHTML = '';
-
-  (currentZoom.comments || []).forEach((c, index) => {
-    const item = document.createElement('div');
-    item.className = 'comment-item';
-
-    // Texte commentaire avec prénom en gras et texte plus petit
-    const text = document.createElement('span');
-    text.innerHTML = `<strong>${c.name}</strong>: <span style="font-size:13px">${c.text}</span>`;
-
-    // Container actions (like bouton et compteur)
-    const actions = document.createElement('div');
-    actions.style.display = 'flex';
-    actions.style.gap = '6px';
-    actions.style.alignItems = 'center';
-
-    // Bouton like + compteur
     const likeBtn = document.createElement('button');
     likeBtn.innerHTML = `
-      <svg viewBox="0 0 24 24" width="16" height="16" style="stroke:#ffb6c1; fill:none">
+      <svg viewBox="0 0 24 24" width="18" height="18" style="stroke:#ffb6c1; fill:none">
         <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5
                  2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09
                  C13.09 3.81 14.76 3 16.5 3
                  19.58 3 22 5.42 22 8.5
                  c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
-      </svg>`;
+      </svg> ${c.likes?.length || 0}`;
     likeBtn.onclick = () => openCommentLikeModal(c);
-
-    const likeCount = document.createElement('span');
-    likeCount.textContent = c.likes?.length || 0;
-    likeCount.style.fontSize = "12px";
-
     actions.appendChild(likeBtn);
-    actions.appendChild(likeCount);
 
     item.appendChild(text);
     item.appendChild(actions);
-
     commentBubbles.appendChild(item);
   });
 
-  // Reset inputs pour envoyer un nouveau commentaire
   document.getElementById('commentName').value = '';
   document.getElementById('commentText').value = '';
-
   commentModal.style.display = 'flex';
-};
-
-// ================== BOUTON ENVOYER COMMENTAIRE ==================
-confirmComment.onclick = async () => {
-  const nameInput = document.getElementById('commentName');
-  const textInput = document.getElementById('commentText');https://github.com/hoobasurf/AmigurumiSteph/edit/main/owner.html
-  const name = nameInput.value.trim();
-  const text = textInput.value.trim();
-  if (!name || !text || !currentZoom) return;
-
-  if (!currentZoom.comments) currentZoom.comments = [];
-  currentZoom.comments.push({ name, text, likes: [] });
-
-  const { error } = await supabase.from('creations')
-    .update({ comments: currentZoom.comments })
-    .eq('id', currentZoom.id);
-  if (error) console.error(error);
-
-  nameInput.value = '';
-  textInput.value = '';
-
-  // Re-crée la liste avec compteur mis à jour
-  document.querySelector('.comment-btn').onclick();
-  updateActions();
 };
 
 // ================== MINI-MODAL LIKE COMMENT ==================
@@ -775,12 +720,9 @@ function openCommentLikeModal(comment){
       </div>
     `;
     document.body.appendChild(modal);
-
-    // Fermer modal si clic dehors
     modal.onclick = (e) => { if(e.target === modal) modal.style.display='none'; };
   }
 
-  // Afficher la liste des prénoms
   const list = modal.querySelector('#commentLikeList');
   list.innerHTML = '';
   (comment.likes || []).forEach(name => {
@@ -790,11 +732,9 @@ function openCommentLikeModal(comment){
     list.appendChild(div);
   });
 
-  // Reset input
   const input = modal.querySelector('#commentLikeName');
   input.value = '';
 
-  // Valider
   const confirmBtn = modal.querySelector('#confirmCommentLike');
   confirmBtn.onclick = async () => {
     const name = input.value.trim();
@@ -802,13 +742,11 @@ function openCommentLikeModal(comment){
     if(!comment.likes) comment.likes = [];
     comment.likes.push(name);
 
-    // Mettre à jour Supabase
     const { error } = await supabase.from('creations')
       .update({ comments: currentZoom.comments })
       .eq('id', currentZoom.id);
     if(error) console.error(error);
 
-    // Rafraîchir la liste
     list.innerHTML = '';
     comment.likes.forEach(n => {
       const div = document.createElement('div');
@@ -818,13 +756,11 @@ function openCommentLikeModal(comment){
     });
 
     modal.style.display='none';
-    render(); // mise à jour des compteurs dans modal comment
+    render(); 
   };
 
   modal.style.display='flex';
 };
-
-  
 
 // ================== DELETE ==================
 function openDeleteModal(project){
@@ -915,13 +851,6 @@ async function refreshCreations() {
   render();
 }
 
-// ================== BOUTON PELOTES ==================
-const pelotesBtn = document.createElement('button');
-pelotesBtn.textContent = "Pelotes";
-document.getElementById('addBtn').insertAdjacentElement('afterend', pelotesBtn);
-pelotesBtn.style.marginTop = "10px";
-pelotesBtn.onclick = () => { window.location.href = 'pelotes.html'; };
-
 // ================== EVENTS ==================
 document.querySelector('.closeZoom').onclick = () => zoomModal.style.display = 'none';
 zoomModal.onclick = e => { if(e.target === zoomModal) zoomModal.style.display = 'none'; };
@@ -944,5 +873,3 @@ refreshCreations();
 </script>
 </body>
 </html>
-
-  
