@@ -346,6 +346,14 @@ body::before {
   justify-content:space-between;
 }
 
+/* taille normale du modal commentaire */
+.comment-box{
+  width:400px;
+  height:400px;
+  max-width:90vw;
+  max-height:80vh;
+}
+
 /* liste commentaires */
 .comment-list{
   flex:1;
@@ -404,13 +412,6 @@ body::before {
   cursor: pointer;
   font-weight: bold;
 }
-
-.comment-box {
-  width: 400px;      /* taille par défaut */
-  height: 400px;
-  max-width: 90vw;
-  max-height: 80vh;
-}
   
 </style>
 </head>
@@ -455,7 +456,6 @@ body::before {
 </div>
 
 <!-- MODAL COMMENT -->
-<!-- MODAL COMMENT -->
 <div id="commentModal" class="modal">
   <div class="modal-box comment-box">
 
@@ -476,11 +476,11 @@ body::before {
 
   </div>
 </div>
-    
+
 <!-- ZOOM -->
 <div id="zoomModal">
   <div class="closeZoom">×</div>
-  <img id="mainZoom">https://github.com/hoobasurf/AmigurumiSteph/edit/main/owner.html
+  <img id="mainZoom">
   <div class="thumbs" id="thumbs"></div>
   <div class="actions">
     <button class="like-btn"><svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"></path></svg> <span id="likeCount">0</span></button>
@@ -488,7 +488,7 @@ body::before {
   </div>
 </div>
 
-<script type="module">
+  <script type="module">
 import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
 
 const supabase = createClient(
@@ -607,7 +607,6 @@ confirmLike.onclick = async () => {
 };
 
 // ================== COMMENT ==================
-// Ouvrir modal commentaire uniquement au clic
 document.querySelector('.comment-btn').onclick = () => {
   if (!currentZoom) return;
 
@@ -638,24 +637,11 @@ document.querySelector('.comment-btn').onclick = () => {
     commentBubbles.appendChild(item);
   });
 
-  // reset inputs
   document.getElementById('commentName').value = '';
   document.getElementById('commentText').value = '';
   commentModal.style.display = 'flex';
 };
 
-// fermer modal si clic en dehors
-document.getElementById('commentModal').onclick = e => {
-  if (e.target === document.getElementById('commentModal')) {
-    document.getElementById('commentModal').style.display = 'none';
-  }
-};
-
-  // réinitialiser les champs d'entrée
-  document.getElementById('commentName').value = '';
-  document.getElementById('commentText').value = '';
-  commentModal.style.display = 'flex';
-};
 confirmComment.onclick = async () => {
   const name = document.getElementById('commentName').value.trim();
   const text = document.getElementById('commentText').value.trim();
@@ -703,20 +689,16 @@ document.getElementById('confirmDelete').onclick = async () => {
 };
 
 // ================== AJOUT ==================
-// Ouvrir modal Ajouter
-// Ouvrir la modal
 document.getElementById('addBtn').onclick = () => {
   addModal.style.display = 'flex';
 };
 
-// Fermer la modal uniquement si on clique sur le fond, PAS sur les inputs ou bouton
 addModal.addEventListener('click', e => {
   if (e.target === addModal) addModal.style.display = 'none';
 });
 
-// Bouton Valider (corrigé)
 document.getElementById('confirmAdd').onclick = async (e) => {
-  e.stopPropagation(); // empêche la fermeture par le click sur le modal
+  e.stopPropagation();
 
   const name = document.getElementById('photoName').value.trim();
   const files = document.getElementById('multiPhoto').files;
@@ -784,17 +766,11 @@ async function refreshCreations() {
 // ================== BOUTON PELOTES ==================
 const pelotesBtn = document.createElement('button');
 pelotesBtn.textContent = "Pelotes";
-
-// juste sous le bouton Ajouter
 document.getElementById('addBtn')
   .insertAdjacentElement('afterend', pelotesBtn);
+pelotesBtn.style.marginTop = "10px";
+pelotesBtn.onclick = () => { window.location.href = 'pelotes.html'; };
 
-// redirection vers la page pelotes
-pelotesBtn.onclick = () => {
-  window.location.href = 'pelotes.html';
-};
-  pelotesBtn.style.marginTop = "10px";
-  
 // ================== EVENTS ==================
 document.querySelector('.closeZoom').onclick = () => zoomModal.style.display = 'none';
 zoomModal.onclick = e => { if(e.target === zoomModal) zoomModal.style.display = 'none'; };
@@ -819,3 +795,5 @@ refreshCreations();
 </script>
 </body>
 </html>
+
+  
