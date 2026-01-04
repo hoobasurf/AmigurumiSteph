@@ -429,7 +429,6 @@ body::before {
 </div>
 
 <!-- MODAL COMMENT -->
-<!-- MODAL COMMENT -->
 <div id="commentModal" class="modal">
   <div class="modal-box comment-box">
 
@@ -580,28 +579,38 @@ confirmLike.onclick = async () => {
 };
 
 // ================== COMMENT ==================
-commentBubbles.innerHTML = '';
-(currentZoom.comments || []).forEach((c, index) => {
-  const item = document.createElement('div');
-  item.className = 'comment-item';
+document.querySelector('.comment-btn').onclick = () => {
+  if (!currentZoom) return;
 
-  const text = document.createElement('span');
-  text.textContent = `${c.name} : ${c.text}`;
+  const commentBubbles = document.getElementById('commentBubbles');
+  commentBubbles.innerHTML = '';
 
-  const like = document.createElement('div');
-  like.className = 'comment-like';
-  like.innerHTML = `❤️ ${c.likes || 0}`;
+  (currentZoom.comments || []).forEach((c, index) => {
+    const item = document.createElement('div');
+    item.className = 'comment-item';
 
-  like.onclick = () => {
-    c.likes = (c.likes || 0) + 1;
-    like.innerHTML = `❤️ ${c.likes}`;
-  };
+    const text = document.createElement('span');
+    text.textContent = `${c.name} : ${c.text}`;
 
-  item.appendChild(text);
-  item.appendChild(like);
-  commentBubbles.appendChild(item);
-});
+    const like = document.createElement('div');
+    like.className = 'comment-like';
+    like.innerHTML = `❤️ ${c.likes || 0}`;
 
+    like.onclick = () => {
+      c.likes = (c.likes || 0) + 1;
+      like.innerHTML = `❤️ ${c.likes}`;
+    };
+
+    item.appendChild(text);
+    item.appendChild(like);
+    commentBubbles.appendChild(item);
+  });
+
+  // réinitialiser les champs d'entrée
+  document.getElementById('commentName').value = '';
+  document.getElementById('commentText').value = '';
+  commentModal.style.display = 'flex';
+};
 confirmComment.onclick = async () => {
   const name = document.getElementById('commentName').value.trim();
   const text = document.getElementById('commentText').value.trim();
