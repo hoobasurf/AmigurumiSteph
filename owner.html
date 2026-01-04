@@ -325,6 +325,67 @@ body::before {
     opacity: 0;
   }
 }
+
+/* bouton agrandir */
+.expand-btn{
+  position:absolute;
+  top:10px;
+  right:12px;
+  cursor:pointer;
+  font-size:18px;
+  color:#b84c6f;
+}
+
+/* mode plein écran */
+.comment-box.fullscreen{
+  width:95vw;
+  height:90vh;
+  max-width:none;
+  max-height:none;
+  border-radius:16px;
+  justify-content:space-between;
+}
+
+/* liste commentaires */
+.comment-list{
+  flex:1;
+  width:100%;
+  overflow-y:auto;
+  padding:10px;
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+}
+
+/* commentaire individuel */
+.comment-item{
+  background:rgba(255,182,193,0.25);
+  border-radius:14px;
+  padding:8px 12px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  font-size:14px;
+}
+
+/* cœur par commentaire */
+.comment-like{
+  cursor:pointer;
+  font-size:14px;
+  color:#e94f9a;
+  display:flex;
+  gap:4px;
+  align-items:center;
+}
+
+/* barre écriture fixée en bas */
+.comment-input-bar{
+  width:100%;
+  display:flex;
+  gap:6px;
+}
+.comment-input-bar input{flex:1}
+  
 </style>
 </head>
 <body>
@@ -368,13 +429,24 @@ body::before {
 </div>
 
 <!-- MODAL COMMENT -->
+<!-- MODAL COMMENT -->
 <div id="commentModal" class="modal">
-  <div class="modal-box">
+  <div class="modal-box comment-box">
+
+    <!-- bouton agrandir -->
+    <div class="expand-btn" id="expandComment">⤢</div>
+
     <h3>Commentaire 💬</h3>
-    <input id="commentName" placeholder="Votre prénom">
-    <input id="commentText" placeholder="Votre commentaire">
-    <button id="confirmComment">Valider</button>
-    <div class="bubble-container" id="commentBubbles"></div>
+
+    <div class="comment-list" id="commentBubbles"></div>
+
+    <!-- barre écriture toujours en bas -->
+    <div class="comment-input-bar">
+      <input id="commentName" placeholder="Votre prénom">
+      <input id="commentText" placeholder="Votre commentaire">
+      <button id="confirmComment">Valider</button>
+    </div>
+
   </div>
 </div>
 
@@ -508,22 +580,27 @@ confirmLike.onclick = async () => {
 };
 
 // ================== COMMENT ==================
-document.querySelector('.comment-btn').onclick = () => {
-  if (!currentZoom) return;
+commentBubbles.innerHTML = '';
+(currentZoom.comments || []).forEach((c, index) => {
+  const item = document.createElement('div');
+  item.className = 'comment-item';
 
-  const commentBubbles = document.getElementById('commentBubbles');
-  commentBubbles.innerHTML = '';
-  (currentZoom.comments || []).forEach(c => {
-    const b = document.createElement('div');
-    b.className = 'bubble';
-    b.textContent = `${c.name}: ${c.text}`;
-    commentBubbles.appendChild(b);
-  });
+  const text = document.createElement('span');
+  text.textContent = `${c.name} : ${c.text}`;
 
-  document.getElementById('commentName').value = '';
-  document.getElementById('commentText').value = '';
-  commentModal.style.display = 'flex';
-};
+  const like = document.createElement('div');
+  like.className = 'comment-like';
+  like.innerHTML = `❤️ ${c.likes || 0}`;
+
+  like.onclick = () => {
+    c.likes = (c.likes || 0) + 1;
+    like.innerHTML = `❤️ ${c.likes}`;
+  };
+
+  item.appendChild(text);
+  item.appendChild(like);
+  commentBubbles.appendChild(item);
+});
 
 confirmComment.onclick = async () => {
   const name = document.getElementById('commentName').value.trim();
@@ -672,6 +749,17 @@ commentModal.onclick = e => { if(e.target === commentModal) commentModal.style.d
 deleteModal.onclick = e => { if(e.target === deleteModal) deleteModal.style.display = 'none'; currentDelete=null; };
 document.getElementById('toggleSidebar').onclick = () => sidebar.classList.toggle('sidebar-open');
 
+// ===== AGRANDISSEMENT MODAL COMMENT =====
+const expandBtn = document.getElementById('expandComment');
+const commentBox = document.querySelector('.comment-box');
+
+expandBtn.onclick = (e) => {
+  e.stopPropagation();
+  commentBox.classList.toggle('fullscreen');
+  expandBtn.textContent =
+    commentBox.classList.contains('fullscreen') ? '⤡' : '⤢';
+};
+  
 // ================== START ==================
 refreshCreations();
 </script>
