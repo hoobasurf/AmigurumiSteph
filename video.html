@@ -6,7 +6,7 @@
 <title>Galerie Vidéo Minimaliste</title>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Arial', sans-serif; }
-  body { background: #fff0f6; color: #333; }
+  body { background: #fff0f6; color: #333; transition: opacity 0.5s ease; }
 
   /* ===== SIDEBAR ===== */
   #sidebar{
@@ -53,12 +53,12 @@
 
   /* CONTENU PRINCIPAL */
   main{
-    margin-left:20px; /* pour ne pas cacher derrière la sidebar */
+    margin-left:20px;
     padding:20px;
     transition: margin-left .3s;
   }
   main.shifted {
-    margin-left:240px; /* décale quand sidebar ouverte */
+    margin-left:240px;
   }
 
   /* --- Bouton Vidéo --- */
@@ -124,6 +124,11 @@
     color: #c71585;
     cursor: text;
   }
+
+  /* --- Transition fondu pour page --- */
+  body.fade-out {
+    opacity: 0;
+  }
 </style>
 </head>
 <body>
@@ -159,16 +164,18 @@
   const backBtn = document.getElementById('backBtn');
   const mainContent = document.getElementById('mainContent');
 
-  // Ouvrir / fermer sidebar avec ☰
+  // Ouvrir sidebar
   toggleSidebar.onclick = () => {
     sidebar.classList.add('sidebar-open');
     mainContent.classList.add('shifted');
   }
 
-  // Fermer sidebar avec Retour
+  // Retour avec fondu vers owner.html
   backBtn.onclick = () => {
-    sidebar.classList.remove('sidebar-open');
-    mainContent.classList.remove('shifted');
+    document.body.classList.add('fade-out');
+    setTimeout(() => {
+      window.location.href = 'owner.html';
+    }, 500); // durée de la transition
   }
 
   // --- Modal vidéo ---
