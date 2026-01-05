@@ -15,25 +15,32 @@ body{
 /* SIDEBAR */
 #sidebar{
   position:fixed;
-  top:0; left:-220px;
-  width:220px; height:100vh;
-  background: rgba(255, 230, 240, 0.35);
-  backdrop-filter: blur(8px);
+  top:0;
+  left:-220px;
+  width:220px;
+  height:100vh;
+  background:rgba(255,230,240,0.2);
   border-right:2px solid #b67385;
   padding:20px;
-  transition:.3s;
-  z-index:20;
+  transition:left .3s;
+  z-index:10;
 }
-#sidebar.open{left:0}
-#toggle{
+#sidebar.sidebar-open{left:0}
+#toggleSidebar{
   position:absolute;
-  right:-30px; top:50%;
-  width:30px; height:60px;
+  top:50%;
+  right:-30px;
+  width:30px;
+  height:60px;
   background:#ffb6c1;
   border-radius:0 12px 12px 0;
-  display:flex;align-items:center;justify-content:center;
+  display:flex;
+  align-items:center;
+  justify-content:center;
   cursor:pointer;
+  font-weight:bold;
 }
+  
 #sidebar button{
   width:100%;
   margin:8px 0;
