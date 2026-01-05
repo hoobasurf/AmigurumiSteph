@@ -5,29 +5,65 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Galerie Vidéo Minimaliste</title>
 <style>
-  /* --- Reset / Base --- */
   * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Arial', sans-serif; }
   body { background: #fff0f6; color: #333; }
 
-  /* --- Sidebar --- */
-  .sidebar {
-    position: fixed;
-    left: 0; top: 0;
-    width: 200px; height: 100%;
-    background: rgba(255, 182, 193, 0.1); /* très léger rose pastel */
-    display: flex; flex-direction: column;
-    padding: 20px;
+  /* ===== SIDEBAR ===== */
+  #sidebar{
+    position:fixed;
+    top:0;
+    left:-220px;
+    width:220px;
+    height:100vh;
+    background:rgba(255,230,240,0.2);
+    border-right:2px solid #b67385;
+    padding:20px;
+    transition:left .3s;
+    z-index:100;
+  }
+  #sidebar.sidebar-open{
+    left:0;
+  }
+  #toggleSidebar{
+    position:absolute;
+    top:50%;
+    right:-30px;
+    width:30px;
+    height:60px;
+    background:#ffb6c1;
+    border-radius:0 12px 12px 0;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    cursor:pointer;
+    font-weight:bold;
+    color:white;
+  }
+  #backBtn{
+    width:auto;
+    padding:8px 16px;
+    border-radius:16px;
+    border:none;
+    background:#ffb6c1;
+    color:#fff;
+    cursor:pointer;
+    font-weight:bold;
+    margin-top:10px;
   }
 
-  /* --- Main content --- */
-  .main {
-    margin-left: 220px;
-    padding: 20px;
+  /* CONTENU PRINCIPAL */
+  main{
+    margin-left:20px; /* pour ne pas cacher derrière la sidebar */
+    padding:20px;
+    transition: margin-left .3s;
+  }
+  main.shifted {
+    margin-left:240px; /* décale quand sidebar ouverte */
   }
 
   /* --- Bouton Vidéo --- */
   .btn-video {
-    background: #ffb6c1; /* rose pastel */
+    background: #ffb6c1;
     color: #fff;
     border: none;
     padding: 12px 20px;
@@ -37,7 +73,6 @@
     font-size: 16px;
     margin-bottom: 20px;
   }
-
   .btn-video:hover { box-shadow: 0 4px 8px rgba(0,0,0,0.2); }
 
   /* --- Modal --- */
@@ -47,7 +82,6 @@
     background: rgba(0,0,0,0.3);
     justify-content: center; align-items: center;
   }
-
   .modal-content {
     background: #fff0f6;
     padding: 30px;
@@ -55,11 +89,9 @@
     width: 90%; max-width: 400px;
     text-align: center;
   }
-
   .modal-content input[type="file"], .modal-content input[type="text"] {
     width: 100%; padding: 10px; margin: 10px 0; border-radius: 6px; border: 1px solid #ffc0cb;
   }
-
   .modal-content button {
     background: #ffb6c1;
     color: #fff;
@@ -75,19 +107,16 @@
     grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
     gap: 15px;
   }
-
   .video-card {
     background: #ffe4ec;
     padding: 10px;
     border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0,0,0,0.1);
   }
-
   .video-card video, .video-card iframe {
     width: 100%;
     border-radius: 6px;
   }
-
   .video-name {
     margin-top: 8px;
     text-align: center;
@@ -99,21 +128,21 @@
 </head>
 <body>
 
-<!-- Sidebar -->
-<div class="sidebar">
-  <h3>Menu</h3>
-  <p>Sidebar transparente</p>
+<!-- SIDEBAR -->
+<div id="sidebar">
+  <div id="toggleSidebar">☰</div>
+  <button id="backBtn">Retour</button>
 </div>
 
-<!-- Main content -->
-<div class="main">
+<!-- CONTENU PRINCIPAL -->
+<main id="mainContent">
   <button class="btn-video" id="openModal">Vidéo</button>
 
   <!-- Galerie vidéos -->
   <div class="gallery" id="gallery"></div>
-</div>
+</main>
 
-<!-- Modal -->
+<!-- MODAL -->
 <div class="modal" id="videoModal">
   <div class="modal-content">
     <h2>Ajouter une vidéo</h2>
@@ -125,6 +154,24 @@
 </div>
 
 <script>
+  const sidebar = document.getElementById('sidebar');
+  const toggleSidebar = document.getElementById('toggleSidebar');
+  const backBtn = document.getElementById('backBtn');
+  const mainContent = document.getElementById('mainContent');
+
+  // Ouvrir / fermer sidebar avec ☰
+  toggleSidebar.onclick = () => {
+    sidebar.classList.add('sidebar-open');
+    mainContent.classList.add('shifted');
+  }
+
+  // Fermer sidebar avec Retour
+  backBtn.onclick = () => {
+    sidebar.classList.remove('sidebar-open');
+    mainContent.classList.remove('shifted');
+  }
+
+  // --- Modal vidéo ---
   const modal = document.getElementById('videoModal');
   const openBtn = document.getElementById('openModal');
   const closeBtn = document.getElementById('closeModal');
@@ -167,7 +214,6 @@
 
     gallery.appendChild(card);
 
-    // Reset modal
     fileInput.value = '';
     youtubeInput.value = '';
     modal.style.display = 'none';
