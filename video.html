@@ -3,259 +3,176 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Mes Vidéos</title>
+<title>Galerie Vidéo Minimaliste</title>
 <style>
-html, body {
-  margin:0; padding:0;
-  font-family:'Comic Sans MS',cursive;
-  background:#ffe6f0;
-  height:100%;
-}
+  /* --- Reset / Base --- */
+  * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Arial', sans-serif; }
+  body { background: #fff0f6; color: #333; }
 
-/* FOND IMAGE */
-body::before{
-  content:"";
-  position:fixed;
-  inset:0;
-  background-image:url('IMG_1722.jpeg');
-  background-size:cover;
-  background-position:center;
-  background-repeat:no-repeat;
-  z-index:-1;
-}
+  /* --- Sidebar --- */
+  .sidebar {
+    position: fixed;
+    left: 0; top: 0;
+    width: 200px; height: 100%;
+    background: rgba(255, 182, 193, 0.1); /* très léger rose pastel */
+    display: flex; flex-direction: column;
+    padding: 20px;
+  }
 
-/* SIDEBAR */
-#sidebar{
-  position:fixed; top:0; left:-220px;
-  width:220px; height:100vh;
-  background:#ffe6f0;
-  border-right:2px solid #b67385;
-  padding:20px;
-  transition:left .3s;
-  z-index:100;
-}
-#sidebar.sidebar-open{left:0;}
-#toggleSidebar{
-  position:absolute; top:50%; right:-30px;
-  width:30px; height:60px;
-  background:#ffb6c1;
-  border-radius:0 12px 12px 0;
-  display:flex; align-items:center; justify-content:center;
-  cursor:pointer; font-weight:bold; color:white;
-}
-#backBtn{
-  width:100%; padding:8px;
-  border-radius:16px; border:none;
-  background:#ffb6c1; color:white; font-weight:bold;
-  cursor:pointer; margin-top:10px;
-}
+  /* --- Main content --- */
+  .main {
+    margin-left: 220px;
+    padding: 20px;
+  }
 
-/* MAIN CONTENU */
-main{
-  margin-left:20px; padding:10px;
-}
+  /* --- Bouton Vidéo --- */
+  .btn-video {
+    background: #ffb6c1; /* rose pastel */
+    color: #fff;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    cursor: pointer;
+    font-size: 16px;
+    margin-bottom: 20px;
+  }
 
-/* INPUTS + BOUTONS */
-input[type="file"], input[type="text"]{
-  width: calc(100% - 10px);
-  padding:8px;
-  margin-bottom:8px;
-  border-radius:12px;
-  border:2px solid #b67385;
-  outline:none;
-}
-button{
-  padding:6px 12px;
-  border:none;
-  border-radius:12px;
-  background:#ffb6c1;
-  color:white;
-  cursor:pointer;
-  margin-bottom:8px;
-}
+  .btn-video:hover { box-shadow: 0 4px 8px rgba(0,0,0,0.2); }
 
-/* LISTE VIDEOS */
-#videoList{
-  display:flex; flex-direction: column;
-  gap:10px; margin-top:10px;
-}
-.video-item{
-  background:rgba(255,182,193,0.4);
-  padding:8px; border-radius:12px;
-  display:flex; align-items:center; justify-content:space-between;
-  cursor:pointer; transition: background 0.2s;
-}
-.video-item:hover{background:rgba(255,182,193,0.6);}
-.video-item span{flex:1; margin-left:6px;}
+  /* --- Modal --- */
+  .modal {
+    display: none;
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: rgba(0,0,0,0.3);
+    justify-content: center; align-items: center;
+  }
 
-/* VIDEO + TRANSCRIPTION */
-#currentVideo{
-  margin-top:10px; display:flex; flex-direction: column; gap:6px;
-}
-#currentVideo iframe, #currentVideo video{
-  width:100%; height:240px; border-radius:12px;
-}
-#transcription{
-  background:rgba(255,182,193,0.2);
-  padding:6px; border-radius:12px;
-  max-height:150px; overflow-y:auto;
-  font-size:14px; line-height:1.4;
-}
-.highlight{background:rgba(255,182,193,0.5);}
+  .modal-content {
+    background: #fff0f6;
+    padding: 30px;
+    border-radius: 10px;
+    width: 90%; max-width: 400px;
+    text-align: center;
+  }
+
+  .modal-content input[type="file"], .modal-content input[type="text"] {
+    width: 100%; padding: 10px; margin: 10px 0; border-radius: 6px; border: 1px solid #ffc0cb;
+  }
+
+  .modal-content button {
+    background: #ffb6c1;
+    color: #fff;
+    border: none;
+    padding: 10px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+  }
+
+  /* --- Galerie Vidéo --- */
+  .gallery {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+    gap: 15px;
+  }
+
+  .video-card {
+    background: #ffe4ec;
+    padding: 10px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  }
+
+  .video-card video, .video-card iframe {
+    width: 100%;
+    border-radius: 6px;
+  }
+
+  .video-name {
+    margin-top: 8px;
+    text-align: center;
+    font-weight: bold;
+    color: #c71585;
+    cursor: text;
+  }
 </style>
 </head>
 <body>
 
-<!-- SIDEBAR -->
-<div id="sidebar">
-  <div id="toggleSidebar">☰</div>
-  <button id="backBtn">Retour</button>
+<!-- Sidebar -->
+<div class="sidebar">
+  <h3>Menu</h3>
+  <p>Sidebar transparente</p>
 </div>
 
-<main>
-  <h2>Ajouter une vidéo</h2>
-  <input type="file" id="fileInput" accept="video/*">
-  <input type="text" id="youtubeUrl" placeholder="Coller URL YouTube">
-  <button id="addYoutubeBtn">Ajouter YouTube</button>
+<!-- Main content -->
+<div class="main">
+  <button class="btn-video" id="openModal">Vidéo</button>
 
-  <h2>Mes vidéos</h2>
-  <div id="videoList"></div>
+  <!-- Galerie vidéos -->
+  <div class="gallery" id="gallery"></div>
+</div>
 
-  <div id="currentVideo">
-    <div id="transcription">Transcription de la vidéo s'affichera ici.</div>
+<!-- Modal -->
+<div class="modal" id="videoModal">
+  <div class="modal-content">
+    <h2>Ajouter une vidéo</h2>
+    <input type="file" id="fileInput" accept="video/*">
+    <input type="text" id="youtubeInput" placeholder="Coller lien YouTube">
+    <button id="addVideo">Ajouter</button>
+    <button id="closeModal">Annuler</button>
   </div>
-</main>
+</div>
 
 <script>
-let videos = [];
-let currentVideo = null;
+  const modal = document.getElementById('videoModal');
+  const openBtn = document.getElementById('openModal');
+  const closeBtn = document.getElementById('closeModal');
+  const addBtn = document.getElementById('addVideo');
+  const fileInput = document.getElementById('fileInput');
+  const youtubeInput = document.getElementById('youtubeInput');
+  const gallery = document.getElementById('gallery');
 
-// SIDEBAR
-document.getElementById('toggleSidebar').onclick = () => {
-  document.getElementById('sidebar').classList.toggle('sidebar-open');
-};
-document.getElementById('backBtn').onclick = () => {
-  document.body.style.transition='opacity 0.5s';
-  document.body.style.opacity='0';
-  setTimeout(()=>{window.location.href='owner.html';},500);
-};
+  openBtn.onclick = () => modal.style.display = 'flex';
+  closeBtn.onclick = () => modal.style.display = 'none';
 
-// AJOUTER FICHIER LOCAL
-document.getElementById('fileInput').onchange = async (e)=>{
-  const file=e.target.files[0];
-  if(!file) return;
-  const url=URL.createObjectURL(file);
-  
-  // Appel au serveur pour transcription automatique
-  const transcription = await fakeTranscription(file.name); // à remplacer par serveur réel
-  addVideo({name:file.name,type:'file',url, transcription});
-  e.target.value='';
-};
+  addBtn.onclick = () => {
+    const file = fileInput.files[0];
+    const youtubeLink = youtubeInput.value.trim();
+    const card = document.createElement('div');
+    card.className = 'video-card';
 
-// AJOUTER YOUTUBE
-document.getElementById('addYoutubeBtn').onclick=async ()=>{
-  const url=document.getElementById('youtubeUrl').value.trim();
-  if(!url) return alert("URL vide !");
-  let id;
-  if(url.includes('youtu.be/')) id=url.split('youtu.be/')[1];
-  else if(url.includes('v=')) id=url.split('v=')[1].split('&')[0];
-  else id=url.split('/').pop();
-  
-  const transcription = await fakeTranscription('YouTube Video'); // simulation serveur
-  addVideo({name:'YouTube Video', type:'youtube', id, url:'https://www.youtube.com/embed/'+id, transcription});
-  document.getElementById('youtubeUrl').value='';
-};
+    if(file){
+      const video = document.createElement('video');
+      video.src = URL.createObjectURL(file);
+      video.controls = true;
+      card.appendChild(video);
+    } else if(youtubeLink){
+      const iframe = document.createElement('iframe');
+      iframe.src = youtubeLink.replace("watch?v=", "embed/");
+      iframe.frameBorder = "0";
+      iframe.allow = "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture";
+      iframe.allowFullscreen = true;
+      card.appendChild(iframe);
+    } else {
+      alert("Veuillez choisir un fichier ou entrer un lien YouTube !");
+      return;
+    }
 
-// AJOUTER VIDEO
-function addVideo(video){
-  videos.push(video);
-  renderList();
-  openVideo(video);
-}
+    const name = document.createElement('div');
+    name.className = 'video-name';
+    name.contentEditable = true;
+    name.innerText = file ? file.name : "Lien YouTube";
+    card.appendChild(name);
 
-// RENDER LISTE
-function renderList(){
-  const list=document.getElementById('videoList');
-  list.innerHTML='';
-  videos.forEach((v,i)=>{
-    const div=document.createElement('div');
-    div.className='video-item';
+    gallery.appendChild(card);
 
-    const span=document.createElement('span');
-    span.textContent=v.name;
-    div.appendChild(span);
-
-    const renameBtn=document.createElement('button');
-    renameBtn.textContent='✏️';
-    renameBtn.onclick=(e)=>{
-      e.stopPropagation();
-      const newName=prompt("Nouveau nom :",v.name);
-      if(newName){ v.name=newName; span.textContent=newName; }
-    };
-    div.appendChild(renameBtn);
-
-    const delBtn=document.createElement('button');
-    delBtn.textContent='🗑️';
-    delBtn.onclick=(e)=>{
-      e.stopPropagation();
-      videos.splice(i,1);
-      renderList();
-      if(v===currentVideo){
-        document.getElementById('currentVideo').innerHTML='<div id="transcription">Transcription de la vidéo s\'affichera ici.</div>';
-      }
-    };
-    div.appendChild(delBtn);
-
-    div.onclick=()=> openVideo(v);
-    list.appendChild(div);
-  });
-}
-
-// OUVRIR VIDEO + TRANSCRIPTION
-function openVideo(v){
-  currentVideo=v;
-  const container=document.getElementById('currentVideo');
-  container.innerHTML='';
-
-  let videoElem;
-  if(v.type==='file'){
-    videoElem=document.createElement('video');
-    videoElem.src=v.url; videoElem.controls=true;
-    videoElem.ontimeupdate = ()=>syncTranscription(videoElem, v.transcription);
-  } else {
-    videoElem=document.createElement('iframe');
-    videoElem.src=v.url;
-    videoElem.frameBorder='0';
-    videoElem.allow='accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture';
-    videoElem.allowFullscreen=true;
+    // Reset modal
+    fileInput.value = '';
+    youtubeInput.value = '';
+    modal.style.display = 'none';
   }
-  container.appendChild(videoElem);
-
-  const trans=document.createElement('div');
-  trans.id='transcription';
-  trans.textContent=v.transcription;
-  container.appendChild(trans);
-}
-
-// SIMULATION TRANSCRIPTION (à remplacer par serveur réel)
-async function fakeTranscription(name){
-  // renvoie chaque mot séparé par espace pour simuler surlignage
-  return name + " : Ceci est une transcription automatique de la vidéo pour test. Chaque mot apparaîtra en surlignage pendant la lecture.";
-}
-
-// SYNC TRANSCRIPTION
-function syncTranscription(videoElem, transcription){
-  const words=transcription.split(' ');
-  const time=Math.floor(videoElem.currentTime); // simulation: 1 mot par seconde
-  const container=document.getElementById('transcription');
-  container.innerHTML='';
-  for(let i=0;i<words.length;i++){
-    const span=document.createElement('span');
-    span.textContent=words[i]+' ';
-    if(i===time) span.className='highlight';
-    container.appendChild(span);
-  }
-}
 </script>
+
 </body>
 </html>
