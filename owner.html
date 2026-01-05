@@ -874,26 +874,38 @@ async function refreshCreations() {
   render();
 }
 
-// ================== BOUTON PELOTES ==================
+// ================== BOUTONS SIDEBAR ==================
+const addBtn = document.getElementById('addBtn');
+
+// --- Bouton Pelotes ---
 const pelotesBtn = document.createElement('button');
 pelotesBtn.textContent = "Pelotes";
+pelotesBtn.style.marginTop = "10px";
 
-// juste sous le bouton Ajouter
-document.getElementById('addBtn')
-  .insertAdjacentElement('afterend', pelotesBtn);
+addBtn.insertAdjacentElement('afterend', pelotesBtn);
 
-// redirection vers la page pelotes
 pelotesBtn.onclick = () => {
-  // Ajouter la classe fade-out
   document.body.style.transition = 'opacity 0.5s';
   document.body.style.opacity = '0';
-  // Après 500ms, rediriger
   setTimeout(() => {
     window.location.href = 'pelotes.html';
   }, 500);
 };
-  pelotesBtn.style.marginTop = "10px";
 
+// --- Bouton Vidéo ---
+const videoBtn = document.createElement('button');
+videoBtn.textContent = "Vidéo";
+videoBtn.style.marginTop = "10px";
+
+pelotesBtn.insertAdjacentElement('afterend', videoBtn);
+
+videoBtn.onclick = () => {
+  document.body.style.transition = 'opacity 0.5s';
+  document.body.style.opacity = '0';
+  setTimeout(() => {
+    window.location.href = 'video.html'; // ← change si besoin
+  }, 500);
+};
   // ================== EVENTS ==================
 document.querySelector('.closeZoom').onclick = () => zoomModal.style.display = 'none';
 zoomModal.onclick = e => { if(e.target === zoomModal) zoomModal.style.display = 'none'; };
