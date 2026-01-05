@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>Vidéos</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+body{
+  margin:0;
+  font-family:'Comic Sans MS', cursive;
+  background:#fff0f5;
+}
+
+/* HEADER */
+.header{
+  padding:16px;
+  display:flex;
+  gap:10px;
+}
+.header button{
+  padding:8px 16px;
+  border:none;
+  border-radius:16px;
+  background:#ffb6c1;
+  color:white;
+  font-weight:bold;
+  cursor:pointer;
+}
+
+/* VIDEO */
+.video-container{
+  width:100%;
+  display:none;
+  justify-content:center;
+  margin-top:10px;
+}
+.video-container iframe{
+  width:90%;
+  height:45vh;
+  border-radius:20px;
+  border:4px solid #b67385;
+}
+
+/* TRANSCRIPTION */
+.transcript{
+  margin:16px;
+  padding:12px;
+  background:white;
+  border-radius:20px;
+  border:2px solid #b67385;
+}
+.transcript h3{
+  margin-top:0;
+  color:#b84c6f;
+}
+.line{
+  margin:6px 0;
+}
+.line.active{
+  background:#ffb6c1;
+  border-radius:8px;
+  padding:2px 6px;
+}
+
+/* MODAL */
+.modal{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,0.6);
+  display:none;
+  justify-content:center;
+  align-items:center;
+  z-index:100;
+}
+.modal-box{
+  background:#ffe6f0;
+  width:90%;
+  max-width:500px;
+  padding:16px;
+  border-radius:20px;
+  border:3px solid #b67385;
+}
+.modal input{
+  width:100%;
+  padding:8px;
+  border-radius:12px;
+  border:2px solid #b67385;
+  margin-bottom:10px;
+}
+.modal iframe{
+  width:100%;
+  height:300px;
+  border-radius:12px;
+  border:none;
+}
+.modal button{
+  margin-top:10px;
+  width:100%;
+  padding:8px;
+  border:none;
+  border-radius:16px;
+  background:#ffb6c1;
+  color:white;
+  font-weight:bold;
+  cursor:pointer;
+}
+</style>
+</head>
+
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <button id="openSearch">Ajouter une vidéo</button>
+</div>
+
+<!-- VIDEO -->
+<div class="video-container" id="videoContainer">
+  <iframe id="player" allowfullscreen></iframe>
+</div>
+
+<!-- TRANSCRIPTION -->
+<div class="transcript">
+  <h3>Transcription</h3>
+  <div id="transcriptContent">
+    <div class="line active">La transcription automatique apparaîtra ici…</div>
+    <div class="line">Chaque phrase sera surlignée en rose</div>
+    <div class="line">au fur et à mesure de la vidéo</div>
+  </div>
+</div>
+
+<!-- MODAL YOUTUBE -->
+<div class="modal" id="searchModal">
+  <div class="modal-box">
+    <input id="searchInput" placeholder="Rechercher sur YouTube">
+    <iframe id="ytFrame"></iframe>
+    <button id="saveVideo">Enregistrer cette vidéo</button>
+  </div>
+</div>
+
+<script>
+const modal = document.getElementById('searchModal');
+const ytFrame = document.getElementById('ytFrame');
+const player = document.getElementById('player');
+const videoContainer = document.getElementById('videoContainer');
+
+document.getElementById('openSearch').onclick = () => {
+  modal.style.display = 'flex';
+};
+
+document.getElementById('searchInput').oninput = (e) => {
+  const q = encodeURIComponent(e.target.value);
+  ytFrame.src = `https://www.youtube.com/results?search_query=${q}`;
+};
+
+document.getElementById('saveVideo').onclick = () => {
+  const url = ytFrame.contentWindow.location.href;
+  const match = url.match(/v=([^&]+)/);
+
+  if(!match){
+    alert("Ouvre une vidéo YouTube avant d'enregistrer");
+    return;
+  }
+
+  const videoId = match[1];
+  player.src = `https://www.youtube.com/embed/${videoId}?enablejsapi=1`;
+  videoContainer.style.display = 'flex';
+
+  localStorage.setItem('savedVideo', videoId);
+  modal.style.display = 'none';
+};
+
+// recharge la vidéo sauvegardée
+const saved = localStorage.getItem('savedVideo');
+if(saved){
+  player.src = `https://www.youtube.com/embed/${saved}?enablejsapi=1`;
+  videoContainer.style.display = 'flex';
+}
+
+modal.onclick = e => {
+  if(e.target === modal) modal.style.display = 'none';
+};
+</script>
+
+</body>
+</html>
