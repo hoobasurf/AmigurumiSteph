@@ -3,229 +3,163 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Galerie Vidéo Minimaliste</title>
+<title>Vidéos</title>
 <style>
-  * { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Arial', sans-serif; }
-  body { background: #fff0f6; color: #333; transition: opacity 0.5s ease; }
+  body { font-family:'Comic Sans MS',cursive; background:#fff0f6; padding:20px; }
 
-  /* ===== SIDEBAR ===== */
+  /* Sidebar */
   #sidebar{
-    position:fixed;
-    top:0;
-    left:-220px;
-    width:220px;
-    height:100vh;
-    background:rgba(255,230,240,0.2);
-    border-right:2px solid #b67385;
-    padding:20px;
-    transition:left .3s;
-    z-index:100;
+    position:fixed; top:0; left:-220px; width:220px; height:100vh;
+    background:rgba(255,230,240,0.2); border-right:2px solid #b67385; padding:20px; transition:left .3s; z-index:100;
   }
-  #sidebar.sidebar-open{
-    left:0;
-  }
-  #toggleSidebar{
-    position:absolute;
-    top:50%;
-    right:-30px;
-    width:30px;
-    height:60px;
-    background:#ffb6c1;
-    border-radius:0 12px 12px 0;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    cursor:pointer;
-    font-weight:bold;
-    color:white;
-  }
-  #backBtn{
-    width:auto;
-    padding:8px 16px;
-    border-radius:16px;
-    border:none;
-    background:#ffb6c1;
-    color:#fff;
-    cursor:pointer;
-    font-weight:bold;
-    margin-top:10px;
+  #sidebar.sidebar-open{ left:0; }
+  #toggleSidebar{ position:absolute; top:50%; right:-30px; width:30px; height:60px; background:#ffb6c1; border-radius:0 12px 12px 0; display:flex; align-items:center; justify-content:center; cursor:pointer; color:white; font-weight:bold;}
+  #sidebar button{ width:auto; padding:8px 16px; border-radius:16px; border:none; background:#ffb6c1; color:#fff; cursor:pointer; font-weight:bold; margin-top:10px;}
+
+  /* Liste vidéos */
+  #video-list { display:flex; flex-direction:column; gap:10px; max-width:400px; margin:auto; margin-top:60px; }
+  .video-item {
+    background:#ffe6f0; padding:10px 16px; border-radius:12px; cursor:pointer;
+    border:2px solid #b67385; color:#b84c6f; font-weight:bold;
   }
 
-  /* CONTENU PRINCIPAL */
-  main{
-    margin-left:20px;
-    padding:20px;
-    transition: margin-left .3s;
-  }
-  main.shifted {
-    margin-left:240px;
-  }
+  /* Modal */
+  .modal { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); justify-content:center; align-items:center; }
+  .modal-content { background:#fff0f6; padding:20px; border-radius:12px; max-width:90%; width:400px; text-align:center; display:flex; flex-direction:column; gap:10px; }
+  .modal-content input{ padding:6px 12px; border-radius:10px; border:2px solid #b67385; width:100%; }
+  .modal-content button{ padding:6px 12px; border:none; background:#ffb6c1; color:#fff; border-radius:12px; cursor:pointer; font-weight:bold; }
+  .modal-content iframe, .modal-content video{ width:100%; height:220px; border-radius:8px; }
 
-  /* --- Bouton Vidéo --- */
-  .btn-video {
-    background: #ffb6c1;
-    color: #fff;
-    border: none;
-    padding: 12px 20px;
-    border-radius: 8px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-    cursor: pointer;
-    font-size: 16px;
-    margin-bottom: 20px;
-  }
-  .btn-video:hover { box-shadow: 0 4px 8px rgba(0,0,0,0.2); }
-
-  /* --- Modal --- */
-  .modal {
-    display: none;
-    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-    background: rgba(0,0,0,0.3);
-    justify-content: center; align-items: center;
-  }
-  .modal-content {
-    background: #fff0f6;
-    padding: 30px;
-    border-radius: 10px;
-    width: 90%; max-width: 400px;
-    text-align: center;
-  }
-  .modal-content input[type="file"], .modal-content input[type="text"] {
-    width: 100%; padding: 10px; margin: 10px 0; border-radius: 6px; border: 1px solid #ffc0cb;
-  }
-  .modal-content button {
-    background: #ffb6c1;
-    color: #fff;
-    border: none;
-    padding: 10px 16px;
-    border-radius: 6px;
-    cursor: pointer;
-  }
-
-  /* --- Galerie Vidéo --- */
-  .gallery {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-    gap: 15px;
-  }
-  .video-card {
-    background: #ffe4ec;
-    padding: 10px;
-    border-radius: 8px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-  }
-  .video-card video, .video-card iframe {
-    width: 100%;
-    border-radius: 6px;
-  }
-  .video-name {
-    margin-top: 8px;
-    text-align: center;
-    font-weight: bold;
-    color: #c71585;
-    cursor: text;
-  }
-
-  /* --- Transition fondu pour page --- */
-  body.fade-out {
-    opacity: 0;
-  }
 </style>
 </head>
 <body>
 
-<!-- SIDEBAR -->
 <div id="sidebar">
   <div id="toggleSidebar">☰</div>
-  <button id="backBtn">Retour</button>
+  <button id="addVideoBtn">Ajouter vidéo</button>
 </div>
 
-<!-- CONTENU PRINCIPAL -->
-<main id="mainContent">
-  <button class="btn-video" id="openModal">Vidéo</button>
+<h2 style="text-align:center;">Mes vidéos</h2>
+<div id="video-list"></div>
 
-  <!-- Galerie vidéos -->
-  <div class="gallery" id="gallery"></div>
-</main>
-
-<!-- MODAL -->
-<div class="modal" id="videoModal">
+<!-- MODAL AJOUT -->
+<div class="modal" id="videoModalAdd">
   <div class="modal-content">
-    <h2>Ajouter une vidéo</h2>
-    <input type="file" id="fileInput" accept="video/*">
-    <input type="text" id="youtubeInput" placeholder="Coller lien YouTube">
-    <button id="addVideo">Ajouter</button>
-    <button id="closeModal">Annuler</button>
+    <h3>Ajouter une vidéo</h3>
+    <input type="file" id="videoFile" accept="video/*">
+    <input type="text" id="youtubeLink" placeholder="Lien YouTube">
+    <button id="confirmAddVideo">Ajouter</button>
+    <button id="cancelAddVideo">Annuler</button>
   </div>
 </div>
 
-<script>
-  const sidebar = document.getElementById('sidebar');
-  const toggleSidebar = document.getElementById('toggleSidebar');
-  const backBtn = document.getElementById('backBtn');
-  const mainContent = document.getElementById('mainContent');
+<!-- MODAL LECTEUR -->
+<div class="modal" id="videoModalPlay">
+  <div class="modal-content" id="modalPlayContent">
+    <button id="closePlayModal">Fermer</button>
+  </div>
+</div>
 
-  // Ouvrir sidebar
-  toggleSidebar.onclick = () => {
-    sidebar.classList.add('sidebar-open');
-    mainContent.classList.add('shifted');
+<script type="module">
+import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
+
+// ====== SUPABASE ======
+const supabase = createClient(
+  "https://jyhbamdcxmpveujjqjla.supabase.co",
+  "sb_publishable_sqsxb-3Kl5o3-JQYv9kGFw_-g0EgwMa"
+);
+
+// ====== DOM ======
+const videoList = document.getElementById('video-list');
+const addVideoBtn = document.getElementById('addVideoBtn');
+const videoModalAdd = document.getElementById('videoModalAdd');
+const videoFile = document.getElementById('videoFile');
+const youtubeLink = document.getElementById('youtubeLink');
+const confirmAddVideo = document.getElementById('confirmAddVideo');
+const cancelAddVideo = document.getElementById('cancelAddVideo');
+
+const videoModalPlay = document.getElementById('videoModalPlay');
+const modalPlayContent = document.getElementById('modalPlayContent');
+const closePlayModal = document.getElementById('closePlayModal');
+
+// ====== SIDEBAR ======
+const sidebar = document.getElementById('sidebar');
+const toggleSidebar = document.getElementById('toggleSidebar');
+toggleSidebar.onclick = () => sidebar.classList.toggle('sidebar-open');
+
+// ====== OUVRIR MODAL AJOUT ======
+addVideoBtn.onclick = () => videoModalAdd.style.display = 'flex';
+cancelAddVideo.onclick = () => videoModalAdd.style.display = 'none';
+videoModalAdd.onclick = e => { if(e.target===videoModalAdd) videoModalAdd.style.display='none'; };
+
+// ====== AJOUT VIDEO ======
+confirmAddVideo.onclick = async () => {
+  const file = videoFile.files[0];
+  const yt = youtubeLink.value.trim();
+  if(!file && !yt){ alert("Sélectionnez un fichier ou collez un lien YouTube"); return; }
+
+  let insertData = { name: file ? file.name : "Lien YouTube", youtubeLink: yt || null, file_path:null };
+
+  // Si fichier
+  if(file){
+    const path = `${Date.now()}_${file.name}`;
+    const { error: uploadError } = await supabase.storage.from('videos').upload(path, file);
+    if(uploadError){ console.error(uploadError); alert("Erreur upload"); return; }
+    insertData.file_path = path;
   }
 
-  // Retour avec fondu vers owner.html
-  backBtn.onclick = () => {
-    document.body.classList.add('fade-out');
-    setTimeout(() => {
-      window.location.href = 'owner.html';
-    }, 500); // durée de la transition
+  const { error } = await supabase.from('videos').insert([insertData]);
+  if(error){ console.error(error); alert("Erreur ajout"); return; }
+
+  videoFile.value = '';
+  youtubeLink.value = '';
+  videoModalAdd.style.display = 'none';
+  loadVideos();
+};
+
+// ====== CHARGER LES VIDEOS ======
+async function loadVideos(){
+  const { data, error } = await supabase.from('videos').select('*').order('created_at',{ascending:false});
+  if(error){ console.error(error); return; }
+
+  videoList.innerHTML = '';
+  data.forEach(v => {
+    const div = document.createElement('div');
+    div.className = 'video-item';
+    div.textContent = v.name;
+    div.onclick = () => openVideo(v);
+    videoList.appendChild(div);
+  });
+}
+
+// ====== LECTEUR ======
+function openVideo(v){
+  modalPlayContent.innerHTML = '';
+  modalPlayContent.appendChild(closePlayModal);
+
+  if(v.youtubeLink){
+    const iframe = document.createElement('iframe');
+    iframe.src = v.youtubeLink.replace("watch?v=","embed/");
+    iframe.frameBorder = "0";
+    iframe.allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture";
+    iframe.allowFullscreen = true;
+    modalPlayContent.appendChild(iframe);
+  } else if(v.file_path){
+    const vid = document.createElement('video');
+    vid.src = supabase.storage.from('videos').getPublicUrl(v.file_path).data.publicUrl;
+    vid.controls = true;
+    modalPlayContent.appendChild(vid);
   }
 
-  // --- Modal vidéo ---
-  const modal = document.getElementById('videoModal');
-  const openBtn = document.getElementById('openModal');
-  const closeBtn = document.getElementById('closeModal');
-  const addBtn = document.getElementById('addVideo');
-  const fileInput = document.getElementById('fileInput');
-  const youtubeInput = document.getElementById('youtubeInput');
-  const gallery = document.getElementById('gallery');
+  videoModalPlay.style.display = 'flex';
+}
 
-  openBtn.onclick = () => modal.style.display = 'flex';
-  closeBtn.onclick = () => modal.style.display = 'none';
+closePlayModal.onclick = () => videoModalPlay.style.display='none';
+videoModalPlay.onclick = e => { if(e.target===videoModalPlay) videoModalPlay.style.display='none'; };
 
-  addBtn.onclick = () => {
-    const file = fileInput.files[0];
-    const youtubeLink = youtubeInput.value.trim();
-    const card = document.createElement('div');
-    card.className = 'video-card';
+// ====== START ======
+loadVideos();
 
-    if(file){
-      const video = document.createElement('video');
-      video.src = URL.createObjectURL(file);
-      video.controls = true;
-      card.appendChild(video);
-    } else if(youtubeLink){
-      const iframe = document.createElement('iframe');
-      iframe.src = youtubeLink.replace("watch?v=", "embed/");
-      iframe.frameBorder = "0";
-      iframe.allow = "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture";
-      iframe.allowFullscreen = true;
-      card.appendChild(iframe);
-    } else {
-      alert("Veuillez choisir un fichier ou entrer un lien YouTube !");
-      return;
-    }
-
-    const name = document.createElement('div');
-    name.className = 'video-name';
-    name.contentEditable = true;
-    name.innerText = file ? file.name : "Lien YouTube";
-    card.appendChild(name);
-
-    gallery.appendChild(card);
-
-    fileInput.value = '';
-    youtubeInput.value = '';
-    modal.style.display = 'none';
-  }
 </script>
-
 </body>
 </html>
