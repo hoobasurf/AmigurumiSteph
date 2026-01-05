@@ -8,8 +8,9 @@
 html, body {
   margin: 0;
   padding: 0;
-  height: 100%;
-  font-family: 'Comic Sans MS', cursive;
+  font-family:'Comic Sans MS', cursive;
+  background:#ffe6f0;
+  height:100%;
 }
 
 /* FOND IMAGE */
@@ -22,106 +23,109 @@ body::before{
   background-position:center;
   background-repeat:no-repeat;
   z-index:-1;
+  filter: brightness(0.85);
 }
 
-/* ===== SIDEBAR ===== */
+/* SIDEBAR */
 #sidebar{
   position:fixed;
-  top:0;
-  left:-220px;
-  width:220px;
-  height:100vh;
-  background:rgba(255,230,240,0.2);
+  top:0; left:-220px;
+  width:220px; height:100vh;
+  background:rgba(255,230,240,0.3);
+  backdrop-filter: blur(6px);
   border-right:2px solid #b67385;
   padding:20px;
   transition:left .3s;
   z-index:100;
 }
-#sidebar.sidebar-open{
-  left:0;
-}
+#sidebar.sidebar-open{left:0;}
 #toggleSidebar{
-  position:absolute;
-  top:50%;
-  right:-30px;
-  width:30px;
-  height:60px;
+  position:absolute; top:50%; right:-30px;
+  width:30px; height:60px;
   background:#ffb6c1;
   border-radius:0 12px 12px 0;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  cursor:pointer;
-  font-weight:bold;
-  color:white;
+  display:flex; align-items:center; justify-content:center;
+  cursor:pointer; font-weight:bold; color:white;
 }
 #backBtn{
-  width:auto;
-  padding:8px 16px;
+  width:100%;
+  padding:8px;
   border-radius:16px;
   border:none;
   background:#ffb6c1;
-  color:#fff;
-  cursor:pointer;
+  color:white;
   font-weight:bold;
+  cursor:pointer;
   margin-top:10px;
 }
 
-/* CONTENU PRINCIPAL */
+/* MAIN CONTENU */
 main{
-  margin-left:20px; /* pour ne pas cacher derrière la sidebar */
-  padding:20px;
+  margin-left:20px;
+  padding:10px;
 }
 
-/* LISTE DES VIDEOS */
+/* INPUTS + BOUTONS */
+input[type="file"], input[type="text"]{
+  width: calc(100% - 10px);
+  padding:8px;
+  margin-bottom:8px;
+  border-radius:12px;
+  border:2px solid #b67385;
+  outline:none;
+}
+button{
+  padding:6px 12px;
+  border:none;
+  border-radius:12px;
+  background:#ffb6c1;
+  color:white;
+  cursor:pointer;
+  margin-bottom:8px;
+}
+
+/* LISTE VIDEOS */
 #videoList{
   display:flex;
   flex-direction: column;
-  gap:12px;
-  margin-top:20px;
+  gap:10px;
+  margin-top:10px;
 }
 .video-item{
-  background:rgba(255,230,240,0.5);
-  padding:10px;
+  background:rgba(255,182,193,0.4);
+  padding:8px;
   border-radius:12px;
   display:flex;
   align-items:center;
   justify-content:space-between;
-}
-.video-item span{
-  flex:1;
-}
-.video-item button{
-  margin-left:8px;
-  padding:4px 10px;
-  border:none;
-  border-radius:12px;
-  background:#ffb6c1;
-  color:white;
   cursor:pointer;
+  transition: background 0.2s;
 }
+.video-item:hover{background:rgba(255,182,193,0.6);}
+.video-item span{flex:1; margin-left:6px;}
 
 /* VIDEO + TRANSCRIPTION */
 #currentVideo{
-  margin-top:20px;
+  margin-top:10px;
   display:flex;
   flex-direction: column;
-  gap:10px;
+  gap:6px;
 }
 #currentVideo iframe, #currentVideo video{
-  max-width:100%;
-  height:360px;
+  width:100%;
+  height:240px;
+  border-radius:12px;
 }
 #transcription{
   background:rgba(255,182,193,0.2);
-  padding:10px;
+  padding:6px;
   border-radius:12px;
-  max-height:200px;
+  max-height:150px;
   overflow-y:auto;
+  font-size:14px;
+  line-height:1.4;
 }
-.highlight{
-  background:rgba(255,182,193,0.5);
-}
+.highlight{background:rgba(255,182,193,0.5);}
 </style>
 </head>
 <body>
@@ -135,7 +139,6 @@ main{
 <main>
   <h2>Ajouter une vidéo</h2>
   <input type="file" id="fileInput" accept="video/*">
-  <br><br>
   <input type="text" id="youtubeUrl" placeholder="Coller URL YouTube">
   <button id="addYoutubeBtn">Ajouter YouTube</button>
 
@@ -143,45 +146,46 @@ main{
   <div id="videoList"></div>
 
   <div id="currentVideo">
-    <div id="transcription">Transcription ici...</div>
+    <div id="transcription">Transcription automatique ici...</div>
   </div>
 </main>
 
 <script>
 let videos = [];
+let currentVideo = null;
 
 // SIDEBAR
 document.getElementById('toggleSidebar').onclick = () => {
   document.getElementById('sidebar').classList.toggle('sidebar-open');
 };
 document.getElementById('backBtn').onclick = () => {
-  document.body.style.transition = 'opacity 0.5s';
-  document.body.style.opacity = '0';
-  setTimeout(()=>{ window.location.href='owner.html'; }, 500);
+  document.body.style.transition='opacity 0.5s';
+  document.body.style.opacity='0';
+  setTimeout(()=>{window.location.href='owner.html';},500);
 };
 
 // AJOUTER FICHIER LOCAL
-document.getElementById('fileInput').onchange = (e) => {
-  const file = e.target.files[0];
+document.getElementById('fileInput').onchange = (e)=>{
+  const file=e.target.files[0];
   if(!file) return;
-  const url = URL.createObjectURL(file);
-  addVideo({name:file.name, type:'file', url});
-  e.target.value = '';
+  const url=URL.createObjectURL(file);
+  addVideo({name:file.name,type:'file',url});
+  e.target.value='';
 };
 
 // AJOUTER YOUTUBE
-document.getElementById('addYoutubeBtn').onclick = () => {
-  const url = document.getElementById('youtubeUrl').value.trim();
+document.getElementById('addYoutubeBtn').onclick=()=>{
+  const url=document.getElementById('youtubeUrl').value.trim();
   if(!url) return alert("URL vide !");
   let id;
-  if(url.includes('youtu.be/')) id = url.split('youtu.be/')[1];
-  else if(url.includes('v=')) id = url.split('v=')[1].split('&')[0];
-  else id = url.split('/').pop();
+  if(url.includes('youtu.be/')) id=url.split('youtu.be/')[1];
+  else if(url.includes('v=')) id=url.split('v=')[1].split('&')[0];
+  else id=url.split('/').pop();
   addVideo({name:'YouTube Video', type:'youtube', id, url:'https://www.youtube.com/embed/'+id});
-  document.getElementById('youtubeUrl').value = '';
+  document.getElementById('youtubeUrl').value='';
 };
 
-// AJOUT VIDEO
+// AJOUTER VIDEO
 function addVideo(video){
   videos.push(video);
   renderList();
@@ -190,68 +194,65 @@ function addVideo(video){
 
 // RENDER LISTE
 function renderList(){
-  const list = document.getElementById('videoList');
-  list.innerHTML = '';
+  const list=document.getElementById('videoList');
+  list.innerHTML='';
   videos.forEach((v,i)=>{
-    const div = document.createElement('div');
+    const div=document.createElement('div');
     div.className='video-item';
-    const span = document.createElement('span');
-    span.textContent = v.name;
+
+    const span=document.createElement('span');
+    span.textContent=v.name;
     div.appendChild(span);
 
-    // Renommer
-    const renameBtn = document.createElement('button');
+    const renameBtn=document.createElement('button');
     renameBtn.textContent='✏️';
-    renameBtn.onclick = () => {
-      const newName = prompt("Nouveau nom :", v.name);
-      if(newName) { v.name=newName; renderList(); }
+    renameBtn.onclick=(e)=>{
+      e.stopPropagation();
+      const newName=prompt("Nouveau nom :",v.name);
+      if(newName){v.name=newName; renderList();}
     };
     div.appendChild(renameBtn);
 
-    // Supprimer
-    const delBtn = document.createElement('button');
+    const delBtn=document.createElement('button');
     delBtn.textContent='🗑️';
-    delBtn.onclick = () => {
+    delBtn.onclick=(e)=>{
+      e.stopPropagation();
       videos.splice(i,1);
       renderList();
-      if(v===currentVideo) document.getElementById('currentVideo').innerHTML='';
+      if(v===currentVideo) document.getElementById('currentVideo').innerHTML='<div id="transcription">Transcription automatique ici...</div>';
     };
     div.appendChild(delBtn);
 
-    // Ouvrir
-    div.onclick = (e) => {
-      if(e.target.tagName!=='BUTTON') openVideo(v);
-    };
-
+    div.onclick=()=> openVideo(v);
     list.appendChild(div);
   });
 }
 
-let currentVideo = null;
+// OUVRIR VIDEO + TRANSCRIPTION
 function openVideo(v){
-  currentVideo = v;
-  const container = document.getElementById('currentVideo');
+  currentVideo=v;
+  const container=document.getElementById('currentVideo');
   container.innerHTML='';
 
   let videoElem;
   if(v.type==='file'){
-    videoElem = document.createElement('video');
-    videoElem.src = v.url;
+    videoElem=document.createElement('video');
+    videoElem.src=v.url;
     videoElem.controls=true;
   } else {
-    videoElem = document.createElement('iframe');
+    videoElem=document.createElement('iframe');
     videoElem.src=v.url;
     videoElem.frameBorder='0';
+    videoElem.allow='accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture';
     videoElem.allowFullscreen=true;
   }
   container.appendChild(videoElem);
 
-  const trans = document.createElement('div');
+  const trans=document.createElement('div');
   trans.id='transcription';
   trans.textContent='Transcription automatique ici...';
   container.appendChild(trans);
 }
 </script>
-
 </body>
 </html>
