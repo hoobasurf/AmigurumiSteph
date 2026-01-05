@@ -240,6 +240,21 @@ videoPlayer.addEventListener('timeupdate', ()=>{
   const current = Math.floor(spans.length * videoPlayer.currentTime / duration);
   spans.forEach((s,i)=> s.classList.toggle('active', i===current));
 });
+
+<input type="text" id="youtubeUrl" placeholder="Coller l'URL YouTube">
+<button id="addYoutube">Ajouter YouTube</button>
+<div id="currentVideo"></div>
+
+<script>
+document.getElementById('addYoutube').onclick = () => {
+  const url = document.getElementById('youtubeUrl').value.trim();
+  if(!url) return;
+  const id = url.split('v=')[1] || url.split('/').pop();
+  const iframe = `<iframe width="560" height="315" src="https://www.youtube.com/embed/${id}" frameborder="0" allowfullscreen></iframe>`;
+  document.getElementById('currentVideo').innerHTML = iframe;
+};
+</script>
+  
 </script>
 </body>
 </html>
