@@ -12,45 +12,6 @@ body{
   background:#fff0f5;
 }
 
-/* SIDEBAR */
-#sidebar{
-  position:fixed;
-  top:0;
-  left:-220px;
-  width:220px;
-  height:100vh;
-  background:rgba(255,230,240,0.2);
-  border-right:2px solid #b67385;
-  padding:20px;
-  transition:left .3s;
-  z-index:10;
-}
-#sidebar.sidebar-open{left:0}
-#toggleSidebar{
-  position:absolute;
-  top:50%;
-  right:-30px;
-  width:30px;
-  height:60px;
-  background:#ffb6c1;
-  border-radius:0 12px 12px 0;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  cursor:pointer;
-  font-weight:bold;
-}
-#sidebar button{
-  width:auto;
-  padding:8px 16px;
-  border-radius:16px;
-  border:none;
-  background:#ffb6c1;
-  color:#fff;
-  cursor:pointer;
-  font-weight:bold;
-}
-
 /* HEADER */
 header{padding:16px}
 header button{
@@ -122,14 +83,62 @@ iframe{
   border-radius:12px;
   border:2px solid #b67385;
 }
+
+  /* ===== SIDEBAR ===== */
+#sidebar{
+  position:fixed;
+  top:0;
+  left:-220px;
+  width:220px;
+  height:100vh;
+  background:rgba(255,230,240,0.2);
+  border-right:2px solid #b67385;
+  padding:20px;
+  transition:left .3s;
+  z-index:100;
+}
+
+#sidebar.sidebar-open{
+  left:0;
+}
+
+#toggleSidebar{
+  position:absolute;
+  top:50%;
+  right:-30px;
+  width:30px;
+  height:60px;
+  background:#ffb6c1;
+  border-radius:0 12px 12px 0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+  font-weight:bold;
+  color:white;
+}
+
+#backBtn{
+  width:auto;
+  padding:8px 16px;
+  border-radius:16px;
+  border:none;
+  background:#ffb6c1;
+  color:#fff;
+  cursor:pointer;
+  font-weight:bold;
+  margin-top:10px;
+}
+
 </style>
 </head>
 
 <body>
 
+  <!-- ===== SIDEBAR ===== -->
 <div id="sidebar">
-  <div id="toggle">☰</div>
-  <button onclick="location.href='owner.html'">Retour</button>
+  <div id="toggleSidebar">☰</div>
+  <button id="backBtn">Retour</button>
 </div>
 
 <header>
