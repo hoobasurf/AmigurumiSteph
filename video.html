@@ -4,87 +4,28 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Vidéos</title>
-
 <style>
-body{
+html, body {
   margin:0;
+  padding:0;
   font-family:'Comic Sans MS',cursive;
+  height:100%;
   background:#fff0f5;
 }
 
-/* HEADER */
-header{padding:16px}
-header button{
-  padding:8px 16px;
-  border:none;
-  border-radius:16px;
-  background:#ffb6c1;
-  color:white;
-  cursor:pointer;
-}
-
-/* VIDEO */
-#playerBox{
-  display:none;
-  justify-content:center;
-}
-iframe{
-  width:90%; height:45vh;
-  border-radius:16px;
-  border:3px solid #b67385;
-}
-
-/* LISTE */
-#list{margin:16px}
-.item{
-  background:white;
-  padding:8px;
-  border-radius:12px;
-  margin-bottom:6px;
-  display:flex;
-  justify-content:space-between;
-}
-.item span{cursor:pointer}
-.item button{
-  border:none;
-  background:#ffb6c1;
-  color:white;
-  border-radius:8px;
-}
-
-/* TRANSCRIPTION */
-#transcript{
-  margin:16px;
-  background:white;
-  border-radius:16px;
-  padding:12px;
-}
-.line{margin:6px 0}
-.active{background:#ffb6c1;border-radius:8px;padding:2px 6px}
-
-/* MODAL */
-#modal{
+/* FOND */
+body::before{
+  content:"";
   position:fixed;
   inset:0;
-  background:rgba(0,0,0,.5);
-  display:none;
-  align-items:center;
-  justify-content:center;
-}
-#modalBox{
-  background:#ffe6f0;
-  padding:16px;
-  border-radius:16px;
-  width:90%;
-}
-#modalBox input{
-  width:100%;
-  padding:8px;
-  border-radius:12px;
-  border:2px solid #b67385;
+  background-image:url('IMG_1722.jpeg');
+  background-size:cover;
+  background-position:center;
+  background-repeat:no-repeat;
+  z-index:-1;
 }
 
-  /* ===== SIDEBAR ===== */
+/* SIDEBAR */
 #sidebar{
   position:fixed;
   top:0;
@@ -97,11 +38,7 @@ iframe{
   transition:left .3s;
   z-index:100;
 }
-
-#sidebar.sidebar-open{
-  left:0;
-}
-
+#sidebar.sidebar-open{left:0}
 #toggleSidebar{
   position:absolute;
   top:50%;
@@ -110,14 +47,11 @@ iframe{
   height:60px;
   background:#ffb6c1;
   border-radius:0 12px 12px 0;
-  display:flex;
-  align-items:center;
-  justify-content:center;
+  display:flex;align-items:center;justify-content:center;
   cursor:pointer;
   font-weight:bold;
   color:white;
 }
-
 #backBtn{
   width:auto;
   padding:8px 16px;
@@ -130,116 +64,182 @@ iframe{
   margin-top:10px;
 }
 
+/* CONTENU PRINCIPAL */
+#main{
+  margin-left:20px; /* pour que le contenu soit visible derrière sidebar */
+  padding:20px;
+}
+.video-container{
+  margin-bottom:20px;
+  border:2px solid #b67385;
+  border-radius:12px;
+  overflow:hidden;
+  background:white;
+  padding:10px;
+}
+.video-container video{
+  width:100%;
+  max-height:300px;
+}
+.video-header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  margin-bottom:5px;
+}
+.video-header button{
+  background:#ffb6c1;
+  color:white;
+  border:none;
+  border-radius:12px;
+  padding:4px 10px;
+  cursor:pointer;
+}
+.transcription{
+  margin-top:10px;
+  line-height:1.5;
+  font-size:14px;
+}
+.transcription span.active{
+  background:pink;
+}
+.video-list{
+  margin-top:20px;
+}
+.video-list-item{
+  padding:6px 10px;
+  border:1px solid #b67385;
+  border-radius:12px;
+  margin-bottom:6px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+}
+.video-list-item button{
+  padding:2px 6px;
+  border:none;
+  border-radius:8px;
+  background:#ffb6c1;
+  color:white;
+  cursor:pointer;
+}
 </style>
 </head>
-
 <body>
 
-  <!-- ===== SIDEBAR ===== -->
+<!-- SIDEBAR -->
 <div id="sidebar">
   <div id="toggleSidebar">☰</div>
   <button id="backBtn">Retour</button>
 </div>
 
-<header>
-  <button onclick="openModal()">Ajouter une vidéo</button>
-</header>
+<!-- CONTENU -->
+<div id="main">
+  <h2>Mes Vidéos</h2>
 
-<div id="playerBox">
-  <iframe id="player" allowfullscreen></iframe>
-</div>
-
-<div id="list"></div>
-
-<div id="transcript"></div>
-
-<!-- MODAL -->
-<div id="modal">
-  <div id="modalBox">
-    <input id="urlInput" placeholder="Colle un lien YouTube">
-    <button onclick="saveVideo()">Enregistrer</button>
+  <!-- Zone vidéo -->
+  <div id="currentVideo" class="video-container" style="display:none;">
+    <div class="video-header">
+      <strong id="videoTitle">Titre de la vidéo</strong>
+      <button id="renameBtn">Renommer</button>
+    </div>
+    <video id="videoPlayer" controls></video>
+    <div class="transcription" id="transcription"></div>
   </div>
+
+  <!-- Liste des vidéos -->
+  <div class="video-list" id="videoList"></div>
+
+  <!-- Ajouter vidéo -->
+  <input type="file" id="videoInput" accept="video/*">
 </div>
 
 <script>
-const sidebar=document.getElementById('sidebar');
-document.getElementById('toggle').onclick=()=>sidebar.classList.toggle('open');
+// Sidebar toggle
+document.getElementById('toggleSidebar').onclick = () => {
+  document.getElementById('sidebar').classList.toggle('sidebar-open');
+};
 
-const modal=document.getElementById('modal');
-const list=document.getElementById('list');
-const player=document.getElementById('player');
-const transcriptBox=document.getElementById('transcript');
+// Retour
+document.getElementById('backBtn').onclick = () => {
+  document.body.style.transition='opacity 0.5s';
+  document.body.style.opacity='0';
+  setTimeout(()=>{ window.location.href='owner.html'; },500);
+};
 
-let videos=JSON.parse(localStorage.getItem('videos')||'[]');
-let transcript=[];
+// Gestion des vidéos
+let videos = []; // stocker vidéos
+const videoInput = document.getElementById('videoInput');
+const videoList = document.getElementById('videoList');
+const currentVideo = document.getElementById('currentVideo');
+const videoPlayer = document.getElementById('videoPlayer');
+const videoTitle = document.getElementById('videoTitle');
+const transcriptionDiv = document.getElementById('transcription');
 
-function openModal(){modal.style.display='flex'}
-modal.onclick=e=>{if(e.target===modal)modal.style.display='none'}
+videoInput.addEventListener('change', (e)=>{
+  const file = e.target.files[0];
+  if(!file) return;
 
-function saveVideo(){
-  const url=document.getElementById('urlInput').value;
-  const id=(url.match(/v=([^&]+)/)||url.match(/youtu\.be\/([^?]+)/))?.[1];
-  if(!id)return alert("Lien invalide");
-  videos.push({id});
-  localStorage.setItem('videos',JSON.stringify(videos));
-  modal.style.display='none';
-  renderList();
-}
+  const url = URL.createObjectURL(file);
+  const videoObj = {title:file.name, url:url, transcription:["Bonjour","Ceci","est","une","démo"], time:0};
+  videos.push(videoObj);
+  renderVideoList();
+});
 
-function renderList(){
-  list.innerHTML='';
+// Afficher liste vidéos
+function renderVideoList(){
+  videoList.innerHTML="";
   videos.forEach((v,i)=>{
-    const div=document.createElement('div');
-    div.className='item';
-    div.innerHTML=`<span onclick="loadVideo('${v.id}')">🎬 ${v.id}</span>
-                   <button onclick="remove(${i})">✖</button>`;
-    list.appendChild(div);
-  });
-}
-function remove(i){
-  videos.splice(i,1);
-  localStorage.setItem('videos',JSON.stringify(videos));
-  renderList();
-}
-
-async function loadVideo(id){
-  player.src=`https://www.youtube.com/embed/${id}?enablejsapi=1`;
-  document.getElementById('playerBox').style.display='flex';
-
-  const res=await fetch(`/transcript/${id}`);
-  transcript=await res.json();
-  renderTranscript();
-  sync();
-}
-
-function renderTranscript(){
-  transcriptBox.innerHTML='';
-  transcript.forEach(t=>{
-    const d=document.createElement('div');
-    d.className='line';
-    d.dataset.time=t.start;
-    d.textContent=t.text;
-    transcriptBox.appendChild(d);
+    const div = document.createElement('div');
+    div.className="video-list-item";
+    div.innerHTML=`<span>${v.title}</span>`;
+    const openBtn = document.createElement('button');
+    openBtn.textContent="Ouvrir";
+    openBtn.onclick=()=>openVideo(i);
+    const delBtn = document.createElement('button');
+    delBtn.textContent="Supprimer";
+    delBtn.onclick=()=>{ videos.splice(i,1); renderVideoList(); if(currentVideo.style.display!=="none") currentVideo.style.display="none"; };
+    div.appendChild(openBtn);
+    div.appendChild(delBtn);
+    videoList.appendChild(div);
   });
 }
 
-function sync(){
-  setInterval(()=>{
-    const time=player.contentWindow?.postMessage;
-    const lines=document.querySelectorAll('.line');
-    let current=null;
-    lines.forEach(l=>{
-      if(player.getCurrentTime && player.getCurrentTime()>=l.dataset.time){
-        current=l;
-      }
-      l.classList.remove('active');
-    });
-    if(current)current.classList.add('active');
-  },500);
+// Ouvrir vidéo
+function openVideo(index){
+  const v = videos[index];
+  videoPlayer.src = v.url;
+  videoTitle.textContent = v.title;
+  currentVideo.style.display="block";
+  renderTranscription(v);
 }
 
-renderList();
+// Renommer vidéo
+document.getElementById('renameBtn').onclick = ()=>{
+  const newName = prompt("Nouveau nom:", videoTitle.textContent);
+  if(newName){
+    const vid = videos.find(v=>v.title===videoTitle.textContent);
+    if(vid){ vid.title=newName; videoTitle.textContent=newName; renderVideoList(); }
+  }
+};
+
+// Transcription simulée
+function renderTranscription(v){
+  transcriptionDiv.innerHTML="";
+  v.transcription.forEach((word,i)=>{
+    const span = document.createElement('span');
+    span.textContent=word+" ";
+    transcriptionDiv.appendChild(span);
+  });
+}
+
+// Surlignage synchronisé simulé
+videoPlayer.addEventListener('timeupdate', ()=>{
+  const spans = transcriptionDiv.querySelectorAll('span');
+  const duration = videoPlayer.duration || 1;
+  const current = Math.floor(spans.length * videoPlayer.currentTime / duration);
+  spans.forEach((s,i)=> s.classList.toggle('active', i===current));
+});
 </script>
-
 </body>
 </html>
