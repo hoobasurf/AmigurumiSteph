@@ -3,17 +3,16 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Vidéos</title>
+<title>Mes Vidéos</title>
 <style>
 html, body {
-  margin:0;
-  padding:0;
-  font-family:'Comic Sans MS',cursive;
-  height:100%;
-  background:#fff0f5;
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  font-family: 'Comic Sans MS', cursive;
 }
 
-/* FOND */
+/* FOND IMAGE */
 body::before{
   content:"";
   position:fixed;
@@ -25,7 +24,7 @@ body::before{
   z-index:-1;
 }
 
-/* SIDEBAR */
+/* ===== SIDEBAR ===== */
 #sidebar{
   position:fixed;
   top:0;
@@ -38,7 +37,9 @@ body::before{
   transition:left .3s;
   z-index:100;
 }
-#sidebar.sidebar-open{left:0}
+#sidebar.sidebar-open{
+  left:0;
+}
 #toggleSidebar{
   position:absolute;
   top:50%;
@@ -47,7 +48,9 @@ body::before{
   height:60px;
   background:#ffb6c1;
   border-radius:0 12px 12px 0;
-  display:flex;align-items:center;justify-content:center;
+  display:flex;
+  align-items:center;
+  justify-content:center;
   cursor:pointer;
   font-weight:bold;
   color:white;
@@ -65,63 +68,59 @@ body::before{
 }
 
 /* CONTENU PRINCIPAL */
-#main{
-  margin-left:20px; /* pour que le contenu soit visible derrière sidebar */
+main{
+  margin-left:20px; /* pour ne pas cacher derrière la sidebar */
   padding:20px;
 }
-.video-container{
-  margin-bottom:20px;
-  border:2px solid #b67385;
-  border-radius:12px;
-  overflow:hidden;
-  background:white;
-  padding:10px;
-}
-.video-container video{
-  width:100%;
-  max-height:300px;
-}
-.video-header{
+
+/* LISTE DES VIDEOS */
+#videoList{
   display:flex;
-  justify-content:space-between;
-  align-items:center;
-  margin-bottom:5px;
-}
-.video-header button{
-  background:#ffb6c1;
-  color:white;
-  border:none;
-  border-radius:12px;
-  padding:4px 10px;
-  cursor:pointer;
-}
-.transcription{
-  margin-top:10px;
-  line-height:1.5;
-  font-size:14px;
-}
-.transcription span.active{
-  background:pink;
-}
-.video-list{
+  flex-direction: column;
+  gap:12px;
   margin-top:20px;
 }
-.video-list-item{
-  padding:6px 10px;
-  border:1px solid #b67385;
+.video-item{
+  background:rgba(255,230,240,0.5);
+  padding:10px;
   border-radius:12px;
-  margin-bottom:6px;
   display:flex;
-  justify-content:space-between;
   align-items:center;
+  justify-content:space-between;
 }
-.video-list-item button{
-  padding:2px 6px;
+.video-item span{
+  flex:1;
+}
+.video-item button{
+  margin-left:8px;
+  padding:4px 10px;
   border:none;
-  border-radius:8px;
+  border-radius:12px;
   background:#ffb6c1;
   color:white;
   cursor:pointer;
+}
+
+/* VIDEO + TRANSCRIPTION */
+#currentVideo{
+  margin-top:20px;
+  display:flex;
+  flex-direction: column;
+  gap:10px;
+}
+#currentVideo iframe, #currentVideo video{
+  max-width:100%;
+  height:360px;
+}
+#transcription{
+  background:rgba(255,182,193,0.2);
+  padding:10px;
+  border-radius:12px;
+  max-height:200px;
+  overflow-y:auto;
+}
+.highlight{
+  background:rgba(255,182,193,0.5);
 }
 </style>
 </head>
@@ -133,128 +132,126 @@ body::before{
   <button id="backBtn">Retour</button>
 </div>
 
-<!-- CONTENU -->
-<div id="main">
-  <h2>Mes Vidéos</h2>
+<main>
+  <h2>Ajouter une vidéo</h2>
+  <input type="file" id="fileInput" accept="video/*">
+  <br><br>
+  <input type="text" id="youtubeUrl" placeholder="Coller URL YouTube">
+  <button id="addYoutubeBtn">Ajouter YouTube</button>
 
-  <!-- Zone vidéo -->
-  <div id="currentVideo" class="video-container" style="display:none;">
-    <div class="video-header">
-      <strong id="videoTitle">Titre de la vidéo</strong>
-      <button id="renameBtn">Renommer</button>
-    </div>
-    <video id="videoPlayer" controls></video>
-    <div class="transcription" id="transcription"></div>
+  <h2>Mes vidéos</h2>
+  <div id="videoList"></div>
+
+  <div id="currentVideo">
+    <div id="transcription">Transcription ici...</div>
   </div>
-
-  <!-- Liste des vidéos -->
-  <div class="video-list" id="videoList"></div>
-
-  <!-- Ajouter vidéo -->
-  <input type="file" id="videoInput" accept="video/*">
-</div>
+</main>
 
 <script>
-// Sidebar toggle
+let videos = [];
+
+// SIDEBAR
 document.getElementById('toggleSidebar').onclick = () => {
   document.getElementById('sidebar').classList.toggle('sidebar-open');
 };
-
-// Retour
 document.getElementById('backBtn').onclick = () => {
-  document.body.style.transition='opacity 0.5s';
-  document.body.style.opacity='0';
-  setTimeout(()=>{ window.location.href='owner.html'; },500);
+  document.body.style.transition = 'opacity 0.5s';
+  document.body.style.opacity = '0';
+  setTimeout(()=>{ window.location.href='owner.html'; }, 500);
 };
 
-// Gestion des vidéos
-let videos = []; // stocker vidéos
-const videoInput = document.getElementById('videoInput');
-const videoList = document.getElementById('videoList');
-const currentVideo = document.getElementById('currentVideo');
-const videoPlayer = document.getElementById('videoPlayer');
-const videoTitle = document.getElementById('videoTitle');
-const transcriptionDiv = document.getElementById('transcription');
-
-videoInput.addEventListener('change', (e)=>{
+// AJOUTER FICHIER LOCAL
+document.getElementById('fileInput').onchange = (e) => {
   const file = e.target.files[0];
   if(!file) return;
-
   const url = URL.createObjectURL(file);
-  const videoObj = {title:file.name, url:url, transcription:["Bonjour","Ceci","est","une","démo"], time:0};
-  videos.push(videoObj);
-  renderVideoList();
-});
+  addVideo({name:file.name, type:'file', url});
+  e.target.value = '';
+};
 
-// Afficher liste vidéos
-function renderVideoList(){
-  videoList.innerHTML="";
+// AJOUTER YOUTUBE
+document.getElementById('addYoutubeBtn').onclick = () => {
+  const url = document.getElementById('youtubeUrl').value.trim();
+  if(!url) return alert("URL vide !");
+  let id;
+  if(url.includes('youtu.be/')) id = url.split('youtu.be/')[1];
+  else if(url.includes('v=')) id = url.split('v=')[1].split('&')[0];
+  else id = url.split('/').pop();
+  addVideo({name:'YouTube Video', type:'youtube', id, url:'https://www.youtube.com/embed/'+id});
+  document.getElementById('youtubeUrl').value = '';
+};
+
+// AJOUT VIDEO
+function addVideo(video){
+  videos.push(video);
+  renderList();
+  openVideo(video);
+}
+
+// RENDER LISTE
+function renderList(){
+  const list = document.getElementById('videoList');
+  list.innerHTML = '';
   videos.forEach((v,i)=>{
     const div = document.createElement('div');
-    div.className="video-list-item";
-    div.innerHTML=`<span>${v.title}</span>`;
-    const openBtn = document.createElement('button');
-    openBtn.textContent="Ouvrir";
-    openBtn.onclick=()=>openVideo(i);
-    const delBtn = document.createElement('button');
-    delBtn.textContent="Supprimer";
-    delBtn.onclick=()=>{ videos.splice(i,1); renderVideoList(); if(currentVideo.style.display!=="none") currentVideo.style.display="none"; };
-    div.appendChild(openBtn);
-    div.appendChild(delBtn);
-    videoList.appendChild(div);
-  });
-}
-
-// Ouvrir vidéo
-function openVideo(index){
-  const v = videos[index];
-  videoPlayer.src = v.url;
-  videoTitle.textContent = v.title;
-  currentVideo.style.display="block";
-  renderTranscription(v);
-}
-
-// Renommer vidéo
-document.getElementById('renameBtn').onclick = ()=>{
-  const newName = prompt("Nouveau nom:", videoTitle.textContent);
-  if(newName){
-    const vid = videos.find(v=>v.title===videoTitle.textContent);
-    if(vid){ vid.title=newName; videoTitle.textContent=newName; renderVideoList(); }
-  }
-};
-
-// Transcription simulée
-function renderTranscription(v){
-  transcriptionDiv.innerHTML="";
-  v.transcription.forEach((word,i)=>{
+    div.className='video-item';
     const span = document.createElement('span');
-    span.textContent=word+" ";
-    transcriptionDiv.appendChild(span);
+    span.textContent = v.name;
+    div.appendChild(span);
+
+    // Renommer
+    const renameBtn = document.createElement('button');
+    renameBtn.textContent='✏️';
+    renameBtn.onclick = () => {
+      const newName = prompt("Nouveau nom :", v.name);
+      if(newName) { v.name=newName; renderList(); }
+    };
+    div.appendChild(renameBtn);
+
+    // Supprimer
+    const delBtn = document.createElement('button');
+    delBtn.textContent='🗑️';
+    delBtn.onclick = () => {
+      videos.splice(i,1);
+      renderList();
+      if(v===currentVideo) document.getElementById('currentVideo').innerHTML='';
+    };
+    div.appendChild(delBtn);
+
+    // Ouvrir
+    div.onclick = (e) => {
+      if(e.target.tagName!=='BUTTON') openVideo(v);
+    };
+
+    list.appendChild(div);
   });
 }
 
-// Surlignage synchronisé simulé
-videoPlayer.addEventListener('timeupdate', ()=>{
-  const spans = transcriptionDiv.querySelectorAll('span');
-  const duration = videoPlayer.duration || 1;
-  const current = Math.floor(spans.length * videoPlayer.currentTime / duration);
-  spans.forEach((s,i)=> s.classList.toggle('active', i===current));
-});
+let currentVideo = null;
+function openVideo(v){
+  currentVideo = v;
+  const container = document.getElementById('currentVideo');
+  container.innerHTML='';
 
-<input type="text" id="youtubeUrl" placeholder="Coller l'URL YouTube">
-<button id="addYoutube">Ajouter YouTube</button>
-<div id="currentVideo"></div>
+  let videoElem;
+  if(v.type==='file'){
+    videoElem = document.createElement('video');
+    videoElem.src = v.url;
+    videoElem.controls=true;
+  } else {
+    videoElem = document.createElement('iframe');
+    videoElem.src=v.url;
+    videoElem.frameBorder='0';
+    videoElem.allowFullscreen=true;
+  }
+  container.appendChild(videoElem);
 
-<script>
-document.getElementById('addYoutube').onclick = () => {
-  const url = document.getElementById('youtubeUrl').value.trim();
-  if(!url) return;
-  const id = url.split('v=')[1] || url.split('/').pop();
-  const iframe = `<iframe width="560" height="315" src="https://www.youtube.com/embed/${id}" frameborder="0" allowfullscreen></iframe>`;
-  document.getElementById('currentVideo').innerHTML = iframe;
-};
+  const trans = document.createElement('div');
+  trans.id='transcription';
+  trans.textContent='Transcription automatique ici...';
+  container.appendChild(trans);
+}
 </script>
-  
-</script>
+
 </body>
 </html>
