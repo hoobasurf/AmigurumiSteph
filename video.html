@@ -33,6 +33,7 @@
   .video-item button{
     background:#ffb6c1; color:white; border:none; border-radius:12px;
     padding:4px 8px; cursor:pointer; font-weight:bold;
+    margin-left:5px;
   }
 
   /* Modal */
@@ -126,15 +127,34 @@ async function loadVideos(){
     div.className = 'video-item';
     div.innerHTML = `
       <span>${v.name}</span>
-      <button>Ouvrir</button>
+      <div>
+        <button class="open-btn">Ouvrir</button>
+        <button class="rename-btn">Renommer</button>
+      </div>
     `;
-    const btn = div.querySelector('button');
-    btn.onclick = (e) => {
-      e.stopPropagation();
-      openVideo(v);
+    div.querySelector('.open-btn').onclick = e => { e.stopPropagation(); openVideo(v); };
+    div.querySelector('.rename-btn').onclick = e => { 
+      e.stopPropagation(); 
+      renameVideo(v); 
     };
     videoList.appendChild(div);
   });
+}
+
+// ====== RENOMMER VIDEO ======
+async function renameVideo(v){
+  const newName = prompt("Nouveau nom de la vidéo :", v.name);
+  if(!newName) return;
+
+  const { data, error } = await supabase
+    .from('videos')
+    .update({ name: newName })
+    .eq('id', v.id)
+    .select();
+
+  if(error){ console.error(error); alert(error.message); return; }
+
+  loadVideos();
 }
 
 // ====== LECTEUR ======
@@ -179,7 +199,6 @@ videoModalPlay.onclick = e => { if(e.target===videoModalPlay) videoModalPlay.sty
 
 // ====== START ======
 loadVideos();
-
 </script>
 </body>
 </html>
