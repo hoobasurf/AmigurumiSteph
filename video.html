@@ -4,48 +4,128 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Mes vidéos</title>
+
 <style>
-  body { font-family:'Comic Sans MS',cursive; background:#fff0f6; padding:20px; }
+body{
+  font-family:'Comic Sans MS',cursive;
+  background:#fff0f6;
+  padding:20px;
+}
 
-  /* Sidebar */
-  #sidebar{
-    position:fixed; top:0; left:-220px; width:220px; height:100vh;
-    background:rgba(255,230,240,0.2); border-right:2px solid #b67385; padding:20px;
-    transition:left .3s; z-index:100;
-  }
-  #sidebar.sidebar-open{ left:0; }
-  #toggleSidebar{
-    position:absolute; top:50%; right:-30px; width:30px; height:60px;
-    background:#ffb6c1; border-radius:0 12px 12px 0; display:flex;
-    align-items:center; justify-content:center; cursor:pointer; color:white; font-weight:bold;
-  }
-  #sidebar button{
-    width:auto; padding:8px 16px; border-radius:16px; border:none;
-    background:#ffb6c1; color:#fff; cursor:pointer; font-weight:bold; margin-top:10px;
-  }
+/* ===== SIDEBAR ===== */
+#sidebar{
+  position:fixed;
+  top:0;
+  left:-220px;
+  width:220px;
+  height:100vh;
+  background:rgba(255,230,240,0.2);
+  border-right:2px solid #b67385;
+  padding:20px;
+  transition:left .3s;
+  z-index:100;
+}
+#sidebar.sidebar-open{ left:0; }
+#toggleSidebar{
+  position:absolute;
+  top:50%;
+  right:-30px;
+  width:30px;
+  height:60px;
+  background:#ffb6c1;
+  border-radius:0 12px 12px 0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+  color:white;
+  font-weight:bold;
+}
+#sidebar button{
+  padding:8px 16px;
+  border-radius:16px;
+  border:none;
+  background:#ffb6c1;
+  color:white;
+  cursor:pointer;
+  font-weight:bold;
+  margin-top:10px;
+}
 
-  /* Liste vidéos */
-  #video-list { display:flex; flex-direction:column; gap:10px; max-width:400px; margin:auto; margin-top:60px; }
-  .video-item {
-    background:#ffe6f0; padding:10px 16px; border-radius:12px; display:flex; justify-content:space-between;
-    align-items:center; cursor:pointer; border:2px solid #b67385; color:#b84c6f; font-weight:bold;
-  }
-  .video-item button{
-    background:#ffb6c1; color:white; border:none; border-radius:12px;
-    padding:4px 8px; cursor:pointer; font-weight:bold;
-  }
+/* ===== LISTE VIDEOS ===== */
+#video-list{
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+  max-width:420px;
+  margin:80px auto 0;
+}
+.video-item{
+  background:#ffe6f0;
+  padding:10px 16px;
+  border-radius:12px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  border:2px solid #b67385;
+  color:#b84c6f;
+  font-weight:bold;
+}
+.video-item button{
+  background:#ffb6c1;
+  color:white;
+  border:none;
+  border-radius:12px;
+  padding:4px 10px;
+  cursor:pointer;
+}
 
-  /* Modal */
-  .modal { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); justify-content:center; align-items:center; z-index:1000; }
-  .modal-content { background:#fff0f6; padding:20px; border-radius:12px; max-width:90%; width:400px; text-align:center; display:flex; flex-direction:column; gap:10px; }
-  .modal-content input{ padding:6px 12px; border-radius:10px; border:2px solid #b67385; width:100%; }
-  .modal-content button{ padding:6px 12px; border:none; background:#ffb6c1; color:#fff; border-radius:12px; cursor:pointer; font-weight:bold; }
-  .modal-content iframe, .modal-content video{ width:100%; height:220px; border-radius:8px; }
-
+/* ===== MODAL ===== */
+.modal{
+  display:none;
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,0.5);
+  justify-content:center;
+  align-items:center;
+  z-index:1000;
+}
+.modal-content{
+  background:#fff0f6;
+  padding:20px;
+  border-radius:12px;
+  width:90%;
+  max-width:400px;
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+}
+.modal-content input{
+  padding:8px;
+  border-radius:10px;
+  border:2px solid #b67385;
+}
+.modal-content button{
+  padding:8px;
+  border:none;
+  background:#ffb6c1;
+  color:white;
+  border-radius:12px;
+  cursor:pointer;
+  font-weight:bold;
+}
+.modal-content iframe,
+.modal-content video{
+  width:100%;
+  height:220px;
+  border-radius:8px;
+}
 </style>
 </head>
+
 <body>
 
+<!-- SIDEBAR -->
 <div id="sidebar">
   <div id="toggleSidebar">☰</div>
   <button id="addVideoBtn">Ajouter vidéo</button>
@@ -67,141 +147,142 @@
 
 <!-- MODAL LECTEUR -->
 <div class="modal" id="videoModalPlay">
-  <div class="modal-content" id="modalPlayContent">
-    <button id="closePlayModal">Fermer</button>
-  </div>
+  <div class="modal-content" id="modalPlayContent"></div>
 </div>
 
 <script type="module">
 import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
 
-// ====== SUPABASE ======
+/* ===== SUPABASE ===== */
 const supabase = createClient(
   "https://jyhbamdcxmpveujjqjla.supabase.co",
   "sb_publishable_sqsxb-3Kl5o3-JQYv9kGFw_-g0EgwMa"
 );
 
-// ====== DOM ======
-const videoList = document.getElementById('video-list');
+/* ===== DOM ===== */
+const sidebar = document.getElementById('sidebar');
+const toggleSidebar = document.getElementById('toggleSidebar');
 const addVideoBtn = document.getElementById('addVideoBtn');
+const videoList = document.getElementById('video-list');
+
 const videoModalAdd = document.getElementById('videoModalAdd');
+const videoModalPlay = document.getElementById('videoModalPlay');
+const modalPlayContent = document.getElementById('modalPlayContent');
+
 const videoFile = document.getElementById('videoFile');
 const youtubeLink = document.getElementById('youtubeLink');
 const confirmAddVideo = document.getElementById('confirmAddVideo');
 const cancelAddVideo = document.getElementById('cancelAddVideo');
 
-const videoModalPlay = document.getElementById('videoModalPlay');
-const modalPlayContent = document.getElementById('modalPlayContent');
-const closePlayModal = document.getElementById('closePlayModal');
-
-// ====== SIDEBAR ======
-const sidebar = document.getElementById('sidebar');
-const toggleSidebar = document.getElementById('toggleSidebar');
+/* ===== SIDEBAR ===== */
 toggleSidebar.onclick = () => sidebar.classList.toggle('sidebar-open');
 
-// ====== OUVRIR MODAL AJOUT ======
-addVideoBtn.onclick = () => videoModalAdd.style.display = 'flex';
-cancelAddVideo.onclick = () => videoModalAdd.style.display = 'none';
+/* ===== MODAL AJOUT ===== */
+addVideoBtn.onclick = () => videoModalAdd.style.display='flex';
+cancelAddVideo.onclick = () => videoModalAdd.style.display='none';
 videoModalAdd.onclick = e => { if(e.target===videoModalAdd) videoModalAdd.style.display='none'; };
 
-// ====== AJOUT VIDEO ======
+/* ===== AJOUT VIDEO ===== */
 confirmAddVideo.onclick = async () => {
   const file = videoFile.files[0];
   const yt = youtubeLink.value.trim();
 
-  if(!file && !yt){ alert("Sélectionnez un fichier ou collez un lien YouTube"); return; }
+  if(!file && !yt){
+    alert("Ajoute un fichier OU un lien YouTube");
+    return;
+  }
 
-  let insertData = { name: file ? file.name : "Vidéo YouTube", youtubeLink: yt || null, file_path:null };
+  let insertData = {
+    name: file ? file.name : "Vidéo YouTube",
+    youtubeLink: yt || null,
+    file_path: null
+  };
 
-  // Si fichier upload
   if(file){
     const path = `${Date.now()}_${file.name}`;
-    const { error: uploadError } = await supabase.storage.from('videos').upload(path, file);
-    if(uploadError){ console.error(uploadError); alert("Erreur upload"); return; }
+    const { error: uploadError } = await supabase
+      .storage.from('videos')
+      .upload(path, file);
+
+    if(uploadError){
+      alert(uploadError.message);
+      return;
+    }
     insertData.file_path = path;
   }
 
-  const { error } = await supabase.from('videos').insert([insertData]);
-  if(error){ console.error(error); alert("Erreur ajout"); return; }
+  const { error } = await supabase
+    .from('videos')
+    .insert([insertData]);
 
-  videoFile.value = '';
-  youtubeLink.value = '';
-  videoModalAdd.style.display = 'none';
+  if(error){
+    alert(error.message);
+    return;
+  }
+
+  videoFile.value='';
+  youtubeLink.value='';
+  videoModalAdd.style.display='none';
   loadVideos();
 };
 
-// ====== CHARGER LES VIDEOS ======
+/* ===== LOAD VIDEOS ===== */
 async function loadVideos(){
-  const { data, error } = await supabase.from('videos').select('*').order('created_at',{ascending:false});
-  if(error){ console.error(error); return; }
+  const { data, error } = await supabase
+    .from('videos')
+    .select('*')
+    .order('created_at',{ascending:false});
 
-  videoList.innerHTML = '';
-  data.forEach(v => {
-    const div = document.createElement('div');
-    div.className = 'video-item';
-    div.innerHTML = `
-      <span>${v.name}</span>
-      <button>Ouvrir</button>
-    `;
-    const btn = div.querySelector('button');
-    btn.onclick = (e) => {
-      e.stopPropagation();
-      openVideo(v);
-    };
+  if(error) return;
+
+  videoList.innerHTML='';
+  data.forEach(v=>{
+    const div=document.createElement('div');
+    div.className='video-item';
+    div.innerHTML=`<span>${v.name}</span><button>Ouvrir</button>`;
+    div.querySelector('button').onclick=()=>openVideo(v);
     videoList.appendChild(div);
   });
 }
 
-// ====== LECTEUR ======
+/* ===== LECTEUR ===== */
 function openVideo(v){
-  modalPlayContent.innerHTML = '';
+  modalPlayContent.innerHTML='';
 
-  const closeBtn = document.createElement('button');
-  closeBtn.textContent = 'Fermer';
-  closeBtn.style.marginBottom = '10px';
-  closeBtn.onclick = () => videoModalPlay.style.display='none';
-  modalPlayContent.appendChild(closeBtn);
+  const close=document.createElement('button');
+  close.textContent='Fermer';
+  close.onclick=()=>videoModalPlay.style.display='none';
+  modalPlayContent.appendChild(close);
 
   if(v.youtubeLink){
-    let ytId = null;
-    const matchWatch = v.youtubeLink.match(/watch\?v=([^&]+)/);
-    if(matchWatch) ytId = matchWatch[1];
-    const matchShort = v.youtubeLink.match(/youtu\.be\/([^?&]+)/);
-    if(matchShort) ytId = matchShort[1];
+    const id =
+      v.youtubeLink.match(/watch\?v=([^&]+)/)?.[1] ||
+      v.youtubeLink.match(/youtu\.be\/([^?&]+)/)?.[1];
 
-    if(ytId){
-      const iframe = document.createElement('iframe');
-      iframe.src = `https://www.youtube.com/embed/${ytId}`;
-      iframe.frameBorder = "0";
-      iframe.allow = "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture";
-      iframe.allowFullscreen = true;
-      iframe.style.width = '100%';
-      iframe.style.height = '220px';
-      iframe.style.borderRadius = '8px';
+    if(id){
+      const iframe=document.createElement('iframe');
+      iframe.src=`https://www.youtube.com/embed/${id}`;
+      iframe.allowFullscreen=true;
       modalPlayContent.appendChild(iframe);
-    } else {
-      const p = document.createElement('p');
-      p.textContent = "Lien YouTube invalide";
-      modalPlayContent.appendChild(p);
     }
-
   } else if(v.file_path){
-    const vid = document.createElement('video');
-    vid.src = supabase.storage.from('videos').getPublicUrl(v.file_path).data.publicUrl;
-    vid.controls = true;
-    modalPlayContent.appendChild(vid);
+    const video=document.createElement('video');
+    video.controls=true;
+    video.src=supabase.storage.from('videos')
+      .getPublicUrl(v.file_path).data.publicUrl;
+    modalPlayContent.appendChild(video);
   }
 
   videoModalPlay.style.display='flex';
 }
 
-// ====== FERMER MODAL ======
-closePlayModal.onclick = () => videoModalPlay.style.display='none';
-videoModalPlay.onclick = e => { if(e.target===videoModalPlay) videoModalPlay.style.display='none'; };
+videoModalPlay.onclick=e=>{
+  if(e.target===videoModalPlay) videoModalPlay.style.display='none';
+};
 
-// ====== START ======
+/* ===== START ===== */
 loadVideos();
-
 </script>
+
 </body>
 </html>
