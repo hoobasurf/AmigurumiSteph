@@ -28,11 +28,12 @@
   #video-list { display:flex; flex-direction:column; gap:10px; max-width:400px; margin:auto; margin-top:60px; }
   .video-item {
     background:#ffe6f0; padding:10px 16px; border-radius:12px; display:flex; justify-content:space-between;
-    align-items:center; border:2px solid #b67385; color:#b84c6f; font-weight:bold;
+    align-items:center; cursor:pointer; border:2px solid #b67385; color:#b84c6f; font-weight:bold;
   }
   .video-item button{
     background:#ffb6c1; color:white; border:none; border-radius:12px;
-    padding:4px 8px; cursor:pointer; font-weight:bold; margin-left:5px;
+    padding:4px 8px; cursor:pointer; font-weight:bold;
+    margin-left:5px;
   }
 
   /* Modal */
@@ -41,7 +42,6 @@
   .modal-content input{ padding:6px 12px; border-radius:10px; border:2px solid #b67385; width:100%; }
   .modal-content button{ padding:6px 12px; border:none; background:#ffb6c1; color:#fff; border-radius:12px; cursor:pointer; font-weight:bold; }
   .modal-content iframe, .modal-content video{ width:100%; height:220px; border-radius:8px; }
-
 </style>
 </head>
 <body>
@@ -68,6 +68,7 @@
 <!-- MODAL LECTEUR -->
 <div class="modal" id="videoModalPlay">
   <div class="modal-content" id="modalPlayContent">
+    <button id="closePlayModal">Fermer</button>
   </div>
 </div>
 
@@ -91,11 +92,13 @@ const cancelAddVideo = document.getElementById('cancelAddVideo');
 
 const videoModalPlay = document.getElementById('videoModalPlay');
 const modalPlayContent = document.getElementById('modalPlayContent');
+const closePlayModal = document.getElementById('closePlayModal');
+
 const sidebar = document.getElementById('sidebar');
 const toggleSidebar = document.getElementById('toggleSidebar');
 toggleSidebar.onclick = () => sidebar.classList.toggle('sidebar-open');
 
-// ====== OUVRIR MODAL AJOUT ======
+// ====== MODAL AJOUT ======
 addVideoBtn.onclick = () => videoModalAdd.style.display = 'flex';
 cancelAddVideo.onclick = () => videoModalAdd.style.display = 'none';
 videoModalAdd.onclick = e => { if(e.target===videoModalAdd) videoModalAdd.style.display='none'; };
@@ -104,13 +107,10 @@ videoModalAdd.onclick = e => { if(e.target===videoModalAdd) videoModalAdd.style.
 confirmAddVideo.onclick = async () => {
   const file = videoFile.files[0];
   const yt = youtubeLink.value.trim();
+
   if(!file && !yt){ alert("Sélectionnez un fichier ou collez un lien YouTube"); return; }
 
-  let insertData = { 
-    name: file ? file.name : "Vidéo YouTube", 
-    youtubelink: yt || null, 
-    file_path: null 
-  };
+  let insertData = { name: file ? file.name : "Vidéo YouTube", youtubelink: yt || null, file_path: null };
 
   if(file){
     const path = `${Date.now()}_${file.name}`;
@@ -130,22 +130,32 @@ confirmAddVideo.onclick = async () => {
 
 // ====== CHARGER LES VIDEOS ======
 async function loadVideos(){
-  const { data, error } = await supabase.from('videos').select('*').order('created_at',{ascending:false});
+  const { data, error } = await supabase.from('videos').select('*').order('created_at', { ascending:false });
   if(error){ console.error(error); return; }
 
   videoList.innerHTML = '';
   data.forEach(v => {
     const div = document.createElement('div');
     div.className = 'video-item';
-    div.innerHTML = `
-      <span>${v.name}</span>
-      <div>
-        <button class="open-btn">Ouvrir</button>
-        <button class="rename-btn">Renommer</button>
-      </div>
-    `;
-    div.querySelector('.open-btn').onclick = (e) => { e.stopPropagation(); openVideo(v); };
-    div.querySelector('.rename-btn').onclick = (e) => { e.stopPropagation(); renameVideo(v); };
+
+    const nameSpan = document.createElement('span');
+    nameSpan.textContent = v.name;
+    nameSpan.style.cursor = 'pointer';
+    nameSpan.onclick = () => openVideo(v);
+    div.appendChild(nameSpan);
+
+    const renameBtn = document.createElement('button');
+    renameBtn.textContent = 'Renommer';
+    renameBtn.onclick = async (e) => {
+      e.stopPropagation();
+      const newName = prompt('Nouveau nom de la vidéo:', v.name);
+      if(!newName) return;
+      const { error } = await supabase.from('videos').update({ name: newName }).eq('id', v.id);
+      if(error){ console.error(error); alert("Erreur renommage"); return; }
+      loadVideos();
+    };
+    div.appendChild(renameBtn);
+
     videoList.appendChild(div);
   });
 }
@@ -153,7 +163,6 @@ async function loadVideos(){
 // ====== LECTEUR ======
 function openVideo(v){
   modalPlayContent.innerHTML = '';
-
   const closeBtn = document.createElement('button');
   closeBtn.textContent = 'Fermer';
   closeBtn.style.marginBottom = '10px';
@@ -189,29 +198,11 @@ function openVideo(v){
     modalPlayContent.appendChild(vid);
   }
 
-  videoModalPlay.style.display='flex';
-}
-
-// ====== RENOMMER VIDEO ======
-async function renameVideo(v){
-  const newName = prompt("Nouveau nom de la vidéo :", v.name);
-  if(!newName) return;
-
-  const { error } = await supabase
-    .from('videos')
-    .update({ name: newName })
-    .eq('id', v.id);
-
-  if(error){
-    console.error("Erreur renommage:", error);
-    alert(error.message);
-    return;
-  }
-
-  loadVideos();
+  videoModalPlay.style.display = 'flex';
 }
 
 // ====== FERMER MODAL ======
+closePlayModal.onclick = () => videoModalPlay.style.display='none';
 videoModalPlay.onclick = e => { if(e.target===videoModalPlay) videoModalPlay.style.display='none'; };
 
 // ====== START ======
