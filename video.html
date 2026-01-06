@@ -5,7 +5,12 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Mes vidéos</title>
 <style>
-  body { font-family:'Comic Sans MS',cursive; background:#fff0f6; padding:20px; }
+  body {
+    font-family:'Comic Sans MS',cursive;
+    background: url('Photoroom_20260106_224222.png') no-repeat center center fixed;
+    background-size: cover;
+    padding:20px;
+  }
 
   /* Sidebar */
   #sidebar{
@@ -75,13 +80,11 @@
 <script type="module">
 import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
 
-// ====== SUPABASE ======
 const supabase = createClient(
   "https://jyhbamdcxmpveujjqjla.supabase.co",
   "sb_publishable_sqsxb-3Kl5o3-JQYv9kGFw_-g0EgwMa"
 );
 
-// ====== DOM ======
 const videoList = document.getElementById('video-list');
 const addVideoBtn = document.getElementById('addVideoBtn');
 const videoModalAdd = document.getElementById('videoModalAdd');
@@ -94,17 +97,14 @@ const videoModalPlay = document.getElementById('videoModalPlay');
 const modalPlayContent = document.getElementById('modalPlayContent');
 const closePlayModal = document.getElementById('closePlayModal');
 
-// ====== SIDEBAR ======
 const sidebar = document.getElementById('sidebar');
 const toggleSidebar = document.getElementById('toggleSidebar');
 toggleSidebar.onclick = () => sidebar.classList.toggle('sidebar-open');
 
-// ====== OUVRIR MODAL AJOUT ======
 addVideoBtn.onclick = () => videoModalAdd.style.display = 'flex';
 cancelAddVideo.onclick = () => videoModalAdd.style.display = 'none';
 videoModalAdd.onclick = e => { if(e.target===videoModalAdd) videoModalAdd.style.display='none'; };
 
-// ====== AJOUT VIDEO ======
 confirmAddVideo.onclick = async () => {
   const file = videoFile.files[0];
   const yt = youtubeLink.value.trim();
@@ -113,7 +113,6 @@ confirmAddVideo.onclick = async () => {
 
   let insertData = { name: file ? file.name : "Vidéo YouTube", youtubelink: yt || null, file_path:null };
 
-  // Si fichier upload
   if(file){
     const path = `${Date.now()}_${file.name}`;
     const { error: uploadError } = await supabase.storage.from('videos').upload(path, file);
@@ -130,7 +129,6 @@ confirmAddVideo.onclick = async () => {
   loadVideos();
 };
 
-// ====== CHARGER LES VIDEOS ======
 async function loadVideos(){
   const { data, error } = await supabase.from('videos').select('*').order('created_at',{ascending:false});
   if(error){ console.error(error); return; }
@@ -145,10 +143,7 @@ async function loadVideos(){
 
     const openBtn = document.createElement('button');
     openBtn.textContent = 'Ouvrir';
-    openBtn.onclick = (e) => {
-      e.stopPropagation();
-      openVideo(v);
-    };
+    openBtn.onclick = (e) => { e.stopPropagation(); openVideo(v); };
 
     const renameBtn = document.createElement('button');
     renameBtn.textContent = 'Renommer';
@@ -167,7 +162,6 @@ async function loadVideos(){
         console.error(error);
         return;
       }
-
       loadVideos();
     };
 
@@ -178,10 +172,8 @@ async function loadVideos(){
   });
 }
 
-// ====== LECTEUR ======
 function openVideo(v){
   modalPlayContent.innerHTML = '';
-
   const closeBtn = document.createElement('button');
   closeBtn.textContent = 'Fermer';
   closeBtn.style.marginBottom = '10px';
@@ -210,7 +202,6 @@ function openVideo(v){
       p.textContent = "Lien YouTube invalide";
       modalPlayContent.appendChild(p);
     }
-
   } else if(v.file_path){
     const vid = document.createElement('video');
     vid.src = supabase.storage.from('videos').getPublicUrl(v.file_path).data.publicUrl;
@@ -221,13 +212,10 @@ function openVideo(v){
   videoModalPlay.style.display='flex';
 }
 
-// ====== FERMER MODAL ======
 closePlayModal.onclick = () => videoModalPlay.style.display='none';
 videoModalPlay.onclick = e => { if(e.target===videoModalPlay) videoModalPlay.style.display='none'; };
 
-// ====== START ======
 loadVideos();
-
 </script>
 </body>
 </html>
