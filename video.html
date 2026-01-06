@@ -37,7 +37,7 @@ body::before {
 }
 
 /* LISTE VIDEOS */
-#video-list { display:flex; flex-direction:column; gap:10px; max-width:360px; /* réduit 2cm */ margin:auto; margin-top:60px; }
+#video-list { display:flex; flex-direction:column; gap:10px; max-width:360px; margin:auto; margin-top:60px; }
 .video-item {
   background: rgba(255,182,193,0.4);
   padding:10px 16px; border-radius:12px;
@@ -46,6 +46,17 @@ body::before {
 }
 .video-item span { flex:1; }
 .video-item div { display:flex; gap:5px; }
+
+/* BOUTONS OUVRIR & RENOMMER */
+.video-item button {
+  background:#ffb6c1;
+  color:white;
+  border:none;
+  border-radius:12px;
+  padding:4px 8px;
+  cursor:pointer;
+  font-weight:bold;
+}
 
 /* MODAL */
 .modal { position:fixed; inset:0; display:none; justify-content:center; align-items:center; background:rgba(0,0,0,0.5); z-index:1000; }
@@ -111,7 +122,7 @@ toggleSidebar.onclick = () => sidebar.classList.toggle('sidebar-open');
 
 // RETOUR avec fondu
 returnBtn.onclick = () => {
-  document.body.style.opacity = '0';
+  document.body.style.opacity='0';
   setTimeout(()=>window.location.href='owner.html',500);
 };
 
@@ -141,28 +152,27 @@ async function loadVideos(){
 
   videoList.innerHTML='';
   data.forEach(v=>{
-    // Encadré vidéo
-    const div = document.createElement('div');
+    const div=document.createElement('div');
     div.className='video-item';
 
-    const span = document.createElement('span');
-    span.textContent = v.name;
+    const span=document.createElement('span');
+    span.textContent=v.name;
     div.appendChild(span);
 
-    const btnDiv = document.createElement('div');
+    const btnDiv=document.createElement('div');
 
     // Ouvrir
-    const openBtn = document.createElement('button');
+    const openBtn=document.createElement('button');
     openBtn.textContent='Ouvrir';
-    openBtn.onclick = e => { e.stopPropagation(); openVideo(v); };
+    openBtn.onclick=e=>{ e.stopPropagation(); openVideo(v); };
     btnDiv.appendChild(openBtn);
 
     // Renommer
-    const renameBtn = document.createElement('button');
+    const renameBtn=document.createElement('button');
     renameBtn.textContent='Renommer';
-    renameBtn.onclick = async e=>{
+    renameBtn.onclick=async e=>{
       e.stopPropagation();
-      const newName = prompt("Nouveau nom :", v.name);
+      const newName=prompt("Nouveau nom :", v.name);
       if(newName && newName.trim()!==''){
         const { error } = await supabase.from('videos').update({ name:newName }).eq('id', v.id);
         if(error){ alert(error.message); console.error(error); return; }
