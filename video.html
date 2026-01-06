@@ -3,200 +3,130 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Test sidebar + modal</title>
-
+<title>Mes vidéos</title>
 <style>
-body {
-  font-family: 'Comic Sans MS', cursive;
-  background: #fff0f6;
-  padding: 20px;
-}
+  body { font-family:'Comic Sans MS',cursive; background:#fff0f6; padding:20px; }
 
-/* ===== SIDEBAR ===== */
-#sidebar{
-  position:fixed;
-  top:0;
-  left:-220px;
-  width:220px;
-  height:100vh;
-  background:rgba(255,230,240,0.2);
-  border-right:2px solid #b67385;
-  padding:20px;
-  transition:left .3s;
-  z-index:100;
-}
-#sidebar.sidebar-open{
-  left:0;
-}
-#toggleSidebar{
-  position:absolute;
-  top:50%;
-  right:-30px;
-  width:30px;
-  height:60px;
-  background:#ffb6c1;
-  border-radius:0 12px 12px 0;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  cursor:pointer;
-  font-weight:bold;
-  color:white;
-}
-#sidebar button{
-  width:100%;
-  padding:8px;
-  border-radius:16px;
-  border:none;
-  background:#ffb6c1;
-  color:#fff;
-  cursor:pointer;
-  font-weight:bold;
-  margin-top:10px;
-}
+  /* Sidebar */
+  #sidebar{
+    position:fixed; top:0; left:-220px; width:220px; height:100vh;
+    background:rgba(255,230,240,0.2); border-right:2px solid #b67385; padding:20px;
+    transition:left .3s; z-index:100;
+  }
+  #sidebar.sidebar-open{ left:0; }
+  #toggleSidebar{
+    position:absolute; top:50%; right:-30px; width:30px; height:60px;
+    background:#ffb6c1; border-radius:0 12px 12px 0; display:flex;
+    align-items:center; justify-content:center; cursor:pointer; color:white; font-weight:bold;
+  }
+  #sidebar button{
+    width:auto; padding:8px 16px; border-radius:16px; border:none;
+    background:#ffb6c1; color:#fff; cursor:pointer; font-weight:bold; margin-top:10px;
+  }
 
-/* ===== MODAL ===== */
-.modal{
-  display:none;
-  position:fixed;
-  inset:0;
-  background:rgba(0,0,0,0.5);
-  justify-content:center;
-  align-items:center;
-  z-index:1000;
-}
-.modal-content{
-  background:#fff0f6;
-  padding:20px;
-  border-radius:12px;
-  width:90%;
-  max-width:400px;
-  display:flex;
-  flex-direction:column;
-  gap:10px;
-}
-.modal-content input{
-  padding:8px;
-  border-radius:10px;
-  border:2px solid #b67385;
-}
-.modal-content button{
-  padding:8px;
-  border:none;
-  border-radius:12px;
-  background:#ffb6c1;
-  color:white;
-  font-weight:bold;
-  cursor:pointer;
-}
+  /* Liste vidéos */
+  #video-list { display:flex; flex-direction:column; gap:10px; max-width:400px; margin:auto; margin-top:60px; }
+  .video-item {
+    background:#ffe6f0; padding:10px 16px; border-radius:12px; display:flex; justify-content:space-between;
+    align-items:center; cursor:pointer; border:2px solid #b67385; color:#b84c6f; font-weight:bold;
+  }
+  .video-item button{
+    background:#ffb6c1; color:white; border:none; border-radius:12px;
+    padding:4px 8px; cursor:pointer; font-weight:bold;
+  }
+
+  /* Modal */
+  .modal { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); justify-content:center; align-items:center; z-index:1000; }
+  .modal-content { background:#fff0f6; padding:20px; border-radius:12px; max-width:90%; width:400px; text-align:center; display:flex; flex-direction:column; gap:10px; }
+  .modal-content input{ padding:6px 12px; border-radius:10px; border:2px solid #b67385; width:100%; }
+  .modal-content button{ padding:6px 12px; border:none; background:#ffb6c1; color:#fff; border-radius:12px; cursor:pointer; font-weight:bold; }
 </style>
 </head>
-
 <body>
 
-<!-- SIDEBAR -->
 <div id="sidebar">
   <div id="toggleSidebar">☰</div>
   <button id="addVideoBtn">Ajouter vidéo</button>
 </div>
 
-<h2 style="text-align:center;">Page test</h2>
+<h2 style="text-align:center;">Mes vidéos</h2>
 <div id="video-list"></div>
-  
+
 <!-- MODAL AJOUT -->
 <div class="modal" id="videoModalAdd">
   <div class="modal-content">
     <h3>Ajouter une vidéo</h3>
-    <input type="text" placeholder="Lien YouTube">
-    <button id="confirmAdd">Ajouter</button>
-    <button id="cancelAdd">Annuler</button>
+    <input type="text" id="youtubeLink" placeholder="Lien YouTube">
+    <button id="confirmAddVideo">Ajouter</button>
+    <button id="cancelAddVideo">Annuler</button>
   </div>
 </div>
-
-<script>
-/* ===== SIDEBAR ===== */
-const sidebar = document.getElementById('sidebar');
-const toggleSidebar = document.getElementById('toggleSidebar');
-
-toggleSidebar.onclick = () => {
-  sidebar.classList.toggle('sidebar-open');
-};
-
-/* ===== MODAL AJOUT ===== */
-const addVideoBtn = document.getElementById('addVideoBtn');
-const modalAdd = document.getElementById('videoModalAdd');
-const cancelAdd = document.getElementById('cancelAdd');
-
-addVideoBtn.onclick = () => {
-  modalAdd.style.display = 'flex';
-};
-
-cancelAdd.onclick = () => {
-  modalAdd.style.display = 'none';
-};
-
-modalAdd.onclick = (e) => {
-  if(e.target === modalAdd){
-    modalAdd.style.display = 'none';
-  }
-};
 
 <script type="module">
 import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
 
+// ====== SUPABASE ======
 const supabase = createClient(
   "https://jyhbamdcxmpveujjqjla.supabase.co",
   "sb_publishable_sqsxb-3Kl5o3-JQYv9kGFw_-g0EgwMa"
 );
 
-const confirmAdd = document.getElementById('confirmAdd');
-const youtubeInput = document.querySelector('.modal-content input');
+// ====== DOM ======
 const videoList = document.getElementById('video-list');
+const addVideoBtn = document.getElementById('addVideoBtn');
+const videoModalAdd = document.getElementById('videoModalAdd');
+const youtubeLink = document.getElementById('youtubeLink');
+const confirmAddVideo = document.getElementById('confirmAddVideo');
+const cancelAddVideo = document.getElementById('cancelAddVideo');
 
-confirmAdd.onclick = async () => {
-  const link = youtubeInput.value.trim();
-  if(!link) return alert("Lien manquant");
+const sidebar = document.getElementById('sidebar');
+const toggleSidebar = document.getElementById('toggleSidebar');
 
-  const { error } = await supabase
+// ====== SIDEBAR ======
+toggleSidebar.onclick = () => sidebar.classList.toggle('sidebar-open');
+
+// ====== MODAL ======
+addVideoBtn.onclick = () => videoModalAdd.style.display = 'flex';
+cancelAddVideo.onclick = () => videoModalAdd.style.display = 'none';
+videoModalAdd.onclick = e => { if(e.target===videoModalAdd) videoModalAdd.style.display='none'; };
+
+// ====== AJOUT VIDEO ======
+confirmAddVideo.onclick = async () => {
+  const link = youtubeLink.value.trim();
+  if(!link){ alert("Colle un lien YouTube"); return; }
+
+  const { data, error } = await supabase
     .from('videos')
-    .insert([{ name: "Vidéo YouTube", youtubelink: link }]);
+    .insert([{ name: "Vidéo YouTube", youtubelink: link }])
+    .select();
 
   if(error){
+    console.error(error);
     alert(error.message);
     return;
   }
 
-  youtubeInput.value = '';
-  modalAdd.style.display = 'none';
+  youtubeLink.value = '';
+  videoModalAdd.style.display = 'none';
   loadVideos();
 };
 
+// ====== CHARGER VIDEOS ======
 async function loadVideos(){
-  const { data, error } = await supabase
-    .from('videos')
-    .select('*')
-    .order('created_at',{ascending:false});
-
-  if(error){
-    console.error(error);
-    return;
-  }
+  const { data, error } = await supabase.from('videos').select('*').order('created_at',{ascending:false});
+  if(error){ console.error(error); return; }
 
   videoList.innerHTML = '';
-  data.forEach(v=>{
+  data.forEach(v => {
     const div = document.createElement('div');
+    div.className = 'video-item';
     div.textContent = v.name;
-    div.style.padding = '10px';
-    div.style.border = '2px solid #b67385';
-    div.style.borderRadius = '12px';
-    div.style.marginTop = '10px';
     videoList.appendChild(div);
   });
 }
 
+// ====== START ======
 loadVideos();
-</script>
-  
 </script>
 
 </body>
