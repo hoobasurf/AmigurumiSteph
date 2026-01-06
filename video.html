@@ -101,7 +101,8 @@ body {
 </div>
 
 <h2 style="text-align:center;">Page test</h2>
-
+<div id="video-list"></div>
+  
 <!-- MODAL AJOUT -->
 <div class="modal" id="videoModalAdd">
   <div class="modal-content">
@@ -139,6 +140,63 @@ modalAdd.onclick = (e) => {
     modalAdd.style.display = 'none';
   }
 };
+
+<script type="module">
+import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
+
+const supabase = createClient(
+  "https://jyhbamdcxmpveujjqjla.supabase.co",
+  "sb_publishable_sqsxb-3Kl5o3-JQYv9kGFw_-g0EgwMa"
+);
+
+const confirmAdd = document.getElementById('confirmAdd');
+const youtubeInput = document.querySelector('.modal-content input');
+const videoList = document.getElementById('video-list');
+
+confirmAdd.onclick = async () => {
+  const link = youtubeInput.value.trim();
+  if(!link) return alert("Lien manquant");
+
+  const { error } = await supabase
+    .from('videos')
+    .insert([{ name: "Vidéo YouTube", youtubelink: link }]);
+
+  if(error){
+    alert(error.message);
+    return;
+  }
+
+  youtubeInput.value = '';
+  modalAdd.style.display = 'none';
+  loadVideos();
+};
+
+async function loadVideos(){
+  const { data, error } = await supabase
+    .from('videos')
+    .select('*')
+    .order('created_at',{ascending:false});
+
+  if(error){
+    console.error(error);
+    return;
+  }
+
+  videoList.innerHTML = '';
+  data.forEach(v=>{
+    const div = document.createElement('div');
+    div.textContent = v.name;
+    div.style.padding = '10px';
+    div.style.border = '2px solid #b67385';
+    div.style.borderRadius = '12px';
+    div.style.marginTop = '10px';
+    videoList.appendChild(div);
+  });
+}
+
+loadVideos();
+</script>
+  
 </script>
 
 </body>
