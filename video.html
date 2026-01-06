@@ -5,55 +5,56 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Mes vidéos</title>
 <style>
-  body {
-    font-family:'Comic Sans MS',cursive;
-    background: url('Photoroom_20260106_224222.png') no-repeat center center fixed;
-    background-size: cover;
-    padding:20px;
-    transition: opacity 0.5s ease;
-  }
+html, body { margin:0; padding:0; height:100%; font-family:'Comic Sans MS', cursive; transition: opacity 0.5s; }
 
-  /* Sidebar */
-  #sidebar{
-    position:fixed; top:0; left:-220px; width:220px; height:100vh;
-    background:rgba(255,230,240,0.2); border-right:2px solid #b67385; padding:20px;
-    transition:left .3s; z-index:100;
-  }
-  #sidebar.sidebar-open{ left:0; }
-  #toggleSidebar{
-    position:absolute; top:50%; right:-30px; width:30px; height:60px;
-    background:#ffb6c1; border-radius:0 12px 12px 0; display:flex;
-    align-items:center; justify-content:center; cursor:pointer; color:white; font-weight:bold;
-  }
-  #sidebar button{
-    width:auto; padding:8px 16px; border-radius:16px; border:none;
-    background:#ffb6c1; color:#fff; cursor:pointer; font-weight:bold; margin-top:10px;
-  }
+/* FOND IMAGE */
+body::before {
+  content:"";
+  position:fixed;
+  inset:0;
+  background-image:url('Photoroom_20260106_224222.png');
+  background-size:cover;
+  background-position:center;
+  background-repeat:no-repeat;
+  z-index:-1;
+}
 
-  /* Liste vidéos */
-  #video-list { display:flex; flex-direction:column; gap:10px; max-width:400px; margin:auto; margin-top:60px; }
-  .video-item {
-    background: rgba(255,182,193,0.4); /* rose transparent */
-    padding:10px 16px;
-    border-radius:12px;
-    display:flex; justify-content:space-between;
-    align-items:center; cursor:pointer;
-    border:2px solid #b67385;
-    color:#b84c6f;
-    font-weight:bold;
-  }
-  .video-item button{
-    background:#ffb6c1; color:white; border:none; border-radius:12px;
-    padding:4px 8px; cursor:pointer; font-weight:bold; margin-left:5px;
-  }
+/* SIDEBAR */
+#sidebar{
+  position:fixed; top:0; left:-220px; width:220px; height:100vh;
+  background:rgba(255,230,240,0.2); border-right:2px solid #b67385; padding:20px;
+  transition:left .3s; z-index:100;
+}
+#sidebar.sidebar-open{ left:0; }
+#toggleSidebar{
+  position:absolute; top:50%; right:-30px; width:30px; height:60px;
+  background:#ffb6c1; border-radius:0 12px 12px 0; display:flex;
+  align-items:center; justify-content:center; cursor:pointer; font-weight:bold; color:white;
+}
+#sidebar button{
+  width:auto; padding:8px 16px; border-radius:16px; border:none;
+  background:#ffb6c1; color:#fff; cursor:pointer; font-weight:bold; margin-top:10px;
+}
 
-  /* Modal */
-  .modal { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); justify-content:center; align-items:center; z-index:1000; }
-  .modal-content { background:#fff0f6; padding:20px; border-radius:12px; max-width:90%; width:400px; text-align:center; display:flex; flex-direction:column; gap:10px; }
-  .modal-content input{ padding:6px 12px; border-radius:10px; border:2px solid #b67385; width:100%; }
-  .modal-content button{ padding:6px 12px; border:none; background:#ffb6c1; color:#fff; border-radius:12px; cursor:pointer; font-weight:bold; }
-  .modal-content iframe, .modal-content video{ width:100%; height:220px; border-radius:8px; }
+/* LISTE VIDEOS */
+#video-list { display:flex; flex-direction:column; gap:10px; max-width:400px; margin:auto; margin-top:60px; }
+.video-item {
+  background: rgba(255,182,193,0.4); /* rose transparent */
+  padding:10px 16px; border-radius:12px;
+  display:flex; justify-content:space-between; align-items:center;
+  cursor:pointer; border:2px solid #b67385; color:#b84c6f; font-weight:bold;
+}
+.video-item button{
+  background:#ffb6c1; color:white; border:none; border-radius:12px;
+  padding:4px 8px; cursor:pointer; font-weight:bold; margin-left:5px;
+}
 
+/* MODAL */
+.modal { position:fixed; inset:0; display:none; justify-content:center; align-items:center; background:rgba(0,0,0,0.5); z-index:1000; }
+.modal-content{ background:#fff0f6; padding:20px; border-radius:12px; max-width:90%; width:400px; text-align:center; display:flex; flex-direction:column; gap:10px; }
+.modal-content input{ padding:6px 12px; border-radius:10px; border:2px solid #b67385; width:100%; }
+.modal-content button{ padding:6px 12px; border:none; background:#ffb6c1; color:#fff; border-radius:12px; cursor:pointer; font-weight:bold; }
+.modal-content iframe, .modal-content video{ width:100%; height:220px; border-radius:8px; }
 </style>
 </head>
 <body>
@@ -87,13 +88,11 @@
 <script type="module">
 import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
 
-// ====== SUPABASE ======
 const supabase = createClient(
   "https://jyhbamdcxmpveujjqjla.supabase.co",
   "sb_publishable_sqsxb-3Kl5o3-JQYv9kGFw_-g0EgwMa"
 );
 
-// ====== DOM ======
 const videoList = document.getElementById('video-list');
 const addVideoBtn = document.getElementById('addVideoBtn');
 const videoModalAdd = document.getElementById('videoModalAdd');
@@ -109,22 +108,22 @@ const sidebar = document.getElementById('sidebar');
 const toggleSidebar = document.getElementById('toggleSidebar');
 const returnBtn = document.getElementById('returnBtn');
 
-// ====== SIDEBAR ======
+// SIDEBAR
 toggleSidebar.onclick = () => sidebar.classList.toggle('sidebar-open');
 
-// ====== BOUTON RETOUR ======
+// RETOUR avec fondu
 returnBtn.onclick = () => {
   document.body.style.opacity = '0';
-  setTimeout(() => window.location.href = 'owner.html', 500);
+  setTimeout(()=>window.location.href='owner.html',500);
 };
 
-// ====== MODAL AJOUT ======
-addVideoBtn.onclick = () => videoModalAdd.style.display='flex';
-cancelAddVideo.onclick = () => videoModalAdd.style.display='none';
+// MODAL AJOUT
+addVideoBtn.onclick = ()=> videoModalAdd.style.display='flex';
+cancelAddVideo.onclick = ()=> videoModalAdd.style.display='none';
 videoModalAdd.onclick = e => { if(e.target===videoModalAdd) videoModalAdd.style.display='none'; };
 
-// ====== AJOUT VIDEO ======
-confirmAddVideo.onclick = async () => {
+// AJOUT VIDEO
+confirmAddVideo.onclick = async ()=>{
   const yt = youtubeLink.value.trim();
   if(!yt){ alert("Colle un lien YouTube"); return; }
 
@@ -134,35 +133,31 @@ confirmAddVideo.onclick = async () => {
 
   if(error){ alert(error.message); console.error(error); return; }
 
-  youtubeLink.value='';
-  videoModalAdd.style.display='none';
-  loadVideos();
+  youtubeLink.value=''; videoModalAdd.style.display='none'; loadVideos();
 };
 
-// ====== CHARGER VIDEOS ======
+// CHARGER VIDEOS
 async function loadVideos(){
   const { data, error } = await supabase.from('videos').select('*').order('created_at',{ascending:false});
   if(error){ console.error(error); return; }
 
   videoList.innerHTML='';
-  data.forEach(v => {
-    const div = document.createElement('div');
+  data.forEach(v=>{
+    const div=document.createElement('div');
     div.className='video-item';
-    div.innerHTML = `
+    div.innerHTML=`
       <span>${v.name}</span>
       <div>
         <button class="openBtn">Ouvrir</button>
         <button class="renameBtn">Renommer</button>
       </div>
     `;
-    // Ouvrir
-    div.querySelector('.openBtn').onclick = (e) => { e.stopPropagation(); openVideo(v); };
-    // Renommer
-    div.querySelector('.renameBtn').onclick = async (e) => {
+    div.querySelector('.openBtn').onclick = e=>{ e.stopPropagation(); openVideo(v); };
+    div.querySelector('.renameBtn').onclick = async e=>{
       e.stopPropagation();
       const newName = prompt("Nouveau nom :", v.name);
       if(newName && newName.trim()!==''){
-        const { error } = await supabase.from('videos').update({ name: newName }).eq('id', v.id);
+        const { error } = await supabase.from('videos').update({ name:newName }).eq('id', v.id);
         if(error){ alert(error.message); console.error(error); return; }
         loadVideos();
       }
@@ -171,13 +166,13 @@ async function loadVideos(){
   });
 }
 
-// ====== LECTEUR ======
+// LECTEUR
 function openVideo(v){
   modalPlayContent.innerHTML='';
-  const closeBtn = document.createElement('button');
+  const closeBtn=document.createElement('button');
   closeBtn.textContent='Fermer';
   closeBtn.style.marginBottom='10px';
-  closeBtn.onclick = ()=> videoModalPlay.style.display='none';
+  closeBtn.onclick=()=> videoModalPlay.style.display='none';
   modalPlayContent.appendChild(closeBtn);
 
   if(v.youtubelink){
@@ -186,33 +181,27 @@ function openVideo(v){
     if(matchWatch) ytId=matchWatch[1];
     const matchShort=v.youtubelink.match(/youtu\.be\/([^?&]+)/);
     if(matchShort) ytId=matchShort[1];
-
     if(ytId){
       const iframe=document.createElement('iframe');
       iframe.src=`https://www.youtube.com/embed/${ytId}`;
       iframe.frameBorder="0";
       iframe.allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture";
       iframe.allowFullscreen=true;
-      iframe.style.width='100%';
-      iframe.style.height='220px';
-      iframe.style.borderRadius='8px';
+      iframe.style.width='100%'; iframe.style.height='220px'; iframe.style.borderRadius='8px';
       modalPlayContent.appendChild(iframe);
     } else {
-      const p=document.createElement('p');
-      p.textContent="Lien YouTube invalide";
+      const p=document.createElement('p'); p.textContent="Lien YouTube invalide";
       modalPlayContent.appendChild(p);
     }
   }
   videoModalPlay.style.display='flex';
 }
 
-// ====== FERMER MODAL ======
-closePlayModal.onclick = ()=> videoModalPlay.style.display='none';
-videoModalPlay.onclick = e => { if(e.target===videoModalPlay) videoModalPlay.style.display='none'; };
+// FERMER MODAL
+closePlayModal.onclick=()=> videoModalPlay.style.display='none';
+videoModalPlay.onclick=e=>{ if(e.target===videoModalPlay) videoModalPlay.style.display='none'; };
 
-// ====== START ======
 loadVideos();
-
 </script>
 </body>
 </html>
