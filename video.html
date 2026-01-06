@@ -156,10 +156,12 @@ const supabase = createClient(
 );
 
 /* SIDEBAR */
-const sidebar = document.getElementById("sidebar");
-document.getElementById("toggleSidebar")
-  .addEventListener("click", () => sidebar.classList.toggle("open"));
+const sidebar = document.getElementById('sidebar');
+const toggleSidebar = document.getElementById('toggleSidebar');
 
+toggleSidebar.onclick = () => {
+  sidebar.classList.toggle('sidebar-open');
+};
 /* MODAL AJOUT */
 const addModal = document.getElementById("addModal");
 document.getElementById("addVideoBtn").onclick = () => addModal.style.display = "flex";
