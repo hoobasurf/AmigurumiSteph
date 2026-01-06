@@ -104,9 +104,9 @@ confirmAddVideo.onclick = async () => {
   const { error } = await supabase
     .from('videos')
     .insert([{
-      name: "Vidéo YouTube",
-      youtubeLink: yt
-    }]);
+  name: "Vidéo YouTube",
+  youtubelink: yt
+}]);
 
   if (error) {
     console.error(error);
