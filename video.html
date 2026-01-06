@@ -94,24 +94,26 @@ videoModalAdd.onclick = e => { if(e.target===videoModalAdd) videoModalAdd.style.
 
 // ====== AJOUT VIDEO ======
 confirmAddVideo.onclick = async () => {
-  const file = videoFile.files[0];
   const yt = youtubeLink.value.trim();
-  if(!file && !yt){ alert("Sélectionnez un fichier ou collez un lien YouTube"); return; }
 
-  let insertData = { name: file ? file.name : "Lien YouTube", youtubeLink: yt || null, file_path:null };
-
-  // Si fichier
-  if(file){
-    const path = `${Date.now()}_${file.name}`;
-    const { error: uploadError } = await supabase.storage.from('videos').upload(path, file);
-    if(uploadError){ console.error(uploadError); alert("Erreur upload"); return; }
-    insertData.file_path = path;
+  if (!yt) {
+    alert("Colle un lien YouTube");
+    return;
   }
 
-  const { error } = await supabase.from('videos').insert([insertData]);
-  if(error){ console.error(error); alert("Erreur ajout"); return; }
+  const { error } = await supabase
+    .from('videos')
+    .insert([{
+      name: "Vidéo YouTube",
+      youtubeLink: yt
+    }]);
 
-  videoFile.value = '';
+  if (error) {
+    console.error(error);
+    alert("Erreur ajout");
+    return;
+  }
+
   youtubeLink.value = '';
   videoModalAdd.style.display = 'none';
   loadVideos();
