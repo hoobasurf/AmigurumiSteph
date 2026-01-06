@@ -28,9 +28,8 @@
   #video-list { display:flex; flex-direction:column; gap:10px; max-width:400px; margin:auto; margin-top:60px; }
   .video-item {
     background:#ffe6f0; padding:10px 16px; border-radius:12px; display:flex; justify-content:space-between;
-    align-items:center; border:2px solid #b67385; color:#b84c6f; font-weight:bold;
+    align-items:center; cursor:pointer; border:2px solid #b67385; color:#b84c6f; font-weight:bold;
   }
-  .video-item span{ flex:1; }
   .video-item button{
     background:#ffb6c1; color:white; border:none; border-radius:12px;
     padding:4px 8px; cursor:pointer; font-weight:bold; margin-left:5px;
@@ -41,7 +40,8 @@
   .modal-content { background:#fff0f6; padding:20px; border-radius:12px; max-width:90%; width:400px; text-align:center; display:flex; flex-direction:column; gap:10px; }
   .modal-content input{ padding:6px 12px; border-radius:10px; border:2px solid #b67385; width:100%; }
   .modal-content button{ padding:6px 12px; border:none; background:#ffb6c1; color:#fff; border-radius:12px; cursor:pointer; font-weight:bold; }
-  .modal-content iframe{ width:100%; height:220px; border-radius:8px; }
+  .modal-content iframe, .modal-content video{ width:100%; height:220px; border-radius:8px; }
+
 </style>
 </head>
 <body>
@@ -58,6 +58,7 @@
 <div class="modal" id="videoModalAdd">
   <div class="modal-content">
     <h3>Ajouter une vidéo</h3>
+    <input type="file" id="videoFile" accept="video/*">
     <input type="text" id="youtubeLink" placeholder="Lien YouTube">
     <button id="confirmAddVideo">Ajouter</button>
     <button id="cancelAddVideo">Annuler</button>
@@ -74,53 +75,62 @@
 <script type="module">
 import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
 
-// ===== SUPABASE =====
+// ====== SUPABASE ======
 const supabase = createClient(
   "https://jyhbamdcxmpveujjqjla.supabase.co",
   "sb_publishable_sqsxb-3Kl5o3-JQYv9kGFw_-g0EgwMa"
 );
 
-// ===== DOM =====
+// ====== DOM ======
 const videoList = document.getElementById('video-list');
 const addVideoBtn = document.getElementById('addVideoBtn');
 const videoModalAdd = document.getElementById('videoModalAdd');
+const videoFile = document.getElementById('videoFile');
 const youtubeLink = document.getElementById('youtubeLink');
 const confirmAddVideo = document.getElementById('confirmAddVideo');
 const cancelAddVideo = document.getElementById('cancelAddVideo');
-
-const sidebar = document.getElementById('sidebar');
-const toggleSidebar = document.getElementById('toggleSidebar');
 
 const videoModalPlay = document.getElementById('videoModalPlay');
 const modalPlayContent = document.getElementById('modalPlayContent');
 const closePlayModal = document.getElementById('closePlayModal');
 
-// ===== SIDEBAR =====
+// ====== SIDEBAR ======
+const sidebar = document.getElementById('sidebar');
+const toggleSidebar = document.getElementById('toggleSidebar');
 toggleSidebar.onclick = () => sidebar.classList.toggle('sidebar-open');
 
-// ===== MODAL AJOUT =====
+// ====== OUVRIR MODAL AJOUT ======
 addVideoBtn.onclick = () => videoModalAdd.style.display = 'flex';
 cancelAddVideo.onclick = () => videoModalAdd.style.display = 'none';
 videoModalAdd.onclick = e => { if(e.target===videoModalAdd) videoModalAdd.style.display='none'; };
 
-// ===== AJOUT VIDEO =====
+// ====== AJOUT VIDEO ======
 confirmAddVideo.onclick = async () => {
-  const link = youtubeLink.value.trim();
-  if(!link){ alert("Colle un lien YouTube"); return; }
+  const file = videoFile.files[0];
+  const yt = youtubeLink.value.trim();
 
-  const { data, error } = await supabase
-    .from('videos')
-    .insert([{ name: "Vidéo YouTube", youtubelink: link }])
-    .select();
+  if(!file && !yt){ alert("Sélectionnez un fichier ou collez un lien YouTube"); return; }
 
-  if(error){ alert(error.message); console.error(error); return; }
+  let insertData = { name: file ? file.name : "Vidéo YouTube", youtubelink: yt || null, file_path:null };
 
+  // Si fichier upload
+  if(file){
+    const path = `${Date.now()}_${file.name}`;
+    const { error: uploadError } = await supabase.storage.from('videos').upload(path, file);
+    if(uploadError){ console.error(uploadError); alert("Erreur upload"); return; }
+    insertData.file_path = path;
+  }
+
+  const { error } = await supabase.from('videos').insert([insertData]);
+  if(error){ console.error(error); alert("Erreur ajout"); return; }
+
+  videoFile.value = '';
   youtubeLink.value = '';
   videoModalAdd.style.display = 'none';
   loadVideos();
 };
 
-// ===== CHARGER VIDEOS =====
+// ====== CHARGER LES VIDEOS ======
 async function loadVideos(){
   const { data, error } = await supabase.from('videos').select('*').order('created_at',{ascending:false});
   if(error){ console.error(error); return; }
@@ -135,16 +145,29 @@ async function loadVideos(){
 
     const openBtn = document.createElement('button');
     openBtn.textContent = 'Ouvrir';
-    openBtn.onclick = (e) => { e.stopPropagation(); openVideo(v); };
+    openBtn.onclick = (e) => {
+      e.stopPropagation();
+      openVideo(v);
+    };
 
     const renameBtn = document.createElement('button');
     renameBtn.textContent = 'Renommer';
     renameBtn.onclick = async (e) => {
       e.stopPropagation();
-      const newName = prompt("Nouveau nom ?", v.name);
-      if(!newName) return;
-      const { error } = await supabase.from('videos').update({ name: newName }).eq('id', v.id);
-      if(error){ alert(error.message); console.error(error); return; }
+      const newName = prompt("Nouveau nom :", v.name);
+      if(!newName || newName.trim() === "") return;
+
+      const { error } = await supabase
+        .from('videos')
+        .update({ name: newName.trim() })
+        .eq('id', v.id);
+
+      if(error){
+        alert(error.message);
+        console.error(error);
+        return;
+      }
+
       loadVideos();
     };
 
@@ -155,13 +178,14 @@ async function loadVideos(){
   });
 }
 
-// ===== LECTEUR =====
+// ====== LECTEUR ======
 function openVideo(v){
   modalPlayContent.innerHTML = '';
+
   const closeBtn = document.createElement('button');
   closeBtn.textContent = 'Fermer';
+  closeBtn.style.marginBottom = '10px';
   closeBtn.onclick = () => videoModalPlay.style.display='none';
-  closeBtn.style.marginBottom='10px';
   modalPlayContent.appendChild(closeBtn);
 
   if(v.youtubelink){
@@ -175,26 +199,33 @@ function openVideo(v){
       const iframe = document.createElement('iframe');
       iframe.src = `https://www.youtube.com/embed/${ytId}`;
       iframe.frameBorder = "0";
-      iframe.allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture";
+      iframe.allow = "accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture";
       iframe.allowFullscreen = true;
-      iframe.style.width='100%';
-      iframe.style.height='220px';
+      iframe.style.width = '100%';
+      iframe.style.height = '220px';
+      iframe.style.borderRadius = '8px';
       modalPlayContent.appendChild(iframe);
     } else {
       const p = document.createElement('p');
       p.textContent = "Lien YouTube invalide";
       modalPlayContent.appendChild(p);
     }
+
+  } else if(v.file_path){
+    const vid = document.createElement('video');
+    vid.src = supabase.storage.from('videos').getPublicUrl(v.file_path).data.publicUrl;
+    vid.controls = true;
+    modalPlayContent.appendChild(vid);
   }
 
   videoModalPlay.style.display='flex';
 }
 
-// ===== FERMER MODAL =====
+// ====== FERMER MODAL ======
 closePlayModal.onclick = () => videoModalPlay.style.display='none';
 videoModalPlay.onclick = e => { if(e.target===videoModalPlay) videoModalPlay.style.display='none'; };
 
-// ===== START =====
+// ====== START ======
 loadVideos();
 
 </script>
