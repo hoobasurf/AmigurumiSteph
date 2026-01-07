@@ -4,179 +4,222 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Accueil</title>
+<link rel="icon" href="favicon.ico" type="image/x-icon">
+
 <style>
-* { box-sizing: border-box; margin:0; padding:0; font-family:'Comic Sans MS',cursive; }
+  *{box-sizing:border-box;margin:0;padding:0;font-family:'Comic Sans MS',cursive;}
+  html,body{height:100%;overflow:hidden;}
 
-html, body {
-  height: 100%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  flex-direction: column;
-  background: linear-gradient(135deg, #ffe6f0, #ffb6c1, #ffc0cb);
-  background-size: 600% 600%;
-  animation: gradientShift 20s ease infinite;
-  color: #b84c6f;
-  overflow: hidden;
-}
+  body {
+    background: #ffe6f0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    animation: bgAnimation 15s infinite alternate;
+  }
 
-@keyframes gradientShift {
-  0% { background-position: 0% 50%; }
-  50% { background-position: 100% 50%; }
-  100% { background-position: 0% 50%; }
-}
+  @keyframes bgAnimation {
+    0%{background-color: #ffe6f0;}
+    50%{background-color: #ffd1e0;}
+    100%{background-color: #ffe6f0;}
+  }
 
-h2 {
-  margin-bottom: 30px;
-  font-size: 36px;
-  text-align: center;
-  text-shadow: 1px 1px 2px rgba(255,255,255,0.7);
-}
+  h1 { color:#b84c6f; margin-bottom:30px; text-shadow:1px 1px 2px #fff; }
 
-/* Cercle central appli */
-#appLogo {
-  width: 180px;
-  height: 180px;
-  border-radius: 50%;
-  border: 3px solid #b67385;
-  object-fit: cover;
-  margin-bottom: 30px;
-  animation: glow 3s ease-in-out infinite alternate;
-}
+  .app-circle {
+    width:180px;
+    height:180px;
+    border-radius:50%;
+    border:4px solid #f6c2d1;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    margin-bottom:30px;
+    box-shadow:0 4px 12px rgba(0,0,0,0.1);
+    animation: pulse 3s infinite alternate;
+  }
 
-@keyframes glow {
-  0% { box-shadow: 0 0 10px rgba(233,79,154,0.3); }
-  100% { box-shadow: 0 0 25px rgba(233,79,154,0.5); }
-}
+  @keyframes pulse {
+    0% {transform: scale(1);}
+    50% {transform: scale(1.02);}
+    100% {transform: scale(1);}
+  }
 
-/* Champs et boutons */
-.input-group {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  margin-bottom: 12px;
-}
+  .app-circle img {
+    width:140px;
+    height:140px;
+    object-fit:cover;
+    border-radius:50%;
+  }
 
-input[type="text"], input[type="password"] {
-  padding: 10px 12px;
-  border-radius: 12px;
-  border: 2px solid #b67385;
-  outline: none;
-  width: 200px;
-  font-size: 16px;
-}
+  .form-container {
+    display:flex;
+    flex-direction:column;
+    align-items:flex-start;
+    gap:12px;
+    width:300px;
+    background: rgba(255,230,240,0.6);
+    border:2px solid #b67385;
+    border-radius:16px;
+    padding:20px;
+  }
 
-input[type="text"]:focus, input[type="password"]:focus {
-  border-color: #e94f9a;
-  box-shadow: 0 0 6px rgba(233,79,154,0.4);
-}
+  .form-row {
+    display:flex;
+    align-items:center;
+    gap:10px;
+    width:100%;
+  }
 
-button {
-  padding: 10px 16px;
-  border-radius: 12px;
-  border: none;
-  background: #ffb6c1;
-  color: #fff;
-  font-weight: bold;
-  cursor: pointer;
-  margin: 6px;
-  transition: background 0.3s;
-  font-size: 16px;
-}
+  input[type="text"], input[type="password"] {
+    flex:1;
+    padding:8px 12px;
+    border-radius:12px;
+    border:2px solid #b67385;
+    outline:none;
+    font-size:16px;
+    background:#fff0f5;
+  }
 
-button:hover {
-  background: #e94f9a;
-}
+  input[type="file"] {
+    display:none;
+  }
 
-/* Bouton photo profil */
-#photoBtn {
-  background: #fff0f5;
-  color: #b84c6f;
-  border: 2px solid #b67385;
-}
+  label.file-btn {
+    padding:6px 12px;
+    border-radius:12px;
+    border:none;
+    background:#ffb6c1;
+    color:#fff;
+    cursor:pointer;
+    font-weight:bold;
+  }
 
-#photoBtn:hover {
-  background: #ffe6f0;
-}
+  .profile-preview {
+    width:40px;
+    height:40px;
+    border-radius:50%;
+    border:2px solid #b67385;
+    display:none;
+    object-fit:cover;
+  }
 
-/* Petit cercle photo profil */
-#profilePreview {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  border: 2px solid #b67385;
-  object-fit: cover;
-  display: none;
-}
+  button {
+    width:100%;
+    padding:8px 12px;
+    border:none;
+    border-radius:12px;
+    background:#ffb6c1;
+    color:#fff;
+    font-weight:bold;
+    cursor:pointer;
+    margin-top:6px;
+  }
+
+  /* Modal choix */
+  .modal {
+    position:fixed;
+    inset:0;
+    background: rgba(0,0,0,0.5);
+    display:none;
+    justify-content:center;
+    align-items:center;
+    z-index:1000;
+  }
+
+  .modal-box {
+    background:#ffe6f0;
+    border:2px solid #b67385;
+    border-radius:16px;
+    padding:20px;
+    text-align:center;
+  }
+
+  .modal-box button {
+    margin:10px;
+    padding:8px 16px;
+    border:none;
+    border-radius:12px;
+    background:#ffb6c1;
+    color:#fff;
+    cursor:pointer;
+    font-weight:bold;
+  }
 
 </style>
 </head>
 <body>
 
-<h2>Bienvenue</h2>
+<h1>Bienvenue !</h1>
 
-<!-- Cercle central appli -->
-<img id="appLogo" src="Photoroom_20260107_185314.png" alt="Logo de l'appli">
-
-<!-- Champ prénom avec petit cercle photo profil -->
-<div class="input-group">
-  <input type="text" id="prenom" placeholder="Prénom" required>
-  <img id="profilePreview" alt="Photo de profil">
+<div class="app-circle">
+  <img src="Photoroom_20260107_185314.png" alt="Logo App">
 </div>
 
-<input type="password" id="password" placeholder="Mot de passe">
-
-<button type="button" id="photoBtn">Choisir Photo</button>
-<input type="file" id="photoInput" accept="image/*" style="display:none;" required>
-
-<div>
+<div class="form-container">
+  <div class="form-row">
+    <input type="text" id="prenom" placeholder="Prénom">
+    <img id="profilePreview" class="profile-preview" alt="Profil">
+  </div>
+  <div class="form-row">
+    <label for="photoInput" class="file-btn">Photo</label>
+    <input type="file" id="photoInput" accept="image/*">
+  </div>
+  <input type="password" id="password" placeholder="Mot de passe">
   <button id="connexionBtn">Connexion</button>
   <button id="entrerBtn">Entrer</button>
 </div>
 
+<!-- Modal choix Creation / Visite -->
+<div id="choiceModal" class="modal">
+  <div class="modal-box">
+    <h3>Bonjour Steph !</h3>
+    <p>Voulez-vous accéder à :</p>
+    <button id="creationBtn">Creation</button>
+    <button id="visiteBtn">Visite</button>
+  </div>
+</div>
+
 <script>
-const photoBtn = document.getElementById('photoBtn');
 const photoInput = document.getElementById('photoInput');
 const profilePreview = document.getElementById('profilePreview');
 
-photoBtn.onclick = () => photoInput.click();
-
-photoInput.onchange = () => {
-  const file = photoInput.files[0];
+photoInput.addEventListener('change', (e)=>{
+  const file = e.target.files[0];
   if(file){
-    const reader = new FileReader();
-    reader.onload = e => {
-      profilePreview.src = e.target.result;
-      profilePreview.style.display = 'block';
-    };
-    reader.readAsDataURL(file);
+    const url = URL.createObjectURL(file);
+    profilePreview.src = url;
+    profilePreview.style.display = 'inline-block';
   }
-};
+});
 
-// Gestion boutons Connexion et Entrer
-document.getElementById('connexionBtn').onclick = () => {
+// Modal choix
+const choiceModal = document.getElementById('choiceModal');
+const creationBtn = document.getElementById('creationBtn');
+const visiteBtn = document.getElementById('visiteBtn');
+
+document.getElementById('connexionBtn').onclick = ()=>{
   const prenom = document.getElementById('prenom').value.trim();
   const mdp = document.getElementById('password').value.trim();
-  if(!prenom || !profilePreview.src) return alert("Veuillez mettre votre prénom et sélectionner une photo.");
 
-  if(prenom === "Steph" && mdp === "Steph1511") {
-    // Petit modal choix Creation/Visite
-    if(confirm("Voulez-vous accéder à Creation (OK) ou Visite (Annuler) ?")){
-      window.location.href = "owner.html";
-    } else {
-      window.location.href = "visitor.html";
-    }
+  if(!prenom || !profilePreview.src){
+    alert("Veuillez mettre votre prénom et sélectionner une photo.");
+    return;
+  }
+
+  if(prenom === "Steph" && mdp === "Steph1511"){
+    choiceModal.style.display = "flex";
   } else {
-    // Tout autre prénom: direct visitor
     window.location.href = "visitor.html";
   }
 };
 
-// Entrer sans connexion
-document.getElementById('entrerBtn').onclick = () => {
-  window.location.href = "visitor.html";
-};
-</script>
+creationBtn.onclick = ()=>{ window.location.href = "owner.html"; };
+visiteBtn.onclick = ()=>{ window.location.href = "visitor.html"; };
 
+document.getElementById('entrerBtn').onclick = ()=>{ window.location.href = "visitor.html"; };
+
+</script>
 </body>
 </html>
