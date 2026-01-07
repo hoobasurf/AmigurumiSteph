@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Notes</title>
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="favicon.ico" type="image/x-icon">
+<link rel="apple-touch-icon" href="icon-152.png">
+<meta name="theme-color" content="#f2b7c9">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;font-family:'Comic Sans MS',cursive;overflow:hidden;}
+
+/* FOND FIXE */
+body::before {
+  content:"";
+  position:fixed;
+  top:0;left:0;width:100vw;height:100vh;
+  background-image: url('Photoroom_20260107_192358.png');
+  background-size: cover;
+  background-position: center;
+  z-index:-1;
+}
+
+/* SIDEBAR */
+#sidebar{
+  position:fixed; top:0; left:-220px;
+  width:220px; height:100vh;
+  background:rgba(255,230,240,0.2);
+  border-right:2px solid #b67385;
+  padding:20px;
+  transition:left .3s;
+  z-index:10;
+}
+#sidebar.sidebar-open{left:0}
+#toggleSidebar{
+  position:absolute; top:50%; right:-30px;
+  width:30px; height:60px;
+  background:#ffb6c1;
+  border-radius:0 12px 12px 0;
+  display:flex; align-items:center; justify-content:center;
+  cursor:pointer;
+  font-weight:bold;
+}
+#sidebar button{
+  width:auto;
+  padding:8px 16px;
+  border-radius:16px;
+  border:none;
+  background:#ffb6c1;
+  color:#fff;
+  cursor:pointer;
+  font-weight:bold;
+  margin-top:10px;
+}
+
+/* ZONE NOTES */
+.center-zone{
+  display:flex;
+  flex-wrap:wrap;
+  justify-content:flex-start;
+  gap:16px;
+  padding:2cm 1cm 1cm 1cm;
+  min-height:100vh;
+  overflow-y:auto;
+}
+
+/* POST-IT NOTE */
+.note{
+  position:relative;
+  width:180px;
+  min-height:180px;
+  background:#ffe6f0;
+  border:3px solid #b67385;
+  border-radius:12px;
+  padding:12px;
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+  box-shadow:0 0 0 3px #f6c2d1, 0 6px 14px rgba(0,0,0,0.25);
+}
+.note textarea{
+  flex:1;
+  border:2px solid #b67385;
+  border-radius:12px;
+  padding:6px;
+  background:#fff0f5;
+  color:#b84c6f;
+  font-family:'Comic Sans MS',cursive;
+  font-size:14px;
+  resize:none;
+}
+.note img{
+  width:100%;
+  max-height:100px;
+  object-fit:cover;
+  border-radius:8px;
+  cursor:pointer;
+}
+
+/* BOUTON AJOUT NOTE */
+#addNoteBtn{
+  position:fixed;
+  bottom:20px;
+  right:20px;
+  width:60px;
+  height:60px;
+  background:#ffb6c1;
+  border-radius:50%;
+  border:none;
+  cursor:pointer;
+  font-size:28px;
+  color:#fff;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  box-shadow:0 4px 8px rgba(0,0,0,0.3);
+  z-index:20;
+}
+</style>
+</head>
+<body>
+
+<div id="sidebar">
+  <div id="toggleSidebar">☰</div>
+  <button id="ownerBtn">Mes Projets</button>
+  <button id="homeBtn">Accueil</button>
+</div>
+
+<div class="center-zone" id="notesContainer">
+  <!-- Les notes post-it apparaîtront ici -->
+</div>
+
+<button id="addNoteBtn">+</button>
+
+<script type="module">
+import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
+
+const supabase = createClient(
+  "https://jyhbamdcxmpveujjqjla.supabase.co",
+  "sb_publishable_sqsxb-3Kl5o3-JQYv9oGFw_-g0EgwMa"
+);
+
+const notesContainer = document.getElementById('notesContainer');
+const addNoteBtn = document.getElementById('addNoteBtn');
+const sidebar = document.getElementById('sidebar');
+const toggleSidebar = document.getElementById('toggleSidebar');
+
+// ================== SIDEBAR ==================
+toggleSidebar.onclick = () => sidebar.classList.toggle('sidebar-open');
+
+// Boutons avec transition en fondu
+document.getElementById('ownerBtn').onclick = () => {
+  document.body.style.transition='opacity 0.5s';
+  document.body.style.opacity='0';
+  setTimeout(()=>window.location.href='owner.html',500);
+};
+document.getElementById('homeBtn').onclick = () => {
+  document.body.style.transition='opacity 0.5s';
+  document.body.style.opacity='0';
+  setTimeout(()=>window.location.href='index.html',500);
+};
+
+// ================== AJOUT NOTE ==================
+addNoteBtn.onclick = () => addNote();
+
+// Crée une note vide
+function addNote(content='', imgUrl='') {
+  const note = document.createElement('div');
+  note.className = 'note';
+  
+  const textarea = document.createElement('textarea');
+  textarea.value = content;
+  note.appendChild(textarea);
+  
+  if(imgUrl){
+    const img = document.createElement('img');
+    img.src = imgUrl;
+    note.appendChild(img);
+  }
+  
+  notesContainer.appendChild(note);
+}
+
+// ================== CHOIX IMAGE / PROJET ==================
+// Exemple: cliquer sur un projet depuis owner pour récupérer image dans note
+async function loadOwnerProjects() {
+  const { data } = await supabase.from('creations').select('*').order('created_at', {ascending:false});
+  data.forEach(c => {
+    const noteBtn = document.createElement('button');
+    noteBtn.textContent = c.name;
+    noteBtn.onclick = () => addNote('', c.images?.[0] ? supabase.storage.from('images').getPublicUrl(c.images[0]).data.publicUrl : '');
+    notesContainer.appendChild(noteBtn);
+  });
+}
+
+// Appel facultatif pour précharger projets
+loadOwnerProjects();
+
+</script>
+</body>
+</html>
