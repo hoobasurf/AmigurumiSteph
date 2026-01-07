@@ -134,6 +134,15 @@ button:hover {
   <button id="entrerBtn">Entrer</button>
 </div>
 
+<!-- MODAL CHOIX CREATION / VISITE -->
+<div id="choiceModal" class="modal" style="display:none; justify-content:center; align-items:center; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:1000;">
+  <div style="background:#ffe6f0; padding:20px 30px; border-radius:20px; border:2px solid #b67385; display:flex; flex-direction:column; gap:12px; text-align:center;">
+    <p>Bienvenue Steph ! Que voulez-vous faire ?</p>
+    <button id="creationBtn">Création</button>
+    <button id="visiteBtn">Visite</button>
+  </div>
+</div>
+  
 <script>
 const photoBtn = document.getElementById('photoBtn');
 const photoInput = document.getElementById('photoInput');
@@ -160,16 +169,8 @@ document.getElementById('connexionBtn').onclick = () => {
   if(!prenom || !profilePreview.src) return alert("Veuillez mettre votre prénom et sélectionner une photo.");
 
   if(prenom === "Steph" && mdp === "Steph1511") {
-  // Affiche la modal
-  const choiceModal = document.getElementById('choiceModal');
-  choiceModal.style.display = "flex";
-
-  document.getElementById('creationBtn').onclick = () => {
-    window.location.href = "owner.html";
-  };
-  document.getElementById('visiteBtn').onclick = () => {
-    window.location.href = "visitor.html";
-  };
+  // Afficher la modal personnalisée
+  document.getElementById('choiceModal').style.display = 'flex';
 } else {
   // Tout autre prénom: direct visitor
   window.location.href = "visitor.html";
@@ -180,6 +181,15 @@ document.getElementById('connexionBtn').onclick = () => {
 document.getElementById('entrerBtn').onclick = () => {
   window.location.href = "visitor.html";
 };
+
+document.getElementById('creationBtn').onclick = () => {
+  window.location.href = "owner.html";
+};
+
+document.getElementById('visiteBtn').onclick = () => {
+  window.location.href = "visitor.html";
+};
+  
 </script>
 <!-- Modal choix Creation / Visite -->
 <div id="choiceModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); display:flex; justify-content:center; align-items:center; z-index:1000;">
