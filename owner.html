@@ -914,6 +914,22 @@ videoBtn.onclick = () => {
     window.location.href = 'video.html'; // ← change si besoin
   }, 500);
 };
+
+// --- Bouton Notes ---
+const notesBtn = document.createElement('button');
+notesBtn.textContent = "Notes";
+notesBtn.style.marginTop = "10px";
+
+videoBtn.insertAdjacentElement('afterend', notesBtn);
+
+notesBtn.onclick = () => {
+  document.body.style.transition = 'opacity 0.5s';
+  document.body.style.opacity = '0';
+  setTimeout(() => {
+    window.location.href = 'notes.html'; // ← change le lien si nécessaire
+  }, 500);
+};
+  
   // ================== EVENTS ==================
 document.querySelector('.closeZoom').onclick = () => zoomModal.style.display = 'none';
 zoomModal.onclick = e => { if(e.target === zoomModal) zoomModal.style.display = 'none'; };
