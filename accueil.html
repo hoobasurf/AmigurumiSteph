@@ -109,6 +109,26 @@ button:hover {
   display: none;
 }
 
+/* MODAL */
+.modal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+.modal-content {
+  background: #ffe6f0;
+  border: 2px solid #b67385;
+  border-radius: 16px;
+  padding: 20px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
 </style>
 </head>
 <body>
@@ -135,9 +155,10 @@ button:hover {
 </div>
 
 <!-- MODAL CHOIX CREATION / VISITE -->
-<div id="choiceModal" class="modal" style="display:none; justify-content:center; align-items:center; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:1000;">
-  <div style="background:#ffe6f0; padding:20px 30px; border-radius:20px; border:2px solid #b67385; display:flex; flex-direction:column; gap:12px; text-align:center;">
-    <p>Bienvenue Steph ! Que voulez-vous faire ?</p>
+<div id="choiceModal" class="modal">
+  <div class="modal-content">
+    <h3>Bonjour Steph !</h3>
+    <p>Voulez-vous accéder à :</p>
     <button id="creationBtn">Création</button>
     <button id="visiteBtn">Visite</button>
   </div>
@@ -169,12 +190,12 @@ document.getElementById('connexionBtn').onclick = () => {
   if(!prenom || !profilePreview.src) return alert("Veuillez mettre votre prénom et sélectionner une photo.");
 
   if(prenom === "Steph" && mdp === "Steph1511") {
-  // Afficher la modal personnalisée
-  document.getElementById('choiceModal').style.display = 'flex';
-} else {
-  // Tout autre prénom: direct visitor
-  window.location.href = "visitor.html";
-}
+    // Afficher la modal personnalisée
+    document.getElementById('choiceModal').style.display = 'flex';
+  } else {
+    // Tout autre prénom: direct visitor
+    window.location.href = "visitor.html";
+  }
 };
 
 // Entrer sans connexion
@@ -182,6 +203,7 @@ document.getElementById('entrerBtn').onclick = () => {
   window.location.href = "visitor.html";
 };
 
+// Boutons modal
 document.getElementById('creationBtn').onclick = () => {
   window.location.href = "owner.html";
 };
@@ -189,16 +211,7 @@ document.getElementById('creationBtn').onclick = () => {
 document.getElementById('visiteBtn').onclick = () => {
   window.location.href = "visitor.html";
 };
-  
 </script>
-<!-- Modal choix Creation / Visite -->
-<div id="choiceModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); display:flex; justify-content:center; align-items:center; z-index:1000;">
-  <div style="background:#ffe6f0; border:2px solid #b67385; border-radius:16px; padding:20px; text-align:center;">
-    <h3>Bonjour Steph !</h3>
-    <p>Voulez-vous accéder à :</p>
-    <button id="creationBtn">Creation</button>
-    <button id="visiteBtn">Visite</button>
-  </div>
-</div>
+
 </body>
 </html>
