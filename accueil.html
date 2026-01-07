@@ -5,168 +5,236 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Accueil</title>
 <style>
-  body {
-    height: 100vh;
+  * { box-sizing: border-box; margin:0; padding:0; font-family:'Comic Sans MS',cursive; }
+  body, html {
+    height: 100%;
     display: flex;
     justify-content: center;
     align-items: center;
-    background: #ffe6f0;
-    font-family: 'Comic Sans MS', cursive;
+    background: linear-gradient(135deg, #ffe6f0, #ffb6c1, #ffc0cb);
+    background-size: 600% 600%;
+    animation: gradientShift 20s ease infinite;
+  }
+  @keyframes gradientShift {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
   }
 
-  /* Cercle central avec image */
-  .circle-container {
-    width: 250px;
-    height: 250px;
-    border-radius: 50%;
-    border: 4px solid rgba(184,76,111,0.5);
+  .container {
+    background: rgba(255, 230, 240, 0.4);
+    padding: 30px 40px;
+    border-radius: 30px;
     display: flex;
-    justify-content: center;
+    flex-direction: column;
     align-items: center;
-    background: #ffd9e6;
-    animation: pulse 3s ease-in-out infinite alternate;
+    gap: 20px;
+    backdrop-filter: blur(6px);
+  }
+
+  .circle {
+    width: 200px;
+    height: 200px;
+    border-radius: 50%;
+    border: 4px solid #ffb6c1;
     overflow: hidden;
-    margin-bottom: 30px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
   }
 
-  .circle-container img {
-    width: 90%;
-    height: 90%;
+  .circle img {
+    width: 100%;
+    height: 100%;
     object-fit: cover;
-    border-radius: 50%;
   }
 
-  @keyframes pulse {
-    0% { transform: scale(1); box-shadow: 0 0 10px rgba(184,76,111,0.2);}
-    100% { transform: scale(1.05); box-shadow: 0 0 20px rgba(184,76,111,0.3);}
-  }
-
-  /* Formulaire */
-  .form-container {
+  form {
     display: flex;
     flex-direction: column;
     gap: 12px;
-    align-items: center;
+    width: 250px;
   }
 
-  .input-group {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-  }
-
-  .input-group input[type="text"],
-  .input-group input[type="password"] {
-    padding: 8px 12px;
+  input[type="text"], input[type="password"], input[type="file"] {
+    padding: 10px;
     border-radius: 12px;
     border: 2px solid #b67385;
     outline: none;
-    font-size: 16px;
-    background: #fff0f5;
-    color: #b84c6f;
   }
 
-  .input-group input[type="file"] {
-    display: none;
+  input[type="text"]:focus, input[type="password"]:focus, input[type="file"]:focus {
+    border-color: #e94f9a;
   }
 
-  .profile-preview {
-    width: 50px;
-    height: 50px;
-    border-radius: 50%;
-    border: 2px solid #b67385;
-    background: #fff0f5;
-    object-fit: cover;
+  .buttons {
+    display: flex;
+    justify-content: space-between;
+    gap: 10px;
   }
 
   button {
-    padding: 8px 16px;
-    border: none;
+    padding: 10px;
     border-radius: 12px;
+    border: none;
     background: #ffb6c1;
     color: #fff;
     font-weight: bold;
     cursor: pointer;
-    font-size: 16px;
-    transition: 0.2s;
+    flex: 1;
+    transition: background 0.3s;
   }
 
-  button:hover {
-    background: #e94f9a;
+  button:hover { background: #e94f9a; }
+
+  /* Cercle plus petit photo de profil */
+  .profile-circle {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    border: 2px solid #b67385;
+    overflow: hidden;
+    margin-left: 10px;
+    display: none;
+  }
+
+  .profile-circle img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  /* Modal choix Owner / Visitor */
+  .modal {
+    position: fixed; inset:0;
+    background: rgba(0,0,0,0.5);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 100;
+  }
+
+  .modal .modal-box {
+    background: #ffe6f0;
+    padding: 20px 30px;
+    border-radius: 20px;
+    border: 3px solid #b67385;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    align-items: center;
+    min-width: 220px;
   }
 
 </style>
 </head>
 <body>
 
-<div style="text-align:center;">
-  <!-- Cercle central avec image principale -->
-  <div class="circle-container">
+<div class="container">
+  <div class="circle">
     <img src="Photoroom_20260107_185314.png" alt="Accueil">
   </div>
 
-  <!-- Formulaire -->
-  <div class="form-container">
-    <div class="input-group">
+  <form id="loginForm">
+    <div style="display:flex; align-items:center;">
       <input type="text" id="prenom" placeholder="Prénom" required>
-      <img id="profilePreview" class="profile-preview" alt="Photo de profil">
-      <label for="profilePhoto" style="cursor:pointer; color:#b84c6f;">📷</label>
-      <input type="file" id="profilePhoto" accept="image/*" required>
+      <div class="profile-circle" id="profileCircle"><img id="profileImg"></div>
     </div>
+    <input type="password" id="password" placeholder="Mot de passe">
+    <input type="file" id="photoInput" accept="image/*" required>
+    <div class="buttons">
+      <button type="submit">Connexion</button>
+      <button type="button" id="enterVisitor">Entrer</button>
+    </div>
+  </form>
+</div>
 
-    <input type="password" id="password" placeholder="Mot de passe (facultatif)">
-
-    <div style="display:flex; gap:12px; margin-top:8px;">
-      <button id="connexionBtn">Connexion</button>
-      <button id="entrerBtn">Entrer</button>
+<!-- Modal choix Owner / Visitor -->
+<div class="modal" id="choiceModal">
+  <div class="modal-box">
+    <p>Choisir la page :</p>
+    <div style="display:flex; gap:10px;">
+      <button id="ownerBtn">Création (Owner)</button>
+      <button id="visitorBtn">Visite (Visitor)</button>
     </div>
   </div>
 </div>
 
 <script>
-const profilePhotoInput = document.getElementById('profilePhoto');
-const profilePreview = document.getElementById('profilePreview');
-const prenomInput = document.getElementById('prenom');
-const passwordInput = document.getElementById('password');
-const connexionBtn = document.getElementById('connexionBtn');
-const entrerBtn = document.getElementById('entrerBtn');
+  const prenomInput = document.getElementById('prenom');
+  const passwordInput = document.getElementById('password');
+  const photoInput = document.getElementById('photoInput');
+  const profileCircle = document.getElementById('profileCircle');
+  const profileImg = document.getElementById('profileImg');
 
-// Prévisualisation de la photo
-profilePhotoInput.addEventListener('change', (e) => {
-  const file = e.target.files[0];
-  if(file){
-    profilePreview.src = URL.createObjectURL(file);
-  } else {
-    profilePreview.src = '';
-  }
-});
+  const loginForm = document.getElementById('loginForm');
+  const enterVisitorBtn = document.getElementById('enterVisitor');
 
-// Connexion
-connexionBtn.addEventListener('click', () => {
-  const prenom = prenomInput.value.trim();
-  const password = passwordInput.value.trim();
-  const photo = profilePhotoInput.files[0];
+  const choiceModal = document.getElementById('choiceModal');
+  const ownerBtn = document.getElementById('ownerBtn');
+  const visitorBtn = document.getElementById('visitorBtn');
 
-  if(!prenom || !photo){
-    return alert("Veuillez entrer votre prénom et choisir une photo !");
-  }
-
-  if(prenom === "Steph" && password === "Steph1511"){
-    const choix = confirm("Vous êtes Steph ! Cliquez OK pour Owner (Création) ou Annuler pour Visitor (Visite)");
-    if(choix){
-      window.location.href = "owner.html";
+  // Affiche la photo à côté du prénom
+  photoInput.addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if(file){
+      profileImg.src = URL.createObjectURL(file);
+      profileCircle.style.display = 'block';
     } else {
-      window.location.href = "visitor.html";
+      profileCircle.style.display = 'none';
     }
-  } else {
-    window.location.href = "visitor.html";
-  }
-});
+  });
 
-// Entrer sans enregistrement
-entrerBtn.addEventListener('click', () => {
-  window.location.href = "visitor.html";
-});
+  loginForm.addEventListener('submit', (e)=>{
+    e.preventDefault();
+    const prenom = prenomInput.value.trim();
+    const password = passwordInput.value.trim();
+    const photo = photoInput.files[0];
+
+    if(!photo){
+      alert("Veuillez ajouter une photo");
+      return;
+    }
+
+    if(prenom === "Steph" && password === "Steph1511"){
+      // Affiche le modal choix
+      choiceModal.style.display = 'flex';
+    } else {
+      // Autres → visitor
+      localStorage.setItem('prenom', prenom);
+      localStorage.setItem('photo', URL.createObjectURL(photo));
+      window.location.href = 'visitor.html';
+    }
+  });
+
+  ownerBtn.addEventListener('click', ()=>{
+    localStorage.setItem('prenom', prenomInput.value.trim());
+    localStorage.setItem('photo', URL.createObjectURL(photoInput.files[0]));
+    window.location.href = 'owner.html';
+  });
+
+  visitorBtn.addEventListener('click', ()=>{
+    localStorage.setItem('prenom', prenomInput.value.trim());
+    localStorage.setItem('photo', URL.createObjectURL(photoInput.files[0]));
+    window.location.href = 'visitor.html';
+  });
+
+  // Entrer directement
+  enterVisitorBtn.addEventListener('click', ()=>{
+    const photo = photoInput.files[0];
+    if(!photo){
+      alert("Veuillez ajouter une photo");
+      return;
+    }
+    localStorage.setItem('prenom', prenomInput.value.trim());
+    localStorage.setItem('photo', URL.createObjectURL(photo));
+    window.location.href = 'visitor.html';
+  });
+
+  // Fermeture du modal si clic en dehors
+  choiceModal.addEventListener('click', (e)=>{
+    if(e.target === choiceModal) choiceModal.style.display = 'none';
+  });
 </script>
 
 </body>
