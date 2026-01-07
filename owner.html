@@ -929,6 +929,21 @@ notesBtn.onclick = () => {
     window.location.href = 'notes.html'; // ← change le lien si nécessaire
   }, 500);
 };
+
+// --- Bouton Messagerie ---
+const messagerieBtn = document.createElement('button');
+messagerieBtn.textContent = "Messagerie";
+messagerieBtn.style.marginTop = "10px";
+
+notesBtn.insertAdjacentElement('afterend', messagerieBtn);
+
+messagerieBtn.onclick = () => {
+  document.body.style.transition = 'opacity 0.5s';
+  document.body.style.opacity = '0';
+  setTimeout(() => {
+    window.location.href = 'messagerie.html';
+  }, 500);
+};
   
   // ================== EVENTS ==================
 document.querySelector('.closeZoom').onclick = () => zoomModal.style.display = 'none';
