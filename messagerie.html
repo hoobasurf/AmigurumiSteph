@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Messagerie</title>
+<style>
+body {
+  margin:0;
+  font-family:'Comic Sans MS',cursive;
+  background:#ffe6f0;
+  display:flex;
+  flex-direction:column;
+  height:100vh;
+}
+
+/* Container messages */
+#chat-container {
+  flex:1;
+  padding:10px;
+  overflow-y:auto;
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+}
+
+/* Bulles messages */
+.message {
+  max-width:70%;
+  padding:8px 12px;
+  border-radius:16px;
+  font-size:14px;
+  word-wrap:break-word;
+  display:inline-block;
+}
+
+.message.you {
+  align-self:flex-end;
+  background:#ffb6c1;
+  color:white;
+  border-bottom-right-radius:4px;
+}
+
+.message.other {
+  align-self:flex-start;
+  background:rgba(255,182,193,0.3);
+  color:#b84c6f;
+  border-bottom-left-radius:4px;
+}
+
+/* Barre en bas */
+#input-bar {
+  display:flex;
+  gap:6px;
+  padding:10px;
+  border-top:2px solid #b67385;
+  background:#fff0f5;
+}
+
+#input-bar input {
+  flex:1;
+  padding:8px 12px;
+  border-radius:16px;
+  border:2px solid #b67385;
+  outline:none;
+}
+
+#input-bar button {
+  padding:8px 16px;
+  border:none;
+  border-radius:16px;
+  background:#ffb6c1;
+  color:white;
+  font-weight:bold;
+  cursor:pointer;
+}
+</style>
+</head>
+<body>
+
+<div id="chat-container"></div>
+
+<div id="input-bar">
+  <input id="message-input" placeholder="Écrire un message...">
+  <button id="send-btn">Envoyer</button>
+</div>
+
+<script>
+const chatContainer = document.getElementById('chat-container');
+const input = document.getElementById('message-input');
+const sendBtn = document.getElementById('send-btn');
+
+// Fonction pour ajouter un message
+function addMessage(text, sender="you") {
+  const msg = document.createElement('div');
+  msg.className = `message ${sender}`;
+  msg.textContent = text;
+  chatContainer.appendChild(msg);
+  chatContainer.scrollTop = chatContainer.scrollHeight; // scroll en bas
+}
+
+// Envoi message
+sendBtn.onclick = () => {
+  const text = input.value.trim();
+  if(!text) return;
+  addMessage(text, "you");
+  input.value = "";
+
+  // Réponse automatique pour démo
+  setTimeout(() => {
+    addMessage("Réponse automatique", "other");
+  }, 500);
+};
+
+// Enter pour envoyer
+input.addEventListener('keypress', e => {
+  if(e.key === 'Enter') sendBtn.onclick();
+});
+</script>
+
+</body>
+</html>
