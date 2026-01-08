@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Notes</title>
+
 <link rel="manifest" href="manifest.json">
 <link rel="icon" href="favicon.ico" type="image/x-icon">
 <link rel="apple-touch-icon" href="icon-152.png">
@@ -16,20 +17,23 @@
 html,body{height:100%;font-family:'Comic Sans MS',cursive;overflow:hidden;}
 
 /* FOND FIXE */
-body::before {
+body::before{
   content:"";
   position:fixed;
-  top:0;left:0;width:100vw;height:100vh;
-  background-image: url('Photoroom_20260107_192358.png');
-  background-size: cover;
-  background-position: center;
+  inset:0;
+  background-image:url('Photoroom_20260107_192358.png');
+  background-size:cover;
+  background-position:center;
   z-index:-1;
 }
 
-/* SIDEBAR */
+/* ===== SIDEBAR ===== */
 #sidebar{
-  position:fixed; top:0; left:-220px;
-  width:220px; height:100vh;
+  position:fixed;
+  top:0;
+  left:-220px;
+  width:220px;
+  height:100vh;
   background:rgba(255,230,240,0.2);
   border-right:2px solid #b67385;
   padding:20px;
@@ -37,17 +41,23 @@ body::before {
   z-index:10;
 }
 #sidebar.sidebar-open{left:0}
+
 #toggleSidebar{
-  position:absolute; top:50%; right:-30px;
-  width:30px; height:60px;
+  position:absolute;
+  top:50%;
+  right:-30px;
+  width:30px;
+  height:60px;
   background:#ffb6c1;
   border-radius:0 12px 12px 0;
-  display:flex; align-items:center; justify-content:center;
+  display:flex;
+  align-items:center;
+  justify-content:center;
   cursor:pointer;
   font-weight:bold;
 }
+
 #sidebar button{
-  width:auto;
   padding:8px 16px;
   border-radius:16px;
   border:none;
@@ -58,7 +68,7 @@ body::before {
   margin-top:10px;
 }
 
-/* ZONE NOTES */
+/* ===== ZONE NOTES ===== */
 .center-zone{
   display:flex;
   flex-wrap:wrap;
@@ -69,9 +79,8 @@ body::before {
   overflow-y:auto;
 }
 
-/* POST-IT NOTE */
+/* NOTE */
 .note{
-  position:relative;
   width:180px;
   min-height:180px;
   background:#ffe6f0;
@@ -83,6 +92,7 @@ body::before {
   gap:6px;
   box-shadow:0 0 0 3px #f6c2d1, 0 6px 14px rgba(0,0,0,0.25);
 }
+
 .note textarea{
   flex:1;
   border:2px solid #b67385;
@@ -90,16 +100,15 @@ body::before {
   padding:6px;
   background:#fff0f5;
   color:#b84c6f;
-  font-family:'Comic Sans MS',cursive;
   font-size:14px;
   resize:none;
 }
+
 .note img{
   width:100%;
   max-height:100px;
   object-fit:cover;
   border-radius:8px;
-  cursor:pointer;
 }
 
 /* BOUTON AJOUT NOTE */
@@ -123,17 +132,16 @@ body::before {
 }
 </style>
 </head>
+
 <body>
 
+<!-- ===== SIDEBAR ===== -->
 <div id="sidebar">
   <div id="toggleSidebar">☰</div>
-  <button id="ownerBtn">Mes Projets</button>
-  <button id="homeBtn">Accueil</button>
+  <button id="backBtn">Retour</button>
 </div>
 
-<div class="center-zone" id="notesContainer">
-  <!-- Les notes post-it apparaîtront ici -->
-</div>
+<div class="center-zone" id="notesContainer"></div>
 
 <button id="addNoteBtn">+</button>
 
@@ -150,57 +158,55 @@ const addNoteBtn = document.getElementById('addNoteBtn');
 const sidebar = document.getElementById('sidebar');
 const toggleSidebar = document.getElementById('toggleSidebar');
 
-// ================== SIDEBAR ==================
+/* ===== SIDEBAR ===== */
 toggleSidebar.onclick = () => sidebar.classList.toggle('sidebar-open');
 
-// Boutons avec transition en fondu
-document.getElementById('ownerBtn').onclick = () => {
-  document.body.style.transition='opacity 0.5s';
-  document.body.style.opacity='0';
-  setTimeout(()=>window.location.href='owner.html',500);
-};
-document.getElementById('homeBtn').onclick = () => {
-  document.body.style.transition='opacity 0.5s';
-  document.body.style.opacity='0';
-  setTimeout(()=>window.location.href='index.html',500);
+// BOUTON RETOUR (fondu identique aux autres pages)
+document.getElementById('backBtn').onclick = () => {
+  document.body.style.transition = 'opacity 0.5s';
+  document.body.style.opacity = '0';
+  setTimeout(() => {
+    window.location.href = 'owner.html';
+  }, 500);
 };
 
-// ================== AJOUT NOTE ==================
+/* ===== NOTES ===== */
 addNoteBtn.onclick = () => addNote();
 
-// Crée une note vide
-function addNote(content='', imgUrl='') {
+function addNote(content='', imgUrl=''){
   const note = document.createElement('div');
   note.className = 'note';
-  
+
   const textarea = document.createElement('textarea');
   textarea.value = content;
   note.appendChild(textarea);
-  
+
   if(imgUrl){
     const img = document.createElement('img');
     img.src = imgUrl;
     note.appendChild(img);
   }
-  
+
   notesContainer.appendChild(note);
 }
 
-// ================== CHOIX IMAGE / PROJET ==================
-// Exemple: cliquer sur un projet depuis owner pour récupérer image dans note
-async function loadOwnerProjects() {
-  const { data } = await supabase.from('creations').select('*').order('created_at', {ascending:false});
-  data.forEach(c => {
-    const noteBtn = document.createElement('button');
-    noteBtn.textContent = c.name;
-    noteBtn.onclick = () => addNote('', c.images?.[0] ? supabase.storage.from('images').getPublicUrl(c.images[0]).data.publicUrl : '');
-    notesContainer.appendChild(noteBtn);
+/* ===== CHARGEMENT PROJETS (facultatif) ===== */
+async function loadOwnerProjects(){
+  const { data } = await supabase
+    .from('creations')
+    .select('*')
+    .order('created_at',{ascending:false});
+
+  data?.forEach(c=>{
+    addNote('', c.images?.[0]
+      ? supabase.storage.from('images').getPublicUrl(c.images[0]).data.publicUrl
+      : ''
+    );
   });
 }
 
-// Appel facultatif pour précharger projets
 loadOwnerProjects();
-
 </script>
+
 </body>
 </html>
