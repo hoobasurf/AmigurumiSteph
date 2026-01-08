@@ -188,17 +188,15 @@ document.getElementById('connexionBtn').onclick = () => {
   const prenom = document.getElementById('prenom').value.trim();
   const mdp = document.getElementById('password').value.trim();
 
-  if(!prenom) return alert("Veuillez mettre votre prénom.");
-
-  // Stockage dans localStorage pour owner
-  localStorage.setItem('prenom', prenom);
-  localStorage.setItem('photo', profilePreview.src || '');
+  // Stockage pour owner (optionnel)
+  if(prenom) localStorage.setItem('prenom', prenom);
+  if(profilePreview.src) localStorage.setItem('photo', profilePreview.src);
 
   if(prenom === "Steph" && mdp === "Steph1511") {
     // Afficher la modal personnalisée
     document.getElementById('choiceModal').style.display = 'flex';
   } else {
-    // Tout autre prénom: direct visitor
+    // Entrer sans bloquer, comme avant
     window.location.href = "visitor.html";
   }
 };
