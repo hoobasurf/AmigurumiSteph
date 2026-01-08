@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Messagerie</title>
+
 <style>
 body {
   margin:0;
@@ -12,9 +13,56 @@ body {
   display:flex;
   flex-direction:column;
   height:100vh;
+  overflow:hidden;
 }
 
-/* Container messages */
+/* ===== SIDEBAR ===== */
+#sidebar{
+  position:fixed;
+  top:0;
+  left:-220px;
+  width:220px;
+  height:100vh;
+  background:rgba(255,230,240,0.9);
+  border-right:2px solid #b67385;
+  padding:20px;
+  transition:left .3s;
+  z-index:1000;
+}
+
+#sidebar.sidebar-open{
+  left:0;
+}
+
+#toggleSidebar{
+  position:absolute;
+  top:50%;
+  right:-30px;
+  width:30px;
+  height:60px;
+  background:#ffb6c1;
+  border-radius:0 12px 12px 0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+  font-weight:bold;
+  color:white;
+}
+
+#backBtn{
+  width:auto;
+  padding:8px 16px;
+  border-radius:16px;
+  border:none;
+  background:#ffb6c1;
+  color:#fff;
+  cursor:pointer;
+  font-weight:bold;
+  margin-top:10px;
+}
+
+/* ===== CHAT ===== */
 #chat-container {
   flex:1;
   padding:10px;
@@ -76,8 +124,16 @@ body {
 }
 </style>
 </head>
+
 <body>
 
+<!-- ===== SIDEBAR ===== -->
+<div id="sidebar">
+  <div id="toggleSidebar">☰</div>
+  <button id="backBtn">Retour</button>
+</div>
+
+<!-- ===== CHAT ===== -->
 <div id="chat-container"></div>
 
 <div id="input-bar">
@@ -86,36 +142,47 @@ body {
 </div>
 
 <script>
+/* ===== CHAT ===== */
 const chatContainer = document.getElementById('chat-container');
 const input = document.getElementById('message-input');
 const sendBtn = document.getElementById('send-btn');
 
-// Fonction pour ajouter un message
 function addMessage(text, sender="you") {
   const msg = document.createElement('div');
   msg.className = `message ${sender}`;
   msg.textContent = text;
   chatContainer.appendChild(msg);
-  chatContainer.scrollTop = chatContainer.scrollHeight; // scroll en bas
+  chatContainer.scrollTop = chatContainer.scrollHeight;
 }
 
-// Envoi message
 sendBtn.onclick = () => {
   const text = input.value.trim();
   if(!text) return;
   addMessage(text, "you");
   input.value = "";
 
-  // Réponse automatique pour démo
   setTimeout(() => {
     addMessage("Réponse automatique", "other");
   }, 500);
 };
 
-// Enter pour envoyer
 input.addEventListener('keypress', e => {
   if(e.key === 'Enter') sendBtn.onclick();
 });
+
+/* ===== SIDEBAR ===== */
+document.getElementById('toggleSidebar').onclick = () => {
+  document.getElementById('sidebar').classList.toggle('sidebar-open');
+};
+
+// Bouton retour avec fondu (IDENTIQUE code 1)
+document.getElementById('backBtn').onclick = () => {
+  document.body.style.transition = 'opacity 0.5s';
+  document.body.style.opacity = '0';
+  setTimeout(() => {
+    window.location.href = 'owner.html';
+  }, 500);
+};
 </script>
 
 </body>
