@@ -187,24 +187,19 @@ photoInput.onchange = () => {
 document.getElementById('connexionBtn').onclick = () => {
   const prenom = document.getElementById('prenom').value.trim();
   const mdp = document.getElementById('password').value.trim();
-
-  // Stockage pour owner (optionnel)
-  if(prenom) localStorage.setItem('prenom', prenom);
-  if(profilePreview.src) localStorage.setItem('photo', profilePreview.src);
+  if(!prenom || !profilePreview.src) return alert("Veuillez mettre votre prénom et sélectionner une photo.");
 
   if(prenom === "Steph" && mdp === "Steph1511") {
     // Afficher la modal personnalisée
     document.getElementById('choiceModal').style.display = 'flex';
   } else {
-    // Entrer sans bloquer, comme avant
+    // Tout autre prénom: direct visitor
     window.location.href = "visitor.html";
   }
 };
 
 // Entrer sans connexion
 document.getElementById('entrerBtn').onclick = () => {
-  localStorage.setItem('prenom', '');
-  localStorage.setItem('photo', '');
   window.location.href = "visitor.html";
 };
 
