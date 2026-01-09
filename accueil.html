@@ -164,7 +164,21 @@ button:hover {
   </div>
 </div>
   
+<img id="ownerPhoto" style="width:32px;height:32px;border-radius:50%;position:fixed;top:10px;right:10px;z-index:10000;" alt="Owner">
+
 <script>
+// récupère prénom et photo stockés
+let currentUser = {
+  prenom: localStorage.getItem('prenom') || '',
+  photo: localStorage.getItem('photo') || ''
+};
+
+// affiche la mini photo si elle existe
+const ownerImg = document.getElementById('ownerPhoto');
+if (currentUser.photo && ownerImg) {
+  ownerImg.src = currentUser.photo;
+}
+  
 const photoBtn = document.getElementById('photoBtn');
 const photoInput = document.getElementById('photoInput');
 const profilePreview = document.getElementById('profilePreview');
