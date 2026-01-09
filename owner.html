@@ -825,8 +825,86 @@ async function refreshCreations(){
   render();
 }
 
-// ====== SIDEBAR ======
-document.getElementById('toggleSidebar').onclick=()=>sidebar.classList.toggle('sidebar-open');
+// ================== BOUTONS SIDEBAR ==================
+const addBtn = document.getElementById('addBtn');
+
+// --- Bouton Pelotes ---
+const pelotesBtn = document.createElement('button');
+pelotesBtn.textContent = "Pelotes";
+pelotesBtn.style.marginTop = "10px";
+
+addBtn.insertAdjacentElement('afterend', pelotesBtn);
+
+pelotesBtn.onclick = () => {
+  document.body.style.transition = 'opacity 0.5s';
+  document.body.style.opacity = '0';
+  setTimeout(() => {
+    window.location.href = 'pelotes.html';
+  }, 500);
+};
+
+// --- Bouton Vidéo ---
+const videoBtn = document.createElement('button');
+videoBtn.textContent = "Vidéo";
+videoBtn.style.marginTop = "10px";
+
+pelotesBtn.insertAdjacentElement('afterend', videoBtn);
+
+videoBtn.onclick = () => {
+  document.body.style.transition = 'opacity 0.5s';
+  document.body.style.opacity = '0';
+  setTimeout(() => {
+    window.location.href = 'video.html'; // ← change si besoin
+  }, 500);
+};
+
+// --- Bouton Notes ---
+const notesBtn = document.createElement('button');
+notesBtn.textContent = "Notes";
+notesBtn.style.marginTop = "10px";
+
+videoBtn.insertAdjacentElement('afterend', notesBtn);
+
+notesBtn.onclick = () => {
+  document.body.style.transition = 'opacity 0.5s';
+  document.body.style.opacity = '0';
+  setTimeout(() => {
+    window.location.href = 'notes.html'; // ← change le lien si nécessaire
+  }, 500);
+};
+
+// --- Bouton Messagerie ---
+const messagerieBtn = document.createElement('button');
+messagerieBtn.textContent = "Messagerie";
+messagerieBtn.style.marginTop = "10px";
+
+notesBtn.insertAdjacentElement('afterend', messagerieBtn);
+
+messagerieBtn.onclick = () => {
+  document.body.style.transition = 'opacity 0.5s';
+  document.body.style.opacity = '0';
+  setTimeout(() => {
+    window.location.href = 'messagerie.html';
+  }, 500);
+};
+  
+  // ================== EVENTS ==================
+document.querySelector('.closeZoom').onclick = () => zoomModal.style.display = 'none';
+zoomModal.onclick = e => { if(e.target === zoomModal) zoomModal.style.display = 'none'; };
+likeModal.onclick = e => { if(e.target === likeModal) likeModal.style.display = 'none'; };
+commentModal.onclick = e => { if(e.target === commentModal) commentModal.style.display = 'none'; };
+deleteModal.onclick = e => { if(e.target === deleteModal) deleteModal.style.display = 'none'; currentDelete=null; };
+document.getElementById('toggleSidebar').onclick = () => sidebar.classList.toggle('sidebar-open');
+
+// ===== AGRANDISSEMENT MODAL COMMENT =====
+const expandBtn = document.getElementById('expandComment');
+const commentBox = document.querySelector('.comment-box');
+expandBtn.onclick = (e) => {
+  e.stopPropagation();
+  commentBox.classList.toggle('fullscreen');
+  expandBtn.textContent = commentBox.classList.contains('fullscreen') ? '⤡' : '⤢';
+};
+
 
 // ====== CLOSE MODALS ======
 document.querySelector('.closeZoom').onclick=()=>zoomModal.style.display='none';
