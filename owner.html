@@ -684,10 +684,14 @@ confirmLike.onclick = async () => {
     if (!name || !currentZoom) return;
 
     if (!currentZoom.likes) currentZoom.likes = [];
-    currentZoom.likes.push({
-  name: name,
-  photo: currentUser.photo || ''
-});
+
+    // 🔒 AJOUT PHOTO AU LIKE
+    const likeObj = {
+      name: name,
+      photo: currentUser.photo || ''
+    };
+
+    currentZoom.likes.push(likeObj);
 
     const { error } = await supabase.from('creations')
         .update({ likes: currentZoom.likes })
@@ -695,16 +699,22 @@ confirmLike.onclick = async () => {
 
     if (error) console.error(error);
 
-    // Re-render likes avec photo
+    // 🔹 RENDER DES BULLES AVEC PHOTO
     likeBubbles.innerHTML = '';
-    currentZoom.likes?.forEach(n => {
+    currentZoom.likes.forEach(like => {
         const bubble = document.createElement('div');
         bubble.className = 'bubble';
-        if(n === currentUser.prenom && currentUser.photo) {
-            bubble.innerHTML = `<img src="${currentUser.photo}" style="width:20px;height:20px;border-radius:50%;margin-right:4px;vertical-align:middle;"> ${n}`;
+
+        if (like.photo) {
+            bubble.innerHTML = `
+              <img src="${like.photo}"
+                   style="width:20px;height:20px;border-radius:50%;margin-right:4px;vertical-align:middle;">
+              ${like.name}
+            `;
         } else {
-            bubble.textContent = n;
+            bubble.textContent = like.name;
         }
+
         likeBubbles.appendChild(bubble);
     });
 
@@ -734,12 +744,10 @@ function renderCommentList() {
         const text = document.createElement('span');
 
         // Si c’est le user actuel, on met sa photo à côté
-        if(c.name === currentUser.prenom && currentUser.photo) {
-            text.innerHTML = `<img src="${currentUser.photo}" style="width:20px;height:20px;border-radius:50%;margin-right:4px;vertical-align:middle;"> <strong>${c.name}</strong>: <span style="font-size:14px">${c.text}</span>`;
-        } else {
-            text.innerHTML = `<strong>${c.name}</strong>: <span style="font-size:14px">${c.text}</span>`;
-        }
-
+        text.innerHTML = `
+  ${c.photo ? `<img src="${c.photo}" style="width:20px;height:20px;border-radius:50%;margin-right:4px;vertical-align:middle;">` : ''}
+  <strong>${c.name}</strong> : ${c.text}
+`;
         item.appendChild(text);
         commentBubbles.appendChild(item);
     });
@@ -755,7 +763,12 @@ confirmComment.onclick = async () => {
     if (!name || !text || !currentZoom) return alert("Veuillez entrer votre prénom et un commentaire.");
 
     if (!currentZoom.comments) currentZoom.comments = [];
-    currentZoom.comments.push({ name, text, likes: [] });
+    currentZoom.comments.push({
+  name,
+  text,
+  photo: currentUser.photo || '',
+  likes: []
+});
 
     const { error } = await supabase
         .from('creations')
