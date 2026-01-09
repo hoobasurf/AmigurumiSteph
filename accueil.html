@@ -192,6 +192,13 @@ photoInput.onchange = () => {
     reader.onload = e => {
       profilePreview.src = e.target.result;
       profilePreview.style.display = 'block';
+
+      // ====== AJOUT POUR OWNER ======
+      localStorage.setItem('photo', e.target.result);
+      currentUser.photo = e.target.result;
+
+      const ownerImg = document.getElementById('ownerPhoto');
+      if(ownerImg) ownerImg.src = currentUser.photo;
     };
     reader.readAsDataURL(file);
   }
