@@ -207,6 +207,21 @@ photoInput.onchange = () => {
     reader.readAsDataURL(file);
   }
 };
+
+document.getElementById('connexionBtn').onclick = () => {
+  const prenom = document.getElementById('prenom').value.trim();
+  const mdp = document.getElementById('password').value.trim();
+  if(!prenom || !profilePreview.src) return alert("Veuillez mettre votre prénom et sélectionner une photo.");
+
+  if(prenom === "Steph" && mdp === "Steph1511") {
+    // Afficher la modal personnalisée
+    document.getElementById('choiceModal').style.display = 'flex';
+  } else {
+    // Tout autre prénom: direct visitor
+    window.location.href = "visitor.html";
+  }
+};
+  
 </script>
 </body>
 </html>
