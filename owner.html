@@ -571,11 +571,6 @@ let currentUser = {
   photo: localStorage.getItem('photo') || ''      // récupère la photo si définie
 };
   
-// ====== CURRENT USER ======
-let currentUser = {
-  prenom: localStorage.getItem('prenom') || '',
-  photo: localStorage.getItem('photo') || ''
-};
 if(currentUser.photo){
   document.getElementById('ownerPhoto').src = currentUser.photo;
 }
@@ -684,31 +679,29 @@ if(currentUser.prenom) likeNameInput.disabled = true;
 confirmLike.onclick = async () => {
   if (!currentZoom) return;
 
-  // Récupérer le prénom (user connecté ou saisie)
   let name = currentUser.prenom || likeNameInput.value.trim();
   if (!name) return;
 
-  // Initialiser likes si nécessaire
   if (!currentZoom.likes) currentZoom.likes = [];
 
-  // Ajouter le like
   currentZoom.likes.push({
     name,
     photo: currentUser.photo || ''
   });
 
-  // Mettre à jour Supabase
-  const { error } = await supabase
-    .from('creations')
-    .update({ likes: currentZoom.likes })
-    .eq('id', currentZoom.id);
+  // Fonction async pour Supabase
+  try {
+    const { error } = await supabase
+      .from('creations')
+      .update({ likes: currentZoom.likes })
+      .eq('id', currentZoom.id);
 
-  if (error) console.error(error);
+    if (error) console.error(error);
+  } catch (err) {
+    console.error(err);
+  }
 
-  // Mettre à jour l’affichage
   renderLikeBubbles();
-
-  // Fermer le modal
   likeModal.style.display = 'none';
 };
 
