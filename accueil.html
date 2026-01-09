@@ -105,7 +105,6 @@ button:hover {
   display: none;
 }
 
-/* MODAL */
 .modal {
   display: none;
   position: fixed;
@@ -135,6 +134,7 @@ button:hover {
   top:10px;
   right:10px;
   z-index:10000;
+  display:none;
 }
 </style>
 </head>
@@ -159,7 +159,6 @@ button:hover {
   <button id="entrerBtn">Entrer</button>
 </div>
 
-<!-- MODAL CHOIX CREATION / VISITE -->
 <div id="choiceModal" class="modal">
   <div class="modal-content">
     <h3>Bonjour Steph !</h3>
@@ -169,7 +168,7 @@ button:hover {
   </div>
 </div>
 
-<!-- Mini photo Owner -->
+<!-- Mini photo owner -->
 <img id="ownerPhoto" alt="Owner">
 
 <script>
@@ -177,20 +176,19 @@ const photoBtn = document.getElementById('photoBtn');
 const photoInput = document.getElementById('photoInput');
 const profilePreview = document.getElementById('profilePreview');
 const ownerImg = document.getElementById('ownerPhoto');
+const prenomInput = document.getElementById('prenom');
 
-// === Affiche automatiquement la photo mini si déjà stockée ===
+// === AU CHARGEMENT DE LA PAGE ===
 const storedPrenom = localStorage.getItem('prenom');
 const storedPhoto = localStorage.getItem('photo');
+if(storedPrenom) prenomInput.value = storedPrenom;
 if(storedPhoto){
   ownerImg.src = storedPhoto;
   ownerImg.style.display = 'block';
 }
-if(storedPrenom){
-  document.getElementById('prenom').value = storedPrenom;
-}
 
+// === SELECTION PHOTO PROFIL ===
 photoBtn.onclick = () => photoInput.click();
-
 photoInput.onchange = () => {
   const file = photoInput.files[0];
   if(file){
@@ -203,15 +201,17 @@ photoInput.onchange = () => {
   }
 };
 
-// Gestion boutons Connexion et Entrer
+// === CONNEXION ===
 document.getElementById('connexionBtn').onclick = () => {
-  const prenom = document.getElementById('prenom').value.trim();
+  const prenom = prenomInput.value.trim();
   const mdp = document.getElementById('password').value.trim();
   if(!prenom || !profilePreview.src) return alert("Veuillez mettre votre prénom et sélectionner une photo.");
 
-  // 🔐 SAUVEGARDE POUR OWNER / LIKE / COMMENT
+  // 🔐 Sauvegarde prénom + photo
   localStorage.setItem('prenom', prenom);
   localStorage.setItem('photo', profilePreview.src);
+
+  // ⚡ Affiche mini photo owner
   ownerImg.src = profilePreview.src;
   ownerImg.style.display = 'block';
 
@@ -227,11 +227,10 @@ document.getElementById('entrerBtn').onclick = () => {
   window.location.href = "visitor.html";
 };
 
-// Boutons modal
+// Modal Création / Visite
 document.getElementById('creationBtn').onclick = () => {
   window.location.href = "owner.html";
 };
-
 document.getElementById('visiteBtn').onclick = () => {
   window.location.href = "visitor.html";
 };
