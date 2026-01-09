@@ -169,10 +169,11 @@ button:hover {
   </div>
 </div>
 
-<img id="ownerPhoto" alt="Owner">
+<!-- Owner mini photo -->
+<img id="ownerPhoto" style="width:32px;height:32px;border-radius:50%;position:fixed;top:10px;right:10px;z-index:10000;display:none;" alt="Owner">
 
 <script>
-// === Récupération photo stockée au chargement ===
+// ======= RECUPERE PHOTO STOCKEE AU CHARGEMENT =======
 const ownerImg = document.getElementById('ownerPhoto');
 const storedPhoto = localStorage.getItem('photo');
 if(storedPhoto){
@@ -180,7 +181,7 @@ if(storedPhoto){
   ownerImg.style.display = 'block';
 }
 
-// === Choisir photo ===
+// ======= CHOISIR PHOTO =======
 const photoBtn = document.getElementById('photoBtn');
 const photoInput = document.getElementById('photoInput');
 const profilePreview = document.getElementById('profilePreview');
@@ -192,14 +193,14 @@ photoInput.onchange = () => {
   if(file){
     const reader = new FileReader();
     reader.onload = e => {
-      // affiche dans le petit cercle input
+      // Affiche dans le petit cercle du formulaire
       profilePreview.src = e.target.result;
       profilePreview.style.display = 'block';
 
-      // 🔐 Stocke dans localStorage
+      // Stocke dans localStorage
       localStorage.setItem('photo', e.target.result);
 
-      // ⚡ Affiche mini-photo owner
+      // Affiche mini-photo owner
       ownerImg.src = e.target.result;
       ownerImg.style.display = 'block';
     };
