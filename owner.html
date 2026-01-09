@@ -566,9 +566,6 @@ let currentUser = {
   photo: ''  // On va remplir avec l'URL Supabase plus tard
 };
   
-const ownerPhoto = document.getElementById('ownerPhoto');
-if (currentUser.photo) ownerPhoto.src = currentUser.photo;
-  
 import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
 
 const supabase = createClient(
@@ -576,12 +573,15 @@ const supabase = createClient(
   "sb_publishable_sqsxb-3Kl5o3-JQYv9kGFw_-g0EgwMa"
 );
 
-// Mettre la photo de l'owner si elle existe
 const storedPhoto = localStorage.getItem('photo');
-if(storedPhoto){
-  const { data } = supabase.storage.from('images').getPublicUrl(storedPhoto);
-  if(data && data.publicUrl){
-    currentUser.photo = data.publicUrl;
+if (storedPhoto) {
+  const { data } = supabase
+    .storage
+    .from('images')
+    .getPublicUrl(storedPhoto);
+
+  currentUser.photo = data?.publicUrl || '';
+  if (currentUser.photo) {
     document.getElementById('ownerPhoto').src = currentUser.photo;
   }
 }
@@ -772,13 +772,16 @@ function renderCommentList() {
     commentCount.textContent = currentZoom.comments?.length || 0;
 }
   
-confirmComment.onclick = async () => {
+// ================== CONFIRM COMMENT ==================
+
+  confirmComment.onclick = async () => {
   const name = document.getElementById('commentName').value.trim();
   const text = document.getElementById('commentText').value.trim();
 
-  if (!name || !text || !currentZoom) return alert("Veuillez entrer votre prénom et un commentaire.");
+  if (!name || !text || !currentZoom) return;
 
   if (!currentZoom.comments) currentZoom.comments = [];
+
   currentZoom.comments.push({
     name,
     text,
@@ -786,45 +789,13 @@ confirmComment.onclick = async () => {
     likes: []
   });
 
-  const { error } = await supabase
+  await supabase
     .from('creations')
     .update({ comments: currentZoom.comments })
     .eq('id', currentZoom.id);
 
-  if (error) { console.error(error); alert("Erreur lors de l'envoi du commentaire"); return; }
-
   renderCommentList();
 
-  document.getElementById('commentName').value = currentUser.prenom || '';
-  document.getElementById('commentText').value = '';
-};
-// ================== CONFIRM COMMENT ==================
-confirmComment.onclick = async () => {
-  const name = document.getElementById('commentName').value.trim();
-  const text = document.getElementById('commentText').value.trim();
-
-  if (!name || !text || !currentZoom) return alert("Veuillez entrer votre prénom et un commentaire.");
-
-  if (!currentZoom.comments) currentZoom.comments = [];
-  currentZoom.comments.push({ name, text, likes: [] });
-
-  // Mettre à jour Supabase
-  const { error } = await supabase
-    .from('creations')
-    .update({ comments: currentZoom.comments })
-    .eq('id', currentZoom.id);
-
-  if (error) {
-    console.error(error);
-    alert("Erreur lors de l'envoi du commentaire");
-    return;
-  }
-
-  // Rafraîchir la liste et compteur
-  renderCommentList();
-
-  // Vider les champs
-  document.getElementById('commentName').value = '';
   document.getElementById('commentText').value = '';
 };
 
