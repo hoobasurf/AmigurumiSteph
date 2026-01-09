@@ -167,21 +167,27 @@ button:hover {
 <img id="ownerPhoto" style="width:32px;height:32px;border-radius:50%;position:fixed;top:10px;right:10px;z-index:10000;" alt="Owner">
 
 <script>
-// récupère prénom et photo stockés
+// Récupère prénom et photo stockés
 let currentUser = {
   prenom: localStorage.getItem('prenom') || '',
   photo: localStorage.getItem('photo') || ''
 };
 
-// affiche la mini photo si elle existe
+// Affiche la mini photo si elle existe
 const ownerImg = document.getElementById('ownerPhoto');
 if (currentUser.photo && ownerImg) {
   ownerImg.src = currentUser.photo;
 }
-  
+
 const photoBtn = document.getElementById('photoBtn');
 const photoInput = document.getElementById('photoInput');
 const profilePreview = document.getElementById('profilePreview');
+
+// ⚡ Affiche la photo existante dans le mini-cercle si déjà stockée
+if(currentUser.photo){
+  profilePreview.src = currentUser.photo;
+  profilePreview.style.display = 'block';
+}
 
 photoBtn.onclick = () => photoInput.click();
 
@@ -193,12 +199,8 @@ photoInput.onchange = () => {
       profilePreview.src = e.target.result;
       profilePreview.style.display = 'block';
 
-      // ====== AJOUT POUR OWNER ======
-      localStorage.setItem('photo', e.target.result);
+      // Met à jour currentUser.photo au moment de la sélection
       currentUser.photo = e.target.result;
-
-      const ownerImg = document.getElementById('ownerPhoto');
-      if(ownerImg) ownerImg.src = currentUser.photo;
     };
     reader.readAsDataURL(file);
   }
@@ -208,17 +210,17 @@ photoInput.onchange = () => {
 document.getElementById('connexionBtn').onclick = () => {
   const prenom = document.getElementById('prenom').value.trim();
   const mdp = document.getElementById('password').value.trim();
-  if(!prenom || !profilePreview.src) return alert("Veuillez mettre votre prénom et sélectionner une photo.");
 
-// 🔐 SAUVEGARDE POUR OWNER / LIKE / COMMENT
-localStorage.setItem('prenom', prenom);
-localStorage.setItem('photo', profilePreview.src);
-  
+  // Vérifie si prénom et photo existent
+  if(!prenom || !currentUser.photo) return alert("Veuillez mettre votre prénom et sélectionner une photo.");
+
+  // 🔐 Sauvegarde pour Owner / Like / Comment
+  localStorage.setItem('prenom', prenom);
+  localStorage.setItem('photo', currentUser.photo);
+
   if(prenom === "Steph" && mdp === "Steph1511") {
-    // Afficher la modal personnalisée
     document.getElementById('choiceModal').style.display = 'flex';
   } else {
-    // Tout autre prénom: direct visitor
     window.location.href = "visitor.html";
   }
 };
@@ -237,6 +239,5 @@ document.getElementById('visiteBtn').onclick = () => {
   window.location.href = "visitor.html";
 };
 </script>
-
 </body>
 </html>
