@@ -1,3 +1,5 @@
+Les code sont bien placé ?
+
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -511,7 +513,18 @@ body::before {
   color:#b84c6f;
   text-align:center;
 }
-  
+
+#zoomCaption {
+  color: #b84c6f;
+  font-size: 18px;
+  font-weight: bold;
+  margin-top: 10px;
+  text-align: center;
+  text-shadow: 1px 1px 2px rgba(255,255,255,0.8);
+  max-width: 80%;
+  word-wrap: break-word;
+}
+
 </style>
 </head>
 <body>
@@ -533,8 +546,9 @@ body::before {
     <h2>Ajouter des photos</h2>
     <input id="photoName" placeholder="Nom du projet">
     <input type="file" id="multiPhoto" multiple>
+    <input id="photoCaption" placeholder="Légende de la photo">
     <button id="confirmAdd">Valider</button>
-  </div>
+    </div>
 </div>
 
 <!-- MODAL DELETE -->
@@ -591,6 +605,7 @@ body::before {
 <div id="zoomModal">
   <div class="closeZoom">×</div>
   <img id="mainZoom">
+  <div id="zoomCaption"></div> <!-- ← ici on affichera la légende -->
   <div class="thumbs" id="thumbs"></div>
   <div class="actions">
     <button class="like-btn"><svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"></path></svg> <span id="likeCount">0</span></button>
@@ -684,6 +699,7 @@ function render() {
 function openZoom(c){
   currentZoom = c;
   mainZoom.src = c.imgUrl;
+  document.getElementById('zoomCaption').textContent = c.caption || ''; // ← affiche la légende
   thumbs.innerHTML = '';
   if(!c.zoomGroup || c.zoomGroup.length===0) c.zoomGroup=[c.imgUrl];
   c.zoomGroup.forEach(u=>{
@@ -725,7 +741,7 @@ confirmLike.onclick = async () => {
   if (!currentZoom) return;
 
   let name = currentUser.prenom || likeNameInput.value.trim();
-  if (!name) return;
+if(!name) name = 'Anonyme';
 
   if (!currentZoom.likes) currentZoom.likes = [];
 
@@ -761,9 +777,9 @@ function renderLikeBubbles(){
     const bubble = document.createElement('div');
     bubble.className = 'bubble';
 
-    bubble.innerHTML = photo
-      ? `<img src="${photo}" class="like-avatar" data-name="${name}"> ${name}`
-      : name;
+    bubble.innerHTML = like.photo
+  ? `<img src="${like.photo}" class="like-avatar" data-name="${like.name || 'Anonyme'}"> ${like.name || 'Anonyme'}`
+  : (like.name || 'Anonyme');
 
     likeBubbles.appendChild(bubble);
   });
@@ -846,29 +862,56 @@ document.getElementById('confirmDelete').onclick=async()=>{
   currentDelete=null;
 };
 
-// ====== AJOUT ======
-document.getElementById('addBtn').onclick=()=>{addModal.style.display='flex';};
-addModal.addEventListener('click',e=>{if(e.target===addModal)addModal.style.display='none';});
-document.getElementById('confirmAdd').onclick=async(e)=>{
+document.getElementById('confirmAdd').onclick = async (e) => {
   e.stopPropagation();
-  const name=document.getElementById('photoName').value.trim();
-  const files=document.getElementById('multiPhoto').files;
-  if(!name||!files.length){alert("Veuillez mettre un nom et sélectionner au moins une photo");return;}
-  const paths=[]; const urls=[];
-  for(let file of files){
-    const path=`${Date.now()}_${file.name}`;
-    const {error:uploadError}=await supabase.storage.from('images').upload(path,file);
-    if(uploadError){console.error(uploadError);continue;}
-    const {data:pubData}=supabase.storage.from('images').getPublicUrl(path);
-    if(!pubData||!pubData.publicUrl) continue;
-    urls.push(pubData.publicUrl); paths.push(path);
+
+  const name = document.getElementById('photoName').value.trim();
+  const caption = document.getElementById('photoCaption').value.trim(); // ← légende
+
+  const files = document.getElementById('multiPhoto').files;
+  if (!name || !files.length) {
+    alert("Veuillez mettre un nom et sélectionner au moins une photo");
+    return;
   }
-  if(urls.length===0) return;
-  const {data,error}=await supabase.from('creations').insert([{name,image_path:paths[0],images:paths,likes:[],comments:[]}]).select();
-  if(error){console.error(error);return;}
-  addModal.style.display='none';
-  document.getElementById('photoName').value='';
-  document.getElementById('multiPhoto').value='';
+
+  const paths = [];
+  const urls = [];
+
+  for (let file of files) {
+    const path = `${Date.now()}_${file.name}`;
+    const { error: uploadError } = await supabase.storage.from('images').upload(path, file);
+    if (uploadError) { 
+      console.error(uploadError); 
+      continue; 
+    }
+    const { data: pubData } = supabase.storage.from('images').getPublicUrl(path);
+    if (!pubData || !pubData.publicUrl) continue;
+    urls.push(pubData.publicUrl);
+    paths.push(path);
+  }
+
+  if (urls.length === 0) return;
+
+  // ✅ Insert dans Supabase avec légende
+  const { data, error } = await supabase.from('creations').insert([{
+    name,
+    caption,           // ← ici on garde la légende
+    image_path: paths[0],
+    images: paths,
+    likes: [],
+    comments: []
+  }]).select();
+
+  if (error) {
+    console.error(error);
+    return;
+  }
+
+  addModal.style.display = 'none';
+  document.getElementById('photoName').value = '';
+  document.getElementById('multiPhoto').value = '';
+  document.getElementById('photoCaption').value = '';
+
   await refreshCreations();
 };
 
@@ -883,6 +926,22 @@ async function refreshCreations(){
   render();
 }
 
+creations = data.map(c => {
+  const zoomGroup = (c.images && c.images.length)
+    ? c.images.map(p => supabase.storage.from('images').getPublicUrl(p).data.publicUrl)
+    : [supabase.storage.from('images').getPublicUrl(c.image_path).data.publicUrl];
+
+  return {
+    id: c.id,
+    name: c.name,
+    caption: c.caption || '',   // ← ajoute la légende ici
+    imgUrl: zoomGroup[0],
+    zoomGroup,
+    likes: c.likes || [],
+    comments: c.comments || []
+  };
+});
+  
 // ================== BOUTONS SIDEBAR ==================
 const addBtn = document.getElementById('addBtn');
 
@@ -995,6 +1054,11 @@ document.addEventListener('DOMContentLoaded', async () => {
 document.addEventListener('DOMContentLoaded', async () => {
   await refreshCreations();
 });
+
+ currentZoom.likes = currentZoom.likes.map(l => ({
+  name: l.name || 'Anonyme',
+  photo: l.photo || ''
+})); 
 
 // ======================
 // AJOUT CLICK AVATAR → MODAL
