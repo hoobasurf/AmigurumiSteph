@@ -33,6 +33,7 @@ h2 {
   text-shadow: 1px 1px 2px rgba(255,255,255,0.7);
 }
 
+/* Cercle central appli */
 #appLogo {
   width: 180px;
   height: 180px;
@@ -48,6 +49,7 @@ h2 {
   100% { box-shadow: 0 0 25px rgba(233,79,154,0.5); }
 }
 
+/* Champs et boutons */
 .input-group {
   display: flex;
   align-items: center;
@@ -86,6 +88,7 @@ button:hover {
   background: #e94f9a;
 }
 
+/* Bouton photo profil */
 #photoBtn {
   background: #fff0f5;
   color: #b84c6f;
@@ -96,6 +99,7 @@ button:hover {
   background: #ffe6f0;
 }
 
+/* Petit cercle photo profil */
 #profilePreview {
   width: 40px;
   height: 40px;
@@ -105,6 +109,7 @@ button:hover {
   display: none;
 }
 
+/* MODAL */
 .modal {
   display: none;
   position: fixed;
@@ -124,26 +129,16 @@ button:hover {
   flex-direction: column;
   gap: 12px;
 }
-
-/* Mini photo owner */
-#ownerPhoto {
-  width:32px;
-  height:32px;
-  border-radius:50%;
-  position:fixed;
-  top:10px;
-  right:10px;
-  z-index:10000;
-  display:none;
-}
 </style>
 </head>
 <body>
 
 <h2>Bienvenue</h2>
 
+<!-- Cercle central appli -->
 <img id="appLogo" src="Photoroom_20260107_185314.png" alt="Logo de l'appli">
 
+<!-- Champ prénom avec petit cercle photo profil -->
 <div class="input-group">
   <input type="text" id="prenom" placeholder="Prénom" required>
   <img id="profilePreview" alt="Photo de profil">
@@ -159,6 +154,7 @@ button:hover {
   <button id="entrerBtn">Entrer</button>
 </div>
 
+<!-- MODAL CHOIX CREATION / VISITE -->
 <div id="choiceModal" class="modal">
   <div class="modal-content">
     <h3>Bonjour Steph !</h3>
@@ -167,28 +163,14 @@ button:hover {
     <button id="visiteBtn">Visite</button>
   </div>
 </div>
-
-<!-- Mini photo owner -->
-<img id="ownerPhoto" alt="Owner">
-
+  
 <script>
 const photoBtn = document.getElementById('photoBtn');
 const photoInput = document.getElementById('photoInput');
 const profilePreview = document.getElementById('profilePreview');
-const ownerImg = document.getElementById('ownerPhoto');
-const prenomInput = document.getElementById('prenom');
 
-// === AU CHARGEMENT DE LA PAGE ===
-const storedPrenom = localStorage.getItem('prenom');
-const storedPhoto = localStorage.getItem('photo');
-if(storedPrenom) prenomInput.value = storedPrenom;
-if(storedPhoto){
-  ownerImg.src = storedPhoto;
-  ownerImg.style.display = 'block';
-}
-
-// === SELECTION PHOTO PROFIL ===
 photoBtn.onclick = () => photoInput.click();
+
 photoInput.onchange = () => {
   const file = photoInput.files[0];
   if(file){
@@ -201,23 +183,17 @@ photoInput.onchange = () => {
   }
 };
 
-// === CONNEXION ===
+// Gestion boutons Connexion et Entrer
 document.getElementById('connexionBtn').onclick = () => {
-  const prenom = prenomInput.value.trim();
+  const prenom = document.getElementById('prenom').value.trim();
   const mdp = document.getElementById('password').value.trim();
   if(!prenom || !profilePreview.src) return alert("Veuillez mettre votre prénom et sélectionner une photo.");
 
-  // 🔐 Sauvegarde prénom + photo
-  localStorage.setItem('prenom', prenom);
-  localStorage.setItem('photo', profilePreview.src);
-
-  // ⚡ Affiche mini photo owner
-  ownerImg.src = profilePreview.src;
-  ownerImg.style.display = 'block';
-
   if(prenom === "Steph" && mdp === "Steph1511") {
+    // Afficher la modal personnalisée
     document.getElementById('choiceModal').style.display = 'flex';
   } else {
+    // Tout autre prénom: direct visitor
     window.location.href = "visitor.html";
   }
 };
@@ -227,10 +203,11 @@ document.getElementById('entrerBtn').onclick = () => {
   window.location.href = "visitor.html";
 };
 
-// Modal Création / Visite
+// Boutons modal
 document.getElementById('creationBtn').onclick = () => {
   window.location.href = "owner.html";
 };
+
 document.getElementById('visiteBtn').onclick = () => {
   window.location.href = "visitor.html";
 };
