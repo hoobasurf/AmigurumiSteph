@@ -475,7 +475,7 @@ body::before {
 </head>
 <body>
 
-  <img id="ownerPhoto" style="width:32px;height:32px;border-radius:50%;position:fixed;top:10px;right:10px;z-index:10000;">
+  <img id="ownerPhoto" style="width:32px;height:32px;border-radius:50%;position:fixed;top:10px;right:10px;z-index:10000;" alt="Owner">
 
 <div class="center-zone">
   <div id="visitor-list-container"></div>
@@ -563,11 +563,9 @@ body::before {
 // Si vide, laisse comme chaîne vide
 let currentUser = {
   prenom: localStorage.getItem('prenom') || '',
-  photo: localStorage.getItem('photo') 
-         ? supabase.storage.from('images').getPublicUrl(localStorage.getItem('photo')).data.publicUrl
-         : ''
+  photo: ''  // On va remplir avec l'URL Supabase plus tard
 };
-
+  
 const ownerPhoto = document.getElementById('ownerPhoto');
 if (currentUser.photo) ownerPhoto.src = currentUser.photo;
   
@@ -578,6 +576,16 @@ const supabase = createClient(
   "sb_publishable_sqsxb-3Kl5o3-JQYv9kGFw_-g0EgwMa"
 );
 
+// Mettre la photo de l'owner si elle existe
+const storedPhoto = localStorage.getItem('photo');
+if(storedPhoto){
+  const { data } = supabase.storage.from('images').getPublicUrl(storedPhoto);
+  if(data && data.publicUrl){
+    currentUser.photo = data.publicUrl;
+    document.getElementById('ownerPhoto').src = currentUser.photo;
+  }
+}
+  
 let creations = [];
 let currentZoom = null;
 let currentDelete = null;
