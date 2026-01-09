@@ -189,6 +189,10 @@ document.getElementById('connexionBtn').onclick = () => {
   const mdp = document.getElementById('password').value.trim();
   if(!prenom || !profilePreview.src) return alert("Veuillez mettre votre prénom et sélectionner une photo.");
 
+// 🔐 SAUVEGARDE POUR OWNER / LIKE / COMMENT
+localStorage.setItem('prenom', prenom);
+localStorage.setItem('photo', profilePreview.src);
+  
   if(prenom === "Steph" && mdp === "Steph1511") {
     // Afficher la modal personnalisée
     document.getElementById('choiceModal').style.display = 'flex';
