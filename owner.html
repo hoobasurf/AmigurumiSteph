@@ -657,26 +657,21 @@ document.querySelector('.like-btn').onclick = () => {
     likeBubbles.innerHTML = '';
 
     currentZoom.likes?.forEach(like => {
-        const bubble = document.createElement('div');
-        bubble.className = 'bubble';
+    const bubble = document.createElement('div');
+    bubble.className = 'bubble';
 
-        // Si c’est le user actuel, on affiche la photo
-        if (c.photo) {
-  text.innerHTML = `
-    <img src="${c.photo}"
-         style="width:20px;height:20px;border-radius:50%;margin-right:4px;vertical-align:middle;">
-    <strong>${c.name}</strong> : ${c.text}
-  `;
-} else {
-  text.innerHTML = `<strong>${c.name}</strong> : ${c.text}`;
-}
-            bubble.innerHTML = `<img src="${currentUser.photo}" style="width:20px;height:20px;border-radius:50%;margin-right:4px;vertical-align:middle;"> ${name}`;
-        } else {
-            bubble.textContent = name;
-        }
+    if (like.photo) {
+        bubble.innerHTML = `
+          <img src="${like.photo}"
+               style="width:20px;height:20px;border-radius:50%;margin-right:4px;vertical-align:middle;">
+          ${like.name}
+        `;
+    } else {
+        bubble.textContent = like.name;
+    }
 
-        likeBubbles.appendChild(bubble);
-    });
+    likeBubbles.appendChild(bubble);
+});
 
     // Pré-remplir automatiquement le prénom du user
     likeNameInput.value = currentUser.prenom || '';
