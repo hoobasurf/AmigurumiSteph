@@ -915,30 +915,31 @@ document.getElementById('confirmAdd').onclick = async (e) => {
 
 // ====== REFRESH ======
 async function refreshCreations(){
-  const {data,error}=await supabase.from('creations').select('*').order('created_at',{ascending:false});
-  if(error){console.error(error);return;}
-  creations=data.map(c=>{
-    const zoomGroup=(c.images&&c.images.length)?c.images.map(p=>supabase.storage.from('images').getPublicUrl(p).data.publicUrl):[supabase.storage.from('images').getPublicUrl(c.image_path).data.publicUrl];
-    return {id:c.id,name:c.name,imgUrl:zoomGroup[0],zoomGroup,likes:c.likes||[],comments:c.comments||[]};
+  const {data, error} = await supabase
+    .from('creations')
+    .select('*')
+    .order('created_at', {ascending: false});
+  
+  if(error){ console.error(error); return; }
+
+  creations = data.map(c => {
+    const zoomGroup = (c.images && c.images.length)
+      ? c.images.map(p => supabase.storage.from('images').getPublicUrl(p)?.data?.publicUrl).filter(Boolean)
+      : [supabase.storage.from('images').getPublicUrl(c.image_path)?.data?.publicUrl].filter(Boolean);
+
+    return {
+      id: c.id,
+      name: c.name,
+      caption: c.caption || '',    // légende
+      imgUrl: zoomGroup[0] || '', // première image
+      zoomGroup,
+      likes: c.likes || [],
+      comments: c.comments || []
+    };
   });
+
   render();
 }
-
-creations = data.map(c => {
-  const zoomGroup = (c.images && c.images.length)
-    ? c.images.map(p => supabase.storage.from('images').getPublicUrl(p).data.publicUrl)
-    : [supabase.storage.from('images').getPublicUrl(c.image_path).data.publicUrl];
-
-  return {
-    id: c.id,
-    name: c.name,
-    caption: c.caption || '',   // ← ajoute la légende ici
-    imgUrl: zoomGroup[0],
-    zoomGroup,
-    likes: c.likes || [],
-    comments: c.comments || []
-  };
-});
   
 // ================== BOUTONS SIDEBAR ==================
 const addBtn = document.getElementById('addBtn');
