@@ -743,11 +743,12 @@ function renderCommentList() {
 
         const text = document.createElement('span');
 
-        // Si c’est le user actuel, on met sa photo à côté
+        // ← Ici on met la photo si elle existe
         text.innerHTML = `
-  ${c.photo ? `<img src="${c.photo}" style="width:20px;height:20px;border-radius:50%;margin-right:4px;vertical-align:middle;">` : ''}
-  <strong>${c.name}</strong> : ${c.text}
-`;
+          ${c.photo ? `<img src="${c.photo}" style="width:20px;height:20px;border-radius:50%;margin-right:4px;vertical-align:middle;">` : ''}
+          <strong>${c.name}</strong> : ${c.text}
+        `;
+
         item.appendChild(text);
         commentBubbles.appendChild(item);
     });
@@ -755,7 +756,7 @@ function renderCommentList() {
     // Mise à jour compteur
     commentCount.textContent = currentZoom.comments?.length || 0;
 }
-
+  
 confirmComment.onclick = async () => {
     const name = document.getElementById('commentName').value.trim();
     const text = document.getElementById('commentText').value.trim();
