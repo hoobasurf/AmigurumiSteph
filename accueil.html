@@ -172,23 +172,18 @@ button:hover {
 <img id="ownerPhoto" alt="Owner">
 
 <script>
-const photoBtn = document.getElementById('photoBtn');
-const photoInput = document.getElementById('photoInput');
-const profilePreview = document.getElementById('profilePreview');
-const ownerImg = document.getElementById('ownerPhoto');
-const prenomInput = document.getElementById('prenom');
-
 // === AU CHARGEMENT DE LA PAGE ===
-const storedPrenom = localStorage.getItem('prenom');
+const ownerImg = document.getElementById('ownerPhoto');
 const storedPhoto = localStorage.getItem('photo');
-if(storedPrenom) prenomInput.value = storedPrenom;
 if(storedPhoto){
   ownerImg.src = storedPhoto;
   ownerImg.style.display = 'block';
 }
 
-// === SELECTION PHOTO PROFIL ===
-photoBtn.onclick = () => photoInput.click();
+// === QUAND L'UTILISATEUR CHOISIT UNE PHOTO ===
+const photoInput = document.getElementById('photoInput');
+const profilePreview = document.getElementById('profilePreview');
+
 photoInput.onchange = () => {
   const file = photoInput.files[0];
   if(file){
@@ -196,45 +191,17 @@ photoInput.onchange = () => {
     reader.onload = e => {
       profilePreview.src = e.target.result;
       profilePreview.style.display = 'block';
+
+      // 🔐 Stocke automatiquement dans localStorage pour réapparition
+      localStorage.setItem('photo', e.target.result);
+
+      // ⚡ Affiche mini-photo owner
+      ownerImg.src = e.target.result;
+      ownerImg.style.display = 'block';
     };
     reader.readAsDataURL(file);
   }
 };
-
-// === CONNEXION ===
-document.getElementById('connexionBtn').onclick = () => {
-  const prenom = prenomInput.value.trim();
-  const mdp = document.getElementById('password').value.trim();
-  if(!prenom || !profilePreview.src) return alert("Veuillez mettre votre prénom et sélectionner une photo.");
-
-  // 🔐 SAUVEGARDE photo + prénom
-  localStorage.setItem('prenom', prenom);
-  localStorage.setItem('photo', profilePreview.src);
-
-  // ⚡ Affiche mini-photo owner
-  ownerImg.src = profilePreview.src;
-  ownerImg.style.display = 'block';
-
-  if(prenom === "Steph" && mdp === "Steph1511") {
-    document.getElementById('choiceModal').style.display = 'flex';
-  } else {
-    window.location.href = "visitor.html";
-  }
-};
-
-// Entrer sans connexion
-document.getElementById('entrerBtn').onclick = () => {
-  window.location.href = "visitor.html";
-};
-
-// Modal Création / Visite
-document.getElementById('creationBtn').onclick = () => {
-  window.location.href = "owner.html";
-};
-document.getElementById('visiteBtn').onclick = () => {
-  window.location.href = "visitor.html";
-};
 </script>
-
 </body>
 </html>
