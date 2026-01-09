@@ -475,6 +475,8 @@ body::before {
 </head>
 <body>
 
+  <img id="ownerPhoto" style="width:32px;height:32px;border-radius:50%;position:fixed;top:10px;right:10px;z-index:10000;">
+
 <div class="center-zone">
   <div id="visitor-list-container"></div>
 </div>
@@ -560,10 +562,15 @@ body::before {
 // Récupère le prénom et la photo envoyés depuis l'accueil
 // Si vide, laisse comme chaîne vide
 let currentUser = {
-  prenom: localStorage.getItem('prenom') || '',   // récupère le prénom si défini
-  photo: localStorage.getItem('photo') || ''      // récupère la photo si définie
+  prenom: localStorage.getItem('prenom') || '',
+  photo: localStorage.getItem('photo') 
+         ? supabase.storage.from('images').getPublicUrl(localStorage.getItem('photo')).data.publicUrl
+         : ''
 };
 
+const ownerPhoto = document.getElementById('ownerPhoto');
+if (currentUser.photo) ownerPhoto.src = currentUser.photo;
+  
 import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
 
 const supabase = createClient(
@@ -758,30 +765,30 @@ function renderCommentList() {
 }
   
 confirmComment.onclick = async () => {
-    const name = document.getElementById('commentName').value.trim();
-    const text = document.getElementById('commentText').value.trim();
+  const name = document.getElementById('commentName').value.trim();
+  const text = document.getElementById('commentText').value.trim();
 
-    if (!name || !text || !currentZoom) return alert("Veuillez entrer votre prénom et un commentaire.");
+  if (!name || !text || !currentZoom) return alert("Veuillez entrer votre prénom et un commentaire.");
 
-    if (!currentZoom.comments) currentZoom.comments = [];
-    currentZoom.comments.push({
-  name,
-  text,
-  photo: currentUser.photo || '',
-  likes: []
-});
+  if (!currentZoom.comments) currentZoom.comments = [];
+  currentZoom.comments.push({
+    name,
+    text,
+    photo: currentUser.photo || '',
+    likes: []
+  });
 
-    const { error } = await supabase
-        .from('creations')
-        .update({ comments: currentZoom.comments })
-        .eq('id', currentZoom.id);
+  const { error } = await supabase
+    .from('creations')
+    .update({ comments: currentZoom.comments })
+    .eq('id', currentZoom.id);
 
-    if (error) { console.error(error); alert("Erreur lors de l'envoi du commentaire"); return; }
+  if (error) { console.error(error); alert("Erreur lors de l'envoi du commentaire"); return; }
 
-    renderCommentList();
+  renderCommentList();
 
-    document.getElementById('commentName').value = currentUser.prenom || '';
-    document.getElementById('commentText').value = '';
+  document.getElementById('commentName').value = currentUser.prenom || '';
+  document.getElementById('commentText').value = '';
 };
 // ================== CONFIRM COMMENT ==================
 confirmComment.onclick = async () => {
@@ -942,20 +949,20 @@ async function refreshCreations() {
   const { data, error } = await supabase.from('creations').select('*').order('created_at', { ascending: false });
   if (error) { console.error(error); return; }
 
-  creations = await Promise.all(data.map(async c => {
-    const zoomGroup = (c.images && c.images.length) ? 
-      await Promise.all(c.images.map(async p => supabase.storage.from('images').getPublicUrl(p).data.publicUrl))
-      : [supabase.storage.from('images').getPublicUrl(c.image_path).data.publicUrl];
+  creations = data.map(c => {
+  const zoomGroup = (c.images && c.images.length) ?
+    c.images.map(p => supabase.storage.from('images').getPublicUrl(p).data.publicUrl)
+    : [supabase.storage.from('images').getPublicUrl(c.image_path).data.publicUrl];
 
-    return {
-      id: c.id,
-      name: c.name,
-      imgUrl: zoomGroup[0],
-      zoomGroup,
-      likes: c.likes || [],
-      comments: c.comments || []
-    };
-  }));
+  return {
+    id: c.id,
+    name: c.name,
+    imgUrl: zoomGroup[0],
+    zoomGroup,
+    likes: c.likes || [],
+    comments: c.comments || []
+  };
+});
 
   render();
 }
