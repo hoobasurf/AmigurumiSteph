@@ -1257,6 +1257,120 @@ resetSelectBtn.onclick = async () => {
     alert("Likes et commentaires supprimés pour les créations sélectionnées !");
   };
 };
+
+
+// ===== BOUTON GESTION CREATIONS =====
+const manageBtn = document.createElement('button');
+manageBtn.textContent = "Gérer Créations";
+manageBtn.style.position = "absolute";
+manageBtn.style.bottom = "20px";
+manageBtn.style.left = "50%";
+manageBtn.style.transform = "translateX(-50%)";
+manageBtn.style.padding = "6px 10px";
+manageBtn.style.fontSize = "12px";
+manageBtn.style.border = "none";
+manageBtn.style.borderRadius = "10px";
+manageBtn.style.background = "#ffb6c1";
+manageBtn.style.color = "#fff";
+manageBtn.style.cursor = "pointer";
+sidebar.appendChild(manageBtn);
+
+// MODAL GESTION CREATIONS
+const manageModal = document.createElement('div');
+manageModal.className = "modal";
+manageModal.innerHTML = `
+  <div class="modal-box" style="max-height:80vh;overflow-y:auto;">
+    <h3>Gérer Création</h3>
+    <div id="manageList"></div>
+    <button id="closeManage" style="margin-top:10px;">Fermer</button>
+  </div>
+`;
+document.body.appendChild(manageModal);
+
+const manageList = manageModal.querySelector("#manageList");
+const closeManage = manageModal.querySelector("#closeManage");
+
+manageBtn.onclick = () => {
+  renderManageModal();
+  manageModal.style.display = "flex";
+};
+
+closeManage.onclick = () => {
+  manageModal.style.display = "none";
+};
+
+manageModal.onclick = e => {
+  if(e.target === manageModal) manageModal.style.display = "none";
+};
+
+// ===== RENDER GESTION CREATIONS =====
+function renderManageModal(){
+  manageList.innerHTML = "";
+
+  creations.forEach(c => {
+    const creationDiv = document.createElement('div');
+    creationDiv.style.borderBottom = "1px solid #f6c2d1";
+    creationDiv.style.padding = "8px 0";
+
+    creationDiv.innerHTML = `<strong>${c.name}</strong>`;
+
+    // LIKES
+    if(c.likes && c.likes.length){
+      const likeSection = document.createElement('div');
+      likeSection.style.margin = "4px 0";
+      likeSection.innerHTML = `<em>Likes:</em>`;
+      c.likes.forEach((like, idx) => {
+        const likeDiv = document.createElement('div');
+        likeDiv.style.display = "flex";
+        likeDiv.style.justifyContent = "space-between";
+        likeDiv.style.alignItems = "center";
+        likeDiv.style.padding = "2px 0";
+
+        likeDiv.innerHTML = `
+          <span>${like.name}</span>
+          <button style="font-size:12px;padding:2px 6px;border:none;border-radius:6px;background:#e94f9a;color:#fff;cursor:pointer;">Supprimer</button>
+        `;
+        likeDiv.querySelector("button").onclick = async () => {
+          c.likes.splice(idx,1);
+          await supabase.from('creations').update({likes:c.likes}).eq('id',c.id);
+          renderManageModal();
+          if(currentZoom && currentZoom.id===c.id) renderLikeBubbles();
+        };
+        likeSection.appendChild(likeDiv);
+      });
+      creationDiv.appendChild(likeSection);
+    }
+
+    // COMMENTS
+    if(c.comments && c.comments.length){
+      const commentSection = document.createElement('div');
+      commentSection.style.margin = "4px 0";
+      commentSection.innerHTML = `<em>Commentaires:</em>`;
+      c.comments.forEach((comm, idx) => {
+        const commDiv = document.createElement('div');
+        commDiv.style.display = "flex";
+        commDiv.style.justifyContent = "space-between";
+        commDiv.style.alignItems = "center";
+        commDiv.style.padding = "2px 0";
+
+        commDiv.innerHTML = `
+          <span><strong>${comm.name}</strong>: ${comm.text}</span>
+          <button style="font-size:12px;padding:2px 6px;border:none;border-radius:6px;background:#e94f9a;color:#fff;cursor:pointer;">Supprimer</button>
+        `;
+        commDiv.querySelector("button").onclick = async () => {
+          c.comments.splice(idx,1);
+          await supabase.from('creations').update({comments:c.comments}).eq('id',c.id);
+          renderManageModal();
+          if(currentZoom && currentZoom.id===c.id) renderCommentList();
+        };
+        commentSection.appendChild(commDiv);
+      });
+      creationDiv.appendChild(commentSection);
+    }
+
+    manageList.appendChild(creationDiv);
+  });
+}
   
 // ====== START ======
 document.addEventListener('DOMContentLoaded', async () => {
