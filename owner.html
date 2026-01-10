@@ -727,16 +727,27 @@ confirmLike.onclick = async () => {
   if (!currentZoom) return;
 
   let name = currentUser.prenom || likeNameInput.value.trim();
-  if (!name) return;
+  if (!name) name = 'Anonyme';
+
+  // --- Assurer que photo est une URL publique ---
+  let photoUrl = '';
+  if (currentUser.photo) {
+    // Si currentUser.photo commence par "http", c'est déjà une URL
+    if (currentUser.photo.startsWith('http')) {
+      photoUrl = currentUser.photo;
+    } else {
+      // Sinon, mettre une image par défaut
+      photoUrl = 'default-avatar.png'; 
+    }
+  }
 
   if (!currentZoom.likes) currentZoom.likes = [];
 
   currentZoom.likes.push({
     name,
-    photo: currentUser.photo || ''
+    photo: photoUrl
   });
 
-  // Fonction async pour Supabase
   try {
     const { error } = await supabase
       .from('creations')
