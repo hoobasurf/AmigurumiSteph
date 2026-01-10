@@ -1186,25 +1186,28 @@ expandBtn.onclick = (e) => {
   expandBtn.textContent = commentBox.classList.contains('fullscreen') ? '⤡' : '⤢';
 };
 
-// ================== CLICK AVATAR → PROFILE MODAL ==================
+// CLICK AVATAR → PROFILE MODAL
 const profileModal = document.getElementById('profileModal');
 const profileModalImg = document.getElementById('profileModalImg');
 const profileModalName = document.getElementById('profileModalName');
 
 document.addEventListener('click', e => {
-  if(
+  // Vérifie si clic sur un avatar existant
+  if (
     e.target.classList.contains('owner-avatar') ||
     e.target.classList.contains('like-avatar') ||
     e.target.classList.contains('comment-avatar')
-  ){
-    profileModalImg.src = e.target.src;
-    profileModalName.textContent = e.target.dataset.name || e.target.parentElement.textContent.trim();
+  ) {
+    // Si src vide ou invalide, fallback sur default
+    profileModalImg.src = e.target.src || 'default-avatar.png';
+    profileModalName.textContent = e.target.dataset.name || 'Utilisateur';
     profileModal.style.display = 'flex';
   }
 });
 
+// Fermer modal si clic sur fond
 profileModal.onclick = e => {
-  if(e.target === profileModal) profileModal.style.display = 'none';
+  if (e.target === profileModal) profileModal.style.display = 'none';
 };
 
 // ===== BOUTON GESTION CREATIONS =====
