@@ -673,7 +673,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     ownerImg.dataset.name = currentUser.prenom || 'Owner';
   }
 
-  // ==== CLICK AVATAR ====
+  // ==== CLICK SUR AVATAR → PROFILE MODAL ====
   const profileModal = document.getElementById('profileModal');
   const profileModalImg = document.getElementById('profileModalImg');
   const profileModalName = document.getElementById('profileModalName');
@@ -696,24 +696,46 @@ document.addEventListener('DOMContentLoaded', async () => {
     };
   }
 
-  // ==== REFRESH CREATIONS + AJOUT LISTENERS LIKE/COMMENT ====
+  // ==== REFRESH CREATIONS ====
   await refreshCreations();
 
-  // ATTACHER LES LISTENERS SUR LES BOUTONS PRINCIPAUX
-  document.querySelector('.like-btn')?.addEventListener('click', () => {
+  // ==== EVENT DELEGATION POUR LIKE / COMMENT ====
+  const zoomModal = document.getElementById('zoomModal');
+  zoomModal?.addEventListener('click', e => {
     if(!currentZoom) return;
-    // code likeModal
-  });
 
-  document.querySelector('.comment-btn')?.addEventListener('click', () => {
-    if(!currentZoom) return;
-    // code commentModal
+    // Like
+    if(e.target.closest('.like-btn')){
+      const likeBubbles = document.getElementById('likeBubbles');
+      likeBubbles.innerHTML = '';
+      (currentZoom.likes || []).forEach(like => {
+        const bubble = document.createElement('div');
+        bubble.className = 'bubble';
+        bubble.innerHTML = like.photo
+          ? `<img src="${like.photo}" class="like-avatar"> ${like.name}`
+          : like.name;
+        likeBubbles.appendChild(bubble);
+      });
+      const likeNameInput = document.getElementById('likeName');
+      likeNameInput.value = currentUser.prenom || '';
+      if(currentUser.prenom) likeNameInput.disabled = true;
+      document.getElementById('likeModal').style.display = 'flex';
+    }
+
+    // Comment
+    if(e.target.closest('.comment-btn')){
+      const commentNameInput = document.getElementById('commentName');
+      commentNameInput.value = currentUser.prenom || '';
+      document.getElementById('commentText').value = '';
+      renderCommentList();
+      document.getElementById('commentModal').style.display = 'flex';
+    }
   });
 });
+
 let creations = [];
 let currentZoom = null;
 let currentDelete = null;
-
 // ====== ELEMENTS ======
 const container = document.getElementById('visitor-list-container');
 const addModal = document.getElementById('addModal');
