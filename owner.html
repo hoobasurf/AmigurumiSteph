@@ -1193,16 +1193,20 @@ manageModal.onclick = e => {
   if(e.target === manageModal) manageModal.style.display = "none";
 };
 
+// ================== VARIABLES SUPPLÉMENTAIRES ==================
+let currentDeleteComment = null;
+let currentDeleteLike = null;
+
 // ===== RENDER GESTION CREATIONS =====
 function renderManageModal() {
   if (!manageList) return; // sécurité si manageList introuvable
   manageList.innerHTML = "";
 
   creations.forEach(c => {
-    // Création du container principal pour chaque création
+    // Container principal pour chaque création
     const creationDiv = document.createElement('div');
     creationDiv.style.display = "flex";
-    creationDiv.style.flexDirection = "column"; // photo + nom + sections
+    creationDiv.style.flexDirection = "column";
     creationDiv.style.padding = "6px 0";
     creationDiv.style.borderBottom = "1px solid #f6c2d1";
 
@@ -1211,6 +1215,7 @@ function renderManageModal() {
     clickable.style.display = "flex";
     clickable.style.alignItems = "center";
     clickable.style.gap = "8px";
+    clickable.style.cursor = "pointer";
 
     const img = document.createElement('img');
     img.src = c.imgUrl || '';
@@ -1225,10 +1230,9 @@ function renderManageModal() {
     nameSpan.textContent = c.name;
     clickable.appendChild(nameSpan);
 
-    clickable.style.cursor = "pointer";
     clickable.onclick = () => {
       manageModal.style.display = 'none';
-      if(c.imgUrl) openZoom(c);
+      if (c.imgUrl) openZoom(c);
     };
 
     creationDiv.appendChild(clickable);
@@ -1300,7 +1304,7 @@ function renderManageModal() {
       creationDiv.appendChild(commentSection);
     }
 
-    // ----- Ajouter le container au DOM -----
+    // ----- Ajouter au DOM -----
     manageList.appendChild(creationDiv);
   });
 }
