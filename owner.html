@@ -1200,12 +1200,10 @@ function renderManageModal() {
   creations.forEach(c => {
     const creationDiv = document.createElement('div');
     creationDiv.style.display = "flex";
-    creationDiv.style.alignItems = "center";
-    creationDiv.style.justifyContent = "space-between";
+    creationDiv.style.flexDirection = "column"; // pour photo + nom + commentaires
     creationDiv.style.padding = "6px 0";
     creationDiv.style.borderBottom = "1px solid #f6c2d1";
-    creationDiv.style.cursor = "pointer";
-
+    
     // Partie cliquable : photo + nom
     const clickable = document.createElement('div');
     clickable.style.display = "flex";
@@ -1225,18 +1223,17 @@ function renderManageModal() {
     nameSpan.textContent = c.name;
     clickable.appendChild(nameSpan);
 
-    // Ouvrir zoom en cliquant sur la création
     clickable.onclick = () => {
       manageModal.style.display = 'none';
-      openZoom(c);
+      if(c.imgUrl) openZoom(c);
     };
 
     creationDiv.appendChild(clickable);
 
-    // LIKES
+    // Likes
     if(c.likes && c.likes.length){
       const likeSection = document.createElement('div');
-      likeSection.style.marginLeft = "10px";
+      likeSection.style.marginTop = "4px";
       c.likes.forEach((like, idx) => {
         const btn = document.createElement('button');
         btn.textContent = "×";
@@ -1258,27 +1255,29 @@ function renderManageModal() {
       creationDiv.appendChild(likeSection);
     }
 
-    // COMMENTS
+    // Commentaires
     if(c.comments && c.comments.length){
       const commentSection = document.createElement('div');
-      commentSection.style.marginLeft = "10px";
+      commentSection.style.marginTop = "4px";
+      commentSection.innerHTML = `<em>Commentaires:</em>`;
       c.comments.forEach((comm, idx) => {
-        const btn = document.createElement('button');
-        btn.textContent = "×";
-        btn.style.fontSize = "12px";
-        btn.style.padding = "2px 6px";
-        btn.style.border = "none";
-        btn.style.borderRadius = "6px";
-        btn.style.background = "#e94f9a";
-        btn.style.color = "#fff";
-        btn.style.cursor = "pointer";
-        btn.onclick = async () => {
+        const commDiv = document.createElement('div');
+        commDiv.style.display = "flex";
+        commDiv.style.justifyContent = "space-between";
+        commDiv.style.alignItems = "center";
+        commDiv.style.padding = "2px 0";
+
+        commDiv.innerHTML = `
+          <span><strong>${comm.name}</strong>: ${comm.text}</span>
+          <button style="font-size:12px;padding:2px 6px;border:none;border-radius:6px;background:#e94f9a;color:#fff;cursor:pointer;">×</button>
+        `;
+        commDiv.querySelector("button").onclick = async () => {
           c.comments.splice(idx,1);
           await supabase.from('creations').update({comments:c.comments}).eq('id',c.id);
           renderManageModal();
           if(currentZoom && currentZoom.id===c.id) renderCommentList();
         };
-        commentSection.appendChild(btn);
+        commentSection.appendChild(commDiv);
       });
       creationDiv.appendChild(commentSection);
     }
