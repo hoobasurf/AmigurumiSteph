@@ -658,7 +658,23 @@ document.addEventListener('DOMContentLoaded', async () => {
   // ==== UTILISATEUR CONNECTÉ ====
   let currentUser = {
     prenom: localStorage.getItem('prenom') || '',
-    photo: localStorage.getItem('photo') || ''
+    let rawPhoto = localStorage.getItem('photo') || '';
+let cleanPhoto = '';
+
+if (
+  typeof rawPhoto === 'string' &&
+  (
+    rawPhoto.startsWith('http') ||
+    rawPhoto.startsWith('data:image')
+  )
+) {
+  cleanPhoto = rawPhoto;
+}
+
+const currentUser = {
+  prenom: localStorage.getItem('prenom') || '',
+  photo: cleanPhoto
+};
   };
 
   if(currentUser.prenom){
