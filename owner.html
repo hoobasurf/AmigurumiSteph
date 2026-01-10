@@ -1094,10 +1094,12 @@ document.getElementById('confirmDeleteLike').onclick = async () => {
 };
 
   
-  // ================== EVENTS ==================
+// ================== EVENTS ==================
 likeModal.onclick = e => { if(e.target === likeModal) likeModal.style.display = 'none'; };
 commentModal.onclick = e => { if(e.target === commentModal) commentModal.style.display = 'none'; };
-deleteModal.onclick = e => { if(e.target === deleteModal) deleteModal.style.display = 'none'; currentDelete=null; };
+deleteModal.onclick = e => { if(e.target === deleteModal) { deleteModal.style.display = 'none'; currentDelete=null; } };
+zoomModal.onclick = e => { if(e.target === zoomModal) zoomModal.style.display = 'none'; };
+document.querySelector('.closeZoom').onclick = () => zoomModal.style.display='none';
 document.getElementById('toggleSidebar').onclick = () => sidebar.classList.toggle('sidebar-open');
 
 // ===== AGRANDISSEMENT MODAL COMMENT =====
@@ -1109,15 +1111,19 @@ expandBtn.onclick = (e) => {
   expandBtn.textContent = commentBox.classList.contains('fullscreen') ? '⤡' : '⤢';
 };
 
+// ================== CLICK AVATAR → PROFILE MODAL ==================
 const profileModal = document.getElementById('profileModal');
 const profileModalImg = document.getElementById('profileModalImg');
 const profileModalName = document.getElementById('profileModalName');
 
 document.addEventListener('click', e => {
-  if (e.target.classList.contains('comment-avatar') || e.target.classList.contains('like-avatar')) {
+  if(
+    e.target.classList.contains('owner-avatar') ||
+    e.target.classList.contains('like-avatar') ||
+    e.target.classList.contains('comment-avatar')
+  ){
     profileModalImg.src = e.target.src;
-    profileModalName.textContent =
-  e.target.parentElement.textContent.trim();
+    profileModalName.textContent = e.target.dataset.name || e.target.parentElement.textContent.trim();
     profileModal.style.display = 'flex';
   }
 });
@@ -1125,42 +1131,13 @@ document.addEventListener('click', e => {
 profileModal.onclick = e => {
   if(e.target === profileModal) profileModal.style.display = 'none';
 };
-  
-// ====== CLOSE MODALS ======
-document.querySelector('.closeZoom').onclick=()=>zoomModal.style.display='none';
-zoomModal.onclick=e=>{if(e.target===zoomModal) zoomModal.style.display='none';};
-likeModal.onclick=e=>{if(e.target===likeModal) likeModal.style.display='none';};
-commentModal.onclick=e=>{if(e.target===commentModal) commentModal.style.display='none';};
-deleteModal.onclick=e=>{if(e.target===deleteModal) deleteModal.style.display='none';currentDelete=null;};
-
 
 // ====== START ======
 document.addEventListener('DOMContentLoaded', async () => {
   await refreshCreations();
 });
 
-// ======================
-// AJOUT CLICK AVATAR → MODAL
-document.addEventListener('click', e => {
-  if(e.target.classList.contains('owner-avatar')
-  || e.target.classList.contains('like-avatar')
-  || e.target.classList.contains('comment-avatar')){
 
-    profileModalImg.src = e.target.src;
-    profileModalName.textContent =
-      e.target.dataset.name || e.target.parentElement.textContent.trim();
-
-    profileModal.style.display = 'flex';
-  }
-});
-
-profileModal.onclick = e => {
-  if(e.target === profileModal) profileModal.style.display = 'none';
-};
-
-let currentDeleteComment = null;
-let currentDeleteLike = null;
-  
 </script>
 
 <div id="profileModal" class="modal">
