@@ -655,28 +655,51 @@ const supabase = createClient(
 );
 
 // ================== UTILISATEUR CONNECTÉ ==================
+// ================== UTILISATEUR CONNECTÉ ==================
 let currentUser = {
   prenom: localStorage.getItem('prenom') || '',   // récupère le prénom si défini
   photo: localStorage.getItem('photo') || ''      // récupère la photo si définie
 };
 
+// BLOQUER LES INPUTS PRÉNOM SI L'UTILISATEUR EST CONNECTÉ
 if(currentUser.prenom){
   document.getElementById('likeName')?.setAttribute('disabled', true);
   document.getElementById('commentName')?.setAttribute('disabled', true);
 }
-  
-if(currentUser.photo){
-  const ownerImg = document.getElementById('ownerPhoto');
 
-// si currentUser.photo existe et n'est pas vide, on l'utilise
-// sinon on met un avatar par défaut
-ownerImg.src = (typeof currentUser.photo === 'string' && currentUser.photo.trim() !== '') 
+// ==== AVATAR PROPRIÉTAIRE ====
+const ownerImg = document.getElementById('ownerPhoto');
+
+// toujours mettre un src, avec fallback si photo vide
+ownerImg.src = (currentUser.photo && currentUser.photo.trim() !== '') 
                 ? currentUser.photo 
-                : 'default-avatar.png';
+                : 'default-avatar.png';  // ← ton avatar par défaut
 
 ownerImg.classList.add('owner-avatar');
 ownerImg.dataset.name = currentUser.prenom || 'Owner';
-}
+
+// ================== CLICK SUR AVATAR → PROFILE MODAL ==================
+const profileModal = document.getElementById('profileModal');
+const profileModalImg = document.getElementById('profileModalImg');
+const profileModalName = document.getElementById('profileModalName');
+
+// écoute tous les clics sur les avatars
+document.addEventListener('click', e => {
+  if(
+    e.target.classList.contains('owner-avatar') ||
+    e.target.classList.contains('like-avatar') ||
+    e.target.classList.contains('comment-avatar')
+  ){
+    profileModalImg.src = e.target.src || 'default-avatar.png';
+    profileModalName.textContent = e.target.dataset.name || 'Utilisateur';
+    profileModal.style.display = 'flex';
+  }
+});
+
+// fermer le modal si on clique en dehors
+profileModal.onclick = e => {
+  if(e.target === profileModal) profileModal.style.display = 'none';
+};
 
 let creations = [];
 let currentZoom = null;
