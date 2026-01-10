@@ -750,13 +750,14 @@ confirmLike.onclick = async () => {
   likeModal.style.display = 'none';
 };
 
-function renderLikeBubbles(){
+function renderLikeBubbles() {
   likeBubbles.innerHTML = '';
 
   (currentZoom.likes || []).forEach(like => {
-    // Sécurité anti undefined
-    const name = typeof like === 'string' ? like : like.name || 'Utilisateur';
-    const photo = typeof like === 'object' ? like.photo : '';
+    // Sécurisation totale
+    const safeLike = (like && typeof like === 'object') ? like : {};
+    const name = safeLike.name?.trim() || 'Utilisateur';
+    const photo = safeLike.photo || '';
 
     const bubble = document.createElement('div');
     bubble.className = 'bubble';
