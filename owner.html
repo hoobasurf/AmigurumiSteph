@@ -656,35 +656,38 @@ const supabase = createClient(
 
 document.addEventListener('DOMContentLoaded', async () => {
   // ==== UTILISATEUR CONNECTÉ ====
-  const prenom = localStorage.getItem('prenom') || '';
-  const rawPhoto = localStorage.getItem('photo') || '';
-  
-  let cleanPhoto = '';
-  if (typeof rawPhoto === 'string' &&
-      (rawPhoto.startsWith('http') || rawPhoto.startsWith('data:image'))) {
-    cleanPhoto = rawPhoto;
-  }
+  // Récupération des infos utilisateur
+const prenom = localStorage.getItem('prenom') || '';
+const rawPhoto = localStorage.getItem('photo') || '';
 
-  const currentUser = {
-    prenom: prenom,
-    photo: cleanPhoto
-  };
+// On nettoie la photo si c’est une URL valide
+let cleanPhoto = '';
+if (
+  typeof rawPhoto === 'string' &&
+  (rawPhoto.startsWith('http') || rawPhoto.startsWith('data:image'))
+) {
+  cleanPhoto = rawPhoto;
+}
 
-  // Bloquer inputs like/comment si utilisateur connecté
-  const likeInput = document.getElementById('likeName');
-  const commentInput = document.getElementById('commentName');
-  if (currentUser.prenom) {
-    if (likeInput) likeInput.disabled = true;
-    if (commentInput) commentInput.disabled = true;
-  }
+// Définition de l’utilisateur courant
+const currentUser = {
+  prenom: prenom || 'Utilisateur',            // fallback prénom
+  photo: cleanPhoto || 'default-avatar.png'   // fallback image
+};
 
-  // Avatar principal
-  const ownerImg = document.getElementById('ownerPhoto');
-  if (ownerImg) {
-    ownerImg.src = currentUser.photo || 'default-avatar.png';
-    ownerImg.classList.add('owner-avatar');
-    ownerImg.dataset.name = currentUser.prenom || 'Owner';
-  }
+// Bloquer inputs si prénom connu
+if (currentUser.prenom !== 'Utilisateur') {
+  document.getElementById('likeName')?.setAttribute('disabled', true);
+  document.getElementById('commentName')?.setAttribute('disabled', true);
+}
+
+// Mettre l’avatar principal
+const ownerImg = document.getElementById('ownerPhoto');
+if (ownerImg) {
+  ownerImg.src = currentUser.photo;   // toujours une URL valide
+  ownerImg.classList.add('owner-avatar');
+  ownerImg.dataset.name = currentUser.prenom;
+}
 
   // Click avatar → modal profile
   const profileModal = document.getElementById('profileModal');
