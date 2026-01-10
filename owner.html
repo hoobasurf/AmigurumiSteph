@@ -773,21 +773,17 @@ function renderLikeBubbles(){
   likeBubbles.innerHTML = '';
 
   (currentZoom.likes || []).forEach(like => {
-    // Sécurité anti undefined
-    const name = typeof like === 'string' ? like : like.name || 'Utilisateur';
-    const photo = typeof like === 'object' ? like.photo : '';
-
     const bubble = document.createElement('div');
     bubble.className = 'bubble';
 
+    const name = like.name || 'Anonyme';
+
     bubble.innerHTML = like.photo
-  ? `<img src="${like.photo}" class="like-avatar" data-name="${like.name || 'Anonyme'}"> ${like.name || 'Anonyme'}`
-  : (like.name || 'Anonyme');
+      ? `<img src="${like.photo}" class="like-avatar" data-name="${name}"> ${name}`
+      : name;
 
     likeBubbles.appendChild(bubble);
   });
-
-  updateActions();
 }
   
 // ====== COMMENT ======
@@ -920,26 +916,31 @@ document.getElementById('confirmAdd').onclick = async (e) => {
 
 // ====== REFRESH ======
 async function refreshCreations(){
-  const {data, error} = await supabase
+  const { data, error } = await supabase
     .from('creations')
     .select('*')
-    .order('created_at', {ascending: false});
-  
-  if(error){ console.error(error); return; }
+    .order('created_at', { ascending: false });
+
+  if(error){
+    console.error(error);
+    return;
+  }
 
   creations = data.map(c => {
     const zoomGroup = (c.images && c.images.length)
-      ? c.images.map(p => supabase.storage.from('images').getPublicUrl(p)?.data?.publicUrl).filter(Boolean)
-      : [supabase.storage.from('images').getPublicUrl(c.image_path)?.data?.publicUrl].filter(Boolean);
+      ? c.images.map(p =>
+          supabase.storage.from('images').getPublicUrl(p).data.publicUrl
+        )
+      : [];
 
     return {
       id: c.id,
       name: c.name,
-      caption: c.caption || '',    // légende
-      imgUrl: zoomGroup[0] || '', // première image
+      caption: c.caption || '',
+      imgUrl: zoomGroup[0] || '',
       zoomGroup,
-      likes: c.likes || [],
-      comments: c.comments || []
+      likes: Array.isArray(c.likes) ? c.likes : [],
+      comments: Array.isArray(c.comments) ? c.comments : []
     };
   });
 
@@ -1028,6 +1029,26 @@ const profileModal = document.getElementById('profileModal');
 const profileModalImg = document.getElementById('profileModalImg');
 const profileModalName = document.getElementById('profileModalName');
 
+  // ====== ZOOM PROFIL (UN SEUL ENDROIT) ======
+document.addEventListener('click', e => {
+  if (
+    e.target.classList.contains('owner-avatar') ||
+    e.target.classList.contains('like-avatar') ||
+    e.target.classList.contains('comment-avatar')
+  ) {
+    profileModalImg.src = e.target.src;
+    profileModalName.textContent =
+      e.target.dataset.name || 'Utilisateur';
+
+    profileModal.style.display = 'flex';
+  }
+});
+
+profileModal.onclick = e => {
+  if (e.target === profileModal) {
+    profileModal.style.display = 'none';
+  }
+};
   
 // ====== CLOSE MODALS ======
 document.querySelector('.closeZoom').onclick=()=>zoomModal.style.display='none';
@@ -1040,22 +1061,6 @@ deleteModal.onclick=e=>{if(e.target===deleteModal) deleteModal.style.display='no
 // ====== START ======
 document.addEventListener('DOMContentLoaded', async () => {
   await refreshCreations();
-});
-
-
-// ======================
-// AJOUT CLICK AVATAR → MODAL
-document.addEventListener('click', e => {
-  if(e.target.classList.contains('owner-avatar')
-  || e.target.classList.contains('like-avatar')
-  || e.target.classList.contains('comment-avatar')){
-
-    profileModalImg.src = e.target.src;
-    profileModalName.textContent =
-      e.target.dataset.name || e.target.parentElement.textContent.trim();
-
-    profileModal.style.display = 'flex';
-  }
 });
 
 profileModal.onclick = e => {
