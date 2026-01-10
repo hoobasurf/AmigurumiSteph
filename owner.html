@@ -654,8 +654,7 @@ const supabase = createClient(
   "sb_publishable_sqsxb-3Kl5o3-JQYv9kGFw_-g0EgwMa"
 );
 
-document.addEventListener('DOMContentLoaded', async () => {
-  // ==== UTILISATEUR CONNECTÉ ====
+document.addEventListener('DOMContentLoaded', // ==== UTILISATEUR CONNECTÉ ====
 const prenom = localStorage.getItem('prenom') || '';
 const rawPhoto = localStorage.getItem('photo') || '';
 
@@ -670,7 +669,7 @@ const currentUser = {
   photo: cleanPhoto
 };
 
-// Bloquer input si connecté
+// Bloquer les inputs si connecté
 const likeNameInput = document.getElementById('likeName');
 const commentNameInput = document.getElementById('commentName');
 if (currentUser.prenom) {
@@ -680,7 +679,7 @@ if (currentUser.prenom) {
 
 // Avatar principal
 const ownerImg = document.getElementById('ownerPhoto');
-if(ownerImg){
+if (ownerImg) {
   ownerImg.src = currentUser.photo || 'default-avatar.png';
   ownerImg.classList.add('owner-avatar');
   ownerImg.dataset.name = currentUser.prenom || 'Owner';
