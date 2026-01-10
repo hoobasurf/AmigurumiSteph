@@ -1022,7 +1022,7 @@ async function refreshCreations() {
         photo: like?.photo || ''
       };
     })
-  : [],,
+  : [],
       comments: Array.isArray(c.comments)
   ? c.comments.map(cmt => ({
       name: (cmt && cmt.name) || 'Utilisateur',
@@ -1209,18 +1209,18 @@ manageModal.onclick = e => {
 
 // ===== RENDER GESTION CREATIONS =====
 function renderManageModal() {
-  if (!manageList) return; // sécurité si manageList introuvable
+  if (!manageList) return;
+
   manageList.innerHTML = "";
 
   creations.forEach(c => {
-    // Container principal de chaque création
     const creationDiv = document.createElement('div');
     creationDiv.style.display = "flex";
-    creationDiv.style.flexDirection = "column"; // photo + nom + sections
+    creationDiv.style.flexDirection = "column";
     creationDiv.style.padding = "6px 0";
     creationDiv.style.borderBottom = "1px solid #f6c2d1";
 
-    // ----- Partie cliquable : photo + nom -----
+    // --- partie cliquable photo + nom ---
     const clickable = document.createElement('div');
     clickable.style.display = "flex";
     clickable.style.alignItems = "center";
@@ -1242,63 +1242,70 @@ function renderManageModal() {
 
     clickable.onclick = () => {
       manageModal.style.display = 'none';
-      if(c.imgUrl) openZoom(c);
+      if (c.imgUrl) openZoom(c);
     };
 
     creationDiv.appendChild(clickable);
 
-    // ----- Likes -----
-if (c.likes && c.likes.length > 0) {
-  const likeSection = document.createElement('div');
-  likeSection.style.display = "flex";
-  likeSection.style.flexWrap = "wrap";
-  likeSection.style.gap = "4px";
-  likeSection.style.marginTop = "4px";
+    // --- LIKES ---
+    if (c.likes && c.likes.length > 0) {
+      const likeSection = document.createElement('div');
+      likeSection.style.display = "flex";
+      likeSection.style.flexWrap = "wrap";
+      likeSection.style.gap = "4px";
+      likeSection.style.marginTop = "4px";
 
-  c.likes.forEach((like, idx) => {
-    const likeDiv = document.createElement('div');
-    likeDiv.style.display = "flex";
-    likeDiv.style.alignItems = "center";
-    likeDiv.style.gap = "4px";
+      c.likes.forEach((like, idx) => {
+        const likeDiv = document.createElement('div');
+        likeDiv.style.display = "flex";
+        likeDiv.style.alignItems = "center";
+        likeDiv.style.gap = "4px";
 
-    // Photo du like
-    const likeImg = document.createElement('img');
-    likeImg.src = like.photo && like.photo !== '' ? like.photo : 'default-avatar.png';
-    likeImg.className = "like-avatar";
-    likeImg.style.width = "24px";
-    likeImg.style.height = "24px";
-    likeImg.style.borderRadius = "50%";
-    likeImg.style.objectFit = "cover";
-    likeDiv.appendChild(likeImg);
+        const likeImg = document.createElement('img');
+        likeImg.src = like.photo || 'default-avatar.png';
+        likeImg.className = "like-avatar";
+        likeImg.style.width = "24px";
+        likeImg.style.height = "24px";
+        likeImg.style.borderRadius = "50%";
+        likeImg.style.objectFit = "cover";
+        likeDiv.appendChild(likeImg);
 
-    // Nom du like
-    const nameSpan = document.createElement('span');
-    nameSpan.textContent = like.name || 'Utilisateur';
-    likeDiv.appendChild(nameSpan);
+        const likeName = document.createElement('span');
+        likeName.textContent = like.name || 'Utilisateur';
+        likeDiv.appendChild(likeName);
 
-    // Bouton supprimer le like
-    const btn = document.createElement('button');
-    btn.textContent = "×";
-    btn.title = like.name || 'Like';
-    btn.style.fontSize = "12px";
-    btn.style.padding = "2px 6px";
-    btn.style.border = "none";
-    btn.style.borderRadius = "6px";
-    btn.style.background = "#e94f9a";
-    btn.style.color = "#fff";
-    btn.style.cursor = "pointer";
-    btn.onclick = async () => {
-      c.likes.splice(idx, 1);
-      await supabase.from('creations').update({ likes: c.likes }).eq('id', c.id);
-      renderManageModal();
-      if (currentZoom && currentZoom.id === c.id) renderLikeBubbles();
-    };
-    likeDiv.appendChild(btn);
+        const btn = document.createElement('button');
+        btn.textContent = "×";
+        btn.style.fontSize = "12px";
+        btn.style.padding = "2px 6px";
+        btn.style.border = "none";
+        btn.style.borderRadius = "6px";
+        btn.style.background = "#e94f9a";
+        btn.style.color = "#fff";
+        btn.style.cursor = "pointer";
 
-    likeSection.appendChild(likeDiv);
+        btn.onclick = async () => {
+          c.likes.splice(idx, 1);
+          await supabase
+            .from('creations')
+            .update({ likes: c.likes })
+            .eq('id', c.id);
+
+          renderManageModal();
+          if (currentZoom && currentZoom.id === c.id) {
+            renderLikeBubbles();
+          }
+        };
+
+        likeDiv.appendChild(btn);
+        likeSection.appendChild(likeDiv);
+      });
+
+      creationDiv.appendChild(likeSection);
+    }
+
+    manageList.appendChild(creationDiv);
   });
-
-  creationDiv.appendChild(likeSection);
 }
   
 // ====== START ======
