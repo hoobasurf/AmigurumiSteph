@@ -670,10 +670,12 @@ function render() {
     `;
 
     const img = d.querySelector('img');
-    img.onload = () => d.querySelector('.placeholder').style.display = 'none';
-    img.onerror = () => img.style.display = 'none';
-    img.onclick = () => openZoom(c);
+const placeholder = d.querySelector('.placeholder');
 
+img.src = c.imgUrl;  // ← image principale
+img.onload = () => placeholder.style.display = 'none';
+img.onerror = () => placeholder.textContent = '❌';
+img.onclick = () => openZoom(c);
     d.querySelector('.delete-btn').onclick = () => openDeleteModal(c);
 
     page.appendChild(d);
