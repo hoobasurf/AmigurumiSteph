@@ -654,58 +654,57 @@ const supabase = createClient(
   "sb_publishable_sqsxb-3Kl5o3-JQYv9kGFw_-g0EgwMa"
 );
 
-document.addEventListener('DOMContentLoaded', async () => {
-  // ===== UTILISATEUR CONNECTÉ =====
-const prenom = localStorage.getItem('prenom') || '';
-const rawPhoto = localStorage.getItem('photo') || '';
-
-// On vérifie que la photo est valide (URL ou base64)
-let cleanPhoto = '';
-if (typeof rawPhoto === 'string' &&
-    (rawPhoto.startsWith('http') || rawPhoto.startsWith('data:image'))) {
-  cleanPhoto = rawPhoto;
-}
-
-// Définition de l'utilisateur courant
-const currentUser = {
-  prenom: prenom || 'Utilisateur',          // fallback si pas de prénom
-  photo: cleanPhoto || 'default-avatar.png' // fallback si pas de photo
-};
-
-// Bloquer les champs Like / Comment si prénom connu
-if (currentUser.prenom !== 'Utilisateur') {
-  document.getElementById('likeName')?.setAttribute('disabled', true);
-  document.getElementById('commentName')?.setAttribute('disabled', true);
-}
-
-// Avatar principal (en haut à droite)
-const ownerImg = document.getElementById('ownerPhoto');
-if (ownerImg) {
-  ownerImg.src = currentUser.photo;         // toujours une URL valide
-  ownerImg.classList.add('owner-avatar');
-  ownerImg.dataset.name = currentUser.prenom;
-}
-
-// ===== CLICK SUR AVATAR → MODAL PROFILE =====
-const profileModal = document.getElementById('profileModal');
-const profileModalImg = document.getElementById('profileModalImg');
-const profileModalName = document.getElementById('profileModalName');
-
-document.addEventListener('click', e => {
-  if (
-    e.target.classList.contains('owner-avatar') ||
-    e.target.classList.contains('like-avatar') ||
-    e.target.classList.contains('comment-avatar')
-  ) {
-    profileModalImg.src = e.target.src || 'default-avatar.png';
-    profileModalName.textContent = e.target.dataset.name || 'Utilisateur';
-    profileModal.style.display = 'flex';
+document.addEventListener('DOMContentLoaded', () => {
+  // UTILISATEUR CONNECTÉ
+  const prenom = localStorage.getItem('prenom') || 'Utilisateur';
+  const rawPhoto = localStorage.getItem('photo') || '';
+  
+  let cleanPhoto = '';
+  if (rawPhoto.startsWith('http') || rawPhoto.startsWith('data:image')) {
+    cleanPhoto = rawPhoto;
   }
-});
 
-// Fermer le modal si on clique en dehors
-profileModal?.addEventListener('click', e => {
-  if (e.target === profileModal) profileModal.style.display = 'none';
+  const currentUser = {
+    prenom: prenom,
+    photo: cleanPhoto || 'default-avatar.png'
+  };
+
+  // Bloquer Like/Comment si prénom connu
+  if (prenom !== 'Utilisateur') {
+    document.getElementById('likeName')?.setAttribute('disabled', true);
+    document.getElementById('commentName')?.setAttribute('disabled', true);
+  }
+
+  // Avatar principal
+  const ownerImg = document.getElementById('ownerPhoto');
+  if (ownerImg) {
+    ownerImg.src = currentUser.photo;
+    ownerImg.classList.add('owner-avatar');
+    ownerImg.dataset.name = currentUser.prenom;
+  }
+
+  // CLICK SUR AVATAR → MODAL
+  const profileModal = document.getElementById('profileModal');
+  const profileModalImg = document.getElementById('profileModalImg');
+  const profileModalName = document.getElementById('profileModalName');
+
+  document.addEventListener('click', e => {
+    if (
+      e.target.classList.contains('owner-avatar') ||
+      e.target.classList.contains('like-avatar') ||
+      e.target.classList.contains('comment-avatar')
+    ) {
+      profileModalImg.src = e.target.src || 'default-avatar.png';
+      profileModalName.textContent = e.target.dataset.name || 'Utilisateur';
+      profileModal.style.display = 'flex';
+    }
+  });
+
+  profileModal?.addEventListener('click', e => {
+    if (e.target === profileModal) profileModal.style.display = 'none';
+  });
+
+  console.log("Utilisateur connecté OK", currentUser);
 });
 
 let creations = [];
