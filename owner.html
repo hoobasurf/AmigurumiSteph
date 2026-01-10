@@ -812,50 +812,54 @@ bubble.innerHTML = like.photo
 confirmLike.onclick = async () => {
   if (!currentZoom) return;
 
-  let name = currentUser.prenom || likeNameInput.value.trim();
-  if (!name) name = 'Anonyme';
-
-  // Récupérer photo correctement
-  let photoUrl = currentUser.photo || '';
-  if (photoUrl && !photoUrl.startsWith('http')) {
-    // transformer chemin Supabase local en URL publique
-    const { data } = supabase.storage.from('images').getPublicUrl(photoUrl);
-    photoUrl = data?.publicUrl || '';
-  }
+  const name = currentUser.prenom || likeNameInput.value.trim();
+  if (!name) return;
 
   if (!currentZoom.likes) currentZoom.likes = [];
 
-  // NE PAS STRINGIFIER ici
+  // Ajouter like avec photo
   currentZoom.likes.push({
-    name: name,
-    photo: photoUrl || 'default-avatar.png'
+    name,
+    photo: currentUser.photo || ''  // ← assure-toi que currentUser.photo est une URL valide
   });
 
-  const { error } = await supabase
-    .from('creations')
-    .update({ likes: currentZoom.likes })
-    .eq('id', currentZoom.id);
+  // Sauvegarde dans Supabase
+  try {
+    const { error } = await supabase
+      .from('creations')
+      .update({ likes: currentZoom.likes })
+      .eq('id', currentZoom.id);
 
-  if (error) console.error(error);
+    if (error) console.error(error);
+  } catch (err) {
+    console.error(err);
+  }
 
-  renderLikeBubbles();
+  renderLikeBubbles();     // ← mise à jour des bulles avec photo
   likeModal.style.display = 'none';
 };
 function renderLikeBubbles() {
+  if (!currentZoom || !currentZoom.likes) return;
+
   likeBubbles.innerHTML = '';
 
-  (currentZoom.likes || []).forEach(like => {
+  currentZoom.likes.forEach(like => {
     const bubble = document.createElement('div');
     bubble.className = 'bubble';
 
-    // afficher correctement la photo
-    if (like.photo) {
-      bubble.innerHTML = `<img src="${like.photo}" class="like-avatar" data-name="${like.name}"> ${like.name}`;
-    } else {
-      bubble.textContent = like.name;
-    }
+    // Ajout photo si elle existe
+    bubble.innerHTML = like.photo
+      ? `<img src="${like.photo}" class="like-avatar"> ${like.name}`
+      : like.name;
 
     likeBubbles.appendChild(bubble);
+  });
+
+  // Met à jour le compteur de likes
+  likeCount.textContent = currentZoom.likes.length;
+
+  updateActions(); // si tu utilises cette fonction ailleurs
+}
 
     // LONG PRESS pour supprimer
     let pressTimer;
