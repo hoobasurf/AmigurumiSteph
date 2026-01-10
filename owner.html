@@ -1238,45 +1238,35 @@ function renderManageModal() {
 if (c.likes && c.likes.length > 0) {
   const likeSection = document.createElement('div');
   likeSection.style.display = "flex";
-  likeSection.style.flexDirection = "column";
+  likeSection.style.flexWrap = "wrap";
   likeSection.style.gap = "4px";
   likeSection.style.marginTop = "4px";
-  likeSection.innerHTML = `<em>Likes:</em>`;
 
   c.likes.forEach((like, idx) => {
     const likeDiv = document.createElement('div');
     likeDiv.style.display = "flex";
     likeDiv.style.alignItems = "center";
-    likeDiv.style.justifyContent = "space-between";
-    likeDiv.style.gap = "8px";
+    likeDiv.style.gap = "4px";
 
-    // Photo like si disponible
-    const likeInfo = document.createElement('div');
-    likeInfo.style.display = "flex";
-    likeInfo.style.alignItems = "center";
-    likeInfo.style.gap = "6px";
+    // Photo du like
+    const likeImg = document.createElement('img');
+    likeImg.src = like.photo && like.photo !== '' ? like.photo : 'default-avatar.png';
+    likeImg.className = "like-avatar";
+    likeImg.style.width = "24px";
+    likeImg.style.height = "24px";
+    likeImg.style.borderRadius = "50%";
+    likeImg.style.objectFit = "cover";
+    likeDiv.appendChild(likeImg);
 
-    // === CORRECTION ===
-    let photoSrc = like.photo && like.photo.startsWith('http') ? like.photo : 'default-avatar.png';
-    if(photoSrc){
-      const likeImg = document.createElement('img');
-      likeImg.src = photoSrc;
-      likeImg.style.width = "24px";
-      likeImg.style.height = "24px";
-      likeImg.style.borderRadius = "50%";
-      likeImg.style.border = "2px solid #f6c2d1";
-      likeInfo.appendChild(likeImg);
-    }
+    // Nom du like
+    const nameSpan = document.createElement('span');
+    nameSpan.textContent = like.name || 'Utilisateur';
+    likeDiv.appendChild(nameSpan);
 
-    const likeName = document.createElement('span');
-    likeName.textContent = like.name || 'Utilisateur';
-    likeInfo.appendChild(likeName);
-
-    likeDiv.appendChild(likeInfo);
-
-    // Bouton supprimer
+    // Bouton supprimer le like
     const btn = document.createElement('button');
     btn.textContent = "×";
+    btn.title = like.name || 'Like';
     btn.style.fontSize = "12px";
     btn.style.padding = "2px 6px";
     btn.style.border = "none";
@@ -1284,15 +1274,14 @@ if (c.likes && c.likes.length > 0) {
     btn.style.background = "#e94f9a";
     btn.style.color = "#fff";
     btn.style.cursor = "pointer";
-
     btn.onclick = async () => {
       c.likes.splice(idx, 1);
       await supabase.from('creations').update({ likes: c.likes }).eq('id', c.id);
       renderManageModal();
-      if(currentZoom && currentZoom.id===c.id) renderLikeBubbles();
+      if (currentZoom && currentZoom.id === c.id) renderLikeBubbles();
     };
-
     likeDiv.appendChild(btn);
+
     likeSection.appendChild(likeDiv);
   });
 
