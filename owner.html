@@ -1135,10 +1135,8 @@ profileModal.onclick = e => {
 // ===== BOUTON GESTION CREATIONS =====
 const manageBtn = document.createElement('button');
 manageBtn.textContent = "Gérer Créations";
-manageBtn.style.position = "absolute";
-manageBtn.style.bottom = "20px";
-manageBtn.style.left = "50%";
-manageBtn.style.transform = "translateX(-50%)";
+manageBtn.style.width = "100%";
+manageBtn.style.marginTop = "auto";  // pousse le bouton en bas
 manageBtn.style.padding = "6px 10px";
 manageBtn.style.fontSize = "12px";
 manageBtn.style.border = "none";
@@ -1146,6 +1144,8 @@ manageBtn.style.borderRadius = "10px";
 manageBtn.style.background = "#ffb6c1";
 manageBtn.style.color = "#fff";
 manageBtn.style.cursor = "pointer";
+
+// On ajoute le bouton à la fin de la sidebar pour qu'il soit en bas
 sidebar.appendChild(manageBtn);
 
 // MODAL GESTION CREATIONS
