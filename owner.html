@@ -656,41 +656,35 @@ const supabase = createClient(
 
 document.addEventListener('DOMContentLoaded', async () => {
   // ==== UTILISATEUR CONNECTÉ ====
-  document.addEventListener('DOMContentLoaded', async () => {
+const prenom = localStorage.getItem('prenom') || '';
+const rawPhoto = localStorage.getItem('photo') || '';
 
-  // ==== UTILISATEUR CONNECTÉ ====
-  const prenom = localStorage.getItem('prenom') || '';
-  const rawPhoto = localStorage.getItem('photo') || '';
+let cleanPhoto = '';
+if (typeof rawPhoto === 'string' &&
+    (rawPhoto.startsWith('http') || rawPhoto.startsWith('data:image'))) {
+  cleanPhoto = rawPhoto;
+}
 
-  let cleanPhoto = '';
-  if (
-    typeof rawPhoto === 'string' &&
-    (
-      rawPhoto.startsWith('http') ||
-      rawPhoto.startsWith('data:image')
-    )
-  ) {
-    cleanPhoto = rawPhoto;
-  }
+const currentUser = {
+  prenom: prenom,
+  photo: cleanPhoto
+};
 
-  const currentUser = {
-    prenom: prenom,
-    photo: cleanPhoto
-  };
+// Bloquer input si connecté
+const likeNameInput = document.getElementById('likeName');
+const commentNameInput = document.getElementById('commentName');
+if (currentUser.prenom) {
+  if (likeNameInput) likeNameInput.disabled = true;
+  if (commentNameInput) commentNameInput.disabled = true;
+}
 
-  // ==== BLOQUER INPUTS ====
-  if (currentUser.prenom) {
-    document.getElementById('likeName')?.setAttribute('disabled', true);
-    document.getElementById('commentName')?.setAttribute('disabled', true);
-  }
-
-  // ==== AVATAR PRINCIPAL ====
-  const ownerImg = document.getElementById('ownerPhoto');
-  if (ownerImg) {
-    ownerImg.src = currentUser.photo || 'default-avatar.png';
-    ownerImg.classList.add('owner-avatar');
-    ownerImg.dataset.name = currentUser.prenom || 'Owner';
-  }
+// Avatar principal
+const ownerImg = document.getElementById('ownerPhoto');
+if(ownerImg){
+  ownerImg.src = currentUser.photo || 'default-avatar.png';
+  ownerImg.classList.add('owner-avatar');
+  ownerImg.dataset.name = currentUser.prenom || 'Owner';
+}
 
   // ==== CLICK AVATAR → MODAL ====
   const profileModal = document.getElementById('profileModal');
