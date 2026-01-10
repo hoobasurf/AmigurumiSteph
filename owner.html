@@ -645,7 +645,7 @@ body::before {
 </div>
 
 <script type="module">
-
+  
 import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
 
 const supabase = createClient(
@@ -655,8 +655,8 @@ const supabase = createClient(
 
 // ================== UTILISATEUR CONNECTÉ ==================
 let currentUser = {
-  prenom: localStorage.getItem('prenom') || '',   
-  photo: localStorage.getItem('photo') || ''      
+  prenom: localStorage.getItem('prenom') || '',   // récupère le prénom si défini
+  photo: localStorage.getItem('photo') || ''      // récupère la photo si définie
 };
 
 if(currentUser.prenom){
@@ -674,8 +674,6 @@ if(currentUser.photo){
 let creations = [];
 let currentZoom = null;
 let currentDelete = null;
-let currentDeleteComment = null;
-let currentDeleteLike = null;
 
 // ====== ELEMENTS ======
 const container = document.getElementById('visitor-list-container');
@@ -718,13 +716,12 @@ function render() {
     `;
 
     const img = d.querySelector('img');
-    const placeholder = d.querySelector('.placeholder');
+const placeholder = d.querySelector('.placeholder');
 
-    img.src = c.imgUrl;
-    img.onload = () => placeholder.style.display = 'none';
-    img.onerror = () => placeholder.textContent = '❌';
-    img.onclick = () => openZoom(c);
-
+img.src = c.imgUrl;  // ← image principale
+img.onload = () => placeholder.style.display = 'none';
+img.onerror = () => placeholder.textContent = '❌';
+img.onclick = () => openZoom(c);
     d.querySelector('.delete-btn').onclick = () => openDeleteModal(c);
 
     page.appendChild(d);
@@ -760,9 +757,9 @@ document.querySelector('.like-btn').onclick = () => {
   (currentZoom.likes || []).forEach(like => {
     const bubble = document.createElement('div');
     bubble.className = 'bubble';
-    bubble.innerHTML = like.photo
-      ? `<img src="${like.photo}" class="like-avatar"> ${like.name}`
-      : like.name;
+bubble.innerHTML = like.photo
+  ? `<img src="${like.photo}" class="like-avatar"> ${like.name}`
+  : like.name;
     likeBubbles.appendChild(bubble);
   });
 
@@ -778,18 +775,24 @@ confirmLike.onclick = async () => {
   let name = currentUser.prenom || likeNameInput.value.trim();
   if (!name) name = 'Anonyme';
 
+  // --- Assurer que photo est une URL publique ---
   let photoUrl = '';
   if (currentUser.photo) {
+    // Si currentUser.photo commence par "http", c'est déjà une URL
     if (currentUser.photo.startsWith('http')) {
       photoUrl = currentUser.photo;
     } else {
+      // Sinon, mettre une image par défaut
       photoUrl = 'default-avatar.png'; 
     }
   }
 
   if (!currentZoom.likes) currentZoom.likes = [];
 
-  currentZoom.likes.push({ name, photo: photoUrl });
+  currentZoom.likes.push({
+    name,
+    photo: photoUrl
+  });
 
   try {
     const { error } = await supabase
@@ -808,48 +811,51 @@ confirmLike.onclick = async () => {
 
 function renderLikeBubbles() {
   likeBubbles.innerHTML = '';
+
   (currentZoom.likes || []).forEach(like => {
-    const bubble = document.createElement('div');
-    bubble.className = 'bubble';
+  const bubble = document.createElement('div');
+  bubble.className = 'bubble';
 
-    const name = like.name || 'Utilisateur';
-    const photo = like.photo || '';
-    bubble.innerHTML = photo
-      ? `<img src="${photo}" class="like-avatar" data-name="${name}"> ${name}`
-      : name;
+  const name = like.name || 'Utilisateur';
+  const photo = like.photo || '';
 
-    likeBubbles.appendChild(bubble);
+  bubble.innerHTML = photo
+    ? `<img src="${photo}" class="like-avatar" data-name="${name}"> ${name}`
+    : name;
 
-    // LONG PRESS
-    let pressTimer;
-    bubble.addEventListener('mousedown', e => {
-      pressTimer = setTimeout(() => {
-        currentDeleteLike = like;
-        document.getElementById('deleteLikeModal').style.display = 'flex';
-      }, 800);
-    });
-    bubble.addEventListener('mouseup', e => clearTimeout(pressTimer));
-    bubble.addEventListener('mouseleave', e => clearTimeout(pressTimer));
-    bubble.addEventListener('touchstart', e => {
-      pressTimer = setTimeout(() => {
-        currentDeleteLike = like;
-        document.getElementById('deleteLikeModal').style.display = 'flex';
-      }, 800);
-    });
-    bubble.addEventListener('touchend', e => clearTimeout(pressTimer));
-    bubble.addEventListener('touchmove', e => clearTimeout(pressTimer));
+  likeBubbles.appendChild(bubble);
+
+  // ===== LONG PRESS LIKE =====
+  let pressTimer;
+  bubble.addEventListener('mousedown', e => {
+    pressTimer = setTimeout(() => {
+      currentDeleteLike = like;
+      document.getElementById('deleteLikeModal').style.display = 'flex';
+    }, 800);
   });
+  bubble.addEventListener('mouseup', e => clearTimeout(pressTimer));
+  bubble.addEventListener('mouseleave', e => clearTimeout(pressTimer));
+  bubble.addEventListener('touchstart', e => {
+    pressTimer = setTimeout(() => {
+      currentDeleteLike = like;
+      document.getElementById('deleteLikeModal').style.display = 'flex';
+    }, 800);
+  });
+  bubble.addEventListener('touchend', e => clearTimeout(pressTimer));
+  bubble.addEventListener('touchmove', e => clearTimeout(pressTimer));
+});
 
   updateActions();
 }
-
+  
 // ====== COMMENT ======
 document.querySelector('.comment-btn').onclick=()=>{
   const commentNameInput = document.getElementById('commentName');
-  commentNameInput.value = currentUser.prenom || '';
-  if(currentUser.prenom) commentNameInput.disabled = true; 
+commentNameInput.value = currentUser.prenom || '';
+if(currentUser.prenom) commentNameInput.disabled = true;  // bloque modification si connecté
   if(!currentZoom) return;
   renderCommentList();
+  document.getElementById('commentName').value=currentUser.prenom||'';
   document.getElementById('commentText').value='';
   commentModal.style.display='flex';
 };
@@ -873,7 +879,7 @@ function renderCommentList() {
 
     commentBubbles.appendChild(item);
 
-    // LONG PRESS COMMENT
+    // ===== LONG PRESS COMMENT =====
     let pressTimer;
     item.addEventListener('mousedown', e => {
       pressTimer = setTimeout(() => {
@@ -901,11 +907,16 @@ confirmComment.onclick = async () => {
 
   const name = currentUser.prenom || document.getElementById('commentName').value.trim();
   const text = document.getElementById('commentText').value.trim();
+
   if (!name || !text) return;
 
   if (!currentZoom.comments) currentZoom.comments = [];
 
-  currentZoom.comments.push({ name, text, photo: currentUser.photo || '' });
+  currentZoom.comments.push({
+    name,
+    text,
+    photo: currentUser.photo || ''
+  });
 
   await supabase
     .from('creations')
@@ -969,6 +980,7 @@ async function refreshCreations() {
     return;
   }
 
+  // Préparer toutes les URLs avant le render
   creations = data.map(c => {
     let zoomGroup = [];
     if (c.images && Array.isArray(c.images) && c.images.length) {
@@ -981,26 +993,179 @@ async function refreshCreations() {
       id: c.id,
       name: c.name,
       caption: c.caption || '',
-      imgUrl: zoomGroup[0] || '',
+      imgUrl: zoomGroup[0] || '',   // image principale
       zoomGroup,
       likes: Array.isArray(c.likes)
-        ? c.likes.map(like => typeof like==='object' ? { name: like.name||'Utilisateur', photo: like.photo||'' } : {name:like, photo:''})
-        : [],
+  ? c.likes.map(like => {
+      if (like && typeof like === 'object') {
+        return {
+          name: like.name || 'Utilisateur',
+          photo: like.photo || ''
+        };
+      } else if (typeof like === 'string') {
+        return { name: like, photo: '' };
+      } else {
+        return { name: 'Utilisateur', photo: '' };
+      }
+    })
+  : [],
       comments: Array.isArray(c.comments)
-        ? c.comments.map(cmt => ({ name:(cmt?.name)||'Utilisateur', text:(cmt?.text)||'', photo:(cmt?.photo)||'' }))
-        : []
+  ? c.comments.map(cmt => ({
+      name: (cmt && cmt.name) || 'Utilisateur',
+      text: (cmt && cmt.text) || '',
+      photo: (cmt && cmt.photo) || ''
+    }))
+  : []
     };
   });
 
   render();
 }
+// ================== BOUTONS SIDEBAR ==================
+const addBtn = document.getElementById('addBtn');
 
-// ================== GESTION MODAL ==================
+// --- Bouton Pelotes ---
+const pelotesBtn = document.createElement('button');
+pelotesBtn.textContent = "Pelotes";
+pelotesBtn.style.marginTop = "10px";
+
+addBtn.insertAdjacentElement('afterend', pelotesBtn);
+
+pelotesBtn.onclick = () => {
+  document.body.style.transition = 'opacity 0.5s';
+  document.body.style.opacity = '0';
+  setTimeout(() => {
+    window.location.href = 'pelotes.html';
+  }, 500);
+};
+
+// --- Bouton Vidéo ---
+const videoBtn = document.createElement('button');
+videoBtn.textContent = "Vidéo";
+videoBtn.style.marginTop = "10px";
+
+pelotesBtn.insertAdjacentElement('afterend', videoBtn);
+
+videoBtn.onclick = () => {
+  document.body.style.transition = 'opacity 0.5s';
+  document.body.style.opacity = '0';
+  setTimeout(() => {
+    window.location.href = 'video.html'; // ← change si besoin
+  }, 500);
+};
+
+// --- Bouton Notes ---
+const notesBtn = document.createElement('button');
+notesBtn.textContent = "Notes";
+notesBtn.style.marginTop = "10px";
+
+videoBtn.insertAdjacentElement('afterend', notesBtn);
+
+notesBtn.onclick = () => {
+  document.body.style.transition = 'opacity 0.5s';
+  document.body.style.opacity = '0';
+  setTimeout(() => {
+    window.location.href = 'notes.html'; // ← change le lien si nécessaire
+  }, 500);
+};
+
+// --- Bouton Messagerie ---
+const messagerieBtn = document.createElement('button');
+messagerieBtn.textContent = "Messagerie";
+messagerieBtn.style.marginTop = "10px";
+
+notesBtn.insertAdjacentElement('afterend', messagerieBtn);
+
+messagerieBtn.onclick = () => {
+  document.body.style.transition = 'opacity 0.5s';
+  document.body.style.opacity = '0';
+  setTimeout(() => {
+    window.location.href = 'messagerie.html';
+  }, 500);
+};
+
+// ===== COMMENT =====
+document.getElementById('cancelDeleteComment').onclick = () => {
+  currentDeleteComment = null;
+  document.getElementById('deleteCommentModal').style.display = 'none';
+};
+
+document.getElementById('confirmDeleteComment').onclick = async () => {
+  if (!currentZoom || !currentDeleteComment) return;
+
+  currentZoom.comments = (currentZoom.comments || []).filter(c => c !== currentDeleteComment);
+
+  await supabase.from('creations').update({ comments: currentZoom.comments }).eq('id', currentZoom.id);
+
+  renderCommentList();
+  currentDeleteComment = null;
+  document.getElementById('deleteCommentModal').style.display = 'none';
+};
+
+// ===== LIKE =====
+document.getElementById('cancelDeleteLike').onclick = () => {
+  currentDeleteLike = null;
+  document.getElementById('deleteLikeModal').style.display = 'none';
+};
+
+document.getElementById('confirmDeleteLike').onclick = async () => {
+  if (!currentZoom || !currentDeleteLike) return;
+
+  currentZoom.likes = (currentZoom.likes || []).filter(l => l !== currentDeleteLike);
+
+  await supabase.from('creations').update({ likes: currentZoom.likes }).eq('id', currentZoom.id);
+
+  renderLikeBubbles();
+  currentDeleteLike = null;
+  document.getElementById('deleteLikeModal').style.display = 'none';
+};
+
+  
+// ================== EVENTS ==================
+likeModal.onclick = e => { if(e.target === likeModal) likeModal.style.display = 'none'; };
+commentModal.onclick = e => { if(e.target === commentModal) commentModal.style.display = 'none'; };
+deleteModal.onclick = e => { if(e.target === deleteModal) { deleteModal.style.display = 'none'; currentDelete=null; } };
+zoomModal.onclick = e => { if(e.target === zoomModal) zoomModal.style.display = 'none'; };
+document.querySelector('.closeZoom').onclick = () => zoomModal.style.display='none';
+document.getElementById('toggleSidebar').onclick = () => sidebar.classList.toggle('sidebar-open');
+
+// ===== AGRANDISSEMENT MODAL COMMENT =====
+const expandBtn = document.getElementById('expandComment');
+const commentBox = document.querySelector('.comment-box');
+expandBtn.onclick = (e) => {
+  e.stopPropagation();
+  commentBox.classList.toggle('fullscreen');
+  expandBtn.textContent = commentBox.classList.contains('fullscreen') ? '⤡' : '⤢';
+};
+
+// ================== CLICK AVATAR → PROFILE MODAL ==================
+const profileModal = document.getElementById('profileModal');
+const profileModalImg = document.getElementById('profileModalImg');
+const profileModalName = document.getElementById('profileModalName');
+
+document.addEventListener('click', e => {
+  if(
+    e.target.classList.contains('owner-avatar') ||
+    e.target.classList.contains('like-avatar') ||
+    e.target.classList.contains('comment-avatar')
+  ){
+    profileModalImg.src = e.target.src;
+    profileModalName.textContent = e.target.dataset.name || e.target.parentElement.textContent.trim();
+    profileModal.style.display = 'flex';
+  }
+});
+
+profileModal.onclick = e => {
+  if(e.target === profileModal) profileModal.style.display = 'none';
+};
+
+// ===== BOUTON GESTION CREATIONS =====
 const manageBtn = document.createElement('button');
 manageBtn.id = 'manageBtn';
 manageBtn.textContent = "Gérer Créations";
 sidebar.appendChild(manageBtn);
 
+// MODAL GESTION CREATIONS
 const manageModal = document.createElement('div');
 manageModal.className = "modal";
 manageModal.innerHTML = `
@@ -1030,21 +1195,22 @@ manageModal.onclick = e => {
 
 // ===== RENDER GESTION CREATIONS =====
 function renderManageModal() {
-  if (!manageList) return;
+  if (!manageList) return; // sécurité si manageList introuvable
   manageList.innerHTML = "";
 
   creations.forEach(c => {
+    // Création du container principal pour chaque création
     const creationDiv = document.createElement('div');
     creationDiv.style.display = "flex";
-    creationDiv.style.flexDirection = "column";
+    creationDiv.style.flexDirection = "column"; // photo + nom + sections
     creationDiv.style.padding = "6px 0";
     creationDiv.style.borderBottom = "1px solid #f6c2d1";
 
+    // ----- Partie cliquable : photo + nom -----
     const clickable = document.createElement('div');
     clickable.style.display = "flex";
     clickable.style.alignItems = "center";
     clickable.style.gap = "8px";
-    clickable.style.cursor = "pointer";
 
     const img = document.createElement('img');
     img.src = c.imgUrl || '';
@@ -1059,6 +1225,7 @@ function renderManageModal() {
     nameSpan.textContent = c.name;
     clickable.appendChild(nameSpan);
 
+    clickable.style.cursor = "pointer";
     clickable.onclick = () => {
       manageModal.style.display = 'none';
       if(c.imgUrl) openZoom(c);
@@ -1066,55 +1233,95 @@ function renderManageModal() {
 
     creationDiv.appendChild(clickable);
 
-    // Likes
-    if(c.likes && c.likes.length >0){
+    // ----- Likes -----
+    if (c.likes && c.likes.length > 0) {
       const likeSection = document.createElement('div');
-      likeSection.style.display="flex";
-      likeSection.style.flexWrap="wrap";
-      likeSection.style.gap="4px";
-      likeSection.style.marginTop="4px";
+      likeSection.style.display = "flex";
+      likeSection.style.flexWrap = "wrap";
+      likeSection.style.gap = "4px";
+      likeSection.style.marginTop = "4px";
 
-      c.likes.forEach((like, idx)=>{
+      c.likes.forEach((like, idx) => {
         const btn = document.createElement('button');
-        btn.textContent="×";
-        btn.title=like.name||'Like';
-        btn.style.fontSize="12px";
-        btn.style.padding="2px 6px";
-        btn.style.border="none";
-        btn.style.borderRadius="6px";
-        btn.style.background="#e94f9a";
-        btn.style.color="#fff";
-        btn.style.cursor="pointer";
+        btn.textContent = "×";
+        btn.title = like.name || 'Like';
+        btn.style.fontSize = "12px";
+        btn.style.padding = "2px 6px";
+        btn.style.border = "none";
+        btn.style.borderRadius = "6px";
+        btn.style.background = "#e94f9a";
+        btn.style.color = "#fff";
+        btn.style.cursor = "pointer";
 
-        btn.onclick=async ()=>{
-          c.likes.splice(idx,1);
-          await supabase.from('creations').update({likes:c.likes}).eq('id',c.id);
+        btn.onclick = async () => {
+          c.likes.splice(idx, 1);
+          await supabase.from('creations').update({ likes: c.likes }).eq('id', c.id);
           renderManageModal();
-          if(currentZoom && currentZoom.id===c.id) renderLikeBubbles();
+          if (currentZoom && currentZoom.id === c.id) renderLikeBubbles();
         };
+
         likeSection.appendChild(btn);
       });
 
       creationDiv.appendChild(likeSection);
     }
 
-    // Comments
-    if(c.comments && c.comments.length){
+    // ----- Commentaires -----
+    if (c.comments && c.comments.length > 0) {
       const commentSection = document.createElement('div');
-      commentSection.style.margin="4px 0";
-      commentSection.innerHTML="<em>Commentaires:</em>";
-      c.comments.forEach((comm, idx)=>{
-        const commDiv = document.createElement('div');
-        commDiv.style.display="flex";
-        commDiv.style.justifyContent="space-between";
-        commDiv.style.alignItems="center";
-        commDiv.style.padding="2px 0";
+      commentSection.style.display = "flex";
+      commentSection.style.flexDirection = "column";
+      commentSection.style.marginTop = "4px";
+      commentSection.innerHTML = `<em>Commentaires:</em>`;
 
-        commDiv.innerHTML=`
+      c.comments.forEach((comm, idx) => {
+        const commDiv = document.createElement('div');
+        commDiv.style.display = "flex";
+        commDiv.style.justifyContent = "space-between";
+        commDiv.style.alignItems = "center";
+        commDiv.style.padding = "2px 0";
+
+        commDiv.innerHTML = `
           <span><strong>${comm.name}</strong>: ${comm.text}</span>
           <button style="font-size:12px;padding:2px 6px;border:none;border-radius:6px;background:#e94f9a;color:#fff;cursor:pointer;">×</button>
         `;
-        commDiv.querySelector("button").onclick=async ()=>{
+
+        const delBtn = commDiv.querySelector("button");
+        delBtn.onclick = async () => {
+          c.comments.splice(idx, 1);
+          await supabase.from('creations').update({ comments: c.comments }).eq('id', c.id);
+          renderManageModal();
+          if (currentZoom && currentZoom.id === c.id) renderCommentList();
+        };
+
+        commentSection.appendChild(commDiv);
+      });
+
+      creationDiv.appendChild(commentSection);
+    }
+
+    // ----- Ajouter le container au DOM -----
+    manageList.appendChild(creationDiv);
+  });
+}
+
+    // COMMENTS
+    if(c.comments && c.comments.length){
+      const commentSection = document.createElement('div');
+      commentSection.style.margin = "4px 0";
+      commentSection.innerHTML = `<em>Commentaires:</em>`;
+      c.comments.forEach((comm, idx) => {
+        const commDiv = document.createElement('div');
+        commDiv.style.display = "flex";
+        commDiv.style.justifyContent = "space-between";
+        commDiv.style.alignItems = "center";
+        commDiv.style.padding = "2px 0";
+
+        commDiv.innerHTML = `
+          <span><strong>${comm.name}</strong>: ${comm.text}</span>
+          <button style="font-size:12px;padding:2px 6px;border:none;border-radius:6px;background:#e94f9a;color:#fff;cursor:pointer;">Supprimer</button>
+        `;
+        commDiv.querySelector("button").onclick = async () => {
           c.comments.splice(idx,1);
           await supabase.from('creations').update({comments:c.comments}).eq('id',c.id);
           renderManageModal();
@@ -1128,11 +1335,12 @@ function renderManageModal() {
     manageList.appendChild(creationDiv);
   });
 }
-
-// ================== START ==================
+  
+// ====== START ======
 document.addEventListener('DOMContentLoaded', async () => {
   await refreshCreations();
 });
+
 
 </script>
 
