@@ -989,18 +989,39 @@ async function refreshCreations() {
       zoomGroup,
       likes: Array.isArray(c.likes)
   ? c.likes.map(like => {
-      if (like && typeof like === 'object') {
-        return {
-          name: like.name || 'Utilisateur',
-          photo: like.photo || ''
-        };
-      } else if (typeof like === 'string') {
-        return { name: like, photo: '' };
-      } else {
-        return { name: 'Utilisateur', photo: '' };
+      // ✅ si like est une string JSON → on nettoie
+      if (typeof like === 'string') {
+        try {
+          const parsed = JSON.parse(like);
+          return {
+            name: parsed.name || 'Utilisateur',
+            photo: parsed.photo || ''
+          };
+        } catch {
+          return { name: like, photo: '' };
+        }
       }
+
+      // ✅ si like.name est lui-même un JSON string
+      if (like && typeof like.name === 'string' && like.name.trim().startsWith('{')) {
+        try {
+          const parsed = JSON.parse(like.name);
+          return {
+            name: parsed.name || 'Utilisateur',
+            photo: parsed.photo || ''
+          };
+        } catch {
+          return { name: 'Utilisateur', photo: '' };
+        }
+      }
+
+      // ✅ cas normal
+      return {
+        name: like?.name || 'Utilisateur',
+        photo: like?.photo || ''
+      };
     })
-  : [],
+  : [],,
       comments: Array.isArray(c.comments)
   ? c.comments.map(cmt => ({
       name: (cmt && cmt.name) || 'Utilisateur',
@@ -1185,7 +1206,6 @@ manageModal.onclick = e => {
   if(e.target === manageModal) manageModal.style.display = "none";
 };
 
-// ===== RENDER GESTION CREATIONS =====
 // ===== RENDER GESTION CREATIONS =====
 function renderManageModal() {
   if (!manageList) return; // sécurité si manageList introuvable
