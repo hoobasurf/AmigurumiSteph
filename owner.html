@@ -654,30 +654,26 @@ const supabase = createClient(
   "sb_publishable_sqsxb-3Kl5o3-JQYv9kGFw_-g0EgwMa"
 );
 
-document.addEventListener('DOMContentLoaded', () => {
-  // ================== UTILISATEUR CONNECTÉ ==================
+document.addEventListener('DOMContentLoaded', async () => {
+  // ==== UTILISATEUR CONNECTÉ ====
   let currentUser = {
     prenom: localStorage.getItem('prenom') || '',
     photo: localStorage.getItem('photo') || ''
   };
 
-  // BLOQUER LES INPUTS PRÉNOM SI L'UTILISATEUR EST CONNECTÉ
   if(currentUser.prenom){
     document.getElementById('likeName')?.setAttribute('disabled', true);
     document.getElementById('commentName')?.setAttribute('disabled', true);
   }
 
-  // ==== AVATAR PROPRIÉTAIRE ====
   const ownerImg = document.getElementById('ownerPhoto');
   if(ownerImg){
-    ownerImg.src = (currentUser.photo && currentUser.photo.trim() !== '') 
-                    ? currentUser.photo 
-                    : 'default-avatar.png';
+    ownerImg.src = currentUser.photo?.trim() ? currentUser.photo : 'default-avatar.png';
     ownerImg.classList.add('owner-avatar');
     ownerImg.dataset.name = currentUser.prenom || 'Owner';
   }
 
-  // ================== CLICK SUR AVATAR → PROFILE MODAL ==================
+  // ==== CLICK AVATAR ====
   const profileModal = document.getElementById('profileModal');
   const profileModalImg = document.getElementById('profileModalImg');
   const profileModalName = document.getElementById('profileModalName');
@@ -699,8 +695,21 @@ document.addEventListener('DOMContentLoaded', () => {
       if(e.target === profileModal) profileModal.style.display = 'none';
     };
   }
-});
 
+  // ==== REFRESH CREATIONS + AJOUT LISTENERS LIKE/COMMENT ====
+  await refreshCreations();
+
+  // ATTACHER LES LISTENERS SUR LES BOUTONS PRINCIPAUX
+  document.querySelector('.like-btn')?.addEventListener('click', () => {
+    if(!currentZoom) return;
+    // code likeModal
+  });
+
+  document.querySelector('.comment-btn')?.addEventListener('click', () => {
+    if(!currentZoom) return;
+    // code commentModal
+  });
+});
 let creations = [];
 let currentZoom = null;
 let currentDelete = null;
