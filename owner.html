@@ -709,13 +709,22 @@ document.addEventListener('DOMContentLoaded', async () => {
       const likeBubbles = document.getElementById('likeBubbles');
       likeBubbles.innerHTML = '';
       (currentZoom.likes || []).forEach(like => {
-        const bubble = document.createElement('div');
-        bubble.className = 'bubble';
-        bubble.innerHTML = like.photo
-          ? `<img src="${like.photo}" class="like-avatar"> ${like.name}`
-          : like.name;
-        likeBubbles.appendChild(bubble);
-      });
+  let data = like;
+
+  // sécurité si Supabase a stocké une string
+  if (typeof data === 'string') {
+    try { data = JSON.parse(data); } catch { data = {}; }
+  }
+
+  const img = document.createElement('img');
+  img.className = 'like-avatar';
+  img.src = data.photo && data.photo.trim() !== ''
+    ? data.photo
+    : 'default-avatar.png';
+
+  img.dataset.name = data.name || 'Anonyme';
+  likeBubbles.appendChild(img);
+});
       const likeNameInput = document.getElementById('likeName');
       likeNameInput.value = currentUser.prenom || '';
       if(currentUser.prenom) likeNameInput.disabled = true;
