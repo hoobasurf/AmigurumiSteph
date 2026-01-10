@@ -1194,12 +1194,13 @@ manageModal.onclick = e => {
 };
 
 // ===== RENDER GESTION CREATIONS =====
+// ===== RENDER GESTION CREATIONS =====
 function renderManageModal() {
   if (!manageList) return; // sécurité si manageList introuvable
   manageList.innerHTML = "";
 
   creations.forEach(c => {
-    // Création du container principal pour chaque création
+    // Container principal de chaque création
     const creationDiv = document.createElement('div');
     creationDiv.style.display = "flex";
     creationDiv.style.flexDirection = "column"; // photo + nom + sections
@@ -1211,6 +1212,7 @@ function renderManageModal() {
     clickable.style.display = "flex";
     clickable.style.alignItems = "center";
     clickable.style.gap = "8px";
+    clickable.style.cursor = "pointer";
 
     const img = document.createElement('img');
     img.src = c.imgUrl || '';
@@ -1225,7 +1227,6 @@ function renderManageModal() {
     nameSpan.textContent = c.name;
     clickable.appendChild(nameSpan);
 
-    clickable.style.cursor = "pointer";
     clickable.onclick = () => {
       manageModal.style.display = 'none';
       if(c.imgUrl) openZoom(c);
@@ -1237,14 +1238,43 @@ function renderManageModal() {
     if (c.likes && c.likes.length > 0) {
       const likeSection = document.createElement('div');
       likeSection.style.display = "flex";
-      likeSection.style.flexWrap = "wrap";
+      likeSection.style.flexDirection = "column";
       likeSection.style.gap = "4px";
       likeSection.style.marginTop = "4px";
+      likeSection.innerHTML = `<em>Likes:</em>`;
 
       c.likes.forEach((like, idx) => {
+        const likeDiv = document.createElement('div');
+        likeDiv.style.display = "flex";
+        likeDiv.style.alignItems = "center";
+        likeDiv.style.justifyContent = "space-between";
+        likeDiv.style.gap = "8px";
+
+        // Photo like si disponible
+        const likeInfo = document.createElement('div');
+        likeInfo.style.display = "flex";
+        likeInfo.style.alignItems = "center";
+        likeInfo.style.gap = "6px";
+
+        if(like.photo){
+          const likeImg = document.createElement('img');
+          likeImg.src = like.photo;
+          likeImg.style.width = "24px";
+          likeImg.style.height = "24px";
+          likeImg.style.borderRadius = "50%";
+          likeImg.style.border = "2px solid #f6c2d1";
+          likeInfo.appendChild(likeImg);
+        }
+
+        const likeName = document.createElement('span');
+        likeName.textContent = like.name || 'Utilisateur';
+        likeInfo.appendChild(likeName);
+
+        likeDiv.appendChild(likeInfo);
+
+        // Bouton supprimer
         const btn = document.createElement('button');
         btn.textContent = "×";
-        btn.title = like.name || 'Like';
         btn.style.fontSize = "12px";
         btn.style.padding = "2px 6px";
         btn.style.border = "none";
@@ -1257,10 +1287,11 @@ function renderManageModal() {
           c.likes.splice(idx, 1);
           await supabase.from('creations').update({ likes: c.likes }).eq('id', c.id);
           renderManageModal();
-          if (currentZoom && currentZoom.id === c.id) renderLikeBubbles();
+          if(currentZoom && currentZoom.id===c.id) renderLikeBubbles();
         };
 
-        likeSection.appendChild(btn);
+        likeDiv.appendChild(btn);
+        likeSection.appendChild(likeDiv);
       });
 
       creationDiv.appendChild(likeSection);
@@ -1271,67 +1302,65 @@ function renderManageModal() {
       const commentSection = document.createElement('div');
       commentSection.style.display = "flex";
       commentSection.style.flexDirection = "column";
+      commentSection.style.gap = "4px";
       commentSection.style.marginTop = "4px";
       commentSection.innerHTML = `<em>Commentaires:</em>`;
 
       c.comments.forEach((comm, idx) => {
         const commDiv = document.createElement('div');
         commDiv.style.display = "flex";
-        commDiv.style.justifyContent = "space-between";
         commDiv.style.alignItems = "center";
-        commDiv.style.padding = "2px 0";
+        commDiv.style.justifyContent = "space-between";
+        commDiv.style.gap = "8px";
 
-        commDiv.innerHTML = `
-          <span><strong>${comm.name}</strong>: ${comm.text}</span>
-          <button style="font-size:12px;padding:2px 6px;border:none;border-radius:6px;background:#e94f9a;color:#fff;cursor:pointer;">×</button>
-        `;
+        // Photo commentaire si dispo
+        const commInfo = document.createElement('div');
+        commInfo.style.display = "flex";
+        commInfo.style.alignItems = "center";
+        commInfo.style.gap = "6px";
 
-        const delBtn = commDiv.querySelector("button");
-        delBtn.onclick = async () => {
+        if(comm.photo){
+          const commImg = document.createElement('img');
+          commImg.src = comm.photo;
+          commImg.style.width = "24px";
+          commImg.style.height = "24px";
+          commImg.style.borderRadius = "50%";
+          commImg.style.border = "2px solid #f6c2d1";
+          commInfo.appendChild(commImg);
+        }
+
+        const commText = document.createElement('span');
+        commText.innerHTML = `<strong>${comm.name}</strong>: ${comm.text}`;
+        commInfo.appendChild(commText);
+
+        commDiv.appendChild(commInfo);
+
+        // Bouton supprimer
+        const btn = document.createElement('button');
+        btn.textContent = "×";
+        btn.style.fontSize = "12px";
+        btn.style.padding = "2px 6px";
+        btn.style.border = "none";
+        btn.style.borderRadius = "6px";
+        btn.style.background = "#e94f9a";
+        btn.style.color = "#fff";
+        btn.style.cursor = "pointer";
+
+        btn.onclick = async () => {
           c.comments.splice(idx, 1);
           await supabase.from('creations').update({ comments: c.comments }).eq('id', c.id);
           renderManageModal();
-          if (currentZoom && currentZoom.id === c.id) renderCommentList();
-        };
-
-        commentSection.appendChild(commDiv);
-      });
-
-      creationDiv.appendChild(commentSection);
-    }
-
-    // ----- Ajouter le container au DOM -----
-    manageList.appendChild(creationDiv);
-  });
-}
-
-    // COMMENTS
-    if(c.comments && c.comments.length){
-      const commentSection = document.createElement('div');
-      commentSection.style.margin = "4px 0";
-      commentSection.innerHTML = `<em>Commentaires:</em>`;
-      c.comments.forEach((comm, idx) => {
-        const commDiv = document.createElement('div');
-        commDiv.style.display = "flex";
-        commDiv.style.justifyContent = "space-between";
-        commDiv.style.alignItems = "center";
-        commDiv.style.padding = "2px 0";
-
-        commDiv.innerHTML = `
-          <span><strong>${comm.name}</strong>: ${comm.text}</span>
-          <button style="font-size:12px;padding:2px 6px;border:none;border-radius:6px;background:#e94f9a;color:#fff;cursor:pointer;">Supprimer</button>
-        `;
-        commDiv.querySelector("button").onclick = async () => {
-          c.comments.splice(idx,1);
-          await supabase.from('creations').update({comments:c.comments}).eq('id',c.id);
-          renderManageModal();
           if(currentZoom && currentZoom.id===c.id) renderCommentList();
         };
+
+        commDiv.appendChild(btn);
         commentSection.appendChild(commDiv);
       });
+
       creationDiv.appendChild(commentSection);
     }
 
+    // Ajouter au DOM
     manageList.appendChild(creationDiv);
   });
 }
