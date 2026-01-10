@@ -667,9 +667,15 @@ if(currentUser.prenom){
   
 if(currentUser.photo){
   const ownerImg = document.getElementById('ownerPhoto');
-  ownerImg.src = currentUser.photo;
-  ownerImg.classList.add('owner-avatar');
-  ownerImg.dataset.name = currentUser.prenom || 'Owner';
+
+// si currentUser.photo existe et n'est pas vide, on l'utilise
+// sinon on met un avatar par défaut
+ownerImg.src = (typeof currentUser.photo === 'string' && currentUser.photo.trim() !== '') 
+                ? currentUser.photo 
+                : 'default-avatar.png';
+
+ownerImg.classList.add('owner-avatar');
+ownerImg.dataset.name = currentUser.prenom || 'Owner';
 }
 
 let creations = [];
