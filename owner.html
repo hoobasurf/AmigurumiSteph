@@ -654,43 +654,45 @@ const supabase = createClient(
   "sb_publishable_sqsxb-3Kl5o3-JQYv9kGFw_-g0EgwMa"
 );
 
-document.addEventListener('DOMContentLoaded', // ==== UTILISATEUR CONNECTÉ ====
-const prenom = localStorage.getItem('prenom') || '';
-const rawPhoto = localStorage.getItem('photo') || '';
+document.addEventListener('DOMContentLoaded', async () => {
+  // ==== UTILISATEUR CONNECTÉ ====
+  const prenom = localStorage.getItem('prenom') || '';
+  const rawPhoto = localStorage.getItem('photo') || '';
+  
+  let cleanPhoto = '';
+  if (typeof rawPhoto === 'string' &&
+      (rawPhoto.startsWith('http') || rawPhoto.startsWith('data:image'))) {
+    cleanPhoto = rawPhoto;
+  }
 
-let cleanPhoto = '';
-if (typeof rawPhoto === 'string' &&
-    (rawPhoto.startsWith('http') || rawPhoto.startsWith('data:image'))) {
-  cleanPhoto = rawPhoto;
-}
+  const currentUser = {
+    prenom: prenom,
+    photo: cleanPhoto
+  };
 
-const currentUser = {
-  prenom: prenom,
-  photo: cleanPhoto
-};
+  // Bloquer inputs like/comment si utilisateur connecté
+  const likeInput = document.getElementById('likeName');
+  const commentInput = document.getElementById('commentName');
+  if (currentUser.prenom) {
+    if (likeInput) likeInput.disabled = true;
+    if (commentInput) commentInput.disabled = true;
+  }
 
-// Bloquer les inputs si connecté
-const likeNameInput = document.getElementById('likeName');
-const commentNameInput = document.getElementById('commentName');
-if (currentUser.prenom) {
-  if (likeNameInput) likeNameInput.disabled = true;
-  if (commentNameInput) commentNameInput.disabled = true;
-}
+  // Avatar principal
+  const ownerImg = document.getElementById('ownerPhoto');
+  if (ownerImg) {
+    ownerImg.src = currentUser.photo || 'default-avatar.png';
+    ownerImg.classList.add('owner-avatar');
+    ownerImg.dataset.name = currentUser.prenom || 'Owner';
+  }
 
-// Avatar principal
-const ownerImg = document.getElementById('ownerPhoto');
-if (ownerImg) {
-  ownerImg.src = currentUser.photo || 'default-avatar.png';
-  ownerImg.classList.add('owner-avatar');
-  ownerImg.dataset.name = currentUser.prenom || 'Owner';
-}
-
-  // ==== CLICK AVATAR → MODAL ====
+  // Click avatar → modal profile
   const profileModal = document.getElementById('profileModal');
   const profileModalImg = document.getElementById('profileModalImg');
   const profileModalName = document.getElementById('profileModalName');
 
   document.addEventListener('click', e => {
+    if (!profileModal || !profileModalImg || !profileModalName) return;
     if (
       e.target.classList.contains('owner-avatar') ||
       e.target.classList.contains('like-avatar') ||
@@ -705,47 +707,6 @@ if (ownerImg) {
   profileModal?.addEventListener('click', e => {
     if (e.target === profileModal) profileModal.style.display = 'none';
   });
-
-  // ==== REFRESH ====
-  await refreshCreations();
-
-  // ==== LIKE / COMMENT ====
-  const zoomModal = document.getElementById('zoomModal');
-  zoomModal?.addEventListener('click', e => {
-    if (!currentZoom) return;
-
-    if (e.target.closest('.like-btn')) {
-      const likeBubbles = document.getElementById('likeBubbles');
-      likeBubbles.innerHTML = '';
-
-      (currentZoom.likes || []).forEach(like => {
-        let data = like;
-        if (typeof data === 'string') {
-          try { data = JSON.parse(data); } catch { data = {}; }
-        }
-
-        const img = document.createElement('img');
-        img.className = 'like-avatar';
-        img.src = (
-          data.photo &&
-          (data.photo.startsWith('http') || data.photo.startsWith('data:image'))
-        ) ? data.photo : 'default-avatar.png';
-
-        img.dataset.name = data.name || 'Anonyme';
-        likeBubbles.appendChild(img);
-      });
-
-      document.getElementById('likeModal').style.display = 'flex';
-    }
-
-    if (e.target.closest('.comment-btn')) {
-      document.getElementById('commentName').value = currentUser.prenom || '';
-      document.getElementById('commentText').value = '';
-      renderCommentList();
-      document.getElementById('commentModal').style.display = 'flex';
-    }
-  });
-
 });
 
 let creations = [];
