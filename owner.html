@@ -546,6 +546,25 @@ body::before {
   </div>
 </div>
 
+<!-- MODAL DELETE COMMENT -->
+<div id="deleteCommentModal" class="modal">
+  <div class="modal-box">
+    <p>Supprimer définitivement ce commentaire ?</p>
+    <button id="confirmDeleteComment">Oui</button>
+    <button id="cancelDeleteComment">Annuler</button>
+  </div>
+</div>
+
+<!-- MODAL DELETE LIKE -->
+<div id="deleteLikeModal" class="modal">
+  <div class="modal-box">
+    <p>Supprimer ce like ?</p>
+    <button id="confirmDeleteLike">Oui</button>
+    <button id="cancelDeleteLike">Annuler</button>
+  </div>
+</div>
+
+  
 <!-- MODAL LIKE -->
 <div id="likeModal" class="modal">
   <div class="modal-box">
@@ -767,26 +786,37 @@ function renderLikeBubbles() {
   likeBubbles.innerHTML = '';
 
   (currentZoom.likes || []).forEach(like => {
-    // Sécurité anti undefined / null
-    let name = 'Utilisateur';
-    let photo = '';
+  const bubble = document.createElement('div');
+  bubble.className = 'bubble';
 
-    if (like && typeof like === 'object') {
-      name = like.name || 'Utilisateur';
-      photo = like.photo || '';
-    } else if (typeof like === 'string') {
-      name = like;
-    }
+  const name = like.name || 'Utilisateur';
+  const photo = like.photo || '';
 
-    const bubble = document.createElement('div');
-    bubble.className = 'bubble';
+  bubble.innerHTML = photo
+    ? `<img src="${photo}" class="like-avatar" data-name="${name}"> ${name}`
+    : name;
 
-    bubble.innerHTML = photo
-      ? `<img src="${photo}" class="like-avatar" data-name="${name}"> ${name}`
-      : name;
+  likeBubbles.appendChild(bubble);
 
-    likeBubbles.appendChild(bubble);
+  // ===== LONG PRESS LIKE =====
+  let pressTimer;
+  bubble.addEventListener('mousedown', e => {
+    pressTimer = setTimeout(() => {
+      currentDeleteLike = like;
+      document.getElementById('deleteLikeModal').style.display = 'flex';
+    }, 800);
   });
+  bubble.addEventListener('mouseup', e => clearTimeout(pressTimer));
+  bubble.addEventListener('mouseleave', e => clearTimeout(pressTimer));
+  bubble.addEventListener('touchstart', e => {
+    pressTimer = setTimeout(() => {
+      currentDeleteLike = like;
+      document.getElementById('deleteLikeModal').style.display = 'flex';
+    }, 800);
+  });
+  bubble.addEventListener('touchend', e => clearTimeout(pressTimer));
+  bubble.addEventListener('touchmove', e => clearTimeout(pressTimer));
+});
 
   updateActions();
 }
@@ -803,7 +833,7 @@ if(currentUser.prenom) commentNameInput.disabled = true;  // bloque modification
   commentModal.style.display='flex';
 };
 
-function renderCommentList(){
+function renderCommentList() {
   commentBubbles.innerHTML = '';
 
   (currentZoom.comments || []).forEach(c => {
@@ -821,6 +851,25 @@ function renderCommentList(){
     `;
 
     commentBubbles.appendChild(item);
+
+    // ===== LONG PRESS COMMENT =====
+    let pressTimer;
+    item.addEventListener('mousedown', e => {
+      pressTimer = setTimeout(() => {
+        currentDeleteComment = c;
+        document.getElementById('deleteCommentModal').style.display = 'flex';
+      }, 800);
+    });
+    item.addEventListener('mouseup', e => clearTimeout(pressTimer));
+    item.addEventListener('mouseleave', e => clearTimeout(pressTimer));
+    item.addEventListener('touchstart', e => {
+      pressTimer = setTimeout(() => {
+        currentDeleteComment = c;
+        document.getElementById('deleteCommentModal').style.display = 'flex';
+      }, 800);
+    });
+    item.addEventListener('touchend', e => clearTimeout(pressTimer));
+    item.addEventListener('touchmove', e => clearTimeout(pressTimer));
   });
 
   commentCount.textContent = currentZoom.comments?.length || 0;
@@ -1007,6 +1056,43 @@ messagerieBtn.onclick = () => {
     window.location.href = 'messagerie.html';
   }, 500);
 };
+
+// ===== COMMENT =====
+document.getElementById('cancelDeleteComment').onclick = () => {
+  currentDeleteComment = null;
+  document.getElementById('deleteCommentModal').style.display = 'none';
+};
+
+document.getElementById('confirmDeleteComment').onclick = async () => {
+  if (!currentZoom || !currentDeleteComment) return;
+
+  currentZoom.comments = (currentZoom.comments || []).filter(c => c !== currentDeleteComment);
+
+  await supabase.from('creations').update({ comments: currentZoom.comments }).eq('id', currentZoom.id);
+
+  renderCommentList();
+  currentDeleteComment = null;
+  document.getElementById('deleteCommentModal').style.display = 'none';
+};
+
+// ===== LIKE =====
+document.getElementById('cancelDeleteLike').onclick = () => {
+  currentDeleteLike = null;
+  document.getElementById('deleteLikeModal').style.display = 'none';
+};
+
+document.getElementById('confirmDeleteLike').onclick = async () => {
+  if (!currentZoom || !currentDeleteLike) return;
+
+  currentZoom.likes = (currentZoom.likes || []).filter(l => l !== currentDeleteLike);
+
+  await supabase.from('creations').update({ likes: currentZoom.likes }).eq('id', currentZoom.id);
+
+  renderLikeBubbles();
+  currentDeleteLike = null;
+  document.getElementById('deleteLikeModal').style.display = 'none';
+};
+
   
   // ================== EVENTS ==================
 likeModal.onclick = e => { if(e.target === likeModal) likeModal.style.display = 'none'; };
@@ -1071,6 +1157,9 @@ document.addEventListener('click', e => {
 profileModal.onclick = e => {
   if(e.target === profileModal) profileModal.style.display = 'none';
 };
+
+let currentDeleteComment = null;
+let currentDeleteLike = null;
   
 </script>
 
