@@ -666,6 +666,7 @@ const commentBubbles = document.getElementById('commentBubbles');
 function render() {
   container.innerHTML = '';
   let page = null;
+
   creations.forEach((c, i) => {
     if (i % 6 === 0) {
       page = document.createElement('div');
@@ -675,28 +676,28 @@ function render() {
 
     const d = document.createElement('div');
     d.className = 'visitor-item';
+
     d.innerHTML = `
       <div class="placeholder">?</div>
       <div class="delete-btn">×</div>
+      <img src="${c.imgUrl || ''}">
       <p>${c.name}</p>
-      const img = d.querySelector('img');
-img.onload = () => d.querySelector('.placeholder').style.display = 'none';
-img.onerror = () => {
-  d.querySelector('.placeholder').textContent = '❌';
-};
     `;
 
     const img = d.querySelector('img');
-    img.onload = () => d.querySelector('.placeholder').style.display = 'none';
-    img.onerror = () => img.style.display = 'none';
-    img.onclick = () => openZoom(c);
+    const placeholder = d.querySelector('.placeholder');
+
+    if (img && img.src) {
+      img.onload = () => placeholder.style.display = 'none';
+      img.onerror = () => placeholder.textContent = '❌';
+      img.onclick = () => openZoom(c);
+    }
 
     d.querySelector('.delete-btn').onclick = () => openDeleteModal(c);
 
     page.appendChild(d);
   });
 }
-
 // ====== ZOOM ======
 function openZoom(c){
   currentZoom = c;
