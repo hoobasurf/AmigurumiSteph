@@ -656,121 +656,103 @@ const supabase = createClient(
 
 document.addEventListener('DOMContentLoaded', async () => {
   // ==== UTILISATEUR CONNECTÉ ====
-  let currentUser = {
-    prenom: localStorage.getItem('prenom') || '',
-    let rawPhoto = localStorage.getItem('photo') || '';
-let cleanPhoto = '';
+  document.addEventListener('DOMContentLoaded', async () => {
 
-if (
-  typeof rawPhoto === 'string' &&
-  (
-    rawPhoto.startsWith('http') ||
-    rawPhoto.startsWith('data:image')
-  )
-) {
-  cleanPhoto = rawPhoto;
-}
+  // ==== UTILISATEUR CONNECTÉ ====
+  const prenom = localStorage.getItem('prenom') || '';
+  const rawPhoto = localStorage.getItem('photo') || '';
 
-const currentUser = {
-  prenom: localStorage.getItem('prenom') || '',
-  photo: cleanPhoto
-};
+  let cleanPhoto = '';
+  if (
+    typeof rawPhoto === 'string' &&
+    (
+      rawPhoto.startsWith('http') ||
+      rawPhoto.startsWith('data:image')
+    )
+  ) {
+    cleanPhoto = rawPhoto;
+  }
+
+  const currentUser = {
+    prenom: prenom,
+    photo: cleanPhoto
   };
 
-  if(currentUser.prenom){
+  // ==== BLOQUER INPUTS ====
+  if (currentUser.prenom) {
     document.getElementById('likeName')?.setAttribute('disabled', true);
     document.getElementById('commentName')?.setAttribute('disabled', true);
   }
 
+  // ==== AVATAR PRINCIPAL ====
   const ownerImg = document.getElementById('ownerPhoto');
-  if(ownerImg){
-    ownerImg.src = currentUser.photo?.trim() ? currentUser.photo : 'default-avatar.png';
+  if (ownerImg) {
+    ownerImg.src = currentUser.photo || 'default-avatar.png';
     ownerImg.classList.add('owner-avatar');
     ownerImg.dataset.name = currentUser.prenom || 'Owner';
   }
 
-  // ==== CLICK SUR AVATAR → PROFILE MODAL ====
+  // ==== CLICK AVATAR → MODAL ====
   const profileModal = document.getElementById('profileModal');
   const profileModalImg = document.getElementById('profileModalImg');
   const profileModalName = document.getElementById('profileModalName');
 
   document.addEventListener('click', e => {
-    if(
+    if (
       e.target.classList.contains('owner-avatar') ||
       e.target.classList.contains('like-avatar') ||
       e.target.classList.contains('comment-avatar')
-    ){
+    ) {
       profileModalImg.src = e.target.src || 'default-avatar.png';
       profileModalName.textContent = e.target.dataset.name || 'Utilisateur';
       profileModal.style.display = 'flex';
     }
   });
 
-  if(profileModal){
-    profileModal.onclick = e => {
-      if(e.target === profileModal) profileModal.style.display = 'none';
-    };
-  }
+  profileModal?.addEventListener('click', e => {
+    if (e.target === profileModal) profileModal.style.display = 'none';
+  });
 
-  // ==== REFRESH CREATIONS ====
+  // ==== REFRESH ====
   await refreshCreations();
 
-  // ==== EVENT DELEGATION POUR LIKE / COMMENT ====
+  // ==== LIKE / COMMENT ====
   const zoomModal = document.getElementById('zoomModal');
   zoomModal?.addEventListener('click', e => {
-    if(!currentZoom) return;
+    if (!currentZoom) return;
 
-    // Like
-    if(e.target.closest('.like-btn')){
+    if (e.target.closest('.like-btn')) {
       const likeBubbles = document.getElementById('likeBubbles');
       likeBubbles.innerHTML = '';
+
       (currentZoom.likes || []).forEach(like => {
-  let data = like;
+        let data = like;
+        if (typeof data === 'string') {
+          try { data = JSON.parse(data); } catch { data = {}; }
+        }
 
-  // 🔐 Sécurité si Supabase a stocké une string
-  if (typeof data === 'string') {
-    try {
-      data = JSON.parse(data);
-    } catch {
-      data = {};
-    }
-  }
+        const img = document.createElement('img');
+        img.className = 'like-avatar';
+        img.src = (
+          data.photo &&
+          (data.photo.startsWith('http') || data.photo.startsWith('data:image'))
+        ) ? data.photo : 'default-avatar.png';
 
-  const img = document.createElement('img');
-  img.className = 'like-avatar';
+        img.dataset.name = data.name || 'Anonyme';
+        likeBubbles.appendChild(img);
+      });
 
-  // ✅ SEULE SOURCE VALIDE
-  if (
-    data.photo &&
-    typeof data.photo === 'string' &&
-    (
-      data.photo.startsWith('http') ||
-      data.photo.startsWith('data:image')
-    )
-  ) {
-    img.src = data.photo;
-  } else {
-    img.src = 'default-avatar.png';
-  }
-
-  img.dataset.name = data.name || 'Anonyme';
-  likeBubbles.appendChild(img);
-});
-      const likeNameInput = document.getElementById('likeName');
-      likeNameInput.value = currentUser.prenom || '';
-      if(currentUser.prenom) likeNameInput.disabled = true;
       document.getElementById('likeModal').style.display = 'flex';
     }
 
-    // Comment
-    if(e.target.closest('.comment-btn')){
-      const commentNameInput = document.getElementById('commentName');
-      commentNameInput.value = currentUser.prenom || '';
+    if (e.target.closest('.comment-btn')) {
+      document.getElementById('commentName').value = currentUser.prenom || '';
       document.getElementById('commentText').value = '';
       renderCommentList();
       document.getElementById('commentModal').style.display = 'flex';
     }
   });
+
 });
 
 let creations = [];
