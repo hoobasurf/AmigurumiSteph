@@ -711,16 +711,31 @@ document.addEventListener('DOMContentLoaded', async () => {
       (currentZoom.likes || []).forEach(like => {
   let data = like;
 
-  // sécurité si Supabase a stocké une string
+  // 🔐 Sécurité si Supabase a stocké une string
   if (typeof data === 'string') {
-    try { data = JSON.parse(data); } catch { data = {}; }
+    try {
+      data = JSON.parse(data);
+    } catch {
+      data = {};
+    }
   }
 
   const img = document.createElement('img');
   img.className = 'like-avatar';
-  img.src = data.photo && data.photo.trim() !== ''
-    ? data.photo
-    : 'default-avatar.png';
+
+  // ✅ SEULE SOURCE VALIDE
+  if (
+    data.photo &&
+    typeof data.photo === 'string' &&
+    (
+      data.photo.startsWith('http') ||
+      data.photo.startsWith('data:image')
+    )
+  ) {
+    img.src = data.photo;
+  } else {
+    img.src = 'default-avatar.png';
+  }
 
   img.dataset.name = data.name || 'Anonyme';
   likeBubbles.appendChild(img);
