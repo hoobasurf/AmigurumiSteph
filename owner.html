@@ -775,25 +775,28 @@ confirmLike.onclick = async () => {
   let name = currentUser.prenom || likeNameInput.value.trim();
   if (!name) name = 'Anonyme';
 
-  // ===== Correctif photo =====
-  let photoUrl = currentUser.photo || ''; // récupère ce qui est dans currentUser
+  // Récupérer photo correctement
+  let photoUrl = currentUser.photo || '';
   if (photoUrl && !photoUrl.startsWith('http')) {
-    // si ce n'est pas une URL, la transformer en URL publique Supabase
+    // transformer chemin Supabase local en URL publique
     const { data } = supabase.storage.from('images').getPublicUrl(photoUrl);
     photoUrl = data?.publicUrl || '';
   }
 
   if (!currentZoom.likes) currentZoom.likes = [];
 
+  // NE PAS STRINGIFIER ici
   currentZoom.likes.push({
-    name,
-    photo: photoUrl || 'default-avatar.png' // seulement si vraiment vide
+    name: name,
+    photo: photoUrl || 'default-avatar.png'
   });
 
-  await supabase
+  const { error } = await supabase
     .from('creations')
     .update({ likes: currentZoom.likes })
     .eq('id', currentZoom.id);
+
+  if (error) console.error(error);
 
   renderLikeBubbles();
   likeModal.style.display = 'none';
@@ -802,37 +805,37 @@ function renderLikeBubbles() {
   likeBubbles.innerHTML = '';
 
   (currentZoom.likes || []).forEach(like => {
-  const bubble = document.createElement('div');
-  bubble.className = 'bubble';
+    const bubble = document.createElement('div');
+    bubble.className = 'bubble';
 
-  const name = like.name || 'Utilisateur';
-  const photo = like.photo || '';
+    // afficher correctement la photo
+    if (like.photo) {
+      bubble.innerHTML = `<img src="${like.photo}" class="like-avatar" data-name="${like.name}"> ${like.name}`;
+    } else {
+      bubble.textContent = like.name;
+    }
 
-  bubble.innerHTML = photo
-    ? `<img src="${photo}" class="like-avatar" data-name="${name}"> ${name}`
-    : name;
+    likeBubbles.appendChild(bubble);
 
-  likeBubbles.appendChild(bubble);
-
-  // ===== LONG PRESS LIKE =====
-  let pressTimer;
-  bubble.addEventListener('mousedown', e => {
-    pressTimer = setTimeout(() => {
-      currentDeleteLike = like;
-      document.getElementById('deleteLikeModal').style.display = 'flex';
-    }, 800);
+    // LONG PRESS pour supprimer
+    let pressTimer;
+    bubble.addEventListener('mousedown', e => {
+      pressTimer = setTimeout(() => {
+        currentDeleteLike = like;
+        document.getElementById('deleteLikeModal').style.display = 'flex';
+      }, 800);
+    });
+    bubble.addEventListener('mouseup', e => clearTimeout(pressTimer));
+    bubble.addEventListener('mouseleave', e => clearTimeout(pressTimer));
+    bubble.addEventListener('touchstart', e => {
+      pressTimer = setTimeout(() => {
+        currentDeleteLike = like;
+        document.getElementById('deleteLikeModal').style.display = 'flex';
+      }, 800);
+    });
+    bubble.addEventListener('touchend', e => clearTimeout(pressTimer));
+    bubble.addEventListener('touchmove', e => clearTimeout(pressTimer));
   });
-  bubble.addEventListener('mouseup', e => clearTimeout(pressTimer));
-  bubble.addEventListener('mouseleave', e => clearTimeout(pressTimer));
-  bubble.addEventListener('touchstart', e => {
-    pressTimer = setTimeout(() => {
-      currentDeleteLike = like;
-      document.getElementById('deleteLikeModal').style.display = 'flex';
-    }, 800);
-  });
-  bubble.addEventListener('touchend', e => clearTimeout(pressTimer));
-  bubble.addEventListener('touchmove', e => clearTimeout(pressTimer));
-});
 
   updateActions();
 }
