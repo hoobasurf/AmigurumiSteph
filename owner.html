@@ -756,10 +756,16 @@ function renderLikeBubbles() {
   likeBubbles.innerHTML = '';
 
   (currentZoom.likes || []).forEach(like => {
-    // Sécurisation totale
-    const safeLike = (like && typeof like === 'object') ? like : {};
-    const name = safeLike.name?.trim() || 'Utilisateur';
-    const photo = safeLike.photo || '';
+    // Sécurité anti undefined / null
+    let name = 'Utilisateur';
+    let photo = '';
+
+    if (like && typeof like === 'object') {
+      name = like.name || 'Utilisateur';
+      photo = like.photo || '';
+    } else if (typeof like === 'string') {
+      name = like;
+    }
 
     const bubble = document.createElement('div');
     bubble.className = 'bubble';
@@ -902,8 +908,27 @@ async function refreshCreations() {
       caption: c.caption || '',
       imgUrl: zoomGroup[0] || '',   // image principale
       zoomGroup,
-      likes: Array.isArray(c.likes) ? c.likes : [],
-      comments: Array.isArray(c.comments) ? c.comments : []
+      likes: Array.isArray(c.likes)
+  ? c.likes.map(like => {
+      if (like && typeof like === 'object') {
+        return {
+          name: like.name || 'Utilisateur',
+          photo: like.photo || ''
+        };
+      } else if (typeof like === 'string') {
+        return { name: like, photo: '' };
+      } else {
+        return { name: 'Utilisateur', photo: '' };
+      }
+    })
+  : [],
+      comments: Array.isArray(c.comments)
+  ? c.comments.map(cmt => ({
+      name: (cmt && cmt.name) || 'Utilisateur',
+      text: (cmt && cmt.text) || '',
+      photo: (cmt && cmt.photo) || ''
+    }))
+  : []
     };
   });
 
