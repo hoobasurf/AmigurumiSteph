@@ -511,33 +511,6 @@ body::before {
   color:#b84c6f;
   text-align:center;
 }
-
-#sidebar {
-  display: flex;
-  flex-direction: column;
-  justify-content: flex-start; /* les boutons principaux en haut */
-  position: fixed;
-  top: 0;
-  left: -220px;
-  width: 220px;
-  height: 100vh;
-  background: rgba(255,230,240,0.2);
-  border-right: 2px solid #b67385;
-  padding: 20px;
-  transition: left .3s;
-  z-index: 10;
-}
-
-#manageBtn {
-  margin-top: auto;       /* pousse le bouton en bas */
-  font-size: 12px;        /* petit et discret */
-  padding: 4px 8px;
-  border-radius: 8px;
-  background: #e94f9a;
-  color: #fff;
-  border: none;
-  cursor: pointer;
-}
   
 </style>
 </head>
@@ -573,25 +546,6 @@ body::before {
   </div>
 </div>
 
-<!-- MODAL DELETE COMMENT -->
-<div id="deleteCommentModal" class="modal">
-  <div class="modal-box">
-    <p>Supprimer définitivement ce commentaire ?</p>
-    <button id="confirmDeleteComment">Oui</button>
-    <button id="cancelDeleteComment">Annuler</button>
-  </div>
-</div>
-
-<!-- MODAL DELETE LIKE -->
-<div id="deleteLikeModal" class="modal">
-  <div class="modal-box">
-    <p>Supprimer ce like ?</p>
-    <button id="confirmDeleteLike">Oui</button>
-    <button id="cancelDeleteLike">Annuler</button>
-  </div>
-</div>
-
-  
 <!-- MODAL LIKE -->
 <div id="likeModal" class="modal">
   <div class="modal-box">
@@ -645,8 +599,7 @@ body::before {
 </div>
 
 <script type="module">
-alert("MODULE OK");
-  console.log("JS chargé");
+  
 import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
 
 const supabase = createClient(
@@ -654,67 +607,28 @@ const supabase = createClient(
   "sb_publishable_sqsxb-3Kl5o3-JQYv9kGFw_-g0EgwMa"
 );
 
-document.addEventListener('DOMContentLoaded', () => {
-  // UTILISATEUR CONNECTÉ
-  const prenom = localStorage.getItem('prenom') || 'Utilisateur';
-  const rawPhoto = localStorage.getItem('photo') || '';
-  
-  let cleanPhoto = '';
-  if (rawPhoto.startsWith('http') || rawPhoto.startsWith('data:image')) {
-    cleanPhoto = rawPhoto;
-  }
+// ================== UTILISATEUR CONNECTÉ ==================
+let currentUser = {
+  prenom: localStorage.getItem('prenom') || '',   // récupère le prénom si défini
+  photo: localStorage.getItem('photo') || ''      // récupère la photo si définie
+};
 
-  const currentUser = {
-    prenom: prenom,
-    photo: cleanPhoto || 'default-avatar.png'
-  };
-
-if (currentUser.photo && !currentUser.photo.startsWith('http') && !currentUser.photo.startsWith('data:image')) {
-  const { data } = supabase.storage.from('images').getPublicUrl(currentUser.photo);
-  currentUser.photo = data?.publicUrl || 'default-avatar.png';
+if(currentUser.prenom){
+  document.getElementById('likeName')?.setAttribute('disabled', true);
+  document.getElementById('commentName')?.setAttribute('disabled', true);
 }
   
-  // Bloquer Like/Comment si prénom connu
-  if (prenom !== 'Utilisateur') {
-    document.getElementById('likeName')?.setAttribute('disabled', true);
-    document.getElementById('commentName')?.setAttribute('disabled', true);
-  }
-
-  // Avatar principal
+if(currentUser.photo){
   const ownerImg = document.getElementById('ownerPhoto');
-  if (ownerImg) {
-    ownerImg.src = currentUser.photo;
-    ownerImg.classList.add('owner-avatar');
-    ownerImg.dataset.name = currentUser.prenom;
-  }
-
-  // CLICK SUR AVATAR → MODAL
-  const profileModal = document.getElementById('profileModal');
-  const profileModalImg = document.getElementById('profileModalImg');
-  const profileModalName = document.getElementById('profileModalName');
-
-  document.addEventListener('click', e => {
-    if (
-      e.target.classList.contains('owner-avatar') ||
-      e.target.classList.contains('like-avatar') ||
-      e.target.classList.contains('comment-avatar')
-    ) {
-      profileModalImg.src = e.target.src || 'default-avatar.png';
-      profileModalName.textContent = e.target.dataset.name || 'Utilisateur';
-      profileModal.style.display = 'flex';
-    }
-  });
-
-  profileModal?.addEventListener('click', e => {
-    if (e.target === profileModal) profileModal.style.display = 'none';
-  });
-
-  console.log("Utilisateur connecté OK", currentUser);
-});
+  ownerImg.src = currentUser.photo;
+  ownerImg.classList.add('owner-avatar');
+  ownerImg.dataset.name = currentUser.prenom || 'Owner';
+}
 
 let creations = [];
 let currentZoom = null;
 let currentDelete = null;
+
 // ====== ELEMENTS ======
 const container = document.getElementById('visitor-list-container');
 const addModal = document.getElementById('addModal');
@@ -756,12 +670,10 @@ function render() {
     `;
 
     const img = d.querySelector('img');
-const placeholder = d.querySelector('.placeholder');
+    img.onload = () => d.querySelector('.placeholder').style.display = 'none';
+    img.onerror = () => img.style.display = 'none';
+    img.onclick = () => openZoom(c);
 
-img.src = c.imgUrl;  // ← image principale
-img.onload = () => placeholder.style.display = 'none';
-img.onerror = () => placeholder.textContent = '❌';
-img.onclick = () => openZoom(c);
     d.querySelector('.delete-btn').onclick = () => openDeleteModal(c);
 
     page.appendChild(d);
@@ -810,9 +722,9 @@ bubble.innerHTML = like.photo
 };
 
 confirmLike.onclick = async () => {
-  if (!currentZoom) return;  // ← très important
+  if (!currentZoom) return;
 
-  const name = currentUser.prenom || likeNameInput.value.trim();
+  let name = currentUser.prenom || likeNameInput.value.trim();
   if (!name) return;
 
   if (!currentZoom.likes) currentZoom.likes = [];
@@ -822,11 +734,13 @@ confirmLike.onclick = async () => {
     photo: currentUser.photo || ''
   });
 
+  // Fonction async pour Supabase
   try {
     const { error } = await supabase
       .from('creations')
       .update({ likes: currentZoom.likes })
       .eq('id', currentZoom.id);
+
     if (error) console.error(error);
   } catch (err) {
     console.error(err);
@@ -835,47 +749,23 @@ confirmLike.onclick = async () => {
   renderLikeBubbles();
   likeModal.style.display = 'none';
 };
-function renderLikeBubbles() {
-  if (!currentZoom || !currentZoom.likes) return;
 
+function renderLikeBubbles(){
   likeBubbles.innerHTML = '';
 
-  currentZoom.likes.forEach(like => {
+  (currentZoom.likes || []).forEach(like => {
+    // Sécurité anti undefined
+    const name = typeof like === 'string' ? like : like.name || 'Utilisateur';
+    const photo = typeof like === 'object' ? like.photo : '';
+
     const bubble = document.createElement('div');
     bubble.className = 'bubble';
 
-    // Ajout photo si elle existe
-    bubble.innerHTML = like.photo
-      ? `<img src="${like.photo}" class="like-avatar"> ${like.name}`
-      : like.name;
+    bubble.innerHTML = photo
+      ? `<img src="${photo}" class="like-avatar" data-name="${name}"> ${name}`
+      : name;
 
     likeBubbles.appendChild(bubble);
-  });
-
-  // Met à jour le compteur de likes
-  likeCount.textContent = currentZoom.likes.length;
-
-  updateActions(); // si tu utilises cette fonction ailleurs
-}
-
-    // LONG PRESS pour supprimer
-    let pressTimer;
-    bubble.addEventListener('mousedown', e => {
-      pressTimer = setTimeout(() => {
-        currentDeleteLike = like;
-        document.getElementById('deleteLikeModal').style.display = 'flex';
-      }, 800);
-    });
-    bubble.addEventListener('mouseup', e => clearTimeout(pressTimer));
-    bubble.addEventListener('mouseleave', e => clearTimeout(pressTimer));
-    bubble.addEventListener('touchstart', e => {
-      pressTimer = setTimeout(() => {
-        currentDeleteLike = like;
-        document.getElementById('deleteLikeModal').style.display = 'flex';
-      }, 800);
-    });
-    bubble.addEventListener('touchend', e => clearTimeout(pressTimer));
-    bubble.addEventListener('touchmove', e => clearTimeout(pressTimer));
   });
 
   updateActions();
@@ -893,7 +783,7 @@ if(currentUser.prenom) commentNameInput.disabled = true;  // bloque modification
   commentModal.style.display='flex';
 };
 
-function renderCommentList() {
+function renderCommentList(){
   commentBubbles.innerHTML = '';
 
   (currentZoom.comments || []).forEach(c => {
@@ -911,25 +801,6 @@ function renderCommentList() {
     `;
 
     commentBubbles.appendChild(item);
-
-    // ===== LONG PRESS COMMENT =====
-    let pressTimer;
-    item.addEventListener('mousedown', e => {
-      pressTimer = setTimeout(() => {
-        currentDeleteComment = c;
-        document.getElementById('deleteCommentModal').style.display = 'flex';
-      }, 800);
-    });
-    item.addEventListener('mouseup', e => clearTimeout(pressTimer));
-    item.addEventListener('mouseleave', e => clearTimeout(pressTimer));
-    item.addEventListener('touchstart', e => {
-      pressTimer = setTimeout(() => {
-        currentDeleteComment = c;
-        document.getElementById('deleteCommentModal').style.display = 'flex';
-      }, 800);
-    });
-    item.addEventListener('touchend', e => clearTimeout(pressTimer));
-    item.addEventListener('touchmove', e => clearTimeout(pressTimer));
   });
 
   commentCount.textContent = currentZoom.comments?.length || 0;
@@ -1002,79 +873,16 @@ document.getElementById('confirmAdd').onclick=async(e)=>{
 };
 
 // ====== REFRESH ======
-async function refreshCreations() {
-  const { data, error } = await supabase
-    .from('creations')
-    .select('*')
-    .order('created_at', { ascending: false });
-
-  if (error) {
-    console.error(error);
-    return;
-  }
-
-  // Préparer toutes les URLs avant le render
-  creations = data.map(c => {
-    let zoomGroup = [];
-    if (c.images && Array.isArray(c.images) && c.images.length) {
-      zoomGroup = c.images.map(p => supabase.storage.from('images').getPublicUrl(p).data.publicUrl);
-    } else if (c.image_path) {
-      zoomGroup = [supabase.storage.from('images').getPublicUrl(c.image_path).data.publicUrl];
-    }
-
-    return {
-      id: c.id,
-      name: c.name,
-      caption: c.caption || '',
-      imgUrl: zoomGroup[0] || '',   // image principale
-      zoomGroup,
-      likes: Array.isArray(c.likes)
-  ? c.likes.map(like => {
-      // ✅ si like est une string JSON → on nettoie
-      if (typeof like === 'string') {
-        try {
-          const parsed = JSON.parse(like);
-          return {
-            name: parsed.name || 'Utilisateur',
-            photo: parsed.photo || ''
-          };
-        } catch {
-          return { name: like, photo: '' };
-        }
-      }
-
-      // ✅ si like.name est lui-même un JSON string
-      if (like && typeof like.name === 'string' && like.name.trim().startsWith('{')) {
-        try {
-          const parsed = JSON.parse(like.name);
-          return {
-            name: parsed.name || 'Utilisateur',
-            photo: parsed.photo || ''
-          };
-        } catch {
-          return { name: 'Utilisateur', photo: '' };
-        }
-      }
-
-      // ✅ cas normal
-      return {
-        name: like?.name || 'Utilisateur',
-        photo: like?.photo || ''
-      };
-    })
-  : [],
-      comments: Array.isArray(c.comments)
-  ? c.comments.map(cmt => ({
-      name: (cmt && cmt.name) || 'Utilisateur',
-      text: (cmt && cmt.text) || '',
-      photo: (cmt && cmt.photo) || ''
-    }))
-  : []
-    };
+async function refreshCreations(){
+  const {data,error}=await supabase.from('creations').select('*').order('created_at',{ascending:false});
+  if(error){console.error(error);return;}
+  creations=data.map(c=>{
+    const zoomGroup=(c.images&&c.images.length)?c.images.map(p=>supabase.storage.from('images').getPublicUrl(p).data.publicUrl):[supabase.storage.from('images').getPublicUrl(c.image_path).data.publicUrl];
+    return {id:c.id,name:c.name,imgUrl:zoomGroup[0],zoomGroup,likes:c.likes||[],comments:c.comments||[]};
   });
-
   render();
 }
+
 // ================== BOUTONS SIDEBAR ==================
 const addBtn = document.getElementById('addBtn');
 
@@ -1137,50 +945,11 @@ messagerieBtn.onclick = () => {
     window.location.href = 'messagerie.html';
   }, 500);
 };
-
-// ===== COMMENT =====
-document.getElementById('cancelDeleteComment').onclick = () => {
-  currentDeleteComment = null;
-  document.getElementById('deleteCommentModal').style.display = 'none';
-};
-
-document.getElementById('confirmDeleteComment').onclick = async () => {
-  if (!currentZoom || !currentDeleteComment) return;
-
-  currentZoom.comments = (currentZoom.comments || []).filter(c => c !== currentDeleteComment);
-
-  await supabase.from('creations').update({ comments: currentZoom.comments }).eq('id', currentZoom.id);
-
-  renderCommentList();
-  currentDeleteComment = null;
-  document.getElementById('deleteCommentModal').style.display = 'none';
-};
-
-// ===== LIKE =====
-document.getElementById('cancelDeleteLike').onclick = () => {
-  currentDeleteLike = null;
-  document.getElementById('deleteLikeModal').style.display = 'none';
-};
-
-document.getElementById('confirmDeleteLike').onclick = async () => {
-  if (!currentZoom || !currentDeleteLike) return;
-
-  currentZoom.likes = (currentZoom.likes || []).filter(l => l !== currentDeleteLike);
-
-  await supabase.from('creations').update({ likes: currentZoom.likes }).eq('id', currentZoom.id);
-
-  renderLikeBubbles();
-  currentDeleteLike = null;
-  document.getElementById('deleteLikeModal').style.display = 'none';
-};
-
   
-// ================== EVENTS ==================
+  // ================== EVENTS ==================
 likeModal.onclick = e => { if(e.target === likeModal) likeModal.style.display = 'none'; };
 commentModal.onclick = e => { if(e.target === commentModal) commentModal.style.display = 'none'; };
-deleteModal.onclick = e => { if(e.target === deleteModal) { deleteModal.style.display = 'none'; currentDelete=null; } };
-zoomModal.onclick = e => { if(e.target === zoomModal) zoomModal.style.display = 'none'; };
-document.querySelector('.closeZoom').onclick = () => zoomModal.style.display='none';
+deleteModal.onclick = e => { if(e.target === deleteModal) deleteModal.style.display = 'none'; currentDelete=null; };
 document.getElementById('toggleSidebar').onclick = () => sidebar.classList.toggle('sidebar-open');
 
 // ===== AGRANDISSEMENT MODAL COMMENT =====
@@ -1192,171 +961,60 @@ expandBtn.onclick = (e) => {
   expandBtn.textContent = commentBox.classList.contains('fullscreen') ? '⤡' : '⤢';
 };
 
-// CLICK AVATAR → PROFILE MODAL
 const profileModal = document.getElementById('profileModal');
 const profileModalImg = document.getElementById('profileModalImg');
 const profileModalName = document.getElementById('profileModalName');
 
 document.addEventListener('click', e => {
-  // Vérifie si clic sur un avatar existant
-  if (
-    e.target.classList.contains('owner-avatar') ||
-    e.target.classList.contains('like-avatar') ||
-    e.target.classList.contains('comment-avatar')
-  ) {
-    // Si src vide ou invalide, fallback sur default
-    profileModalImg.src = e.target.src || 'default-avatar.png';
-    profileModalName.textContent = e.target.dataset.name || 'Utilisateur';
+  if (e.target.classList.contains('comment-avatar') || e.target.classList.contains('like-avatar')) {
+    profileModalImg.src = e.target.src;
+    profileModalName.textContent =
+  e.target.parentElement.textContent.trim();
     profileModal.style.display = 'flex';
   }
 });
 
-// Fermer modal si clic sur fond
 profileModal.onclick = e => {
-  if (e.target === profileModal) profileModal.style.display = 'none';
+  if(e.target === profileModal) profileModal.style.display = 'none';
 };
-
-// ===== BOUTON GESTION CREATIONS =====
-const manageBtn = document.createElement('button');
-manageBtn.id = 'manageBtn';
-manageBtn.textContent = "Gérer Créations";
-sidebar.appendChild(manageBtn);
-
-// MODAL GESTION CREATIONS
-const manageModal = document.createElement('div');
-manageModal.className = "modal";
-manageModal.innerHTML = `
-  <div class="modal-box" style="max-height:80vh;overflow-y:auto;">
-    <h3>Gérer Création</h3>
-    <div id="manageList"></div>
-    <button id="closeManage" style="margin-top:10px;">Fermer</button>
-  </div>
-`;
-document.body.appendChild(manageModal);
-
-const manageList = manageModal.querySelector("#manageList");
-const closeManage = manageModal.querySelector("#closeManage");
-
-manageBtn.onclick = () => {
-  renderManageModal();
-  manageModal.style.display = "flex";
-};
-
-closeManage.onclick = () => {
-  manageModal.style.display = "none";
-};
-
-manageModal.onclick = e => {
-  if(e.target === manageModal) manageModal.style.display = "none";
-};
-
-// ===== RENDER GESTION CREATIONS =====
-function renderManageModal() {
-  if (!manageList) return;
-
-  manageList.innerHTML = "";
-
-  creations.forEach(c => {
-    const creationDiv = document.createElement('div');
-    creationDiv.style.display = "flex";
-    creationDiv.style.flexDirection = "column";
-    creationDiv.style.padding = "6px 0";
-    creationDiv.style.borderBottom = "1px solid #f6c2d1";
-
-    // --- partie cliquable photo + nom ---
-    const clickable = document.createElement('div');
-    clickable.style.display = "flex";
-    clickable.style.alignItems = "center";
-    clickable.style.gap = "8px";
-    clickable.style.cursor = "pointer";
-
-    const img = document.createElement('img');
-    img.src = c.imgUrl || '';
-    img.style.width = "40px";
-    img.style.height = "40px";
-    img.style.objectFit = "cover";
-    img.style.borderRadius = "8px";
-    img.style.border = "2px solid #f6c2d1";
-    clickable.appendChild(img);
-
-    const nameSpan = document.createElement('span');
-    nameSpan.textContent = c.name;
-    clickable.appendChild(nameSpan);
-
-    clickable.onclick = () => {
-      manageModal.style.display = 'none';
-      if (c.imgUrl) openZoom(c);
-    };
-
-    creationDiv.appendChild(clickable);
-
-    // --- LIKES ---
-    if (c.likes && c.likes.length > 0) {
-      const likeSection = document.createElement('div');
-      likeSection.style.display = "flex";
-      likeSection.style.flexWrap = "wrap";
-      likeSection.style.gap = "4px";
-      likeSection.style.marginTop = "4px";
-
-      c.likes.forEach((like, idx) => {
-        const likeDiv = document.createElement('div');
-        likeDiv.style.display = "flex";
-        likeDiv.style.alignItems = "center";
-        likeDiv.style.gap = "4px";
-
-        const likeImg = document.createElement('img');
-        likeImg.src = like.photo || 'default-avatar.png';
-        likeImg.className = "like-avatar";
-        likeImg.style.width = "24px";
-        likeImg.style.height = "24px";
-        likeImg.style.borderRadius = "50%";
-        likeImg.style.objectFit = "cover";
-        likeDiv.appendChild(likeImg);
-
-        const likeName = document.createElement('span');
-        likeName.textContent = like.name || 'Utilisateur';
-        likeDiv.appendChild(likeName);
-
-        const btn = document.createElement('button');
-        btn.textContent = "×";
-        btn.style.fontSize = "12px";
-        btn.style.padding = "2px 6px";
-        btn.style.border = "none";
-        btn.style.borderRadius = "6px";
-        btn.style.background = "#e94f9a";
-        btn.style.color = "#fff";
-        btn.style.cursor = "pointer";
-
-        btn.onclick = async () => {
-          c.likes.splice(idx, 1);
-          await supabase
-            .from('creations')
-            .update({ likes: c.likes })
-            .eq('id', c.id);
-
-          renderManageModal();
-          if (currentZoom && currentZoom.id === c.id) {
-            renderLikeBubbles();
-          }
-        };
-
-        likeDiv.appendChild(btn);
-        likeSection.appendChild(likeDiv);
-      });
-
-      creationDiv.appendChild(likeSection);
-    }
-
-    manageList.appendChild(creationDiv);
-  });
-}
   
+// ====== CLOSE MODALS ======
+document.querySelector('.closeZoom').onclick=()=>zoomModal.style.display='none';
+zoomModal.onclick=e=>{if(e.target===zoomModal) zoomModal.style.display='none';};
+likeModal.onclick=e=>{if(e.target===likeModal) likeModal.style.display='none';};
+commentModal.onclick=e=>{if(e.target===commentModal) commentModal.style.display='none';};
+deleteModal.onclick=e=>{if(e.target===deleteModal) deleteModal.style.display='none';currentDelete=null;};
+
+
 // ====== START ======
 document.addEventListener('DOMContentLoaded', async () => {
   await refreshCreations();
 });
 
-console.log("JS terminé");
+// ====== START ======
+document.addEventListener('DOMContentLoaded', async () => {
+  await refreshCreations();
+});
+
+// ======================
+// AJOUT CLICK AVATAR → MODAL
+document.addEventListener('click', e => {
+  if(e.target.classList.contains('owner-avatar')
+  || e.target.classList.contains('like-avatar')
+  || e.target.classList.contains('comment-avatar')){
+
+    profileModalImg.src = e.target.src;
+    profileModalName.textContent =
+      e.target.dataset.name || e.target.parentElement.textContent.trim();
+
+    profileModal.style.display = 'flex';
+  }
+});
+
+profileModal.onclick = e => {
+  if(e.target === profileModal) profileModal.style.display = 'none';
+};
+  
 </script>
 
 <div id="profileModal" class="modal">
@@ -1365,8 +1023,6 @@ console.log("JS terminé");
     <div id="profileModalName" class="profile-name"></div>
   </div>
 </div>
-  <script>
-  alert("SCRIPT SIMPLE OK");
-</script>
+  
 </body>
 </html>
