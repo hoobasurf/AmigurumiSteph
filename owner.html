@@ -874,16 +874,39 @@ document.getElementById('confirmAdd').onclick=async(e)=>{
 };
 
 // ====== REFRESH ======
-async function refreshCreations(){
-  const {data,error}=await supabase.from('creations').select('*').order('created_at',{ascending:false});
-  if(error){console.error(error);return;}
-  creations=data.map(c=>{
-    const zoomGroup=(c.images&&c.images.length)?c.images.map(p=>supabase.storage.from('images').getPublicUrl(p).data.publicUrl):[supabase.storage.from('images').getPublicUrl(c.image_path).data.publicUrl];
-    return {id:c.id,name:c.name,imgUrl:zoomGroup[0],zoomGroup,likes:c.likes||[],comments:c.comments||[]};
+async function refreshCreations() {
+  const { data, error } = await supabase
+    .from('creations')
+    .select('*')
+    .order('created_at', { ascending: false });
+
+  if (error) {
+    console.error(error);
+    return;
+  }
+
+  // Préparer toutes les URLs avant le render
+  creations = data.map(c => {
+    let zoomGroup = [];
+    if (c.images && Array.isArray(c.images) && c.images.length) {
+      zoomGroup = c.images.map(p => supabase.storage.from('images').getPublicUrl(p).data.publicUrl);
+    } else if (c.image_path) {
+      zoomGroup = [supabase.storage.from('images').getPublicUrl(c.image_path).data.publicUrl];
+    }
+
+    return {
+      id: c.id,
+      name: c.name,
+      caption: c.caption || '',
+      imgUrl: zoomGroup[0] || '',   // image principale
+      zoomGroup,
+      likes: Array.isArray(c.likes) ? c.likes : [],
+      comments: Array.isArray(c.comments) ? c.comments : []
+    };
   });
+
   render();
 }
-
 // ================== BOUTONS SIDEBAR ==================
 const addBtn = document.getElementById('addBtn');
 
@@ -986,11 +1009,6 @@ likeModal.onclick=e=>{if(e.target===likeModal) likeModal.style.display='none';};
 commentModal.onclick=e=>{if(e.target===commentModal) commentModal.style.display='none';};
 deleteModal.onclick=e=>{if(e.target===deleteModal) deleteModal.style.display='none';currentDelete=null;};
 
-
-// ====== START ======
-document.addEventListener('DOMContentLoaded', async () => {
-  await refreshCreations();
-});
 
 // ====== START ======
 document.addEventListener('DOMContentLoaded', async () => {
