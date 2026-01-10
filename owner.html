@@ -775,40 +775,29 @@ confirmLike.onclick = async () => {
   let name = currentUser.prenom || likeNameInput.value.trim();
   if (!name) name = 'Anonyme';
 
-  // --- Assurer que photo est une URL publique ---
-  let photoUrl = '';
-  if (currentUser.photo) {
-    // Si currentUser.photo commence par "http", c'est déjà une URL
-    if (currentUser.photo.startsWith('http')) {
-      photoUrl = currentUser.photo;
-    } else {
-      // Sinon, mettre une image par défaut
-      photoUrl = 'default-avatar.png'; 
-    }
+  // ===== Correctif photo =====
+  let photoUrl = currentUser.photo || ''; // récupère ce qui est dans currentUser
+  if (photoUrl && !photoUrl.startsWith('http')) {
+    // si ce n'est pas une URL, la transformer en URL publique Supabase
+    const { data } = supabase.storage.from('images').getPublicUrl(photoUrl);
+    photoUrl = data?.publicUrl || '';
   }
 
   if (!currentZoom.likes) currentZoom.likes = [];
 
   currentZoom.likes.push({
     name,
-    photo: photoUrl
+    photo: photoUrl || 'default-avatar.png' // seulement si vraiment vide
   });
 
-  try {
-    const { error } = await supabase
-      .from('creations')
-      .update({ likes: currentZoom.likes })
-      .eq('id', currentZoom.id);
-
-    if (error) console.error(error);
-  } catch (err) {
-    console.error(err);
-  }
+  await supabase
+    .from('creations')
+    .update({ likes: currentZoom.likes })
+    .eq('id', currentZoom.id);
 
   renderLikeBubbles();
   likeModal.style.display = 'none';
 };
-
 function renderLikeBubbles() {
   likeBubbles.innerHTML = '';
 
