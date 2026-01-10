@@ -669,6 +669,11 @@ document.addEventListener('DOMContentLoaded', () => {
     photo: cleanPhoto || 'default-avatar.png'
   };
 
+if (currentUser.photo && !currentUser.photo.startsWith('http') && !currentUser.photo.startsWith('data:image')) {
+  const { data } = supabase.storage.from('images').getPublicUrl(currentUser.photo);
+  currentUser.photo = data?.publicUrl || 'default-avatar.png';
+}
+  
   // Bloquer Like/Comment si prénom connu
   if (prenom !== 'Utilisateur') {
     document.getElementById('likeName')?.setAttribute('disabled', true);
