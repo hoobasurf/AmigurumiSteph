@@ -1,3 +1,5 @@
+Les code sont bien placé ?
+
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -482,22 +484,47 @@ body::before {
   box-shadow: 0 0 6px rgba(246,194,209,0.8);
 }
 
-.profile-big{
-  width:160px;
-  height:160px;
+.owner-avatar {
+  width:72px;
+  height:72px;
   border-radius:50%;
   border:4px solid #f6c2d1;
   object-fit:cover;
-  box-shadow:0 0 12px rgba(246,194,209,0.9);
+  cursor:pointer;
+  box-shadow:0 0 10px rgba(246,194,209,0.9);
+  position:fixed;
+  top:10px;
+  right:10px;
+  z-index:10000;
+}
+
+.profile-big{
+  width:200px;
+  height:200px;
+  border-radius:50%;
+  border:5px solid #f6c2d1;
+  object-fit:cover;
 }
 
 .profile-name{
-  margin-top:10px;
-  font-size:20px;
-  font-weight:bold;
+  margin-top:12px;
+  font-size:22px;
+  font-weight:700;
   color:#b84c6f;
+  text-align:center;
 }
-  
+
+#zoomCaption {
+  color: #b84c6f;
+  font-size: 18px;
+  font-weight: bold;
+  margin-top: 10px;
+  text-align: center;
+  text-shadow: 1px 1px 2px rgba(255,255,255,0.8);
+  max-width: 80%;
+  word-wrap: break-word;
+}
+
 </style>
 </head>
 <body>
@@ -519,8 +546,9 @@ body::before {
     <h2>Ajouter des photos</h2>
     <input id="photoName" placeholder="Nom du projet">
     <input type="file" id="multiPhoto" multiple>
+    <input id="photoCaption" placeholder="Légende de la photo">
     <button id="confirmAdd">Valider</button>
-  </div>
+    </div>
 </div>
 
 <!-- MODAL DELETE -->
@@ -577,6 +605,7 @@ body::before {
 <div id="zoomModal">
   <div class="closeZoom">×</div>
   <img id="mainZoom">
+  <div id="zoomCaption"></div> <!-- ← ici on affichera la légende -->
   <div class="thumbs" id="thumbs"></div>
   <div class="actions">
     <button class="like-btn"><svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"></path></svg> <span id="likeCount">0</span></button>
@@ -585,11 +614,7 @@ body::before {
 </div>
 
 <script type="module">
-
-if(currentUser.prenom){
-  document.getElementById('likeName')?.setAttribute('disabled', true);
-  document.getElementById('commentName')?.setAttribute('disabled', true);
-}
+  
 import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
 
 const supabase = createClient(
@@ -602,9 +627,17 @@ let currentUser = {
   prenom: localStorage.getItem('prenom') || '',   // récupère le prénom si défini
   photo: localStorage.getItem('photo') || ''      // récupère la photo si définie
 };
+
+if(currentUser.prenom){
+  document.getElementById('likeName')?.setAttribute('disabled', true);
+  document.getElementById('commentName')?.setAttribute('disabled', true);
+}
   
 if(currentUser.photo){
-  document.getElementById('ownerPhoto').src = currentUser.photo;
+  const ownerImg = document.getElementById('ownerPhoto');
+  ownerImg.src = currentUser.photo;
+  ownerImg.classList.add('owner-avatar');
+  ownerImg.dataset.name = currentUser.prenom || 'Owner';
 }
 
 let creations = [];
@@ -666,6 +699,7 @@ function render() {
 function openZoom(c){
   currentZoom = c;
   mainZoom.src = c.imgUrl;
+  document.getElementById('zoomCaption').textContent = c.caption || ''; // ← affiche la légende
   thumbs.innerHTML = '';
   if(!c.zoomGroup || c.zoomGroup.length===0) c.zoomGroup=[c.imgUrl];
   c.zoomGroup.forEach(u=>{
@@ -691,13 +725,9 @@ document.querySelector('.like-btn').onclick = () => {
   (currentZoom.likes || []).forEach(like => {
     const bubble = document.createElement('div');
     bubble.className = 'bubble';
-
-    if (like.photo) {
-      bubble.innerHTML = `<img src="${like.photo}" style="width:20px;height:20px;border-radius:50%;margin-right:4px;vertical-align:middle;"> ${like.name}`;
-    } else {
-      bubble.textContent = like.name;
-    }
-
+bubble.innerHTML = like.photo
+  ? `<img src="${like.photo}" class="like-avatar"> ${like.name}`
+  : like.name;
     likeBubbles.appendChild(bubble);
   });
 
@@ -711,7 +741,7 @@ confirmLike.onclick = async () => {
   if (!currentZoom) return;
 
   let name = currentUser.prenom || likeNameInput.value.trim();
-  if (!name) return;
+if(!name) name = 'Anonyme';
 
   if (!currentZoom.likes) currentZoom.likes = [];
 
@@ -737,18 +767,26 @@ confirmLike.onclick = async () => {
 };
 
 function renderLikeBubbles(){
-  likeBubbles.innerHTML='';
-  currentZoom.likes.forEach(like=>{
-    const bubble=document.createElement('div');
-    bubble.className='bubble';
-    
+  likeBubbles.innerHTML = '';
+
+  (currentZoom.likes || []).forEach(like => {
+    // Sécurité anti undefined
+    const name = typeof like === 'string' ? like : like.name || 'Utilisateur';
+    const photo = typeof like === 'object' ? like.photo : '';
+
+    const bubble = document.createElement('div');
+    bubble.className = 'bubble';
+
     bubble.innerHTML = like.photo
-  ? `<img src="${like.photo}" class="like-avatar"> ${like.name}`
-  : like.name;
-    
+  ? `<img src="${like.photo}" class="like-avatar" data-name="${like.name || 'Anonyme'}"> ${like.name || 'Anonyme'}`
+  : (like.name || 'Anonyme');
+
     likeBubbles.appendChild(bubble);
   });
 
+  updateActions();
+}
+  
 // ====== COMMENT ======
 document.querySelector('.comment-btn').onclick=()=>{
   const commentNameInput = document.getElementById('commentName');
@@ -829,8 +867,17 @@ document.getElementById('addBtn').onclick=()=>{addModal.style.display='flex';};
 addModal.addEventListener('click',e=>{if(e.target===addModal)addModal.style.display='none';});
 document.getElementById('confirmAdd').onclick=async(e)=>{
   e.stopPropagation();
-  const name=document.getElementById('photoName').value.trim();
-  const files=document.getElementById('multiPhoto').files;
+  const name = document.getElementById('photoName').value.trim();
+const caption = document.getElementById('photoCaption').value.trim(); // ← nouvelle ligne
+const {data,error} = await supabase.from('creations').insert([{
+  name,
+  caption,       // ← ajoute la légende ici
+  image_path: paths[0],
+  images: paths,
+  likes: [],
+  comments: []
+}]).select();
+  const files = document.getElementById('multiPhoto').files;
   if(!name||!files.length){alert("Veuillez mettre un nom et sélectionner au moins une photo");return;}
   const paths=[]; const urls=[];
   for(let file of files){
@@ -861,6 +908,22 @@ async function refreshCreations(){
   render();
 }
 
+creations = data.map(c => {
+  const zoomGroup = (c.images && c.images.length)
+    ? c.images.map(p => supabase.storage.from('images').getPublicUrl(p).data.publicUrl)
+    : [supabase.storage.from('images').getPublicUrl(c.image_path).data.publicUrl];
+  
+  return {
+    id: c.id,
+    name: c.name,
+    caption: c.caption || '',   // ← ici, on garde la légende
+    imgUrl: zoomGroup[0],
+    zoomGroup,
+    likes: c.likes || [],
+    comments: c.comments || []
+  };
+});
+  
 // ================== BOUTONS SIDEBAR ==================
 const addBtn = document.getElementById('addBtn');
 
@@ -946,7 +1009,8 @@ const profileModalName = document.getElementById('profileModalName');
 document.addEventListener('click', e => {
   if (e.target.classList.contains('comment-avatar') || e.target.classList.contains('like-avatar')) {
     profileModalImg.src = e.target.src;
-    profileModalName.textContent = e.target.closest('.comment-item, .bubble')?.querySelector('strong')?.textContent || '';
+    profileModalName.textContent =
+  e.target.parentElement.textContent.trim();
     profileModal.style.display = 'flex';
   }
 });
@@ -967,6 +1031,36 @@ deleteModal.onclick=e=>{if(e.target===deleteModal) deleteModal.style.display='no
 document.addEventListener('DOMContentLoaded', async () => {
   await refreshCreations();
 });
+
+// ====== START ======
+document.addEventListener('DOMContentLoaded', async () => {
+  await refreshCreations();
+});
+
+ currentZoom.likes = currentZoom.likes.map(l => ({
+  name: l.name || 'Anonyme',
+  photo: l.photo || ''
+})); 
+
+// ======================
+// AJOUT CLICK AVATAR → MODAL
+document.addEventListener('click', e => {
+  if(e.target.classList.contains('owner-avatar')
+  || e.target.classList.contains('like-avatar')
+  || e.target.classList.contains('comment-avatar')){
+
+    profileModalImg.src = e.target.src;
+    profileModalName.textContent =
+      e.target.dataset.name || e.target.parentElement.textContent.trim();
+
+    profileModal.style.display = 'flex';
+  }
+});
+
+profileModal.onclick = e => {
+  if(e.target === profileModal) profileModal.style.display = 'none';
+};
+  
 </script>
 
 <div id="profileModal" class="modal">
