@@ -677,32 +677,44 @@ const confirmComment = document.getElementById('confirmComment');
 const commentBubbles = document.getElementById('commentBubbles');
 
 // ====== RENDER ======
+// ====== RENDER ======
 function render() {
-  container.innerHTML = '';
+  container.innerHTML = ''; // vide le container avant de recréer
   let page = null;
+
   creations.forEach((c, i) => {
+    // Crée une nouvelle page tous les 6 items
     if (i % 6 === 0) {
       page = document.createElement('div');
       page.className = 'page';
       container.appendChild(page);
     }
 
+    // Crée l'élément projet
     const d = document.createElement('div');
     d.className = 'visitor-item';
     d.innerHTML = `
       <div class="placeholder">?</div>
       <div class="delete-btn">×</div>
       <p>${c.name}</p>
-      <img src="${c.imgUrl || ''}">
+      <img>
     `;
 
     const img = d.querySelector('img');
+    // Met la source ou le placeholder si vide
+    img.src = c.imgUrl || 'https://via.placeholder.com/200';
+    // Quand l'image charge, on enlève le placeholder
     img.onload = () => d.querySelector('.placeholder').style.display = 'none';
-    img.onerror = () => img.style.display = 'none';
+    // Si erreur de chargement, on met le placeholder
+    img.onerror = () => img.src = 'https://via.placeholder.com/200';
+
+    // Clic sur image pour zoom
     img.onclick = () => openZoom(c);
 
+    // Bouton supprimer
     d.querySelector('.delete-btn').onclick = () => openDeleteModal(c);
 
+    // Ajoute le projet à la page
     page.appendChild(d);
   });
 }
@@ -947,7 +959,49 @@ async function refreshCreations(){
     console.error('Erreur refreshCreations:', err);
   }
 }
+async function refreshCreations() {
+  try {
+    const { data, error } = await supabase
+      .from('creations')
+      .select('*')
+      .order('created_at', { ascending: false });
 
+    if(error){
+      console.error('Erreur Supabase:', error);
+      return;
+    }
+
+    console.log("Données reçues de Supabase :", data);  // <-- Ajouté
+
+    if(!data || data.length === 0){
+      container.innerHTML = "<p style='text-align:center;color:#b84c6f;margin-top:2rem;'>Aucune création à afficher</p>";
+      return;
+    }
+
+    creations = data.map(c => {
+      let zoomGroup = [];
+      if(c.images && c.images.length){
+        zoomGroup = c.images.map(p => supabase.storage.from('images').getPublicUrl(p).data?.publicUrl || 'https://via.placeholder.com/200');
+      } else if(c.image_path){
+        zoomGroup = [supabase.storage.from('images').getPublicUrl(c.image_path).data?.publicUrl || 'https://via.placeholder.com/200'];
+      } else {
+        zoomGroup = ['https://via.placeholder.com/200'];
+      }
+      return {
+        id: c.id,
+        name: c.name,
+        imgUrl: zoomGroup[0],
+        zoomGroup,
+        likes: c.likes || [],
+        comments: c.comments || []
+      };
+    });
+
+    render();
+  } catch(err){
+    console.error('Erreur refreshCreations:', err);
+  }
+}
 // ================== BOUTONS SIDEBAR ==================
 const addBtn = document.getElementById('addBtn');
 
