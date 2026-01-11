@@ -584,22 +584,34 @@ document.addEventListener('DOMContentLoaded', async () => {
     "sb_publishable_sqsxb-3Kl5o3-JQYv9kGFw_-g0EgwMa"
   );
 
-  // ====== USER ======
-  let currentUser = {
-    prenom: localStorage.getItem('prenom') || '',
-    photo: localStorage.getItem('photo') || ''
-  };
+// ====== USER ======
+let currentUser = {
+  prenom: localStorage.getItem('prenom') || '',
+  photo: localStorage.getItem('photo') || '' // ici c’est juste le chemin dans Supabase
+};
 
-  const ownerProfilePhoto = document.getElementById('ownerProfilePhoto');
-  if (currentUser.photo) {
-    const { data: publicUrlData } = supabase.storage
-      .from('images')
-      .getPublicUrl(currentUser.photo);
-    if (publicUrlData?.publicUrl) {
-      ownerProfilePhoto.src = publicUrlData.publicUrl;
-      ownerProfilePhoto.style.display = 'block';
-    }
+const ownerProfilePhoto = document.getElementById('ownerProfilePhoto');
+
+if (currentUser.photo) {
+  const { data: publicUrlData } = supabase.storage
+    .from('images')
+    .getPublicUrl(currentUser.photo);
+
+  if (publicUrlData?.publicUrl) {
+    ownerProfilePhoto.src = publicUrlData.publicUrl;
+    ownerProfilePhoto.style.display = 'block';
+
+    // AJOUT : stocker l'URL complète dans localStorage pour éviter de refaire Supabase getPublicUrl
+    localStorage.setItem('photo', publicUrlData.publicUrl);
   }
+} else {
+  // si localStorage contient déjà l'URL publique, on l'affiche direct
+  const storedPhoto = localStorage.getItem('photo');
+  if (storedPhoto) {
+    ownerProfilePhoto.src = storedPhoto;
+    ownerProfilePhoto.style.display = 'block';
+  }
+}
 
   // ====== VARIABLES ======
   let creations = [];
