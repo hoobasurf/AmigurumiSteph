@@ -557,6 +557,8 @@ body::before {
   </div>
 </div>
 
+C’est bon la:
+
 <script type="module">
 
 // Récupère le prénom et la photo envoyés depuis l'accueil
@@ -565,6 +567,9 @@ let currentUser = {
   prenom: localStorage.getItem('prenom') || '',
   photo: ''  // On va remplir avec l'URL Supabase plus tard
 };
+  
+const ownerPhoto = document.getElementById('ownerPhoto');
+if (currentUser.photo) ownerPhoto.src = currentUser.photo;
   
 import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
 
