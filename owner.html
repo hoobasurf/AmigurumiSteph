@@ -471,11 +471,27 @@ body::before {
   fill: none;
 }
 
+  /* PHOTO PROFIL OWNER (haut droite) */
+#ownerPhoto{
+  width:42px;
+  height:42px;
+  position:fixed;
+  top:10px;
+  right:10px;
+  border-radius:50%;
+  object-fit:cover;
+  border:3px solid #ffb6c1; /* rose pastel */
+  background:#ffe6f0;
+  box-shadow:0 0 8px rgba(233,79,154,0.4);
+  z-index:10000;
+  display:none;
+}
+
 </style>
 </head>
 <body>
 
-  <img id="ownerPhoto" style="width:32px;height:32px;border-radius:50%;position:fixed;top:10px;right:10px;z-index:10000;" alt="Owner">
+  <img id="ownerPhoto" alt="Owner">
 
 <div class="center-zone">
   <div id="visitor-list-container"></div>
@@ -571,8 +587,11 @@ let currentUser = {
   photo: localStorage.getItem('photo') || ''      // récupère la photo si définie
 };
   
-if(currentUser.photo){
-  document.getElementById('ownerPhoto').src = currentUser.photo;
+const ownerPhoto = document.getElementById('ownerPhoto');
+
+if (currentUser.photo) {
+  ownerPhoto.src = currentUser.photo;
+  ownerPhoto.style.display = 'block';
 }
 
 let creations = [];
