@@ -180,17 +180,6 @@ button:hover {
 <img id="ownerPhoto" alt="Owner">
 
 <script>
-const ownerImg = document.getElementById('ownerPhoto');
-
-// ======= AFFICHAGE PHOTO DE LA PAGE D'ACCUEIL =======
-document.addEventListener('DOMContentLoaded', () => {
-  const storedPhoto = localStorage.getItem('photo'); // récupère la photo choisie sur la page d'accueil
-  if(storedPhoto){
-    ownerImg.src = storedPhoto;
-    ownerImg.style.display = 'block';
-  }
-});
-  
 const photoBtn = document.getElementById('photoBtn');
 const photoInput = document.getElementById('photoInput');
 const profilePreview = document.getElementById('profilePreview');
