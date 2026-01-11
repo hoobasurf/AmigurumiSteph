@@ -1,5 +1,3 @@
- Mon code ne dois jamais être modifier supprimer même changer :
-
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -558,6 +556,14 @@ body::before {
 </div>
 
 <script type="module">
+
+// Récupère le prénom et la photo envoyés depuis l'accueil
+// Si vide, laisse comme chaîne vide
+let currentUser = {
+  prenom: localStorage.getItem('prenom') || '',   // récupère le prénom si défini
+  photo: localStorage.getItem('photo') || ''      // récupère la photo si définie
+};
+
 import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
 
 const supabase = createClient(
@@ -646,67 +652,128 @@ function updateActions(){
 
 // ================== LIKE ==================
 document.querySelector('.like-btn').onclick = () => {
-  if (!currentZoom) return;
-  likeBubbles.innerHTML = '';
-  currentZoom.likes?.forEach(name => {
-    const bubble = document.createElement('div');
-    bubble.className = 'bubble';
-    bubble.textContent = name;
-    likeBubbles.appendChild(bubble);
-  });
-  likeNameInput.value = '';
-  likeModal.style.display = 'flex';
+    if (!currentZoom) return;
+
+    likeBubbles.innerHTML = '';
+
+    currentZoom.likes?.forEach(like => {
+        const bubble = document.createElement('div');
+        bubble.className = 'bubble';
+
+        // Si c’est le user actuel, on affiche la photo
+        if (c.photo) {
+  text.innerHTML = `
+    <img src="${c.photo}"
+         style="width:20px;height:20px;border-radius:50%;margin-right:4px;vertical-align:middle;">
+    <strong>${c.name}</strong> : ${c.text}
+  `;
+} else {
+  text.innerHTML = `<strong>${c.name}</strong> : ${c.text}`;
+}
+            bubble.innerHTML = `<img src="${currentUser.photo}" style="width:20px;height:20px;border-radius:50%;margin-right:4px;vertical-align:middle;"> ${name}`;
+        } else {
+            bubble.textContent = name;
+        }
+
+        likeBubbles.appendChild(bubble);
+    });
+
+    // Pré-remplir automatiquement le prénom du user
+    likeNameInput.value = currentUser.prenom || '';
+
+    likeModal.style.display = 'flex';
 };
 
 confirmLike.onclick = async () => {
-  const name = likeNameInput.value.trim();
-  if (!name || !currentZoom) return;
+    const name = likeNameInput.value.trim();
+    if (!name || !currentZoom) return;
 
-  if (!currentZoom.likes) currentZoom.likes = [];
-  currentZoom.likes.push(name);
+    if (!currentZoom.likes) currentZoom.likes = [];
+    currentZoom.likes.push({
+  name: name,
+  photo: currentUser.photo || ''
+});
 
-  const { error } = await supabase.from('creations')
-    .update({ likes: currentZoom.likes })
-    .eq('id', currentZoom.id);
-  if (error) console.error(error);
+    const { error } = await supabase.from('creations')
+        .update({ likes: currentZoom.likes })
+        .eq('id', currentZoom.id);
 
-  updateActions();
-  likeModal.style.display = 'none';
+    if (error) console.error(error);
+
+    // Re-render likes avec photo
+    likeBubbles.innerHTML = '';
+    currentZoom.likes?.forEach(n => {
+        const bubble = document.createElement('div');
+        bubble.className = 'bubble';
+        if(n === currentUser.prenom && currentUser.photo) {
+            bubble.innerHTML = `<img src="${currentUser.photo}" style="width:20px;height:20px;border-radius:50%;margin-right:4px;vertical-align:middle;"> ${n}`;
+        } else {
+            bubble.textContent = n;
+        }
+        likeBubbles.appendChild(bubble);
+    });
+
+    updateActions();
+    likeModal.style.display = 'none';
 };
 
-// ================== COMMENT ==================
 // ================== COMMENT ==================
 document.querySelector('.comment-btn').onclick = () => {
-  if (!currentZoom) return;
+    if (!currentZoom) return;
 
-  // Affiche les commentaires existants
-  renderCommentList();
+    renderCommentList();
 
-  // Vider les inputs
-  document.getElementById('commentName').value = '';
-  document.getElementById('commentText').value = '';
+    // Pré-remplir automatiquement le prénom
+    document.getElementById('commentName').value = currentUser.prenom || '';
+    document.getElementById('commentText').value = '';
 
-  commentModal.style.display = 'flex';
+    commentModal.style.display = 'flex';
 };
 
-// Fonction qui rafraîchit la liste des commentaires dans le modal
 function renderCommentList() {
-  commentBubbles.innerHTML = '';
-  (currentZoom.comments || []).forEach((c, index) => {
-    const item = document.createElement('div');
-    item.className = 'comment-item';
+    commentBubbles.innerHTML = '';
+    (currentZoom.comments || []).forEach(c => {
+        const item = document.createElement('div');
+        item.className = 'comment-item';
 
-    const text = document.createElement('span');
-    text.innerHTML = `<strong>${c.name}</strong>: <span style="font-size:14px">${c.text}</span>`;
+        const text = document.createElement('span');
 
-    item.appendChild(text);
-    commentBubbles.appendChild(item);
-  });
+        // Si c’est le user actuel, on met sa photo à côté
+        if(c.name === currentUser.prenom && currentUser.photo) {
+            text.innerHTML = `<img src="${currentUser.photo}" style="width:20px;height:20px;border-radius:50%;margin-right:4px;vertical-align:middle;"> <strong>${c.name}</strong>: <span style="font-size:14px">${c.text}</span>`;
+        } else {
+            text.innerHTML = `<strong>${c.name}</strong>: <span style="font-size:14px">${c.text}</span>`;
+        }
 
-  // Mise à jour compteur
-  commentCount.textContent = currentZoom.comments?.length || 0;
+        item.appendChild(text);
+        commentBubbles.appendChild(item);
+    });
+
+    // Mise à jour compteur
+    commentCount.textContent = currentZoom.comments?.length || 0;
 }
 
+confirmComment.onclick = async () => {
+    const name = document.getElementById('commentName').value.trim();
+    const text = document.getElementById('commentText').value.trim();
+
+    if (!name || !text || !currentZoom) return alert("Veuillez entrer votre prénom et un commentaire.");
+
+    if (!currentZoom.comments) currentZoom.comments = [];
+    currentZoom.comments.push({ name, text, likes: [] });
+
+    const { error } = await supabase
+        .from('creations')
+        .update({ comments: currentZoom.comments })
+        .eq('id', currentZoom.id);
+
+    if (error) { console.error(error); alert("Erreur lors de l'envoi du commentaire"); return; }
+
+    renderCommentList();
+
+    document.getElementById('commentName').value = currentUser.prenom || '';
+    document.getElementById('commentText').value = '';
+};
 // ================== CONFIRM COMMENT ==================
 confirmComment.onclick = async () => {
   const name = document.getElementById('commentName').value.trim();
@@ -916,6 +983,37 @@ videoBtn.onclick = () => {
     window.location.href = 'video.html'; // ← change si besoin
   }, 500);
 };
+
+// --- Bouton Notes ---
+const notesBtn = document.createElement('button');
+notesBtn.textContent = "Notes";
+notesBtn.style.marginTop = "10px";
+
+videoBtn.insertAdjacentElement('afterend', notesBtn);
+
+notesBtn.onclick = () => {
+  document.body.style.transition = 'opacity 0.5s';
+  document.body.style.opacity = '0';
+  setTimeout(() => {
+    window.location.href = 'notes.html'; // ← change le lien si nécessaire
+  }, 500);
+};
+
+// --- Bouton Messagerie ---
+const messagerieBtn = document.createElement('button');
+messagerieBtn.textContent = "Messagerie";
+messagerieBtn.style.marginTop = "10px";
+
+notesBtn.insertAdjacentElement('afterend', messagerieBtn);
+
+messagerieBtn.onclick = () => {
+  document.body.style.transition = 'opacity 0.5s';
+  document.body.style.opacity = '0';
+  setTimeout(() => {
+    window.location.href = 'messagerie.html';
+  }, 500);
+};
+  
   // ================== EVENTS ==================
 document.querySelector('.closeZoom').onclick = () => zoomModal.style.display = 'none';
 zoomModal.onclick = e => { if(e.target === zoomModal) zoomModal.style.display = 'none'; };
