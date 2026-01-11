@@ -574,7 +574,7 @@ body::before {
 </div>
 
 <script type="module">
-  alert(localStorage.getItem('photo'));
+
 import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
 
 const supabase = createClient(
@@ -936,6 +936,7 @@ deleteModal.onclick=e=>{if(e.target===deleteModal) deleteModal.style.display='no
 document.addEventListener('DOMContentLoaded', async () => {
   await refreshCreations();
 });
+  alert(localStorage.getItem('photo'));
 </script>
 </body>
 </html>
