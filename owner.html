@@ -592,15 +592,25 @@ let currentUser = {
 
 const ownerProfilePhoto = document.getElementById('ownerProfilePhoto');
 
-if (currentUser.photo) {
-  const { data: publicUrlData } = supabase.storage
-    .from('images')
-    .getPublicUrl(currentUser.photo);
+async function loadOwnerPhoto() {
+  if (!currentUser.photo) return;
 
-  if (publicUrlData?.publicUrl) {
-    ownerProfilePhoto.src = publicUrlData.publicUrl;
+  const { data, error } = supabase.storage.from('images').getPublicUrl(currentUser.photo);
+
+  if (error) {
+    console.error('Erreur Supabase getPublicUrl:', error);
+    return;
+  }
+
+  if (data?.publicUrl) {
+    // Forcer le rafraîchissement pour iPhone (cache parfois bloqué)
+    ownerProfilePhoto.src = data.publicUrl + '?t=' + Date.now();
     ownerProfilePhoto.style.display = 'block';
+  }
+}
 
+// Appelle la fonction
+loadOwnerPhoto();
     // AJOUT : stocker l'URL complète dans localStorage pour éviter de refaire Supabase getPublicUrl
     localStorage.setItem('photo', publicUrlData.publicUrl);
   }
