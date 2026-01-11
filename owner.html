@@ -575,6 +575,10 @@ body::before {
 
 <script type="module">
 
+document.addEventListener('DOMContentLoaded', () => {
+
+  console.log("PHOTO :", localStorage.getItem('photo'));
+  
 <img id="ownerProfilePhoto" alt="Profil">
 const ownerImg = document.getElementById('ownerPhoto');
 document.addEventListener('DOMContentLoaded', () => {
@@ -1068,6 +1072,7 @@ expandBtn.onclick = (e) => {
 
 // ================== START ==================
 refreshCreations();
+  });
 </script>
 </body>
 </html>
