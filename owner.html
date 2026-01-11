@@ -471,6 +471,25 @@ body::before {
   fill: none;
 }
 
+#ownerPhoto {
+  width: 48px;                /* taille un peu plus grande */
+  height: 48px;
+  border-radius: 50%;         /* cercle parfait */
+  border: 3px solid #f6c2d1;  /* contour rose pastel */
+  position: fixed;            /* toujours en haut à droite */
+  top: 12px;                  /* décalage depuis le haut */
+  right: 12px;                /* décalage depuis la droite */
+  z-index: 10000;
+  object-fit: cover;          /* l'image remplit le cercle */
+  box-shadow: 0 2px 6px rgba(246,194,209,0.5); /* ombre douce */
+  transition: transform 0.2s;
+}
+
+#ownerPhoto:hover {
+  transform: scale(1.1);       /* effet zoom au survol */
+  cursor: pointer;
+}
+  
 </style>
 </head>
 <body>
