@@ -593,36 +593,42 @@ let currentUser = {
 const ownerProfilePhoto = document.getElementById('ownerProfilePhoto');
 
 async function loadOwnerPhoto() {
+  // Si pas de photo stockée dans localStorage
   if (!currentUser.photo) return;
 
-  const { data, error } = supabase.storage.from('images').getPublicUrl(currentUser.photo);
+  try {
+    // Récupère l'URL publique
+    const { data: publicUrlData } = supabase.storage.from('images').getPublicUrl(currentUser.photo);
+      .storage
+      .from('images')
+      .getPublicUrl(currentUser.photo);
 
-  if (error) {
-    console.error('Erreur Supabase getPublicUrl:', error);
-    return;
-  }
+    if (error) {
+      console.error("Erreur Supabase getPublicUrl:", error);
+      return;
+    }
 
-  if (data?.publicUrl) {
-    // Forcer le rafraîchissement pour iPhone (cache parfois bloqué)
-    ownerProfilePhoto.src = data.publicUrl + '?t=' + Date.now();
-    ownerProfilePhoto.style.display = 'block';
+    if (publicUrlData?.publicUrl) {
+      // Rafraîchir image pour iPhone (cache)
+      ownerProfilePhoto.src = publicUrlData.publicUrl + '?t=' + Date.now();
+      ownerProfilePhoto.style.display = 'block';
+
+      // Stocker l'URL complète pour usages futurs
+      localStorage.setItem('photo', publicUrlData.publicUrl);
+    }
+  } catch (err) {
+    console.error("Erreur JS loadOwnerPhoto:", err);
   }
 }
 
-// Appelle la fonction
-loadOwnerPhoto();
-    // AJOUT : stocker l'URL complète dans localStorage pour éviter de refaire Supabase getPublicUrl
-    localStorage.setItem('photo', publicUrlData.publicUrl);
-  }
+// Si localStorage contient déjà l'URL complète, l'afficher direct
+const storedPhoto = localStorage.getItem('photo');
+if (storedPhoto) {
+  ownerProfilePhoto.src = storedPhoto;
+  ownerProfilePhoto.style.display = 'block';
 } else {
-  // si localStorage contient déjà l'URL publique, on l'affiche direct
-  const storedPhoto = localStorage.getItem('photo');
-  if (storedPhoto) {
-    ownerProfilePhoto.src = storedPhoto;
-    ownerProfilePhoto.style.display = 'block';
-  }
+  loadOwnerPhoto(); // sinon, charger depuis Supabase
 }
-
   // ====== VARIABLES ======
   let creations = [];
   let currentZoom = null;
