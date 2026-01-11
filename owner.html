@@ -586,10 +586,16 @@ setTimeout(() => {
   }
 }, 0);
 
-// Si la photo est déjà stockée en localStorage, on l'affiche directement
-const ownerPhoto = document.getElementById('ownerPhoto');
 if (currentUser.photo) {
-  ownerPhoto.src = currentUser.photo;
+  const { data } = supabase
+    .storage
+    .from('images')
+    .getPublicUrl(currentUser.photo);
+
+  if (data?.publicUrl) {
+    ownerPhoto.src = data.publicUrl;
+    ownerPhoto.style.display = 'block';
+  }
 }
 
 // ==== VARIABLES GÉNÉRALES ====
