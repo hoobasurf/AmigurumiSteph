@@ -471,78 +471,11 @@ body::before {
   fill: none;
 }
 
-  /* PHOTO PROFIL OWNER (haut droite) */
-#ownerPhoto{
-  width:42px;
-  height:42px;
-  position:fixed;
-  top:10px;
-  right:10px;
-  border-radius:50%;
-  object-fit:cover;
-  border:3px solid #ffb6c1; /* rose pastel */
-  background:#ffe6f0;
-  box-shadow:0 0 8px rgba(233,79,154,0.4);
-  z-index:10000;
-  display:none;
-}
-
-  /* AVATAR COMMENT / LIKE / OWNER */
-.avatar {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  border: 3px solid #ffb6c1; /* rose pastel */
-  object-fit: cover;
-  cursor: pointer;
-  transition: transform 0.2s;
-}
-.avatar:hover { transform: scale(1.05); }
-
-/* MODAL AVATAR */
-#profileModal {
-  position: fixed; inset:0;
-  background: rgba(0,0,0,0.7);
-  display: none;
-  justify-content:center;
-  align-items:center;
-  z-index:10002;
-  flex-direction: column;
-}
-#profileModal img {
-  width:150px;
-  height:150px;
-  border-radius:50%;
-  border:4px solid #ffb6c1;
-  margin-bottom:10px;
-  object-fit:cover;
-}
-#profileModal p {
-  font-size:22px;
-  font-weight:bold;
-  color:#fff;
-  text-shadow:1px 1px 2px rgba(0,0,0,0.5);
-}
-#profileModal .closeProfile {
-  position:absolute;
-  top:12px;
-  right:12px;
-  width:28px;
-  height:28px;
-  background:#ffb6c1;
-  color:#fff;
-  border-radius:50%;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  cursor:pointer;
-}
-
 </style>
 </head>
-  <body>
+<body>
 
-  <img id="ownerPhoto" alt="Owner">
+  <img id="ownerPhoto" style="width:32px;height:32px;border-radius:50%;position:fixed;top:10px;right:10px;z-index:10000;" alt="Owner">
 
 <div class="center-zone">
   <div id="visitor-list-container"></div>
@@ -624,32 +557,22 @@ body::before {
   </div>
 </div>
 
-<div id="profileModal">
-  <div class="closeProfile">×</div>
-  <img id="profileImg">
-  <p id="profileName"></p>
-</div>
+<script type="module">
+import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js/dist/supabase.min.js"></script> 
-<script>
-// ================== SUPABASE ==================
-const supabaseUrl = "https://jyhbamdcxmpveujjqjla.supabase.co";
-const supabaseKey = "sb_publishable_sqsxb-3Kl5o3-JQYv9kGFw_-g0EgwMa";
-const supabase = supabase.createClient(
+const supabase = createClient(
   "https://jyhbamdcxmpveujjqjla.supabase.co",
   "sb_publishable_sqsxb-3Kl5o3-JQYv9kGFw_-g0EgwMa"
 );
 
 // ================== UTILISATEUR CONNECTÉ ==================
 let currentUser = {
-  prenom: localStorage.getItem('prenom') || '',
-  photo: localStorage.getItem('photo') || ''
+  prenom: localStorage.getItem('prenom') || '',   // récupère le prénom si défini
+  photo: localStorage.getItem('photo') || ''      // récupère la photo si définie
 };
-
-const ownerPhoto = document.getElementById('ownerPhoto');
-if (currentUser.photo) {
-  ownerPhoto.src = currentUser.photo;
-  ownerPhoto.style.display = 'block';
+  
+if(currentUser.photo){
+  document.getElementById('ownerPhoto').src = currentUser.photo;
 }
 
 let creations = [];
@@ -666,10 +589,12 @@ const mainZoom = document.getElementById('mainZoom');
 const thumbs = document.getElementById('thumbs');
 const likeCount = document.getElementById('likeCount');
 const commentCount = document.getElementById('commentCount');
+
 const likeModal = document.getElementById('likeModal');
 const likeBubbles = document.getElementById('likeBubbles');
 const confirmLike = document.getElementById('confirmLike');
 const likeNameInput = document.getElementById('likeName');
+
 const commentModal = document.getElementById('commentModal');
 const confirmComment = document.getElementById('confirmComment');
 const commentBubbles = document.getElementById('commentBubbles');
@@ -691,16 +616,16 @@ function render() {
       <div class="placeholder">?</div>
       <div class="delete-btn">×</div>
       <p>${c.name}</p>
-      <img>
+      <img src="${c.imgUrl || ''}">
     `;
 
     const img = d.querySelector('img');
-    img.src = c.imgUrl || 'https://via.placeholder.com/200';
     img.onload = () => d.querySelector('.placeholder').style.display = 'none';
-    img.onerror = () => img.src = 'https://via.placeholder.com/200';
+    img.onerror = () => img.style.display = 'none';
     img.onclick = () => openZoom(c);
 
     d.querySelector('.delete-btn').onclick = () => openDeleteModal(c);
+
     page.appendChild(d);
   });
 }
@@ -728,60 +653,63 @@ function updateActions(){
 // ====== LIKE ======
 document.querySelector('.like-btn').onclick = () => {
   if (!currentZoom) return;
+
   likeBubbles.innerHTML = '';
+
   (currentZoom.likes || []).forEach(like => {
     const bubble = document.createElement('div');
     bubble.className = 'bubble';
+
     if (like.photo) {
       bubble.innerHTML = `<img src="${like.photo}" style="width:20px;height:20px;border-radius:50%;margin-right:4px;vertical-align:middle;"> ${like.name}`;
     } else {
       bubble.textContent = like.name;
     }
+
     likeBubbles.appendChild(bubble);
   });
+
   likeNameInput.value = currentUser.prenom || '';
   if (currentUser.prenom) likeNameInput.disabled = true;
+
   likeModal.style.display = 'flex';
 };
 
 confirmLike.onclick = async () => {
   if (!currentZoom) return;
+
   let name = currentUser.prenom || likeNameInput.value.trim();
   if (!name) return;
-  if (!currentZoom.likes) currentZoom.likes = [];
-  currentZoom.likes.push({ name, photo: currentUser.photo || '' });
 
+  if (!currentZoom.likes) currentZoom.likes = [];
+
+  currentZoom.likes.push({
+    name,
+    photo: currentUser.photo || ''
+  });
+
+  // Fonction async pour Supabase
   try {
     const { error } = await supabase
       .from('creations')
       .update({ likes: currentZoom.likes })
       .eq('id', currentZoom.id);
-    if(error) console.error(error);
-  } catch (err) { console.error(err); }
+
+    if (error) console.error(error);
+  } catch (err) {
+    console.error(err);
+  }
 
   renderLikeBubbles();
-  likeModal.style.display='none';
+  likeModal.style.display = 'none';
 };
 
 function renderLikeBubbles(){
   likeBubbles.innerHTML='';
-  if(!currentZoom.likes) return;
   currentZoom.likes.forEach(like=>{
     const bubble=document.createElement('div');
     bubble.className='bubble';
-    if(like.photo){
-      const avatar = document.createElement('img');
-      avatar.src = like.photo;
-      avatar.className='avatar';
-      avatar.onclick = () => openProfileModal(like.photo, like.name);
-      bubble.appendChild(avatar);
-      const span = document.createElement('span');
-      span.textContent = like.name;
-      span.style.marginLeft='6px';
-      bubble.appendChild(span);
-    } else {
-      bubble.textContent = like.name;
-    }
+    bubble.innerHTML=like.photo?`<img src="${like.photo}" style="width:20px;height:20px;border-radius:50%;margin-right:4px;vertical-align:middle;">${like.name}`:like.name;
     likeBubbles.appendChild(bubble);
   });
   updateActions();
@@ -789,6 +717,9 @@ function renderLikeBubbles(){
 
 // ====== COMMENT ======
 document.querySelector('.comment-btn').onclick=()=>{
+  const commentNameInput = document.getElementById('commentName');
+commentNameInput.value = currentUser.prenom || '';
+if(currentUser.prenom) commentNameInput.disabled = true;  // bloque modification si connecté
   if(!currentZoom) return;
   renderCommentList();
   document.getElementById('commentName').value=currentUser.prenom||'';
@@ -800,19 +731,47 @@ function renderCommentList(){
   commentBubbles.innerHTML='';
   (currentZoom.comments || []).forEach(c => {
     const item = document.createElement('div');
-    item.className='comment-item';
-    const avatar = document.createElement('img');
-    avatar.className='avatar';
-    avatar.src = c.photo || 'default-avatar.png';
-    avatar.onclick = () => openProfileModal(c.photo, c.name);
+    item.className = 'comment-item';
+
     const text = document.createElement('span');
-    text.innerHTML = `<strong>${c.name}</strong>: <span>${c.text}</span>`;
-    item.appendChild(avatar);
+
+    // Si c’est le user connecté, on affiche sa photo
+    if(c.name === currentUser.prenom && currentUser.photo) {
+        text.innerHTML = `<img src="${currentUser.photo}" style="width:20px;height:20px;border-radius:50%;margin-right:4px;vertical-align:middle;"> <strong>${c.name}</strong>: <span>${c.text}</span>`;
+    } else {
+        text.innerHTML = `<strong>${c.name}</strong>: <span>${c.text}</span>`;
+    }
+
     item.appendChild(text);
     commentBubbles.appendChild(item);
-  });
+});
   commentCount.textContent=currentZoom.comments?.length||0;
 }
+
+confirmComment.onclick = async () => {
+  if (!currentZoom) return;
+
+  const name = currentUser.prenom || document.getElementById('commentName').value.trim();
+  const text = document.getElementById('commentText').value.trim();
+
+  if (!name || !text) return;
+
+  if (!currentZoom.comments) currentZoom.comments = [];
+
+  currentZoom.comments.push({
+    name,
+    text,
+    photo: currentUser.photo || ''
+  });
+
+  await supabase
+    .from('creations')
+    .update({ comments: currentZoom.comments })
+    .eq('id', currentZoom.id);
+
+  renderCommentList();
+  document.getElementById('commentText').value = '';
+};
 
 // ====== DELETE ======
 function openDeleteModal(project){
@@ -857,52 +816,111 @@ document.getElementById('confirmAdd').onclick=async(e)=>{
 
 // ====== REFRESH ======
 async function refreshCreations(){
-  try {
-    const { data, error } = await supabase
-      .from('creations')
-      .select('*')
-      .order('created_at', { ascending: false });
-
-    if(error){console.error(error);return;}
-
-    creations = data.map(c => {
-      let zoomGroup = [];
-      if(c.images && c.images.length){
-        zoomGroup = c.images.map(p => supabase.storage.from('images').getPublicUrl(p).data?.publicUrl || 'https://via.placeholder.com/200');
-      } else if(c.image_path){
-        zoomGroup = [supabase.storage.from('images').getPublicUrl(c.image_path).data?.publicUrl || 'https://via.placeholder.com/200'];
-      } else {
-        zoomGroup = ['https://via.placeholder.com/200'];
-      }
-      return {
-        id: c.id,
-        name: c.name,
-        imgUrl: zoomGroup[0],
-        zoomGroup,
-        likes: c.likes || [],
-        comments: c.comments || []
-      };
-    });
-
-    render();
-  } catch(err){
-    console.error('Erreur refreshCreations:', err);
-  }
+  const {data,error}=await supabase.from('creations').select('*').order('created_at',{ascending:false});
+  if(error){console.error(error);return;}
+  creations=data.map(c=>{
+    const zoomGroup=(c.images&&c.images.length)?c.images.map(p=>supabase.storage.from('images').getPublicUrl(p).data.publicUrl):[supabase.storage.from('images').getPublicUrl(c.image_path).data.publicUrl];
+    return {id:c.id,name:c.name,imgUrl:zoomGroup[0],zoomGroup,likes:c.likes||[],comments:c.comments||[]};
+  });
+  render();
 }
 
-// ====== MODALS ======
+// ================== BOUTONS SIDEBAR ==================
+const addBtn = document.getElementById('addBtn');
+
+// --- Bouton Pelotes ---
+const pelotesBtn = document.createElement('button');
+pelotesBtn.textContent = "Pelotes";
+pelotesBtn.style.marginTop = "10px";
+
+addBtn.insertAdjacentElement('afterend', pelotesBtn);
+
+pelotesBtn.onclick = () => {
+  document.body.style.transition = 'opacity 0.5s';
+  document.body.style.opacity = '0';
+  setTimeout(() => {
+    window.location.href = 'pelotes.html';
+  }, 500);
+};
+
+// --- Bouton Vidéo ---
+const videoBtn = document.createElement('button');
+videoBtn.textContent = "Vidéo";
+videoBtn.style.marginTop = "10px";
+
+pelotesBtn.insertAdjacentElement('afterend', videoBtn);
+
+videoBtn.onclick = () => {
+  document.body.style.transition = 'opacity 0.5s';
+  document.body.style.opacity = '0';
+  setTimeout(() => {
+    window.location.href = 'video.html'; // ← change si besoin
+  }, 500);
+};
+
+// --- Bouton Notes ---
+const notesBtn = document.createElement('button');
+notesBtn.textContent = "Notes";
+notesBtn.style.marginTop = "10px";
+
+videoBtn.insertAdjacentElement('afterend', notesBtn);
+
+notesBtn.onclick = () => {
+  document.body.style.transition = 'opacity 0.5s';
+  document.body.style.opacity = '0';
+  setTimeout(() => {
+    window.location.href = 'notes.html'; // ← change le lien si nécessaire
+  }, 500);
+};
+
+// --- Bouton Messagerie ---
+const messagerieBtn = document.createElement('button');
+messagerieBtn.textContent = "Messagerie";
+messagerieBtn.style.marginTop = "10px";
+
+notesBtn.insertAdjacentElement('afterend', messagerieBtn);
+
+messagerieBtn.onclick = () => {
+  document.body.style.transition = 'opacity 0.5s';
+  document.body.style.opacity = '0';
+  setTimeout(() => {
+    window.location.href = 'messagerie.html';
+  }, 500);
+};
+  
+  // ================== EVENTS ==================
 likeModal.onclick = e => { if(e.target === likeModal) likeModal.style.display = 'none'; };
 commentModal.onclick = e => { if(e.target === commentModal) commentModal.style.display = 'none'; };
 deleteModal.onclick = e => { if(e.target === deleteModal) deleteModal.style.display = 'none'; currentDelete=null; };
+document.getElementById('toggleSidebar').onclick = () => sidebar.classList.toggle('sidebar-open');
+
+// ===== AGRANDISSEMENT MODAL COMMENT =====
+const expandBtn = document.getElementById('expandComment');
+const commentBox = document.querySelector('.comment-box');
+expandBtn.onclick = (e) => {
+  e.stopPropagation();
+  commentBox.classList.toggle('fullscreen');
+  expandBtn.textContent = commentBox.classList.contains('fullscreen') ? '⤡' : '⤢';
+};
+
+
+// ====== CLOSE MODALS ======
 document.querySelector('.closeZoom').onclick=()=>zoomModal.style.display='none';
 zoomModal.onclick=e=>{if(e.target===zoomModal) zoomModal.style.display='none';};
-document.getElementById('toggleSidebar').onclick = () => sidebar.classList.toggle('sidebar-open');
+likeModal.onclick=e=>{if(e.target===likeModal) likeModal.style.display='none';};
+commentModal.onclick=e=>{if(e.target===commentModal) commentModal.style.display='none';};
+deleteModal.onclick=e=>{if(e.target===deleteModal) deleteModal.style.display='none';currentDelete=null;};
+
 
 // ====== START ======
 document.addEventListener('DOMContentLoaded', async () => {
   await refreshCreations();
-  if(currentUser.photo) ownerPhoto.style.display='block';
 });
 </script>
 </body>
 </html>
+
+
+
+
+ajoute un circle haut droite contour rose pastel ou dedans il y a la photo récupérer de la page accueil 
