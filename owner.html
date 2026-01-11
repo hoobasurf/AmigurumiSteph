@@ -491,7 +491,7 @@ body::before {
 <body>
 
 <!-- Photo profil utilisateur -->
-<img id="ownerPhoto" alt="Profil">
+<img id="ownerProfilePhoto" alt="Profil">
   
 <div class="center-zone">
   <div id="visitor-list-container"></div>
@@ -574,45 +574,26 @@ body::before {
 </div>
 
 <script type="module">
-
 document.addEventListener('DOMContentLoaded', () => {
 
   console.log("PHOTO :", localStorage.getItem('photo'));
-  
-<img id="ownerProfilePhoto" alt="Profil">
-const ownerImg = document.getElementById('ownerPhoto');
-document.addEventListener('DOMContentLoaded', () => {
 
-  console.log("PHOTO :", localStorage.getItem('photo'));
-  
-  const ownerPhoto = document.getElementById('ownerProfilePhoto');
+  const ownerProfilePhoto = document.getElementById('ownerProfilePhoto');
   const photo = localStorage.getItem('photo');
 
-  if(photo && ownerProfilePhoto){
+  if (photo && ownerProfilePhoto) {
     ownerProfilePhoto.src = photo;
     ownerProfilePhoto.style.display = 'block';
   }
-  
-// Récupère le prénom et la photo envoyés depuis l'accueil
-// Si vide, laisse comme chaîne vide
-let currentUser = {
+
+  let currentUser = {
   prenom: localStorage.getItem('prenom') || '',
-  photo:
-    localStorage.getItem('photo') ||
-    localStorage.getItem('photoProfil') ||
-    localStorage.getItem('avatar') ||
-    ''
+  photo: localStorage.getItem('photo') || ''
 };
 
   console.log("LOCALSTORAGE :", localStorage);
 
 // ===== AFFICHAGE PHOTO PROFIL EN HAUT À DROITE =====
-const ownerPhoto = document.getElementById('ownerProfilePhoto');
-
-if(currentUser.photo){
-  ownerProfilePhoto.src = currentUser.photo;
-  ownerProfilePhoto.style.display = 'block';
-}
   
 import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
 
@@ -1072,7 +1053,6 @@ expandBtn.onclick = (e) => {
 
 // ================== START ==================
 refreshCreations();
-  });
 </script>
 </body>
 </html>
