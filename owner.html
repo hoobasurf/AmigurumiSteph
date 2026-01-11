@@ -905,13 +905,47 @@ document.getElementById('confirmAdd').onclick=async(e)=>{
 
 // ====== REFRESH ======
 async function refreshCreations(){
-  const {data,error}=await supabase.from('creations').select('*').order('created_at',{ascending:false});
-  if(error){console.error(error);return;}
-  creations=data.map(c=>{
-    const zoomGroup=(c.images&&c.images.length)?c.images.map(p=>supabase.storage.from('images').getPublicUrl(p).data.publicUrl):[supabase.storage.from('images').getPublicUrl(c.image_path).data.publicUrl];
-    return {id:c.id,name:c.name,imgUrl:zoomGroup[0],zoomGroup,likes:c.likes||[],comments:c.comments||[]};
-  });
-  render();
+  try {
+    const { data, error } = await supabase
+      .from('creations')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    if(error){
+      console.error('Erreur Supabase:', error);
+      return;
+    }
+
+    creations = data.map(c => {
+      // Récupère les urls publiques des images
+      let zoomGroup = [];
+
+      if(c.images && c.images.length){
+        zoomGroup = c.images.map(p => {
+          const publicUrl = supabase.storage.from('images').getPublicUrl(p).data?.publicUrl;
+          return publicUrl || 'https://via.placeholder.com/200'; // fallback si url manquante
+        });
+      } else if(c.image_path){
+        const publicUrl = supabase.storage.from('images').getPublicUrl(c.image_path).data?.publicUrl;
+        zoomGroup = [publicUrl || 'https://via.placeholder.com/200'];
+      } else {
+        zoomGroup = ['https://via.placeholder.com/200'];
+      }
+
+      return {
+        id: c.id,
+        name: c.name,
+        imgUrl: zoomGroup[0],
+        zoomGroup,
+        likes: c.likes || [],
+        comments: c.comments || []
+      };
+    });
+
+    render(); // affichage
+  } catch(err){
+    console.error('Erreur refreshCreations:', err);
+  }
 }
 
 // ================== BOUTONS SIDEBAR ==================
