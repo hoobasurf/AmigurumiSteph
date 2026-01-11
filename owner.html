@@ -475,6 +475,8 @@ body::before {
 </head>
 <body>
 
+  <img id="ownerPhoto" style="width:32px;height:32px;border-radius:50%;position:fixed;top:10px;right:10px;z-index:10000;" alt="Owner">
+
 <div class="center-zone">
   <div id="visitor-list-container"></div>
 </div>
@@ -560,10 +562,13 @@ body::before {
 // Récupère le prénom et la photo envoyés depuis l'accueil
 // Si vide, laisse comme chaîne vide
 let currentUser = {
-  prenom: localStorage.getItem('prenom') || '',   // récupère le prénom si défini
-  photo: localStorage.getItem('photo') || ''      // récupère la photo si définie
+  prenom: localStorage.getItem('prenom') || '',
+  photo: ''  // On va remplir avec l'URL Supabase plus tard
 };
-
+  
+const ownerPhoto = document.getElementById('ownerPhoto');
+if (currentUser.photo) ownerPhoto.src = currentUser.photo;
+  
 import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
 
 const supabase = createClient(
@@ -571,6 +576,16 @@ const supabase = createClient(
   "sb_publishable_sqsxb-3Kl5o3-JQYv9kGFw_-g0EgwMa"
 );
 
+// Mettre la photo de l'owner si elle existe
+const storedPhoto = localStorage.getItem('photo');
+if(storedPhoto){
+  const { data } = supabase.storage.from('images').getPublicUrl(storedPhoto);
+  if(data && data.publicUrl){
+    currentUser.photo = data.publicUrl;
+    document.getElementById('ownerPhoto').src = currentUser.photo;
+  }
+}
+  
 let creations = [];
 let currentZoom = null;
 let currentDelete = null;
@@ -657,26 +672,21 @@ document.querySelector('.like-btn').onclick = () => {
     likeBubbles.innerHTML = '';
 
     currentZoom.likes?.forEach(like => {
-        const bubble = document.createElement('div');
-        bubble.className = 'bubble';
+    const bubble = document.createElement('div');
+    bubble.className = 'bubble';
 
-        // Si c’est le user actuel, on affiche la photo
-        if (c.photo) {
-  text.innerHTML = `
-    <img src="${c.photo}"
-         style="width:20px;height:20px;border-radius:50%;margin-right:4px;vertical-align:middle;">
-    <strong>${c.name}</strong> : ${c.text}
-  `;
-} else {
-  text.innerHTML = `<strong>${c.name}</strong> : ${c.text}`;
-}
-            bubble.innerHTML = `<img src="${currentUser.photo}" style="width:20px;height:20px;border-radius:50%;margin-right:4px;vertical-align:middle;"> ${name}`;
-        } else {
-            bubble.textContent = name;
-        }
+    if (like.photo) {
+        bubble.innerHTML = `
+          <img src="${like.photo}"
+               style="width:20px;height:20px;border-radius:50%;margin-right:4px;vertical-align:middle;">
+          ${like.name}
+        `;
+    } else {
+        bubble.textContent = like.name;
+    }
 
-        likeBubbles.appendChild(bubble);
-    });
+    likeBubbles.appendChild(bubble);
+});
 
     // Pré-remplir automatiquement le prénom du user
     likeNameInput.value = currentUser.prenom || '';
@@ -689,10 +699,14 @@ confirmLike.onclick = async () => {
     if (!name || !currentZoom) return;
 
     if (!currentZoom.likes) currentZoom.likes = [];
-    currentZoom.likes.push({
-  name: name,
-  photo: currentUser.photo || ''
-});
+
+    // 🔒 AJOUT PHOTO AU LIKE
+    const likeObj = {
+      name: name,
+      photo: currentUser.photo || ''
+    };
+
+    currentZoom.likes.push(likeObj);
 
     const { error } = await supabase.from('creations')
         .update({ likes: currentZoom.likes })
@@ -700,16 +714,22 @@ confirmLike.onclick = async () => {
 
     if (error) console.error(error);
 
-    // Re-render likes avec photo
+    // 🔹 RENDER DES BULLES AVEC PHOTO
     likeBubbles.innerHTML = '';
-    currentZoom.likes?.forEach(n => {
+    currentZoom.likes.forEach(like => {
         const bubble = document.createElement('div');
         bubble.className = 'bubble';
-        if(n === currentUser.prenom && currentUser.photo) {
-            bubble.innerHTML = `<img src="${currentUser.photo}" style="width:20px;height:20px;border-radius:50%;margin-right:4px;vertical-align:middle;"> ${n}`;
+
+        if (like.photo) {
+            bubble.innerHTML = `
+              <img src="${like.photo}"
+                   style="width:20px;height:20px;border-radius:50%;margin-right:4px;vertical-align:middle;">
+              ${like.name}
+            `;
         } else {
-            bubble.textContent = n;
+            bubble.textContent = like.name;
         }
+
         likeBubbles.appendChild(bubble);
     });
 
@@ -738,12 +758,11 @@ function renderCommentList() {
 
         const text = document.createElement('span');
 
-        // Si c’est le user actuel, on met sa photo à côté
-        if(c.name === currentUser.prenom && currentUser.photo) {
-            text.innerHTML = `<img src="${currentUser.photo}" style="width:20px;height:20px;border-radius:50%;margin-right:4px;vertical-align:middle;"> <strong>${c.name}</strong>: <span style="font-size:14px">${c.text}</span>`;
-        } else {
-            text.innerHTML = `<strong>${c.name}</strong>: <span style="font-size:14px">${c.text}</span>`;
-        }
+        // ← Ici on met la photo si elle existe
+        text.innerHTML = `
+          ${c.photo ? `<img src="${c.photo}" style="width:20px;height:20px;border-radius:50%;margin-right:4px;vertical-align:middle;">` : ''}
+          <strong>${c.name}</strong> : ${c.text}
+        `;
 
         item.appendChild(text);
         commentBubbles.appendChild(item);
@@ -752,27 +771,32 @@ function renderCommentList() {
     // Mise à jour compteur
     commentCount.textContent = currentZoom.comments?.length || 0;
 }
-
+  
 confirmComment.onclick = async () => {
-    const name = document.getElementById('commentName').value.trim();
-    const text = document.getElementById('commentText').value.trim();
+  const name = document.getElementById('commentName').value.trim();
+  const text = document.getElementById('commentText').value.trim();
 
-    if (!name || !text || !currentZoom) return alert("Veuillez entrer votre prénom et un commentaire.");
+  if (!name || !text || !currentZoom) return alert("Veuillez entrer votre prénom et un commentaire.");
 
-    if (!currentZoom.comments) currentZoom.comments = [];
-    currentZoom.comments.push({ name, text, likes: [] });
+  if (!currentZoom.comments) currentZoom.comments = [];
+  currentZoom.comments.push({
+    name,
+    text,
+    photo: currentUser.photo || '',
+    likes: []
+  });
 
-    const { error } = await supabase
-        .from('creations')
-        .update({ comments: currentZoom.comments })
-        .eq('id', currentZoom.id);
+  const { error } = await supabase
+    .from('creations')
+    .update({ comments: currentZoom.comments })
+    .eq('id', currentZoom.id);
 
-    if (error) { console.error(error); alert("Erreur lors de l'envoi du commentaire"); return; }
+  if (error) { console.error(error); alert("Erreur lors de l'envoi du commentaire"); return; }
 
-    renderCommentList();
+  renderCommentList();
 
-    document.getElementById('commentName').value = currentUser.prenom || '';
-    document.getElementById('commentText').value = '';
+  document.getElementById('commentName').value = currentUser.prenom || '';
+  document.getElementById('commentText').value = '';
 };
 // ================== CONFIRM COMMENT ==================
 confirmComment.onclick = async () => {
@@ -933,20 +957,20 @@ async function refreshCreations() {
   const { data, error } = await supabase.from('creations').select('*').order('created_at', { ascending: false });
   if (error) { console.error(error); return; }
 
-  creations = await Promise.all(data.map(async c => {
-    const zoomGroup = (c.images && c.images.length) ? 
-      await Promise.all(c.images.map(async p => supabase.storage.from('images').getPublicUrl(p).data.publicUrl))
-      : [supabase.storage.from('images').getPublicUrl(c.image_path).data.publicUrl];
+  creations = data.map(c => {
+  const zoomGroup = (c.images && c.images.length) ?
+    c.images.map(p => supabase.storage.from('images').getPublicUrl(p).data.publicUrl)
+    : [supabase.storage.from('images').getPublicUrl(c.image_path).data.publicUrl];
 
-    return {
-      id: c.id,
-      name: c.name,
-      imgUrl: zoomGroup[0],
-      zoomGroup,
-      likes: c.likes || [],
-      comments: c.comments || []
-    };
-  }));
+  return {
+    id: c.id,
+    name: c.name,
+    imgUrl: zoomGroup[0],
+    zoomGroup,
+    likes: c.likes || [],
+    comments: c.comments || []
+  };
+});
 
   render();
 }
