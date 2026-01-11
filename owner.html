@@ -471,10 +471,28 @@ body::before {
   fill: none;
 }
 
+/* Photo profil en haut à droite */
+#ownerProfilePhoto{
+  position: fixed;
+  top: 10px;
+  right: 10px;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid #b67385;
+  z-index: 10002;
+  display: none;
+  background: #fff;
+}
+  
 </style>
 </head>
 <body>
 
+<!-- Photo profil utilisateur -->
+<img id="ownerProfilePhoto" alt="Profil">
+  
 <div class="center-zone">
   <div id="visitor-list-container"></div>
 </div>
@@ -564,6 +582,14 @@ let currentUser = {
   photo: localStorage.getItem('photo') || ''      // récupère la photo si définie
 };
 
+// ===== AFFICHAGE PHOTO PROFIL EN HAUT À DROITE =====
+const ownerProfilePhoto = document.getElementById('ownerProfilePhoto');
+
+if(currentUser.photo){
+  ownerProfilePhoto.src = currentUser.photo;
+  ownerProfilePhoto.style.display = 'block';
+}
+  
 import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
 
 const supabase = createClient(
