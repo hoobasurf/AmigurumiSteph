@@ -585,12 +585,15 @@ document.addEventListener('DOMContentLoaded', () => {
   );
 
   const ownerProfilePhoto = document.getElementById('ownerProfilePhoto');
-  const photo = localStorage.getItem('photo');
+const photoPath = localStorage.getItem('photo'); // ex: "user123.png"
 
-  if (photo && ownerProfilePhoto) {
-    ownerProfilePhoto.src = photo;
+if (photoPath) {
+  const { data } = supabase.storage.from('images').getPublicUrl(photoPath);
+  if (data?.publicUrl) {
+    ownerProfilePhoto.src = data.publicUrl;
     ownerProfilePhoto.style.display = 'block';
   }
+}
 
   let currentUser = {
     prenom: localStorage.getItem('prenom') || '',
@@ -952,21 +955,26 @@ document.getElementById('confirmAdd').onclick = async (e) => {
 // ================== REFRESH ==================
 async function refreshCreations() {
   const { data, error } = await supabase.from('creations').select('*').order('created_at', { ascending: false });
+
+  console.log("CREATIONS SUPABASE :", data, error); // ← ici, OK
+
   if (error) { console.error(error); return; }
 
-  creations = await Promise.all(data.map(async c => {
-    const zoomGroup = c.images?.length
-  ? c.images.map(p => supabase.storage.from('images').getPublicUrl(p).data.publicUrl)
-  : [supabase.storage.from('images').getPublicUrl(c.image_path).data.publicUrl];
+  creations = data.map(c => {
+    const mainImage = c.images && c.images.length ? c.images[0] : c.image_path;
+    const { data: urlData } = supabase.storage.from('images').getPublicUrl(mainImage);
+
     return {
       id: c.id,
       name: c.name,
-      imgUrl: zoomGroup[0],
-      zoomGroup,
+      imgUrl: urlData?.publicUrl || '',
+      zoomGroup: c.images && c.images.length
+        ? c.images.map(img => supabase.storage.from('images').getPublicUrl(img).data.publicUrl)
+        : [urlData?.publicUrl || ''],
       likes: c.likes || [],
       comments: c.comments || []
     };
-  }));
+  });
 
   render();
 }
