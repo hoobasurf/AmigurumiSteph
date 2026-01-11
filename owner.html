@@ -568,17 +568,7 @@ const supabase = createClient(
 );
 
 // ==== CURRENT USER & OWNER PHOTO ====
-import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
-
-// ==== SUPABASE ====
-const supabase = createClient(
-  "https://jyhbamdcxmpveujjqjla.supabase.co",
-  "sb_publishable_sqsxb-3Kl5o3-JQYv9kGFw_-g0EgwMa"
-);
-
-// ==== CURRENT USER & OWNER PHOTO ====
 const ownerPhoto = document.getElementById('ownerPhoto');
-
 let currentUser = {
   prenom: localStorage.getItem('prenom') || '',
   photo: ''
@@ -596,13 +586,12 @@ async function initCurrentUser() {
       currentUser.photo = storedPhoto;
       ownerPhoto.src = storedPhoto;
     } else {
-      // Photo sur Supabase Storage
+      // Photo Supabase
       try {
-        const { data, error } = supabase.storage.from('images').getPublicUrl(storedPhoto);
-        if (error) throw error;
-        if (data?.publicUrl) {
-          currentUser.photo = data.publicUrl;
-          ownerPhoto.src = data.publicUrl;
+        const { publicUrl } = supabase.storage.from('images').getPublicUrl(storedPhoto);
+        if (publicUrl) {
+          currentUser.photo = publicUrl;
+          ownerPhoto.src = publicUrl;
         } else {
           console.warn("Photo Supabase introuvable, placeholder utilisé");
           ownerPhoto.src = placeholderPhoto;
@@ -619,12 +608,6 @@ async function initCurrentUser() {
 
   ownerPhoto.style.display = 'block';
 }
-
-// ==== INIT AU CHARGEMENT ====
-document.addEventListener('DOMContentLoaded', async () => {
-  await initCurrentUser();
-  await refreshCreations(); // ton code existant pour afficher les créations
-});
 
 // ==== VARIABLES GÉNÉRALES ====
 let creations = [];
@@ -736,18 +719,8 @@ confirmLike.onclick = async () => {
 
   if (error) console.error(error);
 
-  // Rafraîchir les bulles
-  likeBubbles.innerHTML = '';
-  currentZoom.likes.forEach(like => {
-    const bubble = document.createElement('div');
-    bubble.className = 'bubble';
-    if (like.photo) bubble.innerHTML = `<img src="${like.photo}" style="width:20px;height:20px;border-radius:50%;margin-right:4px;vertical-align:middle;">${like.name}`;
-    else bubble.textContent = like.name;
-    likeBubbles.appendChild(bubble);
-  });
-
-  updateActions();
   likeModal.style.display = 'none';
+  updateActions();
 };
 
 // ==== COMMENT ====
@@ -804,11 +777,22 @@ async function refreshCreations() {
   if (error) { console.error(error); return; }
 
   creations = data.map(c => {
-    const zoomGroup = (c.images && c.images.length) ?
-      c.images.map(p => supabase.storage.from('images').getPublicUrl(p).data.publicUrl)
-      : [supabase.storage.from('images').getPublicUrl(c.image_path).data.publicUrl];
+    let zoomGroup = [];
 
-    return { id: c.id, name: c.name, imgUrl: zoomGroup[0], zoomGroup, likes: c.likes || [], comments: c.comments || [] };
+    if (c.images && c.images.length) {
+      zoomGroup = c.images.map(p => supabase.storage.from('images').getPublicUrl(p).publicUrl);
+    } else if (c.image_path) {
+      zoomGroup = [supabase.storage.from('images').getPublicUrl(c.image_path).publicUrl];
+    }
+
+    return {
+      id: c.id,
+      name: c.name,
+      imgUrl: zoomGroup[0] || '',
+      zoomGroup,
+      likes: c.likes || [],
+      comments: c.comments || []
+    };
   });
 
   render();
@@ -824,8 +808,11 @@ deleteModal.onclick = e => { if(e.target===deleteModal) deleteModal.style.displa
 // ==== SIDEBAR TOGGLE ====
 document.getElementById('toggleSidebar').onclick = () => sidebar.classList.toggle('sidebar-open');
 
-// ==== INITIALISATION ====
-initCurrentUser().then(() => refreshCreations());
+// ==== INIT DOM ====
+document.addEventListener('DOMContentLoaded', async () => {
+  await initCurrentUser();
+  await refreshCreations();
+});
 </script>
 </body>
 </html>
