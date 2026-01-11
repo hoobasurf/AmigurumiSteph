@@ -491,7 +491,7 @@ body::before {
 <body>
 
 <!-- Photo profil utilisateur -->
-<img id="ownerProfilePhoto" alt="Profil">
+<img id="ownerPhoto" alt="Profil">
   
 <div class="center-zone">
   <div id="visitor-list-container"></div>
@@ -575,6 +575,20 @@ body::before {
 
 <script type="module">
 
+<img id="ownerProfilePhoto" alt="Profil">
+const ownerImg = document.getElementById('ownerPhoto');
+document.addEventListener('DOMContentLoaded', () => {
+
+  console.log("PHOTO :", localStorage.getItem('photo'));
+  
+  const ownerPhoto = document.getElementById('ownerProfilePhoto');
+  const photo = localStorage.getItem('photo');
+
+  if(photo && ownerProfilePhoto){
+    ownerProfilePhoto.src = photo;
+    ownerProfilePhoto.style.display = 'block';
+  }
+  
 // Récupère le prénom et la photo envoyés depuis l'accueil
 // Si vide, laisse comme chaîne vide
 let currentUser = {
@@ -589,7 +603,7 @@ let currentUser = {
   console.log("LOCALSTORAGE :", localStorage);
 
 // ===== AFFICHAGE PHOTO PROFIL EN HAUT À DROITE =====
-const ownerProfilePhoto = document.getElementById('ownerProfilePhoto');
+const ownerPhoto = document.getElementById('ownerProfilePhoto');
 
 if(currentUser.photo){
   ownerProfilePhoto.src = currentUser.photo;
