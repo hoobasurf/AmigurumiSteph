@@ -573,6 +573,19 @@ let currentUser = {
   photo: localStorage.getItem('photo') || ''
 };
 
+// 🔧 SAFARI / iOS FIX : forcer la récupération Base64
+setTimeout(() => {
+  const storedPhoto = localStorage.getItem('photo');
+
+  if (storedPhoto && storedPhoto.startsWith('data:image')) {
+    currentUser.photo = storedPhoto;
+    ownerPhoto.src = storedPhoto;
+    ownerPhoto.style.display = 'block';
+  } else {
+    console.warn('Photo absente ou invalide dans localStorage');
+  }
+}, 0);
+
 // Si la photo est déjà stockée en localStorage, on l'affiche directement
 const ownerPhoto = document.getElementById('ownerPhoto');
 if (currentUser.photo) {
