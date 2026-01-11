@@ -651,25 +651,20 @@ function updateActions(){
 }
 
 // ================== LIKE ==================
-// ====== LIKE ======
 document.querySelector('.like-btn').onclick = () => {
-  if (!currentZoom) return;
+    if (!currentZoom) return;
 
-  likeBubbles.innerHTML = '';
+    likeBubbles.innerHTML = '';
 
-  (currentZoom.likes || []).forEach(like => {
-    const bubble = document.createElement('div');
-    bubble.className = 'bubble';
+    currentZoom.likes?.forEach(name => {
+        const bubble = document.createElement('div');
+        bubble.className = 'bubble';
 
-    // Affiche photo + prénom si photo existe
-    if (like.photo) {
-      bubble.innerHTML = `
-        <img src="${like.photo}"
-             style="width:20px;height:20px;border-radius:50%;
-             margin-right:4px;vertical-align:middle;">
-        ${like.name}`;
-    } else {
-      bubble.textContent = like
+        // Si c’est le user actuel, on affiche la photo
+        if(name === currentUser.prenom && currentUser.photo) {
+            bubble.innerHTML = `<img src="${currentUser.photo}" style="width:20px;height:20px;border-radius:50%;margin-right:4px;vertical-align:middle;"> ${name}`;
+        } else {
+            bubble.textContent = name;
         }
 
         likeBubbles.appendChild(bubble);
