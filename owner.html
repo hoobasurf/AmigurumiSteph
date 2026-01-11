@@ -568,11 +568,24 @@ const supabase = createClient(
 );
 
 // ==== CURRENT USER & OWNER PHOTO ====
+import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
+
+// ==== SUPABASE ====
+const supabase = createClient(
+  "https://jyhbamdcxmpveujjqjla.supabase.co",
+  "sb_publishable_sqsxb-3Kl5o3-JQYv9kGFw_-g0EgwMa"
+);
+
+// ==== CURRENT USER & OWNER PHOTO ====
 const ownerPhoto = document.getElementById('ownerPhoto');
+
 let currentUser = {
   prenom: localStorage.getItem('prenom') || '',
   photo: ''
 };
+
+// Placeholder si pas de photo
+const placeholderPhoto = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMTYiIGN5PSIxNiIgcj0iMTYiIGZpbGw9IiNkZGQiIC8+PC9zdmc+';
 
 async function initCurrentUser() {
   const storedPhoto = localStorage.getItem('photo');
@@ -583,34 +596,34 @@ async function initCurrentUser() {
       currentUser.photo = storedPhoto;
       ownerPhoto.src = storedPhoto;
     } else {
-      // Photo stockée sur Supabase
+      // Photo sur Supabase Storage
       try {
-        const { publicUrl } = supabase.storage.from('images').getPublicUrl(storedPhoto);
-        if (publicUrl) {
-          currentUser.photo = publicUrl;
-          ownerPhoto.src = publicUrl;
+        const { data, error } = supabase.storage.from('images').getPublicUrl(storedPhoto);
+        if (error) throw error;
+        if (data?.publicUrl) {
+          currentUser.photo = data.publicUrl;
+          ownerPhoto.src = data.publicUrl;
         } else {
-          console.warn("Photo Supabase introuvable");
-          ownerPhoto.src = 'default-avatar.png'; // mettre ton placeholder
+          console.warn("Photo Supabase introuvable, placeholder utilisé");
+          ownerPhoto.src = placeholderPhoto;
         }
       } catch (err) {
         console.error("Erreur récupération photo Supabase:", err);
-        ownerPhoto.src = 'default-avatar.png';
+        ownerPhoto.src = placeholderPhoto;
       }
     }
   } else {
-    // Pas de photo, mettre placeholder
-    ownerPhoto.src = 'default-avatar.png';
+    // Pas de photo stockée
+    ownerPhoto.src = placeholderPhoto;
   }
 
   ownerPhoto.style.display = 'block';
 }
 
-// ==== INITIALISATION ====
+// ==== INIT AU CHARGEMENT ====
 document.addEventListener('DOMContentLoaded', async () => {
   await initCurrentUser();
-  // Le reste de ton code continue ici
-  refreshCreations(); 
+  await refreshCreations(); // ton code existant pour afficher les créations
 });
 
 // ==== VARIABLES GÉNÉRALES ====
