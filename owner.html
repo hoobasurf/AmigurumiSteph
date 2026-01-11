@@ -489,7 +489,7 @@ body::before {
 
 </style>
 </head>
-<body>
+  <body>
 
   <img id="ownerPhoto" alt="Owner">
 
@@ -574,6 +574,7 @@ body::before {
 </div>
 
 <script type="module">
+  alert(localStorage.getItem('photo'));
 import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
 
 const supabase = createClient(
