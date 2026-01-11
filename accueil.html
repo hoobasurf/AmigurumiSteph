@@ -185,9 +185,9 @@ const photoInput = document.getElementById('photoInput');
 const profilePreview = document.getElementById('profilePreview');
 const ownerImg = document.getElementById('ownerPhoto');
 
-// ======= AFFICHAGE PHOTO STOCKEE AU CHARGEMENT =======
+// ======= AFFICHAGE PHOTO STOCKÉE AU CHARGEMENT =======
 const storedPhoto = localStorage.getItem('photo');
-if(storedPhoto){
+if (storedPhoto && ownerImg) {
   ownerImg.src = storedPhoto;
   ownerImg.style.display = 'block';
 }
@@ -197,33 +197,38 @@ photoBtn.onclick = () => photoInput.click();
 
 photoInput.onchange = () => {
   const file = photoInput.files[0];
-  if(file){
-    const reader = new FileReader();
-    reader.onload = e => {
-  profilePreview.src = e.target.result;
-  profilePreview.style.display = 'block';
+  if (!file) return;
 
-  // ✅ ENREGISTRE LA PHOTO
-  localStorage.setItem('photo', e.target.result);
-};
-      // Stocke dans localStorage
-      localStorage.setItem('photo', e.target.result);
+  const reader = new FileReader();
 
-      // Affiche mini-photo owner
-      ownerImg.src = e.target.result;
+  reader.onload = function () {
+    // ✅ preview accueil
+    profilePreview.src = reader.result;
+    profilePreview.style.display = 'block';
+
+    // ✅ sauvegarde UNIQUE et VALIDE
+    localStorage.setItem('photo', reader.result);
+
+    // ✅ mini photo owner si présente sur la page
+    if (ownerImg) {
+      ownerImg.src = reader.result;
       ownerImg.style.display = 'block';
-    };
-    reader.readAsDataURL(file);
-  }
+    }
+  };
+
+  reader.readAsDataURL(file);
 };
 
-// ======= BOUTON CONNEXION (NE PAS TOUCHER) =======
+// ======= BOUTON CONNEXION (INCHANGÉ) =======
 document.getElementById('connexionBtn').onclick = () => {
   const prenom = document.getElementById('prenom').value.trim();
   const mdp = document.getElementById('password').value.trim();
-  if(!prenom || !profilePreview.src) return alert("Veuillez mettre votre prénom et sélectionner une photo.");
 
-  if(prenom === "Steph" && mdp === "Steph1511") {
+  if (!prenom || !profilePreview.src) {
+    return alert("Veuillez mettre votre prénom et sélectionner une photo.");
+  }
+
+  if (prenom === "Steph" && mdp === "Steph1511") {
     document.getElementById('choiceModal').style.display = 'flex';
   } else {
     window.location.href = "visitor.html";
