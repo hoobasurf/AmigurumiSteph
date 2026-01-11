@@ -568,6 +568,7 @@ const supabase = createClient(
 );
 
 // ==== CURRENT USER & OWNER PHOTO ====
+// ==== CURRENT USER & OWNER PHOTO ====
 const ownerPhoto = document.getElementById('ownerPhoto');
 let currentUser = {
   prenom: localStorage.getItem('prenom') || '',
@@ -576,24 +577,40 @@ let currentUser = {
 
 async function initCurrentUser() {
   const storedPhoto = localStorage.getItem('photo');
+
   if (storedPhoto) {
     if (storedPhoto.startsWith('data:')) {
       // Photo en Base64
       currentUser.photo = storedPhoto;
       ownerPhoto.src = storedPhoto;
     } else {
-      // Photo sur Supabase
-      const { data, error } = supabase.storage.from('images').getPublicUrl(storedPhoto);
-      if (!error && data?.publicUrl) {
-        currentUser.photo = data.publicUrl;
-        ownerPhoto.src = data.publicUrl;
-      } else {
-        console.warn("Impossible de récupérer la photo Supabase", error);
+      // Photo stockée sur Supabase
+      try {
+        const { data, error } = supabase.storage.from('images').getPublicUrl(storedPhoto);
+        if (error) throw error;
+        if (data?.publicUrl) {
+          currentUser.photo = data.publicUrl;
+          ownerPhoto.src = data.publicUrl;
+        } else {
+          console.warn("Photo Supabase introuvable");
+          ownerPhoto.src = ''; // ou placeholder
+        }
+      } catch (err) {
+        console.error("Erreur récupération photo Supabase:", err);
+        ownerPhoto.src = ''; // ou placeholder
       }
     }
   }
+
   ownerPhoto.style.display = 'block';
 }
+
+// ==== INITIALISATION ====
+document.addEventListener('DOMContentLoaded', async () => {
+  await initCurrentUser();
+  // Le reste de ton code continue ici
+  refreshCreations(); 
+});
 
 // ==== VARIABLES GÉNÉRALES ====
 let creations = [];
