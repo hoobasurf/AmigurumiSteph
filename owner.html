@@ -639,6 +639,8 @@ const supabase = createClient(
   "sb_publishable_sqsxb-3Kl5o3-JQYv9kGFw_-g0EgwMa"
 );
 
+
+});
 // ================== UTILISATEUR CONNECTÉ ==================
 let currentUser = {
   prenom: localStorage.getItem('prenom') || '',   // récupère le prénom si défini
@@ -955,17 +957,6 @@ async function refreshCreations(){
 
     render(); // affichage
   } catch(err){
-    console.error('Erreur refreshCreations:', err);
-  }
-}
-async function refreshCreations(){
-  creations = [
-    { id:1, name:"Test 1", imgUrl:"https://via.placeholder.com/200", zoomGroup:[], likes:[], comments:[] },
-    { id:2, name:"Test 2", imgUrl:"https://via.placeholder.com/200", zoomGroup:[], likes:[], comments:[] }
-  ];
-  render();
-} 
-  catch(err){
     console.error('Erreur refreshCreations:', err);
   }
 }
