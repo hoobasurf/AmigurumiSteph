@@ -579,17 +579,6 @@ if (currentUser.photo) {
   ownerPhoto.src = currentUser.photo;
 }
 
-// ==== Si storedPhoto contient un chemin Supabase mais localStorage vide ou outdated ====
-const storedPhoto = localStorage.getItem('photoPath'); // chemin dans le bucket, pas l'URL publique
-if (storedPhoto && !currentUser.photo) {
-  const { data } = supabase.storage.from('images').getPublicUrl(storedPhoto);
-  if (data?.publicUrl) {
-    currentUser.photo = data.publicUrl;
-    localStorage.setItem('photo', currentUser.photo);
-    ownerPhoto.src = currentUser.photo;
-  }
-}
-
 // ==== VARIABLES GÉNÉRALES ====
 let creations = [];
 let currentZoom = null;
