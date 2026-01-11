@@ -569,45 +569,54 @@ const supabase = createClient(
 
 // ==== CURRENT USER & OWNER PHOTO ====
 const ownerPhoto = document.getElementById('ownerPhoto');
+
 let currentUser = {
   prenom: localStorage.getItem('prenom') || '',
   photo: ''
 };
 
-// Placeholder si pas de photo
+// Placeholder rond gris
 const placeholderPhoto = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMTYiIGN5PSIxNiIgcj0iMTYiIGZpbGw9IiNkZGQiIC8+PC9zdmc+';
 
 async function initCurrentUser() {
+  ownerPhoto.src = placeholderPhoto; // placeholder initial
+  ownerPhoto.style.display = 'block';
+
   const storedPhoto = localStorage.getItem('photo');
 
-  if (storedPhoto) {
-    if (storedPhoto.startsWith('data:')) {
-      // Photo Base64
-      currentUser.photo = storedPhoto;
-      ownerPhoto.src = storedPhoto;
-    } else {
-      // Photo Supabase
-      try {
-        const { publicUrl } = supabase.storage.from('images').getPublicUrl(storedPhoto);
-        if (publicUrl) {
-          currentUser.photo = publicUrl;
-          ownerPhoto.src = publicUrl;
-        } else {
-          console.warn("Photo Supabase introuvable, placeholder utilisé");
-          ownerPhoto.src = placeholderPhoto;
-        }
-      } catch (err) {
-        console.error("Erreur récupération photo Supabase:", err);
-        ownerPhoto.src = placeholderPhoto;
-      }
-    }
-  } else {
-    // Pas de photo stockée
-    ownerPhoto.src = placeholderPhoto;
-  }
+  if (!storedPhoto) return; // pas de photo, on garde le placeholder
 
-  ownerPhoto.style.display = 'block';
+  if (storedPhoto.startsWith('data:')) {
+    // Photo Base64
+    currentUser.photo = storedPhoto;
+    ownerPhoto.src = storedPhoto;
+  } else {
+    // Photo stockée sur Supabase
+    try {
+      const { data, error } = supabase
+        .storage
+        .from('images')
+        .getPublicUrl(storedPhoto);
+
+      if (error || !data?.publicUrl) {
+        console.warn('Photo Supabase introuvable, placeholder utilisé');
+        return;
+      }
+
+      currentUser.photo = data.publicUrl;
+      ownerPhoto.src = data.publicUrl;
+
+    } catch (err) {
+      console.error('Erreur récupération photo Supabase:', err);
+    }
+  }
 }
+
+// Initialisation au chargement
+document.addEventListener('DOMContentLoaded', async () => {
+  await initCurrentUser();
+  await refreshCreations();
+});
 
 // ==== VARIABLES GÉNÉRALES ====
 let creations = [];
