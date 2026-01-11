@@ -652,28 +652,27 @@ function updateActions(){
 
 // ====== LIKE ======
 document.querySelector('.like-btn').onclick = () => {
-  if(!currentZoom) return;
-  likeBubbles.innerHTML='';
-  currentZoom.likes?.forEach(like => {
+  if (!currentZoom) return;
+
+  likeBubbles.innerHTML = '';
+
+  (currentZoom.likes || []).forEach(like => {
     const bubble = document.createElement('div');
     bubble.className = 'bubble';
 
-    // Si c'est le user connecté, on affiche sa photo
-    if(like.name === currentUser.prenom && currentUser.photo) {
-        bubble.innerHTML = `<img src="${currentUser.photo}" style="width:20px;height:20px;border-radius:50%;margin-right:4px;vertical-align:middle;"> ${like.name}`;
+    if (like.photo) {
+      bubble.innerHTML = `<img src="${like.photo}" style="width:20px;height:20px;border-radius:50%;margin-right:4px;vertical-align:middle;"> ${like.name}`;
     } else {
-        bubble.textContent = like.name;
+      bubble.textContent = like.name;
     }
 
     likeBubbles.appendChild(bubble);
-});
-    bubble.innerHTML=like.photo?`<img src="${like.photo}" style="width:20px;height:20px;border-radius:50%;margin-right:4px;vertical-align:middle;">${like.name}`:like.name;
-    likeBubbles.appendChild(bubble);
   });
-  likeNameInput.value=currentUser.prenom||'';
-  // Bloquer la modification si user connecté
-if(currentUser.prenom) likeNameInput.disabled = true;
-  likeModal.style.display='flex';
+
+  likeNameInput.value = currentUser.prenom || '';
+  if (currentUser.prenom) likeNameInput.disabled = true;
+
+  likeModal.style.display = 'flex';
 };
 
 confirmLike.onclick = async () => {
@@ -749,16 +748,29 @@ function renderCommentList(){
   commentCount.textContent=currentZoom.comments?.length||0;
 }
 
-const name = currentUser.prenom || document.getElementById('commentName').value.trim();
-  currentZoom.comments.push({ name, text, photo: currentUser.photo || '' });
-  const name=document.getElementById('commentName').value.trim();
-  const text=document.getElementById('commentText').value.trim();
-  if(!name||!text||!currentZoom) return;
-  if(!currentZoom.comments) currentZoom.comments=[];
-  currentZoom.comments.push({name,text,photo:currentUser.photo||'',likes:[]});
-  await supabase.from('creations').update({comments:currentZoom.comments}).eq('id',currentZoom.id);
+  confirmComment.onclick = async () => {
+  if (!currentZoom) return;
+
+  const name = currentUser.prenom || document.getElementById('commentName').value.trim();
+  const text = document.getElementById('commentText').value.trim();
+
+  if (!name || !text) return;
+
+  if (!currentZoom.comments) currentZoom.comments = [];
+
+  currentZoom.comments.push({
+    name,
+    text,
+    photo: currentUser.photo || ''
+  });
+
+  await supabase
+    .from('creations')
+    .update({ comments: currentZoom.comments })
+    .eq('id', currentZoom.id);
+
   renderCommentList();
-  document.getElementById('commentText').value='';
+  document.getElementById('commentText').value = '';
 };
 
 // ====== DELETE ======
