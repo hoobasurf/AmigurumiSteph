@@ -567,36 +567,30 @@ const supabase = createClient(
   "sb_publishable_sqsxb-3Kl5o3-JQYv9kGFw_-g0EgwMa"
 );
 
-import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
-
-// ==== SUPABASE ====
-const supabase = createClient(
-  "https://jyhbamdcxmpveujjqjla.supabase.co",
-  "sb_publishable_sqsxb-3Kl5o3-JQYv9kGFw_-g0EgwMa"
-);
-
 document.addEventListener('DOMContentLoaded', () => {
   // ==== CURRENT USER ====
   const ownerPhoto = document.getElementById('ownerPhoto');
-  let currentUser = {
+  window.currentUser = {
     prenom: localStorage.getItem('prenom') || '',
     photo: ''
   };
 
   const storedPhoto = localStorage.getItem('photo');
-  if(storedPhoto){
-    if(storedPhoto.startsWith('data:')){
+  if (storedPhoto) {
+    if (storedPhoto.startsWith('data:')) {
       currentUser.photo = storedPhoto;
       ownerPhoto.src = storedPhoto;
     } else {
-      const { data } = supabase.storage.from('images').getPublicUrl(storedPhoto);
-      if(data?.publicUrl){
-        currentUser.photo = data.publicUrl;
-        ownerPhoto.src = data.publicUrl;
+      const { data: publicUrlData } = supabase.storage.from('images').getPublicUrl(storedPhoto);
+      if (publicUrlData?.publicUrl) {
+        currentUser.photo = publicUrlData.publicUrl;
+        ownerPhoto.src = publicUrlData.publicUrl;
       }
     }
     ownerPhoto.style.display = 'block';
   }
+
+  refreshCreations();
 });
 
 // ==== VARIABLES GÉNÉRALES ====
@@ -605,23 +599,11 @@ let currentZoom = null;
 let currentDelete = null;
 
 const container = document.getElementById('visitor-list-container');
-const addModal = document.getElementById('addModal');
-const deleteModal = document.getElementById('deleteModal');
 const zoomModal = document.getElementById('zoomModal');
-const sidebar = document.getElementById('sidebar');
 const mainZoom = document.getElementById('mainZoom');
 const thumbs = document.getElementById('thumbs');
 const likeCount = document.getElementById('likeCount');
 const commentCount = document.getElementById('commentCount');
-
-const likeModal = document.getElementById('likeModal');
-const likeBubbles = document.getElementById('likeBubbles');
-const confirmLike = document.getElementById('confirmLike');
-const likeNameInput = document.getElementById('likeName');
-
-const commentModal = document.getElementById('commentModal');
-const confirmComment = document.getElementById('confirmComment');
-const commentBubbles = document.getElementById('commentBubbles');
 
 // ==== RENDER VISITOR ITEMS ====
 function render() {
@@ -656,7 +638,7 @@ function render() {
 }
 
 // ==== ZOOM ====
-function openZoom(c){
+function openZoom(c) {
   currentZoom = c;
   mainZoom.src = c.imgUrl;
   thumbs.innerHTML = '';
@@ -669,120 +651,46 @@ function openZoom(c){
     thumbs.appendChild(t);
   });
 
-  updateActions();
+  likeCount.textContent = c.likes?.length || 0;
+  commentCount.textContent = c.comments?.length || 0;
+
   zoomModal.style.display = 'flex';
 }
-
-function updateActions(){
-  likeCount.textContent = currentZoom.likes?.length || 0;
-  commentCount.textContent = currentZoom.comments?.length || 0;
-}
-
-// ==== LIKE ====
-document.querySelector('.like-btn').onclick = () => {
-  if (!currentZoom) return;
-
-  likeBubbles.innerHTML = '';
-  (currentZoom.likes || []).forEach(like => {
-    const bubble = document.createElement('div');
-    bubble.className = 'bubble';
-    if (like.photo) {
-      bubble.innerHTML = `<img src="${like.photo}" style="width:20px;height:20px;border-radius:50%;margin-right:4px;vertical-align:middle;">${like.name}`;
-    } else bubble.textContent = like.name;
-    likeBubbles.appendChild(bubble);
-  });
-
-  likeNameInput.value = currentUser.prenom || '';
-  likeModal.style.display = 'flex';
-};
-
-confirmLike.onclick = async () => {
-  const name = likeNameInput.value.trim();
-  if (!name || !currentZoom) return;
-
-  if (!currentZoom.likes) currentZoom.likes = [];
-  currentZoom.likes.push({ name, photo: currentUser.photo || '' });
-
-  const { error } = await supabase.from('creations')
-    .update({ likes: currentZoom.likes })
-    .eq('id', currentZoom.id);
-
-  if (error) console.error(error);
-
-  // Rafraîchir les bulles
-  likeBubbles.innerHTML = '';
-  currentZoom.likes.forEach(like => {
-    const bubble = document.createElement('div');
-    bubble.className = 'bubble';
-    if (like.photo) bubble.innerHTML = `<img src="${like.photo}" style="width:20px;height:20px;border-radius:50%;margin-right:4px;vertical-align:middle;">${like.name}`;
-    else bubble.textContent = like.name;
-    likeBubbles.appendChild(bubble);
-  });
-
-  updateActions();
-  likeModal.style.display = 'none';
-};
-
-// ==== COMMENT ====
-document.querySelector('.comment-btn').onclick = () => {
-  if (!currentZoom) return;
-  renderCommentList();
-  document.getElementById('commentName').value = currentUser.prenom || '';
-  document.getElementById('commentText').value = '';
-  commentModal.style.display = 'flex';
-};
-
-function renderCommentList() {
-  commentBubbles.innerHTML = '';
-  (currentZoom.comments || []).forEach(c => {
-    const item = document.createElement('div');
-    item.className = 'comment-item';
-    item.innerHTML = `${c.photo ? `<img src="${c.photo}" style="width:20px;height:20px;border-radius:50%;margin-right:4px;vertical-align:middle;">` : ''}<strong>${c.name}</strong> : ${c.text}`;
-    commentBubbles.appendChild(item);
-  });
-  commentCount.textContent = currentZoom.comments?.length || 0;
-}
-
-confirmComment.onclick = async () => {
-  const name = document.getElementById('commentName').value.trim();
-  const text = document.getElementById('commentText').value.trim();
-  if (!name || !text || !currentZoom) return;
-
-  if (!currentZoom.comments) currentZoom.comments = [];
-  currentZoom.comments.push({ name, text, photo: currentUser.photo || '', likes: [] });
-
-  await supabase.from('creations').update({ comments: currentZoom.comments }).eq('id', currentZoom.id);
-  renderCommentList();
-  document.getElementById('commentText').value = '';
-};
 
 // ==== DELETE ====
 function openDeleteModal(project){
   currentDelete = project;
-  deleteModal.style.display = 'flex';
+  document.getElementById('deleteModal').style.display = 'flex';
 }
-document.getElementById('cancelDelete').onclick = () => { currentDelete = null; deleteModal.style.display = 'none'; };
-document.getElementById('confirmDelete').onclick = async () => {
-  if (!currentDelete?.id) return;
-  const { error } = await supabase.from('creations').delete().eq('id', currentDelete.id);
-  if (error) { console.error(error); return; }
-  await refreshCreations();
-  deleteModal.style.display = 'none';
-  currentDelete = null;
-};
 
-// ==== REFRESH ====
+// ==== REFRESH CREATIONS ====
 async function refreshCreations() {
   const { data, error } = await supabase.from('creations').select('*').order('created_at', { ascending: false });
   if (error) { console.error(error); return; }
 
-  creations = data.map(c => {
-    const zoomGroup = (c.images && c.images.length) ?
-      c.images.map(p => supabase.storage.from('images').getPublicUrl(p).data.publicUrl)
-      : [supabase.storage.from('images').getPublicUrl(c.image_path).data.publicUrl];
+  creations = [];
 
-    return { id: c.id, name: c.name, imgUrl: zoomGroup[0], zoomGroup, likes: c.likes || [], comments: c.comments || [] };
-  });
+  for (const c of data) {
+    let zoomGroup = [];
+    if (c.images && c.images.length) {
+      for (const p of c.images) {
+        const { data: publicUrlData } = supabase.storage.from('images').getPublicUrl(p);
+        zoomGroup.push(publicUrlData.publicUrl);
+      }
+    } else if (c.image_path) {
+      const { data: publicUrlData } = supabase.storage.from('images').getPublicUrl(c.image_path);
+      zoomGroup.push(publicUrlData.publicUrl);
+    }
+
+    creations.push({
+      id: c.id,
+      name: c.name,
+      imgUrl: zoomGroup[0] || '',
+      zoomGroup,
+      likes: c.likes || [],
+      comments: c.comments || []
+    });
+  }
 
   render();
 }
@@ -790,15 +698,9 @@ async function refreshCreations() {
 // ==== CLOSE MODALS ====
 document.querySelector('.closeZoom').onclick = () => zoomModal.style.display = 'none';
 zoomModal.onclick = e => { if(e.target===zoomModal) zoomModal.style.display='none'; };
-likeModal.onclick = e => { if(e.target===likeModal) likeModal.style.display='none'; };
-commentModal.onclick = e => { if(e.target===commentModal) commentModal.style.display='none'; };
-deleteModal.onclick = e => { if(e.target===deleteModal) deleteModal.style.display='none'; currentDelete=null; };
 
 // ==== SIDEBAR TOGGLE ====
-document.getElementById('toggleSidebar').onclick = () => sidebar.classList.toggle('sidebar-open');
-
-// ==== START ====
-refreshCreations();
+document.getElementById('toggleSidebar').onclick = () => document.getElementById('sidebar').classList.toggle('sidebar-open');
 </script>
 </body>
 </html>
