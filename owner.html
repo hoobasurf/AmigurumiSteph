@@ -571,11 +571,6 @@ let currentUser = {
   photo: localStorage.getItem('photo') || ''      // récupère la photo si définie
 };
   
-// ====== CURRENT USER ======
-let currentUser = {
-  prenom: localStorage.getItem('prenom') || '',
-  photo: localStorage.getItem('photo') || ''
-};
 if(currentUser.photo){
   document.getElementById('ownerPhoto').src = currentUser.photo;
 }
@@ -681,20 +676,33 @@ if(currentUser.prenom) likeNameInput.disabled = true;
   likeModal.style.display='flex';
 };
 
-let name = currentUser.prenom || likeNameInput.value.trim(); // si connecté, utilise currentUser
- currentZoom.likes.push({
+confirmLike.onclick = async () => {
+  if (!currentZoom) return;
+
+  let name = currentUser.prenom || likeNameInput.value.trim();
+  if (!name) return;
+
+  if (!currentZoom.likes) currentZoom.likes = [];
+
+  currentZoom.likes.push({
     name,
     photo: currentUser.photo || ''
-});
-  
-  const name=likeNameInput.value.trim();
-  if(!name||!currentZoom) return;
-  if(!currentZoom.likes) currentZoom.likes=[];
-  currentZoom.likes.push({name, photo:currentUser.photo||''});
-  const {error}=await supabase.from('creations').update({likes:currentZoom.likes}).eq('id',currentZoom.id);
-  if(error) console.error(error);
+  });
+
+  // Fonction async pour Supabase
+  try {
+    const { error } = await supabase
+      .from('creations')
+      .update({ likes: currentZoom.likes })
+      .eq('id', currentZoom.id);
+
+    if (error) console.error(error);
+  } catch (err) {
+    console.error(err);
+  }
+
   renderLikeBubbles();
-  likeModal.style.display='none';
+  likeModal.style.display = 'none';
 };
 
 function renderLikeBubbles(){
