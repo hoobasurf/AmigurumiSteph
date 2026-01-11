@@ -576,7 +576,18 @@ body::before {
   </div>
 </div>
 
-<script type="module">
+<script>
+const ownerImg = document.getElementById('ownerPhoto');
+
+// ======= AFFICHAGE PHOTO DE LA PAGE D'ACCUEIL =======
+document.addEventListener('DOMContentLoaded', () => {
+  const storedPhoto = localStorage.getItem('photo'); // récupère la photo choisie sur la page d'accueil
+  if(storedPhoto){
+    ownerImg.src = storedPhoto;
+    ownerImg.style.display = 'block';
+  }
+});
+  
 import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
 
 const supabase = createClient(
