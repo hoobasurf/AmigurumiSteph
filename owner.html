@@ -573,6 +573,8 @@ body::before {
   </div>
 </div>
 
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js"></script>
 <script type="module">
 document.addEventListener('DOMContentLoaded', () => {
 
@@ -587,43 +589,43 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   let currentUser = {
-  prenom: localStorage.getItem('prenom') || '',
-  photo: localStorage.getItem('photo') || ''
-};
+    prenom: localStorage.getItem('prenom') || '',
+    photo: localStorage.getItem('photo') || ''
+  };
 
   console.log("LOCALSTORAGE :", localStorage);
 
-// ===== AFFICHAGE PHOTO PROFIL EN HAUT À DROITE =====
-  
-import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
+  // ===== AFFICHAGE PHOTO PROFIL EN HAUT À DROITE =====
 
-const supabase = createClient(
-  "https://jyhbamdcxmpveujjqjla.supabase.co",
-  "sb_publishable_sqsxb-3Kl5o3-JQYv9kGFw_-g0EgwMa"
-);
+  // Création du client Supabase avec la version UMD
+  const supabase = supabase.createClient(
+    "https://jyhbamdcxmpveujjqjla.supabase.co",
+    "sb_publishable_sqsxb-3Kl5o3-JQYv9kGFw_-g0EgwMa"
+  );
 
-let creations = [];
-let currentZoom = null;
-let currentDelete = null;
+  // ===== TON CODE EXISTANT =====
+  let creations = [];
+  let currentZoom = null;
+  let currentDelete = null;
 
-const container = document.getElementById('visitor-list-container');
-const addModal = document.getElementById('addModal');
-const deleteModal = document.getElementById('deleteModal');
-const zoomModal = document.getElementById('zoomModal');
-const sidebar = document.getElementById('sidebar');
-const mainZoom = document.getElementById('mainZoom');
-const thumbs = document.getElementById('thumbs');
-const likeCount = document.getElementById('likeCount');
-const commentCount = document.getElementById('commentCount');
+  const container = document.getElementById('visitor-list-container');
+  const addModal = document.getElementById('addModal');
+  const deleteModal = document.getElementById('deleteModal');
+  const zoomModal = document.getElementById('zoomModal');
+  const sidebar = document.getElementById('sidebar');
+  const mainZoom = document.getElementById('mainZoom');
+  const thumbs = document.getElementById('thumbs');
+  const likeCount = document.getElementById('likeCount');
+  const commentCount = document.getElementById('commentCount');
 
-const likeModal = document.getElementById('likeModal');
-const likeBubbles = document.getElementById('likeBubbles');
-const confirmLike = document.getElementById('confirmLike');
-const likeNameInput = document.getElementById('likeName');
+  const likeModal = document.getElementById('likeModal');
+  const likeBubbles = document.getElementById('likeBubbles');
+  const confirmLike = document.getElementById('confirmLike');
+  const likeNameInput = document.getElementById('likeName');
 
-const commentModal = document.getElementById('commentModal');
-const confirmComment = document.getElementById('confirmComment');
-const commentBubbles = document.getElementById('commentBubbles');
+  const commentModal = document.getElementById('commentModal');
+  const confirmComment = document.getElementById('confirmComment');
+  const commentBubbles = document.getElementById('commentBubbles');
 
 // ================== RENDER ==================
 function render() {
