@@ -576,36 +576,29 @@ const supabase = createClient(
   "sb_publishable_sqsxb-3Kl5o3-JQYv9kGFw_-g0EgwMa"
 );
 
-// ==== CURRENT USER ====
-let currentUser = {
-  prenom: localStorage.getItem('prenom') || '',
-  photo: ''
-};
+document.addEventListener('DOMContentLoaded', () => {
+  // ==== CURRENT USER ====
+  const ownerPhoto = document.getElementById('ownerPhoto');
+  let currentUser = {
+    prenom: localStorage.getItem('prenom') || '',
+    photo: ''
+  };
 
-const ownerPhoto = document.getElementById('ownerPhoto');
-const storedPhoto = localStorage.getItem('photo');
-
-if (storedPhoto) {
-  // ✅ PHOTO BASE64 (depuis accueil)
-  if (storedPhoto.startsWith('data:')) {
-    currentUser.photo = storedPhoto;
-    ownerPhoto.src = storedPhoto;
-  }
-  // ✅ PHOTO SUPABASE (ancien cas)
-  else {
-    const { data } = supabase
-      .storage
-      .from('images')
-      .getPublicUrl(storedPhoto);
-
-    if (data?.publicUrl) {
-      currentUser.photo = data.publicUrl;
-      ownerPhoto.src = data.publicUrl;
+  const storedPhoto = localStorage.getItem('photo');
+  if(storedPhoto){
+    if(storedPhoto.startsWith('data:')){
+      currentUser.photo = storedPhoto;
+      ownerPhoto.src = storedPhoto;
+    } else {
+      const { data } = supabase.storage.from('images').getPublicUrl(storedPhoto);
+      if(data?.publicUrl){
+        currentUser.photo = data.publicUrl;
+        ownerPhoto.src = data.publicUrl;
+      }
     }
+    ownerPhoto.style.display = 'block';
   }
-
-  ownerPhoto.style.display = 'block';
-}
+});
 
 // ==== VARIABLES GÉNÉRALES ====
 let creations = [];
