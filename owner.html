@@ -568,7 +568,6 @@ const supabase = createClient(
 );
 
 // ==== CURRENT USER & OWNER PHOTO ====
-// ==== CURRENT USER & OWNER PHOTO ====
 const ownerPhoto = document.getElementById('ownerPhoto');
 let currentUser = {
   prenom: localStorage.getItem('prenom') || '',
@@ -580,26 +579,28 @@ async function initCurrentUser() {
 
   if (storedPhoto) {
     if (storedPhoto.startsWith('data:')) {
-      // Photo en Base64
+      // Photo Base64
       currentUser.photo = storedPhoto;
       ownerPhoto.src = storedPhoto;
     } else {
       // Photo stockée sur Supabase
       try {
-        const { data, error } = supabase.storage.from('images').getPublicUrl(storedPhoto);
-        if (error) throw error;
-        if (data?.publicUrl) {
-          currentUser.photo = data.publicUrl;
-          ownerPhoto.src = data.publicUrl;
+        const { publicUrl } = supabase.storage.from('images').getPublicUrl(storedPhoto);
+        if (publicUrl) {
+          currentUser.photo = publicUrl;
+          ownerPhoto.src = publicUrl;
         } else {
           console.warn("Photo Supabase introuvable");
-          ownerPhoto.src = ''; // ou placeholder
+          ownerPhoto.src = 'default-avatar.png'; // mettre ton placeholder
         }
       } catch (err) {
         console.error("Erreur récupération photo Supabase:", err);
-        ownerPhoto.src = ''; // ou placeholder
+        ownerPhoto.src = 'default-avatar.png';
       }
     }
+  } else {
+    // Pas de photo, mettre placeholder
+    ownerPhoto.src = 'default-avatar.png';
   }
 
   ownerPhoto.style.display = 'block';
