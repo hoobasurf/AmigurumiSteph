@@ -567,36 +567,46 @@ const supabase = createClient(
   "sb_publishable_sqsxb-3Kl5o3-JQYv9kGFw_-g0EgwMa"
 );
 
+<script type="module">
+import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
+
+// ==== SUPABASE ====
+const supabase = createClient(
+  "https://jyhbamdcxmpveujjqjla.supabase.co",
+  "sb_publishable_sqsxb-3Kl5o3-JQYv9kGFw_-g0EgwMa"
+);
+
 // ==== CURRENT USER ====
 let currentUser = {
   prenom: localStorage.getItem('prenom') || '',
-  photo: localStorage.getItem('photo') || ''
+  photo: ''
 };
 
-// 🔧 SAFARI / iOS FIX : forcer la récupération Base64
-setTimeout(() => {
-  const storedPhoto = localStorage.getItem('photo');
+const ownerPhoto = document.getElementById('ownerPhoto');
+const storedPhoto = localStorage.getItem('photo');
 
-  if (storedPhoto && storedPhoto.startsWith('data:image')) {
+if (storedPhoto) {
+  // ✅ PHOTO BASE64 (depuis accueil)
+  if (storedPhoto.startsWith('data:')) {
     currentUser.photo = storedPhoto;
     ownerPhoto.src = storedPhoto;
-    ownerPhoto.style.display = 'block';
-  } else {
-    console.warn('Photo absente ou invalide dans localStorage');
   }
-}, 0);
+  // ✅ PHOTO SUPABASE (ancien cas)
+  else {
+    const { data } = supabase
+      .storage
+      .from('images')
+      .getPublicUrl(storedPhoto);
 
-if (currentUser.photo) {
-  const { data } = supabase
-    .storage
-    .from('images')
-    .getPublicUrl(currentUser.photo);
-
-  if (data?.publicUrl) {
-    ownerPhoto.src = data.publicUrl;
-    ownerPhoto.style.display = 'block';
+    if (data?.publicUrl) {
+      currentUser.photo = data.publicUrl;
+      ownerPhoto.src = data.publicUrl;
+    }
   }
+
+  ownerPhoto.style.display = 'block';
 }
+</script>
 
 // ==== VARIABLES GÉNÉRALES ====
 let creations = [];
