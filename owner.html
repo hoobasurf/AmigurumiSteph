@@ -1,3 +1,585 @@
+
+
+
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <link rel="manifest" href="manifest.json">
+
+<link rel="icon" href="favicon.ico" type="image/x-icon">
+<link rel="apple-touch-icon" href="icon-152.png">
+
+<meta name="theme-color" content="#f2b7c9">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{height:100%;font-family:'Comic Sans MS',cursive;overflow-x:hidden;}
+
+/* BODY FIXE */
+body::before {
+  content:"";
+  position:fixed;
+  top:0;
+  left:0;
+  width:100vw;
+  height:100vh;
+  background-image: url('Photoroom_20251223_114401.jpeg');
+  background-size: cover;
+  background-position: center center;
+  background-repeat: no-repeat;
+  z-index:-1;
+}
+
+/* GRILLE HORIZONTALE */
+.center-zone {
+  display:flex;
+  justify-content:center;
+  align-items:flex-start;
+  padding-top:3.5cm;
+  height:auto;
+  overflow:hidden;
+}
+
+#visitor-list-container{
+  display:flex;
+  overflow-x:auto;
+  scroll-snap-type:x mandatory;
+  -webkit-overflow-scrolling: touch;
+  justify-content:center;
+  padding-left:1cm; 
+}
+
+.page{
+  display:grid;
+  grid-template-columns: repeat(2, 1fr);
+  grid-template-rows: repeat(3, 1fr);
+  column-gap:3mm;
+  row-gap:4mm;
+  flex:0 0 auto;
+  width: calc(2 * 200px + 3mm);
+  height: calc(3 * 200px + 8mm);
+  scroll-snap-align:center;
+  padding:4mm;
+  justify-content:center;
+  margin-top:0;
+}
+
+.visitor-item{
+  position:relative;
+  width:200px;
+  height:200px;
+  border-radius:12px;
+  overflow:hidden;
+  border:3px solid #fff;
+  box-shadow:0 0 0 3px #f6c2d1, 0 6px 14px rgba(0,0,0,0.25), inset 0 0 0 1px rgba(255,255,255,0.4);
+  background:#ffe6f0;
+}
+
+.visitor-item .placeholder{
+  position:absolute;
+  inset:0;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  font-size:24px;
+  color:#b84c6f;
+  font-weight:bold;
+}
+
+.visitor-item img {
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  border-radius:12px;
+  cursor:pointer;
+  display:block;
+  filter: brightness(1.05) contrast(1.05) saturate(0.95);
+  transition: filter 0.3s, transform 0.3s;
+  position: relative;
+  z-index: 2;
+}
+.visitor-item img:hover { transform: scale(1.03); }
+
+.visitor-item::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  background:rgba(255,230,240,0.12);
+  pointer-events:none;
+  z-index:1;
+}
+
+/* NOM SOUS IMAGE */
+.visitor-item p{
+  position:absolute;
+  bottom:2px;
+  width:100%;
+  font-size:14px;
+  color:#b84c6f;
+  font-weight:bold;
+  text-align:center;
+  text-shadow:1px 1px 2px rgba(255,255,255,0.8);
+  z-index:3;
+}
+
+/* CROIX SUPPRESSION */
+.delete-btn{
+  position:absolute;
+  top:2px;
+  right:2px;
+  width:20px;
+  height:20px;
+  background:#ffb6c1;
+  color:#fff;
+  border-radius:50%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-weight:bold;
+  cursor:pointer;
+  z-index:5;
+  font-size:14px;
+  transition: background 0.2s;
+}
+.delete-btn:hover{background:#e94f9a;}
+
+/* SIDEBAR */
+#sidebar{
+  position:fixed;
+  top:0;
+  left:-220px;
+  width:220px;
+  height:100vh;
+  background:rgba(255,230,240,0.2);
+  border-right:2px solid #b67385;
+  padding:20px;
+  transition:left .3s;
+  z-index:10;
+}
+#sidebar.sidebar-open{left:0}
+#toggleSidebar{
+  position:absolute;
+  top:50%;
+  right:-30px;
+  width:30px;
+  height:60px;
+  background:#ffb6c1;
+  border-radius:0 12px 12px 0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+  font-weight:bold;
+}
+#sidebar button{
+  width:auto;
+  padding:8px 16px;
+  border-radius:16px;
+  border:none;
+  background:#ffb6c1;
+  color:#fff;
+  cursor:pointer;
+  font-weight:bold;
+}
+
+/* MODAL */
+.modal {
+  position:fixed; inset:0;
+  background:rgba(0,0,0,0.6);
+  display:none;
+  justify-content:center;
+  align-items:center;
+  z-index:10001;
+}
+.modal .modal-box{
+  background:#ffe6f0;
+  padding:16px 24px;
+  border-radius:20px;
+  border:3px solid #b67385;
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+  align-items:center;
+  min-width:200px;
+  font-family:'Comic Sans MS',cursive;
+}
+.modal input{
+  padding:6px 12px;
+  border-radius:10px;
+  border:2px solid #b67385;
+  width:100%;
+}
+.modal button{
+  padding:6px 14px;
+  border:none;
+  background:#ffb6c1;
+  color:#fff;
+  border-radius:12px;
+  cursor:pointer;
+  font-weight:bold;
+  width:100%;
+}
+
+/* ZOOM */
+#zoomModal{
+  position:fixed; inset:0;
+  background:rgba(0,0,0,0.7);
+  display:none;
+  justify-content:center;
+  align-items:center;
+  flex-direction:column;
+  z-index:10000;
+}
+#zoomModal img{
+  max-width:80%;
+  max-height:60vh;
+  border:4px solid #b67385;
+  border-radius:24px;
+  margin-bottom:10px;
+  filter:none;
+}
+#zoomModal .thumbs{
+  display:flex;
+  gap:8px;
+  max-width:80%;
+  overflow-x:auto;
+}
+#zoomModal .thumbs img{
+  width:50px;
+  height:50px;
+  object-fit:cover;
+  border-radius:12px;
+  border:2px solid #b67385;
+  cursor:pointer;
+}
+.closeZoom{
+  position:absolute;
+  top:12px;
+  right:12px;
+  width:28px;
+  height:28px;
+  background:#ffb6c1;
+  color:#fff;
+  border-radius:50%;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  cursor:pointer;
+}
+
+/* BUBBLES */
+.bubble-container{
+  display:flex;
+  gap:8px;
+  overflow-x:auto;
+  padding:4px 0;
+  max-width:100%;
+}
+.bubble{
+  background:rgba(255,182,193,0.3);
+  border-radius:16px;
+  padding:4px 8px;
+  font-size:12px;
+  white-space:nowrap;
+}
+
+/* ACTIONS ZOOM */
+.actions{
+  display:flex;
+  gap:16px;
+  margin-top:6px;
+  justify-content:center;
+}
+.like-btn,.comment-btn{
+  display:flex;
+  align-items:center;
+  gap:6px;
+  padding:4px 10px;
+  border-radius:12px;
+  border:none;
+  cursor:pointer;
+  font-weight:bold;
+  background:transparent;
+  color:#b84c6f;
+  font-size:14px;
+}
+.like-btn svg,.comment-btn svg{
+  width:16px;
+  height:16px;
+  stroke:#ffb6c1;
+  fill:none;
+}
+
+/* Responsive */
+@media(max-width:480px){
+  .page{grid-template-columns: repeat(2, 120px); grid-template-rows: repeat(3, 120px);}
+  .visitor-item{width:120px;height:120px;}
+  .modal .modal-box{min-width:180px;}
+}
+
+.star {
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  background: gold;
+  border-radius: 50%;
+  pointer-events: none;
+  animation: sparkle 0.8s forwards;
+  z-index: 20;
+}
+@keyframes sparkle {
+  to {
+    transform: translate(var(--dx), var(--dy)) scale(0);
+    opacity: 0;
+  }
+}
+
+/* bouton agrandir */
+.expand-btn{
+  position:absolute;
+  top:10px;
+  right:12px;
+  cursor:pointer;
+  font-size:18px;
+  color:#b84c6f;
+}
+
+/* mode plein écran */
+.comment-box.fullscreen{
+  width:95vw;
+  height:90vh;
+  max-width:none;
+  max-height:none;
+  border-radius:16px;
+  justify-content:space-between;
+}
+
+/* taille normale du modal commentaire */
+.comment-box{
+  width:400px;
+  height:400px;
+  max-width:90vw;
+  max-height:80vh;
+}
+
+/* liste commentaires */
+.comment-list{
+  flex:1;
+  width:100%;
+  overflow-y:auto;
+  padding:10px;
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+}
+
+/* commentaire individuel */
+.comment-item{
+  background:rgba(255,182,193,0.25);
+  border-radius:14px;
+  padding:8px 12px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  font-size:14px;
+}
+
+/* cœur par commentaire */
+.comment-like{
+  cursor:pointer;
+  font-size:14px;
+  color:#e94f9a;
+  display:flex;
+  gap:4px;
+  align-items:center;
+}
+
+.comment-input-bar .comment-input {
+  flex: 1;
+  padding: 12px 16px;          
+  border-radius: 16px;          
+  border: 2px solid #b67385;    
+  font-size: 16px;              
+  outline: none;
+  background: #fff0f5;          
+  color: #b84c6f;               
+  box-shadow: 0 2px 6px rgba(0,0,0,0.1); 
+  transition: all 0.3s ease;    
+}
+
+.comment-input-bar .comment-input:focus {
+  border-color: #e94f9a;
+  box-shadow: 0 2px 12px rgba(233,79,154,0.3);
+}
+.comment-input-bar button {
+  padding: 10px 16px;
+  border: none;
+  background: #ffb6c1;
+  color: #fff;
+  border-radius: 12px;
+  cursor: pointer;
+  font-weight: bold;
+}
+
+#likeListModal .modal-box {
+  min-width: 220px;
+  max-width: 80%;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: center;
+}
+#likeListModal .bubble-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  max-height: 200px;
+  overflow-y: auto;
+  width: 100%;
+  padding: 4px;
+}
+#likeListModal button {
+  margin-top: 8px;
+  width: 80px;
+}
+
+.comment-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 6px;
+  padding: 8px 12px;
+  background: rgba(255,182,193,0.25);
+  border-radius: 14px;
+}
+
+.comment-item button {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  cursor: pointer;
+  background: transparent;
+  border: none;
+  font-size: 14px;
+  padding: 2px 4px;
+}
+
+.comment-item svg {
+  width: 16px;
+  height: 16px;
+  stroke: #ffb6c1;
+  fill: none;
+}
+
+#ownerPhoto {
+  width: 48px;                /* taille un peu plus grande */
+  height: 48px;
+  border-radius: 50%;         /* cercle parfait */
+  border: 3px solid #f6c2d1;  /* contour rose pastel */
+  position: fixed;            /* toujours en haut à droite */
+  top: 12px;                  /* décalage depuis le haut */
+  right: 12px;                /* décalage depuis la droite */
+  z-index: 10000;
+  object-fit: cover;          /* l'image remplit le cercle */
+  box-shadow: 0 2px 6px rgba(246,194,209,0.5); /* ombre douce */
+  transition: transform 0.2s;
+}
+
+#ownerPhoto:hover {
+  transform: scale(1.1);       /* effet zoom au survol */
+  cursor: pointer;
+}
+  
+</style>
+</head>
+<body>
+
+  <img id="ownerPhoto" style="width:32px;height:32px;border-radius:50%;position:fixed;top:10px;right:10px;z-index:10000;" alt="Owner">
+
+<div class="center-zone">
+  <div id="visitor-list-container"></div>
+</div>
+
+<div id="sidebar">
+  <div id="toggleSidebar">☰</div>
+  <button id="addBtn">Ajouter</button>
+</div>
+
+<!-- MODAL AJOUT -->
+<div id="addModal" class="modal">
+  <div class="modal-box">
+    <h2>Ajouter des photos</h2>
+    <input id="photoName" placeholder="Nom du projet">
+    <input type="file" id="multiPhoto" multiple>
+    <button id="confirmAdd">Valider</button>
+  </div>
+</div>
+
+<!-- MODAL DELETE -->
+<div id="deleteModal" class="modal">
+  <div class="modal-box">
+    <p>Supprimer définitivement ce projet ?</p>
+    <button id="confirmDelete">Oui</button>
+    <button id="cancelDelete">Annuler</button>
+  </div>
+</div>
+
+<!-- MODAL LIKE -->
+<div id="likeModal" class="modal">
+  <div class="modal-box">
+    <h3>Like ❤️</h3>
+    <input id="likeName" placeholder="Votre prénom">
+    <button id="confirmLike">Valider</button>
+    <div class="bubble-container" id="likeBubbles"></div>
+  </div>
+</div>
+
+<!-- MODAL COMMENT -->
+<div id="commentModal" class="modal">
+  <div class="modal-box comment-box">
+
+    <!-- bouton agrandir -->
+    <div class="expand-btn" id="expandComment">⤢</div>
+
+    <h3>Commentaire 💬</h3>
+
+    <!-- liste commentaires -->
+    <div class="comment-list" id="commentBubbles"></div>
+
+    <!-- barre écriture fixée en bas -->
+    <div class="comment-input-bar">
+      <input id="commentName" placeholder="Votre prénom" class="comment-input">
+      <input id="commentText" placeholder="Votre commentaire" class="comment-input">
+      <button id="confirmComment">Envoyer</button>
+    </div>
+
+  </div>
+</div>
+
+<!-- MODAL LISTE PRÉNOMS PAR COMMENTAIRE -->
+<div id="likeListModal" class="modal">
+  <div class="modal-box">
+    <h3>Prénoms ❤️</h3>
+    <div id="likeListContainer" class="bubble-container"></div>
+    <button onclick="document.getElementById('likeListModal').style.display='none'">Fermer</button>
+  </div>
+</div>
+  
+<!-- ZOOM -->
+<div id="zoomModal">
+  <div class="closeZoom">×</div>
+  <img id="mainZoom">
+  <div class="thumbs" id="thumbs"></div>
+  <div class="actions">
+    <button class="like-btn"><svg viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"></path></svg> <span id="likeCount">0</span></button>
+    <button class="comment-btn"><svg viewBox="0 0 24 24"><path d="M21 6h-18v12h18v-12zm0-2c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2h-18c-1.1 0-2-.9-2-2v-12c0-1.1.9-2 2-2h18z"></path></svg> <span id="commentCount">0</span></button>
+  </div>
+</div>
+
 <script type="module">
 import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
 
@@ -257,3 +839,8 @@ document.addEventListener('DOMContentLoaded', async () => {
   await refreshCreations();
 });
 </script>
+</body>
+</html>
+
+
+
