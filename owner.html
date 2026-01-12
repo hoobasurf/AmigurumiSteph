@@ -855,9 +855,15 @@ document.addEventListener('DOMContentLoaded', async () => {
   await refreshCreations();
 });
 
-console.log('Photo stockée dans localStorage:', localStorage.getItem('photo'));
-alert('Photo stockée: ' + localStorage.getItem('photo'));
-</script>
+(async () => {
+  const storedPhoto = localStorage.getItem('photo');
+  alert('Photo localStorage: ' + storedPhoto);
 
+  if(storedPhoto) return;
+
+  const { data } = supabase.storage.from('images').getPublicUrl('ton_fichier.jpg');
+  alert('Photo Supabase: ' + (data?.publicUrl || 'vide'));
+})();
+</script>
 </body>
 </html>
