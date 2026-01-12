@@ -667,8 +667,20 @@ function render() {
     `;
 
     const img = d.querySelector('img');
-    img.onload = () => d.querySelector('.placeholder').style.display = 'none';
-    img.onerror = () => img.style.display = 'none';
+const placeholder = d.querySelector('.placeholder');
+
+img.onload = () => {
+  placeholder.style.display = 'none';
+};
+
+img.onerror = () => {
+  placeholder.style.display = 'none';
+};
+
+// Sécurité iOS : si l’image est déjà en cache
+if (img.complete && img.naturalWidth > 0) {
+  placeholder.style.display = 'none';
+}
     img.onclick = () => openZoom(c);
 
     d.querySelector('.delete-btn').onclick = () => openDeleteModal(c);
