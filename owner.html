@@ -645,7 +645,6 @@ body::before {
 </div>
 
 <script type="module">
-  
 import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
 
 // ==== SUPABASE ====
@@ -654,113 +653,117 @@ const supabase = createClient(
   "sb_publishable_sqsxb-3Kl5o3-JQYv9kGFw_-g0EgwMa"
 );
 
-// ==== Récupération des créations ====
-async function refreshCreations() {
-  try {
-    const { data, error } = await supabase.from('creations').select('*').order('created_at', { ascending: false });
-    if (error) console.error('Erreur Supabase:', error);
-    else console.log('Creations:', data);
-  } catch (err) {
-    console.error(err);
-  }
-}
-
-// ==== START ====
-document.addEventListener('DOMContentLoaded', async () => {
-  await refreshCreations();
-});
-
-// ================== UTILISATEUR CONNECTÉ ==================
+// ==== UTILISATEUR CONNECTÉ ====
 let currentUser = {
-  prenom: localStorage.getItem('prenom') || '',   // récupère le prénom si défini
-  photo: localStorage.getItem('photo') || ''      // récupère la photo si définie
+  prenom: localStorage.getItem('prenom') || '',
+  photo: localStorage.getItem('photo') || ''
 };
 
+// Affichage avatar en haut à droite
+const ownerImg = document.getElementById('ownerPhoto');
+if(currentUser.photo) ownerImg.src = currentUser.photo;
+ownerImg.classList.add('owner-avatar');
+ownerImg.dataset.name = currentUser.prenom || 'Owner';
+
+// Désactiver champs prénom si déjà défini
 if(currentUser.prenom){
   document.getElementById('likeName')?.setAttribute('disabled', true);
   document.getElementById('commentName')?.setAttribute('disabled', true);
 }
-  
-if(currentUser.photo){
-  const ownerImg = document.getElementById('ownerPhoto');
-  ownerImg.src = currentUser.photo;
-  ownerImg.classList.add('owner-avatar');
-  ownerImg.dataset.name = currentUser.prenom || 'Owner';
-}
 
+// ==== VARIABLES ====
 let creations = [];
-let currentZoom = null;
 let currentDelete = null;
 
-Je te demande tous se code uniquement corrige enlève les doublons fusionne c’est tous 
+// ==== RÉCUPÉRATION DES CRÉATIONS ====
+async function refreshCreations() {
+  try {
+    const { data, error } = await supabase.from('creations')
+      .select('*')
+      .order('created_at', { ascending: false });
+    if(error) return console.error('Erreur Supabase:', error);
 
+    creations = data;
+    console.log('Creations:', creations);
 
+    const container = document.getElementById('visitor-list-container');
+    container.innerHTML = '';
+    creations.forEach(c => {
+      const div = document.createElement('div');
+      div.className = 'visitor-item';
+      div.innerHTML = `
+        <img src="${c.photo}" alt="${c.nom}">
+        <p>${c.nom}</p>
+      `;
+      container.appendChild(div);
+    });
 
-  // ================== EVENTS ==================
-likeModal.onclick = e => { if(e.target === likeModal) likeModal.style.display = 'none'; };
-commentModal.onclick = e => { if(e.target === commentModal) commentModal.style.display = 'none'; };
-deleteModal.onclick = e => { if(e.target === deleteModal) deleteModal.style.display = 'none'; currentDelete=null; };
+  } catch(err) {
+    console.error(err);
+  }
+}
+
+// ==== MODALS & EVENTS ====
+const zoomModal = document.getElementById('zoomModal');
+const likeModal = document.getElementById('likeModal');
+const commentModal = document.getElementById('commentModal');
+const deleteModal = document.getElementById('deleteModal');
+const profileModal = document.createElement('div');
+profileModal.id = 'profileModal';
+profileModal.className = 'modal';
+profileModal.innerHTML = `
+  <div class="modal-box">
+    <img id="profileModalImg" class="profile-big">
+    <p id="profileModalName" class="profile-name"></p>
+  </div>
+`;
+document.body.appendChild(profileModal);
+
+function closeModal(modal){
+  if(modal) modal.style.display = 'none';
+}
+
+[zoomModal, likeModal, commentModal, deleteModal, profileModal].forEach(modal => {
+  modal.onclick = e => { if(e.target === modal) closeModal(modal); };
+});
+
+// Sidebar toggle
+const sidebar = document.getElementById('sidebar');
 document.getElementById('toggleSidebar').onclick = () => sidebar.classList.toggle('sidebar-open');
 
-// ===== AGRANDISSEMENT MODAL COMMENT =====
+// Comment modal fullscreen toggle
 const expandBtn = document.getElementById('expandComment');
 const commentBox = document.querySelector('.comment-box');
-expandBtn.onclick = (e) => {
+expandBtn.onclick = e => {
   e.stopPropagation();
   commentBox.classList.toggle('fullscreen');
   expandBtn.textContent = commentBox.classList.contains('fullscreen') ? '⤡' : '⤢';
 };
 
-const profileModal = document.getElementById('profileModal');
-const profileModalImg = document.getElementById('profileModalImg');
-const profileModalName = document.getElementById('profileModalName');
-
+// Avatar click → profil modal
 document.addEventListener('click', e => {
-  if (e.target.classList.contains('comment-avatar') || e.target.classList.contains('like-avatar')) {
-    profileModalImg.src = e.target.src;
-    profileModalName.textContent =
-  e.target.parentElement.textContent.trim();
+  if(e.target.classList.contains('owner-avatar') 
+     || e.target.classList.contains('like-avatar') 
+     || e.target.classList.contains('comment-avatar')) {
+
+    const img = e.target;
+    const name = img.dataset.name || img.parentElement.textContent.trim();
+    document.getElementById('profileModalImg').src = img.src;
+    document.getElementById('profileModalName').textContent = name;
     profileModal.style.display = 'flex';
   }
 });
 
-profileModal.onclick = e => {
-  if(e.target === profileModal) profileModal.style.display = 'none';
-};
-  
-// ====== CLOSE MODALS ======
-document.querySelector('.closeZoom').onclick=()=>zoomModal.style.display='none';
-zoomModal.onclick=e=>{if(e.target===zoomModal) zoomModal.style.display='none';};
-likeModal.onclick=e=>{if(e.target===likeModal) likeModal.style.display='none';};
-commentModal.onclick=e=>{if(e.target===commentModal) commentModal.style.display='none';};
-deleteModal.onclick=e=>{if(e.target===deleteModal) deleteModal.style.display='none';currentDelete=null;};
+// Close profile modal
+profileModal.onclick = e => { if(e.target === profileModal) closeModal(profileModal); };
 
+// Zoom modal close
+document.querySelector('.closeZoom')?.addEventListener('click', () => closeModal(zoomModal));
 
-// ====== START ======
+// ==== INITIALISATION ====
 document.addEventListener('DOMContentLoaded', async () => {
   await refreshCreations();
 });
-
-// ======================
-// AJOUT CLICK AVATAR → MODAL
-document.addEventListener('click', e => {
-  if(e.target.classList.contains('owner-avatar')
-  || e.target.classList.contains('like-avatar')
-  || e.target.classList.contains('comment-avatar')){
-
-    profileModalImg.src = e.target.src;
-    profileModalName.textContent =
-      e.target.dataset.name || e.target.parentElement.textContent.trim();
-
-    profileModal.style.display = 'flex';
-  }
-});
-
-profileModal.onclick = e => {
-  if(e.target === profileModal) profileModal.style.display = 'none';
-};
-
-
 </script>
 </body>
 </html>
