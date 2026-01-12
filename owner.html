@@ -648,10 +648,27 @@ body::before {
   
 import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
 
+// ==== SUPABASE ====
 const supabase = createClient(
   "https://jyhbamdcxmpveujjqjla.supabase.co",
   "sb_publishable_sqsxb-3Kl5o3-JQYv9kGFw_-g0EgwMa"
 );
+
+// ==== Récupération des créations ====
+async function refreshCreations() {
+  try {
+    const { data, error } = await supabase.from('creations').select('*').order('created_at', { ascending: false });
+    if (error) console.error('Erreur Supabase:', error);
+    else console.log('Creations:', data);
+  } catch (err) {
+    console.error(err);
+  }
+}
+
+// ==== START ====
+document.addEventListener('DOMContentLoaded', async () => {
+  await refreshCreations();
+});
 
 // ================== UTILISATEUR CONNECTÉ ==================
 let currentUser = {
