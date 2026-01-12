@@ -1195,18 +1195,18 @@ manageModal.onclick = e => {
 
 // ===== RENDER GESTION CREATIONS =====
 function renderManageModal() {
-  if (!manageList) return; // sécurité si manageList introuvable
   manageList.innerHTML = "";
 
   creations.forEach(c => {
-    // Création du container principal pour chaque création
     const creationDiv = document.createElement('div');
     creationDiv.style.display = "flex";
-    creationDiv.style.flexDirection = "column"; // photo + nom + sections
+    creationDiv.style.alignItems = "center";
+    creationDiv.style.justifyContent = "space-between";
     creationDiv.style.padding = "6px 0";
     creationDiv.style.borderBottom = "1px solid #f6c2d1";
+    creationDiv.style.cursor = "pointer";
 
-    // ----- Partie cliquable : photo + nom -----
+    // Partie cliquable : photo + nom
     const clickable = document.createElement('div');
     clickable.style.display = "flex";
     clickable.style.alignItems = "center";
@@ -1225,26 +1225,21 @@ function renderManageModal() {
     nameSpan.textContent = c.name;
     clickable.appendChild(nameSpan);
 
-    clickable.style.cursor = "pointer";
+    // Ouvrir zoom en cliquant sur la création
     clickable.onclick = () => {
       manageModal.style.display = 'none';
-      if(c.imgUrl) openZoom(c);
+      openZoom(c);
     };
 
     creationDiv.appendChild(clickable);
 
-    // ----- Likes -----
-    if (c.likes && c.likes.length > 0) {
+    // LIKES
+    if(c.likes && c.likes.length){
       const likeSection = document.createElement('div');
-      likeSection.style.display = "flex";
-      likeSection.style.flexWrap = "wrap";
-      likeSection.style.gap = "4px";
-      likeSection.style.marginTop = "4px";
-
+      likeSection.style.marginLeft = "10px";
       c.likes.forEach((like, idx) => {
         const btn = document.createElement('button');
         btn.textContent = "×";
-        btn.title = like.name || 'Like';
         btn.style.fontSize = "12px";
         btn.style.padding = "2px 6px";
         btn.style.border = "none";
@@ -1252,55 +1247,42 @@ function renderManageModal() {
         btn.style.background = "#e94f9a";
         btn.style.color = "#fff";
         btn.style.cursor = "pointer";
-
         btn.onclick = async () => {
-          c.likes.splice(idx, 1);
-          await supabase.from('creations').update({ likes: c.likes }).eq('id', c.id);
+          c.likes.splice(idx,1);
+          await supabase.from('creations').update({likes:c.likes}).eq('id',c.id);
           renderManageModal();
-          if (currentZoom && currentZoom.id === c.id) renderLikeBubbles();
+          if(currentZoom && currentZoom.id===c.id) renderLikeBubbles();
         };
-
         likeSection.appendChild(btn);
       });
-
       creationDiv.appendChild(likeSection);
     }
 
-    // ----- Commentaires -----
-    if (c.comments && c.comments.length > 0) {
+    // COMMENTS
+    if(c.comments && c.comments.length){
       const commentSection = document.createElement('div');
-      commentSection.style.display = "flex";
-      commentSection.style.flexDirection = "column";
-      commentSection.style.marginTop = "4px";
-      commentSection.innerHTML = `<em>Commentaires:</em>`;
-
+      commentSection.style.marginLeft = "10px";
       c.comments.forEach((comm, idx) => {
-        const commDiv = document.createElement('div');
-        commDiv.style.display = "flex";
-        commDiv.style.justifyContent = "space-between";
-        commDiv.style.alignItems = "center";
-        commDiv.style.padding = "2px 0";
-
-        commDiv.innerHTML = `
-          <span><strong>${comm.name}</strong>: ${comm.text}</span>
-          <button style="font-size:12px;padding:2px 6px;border:none;border-radius:6px;background:#e94f9a;color:#fff;cursor:pointer;">×</button>
-        `;
-
-        const delBtn = commDiv.querySelector("button");
-        delBtn.onclick = async () => {
-          c.comments.splice(idx, 1);
-          await supabase.from('creations').update({ comments: c.comments }).eq('id', c.id);
+        const btn = document.createElement('button');
+        btn.textContent = "×";
+        btn.style.fontSize = "12px";
+        btn.style.padding = "2px 6px";
+        btn.style.border = "none";
+        btn.style.borderRadius = "6px";
+        btn.style.background = "#e94f9a";
+        btn.style.color = "#fff";
+        btn.style.cursor = "pointer";
+        btn.onclick = async () => {
+          c.comments.splice(idx,1);
+          await supabase.from('creations').update({comments:c.comments}).eq('id',c.id);
           renderManageModal();
-          if (currentZoom && currentZoom.id === c.id) renderCommentList();
+          if(currentZoom && currentZoom.id===c.id) renderCommentList();
         };
-
-        commentSection.appendChild(commDiv);
+        commentSection.appendChild(btn);
       });
-
       creationDiv.appendChild(commentSection);
     }
 
-    // ----- Ajouter le container au DOM -----
     manageList.appendChild(creationDiv);
   });
 }
