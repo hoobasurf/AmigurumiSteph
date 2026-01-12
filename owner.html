@@ -471,24 +471,79 @@ body::before {
   fill: none;
 }
 
+/* avatar commentaires & likes */
+.comment-avatar,
+.like-avatar {
+  width: 36px;            /* ← 2 tailles au-dessus */
+  height: 36px;
+  border-radius: 50%;
+  border: 3px solid #f6c2d1;
+  object-fit: cover;
+  box-shadow: 0 0 6px rgba(246,194,209,0.8);
+}
+
+.owner-avatar {
+  width:72px;
+  height:72px;
+  border-radius:50%;
+  border:4px solid #f6c2d1;
+  object-fit:cover;
+  cursor:pointer;
+  box-shadow:0 0 10px rgba(246,194,209,0.9);
+  position:fixed;
+  top:10px;
+  right:10px;
+  z-index:10000;
+}
+
+.profile-big{
+  width:200px;
+  height:200px;
+  border-radius:50%;
+  border:5px solid #f6c2d1;
+  object-fit:cover;
+}
+
+.profile-name{
+  margin-top:12px;
+  font-size:22px;
+  font-weight:700;
+  color:#b84c6f;
+  text-align:center;
+}
+
+#sidebar {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start; /* les boutons principaux en haut */
+  position: fixed;
+  top: 0;
+  left: -220px;
+  width: 220px;
+  height: 100vh;
+  background: rgba(255,230,240,0.2);
+  border-right: 2px solid #b67385;
+  padding: 20px;
+  transition: left .3s;
+  z-index: 10;
+}
+
+#manageBtn {
+  margin-top: auto;       /* pousse le bouton en bas */
+  font-size: 12px;        /* petit et discret */
+  padding: 4px 8px;
+  border-radius: 8px;
+  background: #e94f9a;
+  color: #fff;
+  border: none;
+  cursor: pointer;
+}
+  
 </style>
 </head>
 <body>
 
-  <img
-  id="ownerPhoto"
-  src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==" 
-  style="
-    width:32px;
-    height:32px;
-    border-radius:50%;
-    position:fixed;
-    top:10px;
-    right:10px;
-    z-index:10000;
-    display:none;
-  "
->
+  <img id="ownerPhoto" style="width:32px;height:32px;border-radius:50%;position:fixed;top:10px;right:10px;z-index:10000;" alt="Owner">
 
 <div class="center-zone">
   <div id="visitor-list-container"></div>
@@ -518,6 +573,25 @@ body::before {
   </div>
 </div>
 
+<!-- MODAL DELETE COMMENT -->
+<div id="deleteCommentModal" class="modal">
+  <div class="modal-box">
+    <p>Supprimer définitivement ce commentaire ?</p>
+    <button id="confirmDeleteComment">Oui</button>
+    <button id="cancelDeleteComment">Annuler</button>
+  </div>
+</div>
+
+<!-- MODAL DELETE LIKE -->
+<div id="deleteLikeModal" class="modal">
+  <div class="modal-box">
+    <p>Supprimer ce like ?</p>
+    <button id="confirmDeleteLike">Oui</button>
+    <button id="cancelDeleteLike">Annuler</button>
+  </div>
+</div>
+
+  
 <!-- MODAL LIKE -->
 <div id="likeModal" class="modal">
   <div class="modal-box">
@@ -570,58 +644,38 @@ body::before {
   </div>
 </div>
 
-
 <script type="module">
+  
 import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
 
-// ==== SUPABASE ====
 const supabase = createClient(
   "https://jyhbamdcxmpveujjqjla.supabase.co",
   "sb_publishable_sqsxb-3Kl5o3-JQYv9kGFw_-g0EgwMa"
 );
 
-// ==== TEST CREATIONS (debug iPhone) ====
-(async () => {
-  try {
-    const { data, error } = await supabase.from('creations').select('*');
-    console.log('Creations:', data);
-    if (error) console.error('Erreur Supabase:', error);
-  } catch(e) {
-    console.error('Erreur inattendue:', e);
-  }
-})();
-
-// ==== CURRENT USER & OWNER PHOTO ====
+// ================== UTILISATEUR CONNECTÉ ==================
 let currentUser = {
-  prenom: localStorage.getItem('prenom') || '',
-  photo: ''
+  prenom: localStorage.getItem('prenom') || '',   // récupère le prénom si défini
+  photo: localStorage.getItem('photo') || ''      // récupère la photo si définie
 };
 
-const DEFAULT_PHOTO =
-  "https://jyhbamdcxmpveujjqjla.supabase.co/storage/v1/object/public/images/default-avatar.png";
-
-const ownerPhoto = document.getElementById('ownerPhoto');
-
-/* ✅ SÉCURITÉ ABSOLUE iOS */
-ownerPhoto.src ||= DEFAULT_PHOTO;
-
-ownerPhoto.onerror = () => {
-  ownerPhoto.src = DEFAULT_PHOTO;
-  ownerPhoto.style.display = 'block';
-};
-
-// Force une photo par défaut pour debug iPhone
-function initCurrentUser() {
-  ownerPhoto.src = DEFAULT_PHOTO;
-  ownerPhoto.style.display = 'block';
-  currentUser.photo = ownerPhoto.src;
+if(currentUser.prenom){
+  document.getElementById('likeName')?.setAttribute('disabled', true);
+  document.getElementById('commentName')?.setAttribute('disabled', true);
+}
+  
+if(currentUser.photo){
+  const ownerImg = document.getElementById('ownerPhoto');
+  ownerImg.src = currentUser.photo;
+  ownerImg.classList.add('owner-avatar');
+  ownerImg.dataset.name = currentUser.prenom || 'Owner';
 }
 
-// ==== VARIABLES GÉNÉRALES ====
 let creations = [];
 let currentZoom = null;
 let currentDelete = null;
 
+// ====== ELEMENTS ======
 const container = document.getElementById('visitor-list-container');
 const addModal = document.getElementById('addModal');
 const deleteModal = document.getElementById('deleteModal');
@@ -641,11 +695,10 @@ const commentModal = document.getElementById('commentModal');
 const confirmComment = document.getElementById('confirmComment');
 const commentBubbles = document.getElementById('commentBubbles');
 
-// ==== RENDER VISITOR ITEMS ====
+// ====== RENDER ======
 function render() {
   container.innerHTML = '';
   let page = null;
-
   creations.forEach((c, i) => {
     if (i % 6 === 0) {
       page = document.createElement('div');
@@ -656,201 +709,647 @@ function render() {
     const d = document.createElement('div');
     d.className = 'visitor-item';
     d.innerHTML = `
-  <div class="delete-btn">×</div>
-  <p>${c.name}</p>
-  <img src="${c.imgUrl || ''}">
-`;
+      <div class="placeholder">?</div>
+      <div class="delete-btn">×</div>
+      <p>${c.name}</p>
+      <img src="${c.imgUrl || ''}">
+    `;
 
     const img = d.querySelector('img');
 const placeholder = d.querySelector('.placeholder');
 
-img.onload = () => {
-  placeholder.remove();
-};
-
-img.onerror = () => {
-  placeholder.remove();
-};
-
-// iOS / Chrome : image déjà chargée depuis cache
-if (img.complete && img.naturalWidth > 0) {
-  placeholder.remove();
-}
-
-// Sécurité iOS : si l’image est déjà en cache
-if (img.complete && img.naturalWidth > 0) {
-  placeholder.style.display = 'none';
-}
-    img.onclick = () => openZoom(c);
-
+img.src = c.imgUrl;  // ← image principale
+img.onload = () => placeholder.style.display = 'none';
+img.onerror = () => placeholder.textContent = '❌';
+img.onclick = () => openZoom(c);
     d.querySelector('.delete-btn').onclick = () => openDeleteModal(c);
 
     page.appendChild(d);
   });
 }
 
-// ==== ZOOM ====
+// ====== ZOOM ======
 function openZoom(c){
   currentZoom = c;
   mainZoom.src = c.imgUrl;
   thumbs.innerHTML = '';
-  if (!c.zoomGroup || c.zoomGroup.length === 0) c.zoomGroup = [c.imgUrl];
-
-  c.zoomGroup.forEach(u => {
-    const t = document.createElement('img');
-    t.src = u;
-    t.onclick = () => mainZoom.src = u;
+  if(!c.zoomGroup || c.zoomGroup.length===0) c.zoomGroup=[c.imgUrl];
+  c.zoomGroup.forEach(u=>{
+    const t=document.createElement('img');
+    t.src=u;
+    t.onclick=()=>mainZoom.src=u;
     thumbs.appendChild(t);
   });
-
   updateActions();
-  zoomModal.style.display = 'flex';
+  zoomModal.style.display='flex';
 }
-
 function updateActions(){
-  likeCount.textContent = currentZoom.likes?.length || 0;
-  commentCount.textContent = currentZoom.comments?.length || 0;
+  likeCount.textContent = currentZoom.likes?.length||0;
+  commentCount.textContent = currentZoom.comments?.length||0;
 }
 
-// ==== LIKE ====
+// ====== LIKE ======
 document.querySelector('.like-btn').onclick = () => {
   if (!currentZoom) return;
 
   likeBubbles.innerHTML = '';
+
   (currentZoom.likes || []).forEach(like => {
     const bubble = document.createElement('div');
     bubble.className = 'bubble';
-    if (like.photo) {
-      bubble.innerHTML = `<img src="${like.photo}" style="width:20px;height:20px;border-radius:50%;margin-right:4px;vertical-align:middle;">${like.name}`;
-    } else bubble.textContent = like.name;
+bubble.innerHTML = like.photo
+  ? `<img src="${like.photo}" class="like-avatar"> ${like.name}`
+  : like.name;
     likeBubbles.appendChild(bubble);
   });
 
   likeNameInput.value = currentUser.prenom || '';
+  if (currentUser.prenom) likeNameInput.disabled = true;
+
   likeModal.style.display = 'flex';
 };
 
 confirmLike.onclick = async () => {
-  const name = likeNameInput.value.trim();
-  if (!name || !currentZoom) return;
+  if (!currentZoom) return;
+
+  let name = currentUser.prenom || likeNameInput.value.trim();
+  if (!name) name = 'Anonyme';
+
+  // --- Assurer que photo est une URL publique ---
+  let photoUrl = '';
+  if (currentUser.photo) {
+    // Si currentUser.photo commence par "http", c'est déjà une URL
+    if (currentUser.photo.startsWith('http')) {
+      photoUrl = currentUser.photo;
+    } else {
+      // Sinon, mettre une image par défaut
+      photoUrl = 'default-avatar.png'; 
+    }
+  }
 
   if (!currentZoom.likes) currentZoom.likes = [];
-  currentZoom.likes.push({ name, photo: currentUser.photo || '' });
 
-  const { error } = await supabase.from('creations')
-    .update({ likes: currentZoom.likes })
-    .eq('id', currentZoom.id);
+  currentZoom.likes.push({
+    name,
+    photo: photoUrl
+  });
 
-  if (error) console.error(error);
+  try {
+    const { error } = await supabase
+      .from('creations')
+      .update({ likes: currentZoom.likes })
+      .eq('id', currentZoom.id);
 
+    if (error) console.error(error);
+  } catch (err) {
+    console.error(err);
+  }
+
+  renderLikeBubbles();
   likeModal.style.display = 'none';
-  updateActions();
 };
 
-// ==== COMMENT ====
-document.querySelector('.comment-btn').onclick = () => {
-  if (!currentZoom) return;
+function renderLikeBubbles() {
+  likeBubbles.innerHTML = '';
+
+  (currentZoom.likes || []).forEach(like => {
+  const bubble = document.createElement('div');
+  bubble.className = 'bubble';
+
+  const name = like.name || 'Utilisateur';
+  const photo = like.photo || '';
+
+  bubble.innerHTML = photo
+    ? `<img src="${photo}" class="like-avatar" data-name="${name}"> ${name}`
+    : name;
+
+  likeBubbles.appendChild(bubble);
+
+  // ===== LONG PRESS LIKE =====
+  let pressTimer;
+  bubble.addEventListener('mousedown', e => {
+    pressTimer = setTimeout(() => {
+      currentDeleteLike = like;
+      document.getElementById('deleteLikeModal').style.display = 'flex';
+    }, 800);
+  });
+  bubble.addEventListener('mouseup', e => clearTimeout(pressTimer));
+  bubble.addEventListener('mouseleave', e => clearTimeout(pressTimer));
+  bubble.addEventListener('touchstart', e => {
+    pressTimer = setTimeout(() => {
+      currentDeleteLike = like;
+      document.getElementById('deleteLikeModal').style.display = 'flex';
+    }, 800);
+  });
+  bubble.addEventListener('touchend', e => clearTimeout(pressTimer));
+  bubble.addEventListener('touchmove', e => clearTimeout(pressTimer));
+});
+
+  updateActions();
+}
+  
+// ====== COMMENT ======
+document.querySelector('.comment-btn').onclick=()=>{
+  const commentNameInput = document.getElementById('commentName');
+commentNameInput.value = currentUser.prenom || '';
+if(currentUser.prenom) commentNameInput.disabled = true;  // bloque modification si connecté
+  if(!currentZoom) return;
   renderCommentList();
-  document.getElementById('commentName').value = currentUser.prenom || '';
-  document.getElementById('commentText').value = '';
-  commentModal.style.display = 'flex';
+  document.getElementById('commentName').value=currentUser.prenom||'';
+  document.getElementById('commentText').value='';
+  commentModal.style.display='flex';
 };
 
 function renderCommentList() {
   commentBubbles.innerHTML = '';
+
   (currentZoom.comments || []).forEach(c => {
     const item = document.createElement('div');
     item.className = 'comment-item';
-    item.innerHTML = `${c.photo ? `<img src="${c.photo}" style="width:20px;height:20px;border-radius:50%;margin-right:4px;vertical-align:middle;">` : ''}<strong>${c.name}</strong> : ${c.text}`;
+
+    item.innerHTML = `
+      <div style="display:flex;align-items:center;gap:8px;">
+        ${c.photo ? `<img src="${c.photo}" class="comment-avatar">` : ``}
+        <div>
+          <strong>${c.name}</strong><br>
+          <span>${c.text}</span>
+        </div>
+      </div>
+    `;
+
     commentBubbles.appendChild(item);
+
+    // ===== LONG PRESS COMMENT =====
+    let pressTimer;
+    item.addEventListener('mousedown', e => {
+      pressTimer = setTimeout(() => {
+        currentDeleteComment = c;
+        document.getElementById('deleteCommentModal').style.display = 'flex';
+      }, 800);
+    });
+    item.addEventListener('mouseup', e => clearTimeout(pressTimer));
+    item.addEventListener('mouseleave', e => clearTimeout(pressTimer));
+    item.addEventListener('touchstart', e => {
+      pressTimer = setTimeout(() => {
+        currentDeleteComment = c;
+        document.getElementById('deleteCommentModal').style.display = 'flex';
+      }, 800);
+    });
+    item.addEventListener('touchend', e => clearTimeout(pressTimer));
+    item.addEventListener('touchmove', e => clearTimeout(pressTimer));
   });
+
   commentCount.textContent = currentZoom.comments?.length || 0;
 }
 
 confirmComment.onclick = async () => {
-  const name = document.getElementById('commentName').value.trim();
+  if (!currentZoom) return;
+
+  const name = currentUser.prenom || document.getElementById('commentName').value.trim();
   const text = document.getElementById('commentText').value.trim();
-  if (!name || !text || !currentZoom) return;
+
+  if (!name || !text) return;
 
   if (!currentZoom.comments) currentZoom.comments = [];
-  currentZoom.comments.push({ name, text, photo: currentUser.photo || '', likes: [] });
 
-  await supabase.from('creations').update({ comments: currentZoom.comments }).eq('id', currentZoom.id);
+  currentZoom.comments.push({
+    name,
+    text,
+    photo: currentUser.photo || ''
+  });
+
+  await supabase
+    .from('creations')
+    .update({ comments: currentZoom.comments })
+    .eq('id', currentZoom.id);
+
   renderCommentList();
   document.getElementById('commentText').value = '';
 };
 
-// ==== DELETE ====
+// ====== DELETE ======
 function openDeleteModal(project){
-  currentDelete = project;
-  deleteModal.style.display = 'flex';
+  currentDelete=project;
+  deleteModal.style.display='flex';
 }
-document.getElementById('cancelDelete').onclick = () => { currentDelete = null; deleteModal.style.display = 'none'; };
-document.getElementById('confirmDelete').onclick = async () => {
-  if (!currentDelete?.id) return;
-  const { error } = await supabase.from('creations').delete().eq('id', currentDelete.id);
-  if (error) { console.error(error); return; }
+document.getElementById('cancelDelete').onclick=()=>{currentDelete=null;deleteModal.style.display='none';};
+document.getElementById('confirmDelete').onclick=async()=>{
+  if(!currentDelete?.id) return;
+  const {error}=await supabase.from('creations').delete().eq('id',currentDelete.id);
+  if(error){console.error(error);return;}
   await refreshCreations();
-  deleteModal.style.display = 'none';
-  currentDelete = null;
+  deleteModal.style.display='none';
+  currentDelete=null;
 };
 
-// ==== REFRESH CREATIONS ====
-async function refreshCreations() {
-  const { data, error } = await supabase.from('creations').select('*').order('created_at', { ascending: false });
-  if (error) { console.error(error); return; }
+// ====== AJOUT ======
+document.getElementById('addBtn').onclick=()=>{addModal.style.display='flex';};
+addModal.addEventListener('click',e=>{if(e.target===addModal)addModal.style.display='none';});
+document.getElementById('confirmAdd').onclick=async(e)=>{
+  e.stopPropagation();
+  const name=document.getElementById('photoName').value.trim();
+  const files=document.getElementById('multiPhoto').files;
+  if(!name||!files.length){alert("Veuillez mettre un nom et sélectionner au moins une photo");return;}
+  const paths=[]; const urls=[];
+  for(let file of files){
+    const path=`${Date.now()}_${file.name}`;
+    const {error:uploadError}=await supabase.storage.from('images').upload(path,file);
+    if(uploadError){console.error(uploadError);continue;}
+    const {data:pubData}=supabase.storage.from('images').getPublicUrl(path);
+    if(!pubData||!pubData.publicUrl) continue;
+    urls.push(pubData.publicUrl); paths.push(path);
+  }
+  if(urls.length===0) return;
+  const {data,error}=await supabase.from('creations').insert([{name,image_path:paths[0],images:paths,likes:[],comments:[]}]).select();
+  if(error){console.error(error);return;}
+  addModal.style.display='none';
+  document.getElementById('photoName').value='';
+  document.getElementById('multiPhoto').value='';
+  await refreshCreations();
+};
 
+// ====== REFRESH ======
+async function refreshCreations() {
+  const { data, error } = await supabase
+    .from('creations')
+    .select('*')
+    .order('created_at', { ascending: false });
+
+  if (error) {
+    console.error(error);
+    return;
+  }
+
+  // Préparer toutes les URLs avant le render
   creations = data.map(c => {
     let zoomGroup = [];
-
-    if (c.images && c.images.length) {
-      zoomGroup = c.images.map(p => {
-  const { data } = supabase.storage.from('images').getPublicUrl(p);
-  return data?.publicUrl || '';
-});
+    if (c.images && Array.isArray(c.images) && c.images.length) {
+      zoomGroup = c.images.map(p => supabase.storage.from('images').getPublicUrl(p).data.publicUrl);
     } else if (c.image_path) {
-      const { data } = supabase.storage.from('images').getPublicUrl(c.image_path);
-zoomGroup = [data?.publicUrl || ''];
+      zoomGroup = [supabase.storage.from('images').getPublicUrl(c.image_path).data.publicUrl];
     }
 
     return {
       id: c.id,
       name: c.name,
-      imgUrl: zoomGroup[0] || '',
+      caption: c.caption || '',
+      imgUrl: zoomGroup[0] || '',   // image principale
       zoomGroup,
-      likes: c.likes || [],
-      comments: c.comments || []
+      likes: Array.isArray(c.likes)
+  ? c.likes.map(like => {
+      if (like && typeof like === 'object') {
+        return {
+          name: like.name || 'Utilisateur',
+          photo: like.photo || ''
+        };
+      } else if (typeof like === 'string') {
+        return { name: like, photo: '' };
+      } else {
+        return { name: 'Utilisateur', photo: '' };
+      }
+    })
+  : [],
+      comments: Array.isArray(c.comments)
+  ? c.comments.map(cmt => ({
+      name: (cmt && cmt.name) || 'Utilisateur',
+      text: (cmt && cmt.text) || '',
+      photo: (cmt && cmt.photo) || ''
+    }))
+  : []
     };
   });
 
   render();
 }
+// ================== BOUTONS SIDEBAR ==================
+const addBtn = document.getElementById('addBtn');
 
-// ==== CLOSE MODALS ====
-document.querySelector('.closeZoom').onclick = () => zoomModal.style.display = 'none';
-zoomModal.onclick = e => { if(e.target===zoomModal) zoomModal.style.display='none'; };
-likeModal.onclick = e => { if(e.target===likeModal) likeModal.style.display='none'; };
-commentModal.onclick = e => { if(e.target===commentModal) commentModal.style.display='none'; };
-deleteModal.onclick = e => { if(e.target===deleteModal) deleteModal.style.display='none'; currentDelete=null; };
+// --- Bouton Pelotes ---
+const pelotesBtn = document.createElement('button');
+pelotesBtn.textContent = "Pelotes";
+pelotesBtn.style.marginTop = "10px";
 
-// ==== SIDEBAR TOGGLE ====
+addBtn.insertAdjacentElement('afterend', pelotesBtn);
+
+pelotesBtn.onclick = () => {
+  document.body.style.transition = 'opacity 0.5s';
+  document.body.style.opacity = '0';
+  setTimeout(() => {
+    window.location.href = 'pelotes.html';
+  }, 500);
+};
+
+// --- Bouton Vidéo ---
+const videoBtn = document.createElement('button');
+videoBtn.textContent = "Vidéo";
+videoBtn.style.marginTop = "10px";
+
+pelotesBtn.insertAdjacentElement('afterend', videoBtn);
+
+videoBtn.onclick = () => {
+  document.body.style.transition = 'opacity 0.5s';
+  document.body.style.opacity = '0';
+  setTimeout(() => {
+    window.location.href = 'video.html'; // ← change si besoin
+  }, 500);
+};
+
+// --- Bouton Notes ---
+const notesBtn = document.createElement('button');
+notesBtn.textContent = "Notes";
+notesBtn.style.marginTop = "10px";
+
+videoBtn.insertAdjacentElement('afterend', notesBtn);
+
+notesBtn.onclick = () => {
+  document.body.style.transition = 'opacity 0.5s';
+  document.body.style.opacity = '0';
+  setTimeout(() => {
+    window.location.href = 'notes.html'; // ← change le lien si nécessaire
+  }, 500);
+};
+
+// --- Bouton Messagerie ---
+const messagerieBtn = document.createElement('button');
+messagerieBtn.textContent = "Messagerie";
+messagerieBtn.style.marginTop = "10px";
+
+notesBtn.insertAdjacentElement('afterend', messagerieBtn);
+
+messagerieBtn.onclick = () => {
+  document.body.style.transition = 'opacity 0.5s';
+  document.body.style.opacity = '0';
+  setTimeout(() => {
+    window.location.href = 'messagerie.html';
+  }, 500);
+};
+
+// ===== COMMENT =====
+document.getElementById('cancelDeleteComment').onclick = () => {
+  currentDeleteComment = null;
+  document.getElementById('deleteCommentModal').style.display = 'none';
+};
+
+document.getElementById('confirmDeleteComment').onclick = async () => {
+  if (!currentZoom || !currentDeleteComment) return;
+
+  currentZoom.comments = (currentZoom.comments || []).filter(c => c !== currentDeleteComment);
+
+  await supabase.from('creations').update({ comments: currentZoom.comments }).eq('id', currentZoom.id);
+
+  renderCommentList();
+  currentDeleteComment = null;
+  document.getElementById('deleteCommentModal').style.display = 'none';
+};
+
+// ===== LIKE =====
+document.getElementById('cancelDeleteLike').onclick = () => {
+  currentDeleteLike = null;
+  document.getElementById('deleteLikeModal').style.display = 'none';
+};
+
+document.getElementById('confirmDeleteLike').onclick = async () => {
+  if (!currentZoom || !currentDeleteLike) return;
+
+  currentZoom.likes = (currentZoom.likes || []).filter(l => l !== currentDeleteLike);
+
+  await supabase.from('creations').update({ likes: currentZoom.likes }).eq('id', currentZoom.id);
+
+  renderLikeBubbles();
+  currentDeleteLike = null;
+  document.getElementById('deleteLikeModal').style.display = 'none';
+};
+
+  
+// ================== EVENTS ==================
+likeModal.onclick = e => { if(e.target === likeModal) likeModal.style.display = 'none'; };
+commentModal.onclick = e => { if(e.target === commentModal) commentModal.style.display = 'none'; };
+deleteModal.onclick = e => { if(e.target === deleteModal) { deleteModal.style.display = 'none'; currentDelete=null; } };
+zoomModal.onclick = e => { if(e.target === zoomModal) zoomModal.style.display = 'none'; };
+document.querySelector('.closeZoom').onclick = () => zoomModal.style.display='none';
 document.getElementById('toggleSidebar').onclick = () => sidebar.classList.toggle('sidebar-open');
 
-// ==== INIT ====
+// ===== AGRANDISSEMENT MODAL COMMENT =====
+const expandBtn = document.getElementById('expandComment');
+const commentBox = document.querySelector('.comment-box');
+expandBtn.onclick = (e) => {
+  e.stopPropagation();
+  commentBox.classList.toggle('fullscreen');
+  expandBtn.textContent = commentBox.classList.contains('fullscreen') ? '⤡' : '⤢';
+};
+
+// ================== CLICK AVATAR → PROFILE MODAL ==================
+const profileModal = document.getElementById('profileModal');
+const profileModalImg = document.getElementById('profileModalImg');
+const profileModalName = document.getElementById('profileModalName');
+
+document.addEventListener('click', e => {
+  if(
+    e.target.classList.contains('owner-avatar') ||
+    e.target.classList.contains('like-avatar') ||
+    e.target.classList.contains('comment-avatar')
+  ){
+    profileModalImg.src = e.target.src;
+    profileModalName.textContent = e.target.dataset.name || e.target.parentElement.textContent.trim();
+    profileModal.style.display = 'flex';
+  }
+});
+
+profileModal.onclick = e => {
+  if(e.target === profileModal) profileModal.style.display = 'none';
+};
+
+// ===== BOUTON GESTION CREATIONS =====
+const manageBtn = document.createElement('button');
+manageBtn.id = 'manageBtn';
+manageBtn.textContent = "Gérer Créations";
+sidebar.appendChild(manageBtn);
+
+// MODAL GESTION CREATIONS
+const manageModal = document.createElement('div');
+manageModal.className = "modal";
+manageModal.innerHTML = `
+  <div class="modal-box" style="max-height:80vh;overflow-y:auto;">
+    <h3>Gérer Création</h3>
+    <div id="manageList"></div>
+    <button id="closeManage" style="margin-top:10px;">Fermer</button>
+  </div>
+`;
+document.body.appendChild(manageModal);
+
+const manageList = manageModal.querySelector("#manageList");
+const closeManage = manageModal.querySelector("#closeManage");
+
+manageBtn.onclick = () => {
+  renderManageModal();
+  manageModal.style.display = "flex";
+};
+
+closeManage.onclick = () => {
+  manageModal.style.display = "none";
+};
+
+manageModal.onclick = e => {
+  if(e.target === manageModal) manageModal.style.display = "none";
+};
+
+// ===== RENDER GESTION CREATIONS =====
+function renderManageModal() {
+  if (!manageList) return; // sécurité si manageList introuvable
+  manageList.innerHTML = "";
+
+  creations.forEach(c => {
+    // Création du container principal pour chaque création
+    const creationDiv = document.createElement('div');
+    creationDiv.style.display = "flex";
+    creationDiv.style.flexDirection = "column"; // photo + nom + sections
+    creationDiv.style.padding = "6px 0";
+    creationDiv.style.borderBottom = "1px solid #f6c2d1";
+
+    // ----- Partie cliquable : photo + nom -----
+    const clickable = document.createElement('div');
+    clickable.style.display = "flex";
+    clickable.style.alignItems = "center";
+    clickable.style.gap = "8px";
+
+    const img = document.createElement('img');
+    img.src = c.imgUrl || '';
+    img.style.width = "40px";
+    img.style.height = "40px";
+    img.style.objectFit = "cover";
+    img.style.borderRadius = "8px";
+    img.style.border = "2px solid #f6c2d1";
+    clickable.appendChild(img);
+
+    const nameSpan = document.createElement('span');
+    nameSpan.textContent = c.name;
+    clickable.appendChild(nameSpan);
+
+    clickable.style.cursor = "pointer";
+    clickable.onclick = () => {
+      manageModal.style.display = 'none';
+      if(c.imgUrl) openZoom(c);
+    };
+
+    creationDiv.appendChild(clickable);
+
+    // ----- Likes -----
+    if (c.likes && c.likes.length > 0) {
+      const likeSection = document.createElement('div');
+      likeSection.style.display = "flex";
+      likeSection.style.flexWrap = "wrap";
+      likeSection.style.gap = "4px";
+      likeSection.style.marginTop = "4px";
+
+      c.likes.forEach((like, idx) => {
+        const btn = document.createElement('button');
+        btn.textContent = "×";
+        btn.title = like.name || 'Like';
+        btn.style.fontSize = "12px";
+        btn.style.padding = "2px 6px";
+        btn.style.border = "none";
+        btn.style.borderRadius = "6px";
+        btn.style.background = "#e94f9a";
+        btn.style.color = "#fff";
+        btn.style.cursor = "pointer";
+
+        btn.onclick = async () => {
+          c.likes.splice(idx, 1);
+          await supabase.from('creations').update({ likes: c.likes }).eq('id', c.id);
+          renderManageModal();
+          if (currentZoom && currentZoom.id === c.id) renderLikeBubbles();
+        };
+
+        likeSection.appendChild(btn);
+      });
+
+      creationDiv.appendChild(likeSection);
+    }
+
+    // ----- Commentaires -----
+    if (c.comments && c.comments.length > 0) {
+      const commentSection = document.createElement('div');
+      commentSection.style.display = "flex";
+      commentSection.style.flexDirection = "column";
+      commentSection.style.marginTop = "4px";
+      commentSection.innerHTML = `<em>Commentaires:</em>`;
+
+      c.comments.forEach((comm, idx) => {
+        const commDiv = document.createElement('div');
+        commDiv.style.display = "flex";
+        commDiv.style.justifyContent = "space-between";
+        commDiv.style.alignItems = "center";
+        commDiv.style.padding = "2px 0";
+
+        commDiv.innerHTML = `
+          <span><strong>${comm.name}</strong>: ${comm.text}</span>
+          <button style="font-size:12px;padding:2px 6px;border:none;border-radius:6px;background:#e94f9a;color:#fff;cursor:pointer;">×</button>
+        `;
+
+        const delBtn = commDiv.querySelector("button");
+        delBtn.onclick = async () => {
+          c.comments.splice(idx, 1);
+          await supabase.from('creations').update({ comments: c.comments }).eq('id', c.id);
+          renderManageModal();
+          if (currentZoom && currentZoom.id === c.id) renderCommentList();
+        };
+
+        commentSection.appendChild(commDiv);
+      });
+
+      creationDiv.appendChild(commentSection);
+    }
+
+    // ----- Ajouter le container au DOM -----
+    manageList.appendChild(creationDiv);
+  });
+}
+
+    // COMMENTS
+    if(c.comments && c.comments.length){
+      const commentSection = document.createElement('div');
+      commentSection.style.margin = "4px 0";
+      commentSection.innerHTML = `<em>Commentaires:</em>`;
+      c.comments.forEach((comm, idx) => {
+        const commDiv = document.createElement('div');
+        commDiv.style.display = "flex";
+        commDiv.style.justifyContent = "space-between";
+        commDiv.style.alignItems = "center";
+        commDiv.style.padding = "2px 0";
+
+        commDiv.innerHTML = `
+          <span><strong>${comm.name}</strong>: ${comm.text}</span>
+          <button style="font-size:12px;padding:2px 6px;border:none;border-radius:6px;background:#e94f9a;color:#fff;cursor:pointer;">Supprimer</button>
+        `;
+        commDiv.querySelector("button").onclick = async () => {
+          c.comments.splice(idx,1);
+          await supabase.from('creations').update({comments:c.comments}).eq('id',c.id);
+          renderManageModal();
+          if(currentZoom && currentZoom.id===c.id) renderCommentList();
+        };
+        commentSection.appendChild(commDiv);
+      });
+      creationDiv.appendChild(commentSection);
+    }
+
+    manageList.appendChild(creationDiv);
+  });
+}
+  
+// ====== START ======
 document.addEventListener('DOMContentLoaded', async () => {
-  initCurrentUser();
   await refreshCreations();
 });
 
-(async () => {
-  const storedPhoto = localStorage.getItem('photo');
-  alert('Photo localStorage: ' + storedPhoto);
 
-  if(storedPhoto) return;
-
-  const { data } = supabase.storage.from('images').getPublicUrl('ton_fichier.jpg');
-  alert('Photo Supabase: ' + (data?.publicUrl || 'vide'));
-})();
 </script>
+
+<div id="profileModal" class="modal">
+  <div class="modal-box">
+    <img id="profileModalImg" class="profile-big">
+    <div id="profileModalName" class="profile-name"></div>
+  </div>
+</div>
+  
 </body>
 </html>
