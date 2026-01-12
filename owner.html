@@ -781,9 +781,13 @@ async function refreshCreations() {
     let zoomGroup = [];
 
     if (c.images && c.images.length) {
-      zoomGroup = c.images.map(p => supabase.storage.from('images').getPublicUrl(p).publicUrl);
+      zoomGroup = c.images.map(p => {
+  const { data } = supabase.storage.from('images').getPublicUrl(p);
+  return data?.publicUrl || '';
+});
     } else if (c.image_path) {
-      zoomGroup = [supabase.storage.from('images').getPublicUrl(c.image_path).publicUrl];
+      const { data } = supabase.storage.from('images').getPublicUrl(c.image_path);
+zoomGroup = [data?.publicUrl || ''];
     }
 
     return {
