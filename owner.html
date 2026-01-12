@@ -672,11 +672,10 @@ function render() {
     const d = document.createElement('div');
     d.className = 'visitor-item';
     d.innerHTML = `
-      <div class="placeholder">?</div>
-      <div class="delete-btn">×</div>
-      <p>${c.name}</p>
-      <img src="${c.imgUrl || ''}">
-    `;
+  <div class="delete-btn">×</div>
+  <p>${c.name}</p>
+  <img src="${c.imgUrl || ''}">
+`;
 
     const img = d.querySelector('img');
 const placeholder = d.querySelector('.placeholder');
