@@ -488,9 +488,8 @@ body::before {
     z-index:10000;
     display:none;
   "
-  alt="Photo de profil"
-/>
-  
+>
+
 <div class="center-zone">
   <div id="visitor-list-container"></div>
 </div>
@@ -600,35 +599,37 @@ ownerPhoto.onerror = () => {
   ownerPhoto.style.display = 'block';
 };
 
-  function initCurrentUser() {
+function initCurrentUser() {
   ownerPhoto.style.display = 'none';
 
-  const storedPhoto = localStorage.getItem('photo');
+  setTimeout(() => {
+    const storedPhoto = localStorage.getItem('photo');
 
-  if (!storedPhoto) {
-    ownerPhoto.src = DEFAULT_PHOTO;
-    currentUser.photo = DEFAULT_PHOTO;
+    if (!storedPhoto) {
+      ownerPhoto.src = DEFAULT_PHOTO;
+      currentUser.photo = DEFAULT_PHOTO;
+      ownerPhoto.style.display = 'block';
+      return;
+    }
+
+    if (storedPhoto.startsWith('data:image')) {
+      ownerPhoto.src = storedPhoto;
+      currentUser.photo = storedPhoto;
+      ownerPhoto.style.display = 'block';
+      return;
+    }
+
+    const { data } = supabase
+      .storage
+      .from('images')
+      .getPublicUrl(storedPhoto);
+
+    ownerPhoto.src = data?.publicUrl || DEFAULT_PHOTO;
+    currentUser.photo = ownerPhoto.src;
     ownerPhoto.style.display = 'block';
-    return;
-  }
-
-  if (storedPhoto.startsWith('data:image')) {
-    ownerPhoto.src = storedPhoto;
-    currentUser.photo = storedPhoto;
-    ownerPhoto.style.display = 'block';
-    return;
-  }
-
-  // Si ce n’est pas un dataURL, on suppose que c’est un nom dans Supabase
-  const { data } = supabase
-    .storage
-    .from('images')
-    .getPublicUrl(storedPhoto);
-
-  ownerPhoto.src = data?.publicUrl || DEFAULT_PHOTO;
-  currentUser.photo = ownerPhoto.src;
-  ownerPhoto.style.display = 'block';
+  }, 200); // ⬅️ CRUCIAL iOS
 }
+
 // ==== VARIABLES GÉNÉRALES ====
 let creations = [];
 let currentZoom = null;
