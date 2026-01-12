@@ -682,12 +682,17 @@ function render() {
 const placeholder = d.querySelector('.placeholder');
 
 img.onload = () => {
-  placeholder.style.display = 'none';
+  placeholder.remove();
 };
 
 img.onerror = () => {
-  placeholder.style.display = 'none';
+  placeholder.remove();
 };
+
+// iOS / Chrome : image déjà chargée depuis cache
+if (img.complete && img.naturalWidth > 0) {
+  placeholder.remove();
+}
 
 // Sécurité iOS : si l’image est déjà en cache
 if (img.complete && img.naturalWidth > 0) {
