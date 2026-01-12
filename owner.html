@@ -475,7 +475,21 @@ body::before {
 </head>
 <body>
 
-  <img id="ownerPhoto" style="width:32px;height:32px;border-radius:50%;position:fixed;top:10px;right:10px;z-index:10000;" alt="Owner">
+  <img
+  id="ownerPhoto"
+  alt=""
+  src=""
+  style="
+    width:32px;
+    height:32px;
+    border-radius:50%;
+    position:fixed;
+    top:10px;
+    right:10px;
+    z-index:10000;
+    display:none;
+  "
+>
 
 <div class="center-zone">
   <div id="visitor-list-container"></div>
@@ -577,6 +591,13 @@ let currentUser = {
 const DEFAULT_PHOTO =
   "https://jyhbamdcxmpveujjqjla.supabase.co/storage/v1/object/public/images/default-avatar.png";
 
+const ownerPhoto = document.getElementById('ownerPhoto');
+
+ownerPhoto.onerror = () => {
+  ownerPhoto.src = DEFAULT_PHOTO;
+  ownerPhoto.style.display = 'block';
+};
+  
 function initCurrentUser() {
   const ownerPhoto = document.getElementById('ownerPhoto');
   if (!ownerPhoto) return;
