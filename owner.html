@@ -477,8 +477,10 @@ body::before {
 
   <img
   id="ownerPhoto"
+  src="https://jyhbamdcxmpveujjqjla.supabase.co/storage/v1/object/public/images/default-avatar.png"
   alt=""
-  src=""
+  loading="eager"
+  decoding="async"
   style="
     width:32px;
     height:32px;
@@ -593,6 +595,8 @@ const DEFAULT_PHOTO =
 
 const ownerPhoto = document.getElementById('ownerPhoto');
 
+ownerPhoto.src ||= DEFAULT_PHOTO;
+  
 ownerPhoto.onerror = () => {
   ownerPhoto.src = DEFAULT_PHOTO;
   ownerPhoto.style.display = 'block';
