@@ -195,27 +195,17 @@ if (storedPhoto && ownerImg) {
 // ======= BOUTON CHOISIR PHOTO =======
 photoBtn.onclick = () => photoInput.click();
 
-photoInput.onchange = () => {
-  const file = photoInput.files[0];
+photoInput.onchange = (e) => {
+  const file = e.target.files[0];
   if (!file) return;
 
   const reader = new FileReader();
-
-  reader.onload = function () {
-    // ✅ preview accueil
+  reader.onload = () => {
     profilePreview.src = reader.result;
-    profilePreview.style.display = 'block';
 
-    // ✅ sauvegarde UNIQUE et VALIDE
+    // 🔥 SAUVEGARDE IMMÉDIATE
     localStorage.setItem('photo', reader.result);
-    
-    // ✅ mini photo owner si présente sur la page
-    if (ownerImg) {
-      ownerImg.src = reader.result;
-      ownerImg.style.display = 'block';
-    }
   };
-
   reader.readAsDataURL(file);
 };
 
