@@ -282,11 +282,32 @@
       .visitor-item{width:120px;height:120px;}
       .modal .modal-box{min-width:180px;}
     }
+
+.profile-circle {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  overflow: hidden;
+  background: #f2b7c9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.profile-circle img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
     
   </style>
 </head>
 <body>
 
+<div class="profile-circle">
+  <img id="ownerPhoto" alt="Photo de profil">
+</div>
+  
 <!-- ===== MINI AVATAR ===== -->
 <img id="ownerPhoto" alt="Owner" style="
   width:32px;
@@ -299,7 +320,7 @@
   background:#ffe6f0; /* couleur du cercle quand pas de photo */
   border:2px solid #b84c6f;
 ">
-  
+
 <div class="center-zone">
   <div id="visitor-list-container"></div>
 </div>
@@ -379,7 +400,27 @@ if (photo && photo.startsWith('data:image')) {
 }
   
   import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
+window.addEventListener('DOMContentLoaded', () => {
+  const ownerPhoto = document.getElementById('ownerPhoto');
+  const wrapper = ownerPhoto.parentElement; // le cercle
 
+  const photo = localStorage.getItem('photo');
+
+  // le cercle reste toujours visible
+  wrapper.style.display = 'flex';
+
+  if (photo && photo.startsWith('data:image')) {
+    ownerPhoto.onload = () => {
+      ownerPhoto.style.opacity = '1';
+    };
+    ownerPhoto.style.opacity = '0';
+    ownerPhoto.src = photo;
+  } else {
+    // pas de photo → cercle vide mais présent
+    ownerPhoto.removeAttribute('src');
+    ownerPhoto.style.opacity = '0';
+  }
+});
 // ================== CONFIG SUPABASE ==================
 const supabase = createClient(
   "https://jyhbamdcxmpveujjqjla.supabase.co",
