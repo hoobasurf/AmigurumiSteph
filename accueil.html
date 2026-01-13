@@ -208,7 +208,7 @@ photoInput.onchange = () => {
 
     // ✅ sauvegarde UNIQUE et VALIDE
     localStorage.setItem('photo', reader.result);
-
+    
     // ✅ mini photo owner si présente sur la page
     if (ownerImg) {
       ownerImg.src = reader.result;
@@ -227,6 +227,8 @@ document.getElementById('connexionBtn').onclick = () => {
   if (!prenom || !profilePreview.src) {
     return alert("Veuillez mettre votre prénom et sélectionner une photo.");
   }
+
+  localStorage.setItem('prenom', prenom); // ✅ OBLIGATOIRE
 
   if (prenom === "Steph" && mdp === "Steph1511") {
     document.getElementById('choiceModal').style.display = 'flex';
