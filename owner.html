@@ -829,9 +829,7 @@ const commentBox=document.querySelector('.comment-box');
 expandBtn.onclick=e=>{e.stopPropagation();commentBox.classList.toggle('fullscreen');expandBtn.textContent=commentBox.classList.contains('fullscreen')?'⤡':'⤢';};
 
 // ====== START ======
-document.addEventListener('DOMContentLoaded', async () => {
-  await refreshCreations();
-});
+refreshCreations();
 </script>
 </body>
 </html>
