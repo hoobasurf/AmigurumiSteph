@@ -368,12 +368,13 @@
 <script type="module">
 
 const ownerPhoto = document.getElementById('ownerPhoto');
-const storedPhoto = localStorage.getItem('photo');
 
-if(storedPhoto){
-  ownerPhoto.src = storedPhoto; // affiche la photo si elle existe
+const photo = localStorage.getItem('photo');
+
+if (photo && photo.startsWith('data:image')) {
+  ownerPhoto.src = photo;
 } else {
-  ownerPhoto.src = 'default-avatar.png'; // image par défaut dans le cercle
+  ownerPhoto.removeAttribute('src'); // ⛔ pas d’image cassée
 }
   
   import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
@@ -383,21 +384,6 @@ const supabase = createClient(
   "https://jyhbamdcxmpveujjqjla.supabase.co",
   "sb_publishable_sqsxb-3Kl5o3-JQYv9kGFw_-g0EgwMa"
 );
-
-// ================== CURRENT USER ==================
-// Récupère le prénom et la photo depuis localStorage
-let currentUser = {
-  prenom: localStorage.getItem('prenom') || '',
-  photo: localStorage.getItem('photo') || ''
-};
-
-// Affiche la mini photo si elle existe
-if (currentUser.photo) {
-  ownerPhoto.src = currentUser.photo;
-} else {
-  // Met une image par défaut si pas de photo
-  ownerPhoto.src = 'default-avatar.png'; // ← tu peux mettre ton image par défaut ici
-}
 
 // ================== VARIABLES ==================
 let creations = [];
@@ -446,7 +432,10 @@ function render() {
 
     const img = d.querySelector('img');
     img.onload = ()=> d.querySelector('.placeholder').style.display='none';
-    img.onerror = ()=> img.style.display='none';
+    img.onerror = ()=>{
+  img.remove();
+  d.querySelector('.placeholder').textContent = '';
+};
     img.onclick = ()=> openZoom(c);
 
     d.querySelector('.delete-btn').onclick = ()=> openDeleteModal(c);
