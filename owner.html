@@ -282,14 +282,27 @@
       .visitor-item{width:120px;height:120px;}
       .modal .modal-box{min-width:180px;}
     }
-
+    
   </style>
 </head>
 <body>
 
 <!-- ===== MINI AVATAR ===== -->
-<img id="ownerPhoto" alt="Owner">
-
+<img id="ownerPhoto" alt="Owner" style="
+  width:32px;
+  height:32px;
+  border-radius:50%;
+  position:fixed;
+  top:10px;
+  right:10px;
+  z-index:10000;
+  background:#ffe6f0; /* couleur du cercle quand pas de photo */
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  border:2px solid #b84c6f;
+">
+  
 <div class="center-zone">
   <div id="visitor-list-container"></div>
 </div>
@@ -356,6 +369,17 @@
 
 <!-- ======= JS COMPLET ======= -->
 <script type="module">
+
+const ownerPhoto = document.getElementById('ownerPhoto');
+const storedPhoto = localStorage.getItem('photo');
+
+if (storedPhoto) {
+  ownerPhoto.src = storedPhoto; // met la photo si elle existe
+} else {
+  ownerPhoto.src = '';           // pas de photo
+  ownerPhoto.textContent = '?';  // optionnel, un "?" dans le cercle
+}
+  
   import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
 
 // ================== CONFIG SUPABASE ==================
