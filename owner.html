@@ -365,14 +365,19 @@ const supabase = createClient(
 );
 
 // ================== CURRENT USER ==================
+// Récupère le prénom et la photo depuis localStorage
 let currentUser = {
   prenom: localStorage.getItem('prenom') || '',
   photo: localStorage.getItem('photo') || ''
 };
 
-// Affiche mini-avatar si disponible
+// Affiche la mini photo si elle existe
+const ownerPhoto = document.getElementById('ownerPhoto');
 if (currentUser.photo) {
-  document.getElementById('ownerPhoto').src = currentUser.photo;
+  ownerPhoto.src = currentUser.photo;
+} else {
+  // Met une image par défaut si pas de photo
+  ownerPhoto.src = 'default-avatar.png'; // ← tu peux mettre ton image par défaut ici
 }
 
 // ================== VARIABLES ==================
