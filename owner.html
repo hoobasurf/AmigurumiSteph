@@ -680,6 +680,20 @@ expandBtn.onclick = e=>{
 
 // ================== START ==================
 refreshCreations();// Ici, tu intègres **tout ton JS complet avec Supabase, likes, commentaires, zoom, delete, add, sidebar**
+
+window.addEventListener('DOMContentLoaded', () => {
+  const ownerPhoto = document.getElementById('ownerPhoto');
+  const photo = localStorage.getItem('photo');
+
+  if (photo && photo.startsWith('data:image')) {
+    ownerPhoto.onload = () => {
+      ownerPhoto.style.display = 'block';
+    };
+    ownerPhoto.src = photo;
+  } else {
+    ownerPhoto.style.display = 'none';
+  }
+});
 </script>
 
 </body>
