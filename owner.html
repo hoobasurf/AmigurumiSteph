@@ -565,12 +565,6 @@ const supabase = createClient(
   "sb_publishable_sqsxb-3Kl5o3-JQYv9kGFw_-g0EgwMa"
 );
 
-// ================== UTILISATEUR CONNECTÉ ==================
-let currentUser = {
-  prenom: localStorage.getItem('prenom') || '',   // récupère le prénom si défini
-  photo: localStorage.getItem('photo') || ''      // récupère la photo si définie
-};
-  
 // ====== CURRENT USER ======
 let currentUser = {
   prenom: localStorage.getItem('prenom') || '',
@@ -659,57 +653,25 @@ function updateActions(){
 document.querySelector('.like-btn').onclick = () => {
   if(!currentZoom) return;
   likeBubbles.innerHTML='';
-  currentZoom.likes?.forEach(like => {
-    const bubble = document.createElement('div');
-    bubble.className = 'bubble';
-
-    // Si c'est le user connecté, on affiche sa photo
-    if(like.name === currentUser.prenom && currentUser.photo) {
-        bubble.innerHTML = `<img src="${currentUser.photo}" style="width:20px;height:20px;border-radius:50%;margin-right:4px;vertical-align:middle;"> ${like.name}`;
-    } else {
-        bubble.textContent = like.name;
-    }
-
-    likeBubbles.appendChild(bubble);
-});
+  currentZoom.likes?.forEach(like=>{
+    const bubble=document.createElement('div');
+    bubble.className='bubble';
     bubble.innerHTML=like.photo?`<img src="${like.photo}" style="width:20px;height:20px;border-radius:50%;margin-right:4px;vertical-align:middle;">${like.name}`:like.name;
     likeBubbles.appendChild(bubble);
   });
   likeNameInput.value=currentUser.prenom||'';
-  // Bloquer la modification si user connecté
-if(currentUser.prenom) likeNameInput.disabled = true;
   likeModal.style.display='flex';
 };
 
-confirmLike.onclick = async () => {
-  if (!currentZoom) return;
-
-  // Récupérer le prénom (user connecté ou saisie)
-  let name = currentUser.prenom || likeNameInput.value.trim();
-  if (!name) return;
-
-  // Initialiser likes si nécessaire
-  if (!currentZoom.likes) currentZoom.likes = [];
-
-  // Ajouter le like
-  currentZoom.likes.push({
-    name,
-    photo: currentUser.photo || ''
-  });
-
-  // Mettre à jour Supabase
-  const { error } = await supabase
-    .from('creations')
-    .update({ likes: currentZoom.likes })
-    .eq('id', currentZoom.id);
-
-  if (error) console.error(error);
-
-  // Mettre à jour l’affichage
+confirmLike.onclick=async()=>{
+  const name=likeNameInput.value.trim();
+  if(!name||!currentZoom) return;
+  if(!currentZoom.likes) currentZoom.likes=[];
+  currentZoom.likes.push({name, photo:currentUser.photo||''});
+  const {error}=await supabase.from('creations').update({likes:currentZoom.likes}).eq('id',currentZoom.id);
+  if(error) console.error(error);
   renderLikeBubbles();
-
-  // Fermer le modal
-  likeModal.style.display = 'none';
+  likeModal.style.display='none';
 };
 
 function renderLikeBubbles(){
@@ -725,9 +687,6 @@ function renderLikeBubbles(){
 
 // ====== COMMENT ======
 document.querySelector('.comment-btn').onclick=()=>{
-  const commentNameInput = document.getElementById('commentName');
-commentNameInput.value = currentUser.prenom || '';
-if(currentUser.prenom) commentNameInput.disabled = true;  // bloque modification si connecté
   if(!currentZoom) return;
   renderCommentList();
   document.getElementById('commentName').value=currentUser.prenom||'';
@@ -737,27 +696,18 @@ if(currentUser.prenom) commentNameInput.disabled = true;  // bloque modification
 
 function renderCommentList(){
   commentBubbles.innerHTML='';
-  (currentZoom.comments || []).forEach(c => {
-    const item = document.createElement('div');
-    item.className = 'comment-item';
-
-    const text = document.createElement('span');
-
-    // Si c’est le user connecté, on affiche sa photo
-    if(c.name === currentUser.prenom && currentUser.photo) {
-        text.innerHTML = `<img src="${currentUser.photo}" style="width:20px;height:20px;border-radius:50%;margin-right:4px;vertical-align:middle;"> <strong>${c.name}</strong>: <span>${c.text}</span>`;
-    } else {
-        text.innerHTML = `<strong>${c.name}</strong>: <span>${c.text}</span>`;
-    }
-
+  (currentZoom.comments||[]).forEach(c=>{
+    const item=document.createElement('div');
+    item.className='comment-item';
+    const text=document.createElement('span');
+    text.innerHTML=`${c.photo?`<img src="${c.photo}" style="width:20px;height:20px;border-radius:50%;margin-right:4px;vertical-align:middle;">`:''}<strong>${c.name}</strong> : ${c.text}`;
     item.appendChild(text);
     commentBubbles.appendChild(item);
-});
+  });
   commentCount.textContent=currentZoom.comments?.length||0;
 }
 
-const name = currentUser.prenom || document.getElementById('commentName').value.trim();
-  currentZoom.comments.push({ name, text, photo: currentUser.photo || '' });
+confirmComment.onclick=async()=>{
   const name=document.getElementById('commentName').value.trim();
   const text=document.getElementById('commentText').value.trim();
   if(!name||!text||!currentZoom) return;
