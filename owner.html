@@ -297,9 +297,6 @@
   right:10px;
   z-index:10000;
   background:#ffe6f0; /* couleur du cercle quand pas de photo */
-  display:flex;
-  align-items:center;
-  justify-content:center;
   border:2px solid #b84c6f;
 ">
   
@@ -373,11 +370,10 @@
 const ownerPhoto = document.getElementById('ownerPhoto');
 const storedPhoto = localStorage.getItem('photo');
 
-if (storedPhoto) {
-  ownerPhoto.src = storedPhoto; // met la photo si elle existe
+if(storedPhoto){
+  ownerPhoto.src = storedPhoto; // affiche la photo si elle existe
 } else {
-  ownerPhoto.src = '';           // pas de photo
-  ownerPhoto.textContent = '?';  // optionnel, un "?" dans le cercle
+  ownerPhoto.src = 'default-avatar.png'; // image par défaut dans le cercle
 }
   
   import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
@@ -396,7 +392,6 @@ let currentUser = {
 };
 
 // Affiche la mini photo si elle existe
-const ownerPhoto = document.getElementById('ownerPhoto');
 if (currentUser.photo) {
   ownerPhoto.src = currentUser.photo;
 } else {
