@@ -889,6 +889,8 @@ messagerieBtn.onclick = () => {
 };
   
   // ================== EVENTS ==================
+document.querySelector('.closeZoom').onclick = () => zoomModal.style.display = 'none';
+zoomModal.onclick = e => { if(e.target === zoomModal) zoomModal.style.display = 'none'; };
 likeModal.onclick = e => { if(e.target === likeModal) likeModal.style.display = 'none'; };
 commentModal.onclick = e => { if(e.target === commentModal) commentModal.style.display = 'none'; };
 deleteModal.onclick = e => { if(e.target === deleteModal) deleteModal.style.display = 'none'; currentDelete=null; };
@@ -911,6 +913,10 @@ likeModal.onclick=e=>{if(e.target===likeModal) likeModal.style.display='none';};
 commentModal.onclick=e=>{if(e.target===commentModal) commentModal.style.display='none';};
 deleteModal.onclick=e=>{if(e.target===deleteModal) deleteModal.style.display='none';currentDelete=null;};
 
+// ====== COMMENT FULLSCREEN ======
+const expandBtn=document.getElementById('expandComment');
+const commentBox=document.querySelector('.comment-box');
+expandBtn.onclick=e=>{e.stopPropagation();commentBox.classList.toggle('fullscreen');expandBtn.textContent=commentBox.classList.contains('fullscreen')?'⤡':'⤢';};
 
 // ====== START ======
 document.addEventListener('DOMContentLoaded', async () => {
