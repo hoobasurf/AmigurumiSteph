@@ -585,7 +585,11 @@ body::before {
 </div>
 
 <script type="module">
-  
+
+if(currentUser.prenom){
+  document.getElementById('likeName')?.setAttribute('disabled', true);
+  document.getElementById('commentName')?.setAttribute('disabled', true);
+}
 import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
 
 const supabase = createClient(
@@ -598,11 +602,6 @@ let currentUser = {
   prenom: localStorage.getItem('prenom') || '',   // récupère le prénom si défini
   photo: localStorage.getItem('photo') || ''      // récupère la photo si définie
 };
-
-if(currentUser.prenom){
-  document.getElementById('likeName')?.setAttribute('disabled', true);
-  document.getElementById('commentName')?.setAttribute('disabled', true);
-}
   
 if(currentUser.photo){
   document.getElementById('ownerPhoto').src = currentUser.photo;
@@ -692,9 +691,13 @@ document.querySelector('.like-btn').onclick = () => {
   (currentZoom.likes || []).forEach(like => {
     const bubble = document.createElement('div');
     bubble.className = 'bubble';
-bubble.innerHTML = like.photo
-  ? `<img src="${like.photo}" class="like-avatar"> ${like.name}`
-  : like.name;
+
+    if (like.photo) {
+      bubble.innerHTML = `<img src="${like.photo}" style="width:20px;height:20px;border-radius:50%;margin-right:4px;vertical-align:middle;"> ${like.name}`;
+    } else {
+      bubble.textContent = like.name;
+    }
+
     likeBubbles.appendChild(bubble);
   });
 
@@ -746,9 +749,6 @@ function renderLikeBubbles(){
     likeBubbles.appendChild(bubble);
   });
 
-  updateActions();
-}
-  
 // ====== COMMENT ======
 document.querySelector('.comment-btn').onclick=()=>{
   const commentNameInput = document.getElementById('commentName');
@@ -946,8 +946,7 @@ const profileModalName = document.getElementById('profileModalName');
 document.addEventListener('click', e => {
   if (e.target.classList.contains('comment-avatar') || e.target.classList.contains('like-avatar')) {
     profileModalImg.src = e.target.src;
-    profileModalName.textContent =
-  e.target.parentElement.textContent.trim();
+    profileModalName.textContent = e.target.closest('.comment-item, .bubble')?.querySelector('strong')?.textContent || '';
     profileModal.style.display = 'flex';
   }
 });
