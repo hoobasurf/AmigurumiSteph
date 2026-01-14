@@ -384,10 +384,40 @@
 </div>
 
 <!-- ======= JS COMPLET ======= -->
-<script type="module">
-  
-  import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
+<img id="ownerPhoto" style="width:32px;height:32px;border-radius:50%;position:fixed;top:10px;right:10px;z-index:10000;">
 
+<script type="module">
+import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
+
+// ====== CONFIG SUPABASE ======
+const supabase = createClient(
+  "https://jyhbamdcxmpveujjqjla.supabase.co",
+  "sb_publishable_sqsxb-3Kl5o3-JQYv9kGFw_-g0EgwMa"
+);
+
+const ownerPhoto = document.getElementById('ownerPhoto');
+const prenom = localStorage.getItem('prenom'); // on garde le prénom saisi à l'accueil
+
+async function loadOwnerPhoto() {
+  if (!prenom) return;
+
+  const { data, error } = await supabase
+    .from('profiles')
+    .select('photo_url')
+    .eq('prenom', prenom)
+    .single();
+
+  if (error || !data?.photo_url) {
+    console.log("Pas de photo pour", prenom);
+    return;
+  }
+
+  ownerPhoto.src = data.photo_url;
+  ownerPhoto.style.display = 'block';
+}
+
+document.addEventListener('DOMContentLoaded', loadOwnerPhoto);
+</script>
 // ================== CONFIG SUPABASE ==================
 const supabase = createClient(
   "https://jyhbamdcxmpveujjqjla.supabase.co",
