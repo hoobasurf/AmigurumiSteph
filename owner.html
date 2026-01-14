@@ -143,6 +143,8 @@ async function loadOwnerPhoto(){
 document.addEventListener('DOMContentLoaded', loadOwnerPhoto);
 window.addEventListener('pageshow', loadOwnerPhoto);
 
+if (ownerPhoto.src) fillUserInfo();
+  
 // ====== VARIABLES ======
 let creations=[];
 let currentZoom=null;
@@ -166,7 +168,18 @@ const confirmComment=document.getElementById('confirmComment');
 const commentBubbles=document.getElementById('commentBubbles');
 const expandBtn=document.getElementById('expandComment');
 const commentBox=document.querySelector('.comment-box');
+const likeAvatar = document.getElementById('likeAvatar');
+const commentAvatar = document.getElementById('commentAvatar');
+  
+function fillUserInfo() {
+  const prenom = localStorage.getItem('prenom') || '';
+  likeNameInput.value = prenom;
+  likeAvatar.src = ownerPhoto.src || '';
+  commentNameInput.value = prenom;
+  commentAvatar.src = ownerPhoto.src || '';
+}
 
+  
 // ====== RENDER ======
 function render(){
   container.innerHTML='';
@@ -294,14 +307,45 @@ document.getElementById('confirmAdd').onclick=async e=>{
 };
 
 // ====== REFRESH CREATIONS ======
-async function refreshCreations(){
-  const {data,error}=await supabase.from('creations').select('*').order('created_at',{ascending:false});
-  if(error){console.error(error);return;}
-  creations=data.map(c=>{
-    const zoomGroup=(c.images?.length)?c.images.map(p=>supabase.storage.from('images').getPublicUrl(p).data.publicUrl):[supabase.storage.from('images').getPublicUrl(c.image_path).data.publicUrl];
-    return {id:c.id,name:c.name,imgUrl:zoomGroup[0],zoomGroup,likes:c.likes||[],comments:c.comments||[]};
-  });
-  render();
+async function refreshCreations() {
+  try {
+    const { data, error } = await supabase
+      .from('creations')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      console.error(error);
+      return;
+    }
+
+    creations = data.map(c => {
+      // Préparer le tableau des URLs pour le zoom
+      let zoomGroup = [];
+      if (c.images?.length) {
+        zoomGroup = c.images.map(p => {
+          const { data } = supabase.storage.from('images').getPublicUrl(p);
+          return data?.publicUrl || '';
+        });
+      } else if (c.image_path) {
+        const { data } = supabase.storage.from('images').getPublicUrl(c.image_path);
+        zoomGroup = [data?.publicUrl || ''];
+      }
+
+      return {
+        id: c.id,
+        name: c.name,
+        imgUrl: zoomGroup[0] || '',
+        zoomGroup,
+        likes: c.likes || [],
+        comments: c.comments || []
+      };
+    });
+
+    render();
+  } catch (err) {
+    console.error('Erreur refreshCreations:', err);
+  }
 }
 
 // ====== SIDEBAR ======
@@ -324,18 +368,6 @@ expandBtn.onclick=e=>{e.stopPropagation();commentBox.classList.toggle('fullscree
 // ====== INITIAL ======
 refreshCreations();
 
-  const likeAvatar = document.getElementById('likeAvatar');
-const commentAvatar = document.getElementById('commentAvatar');
-const likeNameInput = document.getElementById('likeName');
-const commentNameInput = document.getElementById('commentName');
-
-function fillUserInfo() {
-  const prenom = localStorage.getItem('prenom') || '';
-  likeNameInput.value = prenom;
-  likeAvatar.src = ownerPhoto.src || '';
-  commentNameInput.value = prenom;
-  commentAvatar.src = ownerPhoto.src || '';
-}
 
 // Remplir à l'ouverture des modals
 document.querySelector('.like-btn').addEventListener('click', fillUserInfo);
