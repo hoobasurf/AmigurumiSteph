@@ -201,12 +201,14 @@ photoInput.onchange = (e) => {
 
   const reader = new FileReader();
   reader.onload = () => {
-    profilePreview.src = reader.result;
+  profilePreview.src = reader.result;
+  profilePreview.style.display = 'block';
 
-    // 🔥 SAUVEGARDE IMMÉDIATE
-    localStorage.setItem('photo', reader.result);
-  };
-  reader.readAsDataURL(file);
+  // 🔥 SAUVEGARDE
+  localStorage.setItem('photo', reader.result);
+
+  // 🟢 PREUVE VISUELLE
+  alert('Photo enregistrée ✔️');
 };
 
 // ======= BOUTON CONNEXION (INCHANGÉ) =======
