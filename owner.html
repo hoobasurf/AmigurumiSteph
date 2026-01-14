@@ -155,32 +155,50 @@ body::before{
   </div>
 </div>
 
+<!-- Modal Gestion -->
 <div id="manageModal" class="modal">
   <div class="modal-box">
-    <h2>Gestion Likes / Commentaires</h2>
-    <div style="display:flex; gap:12px; margin-top:16px;">
-      <button id="manageLikesBtn" style="flex:1; background:#ffb6c1; color:#fff; border-radius:12px; padding:8px;">Likes</button>
-      <button id="manageCommentsBtn" style="flex:1; background:#ffb6c1; color:#fff; border-radius:12px; padding:8px;">Commentaires</button>
-    </div>
+    <h2>Gestion Likes, Commentaires</h2>
+    <button id="manageLikesBtn">Likes</button>
+    <button id="manageCommentsBtn">Commentaires</button>
   </div>
 </div>
 
+<!-- Modal Likes -->
 <div id="likesModal" class="modal">
-  <div class="modal-box">
-    <h3>Likes</h3>
-    <button id="chooseLikesBtn" style="margin-top:8px; background:#ffe6f0; color:#b84c6f; border:2px solid #b84c6f; border-radius:12px; padding:6px;">Choisir individuellement</button>
-    <button id="clearLikesBtn" style="margin-top:8px; background:#ffb6c1; color:#fff; border-radius:12px; padding:6px;">Tout effacer</button>
+  <div class="modal-box" style="max-height:80vh; overflow-y:auto;">
+    <h2>Likes</h2>
+    <button id="chooseLikeBtn">Choisir individuellement</button>
+    <button id="clearLikesBtn">Tout effacer</button>
+    <div id="likesList"></div>
   </div>
 </div>
 
-  <div id="commentsModal" class="modal">
-  <div class="modal-box">
-    <h3>Commentaires</h3>
-    <button id="chooseCommentsBtn" style="margin-top:8px; background:#ffe6f0; color:#b84c6f; border:2px solid #b84c6f; border-radius:12px; padding:6px;">Choisir individuellement</button>
-    <button id="clearCommentsBtn" style="margin-top:8px; background:#ffb6c1; color:#fff; border-radius:12px; padding:6px;">Tout effacer</button>
+<!-- Modal Commentaires -->
+<div id="commentsModal" class="modal">
+  <div class="modal-box" style="max-height:80vh; overflow-y:auto;">
+    <h2>Commentaires</h2>
+    <button id="chooseCommentBtn">Choisir individuellement</button>
+    <button id="clearCommentsBtn">Tout effacer</button>
+    <div id="commentsList"></div>
   </div>
 </div>
-  
+
+<!-- Modal suppression individuelle -->
+<div id="deleteIndivModal" class="modal">
+  <div class="modal-box">
+    <p>Supprimer définitivement ce Like/Commentaire ?</p>
+    <button id="confirmDeleteIndiv">Oui</button>
+    <button id="cancelDeleteIndiv">Annuler</button>
+  </div>
+</div>
+
+<button id="manageBtn" style="position:absolute;bottom:20px;left:50%;transform:translateX(-50%);width:36px;height:36px;border:none;background:none;cursor:pointer;">
+  <svg viewBox="0 0 24 24" fill="none" stroke="#ff6eb1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="12" cy="12" r="3"></circle>
+    <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33h.09A1.65 1.65 0 0 0 12 5.6V5a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51h.09a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82v.09a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+  </svg>
+</button>
   
 <script type="module">
 import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
@@ -446,34 +464,146 @@ expandBtn.onclick=e=>{e.stopPropagation();commentBox.classList.toggle('fullscree
 
 // ====== INITIAL ======
 refreshCreations();
-
-  const manageBtn = document.getElementById('manageBtn');
+  
+// ====== GESTION LIKES / COMMENTAIRES ======
+const manageBtn = document.getElementById('manageBtn');
 const manageModal = document.getElementById('manageModal');
 const likesModal = document.getElementById('likesModal');
 const commentsModal = document.getElementById('commentsModal');
+const deleteIndivModal = document.getElementById('deleteIndivModal');
+const confirmDeleteIndiv = document.getElementById('confirmDeleteIndiv');
+const cancelDeleteIndiv = document.getElementById('cancelDeleteIndiv');
+const likesList = document.getElementById('likesList');
+const commentsList = document.getElementById('commentsList');
 
+let currentCreation = null;
+let currentItem = null;
+
+// Ouvrir le modal Gestion
 manageBtn.onclick = () => manageModal.style.display = 'flex';
 
-// Ouvrir les modals Likes/Commentaires
+// Ouvrir modals Likes / Commentaires depuis Gestion
 document.getElementById('manageLikesBtn').onclick = () => {
   manageModal.style.display = 'none';
+  renderLikesList();
   likesModal.style.display = 'flex';
 };
 document.getElementById('manageCommentsBtn').onclick = () => {
   manageModal.style.display = 'none';
+  renderCommentsList();
   commentsModal.style.display = 'flex';
 };
 
-// Fermer modals au clic sur fond
-[manageModal, likesModal, commentsModal].forEach(m => {
-  m.onclick = e => {
-    if(e.target === m) m.style.display = 'none';
-  }
+// Fermer modals au clic sur le fond
+[manageModal, likesModal, commentsModal, deleteIndivModal].forEach(m => {
+  m.onclick = e => { if(e.target === m) m.style.display = 'none'; }
 });
 
-// Remplir à l'ouverture des modals
-document.querySelector('.like-btn').addEventListener('click', fillUserInfo);
-document.querySelector('.comment-btn').addEventListener('click', fillUserInfo);
+// ====== TOUT EFFACER ======
+document.getElementById('clearLikesBtn').onclick = async () => {
+  if(!confirm("Supprimer tous les Likes de toutes les créations ?")) return;
+  creations.forEach(c => c.likes = []);
+  for(let c of creations) {
+    await supabase.from('creations').update({likes: c.likes}).eq('id', c.id);
+  }
+  render();
+  likesList.innerHTML = '';
+};
+
+document.getElementById('clearCommentsBtn').onclick = async () => {
+  if(!confirm("Supprimer tous les Commentaires de toutes les créations ?")) return;
+  creations.forEach(c => c.comments = []);
+  for(let c of creations) {
+    await supabase.from('creations').update({comments: c.comments}).eq('id', c.id);
+  }
+  render();
+  commentsList.innerHTML = '';
+};
+
+// ====== CHOISIR INDIVIDUELLEMENT ======
+document.getElementById('chooseLikeBtn').onclick = () => renderCreationsForLikes();
+document.getElementById('chooseCommentBtn').onclick = () => renderCreationsForComments();
+
+// Fonction pour afficher toutes les créations pour Like
+function renderCreationsForLikes() {
+  likesList.innerHTML = '';
+  creations.forEach(c => {
+    const div = document.createElement('div');
+    div.style.display = 'flex';
+    div.style.alignItems = 'center';
+    div.style.marginBottom = '6px';
+    div.style.cursor = 'pointer';
+    div.innerHTML = `<img src="${c.imgUrl}" style="width:40px;height:40px;border-radius:8px;margin-right:6px;">${c.name}`;
+    div.onclick = () => openIndividualLikes(c);
+    likesList.appendChild(div);
+  });
+}
+
+// Fonction pour afficher toutes les créations pour Commentaires
+function renderCreationsForComments() {
+  commentsList.innerHTML = '';
+  creations.forEach(c => {
+    const div = document.createElement('div');
+    div.style.display = 'flex';
+    div.style.alignItems = 'center';
+    div.style.marginBottom = '6px';
+    div.style.cursor = 'pointer';
+    div.innerHTML = `<img src="${c.imgUrl}" style="width:40px;height:40px;border-radius:8px;margin-right:6px;">${c.name}`;
+    div.onclick = () => openIndividualComments(c);
+    commentsList.appendChild(div);
+  });
+}
+
+// ====== MODAL INDIVIDUEL ======
+function openIndividualLikes(c) {
+  currentCreation = c;
+  likesList.innerHTML = '';
+  c.likes?.forEach((like, index) => {
+    const div = document.createElement('div');
+    div.style.display = 'flex';
+    div.style.alignItems = 'center';
+    div.style.marginBottom = '4px';
+    div.style.cursor = 'pointer';
+    div.textContent = like.name;
+    div.onclick = () => { currentItem = index; deleteIndivModal.style.display = 'flex'; };
+    likesList.appendChild(div);
+  });
+}
+
+function openIndividualComments(c) {
+  currentCreation = c;
+  commentsList.innerHTML = '';
+  c.comments?.forEach((com, index) => {
+    const div = document.createElement('div');
+    div.style.display = 'flex';
+    div.style.alignItems = 'center';
+    div.style.marginBottom = '4px';
+    div.style.cursor = 'pointer';
+    div.textContent = com.name + ': ' + com.text;
+    div.onclick = () => { currentItem = index; deleteIndivModal.style.display = 'flex'; };
+    commentsList.appendChild(div);
+  });
+}
+
+// ====== SUPPRIMER INDIVIDUEL ======
+confirmDeleteIndiv.onclick = async () => {
+  if(currentCreation && currentItem != null){
+    if(currentCreation.likes && likesModal.style.display==='flex'){
+      currentCreation.likes.splice(currentItem,1);
+      await supabase.from('creations').update({likes: currentCreation.likes}).eq('id', currentCreation.id);
+      openIndividualLikes(currentCreation);
+    } else if(currentCreation.comments && commentsModal.style.display==='flex'){
+      currentCreation.comments.splice(currentItem,1);
+      await supabase.from('creations').update({comments: currentCreation.comments}).eq('id', currentCreation.id);
+      openIndividualComments(currentCreation);
+    }
+  }
+  deleteIndivModal.style.display='none';
+  currentItem = null;
+};
+
+// Annuler suppression individuelle
+cancelDeleteIndiv.onclick = () => { deleteIndivModal.style.display='none'; currentItem=null; };
 </script>
 
 </body>
