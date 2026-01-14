@@ -307,7 +307,6 @@
 <div class="profile-circle">
 </div>
   
-<!-- ===== MINI AVATAR ===== -->
 <img id="ownerPhoto" alt="Owner" style="
   width:32px;
   height:32px;
@@ -688,31 +687,24 @@ expandBtn.onclick = e=>{
   expandBtn.textContent = commentBox.classList.contains('fullscreen')?'⤡':'⤢';
 };
 
-// ===== AVATAR OWNER : FIX DÉFINITIF SAFARI IPHONE =====
-(function(){
-  const ownerPhoto = document.getElementById('ownerPhoto');
-  if (!ownerPhoto) return;
-
+// ====== AFFICHAGE PHOTO DE L'ACCUEIL ======
+const ownerPhoto = document.getElementById('ownerPhoto');
+if (ownerPhoto) {
   const showPhoto = () => {
     const photo = localStorage.getItem('photo');
-
-    if (photo && photo.startsWith('data:image')) {
+    if (photo) {
       ownerPhoto.src = photo;
       ownerPhoto.style.display = 'block';
       ownerPhoto.style.opacity = '1';
     } else {
-      ownerPhoto.removeAttribute('src');
-      ownerPhoto.style.display = 'block'; // cercle visible même sans photo
-      ownerPhoto.style.opacity = '0';
+      ownerPhoto.style.display = 'block';
+      ownerPhoto.style.opacity = '0.3'; // cercle visible même sans photo
     }
   };
 
-  // chargement normal
   document.addEventListener('DOMContentLoaded', showPhoto);
-
-  // retour arrière iOS / PWA / cache Safari
   window.addEventListener('pageshow', showPhoto);
-})();
+}
 
 // ================== START ==================
 refreshCreations();// Ici, tu intègres **tout ton JS complet avec Supabase, likes, commentaires, zoom, delete, add, sidebar**
