@@ -379,30 +379,24 @@
 <script type="module">
 import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
 
-// ====== CONFIG SUPABASE ======
 const supabase = createClient(
   "https://jyhbamdcxmpveujjqjla.supabase.co",
   "sb_publishable_sqsxb-3Kl5o3-JQYv9kGFw_-g0EgwMa"
 );
 
-// ====== AVATAR OWNER ======
 const ownerPhoto = document.getElementById('ownerPhoto');
-const prenom = localStorage.getItem('prenom'); // prénom récupéré depuis accueil
+const prenom = localStorage.getItem('prenom');
 
+// Charger photo mini avatar
 async function loadOwnerPhoto() {
   if (!prenom) return;
 
-  const { data, error } = await supabase
-    .from('profiles')
-    .select('photo_url')
-    .eq('prenom', prenom)
-    .single();
-
+  const { data, error } = await supabase.from('profiles').select('photo_url').eq('prenom', prenom).single();
   if (!error && data?.photo_url) {
     ownerPhoto.src = data.photo_url;
-    ownerPhoto.style.opacity = '1';
+    ownerPhoto.style.opacity='1';
   } else {
-    ownerPhoto.style.opacity = '0.3'; // cercle si pas de photo
+    ownerPhoto.style.opacity='0.3';
   }
 }
 
