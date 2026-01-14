@@ -120,17 +120,6 @@ button:hover { background: #e94f9a; }
   flex-direction: column;
   gap: 12px;
 }
-
-#ownerPhoto {
-  width:32px;
-  height:32px;
-  border-radius:50%;
-  position:fixed;
-  top:10px;
-  right:10px;
-  z-index:10000;
-  display:none;
-}
 </style>
 </head>
 <body>
@@ -165,6 +154,7 @@ button:hover { background: #e94f9a; }
 <script type="module">
 import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
 
+// Supabase config
 const supabase = createClient(
   "https://jyhbamdcxmpveujjqjla.supabase.co",
   "sb_publishable_sqsxb-3Kl5o3-JQYv9kGFw_-g0EgwMa"
@@ -209,7 +199,7 @@ document.getElementById('connexionBtn').onclick = () => {
 
   if(!prenom) return alert("Veuillez saisir votre prénom");
 
-  if(prenom === "Steph1511" && password === "tonMotDePasse") {
+  if(prenom === "Steph" && password === "Steph1511") {
     document.getElementById('choiceModal').style.display = 'flex';
   } else {
     window.location.href = 'visitor.html';
