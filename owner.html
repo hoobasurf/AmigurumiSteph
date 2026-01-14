@@ -268,40 +268,27 @@
     }
 
     /* ===== AVATAR MINI HAUT DROITE ===== */
-    #ownerPhoto{
-      width:32px; height:32px;
-      border-radius:50%;
-      position:fixed;
-      top:10px; right:10px;
-      z-index:10000;
-    }
-
-    /* ===== Responsive ===== */
-    @media(max-width:480px){
-      .page{grid-template-columns:repeat(2,120px); grid-template-rows:repeat(3,120px);}
-      .visitor-item{width:120px;height:120px;}
-      .modal .modal-box{min-width:180px;}
-    }
-
-.profile-circle {
-  width: 42px;
-  height: 42px;
-  border-radius: 50%;
-  overflow: hidden;
-  background: #f2b7c9;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+#ownerPhoto {
+  width:32px; height:32px;
+  border-radius:50%;
+  position:fixed;
+  top:10px;
+  right:10px;
+  z-index:10000;
+  background:#ffe6f0; /* couleur si pas de photo */
+  border:2px solid #b84c6f;
+  display:block;
 }
 
-.profile-circle img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
+/* ===== Responsive ===== */
+@media(max-width:480px){
+  .page { grid-template-columns:repeat(2,120px); grid-template-rows:repeat(3,120px); }
+  .visitor-item { width:120px; height:120px; }
+  .modal .modal-box { min-width:180px; }
 }
-    
-  </style>
+</style>
 </head>
+
 <body>
 
 <div class="profile-circle">
@@ -319,6 +306,8 @@
   border:2px solid #b84c6f;
 ">
 
+
+<!-- ===== GRILLE DES CREATIONS ===== -->
 <div class="center-zone">
   <div id="visitor-list-container"></div>
 </div>
@@ -384,7 +373,8 @@
 </div>
 
 <!-- ======= JS COMPLET ======= -->
-<img id="ownerPhoto" style="width:32px;height:32px;border-radius:50%;position:fixed;top:10px;right:10px;z-index:10000;">
+<!-- Garde uniquement celui-ci -->
+<img id="ownerPhoto" alt="Owner">
 
 <script type="module">
 import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
@@ -395,8 +385,9 @@ const supabase = createClient(
   "sb_publishable_sqsxb-3Kl5o3-JQYv9kGFw_-g0EgwMa"
 );
 
+// ====== AVATAR OWNER ======
 const ownerPhoto = document.getElementById('ownerPhoto');
-const prenom = localStorage.getItem('prenom'); // on garde le prénom saisi à l'accueil
+const prenom = localStorage.getItem('prenom'); // prénom récupéré depuis accueil
 
 async function loadOwnerPhoto() {
   if (!prenom) return;
@@ -407,24 +398,18 @@ async function loadOwnerPhoto() {
     .eq('prenom', prenom)
     .single();
 
-  if (error || !data?.photo_url) {
-    console.log("Pas de photo pour", prenom);
-    return;
+  if (!error && data?.photo_url) {
+    ownerPhoto.src = data.photo_url;
+    ownerPhoto.style.opacity = '1';
+  } else {
+    ownerPhoto.style.opacity = '0.3'; // cercle si pas de photo
   }
-
-  ownerPhoto.src = data.photo_url;
-  ownerPhoto.style.display = 'block';
 }
 
 document.addEventListener('DOMContentLoaded', loadOwnerPhoto);
-</script>
-// ================== CONFIG SUPABASE ==================
-const supabase = createClient(
-  "https://jyhbamdcxmpveujjqjla.supabase.co",
-  "sb_publishable_sqsxb-3Kl5o3-JQYv9kGFw_-g0EgwMa"
-);
+window.addEventListener('pageshow', loadOwnerPhoto);
 
-// ================== VARIABLES ==================
+// ====== VARIABLES ======
 let creations = [];
 let currentZoom = null;
 let currentDelete = null;
@@ -448,7 +433,7 @@ const commentModal = document.getElementById('commentModal');
 const confirmComment = document.getElementById('confirmComment');
 const commentBubbles = document.getElementById('commentBubbles');
 
-// ================== RENDER ==================
+// ====== RENDER CREATIONS ======
 function render() {
   container.innerHTML = '';
   let page = null;
@@ -471,10 +456,7 @@ function render() {
 
     const img = d.querySelector('img');
     img.onload = ()=> d.querySelector('.placeholder').style.display='none';
-    img.onerror = ()=>{
-  img.remove();
-  d.querySelector('.placeholder').textContent = '';
-};
+    img.onerror = ()=> { img.remove(); d.querySelector('.placeholder').textContent=''; };
     img.onclick = ()=> openZoom(c);
 
     d.querySelector('.delete-btn').onclick = ()=> openDeleteModal(c);
@@ -483,7 +465,7 @@ function render() {
   });
 }
 
-// ================== ZOOM ==================
+// ====== ZOOM ======
 function openZoom(c){
   currentZoom = c;
   mainZoom.src = c.imgUrl;
@@ -507,7 +489,7 @@ function updateActions(){
   commentCount.textContent = currentZoom.comments?.length||0;
 }
 
-// ================== LIKE ==================
+// ====== LIKE ======
 document.querySelector('.like-btn').onclick = ()=>{
   if(!currentZoom) return;
 
@@ -522,7 +504,7 @@ document.querySelector('.like-btn').onclick = ()=>{
     likeBubbles.appendChild(bubble);
   });
 
-  likeNameInput.value = currentUser.prenom||'';
+  likeNameInput.value = localStorage.getItem('prenom')||'';
   likeModal.style.display='flex';
 };
 
@@ -532,7 +514,7 @@ confirmLike.onclick=async()=>{
 
   if(!currentZoom.likes) currentZoom.likes=[];
 
-  currentZoom.likes.push({name, photo:currentUser.photo||''});
+  currentZoom.likes.push({name, photo:ownerPhoto.src||''});
 
   const {error} = await supabase.from('creations')
     .update({likes: currentZoom.likes})
@@ -555,12 +537,12 @@ confirmLike.onclick=async()=>{
   likeModal.style.display='none';
 };
 
-// ================== COMMENT ==================
+// ====== COMMENT ======
 document.querySelector('.comment-btn').onclick = ()=>{
   if(!currentZoom) return;
 
   renderCommentList();
-  document.getElementById('commentName').value = currentUser.prenom||'';
+  document.getElementById('commentName').value = localStorage.getItem('prenom')||'';
   document.getElementById('commentText').value = '';
   commentModal.style.display='flex';
 };
@@ -585,7 +567,7 @@ confirmComment.onclick = async ()=>{
 
   if(!currentZoom.comments) currentZoom.comments=[];
 
-  currentZoom.comments.push({name, text, photo:currentUser.photo||'', likes:[]});
+  currentZoom.comments.push({name, text, photo:ownerPhoto.src||'', likes:[]});
 
   await supabase.from('creations').update({comments: currentZoom.comments}).eq('id', currentZoom.id);
 
@@ -593,7 +575,7 @@ confirmComment.onclick = async ()=>{
   document.getElementById('commentText').value='';
 };
 
-// ================== DELETE ==================
+// ====== DELETE ======
 function openDeleteModal(project){
   currentDelete = project;
   deleteModal.style.display='flex';
@@ -613,7 +595,7 @@ document.getElementById('confirmDelete').onclick = async ()=>{
   currentDelete=null;
 };
 
-// ================== AJOUT ==================
+// ====== AJOUT ======
 document.getElementById('addBtn').onclick = ()=> addModal.style.display='flex';
 addModal.addEventListener('click', e=>{ if(e.target===addModal) addModal.style.display='none'; });
 
@@ -652,7 +634,7 @@ document.getElementById('confirmAdd').onclick = async e=>{
   await refreshCreations();
 };
 
-// ================== REFRESH ==================
+// ====== REFRESH CREATIONS ======
 async function refreshCreations(){
   const {data,error} = await supabase.from('creations').select('*').order('created_at',{ascending:false});
   if(error){ console.error(error); return; }
@@ -674,41 +656,21 @@ async function refreshCreations(){
   render();
 }
 
-// ================== SIDEBAR ==================
-document.getElementById('pelotesBtn').onclick = ()=>{
-  document.body.style.transition='opacity 0.5s';
-  document.body.style.opacity='0';
-  setTimeout(()=> window.location.href='pelotes.html',500);
-};
-
-document.getElementById('videoBtn').onclick = ()=>{
-  document.body.style.transition='opacity 0.5s';
-  document.body.style.opacity='0';
-  setTimeout(()=> window.location.href='video.html',500);
-};
-
-document.getElementById('notesBtn').onclick = ()=>{
-  document.body.style.transition='opacity 0.5s';
-  document.body.style.opacity='0';
-  setTimeout(()=> window.location.href='notes.html',500);
-};
-
-document.getElementById('messagerieBtn').onclick = ()=>{
-  document.body.style.transition='opacity 0.5s';
-  document.body.style.opacity='0';
-  setTimeout(()=> window.location.href='messagerie.html',500);
-};
-
+// ====== SIDEBAR ======
+document.getElementById('pelotesBtn').onclick = ()=> { document.body.style.opacity='0'; setTimeout(()=> window.location.href='pelotes.html',500); };
+document.getElementById('videoBtn').onclick = ()=> { document.body.style.opacity='0'; setTimeout(()=> window.location.href='video.html',500); };
+document.getElementById('notesBtn').onclick = ()=> { document.body.style.opacity='0'; setTimeout(()=> window.location.href='notes.html',500); };
+document.getElementById('messagerieBtn').onclick = ()=> { document.body.style.opacity='0'; setTimeout(()=> window.location.href='messagerie.html',500); };
 document.getElementById('toggleSidebar').onclick = ()=> sidebar.classList.toggle('sidebar-open');
 
-// ================== ZOOM EVENTS ==================
+// ====== ZOOM EVENTS ======
 document.querySelector('.closeZoom').onclick = ()=> zoomModal.style.display='none';
 zoomModal.onclick = e=>{ if(e.target===zoomModal) zoomModal.style.display='none'; };
 likeModal.onclick = e=>{ if(e.target===likeModal) likeModal.style.display='none'; };
 commentModal.onclick = e=>{ if(e.target===commentModal) commentModal.style.display='none'; };
 deleteModal.onclick = e=>{ if(e.target===deleteModal) deleteModal.style.display='none'; currentDelete=null; };
 
-// ================== COMMENT MODAL FULLSCREEN ==================
+// ====== COMMENT FULLSCREEN ======
 const expandBtn = document.getElementById('expandComment');
 const commentBox = document.querySelector('.comment-box');
 expandBtn.onclick = e=>{
@@ -717,27 +679,8 @@ expandBtn.onclick = e=>{
   expandBtn.textContent = commentBox.classList.contains('fullscreen')?'⤡':'⤢';
 };
 
-// ====== AFFICHAGE PHOTO DE L'ACCUEIL ======
-const ownerPhoto = document.getElementById('ownerPhoto');
-if (ownerPhoto) {
-  const showPhoto = () => {
-    const photo = localStorage.getItem('photo');
-    if (photo) {
-      ownerPhoto.src = photo;
-      ownerPhoto.style.display = 'block';
-      ownerPhoto.style.opacity = '1';
-    } else {
-      ownerPhoto.style.display = 'block';
-      ownerPhoto.style.opacity = '0.3'; // cercle visible même sans photo
-    }
-  };
-
-  document.addEventListener('DOMContentLoaded', showPhoto);
-  window.addEventListener('pageshow', showPhoto);
-}
-
-// ================== START ==================
-refreshCreations();// Ici, tu intègres **tout ton JS complet avec Supabase, likes, commentaires, zoom, delete, add, sidebar**
+// ====== LANCEMENT ======
+refreshCreations();
 
 </script>
 
