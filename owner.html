@@ -49,6 +49,19 @@ body::before{
 
 #ownerPhoto{width:32px;height:32px;border-radius:50%;position:fixed;top:10px;right:10px;z-index:10000;background:#ffe6f0;border:2px solid #b84c6f;}
 @media(max-width:480px){.page{grid-template-columns:repeat(2,120px);grid-template-rows:repeat(3,120px);}.visitor-item{width:120px;height:120px;}.modal .modal-box{min-width:180px;}}
+
+.icon-btn svg {
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+.icon-btn:hover svg {
+  transform: scale(1.2);
+}
+.icon-btn span {
+  font-weight: bold;
+  color: #b84c6f;
+  font-size: 14px;
+}
 </style>
 </head>
 <body>
@@ -121,8 +134,21 @@ body::before{
   <img id="mainZoom">
   <div class="thumbs" id="thumbs"></div>
   <div class="actions">
-    <button class="like-btn">Like ❤️ <span id="likeCount">0</span></button>
-    <button class="comment-btn">Commentaire 💬 <span id="commentCount">0</span></button>
+    <div class="actions" style="display:flex; gap:12px; align-items:center; margin-top:8px;">
+  <div class="icon-btn" id="likeBtn" style="display:flex; align-items:center; cursor:pointer; gap:4px;">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#b84c6f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M12 21C12 21 4 13.5 4 8.5C4 5.5 6.5 3 9.5 3C11 3 12 4 12 4C12 4 13 3 14.5 3C17.5 3 20 5.5 20 8.5C20 13.5 12 21 12 21Z"></path>
+    </svg>
+    <span id="likeCount">0</span>
+  </div>
+
+  <div class="icon-btn" id="commentBtn" style="display:flex; align-items:center; cursor:pointer; gap:4px;">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#b84c6f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+    </svg>
+    <span id="commentCount">0</span>
+  </div>
+</div>
   </div>
 </div>
 
@@ -213,61 +239,77 @@ function updateActions(){
 }
 
 // ====== LIKE ======
-document.querySelector('.like-btn').onclick=()=>{
-  if(!currentZoom) return;
-  likeBubbles.innerHTML='';
-  currentZoom.likes?.forEach(like=>{
-    const bubble=document.createElement('div');bubble.className='bubble';
-    if(like.photo){bubble.innerHTML=`<img src="${like.photo}" style="width:20px;height:20px;border-radius:50%;margin-right:4px;vertical-align:middle;">${like.name}`;}
-    else bubble.textContent=like.name;
+document.getElementById('likeBtn').onclick = () => {
+  if (!currentZoom) return;
+  likeBubbles.innerHTML = '';
+  currentZoom.likes?.forEach(like => {
+    const bubble = document.createElement('div');
+    bubble.className = 'bubble';
+    if (like.photo) {
+      bubble.innerHTML = `<img src="${like.photo}" style="width:20px;height:20px;border-radius:50%;margin-right:4px;vertical-align:middle;">${like.name}`;
+    } else {
+      bubble.textContent = like.name;
+    }
     likeBubbles.appendChild(bubble);
   });
-  likeNameInput.value=localStorage.getItem('prenom')||'';
-  likeModal.style.display='flex';
+  likeNameInput.value = localStorage.getItem('prenom') || '';
+  likeModal.style.display = 'flex';
 };
-confirmLike.onclick=async()=>{
-  const name=likeNameInput.value.trim();
-  if(!name || !currentZoom) return;
-  if(!currentZoom.likes) currentZoom.likes=[];
-  currentZoom.likes.push({name,photo:ownerPhoto.src||''});
-  await supabase.from('creations').update({likes: currentZoom.likes}).eq('id',currentZoom.id);
-  likeBubbles.innerHTML='';
-  currentZoom.likes.forEach(like=>{
-    const bubble=document.createElement('div');bubble.className='bubble';
-    if(like.photo){bubble.innerHTML=`<img src="${like.photo}" style="width:20px;height:20px;border-radius:50%;margin-right:4px;vertical-align:middle;">${like.name}`;}
-    else bubble.textContent=like.name;
+
+confirmLike.onclick = async () => {
+  const name = likeNameInput.value.trim();
+  if (!name || !currentZoom) return;
+  if (!currentZoom.likes) currentZoom.likes = [];
+  currentZoom.likes.push({ name, photo: ownerPhoto.src || '' });
+  await supabase.from('creations').update({ likes: currentZoom.likes }).eq('id', currentZoom.id);
+  
+  likeBubbles.innerHTML = '';
+  currentZoom.likes.forEach(like => {
+    const bubble = document.createElement('div');
+    bubble.className = 'bubble';
+    if (like.photo) {
+      bubble.innerHTML = `<img src="${like.photo}" style="width:20px;height:20px;border-radius:50%;margin-right:4px;vertical-align:middle;">${like.name}`;
+    } else {
+      bubble.textContent = like.name;
+    }
     likeBubbles.appendChild(bubble);
   });
+  
   updateActions();
-  likeModal.style.display='none';
+  likeModal.style.display = 'none';
 };
 
 // ====== COMMENT ======
-document.querySelector('.comment-btn').onclick=()=>{
-  if(!currentZoom) return;
+document.getElementById('commentBtn').onclick = () => {
+  if (!currentZoom) return;
   renderCommentList();
-  document.getElementById('commentName').value=localStorage.getItem('prenom')||'';
-  document.getElementById('commentText').value='';
-  commentModal.style.display='flex';
+  document.getElementById('commentName').value = localStorage.getItem('prenom') || '';
+  document.getElementById('commentText').value = '';
+  commentModal.style.display = 'flex';
 };
-function renderCommentList(){
-  commentBubbles.innerHTML='';
-  (currentZoom.comments||[]).forEach(c=>{
-    const item=document.createElement('div');item.className='comment-item';
-    const text=document.createElement('span');
-    text.innerHTML=`${c.photo?`<img src="${c.photo}" style="width:20px;height:20px;border-radius:50%;margin-right:4px;vertical-align:middle;">`:''}<strong>${c.name}</strong>: ${c.text}`;
-    item.appendChild(text);commentBubbles.appendChild(item);
+
+function renderCommentList() {
+  commentBubbles.innerHTML = '';
+  (currentZoom.comments || []).forEach(c => {
+    const item = document.createElement('div');
+    item.className = 'comment-item';
+    const text = document.createElement('span');
+    text.innerHTML = `${c.photo ? `<img src="${c.photo}" style="width:20px;height:20px;border-radius:50%;margin-right:4px;vertical-align:middle;">` : ''}<strong>${c.name}</strong>: ${c.text}`;
+    item.appendChild(text);
+    commentBubbles.appendChild(item);
   });
-  commentCount.textContent=currentZoom.comments?.length||0;
+  commentCount.textContent = currentZoom.comments?.length || 0;
 }
-confirmComment.onclick=async()=>{
-  const name=document.getElementById('commentName').value.trim();
-  const text=document.getElementById('commentText').value.trim();
-  if(!name || !text || !currentZoom) return;
-  if(!currentZoom.comments) currentZoom.comments=[];
-  currentZoom.comments.push({name,text,photo:ownerPhoto.src||'',likes:[]});
-  await supabase.from('creations').update({comments: currentZoom.comments}).eq('id',currentZoom.id);
-  renderCommentList();document.getElementById('commentText').value='';
+
+confirmComment.onclick = async () => {
+  const name = document.getElementById('commentName').value.trim();
+  const text = document.getElementById('commentText').value.trim();
+  if (!name || !text || !currentZoom) return;
+  if (!currentZoom.comments) currentZoom.comments = [];
+  currentZoom.comments.push({ name, text, photo: ownerPhoto.src || '', likes: [] });
+  await supabase.from('creations').update({ comments: currentZoom.comments }).eq('id', currentZoom.id);
+  renderCommentList();
+  document.getElementById('commentText').value = '';
 };
 
 // ====== DELETE ======
