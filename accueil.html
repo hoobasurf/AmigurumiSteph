@@ -125,7 +125,10 @@ button:hover { background: #e94f9a; }
 <body>
 
 <h2>Bienvenue</h2>
-<img id="appLogo" src="Photoroom_20260107_185314.png" alt="Logo de l'appli">
+<img id="ownerPhoto" 
+     src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///ywAAAAAAQABAAACAUwAOw==" 
+     alt="Owner"
+     style="width:32px;height:32px;border-radius:50%;position:fixed;top:10px;right:10px;z-index:10000;border:2px solid #b84c6f;">
 
 <div class="input-group">
   <input type="text" id="prenom" placeholder="Prénom" required>
@@ -154,18 +157,42 @@ button:hover { background: #e94f9a; }
 <script type="module">
 import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
 
-// Supabase config
+// ====== Supabase config ======
 const supabase = createClient(
   "https://jyhbamdcxmpveujjqjla.supabase.co",
   "sb_publishable_sqsxb-3Kl5o3-JQYv9kGFw_-g0EgwMa"
 );
 
+// ====== Owner photo ======
+const ownerPhoto = document.getElementById('ownerPhoto');
+const prenom = localStorage.getItem('prenom'); // ton prénom enregistré
+
+async function loadOwnerPhoto() {
+  if (!prenom) return;
+
+  const { data, error } = await supabase
+    .from('profiles')
+    .select('photo_url')
+    .eq('prenom', prenom)
+    .single();
+
+  if (!error && data?.photo_url) {
+    ownerPhoto.src = data.photo_url;      // remplace le src par défaut
+    ownerPhoto.style.opacity = '1';
+  } else {
+    ownerPhoto.style.opacity = '0.3';     // cercle rose si pas de photo
+  }
+}
+
+document.addEventListener('DOMContentLoaded', loadOwnerPhoto);
+window.addEventListener('pageshow', loadOwnerPhoto);
+
+// ====== Choisir photo ======
 const photoBtn = document.getElementById('photoBtn');
 const photoInput = document.getElementById('photoInput');
 const profilePreview = document.getElementById('profilePreview');
 const prenomInput = document.getElementById('prenom');
 
-// Choisir photo
 photoBtn.onclick = () => photoInput.click();
 photoInput.onchange = async (e) => {
   const file = e.target.files[0];
@@ -192,7 +219,7 @@ photoInput.onchange = async (e) => {
   alert("Photo enregistrée et envoyée ✔️");
 };
 
-// Connexion
+// ====== Connexion ======
 document.getElementById('connexionBtn').onclick = () => {
   const prenom = prenomInput.value.trim();
   const password = document.getElementById('password').value;
@@ -206,11 +233,11 @@ document.getElementById('connexionBtn').onclick = () => {
   }
 };
 
-// Modal Création / Visite
+// ====== Modal Création / Visite ======
 document.getElementById('creationBtn').onclick = () => window.location.href = 'owner.html';
 document.getElementById('visiteBtn').onclick = () => window.location.href = 'visitor.html';
 
-// Fermer modal si clic en dehors
+// ====== Fermer modal si clic en dehors ======
 document.getElementById('choiceModal').onclick = e => {
   if(e.target === document.getElementById('choiceModal')) document.getElementById('choiceModal').style.display='none';
 };
