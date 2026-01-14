@@ -79,6 +79,12 @@ body::before{
   <button id="videoBtn">Vidéo</button>
   <button id="notesBtn">Notes</button>
   <button id="messagerieBtn">Messagerie</button>
+  <button id="manageBtn" style="position:absolute;bottom:20px;left:50%;transform:translateX(-50%);width:40px;height:40px;padding:0;border-radius:50%;display:flex;align-items:center;justify-content:center;">
+  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="#ffb6c1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-settings">
+    <circle cx="12" cy="12" r="3"/>
+    <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l0 0a2 2 0 1 1-2.83 2.83l0 0a1.65 1.65 0 0 0-1.82.33l0 0a1.65 1.65 0 0 0-.5 1.51l0 0a2 2 0 1 1-3.18 0l0 0a1.65 1.65 0 0 0-1.51-.5l0 0a1.65 1.65 0 0 0-.33-1.82l0 0a2 2 0 1 1 0-2.83l0 0a1.65 1.65 0 0 0 .33-1.82l0 0a1.65 1.65 0 0 0-1.51-.5l0 0a2 2 0 1 1 0-3.18l0 0a1.65 1.65 0 0 0 .5-1.51l0 0a1.65 1.65 0 0 0 1.82-.33l0 0a2 2 0 1 1 2.83 0l0 0a1.65 1.65 0 0 0 1.82.33l0 0a1.65 1.65 0 0 0 .5 1.51l0 0a2 2 0 1 1 3.18 0l0 0a1.65 1.65 0 0 0 1.51.5l0 0a1.65 1.65 0 0 0 .33 1.82l0 0a2 2 0 1 1 0 2.83l0 0a1.65 1.65 0 0 0-.33 1.82l0 0a1.65 1.65 0 0 0 1.51.5z"/>
+  </svg>
+</button>
 </div>
 
 <!-- Modals -->
@@ -149,6 +155,33 @@ body::before{
   </div>
 </div>
 
+<div id="manageModal" class="modal">
+  <div class="modal-box">
+    <h2>Gestion Likes / Commentaires</h2>
+    <div style="display:flex; gap:12px; margin-top:16px;">
+      <button id="manageLikesBtn" style="flex:1; background:#ffb6c1; color:#fff; border-radius:12px; padding:8px;">Likes</button>
+      <button id="manageCommentsBtn" style="flex:1; background:#ffb6c1; color:#fff; border-radius:12px; padding:8px;">Commentaires</button>
+    </div>
+  </div>
+</div>
+
+<div id="likesModal" class="modal">
+  <div class="modal-box">
+    <h3>Likes</h3>
+    <button id="chooseLikesBtn" style="margin-top:8px; background:#ffe6f0; color:#b84c6f; border:2px solid #b84c6f; border-radius:12px; padding:6px;">Choisir individuellement</button>
+    <button id="clearLikesBtn" style="margin-top:8px; background:#ffb6c1; color:#fff; border-radius:12px; padding:6px;">Tout effacer</button>
+  </div>
+</div>
+
+  <div id="commentsModal" class="modal">
+  <div class="modal-box">
+    <h3>Commentaires</h3>
+    <button id="chooseCommentsBtn" style="margin-top:8px; background:#ffe6f0; color:#b84c6f; border:2px solid #b84c6f; border-radius:12px; padding:6px;">Choisir individuellement</button>
+    <button id="clearCommentsBtn" style="margin-top:8px; background:#ffb6c1; color:#fff; border-radius:12px; padding:6px;">Tout effacer</button>
+  </div>
+</div>
+  
+  
 <script type="module">
 import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
 const supabase = createClient("https://jyhbamdcxmpveujjqjla.supabase.co","sb_publishable_sqsxb-3Kl5o3-JQYv9kGFw_-g0EgwMa");
@@ -414,6 +447,29 @@ expandBtn.onclick=e=>{e.stopPropagation();commentBox.classList.toggle('fullscree
 // ====== INITIAL ======
 refreshCreations();
 
+  const manageBtn = document.getElementById('manageBtn');
+const manageModal = document.getElementById('manageModal');
+const likesModal = document.getElementById('likesModal');
+const commentsModal = document.getElementById('commentsModal');
+
+manageBtn.onclick = () => manageModal.style.display = 'flex';
+
+// Ouvrir les modals Likes/Commentaires
+document.getElementById('manageLikesBtn').onclick = () => {
+  manageModal.style.display = 'none';
+  likesModal.style.display = 'flex';
+};
+document.getElementById('manageCommentsBtn').onclick = () => {
+  manageModal.style.display = 'none';
+  commentsModal.style.display = 'flex';
+};
+
+// Fermer modals au clic sur fond
+[manageModal, likesModal, commentsModal].forEach(m => {
+  m.onclick = e => {
+    if(e.target === m) m.style.display = 'none';
+  }
+});
 
 // Remplir à l'ouverture des modals
 document.querySelector('.like-btn').addEventListener('click', fillUserInfo);
