@@ -176,74 +176,56 @@ button:hover {
   </div>
 </div>
 
-<!-- Mini-photo owner -->
-<img id="ownerPhoto" alt="Owner">
+<!-- Bouton choisir photo et input hidden -->
+<button type="button" id="photoBtn">Choisir Photo</button>
+<input type="file" id="photoInput" accept="image/*" style="display:none;">
+<img id="profilePreview" alt="Photo de profil" style="width:40px;height:40px;border-radius:50%;border:2px solid #b67385;display:none;">
 
-<script>
+
+<script type="module">
+import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
+
+// ====== CONFIG SUPABASE ======
+const supabase = createClient(
+  "https://jyhbamdcxmpveujjqjla.supabase.co",
+  "sb_publishable_sqsxb-3Kl5o3-JQYv9kGFw_-g0EgwMa"
+);
+
 const photoBtn = document.getElementById('photoBtn');
 const photoInput = document.getElementById('photoInput');
 const profilePreview = document.getElementById('profilePreview');
-const ownerImg = document.getElementById('ownerPhoto');
+const prenomInput = document.getElementById('prenom');
 
-// ======= AFFICHAGE PHOTO STOCKÉE AU CHARGEMENT =======
-const storedPhoto = localStorage.getItem('photo');
-if (storedPhoto && ownerImg) {
-  ownerImg.src = storedPhoto;
-  ownerImg.style.display = 'block';
-}
-
-// ======= BOUTON CHOISIR PHOTO =======
+// ====== CHOIX DE PHOTO ======
 photoBtn.onclick = () => photoInput.click();
 
-photoInput.onchange = (e) => {
+photoInput.onchange = async (e) => {
   const file = e.target.files[0];
   if (!file) return;
 
-  const reader = new FileReader();
-  reader.onload = () => {
-    profilePreview.src = reader.result;
-    profilePreview.style.display = 'block';
+  // ✅ Upload dans Supabase
+  const filePath = `profile_${Date.now()}_${file.name}`;
+  const { error: uploadError } = await supabase.storage.from('images').upload(filePath, file);
 
-    // 🔥 SAUVEGARDE
-    localStorage.setItem('photo', reader.result);
+  if (uploadError) return alert("Erreur upload: " + uploadError.message);
 
-    // 🟢 PREUVE VISUELLE
-    alert('Photo enregistrée ✔️');
-  };
+  const { data } = supabase.storage.from('images').getPublicUrl(filePath);
+  if (!data?.publicUrl) return alert("Impossible de récupérer l'URL de l'image");
 
-  reader.readAsDataURL(file); // <-- c'est ça qui manquait !
-};
+  const prenom = prenomInput.value.trim();
+  if (!prenom) return alert("Veuillez saisir votre prénom avant de choisir une photo");
 
-// ======= BOUTON CONNEXION (INCHANGÉ) =======
-document.getElementById('connexionBtn').onclick = () => {
-  const prenom = document.getElementById('prenom').value.trim();
-  const mdp = document.getElementById('password').value.trim();
+  // ✅ Insert ou update dans table profiles
+  const { error } = await supabase
+    .from('profiles')
+    .upsert({ prenom, photo_url: data.publicUrl }, { onConflict: ['prenom'] });
 
-  if (!prenom || !profilePreview.src) {
-    return alert("Veuillez mettre votre prénom et sélectionner une photo.");
-  }
+  if (error) return alert("Erreur sauvegarde profil: " + error.message);
 
-  localStorage.setItem('prenom', prenom); // ✅ OBLIGATOIRE
-
-  if (prenom === "Steph" && mdp === "Steph1511") {
-    document.getElementById('choiceModal').style.display = 'flex';
-  } else {
-    window.location.href = "visitor.html";
-  }
-};
-
-// ======= ENTRER SANS CONNEXION =======
-document.getElementById('entrerBtn').onclick = () => {
-  window.location.href = "visitor.html";
-};
-
-// ======= BOUTONS MODAL =======
-document.getElementById('creationBtn').onclick = () => {
-  window.location.href = "owner.html";
-};
-
-document.getElementById('visiteBtn').onclick = () => {
-  window.location.href = "visitor.html";
+  // ✅ Affichage immédiat
+  profilePreview.src = data.publicUrl;
+  profilePreview.style.display = 'block';
+  alert("Photo enregistrée et envoyée ✔️");
 };
 </script>
 
