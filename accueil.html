@@ -201,14 +201,17 @@ photoInput.onchange = (e) => {
 
   const reader = new FileReader();
   reader.onload = () => {
-  profilePreview.src = reader.result;
-  profilePreview.style.display = 'block';
+    profilePreview.src = reader.result;
+    profilePreview.style.display = 'block';
 
-  // 🔥 SAUVEGARDE
-  localStorage.setItem('photo', reader.result);
+    // 🔥 SAUVEGARDE
+    localStorage.setItem('photo', reader.result);
 
-  // 🟢 PREUVE VISUELLE
-  alert('Photo enregistrée ✔️');
+    // 🟢 PREUVE VISUELLE
+    alert('Photo enregistrée ✔️');
+  };
+
+  reader.readAsDataURL(file); // <-- c'est ça qui manquait !
 };
 
 // ======= BOUTON CONNEXION (INCHANGÉ) =======
