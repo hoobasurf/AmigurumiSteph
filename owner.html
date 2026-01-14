@@ -305,7 +305,6 @@
 <body>
 
 <div class="profile-circle">
-  <img id="ownerPhoto" alt="Photo de profil">
 </div>
   
 <!-- ===== MINI AVATAR ===== -->
@@ -387,40 +386,9 @@
 
 <!-- ======= JS COMPLET ======= -->
 <script type="module">
-  console.log('PHOTO =', localStorage.getItem('photo'));
-
-const ownerPhoto = document.getElementById('ownerPhoto');
-
-const photo = localStorage.getItem('photo');
-
-if (photo && photo.startsWith('data:image')) {
-  ownerPhoto.src = photo;
-} else {
-  ownerPhoto.removeAttribute('src'); // ⛔ pas d’image cassée
-}
   
   import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
-window.addEventListener('DOMContentLoaded', () => {
-  const ownerPhoto = document.getElementById('ownerPhoto');
-  const wrapper = ownerPhoto.parentElement; // le cercle
 
-  const photo = localStorage.getItem('photo');
-
-  // le cercle reste toujours visible
-  wrapper.style.display = 'flex';
-
-  if (photo && photo.startsWith('data:image')) {
-    ownerPhoto.onload = () => {
-      ownerPhoto.style.opacity = '1';
-    };
-    ownerPhoto.style.opacity = '0';
-    ownerPhoto.src = photo;
-  } else {
-    // pas de photo → cercle vide mais présent
-    ownerPhoto.removeAttribute('src');
-    ownerPhoto.style.opacity = '0';
-  }
-});
 // ================== CONFIG SUPABASE ==================
 const supabase = createClient(
   "https://jyhbamdcxmpveujjqjla.supabase.co",
@@ -720,22 +688,35 @@ expandBtn.onclick = e=>{
   expandBtn.textContent = commentBox.classList.contains('fullscreen')?'⤡':'⤢';
 };
 
+// ===== AVATAR OWNER : FIX DÉFINITIF SAFARI IPHONE =====
+(function(){
+  const ownerPhoto = document.getElementById('ownerPhoto');
+  if (!ownerPhoto) return;
+
+  const showPhoto = () => {
+    const photo = localStorage.getItem('photo');
+
+    if (photo && photo.startsWith('data:image')) {
+      ownerPhoto.src = photo;
+      ownerPhoto.style.display = 'block';
+      ownerPhoto.style.opacity = '1';
+    } else {
+      ownerPhoto.removeAttribute('src');
+      ownerPhoto.style.display = 'block'; // cercle visible même sans photo
+      ownerPhoto.style.opacity = '0';
+    }
+  };
+
+  // chargement normal
+  document.addEventListener('DOMContentLoaded', showPhoto);
+
+  // retour arrière iOS / PWA / cache Safari
+  window.addEventListener('pageshow', showPhoto);
+})();
+
 // ================== START ==================
 refreshCreations();// Ici, tu intègres **tout ton JS complet avec Supabase, likes, commentaires, zoom, delete, add, sidebar**
 
-window.addEventListener('DOMContentLoaded', () => {
-  const ownerPhoto = document.getElementById('ownerPhoto');
-  const photo = localStorage.getItem('photo');
-
-  if (photo && photo.startsWith('data:image')) {
-    ownerPhoto.onload = () => {
-      ownerPhoto.style.display = 'block';
-    };
-    ownerPhoto.src = photo;
-  } else {
-    ownerPhoto.style.display = 'none';
-  }
-});
 </script>
 
 </body>
