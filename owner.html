@@ -64,77 +64,141 @@ body::before{
 }
 </style>
 </head>
-
 <body>
 
-<!-- ================= SIDEBAR ================= -->
-<div class="sidebar">
-  <button id="addBtn">+</button>
-  <div class="spacer"></div>
+<img id="ownerPhoto" alt="Owner">
 
-  <!-- ⚙️ -->
-  <button id="manageBtn">
-    <svg viewBox="0 0 24 24">
-      <path d="M12 8a4 4 0 100 8 4 4 0 000-8z"/>
-      <path d="M2 12h2m16 0h2M12 2v2m0 16v2
-      M4.9 4.9l1.4 1.4m11.4 11.4l1.4 1.4
-      M19.1 4.9l-1.4 1.4M6.3 17.7l-1.4 1.4"/>
+<div class="center-zone">
+  <div id="visitor-list-container"></div>
+</div>
+
+<div id="sidebar">
+  <div id="toggleSidebar">☰</div>
+  <button id="addBtn">Ajouter</button>
+  <button id="pelotesBtn">Pelotes</button>
+  <button id="videoBtn">Vidéo</button>
+  <button id="notesBtn">Notes</button>
+  <button id="messagerieBtn">Messagerie</button>
+  <button id="manageBtn" style="position:absolute;bottom:20px;left:50%;transform:translateX(-50%);width:40px;height:40px;padding:0;border-radius:50%;display:flex;align-items:center;justify-content:center;">
+  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="#ffb6c1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-settings">
+    <circle cx="12" cy="12" r="3"/>
+    <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l0 0a2 2 0 1 1-2.83 2.83l0 0a1.65 1.65 0 0 0-1.82.33l0 0a1.65 1.65 0 0 0-.5 1.51l0 0a2 2 0 1 1-3.18 0l0 0a1.65 1.65 0 0 0-1.51-.5l0 0a1.65 1.65 0 0 0-.33-1.82l0 0a2 2 0 1 1 0-2.83l0 0a1.65 1.65 0 0 0 .33-1.82l0 0a1.65 1.65 0 0 0-1.51-.5l0 0a2 2 0 1 1 0-3.18l0 0a1.65 1.65 0 0 0 .5-1.51l0 0a1.65 1.65 0 0 0 1.82-.33l0 0a2 2 0 1 1 2.83 0l0 0a1.65 1.65 0 0 0 1.82.33l0 0a1.65 1.65 0 0 0 .5 1.51l0 0a2 2 0 1 1 3.18 0l0 0a1.65 1.65 0 0 0 1.51.5l0 0a1.65 1.65 0 0 0 .33 1.82l0 0a2 2 0 1 1 0 2.83l0 0a1.65 1.65 0 0 0-.33 1.82l0 0a1.65 1.65 0 0 0 1.51.5z"/>
+  </svg>
+</button>
+</div>
+
+<!-- Modals -->
+<div id="addModal" class="modal">
+  <div class="modal-box">
+    <h2>Ajouter des photos</h2>
+    <input id="photoName" placeholder="Nom du projet">
+    <input type="file" id="multiPhoto" multiple>
+    <button id="confirmAdd">Valider</button>
+  </div>
+</div>
+
+<div id="deleteModal" class="modal">
+  <div class="modal-box">
+    <p>Supprimer définitivement ce projet ?</p>
+    <button id="confirmDelete">Oui</button>
+    <button id="cancelDelete">Annuler</button>
+  </div>
+</div>
+
+<!-- ====== LIKE MODAL ====== -->
+<div id="likeModal" class="modal">
+  <div class="modal-box">
+    <h3>Like ❤️</h3>
+    <div style="display:flex; align-items:center; gap:6px; margin-bottom:8px;">
+      <img id="likeAvatar" src="" alt="Avatar" style="width:24px; height:24px; border-radius:50%; border:2px solid #b67385;">
+      <input type="text" id="likeName" readonly style="flex:1; padding:4px 8px; border:2px solid #b67385; border-radius:8px; background:#ffe6f0;">
+    </div>
+    <button id="confirmLike">Valider</button>
+    <div class="bubble-container" id="likeBubbles" style="margin-top:12px; max-height:120px; overflow-y:auto;"></div>
+  </div>
+</div>
+
+<!-- ====== COMMENT MODAL ====== -->
+<div id="commentModal" class="modal">
+  <div class="modal-box comment-box">
+    <div class="expand-btn" id="expandComment">⤢</div>
+    <h3>Commentaire 💬</h3>
+    <div class="comment-list" id="commentBubbles" style="max-height:160px; overflow-y:auto; margin-bottom:8px;"></div>
+    <div style="display:flex; flex-direction:column; gap:6px;">
+      <input type="text" id="commentName" readonly style="flex:1; padding:4px 8px; border:2px solid #b67385; border-radius:8px; background:#ffe6f0; margin-bottom:8px;">
+      <input type="text" id="commentText" placeholder="Votre commentaire" style="padding:4px 8px; border:2px solid #b67385; border-radius:8px;">
+      <button id="confirmComment">Envoyer</button>
+    </div>
+  </div>
+</div>
+
+<div id="zoomModal">
+  <div class="closeZoom">×</div>
+  <img id="mainZoom">
+  <div class="thumbs" id="thumbs"></div>
+  <div class="actions">
+    <div class="actions" style="display:flex; gap:12px; align-items:center; margin-top:8px;">
+  <div class="icon-btn" id="likeBtn" style="display:flex; align-items:center; cursor:pointer; gap:4px;">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#b84c6f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M12 21C12 21 4 13.5 4 8.5C4 5.5 6.5 3 9.5 3C11 3 12 4 12 4C12 4 13 3 14.5 3C17.5 3 20 5.5 20 8.5C20 13.5 12 21 12 21Z"></path>
     </svg>
-  </button>
+    <span id="likeCount">0</span>
+  </div>
+
+  <div class="icon-btn" id="commentBtn" style="display:flex; align-items:center; cursor:pointer; gap:4px;">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#b84c6f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+    </svg>
+    <span id="commentCount">0</span>
+  </div>
+</div>
+  </div>
 </div>
 
-<!-- ================= HEADER ================= -->
-<div class="header">
-  <img id="ownerPhoto">
-</div>
-
-<!-- ================= MAIN ================= -->
-<div class="main" id="main"></div>
-
-<!-- ================= LIKE MODAL ================= -->
-<div class="modal" id="likeModal">
+<!-- Modal Gestion -->
+<div id="manageModal" class="modal">
   <div class="modal-box">
+    <h2>Gestion Likes, Commentaires</h2>
+    <button id="manageLikesBtn">Likes</button>
+    <button id="manageCommentsBtn">Commentaires</button>
+  </div>
+</div>
+
+<!-- Modal Likes -->
+<div id="likesModal" class="modal">
+  <div class="modal-box" style="max-height:80vh; overflow-y:auto;">
     <h2>Likes</h2>
-    <div id="likeBubbles"></div>
-    <button class="confirm" id="confirmLike">J’aime</button>
+    <button id="chooseLikeBtn">Choisir individuellement</button>
+    <button id="clearLikesBtn">Tout effacer</button>
+    <div id="likesList"></div>
   </div>
 </div>
 
-<!-- ================= COMMENT MODAL ================= -->
-<div class="modal" id="commentModal">
-  <div class="modal-box">
+<!-- Modal Commentaires -->
+<div id="commentsModal" class="modal">
+  <div class="modal-box" style="max-height:80vh; overflow-y:auto;">
     <h2>Commentaires</h2>
-    <div id="commentBubbles"></div>
-    <textarea id="commentText" placeholder="Écrire un commentaire"></textarea>
-    <button class="confirm" id="confirmComment">Envoyer</button>
+    <button id="chooseCommentBtn">Choisir individuellement</button>
+    <button id="clearCommentsBtn">Tout effacer</button>
+    <div id="commentsList"></div>
   </div>
 </div>
 
-<!-- ================= GESTION MODALS ================= -->
-<div class="modal" id="manageModal">
+<!-- Modal suppression individuelle -->
+<div id="deleteIndivModal" class="modal">
   <div class="modal-box">
-    <h2>Gestion Likes & Commentaires</h2>
-    <button class="confirm" id="manageLikesBtn">Likes</button>
-    <button class="confirm" id="manageCommentsBtn">Commentaires</button>
+    <p>Supprimer définitivement ce Like/Commentaire ?</p>
+    <button id="confirmDeleteIndiv">Oui</button>
+    <button id="cancelDeleteIndiv">Annuler</button>
   </div>
 </div>
 
-<div class="modal" id="likesModal">
-  <div class="modal-box">
-    <h2>Gestion Likes</h2>
-    <button class="confirm" id="clearAllLikes">Tout effacer</button>
-    <div class="manage-list" id="likesList"></div>
-  </div>
-</div>
-
-<div class="modal" id="commentsModal">
-  <div class="modal-box">
-    <h2>Gestion Commentaires</h2>
-    <button class="confirm" id="clearAllComments">Tout effacer</button>
-    <div class="manage-list" id="commentsList"></div>
-  </div>
-</div>
-
+<button id="manageBtn" style="position:absolute;bottom:20px;left:50%;transform:translateX(-50%);width:36px;height:36px;border:none;background:none;cursor:pointer;">
+  <svg viewBox="0 0 24 24" fill="none" stroke="#ff6eb1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="12" cy="12" r="3"></circle>
+    <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33h.09A1.65 1.65 0 0 0 12 5.6V5a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51h.09a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82v.09a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/>
+  </svg>
+</button>
 <!-- ================= SCRIPT ================= -->
 <script type="module">
 import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
