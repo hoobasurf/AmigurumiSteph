@@ -309,20 +309,16 @@ function addTripleClick(elem, callback){
     setTimeout(()=>{ count=0; },500);
   });
 }
-
+  
 // ====== RENDER ======
 function render(){
   container.innerHTML='';
-  let page=null;
+  let page;
   creations.forEach((c,i)=>{
-    if(i%6===0){page=document.createElement('div');page.className='page';container.appendChild(page);}
-    const d=document.createElement('div');d.className='visitor-item';
-    d.innerHTML=`<div class="placeholder">?</div><div class="delete-btn">×</div><p>${c.name}</p><img src="${c.imgUrl||''}">`;
-    const img=d.querySelector('img');
-    img.onload=()=>d.querySelector('.placeholder').style.display='none';
-    img.onerror=()=>{img.remove();d.querySelector('.placeholder').textContent='';};
-    img.onclick=()=>openZoom(c);
-    d.querySelector('.delete-btn').onclick=()=>openDeleteModal(c);
+    if(i%6===0){ page=document.createElement('div'); page.className='page'; container.appendChild(page); }
+    const d=document.createElement('div'); d.className='visitor-item';
+    d.innerHTML=`<div class="delete-btn">×</div><p>${c.name}</p><img src="${c.imgUrl}">`;
+    d.querySelector('img').onclick=()=>openZoom(c);
     page.appendChild(d);
   });
 }
