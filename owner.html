@@ -227,8 +227,6 @@ const supabase = createClient("https://jyhbamdcxmpveujjqjla.supabase.co","sb_pub
 // ====== OWNER AVATAR ======
 const ownerPhoto = document.getElementById('ownerPhoto');
 const prenom = localStorage.getItem('prenom');
-const likeNameInput = document.getElementById('likeName');
-const commentNameInput = document.getElementById('commentName');
 
 async function loadOwnerPhoto(){
   if(!prenom) return;
@@ -239,17 +237,12 @@ async function loadOwnerPhoto(){
 document.addEventListener('DOMContentLoaded', loadOwnerPhoto);
 window.addEventListener('pageshow', loadOwnerPhoto);
 
-// Remplir info utilisateur dans modals
-function fillUserInfo(){
-  likeNameInput.value = prenom || '';
-  document.getElementById('commentName').value = prenom || '';
-}
-fillUserInfo();
-
 // ====== VARIABLES ======
 let creations=[];
 let currentZoom=null;
 let currentDelete=null;
+let currentCreation=null;
+let currentItem=null;
 
 const container=document.getElementById('visitor-list-container');
 const addModal=document.getElementById('addModal');
@@ -260,22 +253,62 @@ const mainZoom=document.getElementById('mainZoom');
 const thumbs=document.getElementById('thumbs');
 const likeCount=document.getElementById('likeCount');
 const commentCount=document.getElementById('commentCount');
+
 const likeModal=document.getElementById('likeModal');
 const likeBubbles=document.getElementById('likeBubbles');
-const confirmLike=document.getElementById('confirmLike');
+const likeNameInput=document.getElementById('likeName');
+const likeAvatar=document.getElementById('likeAvatar');
+
 const commentModal=document.getElementById('commentModal');
-const confirmComment=document.getElementById('confirmComment');
 const commentBubbles=document.getElementById('commentBubbles');
+const commentNameInput=document.getElementById('commentName');
+const commentAvatar=document.getElementById('commentAvatar');
+const commentTextInput=document.getElementById('commentText');
 const expandBtn=document.getElementById('expandComment');
 const commentBox=document.querySelector('.comment-box');
+
+const manageModal = document.getElementById('manageModal');
+const likesModal = document.getElementById('likesModal');
+const commentsModal = document.getElementById('commentsModal');
 const deleteIndivModal = document.getElementById('deleteIndivModal');
 const confirmDeleteIndiv = document.getElementById('confirmDeleteIndiv');
 const cancelDeleteIndiv = document.getElementById('cancelDeleteIndiv');
 const likesList = document.getElementById('likesList');
 const commentsList = document.getElementById('commentsList');
+const selectCreationModal = document.getElementById('selectCreationModal');
+const selectCreationList = document.getElementById('selectCreationList');
+const clearSelectedBtn = document.getElementById('clearSelectedBtn');
+const chooseLikesBtn = document.getElementById('chooseLikesBtn');
+const chooseCommentsBtn = document.getElementById('chooseCommentsBtn');
 
-let currentCreation = null;
-let currentItem = null;
+let currentDeleteType = null; // 'like' ou 'comment'
+
+// ====== FILL USER INFO ======
+function fillUserInfo() {
+  const prenom = localStorage.getItem('prenom') || '';
+  likeNameInput.value = prenom;
+  likeAvatar.src = ownerPhoto.src || '';
+  commentNameInput.value = prenom;
+  commentAvatar.src = ownerPhoto.src || '';
+}
+if(ownerPhoto.src) fillUserInfo();
+
+// ====== UTILITAIRES ======
+function addLongClick(elem, callback){
+  let timer;
+  elem.addEventListener('mousedown', ()=>{ timer=setTimeout(callback,600); });
+  elem.addEventListener('mouseup', ()=>{ clearTimeout(timer); });
+  elem.addEventListener('mouseleave', ()=>{ clearTimeout(timer); });
+}
+
+function addTripleClick(elem, callback){
+  let count=0;
+  elem.addEventListener('click', ()=>{
+    count++;
+    if(count===3){ callback(); count=0; }
+    setTimeout(()=>{ count=0; },500);
+  });
+}
 
 // ====== RENDER ======
 function render(){
@@ -300,160 +333,102 @@ function openZoom(c){
   mainZoom.src=c.imgUrl;
   thumbs.innerHTML='';
   if(!c.zoomGroup || c.zoomGroup.length===0)c.zoomGroup=[c.imgUrl];
-  c.zoomGroup.forEach(u=>{
-    const t=document.createElement('img');
-    t.src=u;
-    t.onclick=()=>mainZoom.src=u;
-    thumbs.appendChild(t);
-  });
+  c.zoomGroup.forEach(u=>{const t=document.createElement('img');t.src=u;t.onclick=()=>mainZoom.src=u;thumbs.appendChild(t);});
   updateActions();
   zoomModal.style.display='flex';
 }
+
 function updateActions(){
-  likeCount.textContent=currentZoom.likes?.length||0;
-  commentCount.textContent=currentZoom.comments?.length||0;
+  if(currentZoom){
+    likeCount.textContent=currentZoom.likes?.length||0;
+    commentCount.textContent=currentZoom.comments?.length||0;
+  }
 }
 
 // ====== LIKE ======
-function openLikeModal(){
+document.getElementById('likeBtn').onclick = () => {
   if (!currentZoom) return;
   likeBubbles.innerHTML='';
-  currentZoom.likes?.forEach(like=>{
-    const bubble=document.createElement('div');
-    bubble.className='bubble';
-    if(like.photo){
-      bubble.innerHTML=`<img src="${like.photo}" style="width:20px;height:20px;border-radius:50%;margin-right:4px;vertical-align:middle;">${like.name}`;
-    }else bubble.textContent = like.name;
-    likeBubbles.appendChild(bubble);
+  (currentZoom.likes||[]).forEach(l=>{
+    const div=document.createElement('div'); div.className='bubble';
+    div.textContent=l.name;
+    likeBubbles.appendChild(div);
   });
-  likeNameInput.value = prenom || '';
+  likeNameInput.value=localStorage.getItem('prenom')||'';
   likeModal.style.display='flex';
-}
+};
 
-// ====== COMMENT ======
-function openCommentModal(){
-  if(!currentZoom) return;
-  commentBubbles.innerHTML='';
-  (currentZoom.comments||[]).forEach(c=>{
-    const div=document.createElement('div');
-    div.innerHTML=`${c.photo?`<img src="${c.photo}" style="width:20px;height:20px;border-radius:50%;margin-right:4px;vertical-align:middle;">`:''}<strong>${c.name}</strong>: ${c.text}`;
-    commentBubbles.appendChild(div);
-  });
-  document.getElementById('commentText').value='';
-  document.getElementById('commentName').value = prenom || '';
-  commentModal.style.display='flex';
-}
-
-// ====== TRIPLE CLICK / LONG PRESS ======
-function addClickHandlers(elem, callback){
-  let timer=null, clickCount=0;
-  elem.addEventListener('click', ()=>{
-    clickCount++;
-    if(clickCount===3){callback(); clickCount=0;}
-    timer=setTimeout(()=>{clickCount=0;},600);
-  });
-  elem.addEventListener('mousedown', ()=>{
-    timer=setTimeout(callback,600);
-  });
-  elem.addEventListener('mouseup', ()=>clearTimeout(timer));
-  elem.addEventListener('mouseleave', ()=>clearTimeout(timer));
-}
-addClickHandlers(document.getElementById('likeBtn'), openLikeModal);
-addClickHandlers(document.getElementById('commentBtn'), openCommentModal);
-
-// ====== CONFIRM LIKE ======
-confirmLike.onclick = async ()=>{
+document.getElementById('confirmLike').onclick = async () => {
   if(!currentZoom) return;
   const name = likeNameInput.value.trim();
   if(!name) return;
   if(!currentZoom.likes) currentZoom.likes=[];
-  if(!currentZoom.likes.some(l=>l.name===name)) currentZoom.likes.push({name, photo:ownerPhoto.src||''});
-  await supabase.from('creations').update({likes:currentZoom.likes}).eq('id',currentZoom.id);
-  openLikeModal();
-  updateActions();
+  if(!currentZoom.likes.some(l=>l.name===name)){
+    currentZoom.likes.push({name, photo: ownerPhoto.src || ''});
+  }
+  await supabase.from('creations').update({likes: currentZoom.likes}).eq('id',currentZoom.id);
+  likeBubbles.innerHTML='';
+  currentZoom.likes.forEach(l=>{
+    const div=document.createElement('div'); div.className='bubble'; div.textContent=l.name; likeBubbles.appendChild(div);
+  });
+  likeCount.textContent=currentZoom.likes.length;
   likeModal.style.display='none';
 };
 
-// ====== CONFIRM COMMENT ======
-confirmComment.onclick=async()=>{
+// ====== COMMENT ======
+document.getElementById('commentBtn').onclick = () => {
   if(!currentZoom) return;
-  const name=document.getElementById('commentName').value.trim();
-  const text=document.getElementById('commentText').value.trim();
+  renderCommentList();
+  commentNameInput.value=localStorage.getItem('prenom')||'';
+  commentTextInput.value='';
+  commentModal.style.display='flex';
+};
+
+document.getElementById('confirmComment').onclick = async () => {
+  if(!currentZoom) return;
+  const name=commentNameInput.value.trim();
+  const text=commentTextInput.value.trim();
   if(!name || !text) return;
   if(!currentZoom.comments) currentZoom.comments=[];
-  currentZoom.comments.push({name, text, photo: ownerPhoto.src||''});
+  currentZoom.comments.push({name,text,photo:ownerPhoto.src||'',likes:[]});
   await supabase.from('creations').update({comments:currentZoom.comments}).eq('id',currentZoom.id);
-  openCommentModal();
-  updateActions();
-  commentModal.style.display='none';
+  renderCommentList();
+  commentTextInput.value='';
 };
 
-// ====== DELETE INDIVIDUEL ======
-function openIndividualLikes(c){
-  currentCreation=c;
-  likesList.innerHTML='';
-  c.likes?.forEach((l,i)=>{
-    const div=document.createElement('div');
-    div.textContent=l.name;
-    div.style.cursor='pointer';
-    div.onclick=()=>{currentItem=i; deleteIndivModal.style.display='flex';};
-    likesList.appendChild(div);
+function renderCommentList(){
+  commentBubbles.innerHTML='';
+  (currentZoom.comments||[]).forEach(c=>{
+    const div=document.createElement('div'); div.className='comment-item';
+    div.textContent=`${c.name}: ${c.text}`;
+    commentBubbles.appendChild(div);
   });
-}
-function openIndividualComments(c){
-  currentCreation=c;
-  commentsList.innerHTML='';
-  c.comments?.forEach((com,i)=>{
-    const div=document.createElement('div');
-    div.textContent=com.name+': '+com.text;
-    div.style.cursor='pointer';
-    div.onclick=()=>{currentItem=i; deleteIndivModal.style.display='flex';};
-    commentsList.appendChild(div);
-  });
+  commentCount.textContent=currentZoom.comments.length;
 }
 
-confirmDeleteIndiv.onclick=async()=>{
-  if(currentCreation && currentItem!=null){
-    if(currentCreation.likes && likeModal.style.display==='flex'){
-      currentCreation.likes.splice(currentItem,1);
-      await supabase.from('creations').update({likes:currentCreation.likes}).eq('id',currentCreation.id);
-      openIndividualLikes(currentCreation);
-    }else if(currentCreation.comments && commentModal.style.display==='flex'){
-      currentCreation.comments.splice(currentItem,1);
-      await supabase.from('creations').update({comments:currentCreation.comments}).eq('id',currentCreation.id);
-      openIndividualComments(currentCreation);
-    }
-    updateActions();
-  }
-  deleteIndivModal.style.display='none';
-  currentItem=null;
-};
-cancelDeleteIndiv.onclick=()=>{deleteIndivModal.style.display='none'; currentItem=null;};
-
-// ====== DELETE PROJECT ======
-function openDeleteModal(project){currentDelete=project; deleteModal.style.display='flex';}
+// ====== DELETE MODAL ======
+function openDeleteModal(project){ currentDelete=project; deleteModal.style.display='flex'; }
 document.getElementById('cancelDelete').onclick=()=>{currentDelete=null;deleteModal.style.display='none';};
-document.getElementById('confirmDelete').onclick=async()=>{
+document.getElementById('confirmDelete').onclick=async ()=>{
   if(!currentDelete?.id) return;
   await supabase.from('creations').delete().eq('id',currentDelete.id);
-  currentDelete=null;
-  deleteModal.style.display='none';
+  currentDelete=null; deleteModal.style.display='none';
   await refreshCreations();
 };
 
-// ====== AJOUT ======
+// ====== ADD ======
 document.getElementById('addBtn').onclick=()=>addModal.style.display='flex';
-addModal.addEventListener('click', e=>{if(e.target===addModal)addModal.style.display='none';});
+addModal.addEventListener('click',e=>{if(e.target===addModal)addModal.style.display='none';});
 document.getElementById('confirmAdd').onclick=async e=>{
   e.stopPropagation();
   const name=document.getElementById('photoName').value.trim();
   const files=document.getElementById('multiPhoto').files;
-  if(!name || !files.length){alert("Nom et photo requis"); return;}
-  const paths=[], urls=[];
+  if(!name || !files.length){alert("Mettre un nom et choisir au moins une photo");return;}
+  const paths=[],urls=[];
   for(let file of files){
     const path=`${Date.now()}_${file.name}`;
     const {error:uploadError}=await supabase.storage.from('images').upload(path,file);
-    if(uploadError){console.error(uploadError); continue;}
+    if(uploadError){console.error(uploadError);continue;}
     const {data:pubData}=supabase.storage.from('images').getPublicUrl(path);
     if(!pubData?.publicUrl) continue;
     urls.push(pubData.publicUrl);
@@ -474,16 +449,16 @@ async function refreshCreations(){
     if(error){console.error(error); return;}
     creations=data.map(c=>{
       let zoomGroup=[];
-      if(c.images?.length) zoomGroup=c.images.map(p=>supabase.storage.from('images').getPublicUrl(p).data.publicUrl||'');
-      else if(c.image_path) zoomGroup=[supabase.storage.from('images').getPublicUrl(c.image_path).data?.publicUrl||''];
-      return {
-        id:c.id,
-        name:c.name,
-        imgUrl:zoomGroup[0]||'',
-        zoomGroup,
-        likes:c.likes||[],
-        comments:c.comments||[]
-      };
+      if(c.images?.length){
+        zoomGroup=c.images.map(p=>{
+          const {data}=supabase.storage.from('images').getPublicUrl(p);
+          return data?.publicUrl||'';
+        });
+      } else if(c.image_path){
+        const {data}=supabase.storage.from('images').getPublicUrl(c.image_path);
+        zoomGroup=[data?.publicUrl||''];
+      }
+      return {id:c.id,name:c.name,imgUrl:zoomGroup[0]||'',zoomGroup,likes:c.likes||[],comments:c.comments||[]};
     });
     render();
   }catch(err){console.error(err);}
@@ -498,11 +473,124 @@ document.getElementById('toggleSidebar').onclick=()=>sidebar.classList.toggle('s
 
 // ====== ZOOM MODAL EVENTS ======
 document.querySelector('.closeZoom').onclick=()=>zoomModal.style.display='none';
-zoomModal.onclick=e=>{if(e.target===zoomModal)zoomModal.style.display='none';};
-likeModal.onclick=e=>{if(e.target===likeModal)likeModal.style.display='none';};
-commentModal.onclick=e=>{if(e.target===commentModal)commentModal.style.display='none';};
-deleteModal.onclick=e=>{if(e.target===deleteModal){deleteModal.style.display='none'; currentDelete=null;}};
-expandBtn.onclick=e=>{e.stopPropagation();commentBox.classList.toggle('fullscreen'); expandBtn.textContent=commentBox.classList.contains('fullscreen')?'⤡':'⤢';};
+zoomModal.onclick=e=>{if(e.target===zoomModal) zoomModal.style.display='none';};
+likeModal.onclick=e=>{if(e.target===likeModal) likeModal.style.display='none';};
+commentModal.onclick=e=>{if(e.target===commentModal) commentModal.style.display='none';};
+deleteModal.onclick=e=>{if(e.target===deleteModal){deleteModal.style.display='none';currentDelete=null;}};
+
+// ====== COMMENT FULLSCREEN ======
+expandBtn.onclick=e=>{e.stopPropagation();commentBox.classList.toggle('fullscreen');expandBtn.textContent=commentBox.classList.contains('fullscreen')?'⤡':'⤢';};
+
+// ====== GESTION LIKES / COMMENTS MODAL ======
+document.getElementById('manageLikesBtn').onclick=()=>{manageModal.style.display='none';renderCreationsForLikes();likesModal.style.display='flex';};
+document.getElementById('manageCommentsBtn').onclick=()=>{manageModal.style.display='none';renderCreationsForComments();commentsModal.style.display='flex';};
+[manageModal, likesModal, commentsModal, deleteIndivModal].forEach(m=>{m.onclick=e=>{if(e.target===m)m.style.display='none';}});
+
+document.getElementById('clearLikesBtn').onclick=async ()=>{
+  if(!confirm("Supprimer tous les Likes de toutes les créations ?")) return;
+  creations.forEach(c=>c.likes=[]);
+  for(let c of creations){await supabase.from('creations').update({likes:c.likes}).eq('id',c.id);}
+  render(); likesList.innerHTML='';
+};
+document.getElementById('clearCommentsBtn').onclick=async ()=>{
+  if(!confirm("Supprimer tous les Commentaires de toutes les créations ?")) return;
+  creations.forEach(c=>c.comments=[]);
+  for(let c of creations){await supabase.from('creations').update({comments:c.comments}).eq('id',c.id);}
+  render(); commentsList.innerHTML='';
+};
+
+chooseLikesBtn.onclick=()=>openSelectCreation('like');
+chooseCommentsBtn.onclick=()=>openSelectCreation('comment');
+
+function openSelectCreation(type){
+  currentDeleteType=type;
+  selectCreationList.innerHTML='';
+  creations.forEach(c=>{
+    const div=document.createElement('div');
+    div.style.display='flex'; div.style.alignItems='center'; div.style.gap='8px'; div.style.cursor='pointer';
+    div.innerHTML=`<img src="${c.imgUrl}" style="width:50px;height:50px;border-radius:8px;"><span>${c.name}</span>`;
+    div.onclick=()=>openIndividualModal(c,type);
+    selectCreationList.appendChild(div);
+  });
+  selectCreationModal.style.display='flex';
+}
+
+function openIndividualModal(c,type){
+  currentZoom=c;
+  if(type==='like'){likeModal.style.display='flex';renderLikesListForCreation(c);}
+  else{commentModal.style.display='flex';renderCommentsListForCreation(c);}
+  selectCreationModal.style.display='none';
+}
+
+function renderLikesListForCreation(c){
+  likeBubbles.innerHTML='';
+  c.likes?.forEach((l,i)=>{
+    const div=document.createElement('div'); div.style.cursor='pointer'; div.textContent=l.name;
+    div.onclick=async ()=>{
+      if(confirm('Supprimer ce Like ?')){
+        c.likes.splice(i,1);
+        await supabase.from('creations').update({likes:c.likes}).eq('id',c.id);
+        renderLikesListForCreation(c); likeCount.textContent=c.likes.length;
+      }
+    };
+    likeBubbles.appendChild(div);
+  });
+}
+
+function renderCommentsListForCreation(c){
+  commentBubbles.innerHTML='';
+  c.comments?.forEach((com,i)=>{
+    const div=document.createElement('div'); div.style.cursor='pointer';
+    div.textContent=`${com.name}: ${com.text}`;
+    div.onclick=async ()=>{
+      if(confirm('Supprimer ce Commentaire ?')){
+        c.comments.splice(i,1);
+        await supabase.from('creations').update({comments:c.comments}).eq('id',c.id);
+        renderCommentsListForCreation(c); commentCount.textContent=c.comments.length;
+      }
+    };
+    commentBubbles.appendChild(div);
+  });
+}
+
+clearSelectedBtn.onclick=async ()=>{
+  if(!confirm('Tout effacer pour toutes les créations affichées ?')) return;
+  creations.forEach(c=>{
+    if(currentDeleteType==='like') c.likes=[];
+    else if(currentDeleteType==='comment') c.comments=[];
+  });
+  for(let c of creations){
+    await supabase.from('creations').update({likes:c.likes,comments:c.comments}).eq('id',c.id);
+  }
+  selectCreationModal.style.display='none';
+  render(); updateActions();
+}
+
+// ====== SUPPR INDIVIDUEL ======
+confirmDeleteIndiv.onclick=async ()=>{
+  if(currentCreation!=null && currentItem!=null){
+    if(currentDeleteType==='like' && currentCreation.likes){
+      currentCreation.likes.splice(currentItem,1);
+      await supabase.from('creations').update({likes:currentCreation.likes}).eq('id',currentCreation.id);
+      openIndividualModal(currentCreation,'like');
+    } else if(currentDeleteType==='comment' && currentCreation.comments){
+      currentCreation.comments.splice(currentItem,1);
+      await supabase.from('creations').update({comments:currentCreation.comments}).eq('id',currentCreation.id);
+      openIndividualModal(currentCreation,'comment');
+    }
+  }
+  deleteIndivModal.style.display='none'; currentItem=null;
+};
+cancelDeleteIndiv.onclick=()=>{ deleteIndivModal.style.display='none'; currentItem=null; };
+
+// ====== LONG / TRIPLE CLICK SUR TITRES LIKE / COMMENT ======
+const likeTitle=document.getElementById('likeModalTitle');
+const commentTitle=document.getElementById('commentModalTitle');
+
+addLongClick(likeTitle,()=>{currentDeleteType='like'; deleteLikeModal.style.display='flex';});
+addTripleClick(likeTitle,()=>{currentDeleteType='like'; deleteLikeModal.style.display='flex';});
+addLongClick(commentTitle,()=>{currentDeleteType='comment'; deleteCommentModal.style.display='flex';});
+addTripleClick(commentTitle,()=>{currentDeleteType='comment'; deleteCommentModal.style.display='flex';});
 
 // ====== INITIAL ======
 refreshCreations();
