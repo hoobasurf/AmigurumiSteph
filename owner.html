@@ -352,7 +352,6 @@ confirmLike.onclick = async () => {
     currentZoom.likes = [];
   }
 
-  // ❗ BLOQUE SI DÉJÀ LIKÉ
   const alreadyLiked = currentZoom.likes.some(l => l.name === name);
   if (alreadyLiked) {
     likeModal.style.display = 'none';
@@ -369,21 +368,15 @@ confirmLike.onclick = async () => {
     .update({ likes: currentZoom.likes })
     .eq('id', currentZoom.id);
 
-const zoomId = currentZoom.id; // 🔒 sauvegarde
+  likeCount.textContent = currentZoom.likes.length;
 
-await refreshCreations();
+  // ✅ LA CORRECTION (3 lignes)
+  await refreshCreations();
+  currentZoom = creations.find(c => c.id === currentZoom.id);
+  renderLikeBubbles(currentZoom);
 
-// 🔁 récupération propre
-currentZoom = creations.find(c => c.id === zoomId);
-if (!currentZoom) return;
-
-// 🔄 mise à jour UI
-updateActions();
-renderLikeBubbles(currentZoom);
-
-// fermer la modal
-likeModal.style.display = 'none';
-  };
+  likeModal.style.display = 'none';
+};
 
 // ====== COMMENT ======
 document.getElementById('commentBtn').onclick = () => {
