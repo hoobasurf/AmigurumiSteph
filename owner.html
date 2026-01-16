@@ -305,21 +305,24 @@ function updateActions(){
 // ====== LIKE ======
 document.getElementById('likeBtn').onclick = () => {
   if (!currentZoom) return;
-  renderLikeList();
+  renderLikeList();  // ✅ ici on utilise la nouvelle fonction
   likeNameInput.value = localStorage.getItem('prenom') || '';
   likeModal.style.display = 'flex';
 };
 
 confirmLike.onclick = async () => {
+  if (!currentZoom) return;
+
   const name = likeNameInput.value.trim();
-  if (!name || !currentZoom) return;
+  if (!name) return;
 
   if (!Array.isArray(currentZoom.likes)) {
     currentZoom.likes = [];
   }
 
-  // ❌ empêche double like
-  if (currentZoom.likes.some(l => l.name === name)) {
+  // ❗ Bloque si déjà liké
+  const alreadyLiked = currentZoom.likes.some(l => l.name === name);
+  if (alreadyLiked) {
     likeModal.style.display = 'none';
     return;
   }
@@ -334,7 +337,8 @@ confirmLike.onclick = async () => {
     .update({ likes: currentZoom.likes })
     .eq('id', currentZoom.id);
 
-  renderLikeList();
+  await refreshCreations();       // recharge les données depuis Supabase
+  renderLikeList();               // affiche les likes avec photo
   likeModal.style.display = 'none';
 };
 
@@ -375,9 +379,13 @@ function renderCommentList() {
 }
 
 function renderLikeList() {
+  if (!currentZoom) return;
+
   likeBubbles.innerHTML = '';
 
-  (currentZoom.likes || []).forEach(like => {
+  const likes = Array.isArray(currentZoom.likes) ? currentZoom.likes : [];
+
+  likes.forEach(like => {
     const item = document.createElement('div');
     item.className = 'like-item';
 
@@ -391,9 +399,7 @@ function renderLikeList() {
     likeBubbles.appendChild(item);
   });
 
-  likeCount.textContent = Array.isArray(currentZoom.likes)
-    ? currentZoom.likes.length
-    : 0;
+  likeCount.textContent = likes.length;
 }
     
 confirmComment.onclick = async () => {
