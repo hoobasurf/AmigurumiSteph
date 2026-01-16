@@ -369,10 +369,20 @@ confirmLike.onclick = async () => {
     .update({ likes: currentZoom.likes })
     .eq('id', currentZoom.id);
 
- await refreshCreations();          // recharge les données depuis Supabase
-renderLikeBubbles(currentZoom);    // affiche les likes avec photo
-likeModal.style.display = 'none';  // ferme la modal
-};
+ await refreshCreations();
+
+// 🔁 Récupérer la création mise à jour depuis creations[]
+currentZoom = creations.find(c => c.id === currentZoom.id);
+
+// 🔒 sécurité
+if (!currentZoom) return;
+
+// 🔄 rafraîchir affichage
+updateActions();
+renderLikeBubbles(currentZoom);
+
+// fermer la modal
+likeModal.style.display = 'none';
 
 // ====== COMMENT ======
 document.getElementById('commentBtn').onclick = () => {
