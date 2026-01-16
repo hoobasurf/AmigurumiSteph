@@ -312,6 +312,7 @@ document.getElementById('likeBtn').onclick = () => {
 
 confirmLike.onclick = async () => {
   if (!currentZoom) return;
+
   const name = likeNameInput.value.trim();
   if (!name) return;
 
@@ -323,27 +324,27 @@ confirmLike.onclick = async () => {
     return;
   }
 
+  // Ajout local
   currentZoom.likes.push({ name, photo: ownerPhoto.src || '' });
 
-  // Mise à jour Supabase
+  // ⚡ Mise à jour Supabase
   const { data, error } = await supabase
     .from('creations')
     .update({ likes: currentZoom.likes })
     .eq('id', currentZoom.id)
-    .select(); // ← renvoie le nouvel enregistrement
+    .select(); // récupère l'enregistrement mis à jour
 
   if (error) {
     console.error("Erreur update likes:", error);
     return;
   }
 
-  // Met à jour le local
-  const updated = data[0];
-  if (updated) {
-    currentZoom.likes = Array.isArray(updated.likes) ? updated.likes : [];
+  // ⚡ Synchroniser currentZoom avec la base
+  if (data?.[0]) {
+    currentZoom.likes = Array.isArray(data[0].likes) ? data[0].likes : [];
   }
 
-  renderLikeList();
+  renderLikeList();       // affiche tout correctement
   likeModal.style.display = 'none';
 };
 
@@ -535,8 +536,8 @@ async function refreshCreations() {
       return data?.publicUrl || '';
     });
   } else if (c.image_path) {
-    const { data } = supabase.storage.from('images').getPublicUrl(c.image_path);
-    zoomGroup = [data?.publicUrl || ''];
+    const { data: pubData } = supabase.storage.from('images').getPublicUrl(p);
+    return pubData?.publicUrl || '';
   }
 
   return {
