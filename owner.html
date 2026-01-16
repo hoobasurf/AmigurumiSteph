@@ -1,3 +1,5 @@
+Il est correct ?
+
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -61,13 +63,6 @@ body::before{
   font-weight: bold;
   color: #b84c6f;
   font-size: 14px;
-}
-/* SUPPRIME LES AVATARS DANS LIKE / COMMENT */
-.like-bubble img,
-.comment-bubble img,
-#likeAvatar,
-#commentAvatar {
-  display: none !important;
 }
 </style>
 </head>
@@ -229,212 +224,482 @@ body::before{
   
 <script type="module">
 import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
+const supabase = createClient("https://jyhbamdcxmpveujjqjla.supabase.co","sb_publishable_sqsxb-3Kl5o3-JQYv9kGFw_-g0EgwMa");
 
-const supabase = createClient(
-  "https://jyhbamdcxmpveujjqjla.supabase.co",
-  "sb_publishable_sqsxb-3Kl5o3-JQYv9kGFw_-g0EgwMa"
-);
-
-/* ================= GLOBAL ================= */
-let creations = [];
-let currentZoom = null;
-let currentCreation = null;
-let currentIndex = null;
-
-/* ================= ELEMENTS ================= */
-const container = document.getElementById('visitor-list-container');
-const zoomModal = document.getElementById('zoomModal');
-const mainZoom = document.getElementById('mainZoom');
-const likeBtn = document.getElementById('likeBtn');
-const commentBtn = document.getElementById('commentBtn');
-const likeCount = document.getElementById('likeCount');
-const commentCount = document.getElementById('commentCount');
-
-const likeModal = document.getElementById('likeModal');
-const commentModal = document.getElementById('commentModal');
-const likeBubbles = document.getElementById('likeBubbles');
-const commentBubbles = document.getElementById('commentBubbles');
-
-const likeNameInput = document.getElementById('likeName');
-const commentNameInput = document.getElementById('commentName');
-const commentTextInput = document.getElementById('commentText');
-
-const confirmLike = document.getElementById('confirmLike');
-const confirmComment = document.getElementById('confirmComment');
-
+// ====== OWNER AVATAR ======
 const ownerPhoto = document.getElementById('ownerPhoto');
+const prenom = localStorage.getItem('prenom');
 
-/* ================= USER ================= */
-const prenom = localStorage.getItem('prenom') || '';
-likeNameInput.value = prenom;
-commentNameInput.value = prenom;
-likeNameInput.readOnly = true;
-commentNameInput.readOnly = true;
+async function loadOwnerPhoto(){
+  if(!prenom) return;
+  const {data,error} = await supabase.from('profiles').select('photo_url').eq('prenom',prenom).single();
+  if(!error && data?.photo_url){ownerPhoto.src=data.photo_url;ownerPhoto.style.opacity='1';} 
+  else{ownerPhoto.style.opacity='0.3';}
+}
+document.addEventListener('DOMContentLoaded', loadOwnerPhoto);
+window.addEventListener('pageshow', loadOwnerPhoto);
 
-/* ================= LOAD CREATIONS ================= */
-async function refresh(){
-  const { data } = await supabase
-    .from('creations')
-    .select('*')
-    .order('created_at',{ascending:false});
+if (ownerPhoto.src) fillUserInfo();
+  
+// ====== VARIABLES ======
+let creations=[];
+let currentZoom=null;
+let currentDelete=null;
 
-  creations = data.map(c=>{
-    const urls = c.images?.map(p =>
-      supabase.storage.from('images').getPublicUrl(p).data.publicUrl
-    ) || [];
-    return {
-      ...c,
-      imgUrl: urls[0],
-      likes: c.likes || [],
-      comments: c.comments || []
-    };
-  });
-
-  render();
+const container=document.getElementById('visitor-list-container');
+const addModal=document.getElementById('addModal');
+const deleteModal=document.getElementById('deleteModal');
+const zoomModal=document.getElementById('zoomModal');
+const sidebar=document.getElementById('sidebar');
+const mainZoom=document.getElementById('mainZoom');
+const thumbs=document.getElementById('thumbs');
+const likeCount=document.getElementById('likeCount');
+const commentCount=document.getElementById('commentCount');
+const likeModal=document.getElementById('likeModal');
+const likeBubbles=document.getElementById('likeBubbles');
+const confirmLike=document.getElementById('confirmLike');
+const likeNameInput=document.getElementById('likeName');
+const commentModal=document.getElementById('commentModal');
+const confirmComment=document.getElementById('confirmComment');
+const commentBubbles=document.getElementById('commentBubbles');
+const expandBtn=document.getElementById('expandComment');
+const commentBox=document.querySelector('.comment-box');
+const likeAvatar = document.getElementById('likeAvatar');
+const commentAvatar = document.getElementById('commentAvatar');
+  
+function fillUserInfo() {
+  const prenom = localStorage.getItem('prenom') || '';
+  likeNameInput.value = prenom;
+  likeAvatar.src = ownerPhoto.src || '';
+  commentNameInput.value = prenom;
+  commentAvatar.src = ownerPhoto.src || '';
 }
 
-/* ================= RENDER GRID ================= */
+  
+// ====== RENDER ======
 function render(){
   container.innerHTML='';
-  let page;
-
+  let page=null;
   creations.forEach((c,i)=>{
-    if(i%6===0){
-      page=document.createElement('div');
-      page.className='page';
-      container.appendChild(page);
-    }
-    const d=document.createElement('div');
-    d.className='visitor-item';
-    d.innerHTML=`<p>${c.name}</p><img src="${c.imgUrl}">`;
-    d.querySelector('img').onclick=()=>openZoom(c);
+    if(i%6===0){page=document.createElement('div');page.className='page';container.appendChild(page);}
+    const d=document.createElement('div');d.className='visitor-item';
+    d.innerHTML=`<div class="placeholder">?</div><div class="delete-btn">×</div><p>${c.name}</p><img src="${c.imgUrl||''}">`;
+    const img=d.querySelector('img');
+    img.onload=()=>d.querySelector('.placeholder').style.display='none';
+    img.onerror=()=>{img.remove();d.querySelector('.placeholder').textContent='';};
+    img.onclick=()=>openZoom(c);
+    d.querySelector('.delete-btn').onclick=()=>openDeleteModal(c);
     page.appendChild(d);
   });
 }
 
-/* ================= ZOOM ================= */
+// ====== ZOOM ======
 function openZoom(c){
   currentZoom=c;
   mainZoom.src=c.imgUrl;
-  likeCount.textContent=c.likes.length;
-  commentCount.textContent=c.comments.length;
+  thumbs.innerHTML='';
+  if(!c.zoomGroup || c.zoomGroup.length===0)c.zoomGroup=[c.imgUrl];
+  c.zoomGroup.forEach(u=>{const t=document.createElement('img');t.src=u;t.onclick=()=>mainZoom.src=u;thumbs.appendChild(t);});
+  updateActions();
   zoomModal.style.display='flex';
 }
+function updateActions(){
+  likeCount.textContent=currentZoom.likes?.length||0;
+  commentCount.textContent=currentZoom.comments?.length||0;
+}
 
-/* ================= LIKE ================= */
-likeBtn.onclick=()=>{
-  renderLikeBubbles(currentZoom);
-  likeModal.style.display='flex';
+// ====== LIKE ======
+document.getElementById('likeBtn').onclick = () => {
+  if (!currentZoom) return;
+  likeBubbles.innerHTML = '';
+  currentZoom.likes?.forEach(like => {
+    const bubble = document.createElement('div');
+    bubble.className = 'bubble';
+    if (like.photo) {
+      bubble.innerHTML = `<img src="${like.photo}" style="width:20px;height:20px;border-radius:50%;margin-right:4px;vertical-align:middle;">${like.name}`;
+    } else {
+      bubble.textContent = like.name;
+    }
+    likeBubbles.appendChild(bubble);
+  });
+  likeNameInput.value = localStorage.getItem('prenom') || '';
+  likeModal.style.display = 'flex';
 };
 
-confirmLike.onclick=async()=>{
+confirmLike.onclick = async () => {
+  if(!currentZoom) return;
   const name = likeNameInput.value.trim();
   if(!name) return;
-  if(currentZoom.likes.some(l=>l.name===name)) return;
 
-  currentZoom.likes.push({ name, photo: ownerPhoto?.src || '' });
+  if(!currentZoom.likes) currentZoom.likes = [];
 
-  await supabase.from('creations')
-    .update({likes:currentZoom.likes})
-    .eq('id',currentZoom.id);
-
-  likeCount.textContent=currentZoom.likes.length;
-  renderLikeBubbles(currentZoom);
-};
-
-/* ================= COMMENT ================= */
-commentBtn.onclick=()=>{
-  renderCommentBubbles(currentZoom);
-  commentModal.style.display='flex';
-};
-
-confirmComment.onclick=async()=>{
-  const name = commentNameInput.value.trim();
-  const text = commentTextInput.value.trim();
-  if(!name || !text) return;
-
-  currentZoom.comments.push({ name, text, photo: ownerPhoto?.src || '' });
+  // Vérifie si la personne a déjà liké
+  if(!currentZoom.likes.some(l => l.name === name)){
+    currentZoom.likes.push({name, photo: ownerPhoto.src || ''});
+  }
 
   await supabase.from('creations')
-    .update({comments:currentZoom.comments})
-    .eq('id',currentZoom.id);
+    .update({likes: currentZoom.likes})
+    .eq('id', currentZoom.id);
 
-  commentTextInput.value='';
-  commentCount.textContent=currentZoom.comments.length;
-  renderCommentBubbles(currentZoom);
+  // Mettre à jour les bulles
+  likeBubbles.innerHTML = '';
+  currentZoom.likes.forEach(like => {
+    const bubble = document.createElement('div');
+    bubble.className = 'bubble';
+    bubble.textContent = like.name;
+    likeBubbles.appendChild(bubble);
+  });
+
+  // Mise à jour compteur
+  likeCount.textContent = currentZoom.likes.length;
+  likeModal.style.display = 'none';
 };
 
-/* ================= RENDER LIKE ================= */
-function renderLikeBubbles(c){
-  likeBubbles.innerHTML='';
-  c.likes.forEach((l,i)=>{
-    const div=document.createElement('div');
+// ====== COMMENT ======
+document.getElementById('commentBtn').onclick = () => {
+  if (!currentZoom) return;
+  renderCommentList();
+  document.getElementById('commentName').value = localStorage.getItem('prenom') || '';
+  document.getElementById('commentText').value = '';
+  commentModal.style.display = 'flex';
+};
+
+// Détecter click long
+function addLongClick(elem, callback){
+  let timer;
+  elem.addEventListener('mousedown', ()=>{timer=setTimeout(callback,600)});
+  elem.addEventListener('mouseup', ()=>{clearTimeout(timer)});
+  elem.addEventListener('mouseleave', ()=>{clearTimeout(timer)});
+}
+
+// Appliquer sur les boutons du zoom
+addLongClick(document.getElementById('likeBtn'), ()=>deleteLikeModal.style.display='flex');
+addLongClick(document.getElementById('commentBtn'), ()=>deleteCommentModal.style.display='flex');
+  
+function renderCommentList() {
+  commentBubbles.innerHTML = '';
+  (currentZoom.comments || []).forEach(c => {
+    const item = document.createElement('div');
+    item.className = 'comment-item';
+    const text = document.createElement('span');
+    text.innerHTML = `${c.photo ? `<img src="${c.photo}" style="width:20px;height:20px;border-radius:50%;margin-right:4px;vertical-align:middle;">` : ''}<strong>${c.name}</strong>: ${c.text}`;
+    item.appendChild(text);
+    commentBubbles.appendChild(item);
+  });
+  commentCount.textContent = currentZoom.comments.length;
+}
+
+confirmComment.onclick = async () => {
+  const name = document.getElementById('commentName').value.trim();
+  const text = document.getElementById('commentText').value.trim();
+  if (!name || !text || !currentZoom) return;
+  if (!currentZoom.comments) currentZoom.comments = [];
+  currentZoom.comments.push({ name, text, photo: ownerPhoto.src || '', likes: [] });
+  await supabase.from('creations').update({ comments: currentZoom.comments }).eq('id', currentZoom.id);
+  renderCommentList();
+  document.getElementById('commentText').value = '';
+};
+
+function openSelectCreation(type){ // type = 'like' ou 'comment'
+  const list = document.getElementById('selectCreationList');
+  list.innerHTML='';
+  creations.forEach(c=>{
+    const div = document.createElement('div');
     div.style.display='flex';
     div.style.alignItems='center';
-    div.style.gap='6px';
-    div.innerHTML = `${l.photo?`<img src="${l.photo}" style="width:20px;height:20px;border-radius:50%">`:''}<span>${l.name}</span>`;
-    addDeleteGesture(div,()=>deleteLike(c,i));
-    likeBubbles.appendChild(div);
+    div.style.gap='8px';
+    div.style.cursor='pointer';
+    div.innerHTML=`<img src="${c.imgUrl}" style="width:50px;height:50px;border-radius:8px;"><span>${c.name}</span>`;
+    div.onclick = ()=>openCreationModal(c, type);
+    list.appendChild(div);
   });
+  document.getElementById('selectCreationModal').style.display='flex';
 }
 
-/* ================= RENDER COMMENT ================= */
-function renderCommentBubbles(c){
-  commentBubbles.innerHTML='';
-  c.comments.forEach((com,i)=>{
-    const div=document.createElement('div');
-    div.style.display='flex';
-    div.style.alignItems='center';
-    div.style.gap='6px';
-    div.innerHTML = `${com.photo?`<img src="${com.photo}" style="width:20px;height:20px;border-radius:50%">`:''}<span>${com.name}: ${com.text}</span>`;
-    addDeleteGesture(div,()=>deleteComment(c,i));
-    commentBubbles.appendChild(div);
-  });
+// Exemple openCreationModal
+function openCreationModal(c, type){
+  if(type==='like'){
+    currentZoom = c;
+    likeModal.style.display='flex';
+    renderLikesListForCreation(c); // fonction à créer
+  } else {
+    currentZoom = c;
+    commentModal.style.display='flex';
+    renderCommentsListForCreation(c); // fonction à créer
+  }
 }
 
-/* ================= DELETE ================= */
-async function deleteLike(c,i){
-  if(!confirm("Supprimer ce like ?")) return;
-  c.likes.splice(i,1);
-  await supabase.from('creations').update({likes:c.likes}).eq('id',c.id);
-  renderLikeBubbles(c);
-  likeCount.textContent=c.likes.length;
-}
-
-async function deleteComment(c,i){
-  if(!confirm("Supprimer ce commentaire ?")) return;
-  c.comments.splice(i,1);
-  await supabase.from('creations').update({comments:c.comments}).eq('id',c.id);
-  renderCommentBubbles(c);
-  commentCount.textContent=c.comments.length;
-}
-
-/* ================= LONG / TRIPLE CLICK ================= */
-function addDeleteGesture(el,callback){
-  let clicks=0,timer;
-  el.onclick=()=>{
-    clicks++;
-    if(clicks===3){
-      callback();
-      clicks=0;
+  function renderLikesListForCreation(c){
+  const container = document.getElementById('likeBubbles');
+  container.innerHTML='';
+  c.likes.forEach((like,i)=>{
+    const div = document.createElement('div');
+    div.textContent = like.name;
+    div.style.cursor='pointer';
+    div.onclick = async ()=>{
+      if(confirm('Supprimer ce like ?')){
+        c.likes.splice(i,1);
+        await supabase.from('creations').update({likes:c.likes}).eq('id',c.id);
+        renderLikesListForCreation(c);
+      }
     }
-    clearTimeout(timer);
-    timer=setTimeout(()=>clicks=0,400);
-  };
-  el.onmousedown=()=>{
-    timer=setTimeout(callback,600);
-  };
-  el.onmouseup=()=>clearTimeout(timer);
-  el.onmouseleave=()=>clearTimeout(timer);
+    container.appendChild(div);
+  });
 }
 
-/* ================= CLOSE MODALS ================= */
-document.querySelectorAll('.modal').forEach(m=>{
-  m.onclick=e=>{ if(e.target===m) m.style.display='none'; };
+  document.getElementById('clearSelectedBtn').onclick = async ()=>{
+  if(confirm('Tout effacer pour toutes les créations affichées ?')){
+    creations.forEach(c=>{
+      if(currentZoom && likeModal.style.display==='flex') c.likes=[];
+      else if(currentZoom && commentModal.style.display==='flex') c.comments=[];
+    });
+    for(let c of creations){
+      await supabase.from('creations').update({likes:c.likes,comments:c.comments}).eq('id',c.id);
+    }
+    refresh();
+    document.getElementById('selectCreationModal').style.display='none';
+  }
+};
+  
+// ====== DELETE ======
+function openDeleteModal(project){currentDelete=project;deleteModal.style.display='flex';}
+document.getElementById('cancelDelete').onclick=()=>{currentDelete=null;deleteModal.style.display='none';};
+document.getElementById('confirmDelete').onclick=async()=>{
+  if(!currentDelete?.id) return;
+  await supabase.from('creations').delete().eq('id',currentDelete.id);
+  currentDelete=null;deleteModal.style.display='none';
+  await refreshCreations();
+};
+
+// ====== AJOUT ======
+document.getElementById('addBtn').onclick=()=>addModal.style.display='flex';
+addModal.addEventListener('click', e=>{if(e.target===addModal)addModal.style.display='none';});
+document.getElementById('confirmAdd').onclick=async e=>{
+  e.stopPropagation();
+  const name=document.getElementById('photoName').value.trim();
+  const files=document.getElementById('multiPhoto').files;
+  if(!name || !files.length){alert("Mettre un nom et choisir au moins une photo");return;}
+  const paths=[],urls=[];
+  for(let file of files){
+    const path=`${Date.now()}_${file.name}`;
+    const {error:uploadError}=await supabase.storage.from('images').upload(path,file);
+    if(uploadError){console.error(uploadError);continue;}
+    const {data:pubData}=supabase.storage.from('images').getPublicUrl(path);
+    if(!pubData?.publicUrl) continue;
+    urls.push(pubData.publicUrl);
+    paths.push(path);
+  }
+  if(urls.length===0)return;
+  await supabase.from('creations').insert([{name,image_path:paths[0],images:paths,likes:[],comments:[]}]);
+  addModal.style.display='none';
+  document.getElementById('photoName').value='';
+  document.getElementById('multiPhoto').value='';
+  await refreshCreations();
+};
+
+// ====== REFRESH CREATIONS ======
+async function refreshCreations() {
+  try {
+    const { data, error } = await supabase
+      .from('creations')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      console.error(error);
+      return;
+    }
+
+    creations = data.map(c => {
+      // Préparer le tableau des URLs pour le zoom
+      let zoomGroup = [];
+      if (c.images?.length) {
+        zoomGroup = c.images.map(p => {
+          const { data } = supabase.storage.from('images').getPublicUrl(p);
+          return data?.publicUrl || '';
+        });
+      } else if (c.image_path) {
+        const { data } = supabase.storage.from('images').getPublicUrl(c.image_path);
+        zoomGroup = [data?.publicUrl || ''];
+      }
+
+      return {
+        id: c.id,
+        name: c.name,
+        imgUrl: zoomGroup[0] || '',
+        zoomGroup,
+        likes: c.likes || [],
+        comments: c.comments || []
+      };
+    });
+
+    render();
+  } catch (err) {
+    console.error('Erreur refreshCreations:', err);
+  }
+}
+
+// ====== SIDEBAR ======
+document.getElementById('pelotesBtn').onclick=()=>{document.body.style.opacity='0';setTimeout(()=>window.location.href='pelotes.html',500);};
+document.getElementById('videoBtn').onclick=()=>{document.body.style.opacity='0';setTimeout(()=>window.location.href='video.html',500);};
+document.getElementById('notesBtn').onclick=()=>{document.body.style.opacity='0';setTimeout(()=>window.location.href='notes.html',500);};
+document.getElementById('messagerieBtn').onclick=()=>{document.body.style.opacity='0';setTimeout(()=>window.location.href='messagerie.html',500);};
+document.getElementById('toggleSidebar').onclick=()=>sidebar.classList.toggle('sidebar-open');
+
+// ====== ZOOM MODAL EVENTS ======
+document.querySelector('.closeZoom').onclick=()=>zoomModal.style.display='none';
+zoomModal.onclick=e=>{if(e.target===zoomModal)zoomModal.style.display='none';};
+likeModal.onclick=e=>{if(e.target===likeModal)likeModal.style.display='none';};
+commentModal.onclick=e=>{if(e.target===commentModal)commentModal.style.display='none';};
+deleteModal.onclick=e=>{if(e.target===deleteModal){deleteModal.style.display='none';currentDelete=null;}};
+
+// ====== COMMENT FULLSCREEN ======
+expandBtn.onclick=e=>{e.stopPropagation();commentBox.classList.toggle('fullscreen');expandBtn.textContent=commentBox.classList.contains('fullscreen')?'⤡':'⤢';};
+
+// ====== INITIAL ======
+refreshCreations();
+  
+// ====== GESTION LIKES / COMMENTAIRES ======
+const manageBtn = document.getElementById('manageBtn');
+const manageModal = document.getElementById('manageModal');
+const likesModal = document.getElementById('likesModal');
+const commentsModal = document.getElementById('commentsModal');
+const deleteIndivModal = document.getElementById('deleteIndivModal');
+const confirmDeleteIndiv = document.getElementById('confirmDeleteIndiv');
+const cancelDeleteIndiv = document.getElementById('cancelDeleteIndiv');
+const likesList = document.getElementById('likesList');
+const commentsList = document.getElementById('commentsList');
+
+let currentCreation = null;
+let currentItem = null;
+
+// Ouvrir le modal Gestion
+manageBtn.onclick = () => manageModal.style.display = 'flex';
+
+// Ouvrir modals Likes / Commentaires depuis Gestion
+document.getElementById('manageLikesBtn').onclick = () => {
+  manageModal.style.display = 'none';
+  renderLikesList();
+  likesModal.style.display = 'flex';
+};
+document.getElementById('manageCommentsBtn').onclick = () => {
+  manageModal.style.display = 'none';
+  renderCommentsList();
+  commentsModal.style.display = 'flex';
+};
+
+// Fermer modals au clic sur le fond
+[manageModal, likesModal, commentsModal, deleteIndivModal].forEach(m => {
+  m.onclick = e => { if(e.target === m) m.style.display = 'none'; }
 });
 
-/* ================= INIT ================= */
-refresh();
+// ====== TOUT EFFACER ======
+document.getElementById('clearLikesBtn').onclick = async () => {
+  if(!confirm("Supprimer tous les Likes de toutes les créations ?")) return;
+  creations.forEach(c => c.likes = []);
+  for(let c of creations) {
+    await supabase.from('creations').update({likes: c.likes}).eq('id', c.id);
+  }
+  render();
+  likesList.innerHTML = '';
+};
+
+document.getElementById('clearCommentsBtn').onclick = async () => {
+  if(!confirm("Supprimer tous les Commentaires de toutes les créations ?")) return;
+  creations.forEach(c => c.comments = []);
+  for(let c of creations) {
+    await supabase.from('creations').update({comments: c.comments}).eq('id', c.id);
+  }
+  render();
+  commentsList.innerHTML = '';
+};
+
+// ====== CHOISIR INDIVIDUELLEMENT ======
+document.getElementById('chooseLikeBtn').onclick = () => renderCreationsForLikes();
+document.getElementById('chooseCommentBtn').onclick = () => renderCreationsForComments();
+
+// Fonction pour afficher toutes les créations pour Like
+function renderCreationsForLikes() {
+  likesList.innerHTML = '';
+  creations.forEach(c => {
+    const div = document.createElement('div');
+    div.style.display = 'flex';
+    div.style.alignItems = 'center';
+    div.style.marginBottom = '6px';
+    div.style.cursor = 'pointer';
+    div.innerHTML = `<img src="${c.imgUrl}" style="width:40px;height:40px;border-radius:8px;margin-right:6px;">${c.name}`;
+    div.onclick = () => openIndividualLikes(c);
+    likesList.appendChild(div);
+  });
+}
+
+// Fonction pour afficher toutes les créations pour Commentaires
+function renderCreationsForComments() {
+  commentsList.innerHTML = '';
+  creations.forEach(c => {
+    const div = document.createElement('div');
+    div.style.display = 'flex';
+    div.style.alignItems = 'center';
+    div.style.marginBottom = '6px';
+    div.style.cursor = 'pointer';
+    div.innerHTML = `<img src="${c.imgUrl}" style="width:40px;height:40px;border-radius:8px;margin-right:6px;">${c.name}`;
+    div.onclick = () => openIndividualComments(c);
+    commentsList.appendChild(div);
+  });
+}
+
+// ====== MODAL INDIVIDUEL ======
+function openIndividualLikes(c) {
+  currentCreation = c;
+  likesList.innerHTML = '';
+  c.likes?.forEach((like, index) => {
+    const div = document.createElement('div');
+    div.style.display = 'flex';
+    div.style.alignItems = 'center';
+    div.style.marginBottom = '4px';
+    div.style.cursor = 'pointer';
+    div.textContent = like.name;
+    div.onclick = () => { currentItem = index; deleteIndivModal.style.display = 'flex'; };
+    likesList.appendChild(div);
+  });
+}
+
+function openIndividualComments(c) {
+  currentCreation = c;
+  commentsList.innerHTML = '';
+  c.comments?.forEach((com, index) => {
+    const div = document.createElement('div');
+    div.style.display = 'flex';
+    div.style.alignItems = 'center';
+    div.style.marginBottom = '4px';
+    div.style.cursor = 'pointer';
+    div.textContent = com.name + ': ' + com.text;
+    div.onclick = () => { currentItem = index; deleteIndivModal.style.display = 'flex'; };
+    commentsList.appendChild(div);
+  });
+}
+
+// ====== SUPPRIMER INDIVIDUEL ======
+confirmDeleteIndiv.onclick = async () => {
+  if(currentCreation && currentItem != null){
+    if(currentCreation.likes && likesModal.style.display==='flex'){
+      currentCreation.likes.splice(currentItem,1);
+      await supabase.from('creations').update({likes: currentCreation.likes}).eq('id', currentCreation.id);
+      openIndividualLikes(currentCreation);
+    } else if(currentCreation.comments && commentsModal.style.display==='flex'){
+      currentCreation.comments.splice(currentItem,1);
+      await supabase.from('creations').update({comments: currentCreation.comments}).eq('id', currentCreation.id);
+      openIndividualComments(currentCreation);
+    }
+  }
+  deleteIndivModal.style.display='none';
+  currentItem = null;
+};
+
+// Annuler suppression individuelle
+cancelDeleteIndiv.onclick = () => { deleteIndivModal.style.display='none'; currentItem=null; };
 </script>
+
 </body>
 </html>
