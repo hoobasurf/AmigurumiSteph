@@ -284,24 +284,13 @@ function render(){
 
 // ====== ZOOM ======
 function openZoom(c){
-  currentZoom = c;
-  mainZoom.src = c.imgUrl;
-  thumbs.innerHTML = '';
-
-  if(!c.zoomGroup || c.zoomGroup.length === 0){
-    c.zoomGroup = [c.imgUrl];
-  }
-
-  c.zoomGroup.forEach(u=>{
-    const t = document.createElement('img');
-    t.src = u;
-    t.onclick = () => mainZoom.src = u;
-    thumbs.appendChild(t);
-  });
-
+  currentZoom=c;
+  mainZoom.src=c.imgUrl;
+  thumbs.innerHTML='';
+  if(!c.zoomGroup || c.zoomGroup.length===0)c.zoomGroup=[c.imgUrl];
+  c.zoomGroup.forEach(u=>{const t=document.createElement('img');t.src=u;t.onclick=()=>mainZoom.src=u;thumbs.appendChild(t);});
   updateActions();
-
-  zoomModal.style.display = 'flex';
+  zoomModal.style.display='flex';
 }
 function updateActions(){
   likeCount.textContent = Array.isArray(currentZoom.likes)
@@ -313,47 +302,23 @@ function updateActions(){
     : 0;
 }
 
-// ====== RENDER LIKE BUBBLES AVEC PHOTO ======
-function renderLikeBubbles(c) {
-  likeBubbles.innerHTML = '';
-  if (!Array.isArray(c.likes)) return;
-
-  c.likes.forEach(like => {
-    const div = document.createElement('div');
-    div.style.display = 'flex';
-    div.style.alignItems = 'center';
-    div.style.gap = '4px';
-
-    if (like.photo) {
-      const img = document.createElement('img');
-      img.src = like.photo;
-      img.style.width = '20px';
-      img.style.height = '20px';
-      img.style.borderRadius = '50%';
-      img.style.objectFit = 'cover';
-      div.appendChild(img);
-    }
-
-    const span = document.createElement('span');
-    span.textContent = like.name;
-    div.appendChild(span);
-
-    likeBubbles.appendChild(div);
-  });
-
-  likeCount.textContent = c.likes.length || 0;
-}
-
-    
 // ====== LIKE ======
 document.getElementById('likeBtn').onclick = () => {
   if (!currentZoom) return;
-  renderLikeBubbles(currentZoom);
+  likeBubbles.innerHTML = '';
+  currentZoom.likes?.forEach(like => {
+    const bubble = document.createElement('div');
+    bubble.className = 'bubble';
+    if (like.photo) {
+      bubble.innerHTML = `<img src="${like.photo}" style="width:20px;height:20px;border-radius:50%;margin-right:4px;vertical-align:middle;">${like.name}`;
+    } else {
+      bubble.textContent = like.name;
+    }
+    likeBubbles.appendChild(bubble);
+  });
   likeNameInput.value = localStorage.getItem('prenom') || '';
   likeModal.style.display = 'flex';
 };
-
-ce code la 
 
 confirmLike.onclick = async () => {
   if (!currentZoom) return;
