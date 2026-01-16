@@ -62,6 +62,13 @@ body::before{
   color: #b84c6f;
   font-size: 14px;
 }
+/* SUPPRIME LES AVATARS DANS LIKE / COMMENT */
+.like-bubble img,
+.comment-bubble img,
+#likeAvatar,
+#commentAvatar {
+  display: none !important;
+}
 </style>
 </head>
 <body>
@@ -306,7 +313,15 @@ function render(){
     page.appendChild(d);
   });
 }
+function fillUserInfo() {
+  const prenom = localStorage.getItem('prenom') || '';
+  likeNameInput.value = prenom;
+  commentNameInput.value = prenom;
 
+  likeNameInput.setAttribute('readonly', true);
+  commentNameInput.setAttribute('readonly', true);
+}
+fillUserInfo();
 // ====== ZOOM ======
 function openZoom(c){
   currentZoom=c;
@@ -368,42 +383,60 @@ function renderCommentBubbles(c){
 }
 
 // ====== LIKE ======
-document.getElementById('likeBtn').onclick = () => {
+document.getElementById('confirmLike').onclick = async () => {
   if (!currentZoom) return;
-  renderLikeBubbles(currentZoom);
-  likeModal.style.display = 'flex';
-};
-confirmLike.onclick = async () => {
-  if(!currentZoom) return;
+
   const name = likeNameInput.value.trim();
-  if(!name) return;
-  if(!currentZoom.likes) currentZoom.likes = [];
-  if(!currentZoom.likes.some(l => l.name === name)){
-    currentZoom.likes.push({name, photo: ownerPhoto.src || ''});
-  }
-  await supabase.from('creations').update({likes: currentZoom.likes}).eq('id', currentZoom.id);
-  renderLikeBubbles(currentZoom);
+  if (!name) return;
+
+  currentZoom.likes = currentZoom.likes || [];
+
+  // évite doublon
+  if (currentZoom.likes.some(l => l.name === name)) return;
+
+  currentZoom.likes.push({ name });
+
+  await supabase
+    .from('creations')
+    .update({ likes: currentZoom.likes })
+    .eq('id', currentZoom.id);
+
   likeCount.textContent = currentZoom.likes.length;
+  renderLikeBubbles(currentZoom);
+
   likeModal.style.display = 'none';
 };
-
 // ====== COMMENT ======
-document.getElementById('commentBtn').onclick = () => {
+document.getElementById('confirmComment').onclick = async () => {
   if (!currentZoom) return;
-  renderCommentBubbles(currentZoom);
-  commentModal.style.display = 'flex';
-};
-confirmComment.onclick = async () => {
+
   const name = commentNameInput.value.trim();
   const text = document.getElementById('commentText').value.trim();
-  if (!name || !text || !currentZoom) return;
-  if (!currentZoom.comments) currentZoom.comments = [];
-  currentZoom.comments.push({ name, text, photo: ownerPhoto.src || '' });
-  await supabase.from('creations').update({ comments: currentZoom.comments }).eq('id', currentZoom.id);
+  if (!name || !text) return;
+
+  currentZoom.comments = currentZoom.comments || [];
+  currentZoom.comments.push({ name, text });
+
+  await supabase
+    .from('creations')
+    .update({ comments: currentZoom.comments })
+    .eq('id', currentZoom.id);
+
+  commentCount.textContent = currentZoom.comments.length;
   renderCommentBubbles(currentZoom);
+
   document.getElementById('commentText').value = '';
+  commentModal.style.display = 'none';
 };
 
+document.querySelectorAll('.modal').forEach(modal => {
+  modal.addEventListener('click', e => {
+    if (e.target === modal) {
+      modal.style.display = 'none';
+    }
+  });
+});
+  
 // ====== CLICK LONG / TRIPLE CLICK POUR SUPPRIMER ======
 function addLongOrTripleClick(el, callback){
   let timer=null, clicks=0;
