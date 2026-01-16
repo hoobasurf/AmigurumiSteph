@@ -302,49 +302,79 @@ function updateActions(){
     : 0;
 }
 
-// ====== LIKE ======
+// ====== LIKE MODAL ======
 document.getElementById('likeBtn').onclick = () => {
   if (!currentZoom) return;
-  renderLikeList();  // ✅ ici on utilise la nouvelle fonction
-  likeNameInput.value = localStorage.getItem('prenom') || '';
+  fillLikeModal();
   likeModal.style.display = 'flex';
 };
 
+function fillLikeModal() {
+  likeNameInput.value = localStorage.getItem('prenom') || '';
+  renderLikeList();
+}
+
+// ✅ Fonction qui affiche les likes
+function renderLikeList() {
+  if (!currentZoom) return;
+  likeBubbles.innerHTML = '';
+
+  const likes = Array.isArray(currentZoom.likes) ? currentZoom.likes : [];
+
+  likes.forEach(like => {
+    const div = document.createElement('div');
+    div.className = 'like-item';
+    div.innerHTML = `
+      ${like.photo ? `<img src="${like.photo}" style="width:20px;height:20px;border-radius:50%;margin-right:4px;vertical-align:middle;">` : ''}
+      <strong>${like.name}</strong>
+    `;
+    likeBubbles.appendChild(div);
+  });
+
+  likeCount.textContent = likes.length;
+}
+
+// ✅ Ajouter un like
 confirmLike.onclick = async () => {
   if (!currentZoom) return;
 
   const name = likeNameInput.value.trim();
   if (!name) return;
 
+  // Init likes si jamais
   if (!Array.isArray(currentZoom.likes)) currentZoom.likes = [];
 
-  // Bloque si déjà liké
+  // Bloquer si déjà liké
   if (currentZoom.likes.some(l => l.name === name)) {
     likeModal.style.display = 'none';
     return;
   }
 
-  // Ajout local
-  currentZoom.likes.push({ name, photo: ownerPhoto.src || '' });
+  // Ajouter like proprement
+  const newLike = {
+    name,
+    photo: ownerPhoto.src || ''
+  };
+  currentZoom.likes.push(newLike);
 
-  // ⚡ Mise à jour Supabase
-  const { data, error } = await supabase
+  // Mettre à jour Supabase avec uniquement les likes propres
+  const cleanLikes = currentZoom.likes.map(l => ({
+    name: l.name || '',
+    photo: l.photo || ''
+  }));
+
+  await supabase
     .from('creations')
-    .update({ likes: currentZoom.likes })
-    .eq('id', currentZoom.id)
-    .select(); // récupère l'enregistrement mis à jour
+    .update({ likes: cleanLikes })
+    .eq('id', currentZoom.id);
 
-  if (error) {
-    console.error("Erreur update likes:", error);
-    return;
-  }
+  // 🔁 Recharger les créations depuis Supabase
+  await refreshCreations();
 
-  // ⚡ Synchroniser currentZoom avec la base
-  if (data?.[0]) {
-    currentZoom.likes = Array.isArray(data[0].likes) ? data[0].likes : [];
-  }
+  // 🔄 Trouver le like mis à jour
+  currentZoom = creations.find(c => c.id === currentZoom.id);
 
-  renderLikeList();       // affiche tout correctement
+  renderLikeList();          // Afficher les likes
   likeModal.style.display = 'none';
 };
 
