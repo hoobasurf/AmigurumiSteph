@@ -326,11 +326,8 @@ confirmLike.onclick = async () => {
   const name = likeNameInput.value.trim();
   if (!name) return;
 
-  if (!Array.isArray(currentZoom.likes)) {
-    currentZoom.likes = [];
-  }
+  if (!Array.isArray(currentZoom.likes)) currentZoom.likes = [];
 
-  // ❗ BLOQUE SI DÉJÀ LIKÉ
   const alreadyLiked = currentZoom.likes.some(l => l.name === name);
   if (alreadyLiked) {
     likeModal.style.display = 'none';
@@ -342,12 +339,15 @@ confirmLike.onclick = async () => {
     photo: ownerPhoto.src || ''
   });
 
-  await supabase
-    .from('creations')
-    .update({ likes: currentZoom.likes })
-    .eq('id', currentZoom.id);
+  // Mise à jour Supabase
+  await supabase.from('creations').update({ likes: currentZoom.likes }).eq('id', currentZoom.id);
 
-  likeCount.textContent = currentZoom.likes.length;
+  // 🔄 Recharger toutes les créations depuis Supabase
+  await refreshCreations();
+
+  // 🔄 Re-ouvrir le zoom sur la création actuelle
+  currentZoom = creations.find(c => c.id === currentZoom.id);
+  openZoom(currentZoom);
 
   likeModal.style.display = 'none';
 };
