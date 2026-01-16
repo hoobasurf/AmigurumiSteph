@@ -312,38 +312,33 @@ document.getElementById('likeBtn').onclick = () => {
 
 confirmLike.onclick = async () => {
   if (!currentZoom) return;
+
   const name = likeNameInput.value.trim();
   if (!name) return;
 
-  if (!Array.isArray(currentZoom.likes)) currentZoom.likes = [];
+  if (!Array.isArray(currentZoom.likes)) {
+    currentZoom.likes = [];
+  }
 
-  // Bloque si déjà liké
-  if (currentZoom.likes.some(l => l.name === name)) {
+  // ❗ Bloque si déjà liké
+  const alreadyLiked = currentZoom.likes.some(l => l.name === name);
+  if (alreadyLiked) {
     likeModal.style.display = 'none';
     return;
   }
 
-  currentZoom.likes.push({ name, photo: ownerPhoto.src || '' });
+  currentZoom.likes.push({
+    name,
+    photo: ownerPhoto.src || ''
+  });
 
-  // Mise à jour Supabase
-  const { data, error } = await supabase
+  await supabase
     .from('creations')
     .update({ likes: currentZoom.likes })
-    .eq('id', currentZoom.id)
-    .select(); // ← renvoie le nouvel enregistrement
+    .eq('id', currentZoom.id);
 
-  if (error) {
-    console.error("Erreur update likes:", error);
-    return;
-  }
-
-  // Met à jour le local
-  const updated = data[0];
-  if (updated) {
-    currentZoom.likes = Array.isArray(updated.likes) ? updated.likes : [];
-  }
-
-  renderLikeList();
+  await refreshCreations();       // recharge les données depuis Supabase
+  renderLikeList();               // affiche les likes avec photo
   likeModal.style.display = 'none';
 };
 
@@ -527,27 +522,27 @@ async function refreshCreations() {
       return;
     }
 
- creations = data.map(c => {
-  let zoomGroup = [];
-  if (c.images?.length) {
-    zoomGroup = c.images.map(p => {
-      const { data } = supabase.storage.from('images').getPublicUrl(p);
-      return data?.publicUrl || '';
-    });
-  } else if (c.image_path) {
-    const { data } = supabase.storage.from('images').getPublicUrl(c.image_path);
-    zoomGroup = [data?.publicUrl || ''];
-  }
+    creations = data.map(c => {
+      let zoomGroup = [];
+      if (c.images?.length) {
+        zoomGroup = c.images.map(p => {
+          const { data } = supabase.storage.from('images').getPublicUrl(p);
+          return data?.publicUrl || '';
+        });
+      } else if (c.image_path) {
+        const { data } = supabase.storage.from('images').getPublicUrl(c.image_path);
+        zoomGroup = [data?.publicUrl || ''];
+      }
 
-  return {
-    id: c.id,
-    name: c.name,
-    imgUrl: zoomGroup[0] || '',
-    zoomGroup,
-    likes: Array.isArray(c.likes) ? c.likes.map(l => ({ name: l.name || '', photo: l.photo || '' })) : [],
-    comments: Array.isArray(c.comments) ? c.comments.map(cmt => ({ name: cmt.name || '', text: cmt.text || '', photo: cmt.photo || '' })) : []
-  };
-});
+      return {
+        id: c.id,
+        name: c.name,
+        imgUrl: zoomGroup[0] || '',
+        zoomGroup,
+        likes: Array.isArray(c.likes) ? c.likes : [],
+        comments: Array.isArray(c.comments) ? c.comments : []
+      };
+    });
 
     render();
   } catch (err) {
