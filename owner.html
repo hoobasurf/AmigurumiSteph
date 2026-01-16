@@ -299,8 +299,13 @@ function openZoom(c){
   zoomModal.style.display='flex';
 }
 function updateActions(){
-  likeCount.textContent = Array.isArray(currentZoom.likes) ? currentZoom.likes.length : 0;
-  commentCount.textContent = Array.isArray(currentZoom.comments) ? currentZoom.comments.length : 0;
+  likeCount.textContent = Array.isArray(currentZoom.likes)
+    ? currentZoom.likes.length
+    : 0;
+
+  commentCount.textContent = Array.isArray(currentZoom.comments)
+    ? currentZoom.comments.length
+    : 0;
 }
 // ====== LIKE ======
 document.getElementById('likeBtn').onclick = () => {
@@ -522,14 +527,13 @@ async function refreshCreations() {
       }
 
       return {
-        id: c.id,
-        name: c.name,
-        imgUrl: zoomGroup[0] || '',
-        zoomGroup,
-        likes: c.likes || [],
-        comments: c.comments || []
-      };
-    });
+  id: c.id,
+  name: c.name,
+  imgUrl: zoomGroup[0] || '',
+  zoomGroup,
+  likes: Array.isArray(c.likes) ? c.likes : [],
+  comments: Array.isArray(c.comments) ? c.comments : []
+};
 
     render();
   } catch (err) {
