@@ -302,44 +302,7 @@ function updateActions(){
     : 0;
 }
 
-// ====== LIKE ======
-document.getElementById('likeBtn').onclick = () => {
-  if (!currentZoom) return;
-  renderLikeList();  // ✅ ici on utilise la nouvelle fonction
-  likeNameInput.value = localStorage.getItem('prenom') || '';
-  likeModal.style.display = 'flex';
-};
 
-confirmLike.onclick = async () => {
-  if (!currentZoom) return;
-  const name = likeNameInput.value.trim();
-  if (!name) return;
-
-  if (!Array.isArray(currentZoom.likes)) currentZoom.likes = [];
-
-  // Empêche double like
-  if (currentZoom.likes.some(l => l.name === name)) {
-    likeModal.style.display = 'none';
-    return;
-  }
-
-  // Ajouter le like avec photo
-  currentZoom.likes.push({
-    name,
-    photo: ownerPhoto.src || ''
-  });
-
-  // Mettre à jour dans Supabase
-  await supabase.from('creations')
-    .update({ likes: currentZoom.likes })
-    .eq('id', currentZoom.id);
-
-  // Recharge les créations et mets à jour l'affichage
-  await refreshCreations();  // recharge depuis Supabase
-  currentZoom = creations.find(c => c.id === currentZoom.id); // retrouve la création actuelle
-  refreshLikes();             // affiche les likes avec photo
-  likeModal.style.display = 'none';
-};
     
 // ====== COMMENT ======
 document.getElementById('commentBtn').onclick = () => {
