@@ -110,7 +110,6 @@ body::before{
   <div class="modal-box">
     <h3>Like ❤️</h3>
     <div style="display:flex; align-items:center; gap:6px; margin-bottom:8px;">
-      <img id="likeAvatar" src="" alt="Avatar" style="width:24px; height:24px; border-radius:50%; border:2px solid #b67385;">
       <input type="text" id="likeName" readonly style="flex:1; padding:4px 8px; border:2px solid #b67385; border-radius:8px; background:#ffe6f0;">
     </div>
     <button id="confirmLike">Valider</button>
@@ -262,13 +261,11 @@ const confirmComment=document.getElementById('confirmComment');
 const commentBubbles=document.getElementById('commentBubbles');
 const expandBtn=document.getElementById('expandComment');
 const commentBox=document.querySelector('.comment-box');
-const likeAvatar = document.getElementById('likeAvatar');
 const commentAvatar = document.getElementById('commentAvatar');
   
 function fillUserInfo() {
   const prenom = localStorage.getItem('prenom') || '';
   likeNameInput.value = prenom;
-  likeAvatar.src = ownerPhoto.src || '';
   commentNameInput.value = prenom;
   commentAvatar.src = ownerPhoto.src || '';
 }
