@@ -312,36 +312,35 @@ document.getElementById('likeBtn').onclick = () => {
 
 confirmLike.onclick = async () => {
   if (!currentZoom) return;
-
   const name = likeNameInput.value.trim();
   if (!name) return;
 
-  if (!Array.isArray(currentZoom.likes)) {
-    currentZoom.likes = [];
-  }
+  if (!Array.isArray(currentZoom.likes)) currentZoom.likes = [];
 
-  // ❗ Bloque si déjà liké
-  const alreadyLiked = currentZoom.likes.some(l => l.name === name);
-  if (alreadyLiked) {
+  // Empêche double like
+  if (currentZoom.likes.some(l => l.name === name)) {
     likeModal.style.display = 'none';
     return;
   }
 
+  // Ajouter le like avec photo
   currentZoom.likes.push({
     name,
     photo: ownerPhoto.src || ''
   });
 
-  await supabase
-    .from('creations')
+  // Mettre à jour dans Supabase
+  await supabase.from('creations')
     .update({ likes: currentZoom.likes })
     .eq('id', currentZoom.id);
 
-  await refreshCreations();       // recharge les données depuis Supabase
-  renderLikeList();               // affiche les likes avec photo
+  // Recharge les créations et mets à jour l'affichage
+  await refreshCreations();  // recharge depuis Supabase
+  currentZoom = creations.find(c => c.id === currentZoom.id); // retrouve la création actuelle
+  refreshLikes();             // affiche les likes avec photo
   likeModal.style.display = 'none';
 };
-
+    
 // ====== COMMENT ======
 document.getElementById('commentBtn').onclick = () => {
   if (!currentZoom) return;
@@ -539,8 +538,19 @@ async function refreshCreations() {
         name: c.name,
         imgUrl: zoomGroup[0] || '',
         zoomGroup,
-        likes: Array.isArray(c.likes) ? c.likes : [],
-        comments: Array.isArray(c.comments) ? c.comments : []
+        likes: Array.isArray(c.likes) 
+    ? c.likes.map(like => ({
+        name: like.name || '',
+        photo: like.photo || ''
+      })) 
+    : [],
+comments: Array.isArray(c.comments)
+    ? c.comments.map(cmt => ({
+        name: cmt.name || '',
+        text: cmt.text || '',
+        photo: cmt.photo || ''
+      }))
+    : []
       };
     });
 
@@ -550,6 +560,25 @@ async function refreshCreations() {
   }
 }
 
+function refreshLikes() {
+  if (!currentZoom) return;
+
+  likeBubbles.innerHTML = '';
+  (currentZoom.likes || []).forEach(like => {
+    const div = document.createElement('div');
+    div.className = 'like-item';
+    div.innerHTML = `
+      ${like.photo ? `<img src="${like.photo}" style="width:20px;height:20px;border-radius:50%;margin-right:4px;vertical-align:middle;">` : ''}
+      <strong>${like.name}</strong>
+    `;
+    likeBubbles.appendChild(div);
+  });
+
+  likeCount.textContent = Array.isArray(currentZoom.likes)
+    ? currentZoom.likes.length
+    : 0;
+}
+    
 // ====== SIDEBAR ======
 document.getElementById('pelotesBtn').onclick=()=>{document.body.style.opacity='0';setTimeout(()=>window.location.href='pelotes.html',500);};
 document.getElementById('videoBtn').onclick=()=>{document.body.style.opacity='0';setTimeout(()=>window.location.href='video.html',500);};
