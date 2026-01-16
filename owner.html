@@ -305,34 +305,21 @@ function updateActions(){
 // ====== LIKE ======
 document.getElementById('likeBtn').onclick = () => {
   if (!currentZoom) return;
-  likeBubbles.innerHTML = '';
-  currentZoom.likes?.forEach(like => {
-    const bubble = document.createElement('div');
-    bubble.className = 'bubble';
-    if (like.photo) {
-      bubble.innerHTML = `<img src="${like.photo}" style="width:20px;height:20px;border-radius:50%;margin-right:4px;vertical-align:middle;">${like.name}`;
-    } else {
-      bubble.textContent = like.name;
-    }
-    likeBubbles.appendChild(bubble);
-  });
+  renderLikeList();
   likeNameInput.value = localStorage.getItem('prenom') || '';
   likeModal.style.display = 'flex';
 };
 
 confirmLike.onclick = async () => {
-  if (!currentZoom) return;
-
   const name = likeNameInput.value.trim();
-  if (!name) return;
+  if (!name || !currentZoom) return;
 
   if (!Array.isArray(currentZoom.likes)) {
     currentZoom.likes = [];
   }
 
-  // ❗ BLOQUE SI DÉJÀ LIKÉ
-  const alreadyLiked = currentZoom.likes.some(l => l.name === name);
-  if (alreadyLiked) {
+  // ❌ empêche double like
+  if (currentZoom.likes.some(l => l.name === name)) {
     likeModal.style.display = 'none';
     return;
   }
@@ -347,8 +334,7 @@ confirmLike.onclick = async () => {
     .update({ likes: currentZoom.likes })
     .eq('id', currentZoom.id);
 
-  likeCount.textContent = currentZoom.likes.length;
-
+  renderLikeList();
   likeModal.style.display = 'none';
 };
 
@@ -388,6 +374,28 @@ function renderCommentList() {
     : 0;
 }
 
+function renderLikeList() {
+  likeBubbles.innerHTML = '';
+
+  (currentZoom.likes || []).forEach(like => {
+    const item = document.createElement('div');
+    item.className = 'like-item';
+
+    const span = document.createElement('span');
+    span.innerHTML = `
+      ${like.photo ? `<img src="${like.photo}" style="width:20px;height:20px;border-radius:50%;margin-right:4px;vertical-align:middle;">` : ''}
+      <strong>${like.name}</strong>
+    `;
+
+    item.appendChild(span);
+    likeBubbles.appendChild(item);
+  });
+
+  likeCount.textContent = Array.isArray(currentZoom.likes)
+    ? currentZoom.likes.length
+    : 0;
+}
+    
 confirmComment.onclick = async () => {
   const name = document.getElementById('commentName').value.trim();
   const text = document.getElementById('commentText').value.trim();
