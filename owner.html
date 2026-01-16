@@ -342,6 +342,8 @@ document.getElementById('likeBtn').onclick = () => {
   likeModal.style.display = 'flex';
 };
 
+ce code la 
+
 confirmLike.onclick = async () => {
   if (!currentZoom) return;
 
@@ -352,6 +354,7 @@ confirmLike.onclick = async () => {
     currentZoom.likes = [];
   }
 
+  // ❗ BLOQUE SI DÉJÀ LIKÉ
   const alreadyLiked = currentZoom.likes.some(l => l.name === name);
   if (alreadyLiked) {
     likeModal.style.display = 'none';
@@ -369,11 +372,6 @@ confirmLike.onclick = async () => {
     .eq('id', currentZoom.id);
 
   likeCount.textContent = currentZoom.likes.length;
-
-  // ✅ LA CORRECTION (3 lignes)
-  await refreshCreations();
-  currentZoom = creations.find(c => c.id === currentZoom.id);
-  renderLikeBubbles(currentZoom);
 
   likeModal.style.display = 'none';
 };
