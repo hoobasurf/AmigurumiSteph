@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+ complet <!DOCTYPE html>
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
@@ -321,48 +321,86 @@ function addLongClick(elem, callback){
   elem.addEventListener('mouseleave', ()=>{clearTimeout(timer)});
 }
 
-// Appliquer sur les boutons du zoom
-addLongClick(document.getElementById('likeBtn'), ()=>deleteLikeModal.style.display='flex');
-addLongClick(document.getElementById('commentBtn'), ()=>deleteCommentModal.style.display='flex');
-  
-function renderCommentList() {
-  commentBubbles.innerHTML = '';
-  (currentZoom.comments || []).forEach(c => {
-    const item = document.createElement('div');
-    item.className = 'comment-item';
-    const text = document.createElement('span');
-    text.innerHTML = `${c.photo ? `<img src="${c.photo}" style="width:20px;height:20px;border-radius:50%;margin-right:4px;vertical-align:middle;">` : ''}<strong>${c.name}</strong>: ${c.text}`;
-    item.appendChild(text);
-    commentBubbles.appendChild(item);
-  });
-  commentCount.textContent = Array.isArray(currentZoom.comments)
-    ? currentZoom.comments.length
-    : 0;
+/// ====== LIKE MODAL ET LISTE ======
+const likeBtn = document.getElementById('likeBtn');
+const likeModal = document.getElementById('likeModal');
+const likeBubbles = document.getElementById('likeBubbles');
+const confirmLike = document.getElementById('confirmLike');
+const likeNameInput = document.getElementById('likeName');
+const likeCount = document.getElementById('likeCount');
+
+// Remplit le prénom depuis localStorage
+function fillLikeUser() {
+  likeNameInput.value = localStorage.getItem('prenom') || '';
 }
 
+// Affiche la liste des likes avec photo et nom
 function renderLikeList() {
   if (!currentZoom) return;
-
   likeBubbles.innerHTML = '';
 
-  const likes = Array.isArray(currentZoom.likes) ? currentZoom.likes : [];
+  (currentZoom.likes || []).forEach(like => {
+    const div = document.createElement('div');
+    div.className = 'like-item';
 
-  likes.forEach(like => {
-    const item = document.createElement('div');
-    item.className = 'like-item';
-
-    const span = document.createElement('span');
-    span.innerHTML = `
+    div.innerHTML = `
       ${like.photo ? `<img src="${like.photo}" style="width:20px;height:20px;border-radius:50%;margin-right:4px;vertical-align:middle;">` : ''}
       <strong>${like.name}</strong>
     `;
 
-    item.appendChild(span);
-    likeBubbles.appendChild(item);
+    likeBubbles.appendChild(div);
   });
 
-  likeCount.textContent = likes.length;
+  likeCount.textContent = Array.isArray(currentZoom.likes) ? currentZoom.likes.length : 0;
 }
+
+// ====== OUVRIR MODAL LIKE ======
+likeBtn.onclick = () => {
+  if (!currentZoom) {
+    alert('Ouvre d’abord une création pour liker !');
+    return;
+  }
+  fillLikeUser();
+  renderLikeList();
+  likeModal.style.display = 'flex';
+};
+
+// ====== CONFIRMER UN LIKE ======
+confirmLike.onclick = async () => {
+  if (!currentZoom) return;
+
+  const name = likeNameInput.value.trim();
+  if (!name) return;
+
+  if (!Array.isArray(currentZoom.likes)) currentZoom.likes = [];
+
+  // Bloque si déjà liké
+  const alreadyLiked = currentZoom.likes.some(l => l.name === name);
+  if (alreadyLiked) {
+    likeModal.style.display = 'none';
+    return;
+  }
+
+  // Ajouter like
+  currentZoom.likes.push({
+    name,
+    photo: ownerPhoto.src || ''
+  });
+
+  // Enregistrer sur Supabase
+  await supabase
+    .from('creations')
+    .update({ likes: currentZoom.likes })
+    .eq('id', currentZoom.id);
+
+  // Recharger les créations pour persistency
+  await refreshCreations();
+
+  // Afficher les likes mis à jour
+  renderLikeList();
+
+  likeModal.style.display = 'none';
+};
     
 confirmComment.onclick = async () => {
   const name = document.getElementById('commentName').value.trim();
