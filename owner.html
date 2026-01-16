@@ -539,12 +539,10 @@ async function refreshCreations() {
         name: c.name,
         imgUrl: zoomGroup[0] || '',
         zoomGroup,
-        likes: Array.isArray(c.likes)
-  ? c.likes.map(like => ({
-      name: like.name || '',
-      photo: like.photo || ownerPhoto.src || '' // <-- ici on garde la photo du profil si absent
-    }))
-  : [],
+        likes: Array.isArray(c.likes) ? c.likes : [],
+        comments: Array.isArray(c.comments) ? c.comments : []
+      };
+    });
 
     render();
   } catch (err) {
