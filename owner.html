@@ -522,27 +522,27 @@ async function refreshCreations() {
       return;
     }
 
-    creations = data.map(c => {
-      let zoomGroup = [];
-      if (c.images?.length) {
-        zoomGroup = c.images.map(p => {
-          const { data } = supabase.storage.from('images').getPublicUrl(p);
-          return data?.publicUrl || '';
-        });
-      } else if (c.image_path) {
-        const { data } = supabase.storage.from('images').getPublicUrl(c.image_path);
-        zoomGroup = [data?.publicUrl || ''];
-      }
-
-      return {
-        id: c.id,
-        name: c.name,
-        imgUrl: zoomGroup[0] || '',
-        zoomGroup,
-        likes: Array.isArray(c.likes) ? c.likes : [],
-        comments: Array.isArray(c.comments) ? c.comments : []
-      };
+ creations = data.map(c => {
+  let zoomGroup = [];
+  if (c.images?.length) {
+    zoomGroup = c.images.map(p => {
+      const { data } = supabase.storage.from('images').getPublicUrl(p);
+      return data?.publicUrl || '';
     });
+  } else if (c.image_path) {
+    const { data } = supabase.storage.from('images').getPublicUrl(c.image_path);
+    zoomGroup = [data?.publicUrl || ''];
+  }
+
+  return {
+    id: c.id,
+    name: c.name,
+    imgUrl: zoomGroup[0] || '',
+    zoomGroup,
+    likes: Array.isArray(c.likes) ? c.likes.map(l => ({ name: l.name || '', photo: l.photo || '' })) : [],
+    comments: Array.isArray(c.comments) ? c.comments.map(cmt => ({ name: cmt.name || '', text: cmt.text || '', photo: cmt.photo || '' })) : []
+  };
+});
 
     render();
   } catch (err) {
