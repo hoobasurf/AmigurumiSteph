@@ -302,10 +302,9 @@ function openZoom(c){
   zoomModal.style.display='flex';
 }
 function updateActions(){
-  likeCount.textContent=currentZoom.likes?.length||0;
-  commentCount.textContent=currentZoom.comments?.length||0;
+  likeCount.textContent = Array.isArray(currentZoom.likes) ? currentZoom.likes.length : 0;
+  commentCount.textContent = Array.isArray(currentZoom.comments) ? currentZoom.comments.length : 0;
 }
-
 // ====== LIKE ======
 document.getElementById('likeBtn').onclick = () => {
   if (!currentZoom) return;
@@ -325,32 +324,35 @@ document.getElementById('likeBtn').onclick = () => {
 };
 
 confirmLike.onclick = async () => {
-  if(!currentZoom) return;
+  if (!currentZoom) return;
+
   const name = likeNameInput.value.trim();
-  if(!name) return;
+  if (!name) return;
 
-  if(!currentZoom.likes) currentZoom.likes = [];
-
-  // Vérifie si la personne a déjà liké
-  if(!currentZoom.likes.some(l => l.name === name)){
-    currentZoom.likes.push({name, photo: ownerPhoto.src || ''});
+  if (!Array.isArray(currentZoom.likes)) {
+    currentZoom.likes = [];
   }
 
-  await supabase.from('creations')
-    .update({likes: currentZoom.likes})
-    .eq('id', currentZoom.id);
+  // ❗ BLOQUE SI DÉJÀ LIKÉ
+  const alreadyLiked = currentZoom.likes.some(l => l.name === name);
+  if (alreadyLiked) {
+    likeModal.style.display = 'none';
+    return;
+  }
 
-  // Mettre à jour les bulles
-  likeBubbles.innerHTML = '';
-  currentZoom.likes.forEach(like => {
-    const bubble = document.createElement('div');
-    bubble.className = 'bubble';
-    bubble.textContent = like.name;
-    likeBubbles.appendChild(bubble);
+  currentZoom.likes.push({
+    name,
+    photo: ownerPhoto.src || ''
   });
 
-  // Mise à jour compteur
+  await supabase
+    .from('creations')
+    .update({ likes: currentZoom.likes })
+    .eq('id', currentZoom.id);
+
+  // ✅ MET À JOUR LE COMPTEUR UNE SEULE FOIS
   likeCount.textContent = currentZoom.likes.length;
+
   likeModal.style.display = 'none';
 };
 
@@ -568,7 +570,8 @@ const confirmDeleteIndiv = document.getElementById('confirmDeleteIndiv');
 const cancelDeleteIndiv = document.getElementById('cancelDeleteIndiv');
 const likesList = document.getElementById('likesList');
 const commentsList = document.getElementById('commentsList');
-
+const commentNameInput = document.getElementById('commentName');
+  
 let currentCreation = null;
 let currentItem = null;
 
