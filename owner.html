@@ -326,51 +326,26 @@ confirmLike.onclick = async () => {
   const name = likeNameInput.value.trim();
   if (!name) return;
 
-  if (!Array.isArray(currentZoom.likes)) currentZoom.likes = [];
+  if (!Array.isArray(currentZoom.likes)) {
+    currentZoom.likes = [];
+  }
 
+  // ❗ BLOQUE SI DÉJÀ LIKÉ
   const alreadyLiked = currentZoom.likes.some(l => l.name === name);
   if (alreadyLiked) {
     likeModal.style.display = 'none';
     return;
   }
 
-  // Ajouter le like
   currentZoom.likes.push({
     name,
     photo: ownerPhoto.src || ''
   });
 
-  // Mise à jour Supabase
-  await supabase.from('creations').update({ likes: currentZoom.likes }).eq('id', currentZoom.id);
-
-  // Recharger toutes les créations
-  await refreshCreations();
-
-  // Re-ouvrir le zoom sur la création actuelle
-  currentZoom = creations.find(c => c.id === currentZoom.id);
-
-  // Afficher le zoom
-  openZoom(currentZoom);
-
-  // 🔹 Re-render les bulles avec photo
-  likeBubbles.innerHTML = '';
-  currentZoom.likes.forEach(like => {
-    const div = document.createElement('div');
-    div.style.display = 'flex';
-    div.style.alignItems = 'center';
-    div.style.gap = '4px';
-    const img = document.createElement('img');
-    img.src = like.photo || '';
-    img.style.width = '20px';
-    img.style.height = '20px';
-    img.style.borderRadius = '50%';
-    img.style.objectFit = 'cover';
-    div.appendChild(img);
-    const span = document.createElement('span');
-    span.textContent = like.name;
-    div.appendChild(span);
-    likeBubbles.appendChild(div);
-  });
+  await supabase
+    .from('creations')
+    .update({ likes: currentZoom.likes })
+    .eq('id', currentZoom.id);
 
   likeCount.textContent = currentZoom.likes.length;
 
