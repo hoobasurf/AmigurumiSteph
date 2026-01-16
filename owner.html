@@ -284,13 +284,27 @@ function render(){
 
 // ====== ZOOM ======
 function openZoom(c){
-  currentZoom=c;
-  mainZoom.src=c.imgUrl;
-  thumbs.innerHTML='';
-  if(!c.zoomGroup || c.zoomGroup.length===0)c.zoomGroup=[c.imgUrl];
-  c.zoomGroup.forEach(u=>{const t=document.createElement('img');t.src=u;t.onclick=()=>mainZoom.src=u;thumbs.appendChild(t);});
+  currentZoom = c;
+  mainZoom.src = c.imgUrl;
+  thumbs.innerHTML = '';
+
+  if(!c.zoomGroup || c.zoomGroup.length === 0){
+    c.zoomGroup = [c.imgUrl];
+  }
+
+  c.zoomGroup.forEach(u=>{
+    const t = document.createElement('img');
+    t.src = u;
+    t.onclick = () => mainZoom.src = u;
+    thumbs.appendChild(t);
+  });
+
   updateActions();
-  zoomModal.style.display='flex';
+
+  // 🔴 LA LIGNE À AJOUTER
+  renderLikeBubbles(c);
+
+  zoomModal.style.display = 'flex';
 }
 function updateActions(){
   likeCount.textContent = Array.isArray(currentZoom.likes)
