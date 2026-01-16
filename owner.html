@@ -562,7 +562,6 @@ expandBtn.onclick=e=>{e.stopPropagation();commentBox.classList.toggle('fullscree
 refreshCreations();
   
 // ====== GESTION LIKES / COMMENTAIRES ======
-const manageBtn = document.getElementById('manageBtn');
 const manageModal = document.getElementById('manageModal');
 const likesModal = document.getElementById('likesModal');
 const commentsModal = document.getElementById('commentsModal');
@@ -574,21 +573,7 @@ const commentsList = document.getElementById('commentsList');
 const commentNameInput = document.getElementById('commentName');
   
 let currentCreation = null;
-let currentItem = null;
-
-// Ouvrir le modal Gestion
-manageBtn.onclick = () => manageModal.style.display = 'flex';
-
-// Ouvrir modals Likes / Commentaires depuis Gestion
-document.getElementById('manageLikesBtn').onclick = () => {
-  manageModal.style.display = 'none';
-  renderLikesList();
-  likesModal.style.display = 'flex';
-};
-document.getElementById('manageCommentsBtn').onclick = () => {
-  manageModal.style.display = 'none';
-  renderCommentsList();
-  commentsModal.style.display = 'flex';
+let currentItem 
 };
 
 // Fermer modals au clic sur le fond
