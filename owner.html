@@ -343,32 +343,33 @@ confirmLike.onclick = async () => {
     currentZoom.likes = [];
   }
 
-  // Empêche le double like
+  // Bloque le double like
   const alreadyLiked = currentZoom.likes.some(l => l.name === name);
   if (alreadyLiked) {
     likeModal.style.display = 'none';
     return;
   }
 
-  // Ajout du like
+  // ✅ 1️⃣ AJOUT IMMÉDIAT (affichage instantané)
   currentZoom.likes.push({
     name,
     photo: ownerPhoto.src || ''
   });
 
-  // Sauvegarde Supabase
+  updateActions();
+  renderLikeList();
+
+  likeModal.style.display = 'none';
+
+  // ✅ 2️⃣ SAUVEGARDE + RESYNC (corrige le bug refresh)
   await supabase
     .from('creations')
     .update({ likes: currentZoom.likes })
     .eq('id', currentZoom.id);
 
-  // 🔥 FIX DISPARITION AU RAFRAÎCHISSEMENT
   await refreshCreations();
   syncCurrentZoom();
   updateActions();
-  renderLikeList();
-
-  likeModal.style.display = 'none';
 };
     function renderLikeList() {
   if (!currentZoom) return;
