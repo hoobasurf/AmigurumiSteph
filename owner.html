@@ -327,6 +327,7 @@ document.getElementById('likeBtn').onclick = () => {
     alert("Sélectionnez d'abord une image !");
     return;
   }
+
   likeNameInput.value = localStorage.getItem('prenom') || '';
   renderLikeList();
   likeModal.style.display = 'flex';
@@ -334,29 +335,60 @@ document.getElementById('likeBtn').onclick = () => {
 
 confirmLike.onclick = async () => {
   if (!currentZoom) return;
+
   const name = likeNameInput.value.trim();
   if (!name) return;
 
-  if (!Array.isArray(currentZoom.likes)) currentZoom.likes = [];
+  if (!Array.isArray(currentZoom.likes)) {
+    currentZoom.likes = [];
+  }
 
-  // Bloque si déjà liké
+  // Empêche le double like
   const alreadyLiked = currentZoom.likes.some(l => l.name === name);
   if (alreadyLiked) {
     likeModal.style.display = 'none';
     return;
   }
 
+  // Ajout du like
   currentZoom.likes.push({
     name,
     photo: ownerPhoto.src || ''
   });
 
-  await supabase.from('creations').update({ likes: currentZoom.likes }).eq('id', currentZoom.id);
+  // Sauvegarde Supabase
+  await supabase
+    .from('creations')
+    .update({ likes: currentZoom.likes })
+    .eq('id', currentZoom.id);
 
+  // 🔥 FIX DISPARITION AU RAFRAÎCHISSEMENT
   await refreshCreations();
+  syncCurrentZoom();
+  updateActions();
   renderLikeList();
+
   likeModal.style.display = 'none';
 };
+    function renderLikeList() {
+  if (!currentZoom) return;
+
+  likeBubbles.innerHTML = '';
+
+  (currentZoom.likes || []).forEach(like => {
+    const div = document.createElement('div');
+    div.className = 'like-item';
+    div.innerHTML = `
+      ${like.photo ? `<img src="${like.photo}" style="width:20px;height:20px;border-radius:50%;margin-right:4px;vertical-align:middle;">` : ''}
+      <strong>${like.name}</strong>
+    `;
+    likeBubbles.appendChild(div);
+  });
+
+  likeCount.textContent = Array.isArray(currentZoom.likes)
+    ? currentZoom.likes.length
+    : 0;
+}
 
 // ====== COMMENT ======
 document.getElementById('commentBtn').onclick = () => {
@@ -384,22 +416,6 @@ confirmComment.onclick = async () => {
   renderCommentList();
   document.getElementById('commentText').value = '';
 };
-
-// ====== RENDER LIKE LIST ======
-function renderLikeList() {
-  if (!currentZoom) return;
-  likeBubbles.innerHTML = '';
-  (currentZoom.likes || []).forEach(like => {
-    const div = document.createElement('div');
-    div.className = 'like-item';
-    div.innerHTML = `
-      ${like.photo ? `<img src="${like.photo}" style="width:20px;height:20px;border-radius:50%;margin-right:4px;vertical-align:middle;">` : ''}
-      <strong>${like.name}</strong>
-    `;
-    likeBubbles.appendChild(div);
-  });
-  likeCount.textContent = (currentZoom.likes || []).length;
-}
 
 // ====== RENDER COMMENT LIST ======
 function renderCommentList() {
@@ -593,6 +609,12 @@ function refreshLikes() {
   likeCount.textContent = Array.isArray(currentZoom.likes)
     ? currentZoom.likes.length
     : 0;
+}
+
+    function syncCurrentZoom() {
+  if (!currentZoom) return;
+  const fresh = creations.find(c => c.id === currentZoom.id);
+  if (fresh) currentZoom = fresh;
 }
     
 // ====== SIDEBAR ======
