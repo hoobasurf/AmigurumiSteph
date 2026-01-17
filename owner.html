@@ -315,10 +315,10 @@ function addLongClick(elem, callback){
 }
 
 // =======================
-// ====== LIKES CORRIGÉS ======
+// ====== LIKES ======
 // =======================
 
-// OUVRIR MODALE LIKE
+// ====== OUVRIR MODALE LIKE ======
 likeBtn.onclick = () => {
   if (!currentZoom) return alert("Sélectionnez d'abord une image");
   const prenom = localStorage.getItem('prenom');
@@ -328,24 +328,29 @@ likeBtn.onclick = () => {
   likeModal.style.display = 'flex';
 };
 
-// CONFIRMER UN LIKE
+// ====== CONFIRMER UN LIKE ======
 confirmLike.onclick = async () => {
   if (!currentZoom) return;
   const name = likeNameInput.value.trim();
   if (!name) return;
+
   if (!Array.isArray(currentZoom.likes)) currentZoom.likes = [];
 
+  // Anti double-like
   if (currentZoom.likes.some(l => l.name === name)) {
     likeModal.style.display = 'none';
     return;
   }
 
+  // Ajouter le like
   currentZoom.likes.push({ name, photo: ownerPhoto?.src || '' });
 
+  // Sauvegarder dans Supabase
   await supabase.from('creations')
     .update({ likes: currentZoom.likes })
     .eq('id', currentZoom.id);
 
+  // Rafraîchir et resync
   await refreshCreations();
   currentZoom = creations.find(c => c.id === currentZoom.id);
 
@@ -354,9 +359,10 @@ confirmLike.onclick = async () => {
   likeModal.style.display = 'none';
 };
 
-// RENDER LIKE LIST
+// ====== RENDER LISTE DES LIKES ======
 function renderLikeList() {
   if (!currentZoom) return;
+
   likeBubbles.innerHTML = '';
   (currentZoom.likes || []).forEach(like => {
     const div = document.createElement('div');
@@ -367,11 +373,14 @@ function renderLikeList() {
     `;
     likeBubbles.appendChild(div);
   });
+
   likeCount.textContent = (currentZoom.likes || []).length;
-};
+}
 
 // ====== FERMETURE MODALE AU CLIC SUR LE FOND ======
-likeModal.onclick = e => { if (e.target === likeModal) likeModal.style.display='none'; };
+likeModal.onclick = e => {
+  if (e.target === likeModal) likeModal.style.display = 'none';
+};
 
 // ====== COMMENT & CONFIRM ======
 // (reste inchangé par rapport à ton script original)
