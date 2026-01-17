@@ -239,10 +239,7 @@ const confirmComment=document.getElementById('confirmComment');
 const commentBubbles=document.getElementById('commentBubbles');
 const mainZoom=document.getElementById('mainZoom');
 const thumbs=document.getElementById('thumbs');
-const sidebar = document.getElementById('sidebar');
-const expandBtn = document.getElementById('expandComment');
-const commentBox = document.querySelector('.comment-box');
-    
+
 let creations=[];
 let currentZoom=null;
 
@@ -343,11 +340,7 @@ confirmComment.onclick = async () => {
 // ====== FERMETURE MODAL ======
 zoomModal.onclick=e=>{if(e.target===zoomModal)zoomModal.style.display='none';};
 likeModal.onclick=e=>{if(e.target===likeModal)likeModal.style.display='none';};
-commentModal.onclick = e => {
-  if (e.target === commentModal) {
-    commentModal.style.display = 'none';
-  }
-};
+commentModal.onclick=e=>{if(e.target===commentModal)commentModal.style.display='none';};none';
 };
 
 // ====== RENDER COMMENT LIST ======
@@ -549,13 +542,8 @@ deleteModal.onclick=e=>{if(e.target===deleteModal){deleteModal.style.display='no
 expandBtn.onclick=e=>{e.stopPropagation();commentBox.classList.toggle('fullscreen');expandBtn.textContent=commentBox.classList.contains('fullscreen')?'⤡':'⤢';};
 
 // ====== INITIAL ======
-document.addEventListener('DOMContentLoaded', async () => {
-  try {
-    await refreshCreations();
-  } catch (e) {
-    console.error('Erreur au refresh des créations:', e);
-  }
-});
+refreshCreations();
+
 // ====== GESTION LIKES / COMMENTAIRES ======
 const manageModal = document.getElementById('manageModal');
 const likesModal = document.getElementById('likesModal');
@@ -683,3 +671,4 @@ cancelDeleteIndiv.onclick = () => { deleteIndivModal.style.display='none'; curre
 
 </body>
 </html>
+
