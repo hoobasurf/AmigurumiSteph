@@ -542,8 +542,13 @@ deleteModal.onclick=e=>{if(e.target===deleteModal){deleteModal.style.display='no
 expandBtn.onclick=e=>{e.stopPropagation();commentBox.classList.toggle('fullscreen');expandBtn.textContent=commentBox.classList.contains('fullscreen')?'⤡':'⤢';};
 
 // ====== INITIAL ======
-refreshCreations();
-
+document.addEventListener('DOMContentLoaded', async () => {
+  try {
+    await refreshCreations();
+  } catch (e) {
+    console.error('Erreur au refresh des créations:', e);
+  }
+});
 // ====== GESTION LIKES / COMMENTAIRES ======
 const manageModal = document.getElementById('manageModal');
 const likesModal = document.getElementById('likesModal');
