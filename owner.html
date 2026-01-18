@@ -338,19 +338,17 @@ confirmLike.onclick = async () => {
   const name = likeNameInput.value.trim();
   if (!name) return;
 
-  // Initialise si besoin
   if (!Array.isArray(currentZoom.likes)) {
     currentZoom.likes = [];
   }
 
-  // Bloquer si déjà liké
-  const alreadyLiked = currentZoom.likes.some(l => l.name === name);
-  if (alreadyLiked) {
+  // Bloque double like
+  if (currentZoom.likes.some(l => l.name === name)) {
     likeModal.style.display = 'none';
     return;
   }
 
-  // Ajout du like en local
+  // Ajout local
   currentZoom.likes.push({
     name,
     photo: ownerPhoto.src || ''
@@ -362,13 +360,12 @@ confirmLike.onclick = async () => {
     .update({ likes: currentZoom.likes })
     .eq('id', currentZoom.id);
 
-  // 🔑 REFRESH + RESYNC (LA CORRECTION)
-  await refreshCreations();
-  currentZoom = creations.find(c => c.id === currentZoom.id);
+  // ✅ NE PAS refresh ici
+  // Les commentaires fonctionnent pareil
 
-  // Mise à jour UI
+  // Mise à jour UI immédiate
+  likeCount.textContent = currentZoom.likes.length;
   renderLikeList();
-  updateActions();
 
   likeModal.style.display = 'none';
 };
