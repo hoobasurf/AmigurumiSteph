@@ -74,57 +74,59 @@ body::before{
 }
 
 
-/* SURCOUCHE */
+/* ====== SURCOUCHE ====== */
 .chat-overlay {
   position: fixed;
   inset: 0;
   background: rgba(0,0,0,0.4);
-  display: none;
+  display: none; /* caché par défaut */
   justify-content: center;
   align-items: center;
   z-index: 20000;
 }
 
-/* FENÊTRE CHAT */
+/* ====== FENÊTRE CHAT ====== */
 .chat-window {
-  width: 720px;
-  height: 460px;
+  width: 360px;  /* Petite modal */
+  height: 230px;
   background: #ffe6f0;
-  border-radius: 24px;
-  border: 3px solid #b67385;
+  border-radius: 20px;
+  border: 2px solid #b67385;
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  box-shadow: 0 20px 40px rgba(0,0,0,0.25);
+  box-shadow: 0 12px 24px rgba(0,0,0,0.25);
   position: relative;
+  transition: width 0.3s, height 0.3s;
 }
 
-/* HEADER */
+/* ====== HEADER ====== */
 .chat-header {
-  height: 48px;
+  height: 40px;
   background: linear-gradient(#ffd6e6, #ffb6c1);
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 12px;
+  padding: 0 10px;
   font-weight: bold;
   color: #b84c6f;
   flex-shrink: 0;
   position: sticky;
   top: 0;
   z-index: 10;
+  font-size: 14px;
 }
 
-/* BODY */
+/* ====== BODY ====== */
 .chat-body {
   flex: 1;
   display: flex;
   min-height: 0;
 }
 
-/* CONTACTS */
+/* ====== CONTACTS ====== */
 .chat-sidebar {
-  width: 200px;
+  width: 120px;  /* réduit pour petite modal */
   background: #fff5fa;
   border-right: 2px solid #f3b3c8;
   overflow-y: auto;
@@ -133,18 +135,23 @@ body::before{
 .chat-user {
   display: flex;
   align-items: center;
-  gap: 8px;
-  padding: 8px;
+  gap: 6px;
+  padding: 4px;
   cursor: pointer;
+  transition: background 0.2s;
+  font-size: 12px;
 }
 .chat-user.active {
   background: #ffd6e6;
 }
 .chat-user img {
   border-radius: 50%;
+  width: 28px;
+  height: 28px;
+  object-fit: cover;
 }
 
-/* CONVERSATION */
+/* ====== CONVERSATION ====== */
 .chat-content {
   flex: 1;
   display: flex;
@@ -154,17 +161,17 @@ body::before{
 
 .chat-messages {
   flex: 1;
-  padding: 12px;
+  padding: 6px;
   overflow-y: auto;
   background: #fffafa;
+  font-size: 12px;
 }
 
 .msg {
   max-width: 70%;
-  padding: 8px 12px;
-  margin-bottom: 6px;
-  border-radius: 16px;
-  font-size: 14px;
+  padding: 4px 8px;
+  margin-bottom: 4px;
+  border-radius: 12px;
 }
 
 .msg-me {
@@ -176,40 +183,35 @@ body::before{
   border: 1px solid #f3b3c8;
 }
 
-/* INPUT */
+/* ====== INPUT ====== */
 .chat-input {
   display: flex;
-  padding: 8px;
-  gap: 6px;
+  padding: 4px;
+  gap: 4px;
 }
 .chat-input input {
   flex: 1;
-  border-radius: 12px;
+  border-radius: 10px;
   border: 2px solid #b67385;
-  padding: 6px 10px;
+  padding: 4px 6px;
+  font-size: 12px;
 }
 
-/* MODE AGRANDI (expanded) */
-.expanded .chat-window {
-  width: 880px;
-  height: 560px;
-  border-radius: 24px;
-}
-@media(max-width:1000px){
-  .expanded .chat-window {
-    width: 90vw;
-    height: 60vh;
-  }
-}
-
-/* BOUTON ICON */
+/* ====== BOUTON ICON ====== */
 .chat-icon-btn {
   background: transparent;
   border: none;
   cursor: pointer;
-  padding: 4px;
+  padding: 2px;
   display: flex;
   align-items: center;
+}
+
+/* ====== MODE AGRANDI ====== */
+.expanded .chat-window {
+  width: 720px;  /* double taille de la petite modal */
+  height: 460px;
+  border-radius: 24px;
 }
   
 </style>
@@ -375,9 +377,8 @@ body::before{
     <div class="chat-header">
       <span class="chat-title">Messagerie</span>
 
-      <!-- Bouton agrandir / réduire -->
       <button id="toggleChatSize" class="chat-icon-btn" aria-label="Agrandir / Réduire">
-        <svg id="chatResizeIcon" width="22" height="22" viewBox="0 0 24 24"
+        <svg id="chatResizeIcon" width="20" height="20" viewBox="0 0 24 24"
           fill="none" stroke="#b84c6f" stroke-width="2" stroke-linecap="round">
           <path d="M4 9V4h5M20 15v5h-5M15 4h5v5M9 20H4v-5"/>
         </svg>
@@ -405,41 +406,6 @@ body::before{
       </div>
 
     </div>
-  </div>
-</div>
-    <!-- HEADER -->
-   <div class="chat-header">
-  <span class="chat-title">Messagerie</span>
-
-  <button id="toggleChatSize" class="chat-icon-btn" aria-label="Agrandir / Réduire">
-    <!-- SVG Agrandir / Réduire -->
-    <svg id="chatResizeIcon" width="22" height="22" viewBox="0 0 24 24"
-      fill="none" stroke="#b84c6f" stroke-width="2" stroke-linecap="round">
-      <path d="M4 9V4h5M20 15v5h-5M15 4h5v5M9 20H4v-5"/>
-    </svg>
-  </button>
-</div>
-
-      <!-- LISTE DES CONTACTS -->
-      <div class="chat-sidebar" id="chatUserList"></div>
-        
-
-      <!-- CONVERSATION -->
-      <div class="chat-content">
-
-        <div class="chat-messages">
-          <div class="msg msg-them">Salut 👋</div>
-          <div class="msg msg-me">Coucou 😊</div>
-        </div>
-
-        <div class="chat-input">
-          <input type="text" placeholder="Écrire un message…">
-          <button>➤</button>
-        </div>
-
-      </div>
-    </div>
-
   </div>
 </div>
   <script type="module">
