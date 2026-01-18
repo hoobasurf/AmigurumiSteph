@@ -187,13 +187,19 @@ body::before{
   padding: 6px 10px;
 }
 
-/* PLEIN ÉCRAN */
-.fullscreen .chat-window {
-  width: 100vw;
-  height: 100vh;
-  max-width: none;
-  max-height: none;
-  border-radius: 0;
+/* MODE AGRANDI (un peu plus grand que la modal) */
+.expanded .chat-window {
+  width: 880px; /* un peu plus large que la modal normale */
+  height: 560px; /* un peu plus haut que la modal normale */
+  border-radius: 24px; /* garde les coins arrondis */
+}
+
+/* Sur mobile, on reste responsive */
+@media(max-width:1000px){
+  .expanded .chat-window {
+    width: 90vw;
+    height: 60vh;
+  }
 }
 
 /* HEADER sticky */
@@ -742,11 +748,11 @@ chatModal.addEventListener('touchmove', e => {
       e.touches[0].clientY - e.touches[1].clientY
     );
     if (currentDistance - initialDistance > 40) {
-      chatModal.classList.add('fullscreen');
-    }
-    if (initialDistance - currentDistance > 40) {
-      chatModal.classList.remove('fullscreen');
-    }
+  chatModal.classList.add('expanded');
+}
+if (initialDistance - currentDistance > 40) {
+  chatModal.classList.remove('expanded');
+}
   }
 });
 
@@ -757,9 +763,11 @@ chatModal.addEventListener('touchend', () => {
 const icon = document.getElementById('chatResizeIcon');
 
 toggleChatSize.onclick = () => {
-  chatModal.classList.toggle('fullscreen');
+  // bascule expanded
+  chatModal.classList.toggle('expanded');
 
-  icon.innerHTML = chatModal.classList.contains('fullscreen')
+  // change l'icône selon l'état
+  icon.innerHTML = chatModal.classList.contains('expanded')
     ? '<path d="M9 4H4v5M15 20h5v-5M20 9V4h-5M4 15v5h5"/>'
     : '<path d="M4 9V4h5M20 15v5h-5M15 4h5v5M9 20H4v-5"/>';
 };
