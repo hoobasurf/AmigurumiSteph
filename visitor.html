@@ -3,9 +3,16 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Visitor</title>
+<title>Owner</title>
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="favicon.ico" type="image/x-icon">
+<link rel="apple-touch-icon" href="icon-152.png">
+<meta name="theme-color" content="#f2b7c9">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+
 <style>
-* { <style>
+* { box-sizing:border-box;margin:0;padding:0;font-family:'Comic Sans MS',cursive; }
 html,body{height:100%;overflow-x:hidden;}
 body::before{
   content:"";position:fixed;top:0;left:0;width:100vw;height:100vh;
@@ -66,128 +73,680 @@ body::before{
   align-items: center;
 }
 
-/* OWNER PHOTO & MESSAGERIE */
-#ownerPhoto {
-  width:32px; height:32px; border-radius:50%; position:fixed; top:10px; right:50px;
-  border:2px solid #b84c6f; background:#ffe6f0; display:none; z-index:1000;
-}
 
-#messagerieBtn {
-  position:fixed; top:10px; right:10px;
-  width:36px; height:36px; border-radius:50%; border:none; background:#ffb6c1;
-  display:none; justify-content:center; align-items:center; cursor:pointer; z-index:1000;
-}
-#messagerieBtn svg { stroke:#fff; stroke-width:2; }
-
-/* MESSAGERIE MODAL */
+/* ====== SURCOUCHE ====== */
 .chat-overlay {
-  position: fixed; inset:0; background: rgba(0,0,0,0.4);
-  display:none; justify-content:center; align-items:center; z-index:2000;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.4);
+  display: none; /* caché par défaut */
+  justify-content: center;
+  align-items: center;
+  z-index: 20000;
 }
+
+/* ====== FENÊTRE CHAT ====== */
 .chat-window {
-  width:360px; height:230px;
-  background:#ffe6f0; border-radius:20px; border:2px solid #b67385;
-  display:flex; flex-direction:column; overflow:hidden; box-shadow:0 12px 24px rgba(0,0,0,0.25);
+  width: 360px;  /* Petite modal */
+  height: 230px;
+  background: #ffe6f0;
+  border-radius: 20px;
+  border: 2px solid #b67385;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow: 0 12px 24px rgba(0,0,0,0.25);
+  position: relative;
   transition: width 0.3s, height 0.3s;
 }
-.chat-header { height:40px; background:linear-gradient(#ffd6e6,#ffb6c1);
-  display:flex; align-items:center; justify-content:space-between;
-  padding:0 10px; font-weight:bold; color:#b84c6f; flex-shrink:0; font-size:14px;
+
+/* ====== HEADER ====== */
+.chat-header {
+  height: 40px;
+  background: linear-gradient(#ffd6e6, #ffb6c1);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 10px;
+  font-weight: bold;
+  color: #b84c6f;
+  flex-shrink: 0;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  font-size: 14px;
 }
-.chat-body { flex:1; display:flex; min-height:0; }
-.chat-sidebar { width:120px; background:#fff5fa; border-right:2px solid #f3b3c8; overflow-y:auto; }
-.chat-user { display:flex; align-items:center; gap:6px; padding:4px; cursor:pointer; font-size:12px; }
-.chat-user.active { background:#ffd6e6; }
-.chat-user img { border-radius:50%; width:28px; height:28px; object-fit:cover; }
-.chat-content { flex:1; display:flex; flex-direction:column; min-height:0; }
-.chat-messages { flex:1; padding:6px; overflow-y:auto; background:#fffafa; font-size:12px; }
-.msg { max-width:70%; padding:4px 8px; margin-bottom:4px; border-radius:12px; }
-.msg-me { background:#ffb6c1; align-self:flex-end; }
-.msg-them { background:#ffffff; border:1px solid #f3b3c8; }
-.chat-input { display:flex; padding:4px; gap:4px; }
-.chat-input input { flex:1; border-radius:10px; border:2px solid #b67385; padding:4px 6px; font-size:12px; }
-.chat-icon-btn { background:transparent; border:none; cursor:pointer; padding:2px; display:flex; align-items:center; }
-.expanded .chat-window { width:720px; height:460px; border-radius:24px; }
+
+/* ====== BODY ====== */
+.chat-body {
+  flex: 1;
+  display: flex;
+  min-height: 0;
+}
+
+/* ====== CONTACTS ====== */
+.chat-sidebar {
+  width: 120px;  /* réduit pour petite modal */
+  background: #fff5fa;
+  border-right: 2px solid #f3b3c8;
+  overflow-y: auto;
+}
+
+.chat-user {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 4px;
+  cursor: pointer;
+  transition: background 0.2s;
+  font-size: 12px;
+}
+.chat-user.active {
+  background: #ffd6e6;
+}
+.chat-user img {
+  border-radius: 50%;
+  width: 28px;
+  height: 28px;
+  object-fit: cover;
+}
+
+/* ====== CONVERSATION ====== */
+.chat-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+}
+
+.chat-messages {
+  flex: 1;
+  padding: 6px;
+  overflow-y: auto;
+  background: #fffafa;
+  font-size: 12px;
+}
+
+.msg {
+  max-width: 70%;
+  padding: 4px 8px;
+  margin-bottom: 4px;
+  border-radius: 12px;
+}
+
+.msg-me {
+  background: #ffb6c1;
+  align-self: flex-end;
+}
+.msg-them {
+  background: #ffffff;
+  border: 1px solid #f3b3c8;
+}
+
+/* ====== INPUT ====== */
+.chat-input {
+  display: flex;
+  padding: 4px;
+  gap: 4px;
+}
+.chat-input input {
+  flex: 1;
+  border-radius: 10px;
+  border: 2px solid #b67385;
+  padding: 4px 6px;
+  font-size: 12px;
+}
+
+/* ====== BOUTON ICON ====== */
+.chat-icon-btn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 2px;
+  display: flex;
+  align-items: center;
+}
+
+/* ====== MODE AGRANDI ====== */
+.expanded .chat-window {
+  width: 720px;  /* double taille de la petite modal */
+  height: 460px;
+  border-radius: 24px;
+}
+  
 </style>
 </head>
 <body>
 
-<!-- Mini cercle profil -->
 <img id="ownerPhoto" alt="Owner">
 
-<!-- Bouton Messagerie -->
-<button id="messagerieBtn" aria-label="Messagerie">
-<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" stroke="#fff" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
-  <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
-</svg>
+<div class="center-zone">
+  <div id="visitor-list-container"></div>
+</div>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="#ffb6c1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-settings">
+    <circle cx="12" cy="12" r="3"/>
+    <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l0 0a2 2 0 1 1-2.83 2.83l0 0a1.65 1.65 0 0 0-1.82.33l0 0a1.65 1.65 0 0 0-.5 1.51l0 0a2 2 0 1 1-3.18 0l0 0a1.65 1.65 0 0 0-1.51-.5l0 0a1.65 1.65 0 0 0-.33-1.82l0 0a2 2 0 1 1 0-2.83l0 0a1.65 1.65 0 0 0 .33-1.82l0 0a1.65 1.65 0 0 0-1.51-.5l0 0a2 2 0 1 1 0-3.18l0 0a1.65 1.65 0 0 0 .5-1.51l0 0a1.65 1.65 0 0 0 1.82-.33l0 0a2 2 0 1 1 2.83 0l0 0a1.65 1.65 0 0 0 1.82.33l0 0a1.65 1.65 0 0 0 .5 1.51l0 0a2 2 0 1 1 3.18 0l0 0a1.65 1.65 0 0 0 1.51.5l0 0a1.65 1.65 0 0 0 .33 1.82l0 0a2 2 0 1 1 0 2.83l0 0a1.65 1.65 0 0 0-.33 1.82l0 0a1.65 1.65 0 0 0 1.51.5z"/>
+  </svg>
 </button>
+</div>
 
-<!-- Messagerie modal -->
+<!-- Modals -->
+<div id="addModal" class="modal">
+  <div class="modal-box">
+    <h2>Ajouter des photos</h2>
+    <input id="photoName" placeholder="Nom du projet">
+    <input type="file" id="multiPhoto" multiple>
+    <button id="confirmAdd">Valider</button>
+  </div>
+</div>
+
+<div id="deleteModal" class="modal">
+  <div class="modal-box">
+    <p>Supprimer définitivement ce projet ?</p>
+    <button id="confirmDelete">Oui</button>
+    <button id="cancelDelete">Annuler</button>
+  </div>
+</div>
+
+<!-- ====== LIKE MODAL ====== -->
+<div id="likeModal" class="modal">
+  <div class="modal-box">
+    <h3>Like ❤️</h3>
+    <div style="display:flex; align-items:center; gap:6px; margin-bottom:8px;">
+      <input type="text" id="likeName" readonly style="flex:1; padding:4px 8px; border:2px solid #b67385; border-radius:8px; background:#ffe6f0;">
+    </div>
+    <button id="confirmLike">Valider</button>
+    <div class="bubble-container" id="likeBubbles" style="margin-top:12px; max-height:120px; overflow-y:auto;"></div>
+  </div>
+</div>
+
+<!-- ====== COMMENT MODAL ====== -->
+<div id="commentModal" class="modal">
+  <div class="modal-box comment-box">
+    <div class="expand-btn" id="expandComment">⤢</div>
+    <h3>Commentaire 💬</h3>
+    <div class="comment-list" id="commentBubbles" style="max-height:160px; overflow-y:auto; margin-bottom:8px;"></div>
+    <div style="display:flex; flex-direction:column; gap:6px;">
+      <input type="text" id="commentName" readonly style="flex:1; padding:4px 8px; border:2px solid #b67385; border-radius:8px; background:#ffe6f0; margin-bottom:8px;">
+      <input type="text" id="commentText" placeholder="Votre commentaire" style="padding:4px 8px; border:2px solid #b67385; border-radius:8px;">
+      <button id="confirmComment">Envoyer</button>
+    </div>
+  </div>
+</div>
+
+<div id="zoomModal">
+  <div class="closeZoom">×</div>
+  <img id="mainZoom">
+  <div class="thumbs" id="thumbs"></div>
+  <div class="actions">
+    <div class="actions" style="display:flex; gap:12px; align-items:center; margin-top:8px;">
+  <div class="icon-btn" id="likeBtn" style="display:flex; align-items:center; cursor:pointer; gap:4px;">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#b84c6f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M12 21C12 21 4 13.5 4 8.5C4 5.5 6.5 3 9.5 3C11 3 12 4 12 4C12 4 13 3 14.5 3C17.5 3 20 5.5 20 8.5C20 13.5 12 21 12 21Z"></path>
+    </svg>
+    <span id="likeCount">0</span>
+  </div>
+
+  <div class="icon-btn" id="commentBtn" style="display:flex; align-items:center; cursor:pointer; gap:4px;">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#b84c6f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+    </svg>
+    <span id="commentCount">0</span>
+  </div>
+</div>
+  </div>
+</div>
+
+<!-- Modal Gestion -->
+<div id="manageModal" class="modal">
+  <div class="modal-box">
+    <h2>Gestion Likes, Commentaires</h2>
+    <button id="manageLikesBtn">Likes</button>
+    <button id="manageCommentsBtn">Commentaires</button>
+  </div>
+</div>
+
+<!-- Modal Likes -->
+<div id="likesModal" class="modal">
+  <div class="modal-box" style="max-height:80vh; overflow-y:auto;">
+    <h2>Likes</h2>
+    <button id="chooseLikeBtn">Choisir individuellement</button>
+    <button id="clearLikesBtn">Tout effacer</button>
+    <div id="likesList"></div>
+  </div>
+</div>
+
+<!-- Modal Commentaires -->
+<div id="commentsModal" class="modal">
+  <div class="modal-box" style="max-height:80vh; overflow-y:auto;">
+    <h2>Commentaires</h2>
+    <button id="chooseCommentBtn">Choisir individuellement</button>
+    <button id="clearCommentsBtn">Tout effacer</button>
+    <div id="commentsList"></div>
+  </div>
+</div>
+
+<!-- Modal suppression individuelle -->
+<div id="deleteIndivModal" class="modal">
+  <div class="modal-box">
+    <p>Supprimer définitivement ce Like/Commentaire ?</p>
+    <button id="confirmDeleteIndiv">Oui</button>
+    <button id="cancelDeleteIndiv">Annuler</button>
+  </div>
+</div>
+
+<!-- Modal Supprimer Like -->
+<div id="deleteLikeModal" class="modal">
+  <div class="modal-box">
+    <h3>Supprimer Like</h3>
+    <button id="chooseLikesBtn">Choisir</button>
+  </div>
+</div>
+
+<!-- Modal Supprimer Commentaire -->
+<div id="deleteCommentModal" class="modal">
+  <div class="modal-box">
+    <h3>Supprimer Commentaire</h3>
+    <button id="chooseCommentsBtn">Choisir</button>
+  </div>
+</div>
+
+<!-- Modal Sélection Créations -->
+<div id="selectCreationModal" class="modal">
+  <div class="modal-box">
+    <h3>Sélectionner les créations</h3>
+    <div id="selectCreationList" style="max-height:60vh;overflow-y:auto;display:flex;flex-direction:column;gap:6px;"></div>
+    <button id="clearSelectedBtn">Tout effacer</button>
+  </div>
+</div>
+
+<!-- ====== MESSAGERIE ====== -->
 <div id="chatModal" class="chat-overlay">
   <div class="chat-window">
+
+    <!-- HEADER -->
     <div class="chat-header">
       <span class="chat-title">Messagerie</span>
-      <button id="toggleChatSize" class="chat-icon-btn">
-        <svg id="chatResizeIcon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#b84c6f" stroke-width="2" stroke-linecap="round">
+
+      <button id="toggleChatSize" class="chat-icon-btn" aria-label="Agrandir / Réduire">
+        <svg id="chatResizeIcon" width="20" height="20" viewBox="0 0 24 24"
+          fill="none" stroke="#b84c6f" stroke-width="2" stroke-linecap="round">
           <path d="M4 9V4h5M20 15v5h-5M15 4h5v5M9 20H4v-5"/>
         </svg>
       </button>
     </div>
+
+    <!-- BODY -->
     <div class="chat-body">
-      <div class="chat-sidebar" id="chatUserList"></div>
+
+      <!-- CONTACTS -->
+      <div class="chat-sidebar" id="chatUserList">
+        <!-- Liste vide par défaut -->
+      </div>
+
+      <!-- CONVERSATION -->
       <div class="chat-content">
-        <div class="chat-messages" id="chatMessages"></div>
+        <div class="chat-messages" id="chatMessages">
+          <!-- Messages dynamiques -->
+        </div>
+
         <div class="chat-input">
           <input type="text" id="chatInput" placeholder="Écrire un message…">
           <button id="sendMsgBtn">➤</button>
         </div>
       </div>
+
     </div>
   </div>
 </div>
-
-<script type="module">
+  <script type="module">
 import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
-const supabase = createClient("https://jyhbamdcxmpveujjqjla.supabase.co", "sb_publishable_sqsxb-3Kl5o3-JQYv9kGFw_-g0EgwMa");
+const supabase = createClient(
+  "https://jyhbamdcxmpveujjqjla.supabase.co",
+  "sb_publishable_sqsxb-3Kl5o3-JQYv9kGFw_-g0EgwMa"
+);
 
+// ====== OWNER AVATAR ======
 const ownerPhoto = document.getElementById('ownerPhoto');
-const messagerieBtn = document.getElementById('messagerieBtn');
-const chatModal = document.getElementById('chatModal');
-const toggleChatSize = document.getElementById('toggleChatSize');
-const icon = document.getElementById('chatResizeIcon');
-
-// Afficher bouton Messagerie et mini cercle uniquement si connecté
 const prenom = localStorage.getItem('prenom');
-if(prenom){
-  ownerPhoto.style.display='block';
-  messagerieBtn.style.display='flex';
+
+async function loadOwnerPhoto(){
+  if(!prenom) return;
+  const {data,error} = await supabase.from('profiles').select('photo_url').eq('prenom',prenom).single();
+  if(!error && data?.photo_url){ownerPhoto.src=data.photo_url;ownerPhoto.style.opacity='1';} 
+  else{ownerPhoto.style.opacity='0.3';}
+}
+document.addEventListener('DOMContentLoaded', loadOwnerPhoto);
+window.addEventListener('pageshow', loadOwnerPhoto);
+
+// ====== VARIABLES ======
+let creations=[];
+let currentZoom=null;
+let currentDelete=null;
+
+const container=document.getElementById('visitor-list-container');
+const addModal=document.getElementById('addModal');
+const deleteModal=document.getElementById('deleteModal');
+const zoomModal=document.getElementById('zoomModal');
+const sidebar=document.getElementById('sidebar');
+const mainZoom=document.getElementById('mainZoom');
+const thumbs=document.getElementById('thumbs');
+const likeCount=document.getElementById('likeCount');
+const commentCount=document.getElementById('commentCount');
+const likeModal=document.getElementById('likeModal');
+const likeBubbles=document.getElementById('likeBubbles');
+const confirmLike=document.getElementById('confirmLike');
+const likeNameInput=document.getElementById('likeName');
+const commentModal=document.getElementById('commentModal');
+const confirmComment=document.getElementById('confirmComment');
+const commentBubbles=document.getElementById('commentBubbles');
+const commentNameInput=document.getElementById('commentName');
+const commentTextInput=document.getElementById('commentText');
+
+// ====== RENDER ======
+function render(){
+  container.innerHTML='';
+  let page=null;
+  creations.forEach((c,i)=>{
+    if(i%6===0){page=document.createElement('div');page.className='page';container.appendChild(page);}
+    const d=document.createElement('div');d.className='visitor-item';
+    d.innerHTML=`<div class="placeholder">?</div><div class="delete-btn">×</div><p>${c.name}</p><img src="${c.imgUrl||''}">`;
+    const img=d.querySelector('img');
+    img.onload=()=>d.querySelector('.placeholder').style.display='none';
+    img.onerror=()=>{img.remove();d.querySelector('.placeholder').textContent='';};
+    img.onclick=()=>openZoom(c);
+    d.querySelector('.delete-btn').onclick=()=>openDeleteModal(c);
+    page.appendChild(d);
+  });
 }
 
-// Ouvrir modal
-messagerieBtn.onclick = () => chatModal.style.display='flex';
-chatModal.addEventListener('click', e => { if(e.target===chatModal) chatModal.style.display='none'; });
+// ====== ZOOM ======
+function openZoom(c){
+  currentZoom = creations.find(x => x.id === c.id);
+  mainZoom.src = currentZoom.imgUrl;
+  thumbs.innerHTML = '';
+  (currentZoom.zoomGroup || []).forEach(u=>{
+    const t=document.createElement('img'); t.src=u;
+    t.onclick=()=>mainZoom.src=u;
+    thumbs.appendChild(t);
+  });
+  updateActions();
+  zoomModal.style.display='flex';
+}
 
-// Toggle petite/grande taille
+function updateActions(){
+  if(!currentZoom) return;
+  likeCount.textContent = (currentZoom.likes || []).length;
+  commentCount.textContent = (currentZoom.comments || []).length;
+}
+
+// ====== LIKE MODAL ======
+document.getElementById('likeBtn').onclick=()=>{
+  if(!currentZoom){alert("Sélectionnez d'abord une image !"); return;}
+  likeNameInput.value = localStorage.getItem('prenom')||'';
+  renderLikeList();
+  likeModal.style.display='flex';
+};
+
+confirmLike.onclick=async()=>{
+  if(!currentZoom) return;
+  const name = likeNameInput.value.trim();
+  if(!name) return;
+  currentZoom.likes = currentZoom.likes||[];
+  if(currentZoom.likes.some(l=>l.name===name)){likeModal.style.display='none'; return;}
+  currentZoom.likes.push({name, photo: ownerPhoto.src||''});
+  await supabase.from('creations').update({likes:currentZoom.likes}).eq('id',currentZoom.id);
+  renderLikeList();
+  likeCount.textContent = currentZoom.likes.length;
+  likeModal.style.display='none';
+};
+
+// ====== COMMENT MODAL ======
+document.getElementById('commentBtn').onclick=()=>{
+  if(!currentZoom) return;
+  commentNameInput.value = localStorage.getItem('prenom')||'';
+  commentTextInput.value = '';
+  renderCommentList();
+  commentModal.style.display='flex';
+};
+
+confirmComment.onclick=async()=>{
+  if(!currentZoom) return;
+  const name = commentNameInput.value.trim();
+  const text = commentTextInput.value.trim();
+  if(!name||!text) return;
+  currentZoom.comments = currentZoom.comments||[];
+  currentZoom.comments.push({name, text, photo: ownerPhoto.src||''});
+  await supabase.from('creations').update({comments:currentZoom.comments}).eq('id',currentZoom.id);
+  renderCommentList();
+  commentTextInput.value='';
+  commentCount.textContent = currentZoom.comments.length;
+};
+
+// ====== RENDER LISTS ======
+function renderLikeList(){
+  if(!currentZoom) return;
+  likeBubbles.innerHTML='';
+  (currentZoom.likes||[]).forEach(l=>{
+    const div=document.createElement('div');
+    div.className='like-item';
+    div.innerHTML=`${l.photo?`<img src="${l.photo}" style="width:20px;height:20px;border-radius:50%;margin-right:4px;vertical-align:middle;">`:''}<strong>${l.name}</strong>`;
+    likeBubbles.appendChild(div);
+  });
+  likeCount.textContent = (currentZoom.likes||[]).length;
+}
+
+function renderCommentList(){
+  if(!currentZoom) return;
+  commentBubbles.innerHTML='';
+  (currentZoom.comments||[]).forEach(c=>{
+    const div=document.createElement('div');
+    div.className='comment-item';
+    div.innerHTML=`${c.photo?`<img src="${c.photo}" style="width:20px;height:20px;border-radius:50%;margin-right:4px;vertical-align:middle;">`:''}<strong>${c.name}</strong>: ${c.text}`;
+    commentBubbles.appendChild(div);
+  });
+  commentCount.textContent = (currentZoom.comments||[]).length;
+}
+
+// ====== ADD CREATIONS ======
+document.getElementById('addBtn').onclick=()=>addModal.style.display='flex';
+addModal.addEventListener('click', e=>{if(e.target===addModal)addModal.style.display='none';});
+document.getElementById('confirmAdd').onclick=async e=>{
+  e.stopPropagation();
+  const name=document.getElementById('photoName').value.trim();
+  const files=document.getElementById('multiPhoto').files;
+  if(!name||!files.length){alert("Mettre un nom et choisir au moins une photo");return;}
+  const paths=[],urls=[];
+  for(let file of files){
+    const path=`${Date.now()}_${file.name}`;
+    const {error:uploadError}=await supabase.storage.from('images').upload(path,file);
+    if(uploadError){console.error(uploadError);continue;}
+    const {data:pubData}=supabase.storage.from('images').getPublicUrl(path);
+    if(!pubData?.publicUrl) continue;
+    urls.push(pubData.publicUrl); paths.push(path);
+  }
+  if(urls.length===0) return;
+  await supabase.from('creations').insert([{name,image_path:paths[0],images:paths,likes:[],comments:[]}]);
+  addModal.style.display='none';
+  document.getElementById('photoName').value='';
+  document.getElementById('multiPhoto').value='';
+  await refreshCreations();
+};
+
+    <!-- Mini cercle haut droite -->
+<img id="ownerPhoto" src="" alt="Owner">
+
+<!-- Bouton messagerie SVG -->
+<button id="messagerieBtn" class="chat-icon-btn" style="position:fixed; top:10px; right:50px; background:transparent; border:none; cursor:pointer; z-index:10001;">
+  <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#b84c6f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+  </svg>
+</button>
+const chatModal = document.getElementById('chatModal');
+const messagerieBtn = document.getElementById('messagerieBtn');
+
+messagerieBtn.onclick = () => {
+  if (!ownerPhoto.src) {
+    alert("Veuillez vous connecter pour accéder à la messagerie");
+    return;
+  }
+  chatModal.style.display = 'flex';
+};
+    
+
+// ====== DELETE CREATION ======
+function openDeleteModal(c){currentDelete=c; deleteModal.style.display='flex';}
+document.getElementById('cancelDelete').onclick=()=>{currentDelete=null; deleteModal.style.display='none';};
+document.getElementById('confirmDelete').onclick=async()=>{
+  if(!currentDelete?.id) return;
+  await supabase.from('creations').delete().eq('id',currentDelete.id);
+  currentDelete=null; deleteModal.style.display='none';
+  await refreshCreations();
+};
+
+// ====== MODAL CLICS ======
+[zoomModal, likeModal, commentModal, deleteModal].forEach(m=>{
+  m.onclick=e=>{if(e.target===m)m.style.display='none';}
+});
+document.querySelector('.closeZoom').onclick=()=>zoomModal.style.display='none';
+
+// ====== REFRESH CREATIONS (version tolérante pour likes) ======
+async function refreshCreations() {
+  try {
+    const { data, error } = await supabase
+      .from('creations')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      console.error(error);
+      return;
+    }
+
+    creations = data.map(c => {
+      let zoomGroup = [];
+      if (c.images?.length) {
+        zoomGroup = c.images.map(p => {
+          const { data } = supabase.storage.from('images').getPublicUrl(p);
+          return data?.publicUrl || '';
+        });
+      } else if (c.image_path) {
+        const { data } = supabase.storage.from('images').getPublicUrl(c.image_path);
+        zoomGroup = [data?.publicUrl || ''];
+      }
+
+      // ✅ Likes et commentaires sécurisés
+      let likesArray = [];
+      if (Array.isArray(c.likes)) {
+        likesArray = c.likes;
+      } else if (typeof c.likes === 'string') {
+        try {
+          likesArray = JSON.parse(c.likes);
+          if (!Array.isArray(likesArray)) likesArray = [];
+        } catch (e) {
+          likesArray = [];
+        }
+      }
+
+      let commentsArray = [];
+      if (Array.isArray(c.comments)) {
+        commentsArray = c.comments;
+      } else if (typeof c.comments === 'string') {
+        try {
+          commentsArray = JSON.parse(c.comments);
+          if (!Array.isArray(commentsArray)) commentsArray = [];
+        } catch (e) {
+          commentsArray = [];
+        }
+      }
+
+      return {
+        id: c.id,
+        name: c.name,
+        imgUrl: zoomGroup[0] || '',
+        zoomGroup,
+        likes: likesArray.map(like => ({
+          name: like.name || '',
+          photo: like.photo || ''
+        })),
+        comments: commentsArray.map(cmt => ({
+          name: cmt.name || '',
+          text: cmt.text || '',
+          photo: cmt.photo || ''
+        }))
+      };
+    });
+
+    render();
+  } catch (err) {
+    console.error('Erreur refreshCreations:', err);
+  }
+}
+
+    const chatModal = document.getElementById('chatModal');
+const toggleChatSize = document.getElementById('toggleChatSize');
+
+// Ouvrir la modal
+document.getElementById('messagerieBtn').onclick = () => {
+  chatModal.style.display = 'flex';
+};
+
+// Fermer si clic hors fenêtre
+chatModal.addEventListener('click', e => {
+  if (e.target === chatModal) chatModal.style.display = 'none';
+});
+
+// Bouton agrandir / réduire
 toggleChatSize.onclick = () => {
+  chatModal.classList.toggle('fullscreen');
+};
+
+// PINCH 2 doigts
+let initialDistance = null;
+chatModal.addEventListener('touchstart', e => {
+  if (e.touches.length === 2) {
+    initialDistance = Math.hypot(
+      e.touches[0].clientX - e.touches[1].clientX,
+      e.touches[0].clientY - e.touches[1].clientY
+    );
+  }
+});
+
+chatModal.addEventListener('touchmove', e => {
+  if (e.touches.length === 2 && initialDistance) {
+    const currentDistance = Math.hypot(
+      e.touches[0].clientX - e.touches[1].clientX,
+      e.touches[0].clientY - e.touches[1].clientY
+    );
+    if (currentDistance - initialDistance > 40) {
+  chatModal.classList.add('expanded');
+}
+if (initialDistance - currentDistance > 40) {
+  chatModal.classList.remove('expanded');
+}
+  }
+});
+
+chatModal.addEventListener('touchend', () => {
+  initialDistance = null;
+});
+    // ====== MESSAGERIE : AGRANDIR / RÉDUIRE ======
+const icon = document.getElementById('chatResizeIcon');
+
+toggleChatSize.onclick = () => {
+  // bascule expanded
   chatModal.classList.toggle('expanded');
+
+  // change l'icône selon l'état
   icon.innerHTML = chatModal.classList.contains('expanded')
     ? '<path d="M9 4H4v5M15 20h5v-5M20 9V4h-5M4 15v5h5"/>'
     : '<path d="M4 9V4h5M20 15v5h-5M15 4h5v5M9 20H4v-5"/>';
 };
-
-// Pinch pour mobile
-let initialDistance=null;
-chatModal.addEventListener('touchstart', e=>{ if(e.touches.length===2) initialDistance=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY); });
-chatModal.addEventListener('touchmove', e=>{
-  if(e.touches.length===2 && initialDistance){
-    const currentDistance=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);
-    if(currentDistance-initialDistance>30) chatModal.classList.add('expanded');
-    if(initialDistance-currentDistance>30) chatModal.classList.remove('expanded');
-  }
-});
-chatModal.addEventListener('touchend',()=>{ initialDistance=null; });
-
+// ====== INITIAL ======
+refreshCreations();
 </script>
+
 
 </body>
 </html>
