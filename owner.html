@@ -74,6 +74,7 @@ body::before{
 }
 
 
+/* SURCOUCHE */
 .chat-overlay {
   position: fixed;
   inset: 0;
@@ -84,31 +85,48 @@ body::before{
   z-index: 20000;
 }
 
+/* FENÊTRE CHAT */
 .chat-window {
+  width: 720px;
+  height: 460px;
+  background: #ffe6f0;
+  border-radius: 24px;
+  border: 3px solid #b67385;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.25);
   position: relative;
-  max-width: 96vw;
-  max-height: 92vh;
 }
 
-
-/* Header toujours au-dessus */
+/* HEADER */
 .chat-header {
-  position: sticky;
-  top: 0;
-  z-index: 10;
+  height: 48px;
+  background: linear-gradient(#ffd6e6, #ffb6c1);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 12px;
+  font-weight: bold;
+  color: #b84c6f;
+  flex-shrink: 0;
 }
 
+/* BODY */
 .chat-body {
   flex: 1;
   display: flex;
+  min-height: 0; /* permet aux scroll de fonctionner */
 }
 
+/* CONTACTS */
 .chat-sidebar {
   width: 200px;
-  background: #fff0f6;
+  background: #fff5fa;
   border-right: 2px solid #f3b3c8;
   overflow-y: auto;
 }
+
 
 .chat-user {
   display: flex;
@@ -124,16 +142,19 @@ body::before{
   border-radius: 50%;
 }
 
+/* CONVERSATION */
 .chat-content {
   flex: 1;
   display: flex;
   flex-direction: column;
+  min-height: 0; /* essentiel pour scroll */
 }
 
 .chat-messages {
   flex: 1;
   padding: 12px;
   overflow-y: auto;
+  background: #fffafa;
 }
 
 .msg {
@@ -149,9 +170,11 @@ body::before{
   align-self: flex-end;
 }
 .msg-them {
-  background: #fff;
+  background: #ffffff;
+  border: 1px solid #f3b3c8;
 }
 
+/* INPUT */
 .chat-input {
   display: flex;
   padding: 8px;
@@ -164,7 +187,7 @@ body::before{
   padding: 6px 10px;
 }
 
-  /* Mode plein écran */
+/* PLEIN ÉCRAN */
 .fullscreen .chat-window {
   width: 100vw;
   height: 100vh;
@@ -173,27 +196,11 @@ body::before{
   border-radius: 0;
 }
 
-/* PLEIN ÉCRAN RÉTRO PASTEL (MSN revisité) */
-.fullscreen .chat-header {
-  background: linear-gradient(#ffe6f0, #ffccd9);
-  color: #b84c6f;
-}
-
-.fullscreen .chat-sidebar {
-  background: #fff5fa;
-}
-
-.fullscreen .chat-messages {
-  background: #fffafa;
-}
-
-.fullscreen .msg-me {
-  background: #ffb6c1;
-}
-
-.fullscreen .msg-them {
-  background: #ffffff;
-  border: 1px solid #f3b3c8;
+/* HEADER sticky */
+.chat-header {
+  position: sticky;
+  top: 0;
+  z-index: 10;
 }
   
 </style>
@@ -351,9 +358,48 @@ body::before{
   </div>
 </div>
 
- <!-- ====== MESSAGERIE ====== -->
+<!-- ====== MESSAGERIE ====== -->
 <div id="chatModal" class="chat-overlay">
   <div class="chat-window modal-mode">
+
+    <!-- HEADER -->
+    <div class="chat-header">
+      <span class="chat-title">Messagerie</span>
+
+      <!-- Bouton agrandir / réduire -->
+      <button id="toggleChatSize" class="chat-icon-btn" aria-label="Agrandir / Réduire">
+        <svg id="chatResizeIcon" width="22" height="22" viewBox="0 0 24 24"
+          fill="none" stroke="#b84c6f" stroke-width="2" stroke-linecap="round">
+          <path d="M4 9V4h5M20 15v5h-5M15 4h5v5M9 20H4v-5"/>
+        </svg>
+      </button>
+    </div>
+
+    <!-- BODY -->
+    <div class="chat-body">
+
+      <!-- CONTACTS -->
+      <div class="chat-sidebar" id="chatUserList">
+        <!-- Liste vide par défaut -->
+      </div>
+
+      <!-- CONVERSATION -->
+      <div class="chat-content">
+
+        <div class="chat-messages" id="chatMessages">
+          <!-- Messages dynamiques -->
+        </div>
+
+        <div class="chat-input">
+          <input type="text" id="chatInput" placeholder="Écrire un message…">
+          <button id="sendMsgBtn">➤</button>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</div>
 
     <!-- HEADER -->
    <div class="chat-header">
@@ -662,22 +708,24 @@ async function refreshCreations() {
 
     const chatModal = document.getElementById('chatModal');
 const toggleChatSize = document.getElementById('toggleChatSize');
-const chatWindow = document.querySelector('.chat-window');
 
+// Ouvrir la modal
 document.getElementById('messagerieBtn').onclick = () => {
   chatModal.style.display = 'flex';
 };
 
+// Fermer si clic hors fenêtre
 chatModal.addEventListener('click', e => {
   if (e.target === chatModal) chatModal.style.display = 'none';
 });
 
+// Bouton agrandir / réduire
 toggleChatSize.onclick = () => {
   chatModal.classList.toggle('fullscreen');
 };
 
+// PINCH 2 doigts
 let initialDistance = null;
-
 chatModal.addEventListener('touchstart', e => {
   if (e.touches.length === 2) {
     initialDistance = Math.hypot(
@@ -693,11 +741,9 @@ chatModal.addEventListener('touchmove', e => {
       e.touches[0].clientX - e.touches[1].clientX,
       e.touches[0].clientY - e.touches[1].clientY
     );
-
     if (currentDistance - initialDistance > 40) {
       chatModal.classList.add('fullscreen');
     }
-
     if (initialDistance - currentDistance > 40) {
       chatModal.classList.remove('fullscreen');
     }
