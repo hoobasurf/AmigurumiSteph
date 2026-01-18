@@ -220,7 +220,10 @@ body::before{
 
   <script type="module">
 import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
-const supabase = createClient("https://jyhbamdcxmpveujjqjla.supabase.co","sb_publishable_sqsxb-3Kl5o3-JQYv9kGFw_-g0EgwMa");
+const supabase = createClient(
+  "https://jyhbamdcxmpveujjqjla.supabase.co",
+  "sb_publishable_sqsxb-3Kl5o3-JQYv9kGFw_-g0EgwMa"
+);
 
 // ====== OWNER AVATAR ======
 const ownerPhoto = document.getElementById('ownerPhoto');
@@ -256,15 +259,8 @@ const likeNameInput=document.getElementById('likeName');
 const commentModal=document.getElementById('commentModal');
 const confirmComment=document.getElementById('confirmComment');
 const commentBubbles=document.getElementById('commentBubbles');
-const expandBtn=document.getElementById('expandComment');
-const commentBox=document.querySelector('.comment-box');
 const commentNameInput=document.getElementById('commentName');
-
-function fillUserInfo() {
-  const prenom = localStorage.getItem('prenom') || '';
-  likeNameInput.value = prenom;
-  commentNameInput.value = prenom;
-}
+const commentTextInput=document.getElementById('commentText');
 
 // ====== RENDER ======
 function render(){
@@ -283,212 +279,102 @@ function render(){
   });
 }
 
-// ====== OPEN ZOOM & UPDATE ACTIONS (corrigé likes) ======
+// ====== ZOOM ======
 function openZoom(c){
-  // ✅ Toujours prendre l'objet frais depuis creations pour ne pas perdre les likes
   currentZoom = creations.find(x => x.id === c.id);
-
   mainZoom.src = currentZoom.imgUrl;
   thumbs.innerHTML = '';
-
-  (currentZoom.zoomGroup || []).forEach(u => {
-    const t = document.createElement('img');
-    t.src = u;
-    t.onclick = () => mainZoom.src = u;
+  (currentZoom.zoomGroup || []).forEach(u=>{
+    const t=document.createElement('img'); t.src=u;
+    t.onclick=()=>mainZoom.src=u;
     thumbs.appendChild(t);
   });
-
   updateActions();
-  zoomModal.style.display = 'flex';
+  zoomModal.style.display='flex';
 }
 
 function updateActions(){
-  if (!currentZoom) return;
-
-  // ✅ NE PLUS réinitialiser likes/commentaires
+  if(!currentZoom) return;
   likeCount.textContent = (currentZoom.likes || []).length;
   commentCount.textContent = (currentZoom.comments || []).length;
 }
-// ====== COMMENT ======
-document.getElementById('commentBtn').onclick = () => {
-  if (!currentZoom) return;
-  renderCommentList();
-  document.getElementById('commentName').value = localStorage.getItem('prenom') || '';
-  document.getElementById('commentText').value = '';
-  commentModal.style.display = 'flex';
-};
 
-// Détecter click long
-function addLongClick(elem, callback){
-  let timer;
-  elem.addEventListener('mousedown', ()=>{timer=setTimeout(callback,600)});
-  elem.addEventListener('mouseup', ()=>{clearTimeout(timer)});
-  elem.addEventListener('mouseleave', ()=>{clearTimeout(timer)});
-}
-
-// ====== LIKE ======
-document.getElementById('likeBtn').onclick = () => {
-  if (!currentZoom) {
-    alert("Sélectionnez d'abord une image !");
-    return;
-  }
-
-  if (!Array.isArray(currentZoom.likes)) {
-    currentZoom.likes = [];
-  }
-
-  likeNameInput.value = localStorage.getItem('prenom') || '';
+// ====== LIKE MODAL ======
+document.getElementById('likeBtn').onclick=()=>{
+  if(!currentZoom){alert("Sélectionnez d'abord une image !"); return;}
+  likeNameInput.value = localStorage.getItem('prenom')||'';
   renderLikeList();
-  likeModal.style.display = 'flex';
+  likeModal.style.display='flex';
 };
 
-confirmLike.onclick = async () => {
-  if (!currentZoom) return;
-
+confirmLike.onclick=async()=>{
+  if(!currentZoom) return;
   const name = likeNameInput.value.trim();
-  if (!name) return;
-
-  if (!Array.isArray(currentZoom.likes)) {
-    currentZoom.likes = [];
-  }
-
-  // Empêche double like
-  if (currentZoom.likes.some(l => l.name === name)) {
-    likeModal.style.display = 'none';
-    return;
-  }
-
-  // Ajout local
-  currentZoom.likes.push({
-    name,
-    photo: ownerPhoto.src || ''
-  });
-
-  // Sauvegarde Supabase (comme commentaires)
-  await supabase
-    .from('creations')
-    .update({ likes: currentZoom.likes })
-    .eq('id', currentZoom.id);
-
-  // Mise à jour UI immédiate
-  likeCount.textContent = currentZoom.likes.length;
+  if(!name) return;
+  currentZoom.likes = currentZoom.likes||[];
+  if(currentZoom.likes.some(l=>l.name===name)){likeModal.style.display='none'; return;}
+  currentZoom.likes.push({name, photo: ownerPhoto.src||''});
+  await supabase.from('creations').update({likes:currentZoom.likes}).eq('id',currentZoom.id);
   renderLikeList();
-
-  likeModal.style.display = 'none';
+  likeCount.textContent = currentZoom.likes.length;
+  likeModal.style.display='none';
 };
 
 // ====== COMMENT MODAL ======
-document.getElementById('commentBtn').onclick = () => {
-  if (!currentZoom) return;
+document.getElementById('commentBtn').onclick=()=>{
+  if(!currentZoom) return;
+  commentNameInput.value = localStorage.getItem('prenom')||'';
+  commentTextInput.value = '';
   renderCommentList();
-  document.getElementById('commentName').value = localStorage.getItem('prenom') || '';
-  document.getElementById('commentText').value = '';
-  commentModal.style.display = 'flex';
+  commentModal.style.display='flex';
 };
 
-// ====== LIKE MODAL ======
-document.getElementById('likeBtn').onclick = () => {
-  if (!currentZoom) {
-    alert("Sélectionnez d'abord une image !");
-    return;
-  }
-
-  likeNameInput.value = localStorage.getItem('prenom') || '';
-  renderLikeList();
-  likeModal.style.display = 'flex';
-};
-
-// ====== CONFIRM LIKE ======
-confirmLike.onclick = async () => {
-  if (!currentZoom) return;
-
-  const name = likeNameInput.value.trim();
-  if (!name) return;
-
-  // ✅ Initialisation défensive seulement si undefined
-  if (!Array.isArray(currentZoom.likes)) currentZoom.likes = [];
-
-  // Empêche double like
-  if (currentZoom.likes.some(l => l.name === name)) {
-    likeModal.style.display = 'none';
-    return;
-  }
-
-  // Ajout local
-  currentZoom.likes.push({
-    name,
-    photo: ownerPhoto.src || ''
-  });
-
-  // Sauvegarde Supabase
-  await supabase
-    .from('creations')
-    .update({ likes: currentZoom.likes })
-    .eq('id', currentZoom.id);
-
-  // Mise à jour UI immédiate
-  likeCount.textContent = currentZoom.likes.length;
-  renderLikeList();
-
-  likeModal.style.display = 'none';
-};
-
-// ====== CONFIRM COMMENT ======
-confirmComment.onclick = async () => {
-  if (!currentZoom) return;
-  const name = document.getElementById('commentName').value.trim();
-  const text = document.getElementById('commentText').value.trim();
-  if (!name || !text) return;
-
-  if (!Array.isArray(currentZoom.comments)) currentZoom.comments = [];
-
-  currentZoom.comments.push({ name, text, photo: ownerPhoto.src || '' });
-  await supabase.from('creations').update({ comments: currentZoom.comments }).eq('id', currentZoom.id);
-
+confirmComment.onclick=async()=>{
+  if(!currentZoom) return;
+  const name = commentNameInput.value.trim();
+  const text = commentTextInput.value.trim();
+  if(!name||!text) return;
+  currentZoom.comments = currentZoom.comments||[];
+  currentZoom.comments.push({name, text, photo: ownerPhoto.src||''});
+  await supabase.from('creations').update({comments:currentZoom.comments}).eq('id',currentZoom.id);
   renderCommentList();
-  document.getElementById('commentText').value = '';
+  commentTextInput.value='';
+  commentCount.textContent = currentZoom.comments.length;
 };
 
-// ====== RENDER LIKE LIST ======
-function renderLikeList() {
-  if (!currentZoom) return;
-
-  likeBubbles.innerHTML = '';
-  (currentZoom.likes || []).forEach(like => {
-    const div = document.createElement('div');
-    div.className = 'like-item';
-    div.innerHTML = `
-      ${like.photo ? `<img src="${like.photo}" style="width:20px;height:20px;border-radius:50%;margin-right:4px;vertical-align:middle;">` : ''}
-      <strong>${like.name}</strong>
-    `;
+// ====== RENDER LISTS ======
+function renderLikeList(){
+  if(!currentZoom) return;
+  likeBubbles.innerHTML='';
+  (currentZoom.likes||[]).forEach(l=>{
+    const div=document.createElement('div');
+    div.className='like-item';
+    div.innerHTML=`${l.photo?`<img src="${l.photo}" style="width:20px;height:20px;border-radius:50%;margin-right:4px;vertical-align:middle;">`:''}<strong>${l.name}</strong>`;
     likeBubbles.appendChild(div);
   });
-
-  likeCount.textContent = (currentZoom.likes || []).length;
+  likeCount.textContent = (currentZoom.likes||[]).length;
 }
 
-// ====== RENDER COMMENT LIST ======
-function renderCommentList() {
-  if (!currentZoom) return;
-  commentBubbles.innerHTML = '';
-  (currentZoom.comments || []).forEach(c => {
-    const div = document.createElement('div');
-    div.className = 'comment-item';
-    div.innerHTML = `
-      ${c.photo ? `<img src="${c.photo}" style="width:20px;height:20px;border-radius:50%;margin-right:4px;vertical-align:middle;">` : ''}
-      <strong>${c.name}</strong>: ${c.text}
-    `;
+function renderCommentList(){
+  if(!currentZoom) return;
+  commentBubbles.innerHTML='';
+  (currentZoom.comments||[]).forEach(c=>{
+    const div=document.createElement('div');
+    div.className='comment-item';
+    div.innerHTML=`${c.photo?`<img src="${c.photo}" style="width:20px;height:20px;border-radius:50%;margin-right:4px;vertical-align:middle;">`:''}<strong>${c.name}</strong>: ${c.text}`;
     commentBubbles.appendChild(div);
   });
-  commentCount.textContent = (currentZoom.comments || []).length;
-};// ====== AJOUT ======
+  commentCount.textContent = (currentZoom.comments||[]).length;
+}
+
+// ====== ADD CREATIONS ======
 document.getElementById('addBtn').onclick=()=>addModal.style.display='flex';
 addModal.addEventListener('click', e=>{if(e.target===addModal)addModal.style.display='none';});
 document.getElementById('confirmAdd').onclick=async e=>{
   e.stopPropagation();
   const name=document.getElementById('photoName').value.trim();
   const files=document.getElementById('multiPhoto').files;
-  if(!name || !files.length){alert("Mettre un nom et choisir au moins une photo");return;}
+  if(!name||!files.length){alert("Mettre un nom et choisir au moins une photo");return;}
   const paths=[],urls=[];
   for(let file of files){
     const path=`${Date.now()}_${file.name}`;
@@ -496,10 +382,9 @@ document.getElementById('confirmAdd').onclick=async e=>{
     if(uploadError){console.error(uploadError);continue;}
     const {data:pubData}=supabase.storage.from('images').getPublicUrl(path);
     if(!pubData?.publicUrl) continue;
-    urls.push(pubData.publicUrl);
-    paths.push(path);
+    urls.push(pubData.publicUrl); paths.push(path);
   }
-  if(urls.length===0)return;
+  if(urls.length===0) return;
   await supabase.from('creations').insert([{name,image_path:paths[0],images:paths,likes:[],comments:[]}]);
   addModal.style.display='none';
   document.getElementById('photoName').value='';
@@ -507,210 +392,16 @@ document.getElementById('confirmAdd').onclick=async e=>{
   await refreshCreations();
 };
 
-// ====== REFRESH CREATIONS ======
-async function refreshCreations() {
-  try {
-    const { data, error } = await supabase
-      .from('creations')
-      .select('*')
-      .order('created_at', { ascending: false });
-
-    if (error) {
-      console.error(error);
-      return;
-    }
-
-    creations = data.map(c => {
-      let zoomGroup = [];
-      if (c.images?.length) {
-        zoomGroup = c.images.map(p => {
-          const { data } = supabase.storage.from('images').getPublicUrl(p);
-          return data?.publicUrl || '';
-        });
-      } else if (c.image_path) {
-        const { data } = supabase.storage.from('images').getPublicUrl(c.image_path);
-        zoomGroup = [data?.publicUrl || ''];
-      }
-
-      return {
-        id: c.id,
-        name: c.name,
-        imgUrl: zoomGroup[0] || '',
-        zoomGroup,
-        // ✅ Likes et commentaires stables après refresh
-        likes: Array.isArray(c.likes) 
-          ? c.likes.map(like => ({ name: like.name || '', photo: like.photo || '' })) 
-          : [],
-        comments: Array.isArray(c.comments)
-          ? c.comments.map(cmt => ({ name: cmt.name || '', text: cmt.text || '', photo: cmt.photo || '' }))
-          : []
-      };
-    });
-
-    render();
-  } catch (err) {
-    console.error('Erreur refreshCreations:', err);
-  }
-}
-
-// ====== INITIAL ======
-refreshCreations();
-
-// ====== REFRESH / UTILITY POUR LIKES (optionnel) ======
-function refreshLikes() {
-  if (!currentZoom) return;
-
-  likeBubbles.innerHTML = '';
-  (currentZoom.likes || []).forEach(like => {
-    const div = document.createElement('div');
-    div.className = 'like-item';
-    div.innerHTML = `
-      ${like.photo ? `<img src="${like.photo}" style="width:20px;height:20px;border-radius:50%;margin-right:4px;vertical-align:middle;">` : ''}
-      <strong>${like.name}</strong>
-    `;
-    likeBubbles.appendChild(div);
-  });
-
-  likeCount.textContent = (currentZoom.likes || []).length;
-}
-
-    // ====== COMMENT LIST / SELECT CREATION ======
-function renderCommentList() {
-  if (!currentZoom) return;
-  commentBubbles.innerHTML = '';
-  (currentZoom.comments || []).forEach(c => {
-    const div = document.createElement('div');
-    div.className = 'comment-item';
-    div.innerHTML = `
-      ${c.photo ? `<img src="${c.photo}" style="width:20px;height:20px;border-radius:50%;margin-right:4px;vertical-align:middle;">` : ''}
-      <strong>${c.name}</strong>: ${c.text}
-    `;
-    commentBubbles.appendChild(div);
-  });
-  commentCount.textContent = (currentZoom.comments || []).length;
-};
-
-confirmComment.onclick = async () => {
-  const name = document.getElementById('commentName').value.trim();
-  const text = document.getElementById('commentText').value.trim();
-  if (!name || !text || !currentZoom) return;
-  if (!Array.isArray(currentZoom.comments)) currentZoom.comments = [];
-  currentZoom.comments.push({ name, text, photo: ownerPhoto.src || '' });
-  await supabase.from('creations').update({ comments: currentZoom.comments }).eq('id', currentZoom.id);
-  renderCommentList();
-  document.getElementById('commentText').value = '';
-};
-
-// ====== OPEN SELECT CREATION MODAL ======
-function openSelectCreation(type){
-  const list = document.getElementById('selectCreationList');
-  list.innerHTML='';
-  creations.forEach(c=>{
-    const div = document.createElement('div');
-    div.style.display='flex';
-    div.style.alignItems='center';
-    div.style.gap='8px';
-    div.style.cursor='pointer';
-    div.innerHTML=`<img src="${c.imgUrl}" style="width:50px;height:50px;border-radius:8px;"><span>${c.name}</span>`;
-    div.onclick = ()=>openCreationModal(c, type);
-    list.appendChild(div);
-  });
-  document.getElementById('selectCreationModal').style.display='flex';
-}
-
-// ====== OPEN CREATION MODAL INDIVIDUEL ======
-function openCreationModal(c, type){
-  currentZoom = creations.find(x => x.id === c.id); // ✅ Toujours l'objet frais
-
-  if(type==='like'){
-    likeModal.style.display='flex';
-    renderLikesListForCreation(currentZoom);
-  } else {
-    commentModal.style.display='flex';
-    renderCommentsListForCreation(currentZoom);
-  }
-}
-
-// ====== RENDER LIKES POUR UNE CREATION ======
-function renderLikesListForCreation(c){
-  const container = document.getElementById('likeBubbles');
-  container.innerHTML='';
-  (c.likes || []).forEach((like,i)=>{
-    const div = document.createElement('div');
-    div.textContent = like.name;
-    div.style.cursor='pointer';
-    div.onclick = async ()=>{
-      if(confirm('Supprimer ce like ?')){
-        c.likes.splice(i,1);
-        await supabase.from('creations').update({likes:c.likes}).eq('id',c.id);
-        renderLikesListForCreation(c);
-      }
-    }
-    container.appendChild(div);
-  });
-}
-
-// ====== RENDER COMMENTS POUR UNE CREATION ======
-function renderCommentsListForCreation(c){
-  const container = document.getElementById('commentBubbles');
-  container.innerHTML='';
-  (c.comments || []).forEach((com,i)=>{
-    const div = document.createElement('div');
-    div.textContent = `${com.name}: ${com.text}`;
-    div.style.cursor='pointer';
-    div.onclick = async ()=>{
-      if(confirm('Supprimer ce commentaire ?')){
-        c.comments.splice(i,1);
-        await supabase.from('creations').update({comments:c.comments}).eq('id',c.id);
-        renderCommentsListForCreation(c);
-      }
-    }
-    container.appendChild(div);
-  });
-}
-
-// ====== CLEAR ALL LIKES / COMMENTS ======
-document.getElementById('clearSelectedBtn').onclick = async ()=>{
-  if(confirm('Tout effacer pour toutes les créations affichées ?')){
-    creations.forEach(c=>{
-      if(currentZoom && likeModal.style.display==='flex') c.likes=[];
-      else if(currentZoom && commentModal.style.display==='flex') c.comments=[];
-    });
-    for(let c of creations){
-      await supabase.from('creations').update({likes:c.likes,comments:c.comments}).eq('id',c.id);
-    }
-    refreshCreations();
-    document.getElementById('selectCreationModal').style.display='none';
-  }
-};
-
-document.getElementById('clearLikesBtn').onclick = async () => {
-  if(!confirm("Supprimer tous les Likes de toutes les créations ?")) return;
-  creations.forEach(c => c.likes = []);
-  for(let c of creations) {
-    await supabase.from('creations').update({likes: c.likes}).eq('id', c.id);
-  }
-  render();
-};
-
-document.getElementById('clearCommentsBtn').onclick = async () => {
-  if(!confirm("Supprimer tous les Commentaires de toutes les créations ?")) return;
-  creations.forEach(c => c.comments = []);
-  for(let c of creations) {
-    await supabase.from('creations').update({comments: c.comments}).eq('id', c.id);
-  }
-  render();
-};
-
-// ====== DELETE MODAL INDIVIDUEL ======
-function openDeleteModal(project){currentDelete=project;deleteModal.style.display='flex';}
-document.getElementById('cancelDelete').onclick=()=>{currentDelete=null;deleteModal.style.display='none';};
+// ====== DELETE CREATION ======
+function openDeleteModal(c){currentDelete=c; deleteModal.style.display='flex';}
+document.getElementById('cancelDelete').onclick=()=>{currentDelete=null; deleteModal.style.display='none';};
 document.getElementById('confirmDelete').onclick=async()=>{
   if(!currentDelete?.id) return;
   await supabase.from('creations').delete().eq('id',currentDelete.id);
-  currentDelete=null;deleteModal.style.display='none';
+  currentDelete=null; deleteModal.style.display='none';
   await refreshCreations();
 };
+
 // ====== SIDEBAR ======
 document.getElementById('pelotesBtn').onclick=()=>{document.body.style.opacity='0';setTimeout(()=>window.location.href='pelotes.html',500);};
 document.getElementById('videoBtn').onclick=()=>{document.body.style.opacity='0';setTimeout(()=>window.location.href='video.html',500);};
@@ -718,116 +409,34 @@ document.getElementById('notesBtn').onclick=()=>{document.body.style.opacity='0'
 document.getElementById('messagerieBtn').onclick=()=>{document.body.style.opacity='0';setTimeout(()=>window.location.href='messagerie.html',500);};
 document.getElementById('toggleSidebar').onclick=()=>sidebar.classList.toggle('sidebar-open');
 
-// ====== ZOOM MODAL EVENTS ======
-document.querySelector('.closeZoom').onclick=()=>zoomModal.style.display='none';
-zoomModal.onclick=e=>{if(e.target===zoomModal)zoomModal.style.display='none';};
-likeModal.onclick=e=>{if(e.target===likeModal)likeModal.style.display='none';};
-commentModal.onclick=e=>{if(e.target===commentModal)commentModal.style.display='none';};
-deleteModal.onclick=e=>{if(e.target===deleteModal){deleteModal.style.display='none';currentDelete=null;}};
-
-// ====== COMMENT FULLSCREEN ======
-expandBtn.onclick=e=>{e.stopPropagation();commentBox.classList.toggle('fullscreen');expandBtn.textContent=commentBox.classList.contains('fullscreen')?'⤡':'⤢';};
-
-// ====== GESTION LIKES / COMMENTAIRES INDIVIDUELS ======
-const manageModal = document.getElementById('manageModal');
-const likesModal = document.getElementById('likesModal');
-const commentsModal = document.getElementById('commentsModal');
-const deleteIndivModal = document.getElementById('deleteIndivModal');
-const confirmDeleteIndiv = document.getElementById('confirmDeleteIndiv');
-const cancelDeleteIndiv = document.getElementById('cancelDeleteIndiv');
-const likesList = document.getElementById('likesList');
-const commentsList = document.getElementById('commentsList');
-
-let currentCreation = null;
-let currentItem = null;
-
-// Fermer modals au clic sur le fond
-[manageModal, likesModal, commentsModal, deleteIndivModal].forEach(m => {
-  m.onclick = e => { if(e.target === m) m.style.display = 'none'; }
+// ====== MODAL CLICS ======
+[zoomModal, likeModal, commentModal, deleteModal].forEach(m=>{
+  m.onclick=e=>{if(e.target===m)m.style.display='none';}
 });
+document.querySelector('.closeZoom').onclick=()=>zoomModal.style.display='none';
 
-// ====== AFFICHAGE INDIVIDUEL LIKES ======
-function renderCreationsForLikes() {
-  likesList.innerHTML = '';
-  creations.forEach(c => {
-    const div = document.createElement('div');
-    div.style.display = 'flex';
-    div.style.alignItems = 'center';
-    div.style.marginBottom = '6px';
-    div.style.cursor = 'pointer';
-    div.innerHTML = `<img src="${c.imgUrl}" style="width:40px;height:40px;border-radius:8px;margin-right:6px;">${c.name}`;
-    div.onclick = () => openIndividualLikes(c);
-    likesList.appendChild(div);
+// ====== REFRESH CREATIONS ======
+async function refreshCreations(){
+  const {data,error}=await supabase.from('creations').select('*').order('created_at',{ascending:false});
+  if(error){console.error(error); return;}
+  creations = data.map(c=>{
+    let zoomGroup=[];
+    if(c.images?.length) zoomGroup=c.images.map(p=>{const {data}=supabase.storage.from('images').getPublicUrl(p); return data?.publicUrl||'';});
+    else if(c.image_path){const {data}=supabase.storage.from('images').getPublicUrl(c.image_path); zoomGroup=[data?.publicUrl||''];}
+    return {
+      id:c.id,
+      name:c.name,
+      imgUrl:zoomGroup[0]||'',
+      zoomGroup,
+      likes:Array.isArray(c.likes)?c.likes.map(like=>({name:like.name||'',photo:like.photo||''})):[],
+      comments:Array.isArray(c.comments)?c.comments.map(cmt=>({name:cmt.name||'',text:cmt.text||'',photo:cmt.photo||''})):[]
+    };
   });
+  render();
 }
 
-// ====== AFFICHAGE INDIVIDUEL COMMENTS ======
-function renderCreationsForComments() {
-  commentsList.innerHTML = '';
-  creations.forEach(c => {
-    const div = document.createElement('div');
-    div.style.display = 'flex';
-    div.style.alignItems = 'center';
-    div.style.marginBottom = '6px';
-    div.style.cursor = 'pointer';
-    div.innerHTML = `<img src="${c.imgUrl}" style="width:40px;height:40px;border-radius:8px;margin-right:6px;">${c.name}`;
-    div.onclick = () => openIndividualComments(c);
-    commentsList.appendChild(div);
-  });
-}
-
-// ====== MODAL INDIVIDUEL LIKES ======
-function openIndividualLikes(c) {
-  currentCreation = creations.find(x => x.id === c.id); // ✅ objet frais
-  likesList.innerHTML = '';
-  (currentCreation.likes || []).forEach((like, index) => {
-    const div = document.createElement('div');
-    div.style.display = 'flex';
-    div.style.alignItems = 'center';
-    div.style.marginBottom = '4px';
-    div.style.cursor = 'pointer';
-    div.textContent = like.name;
-    div.onclick = () => { currentItem = index; deleteIndivModal.style.display = 'flex'; };
-    likesList.appendChild(div);
-  });
-}
-
-// ====== MODAL INDIVIDUEL COMMENTS ======
-function openIndividualComments(c) {
-  currentCreation = creations.find(x => x.id === c.id); // ✅ objet frais
-  commentsList.innerHTML = '';
-  (currentCreation.comments || []).forEach((com, index) => {
-    const div = document.createElement('div');
-    div.style.display = 'flex';
-    div.style.alignItems = 'center';
-    div.style.marginBottom = '4px';
-    div.style.cursor = 'pointer';
-    div.textContent = com.name + ": " + com.text;
-    div.onclick = () => { currentItem = index; deleteIndivModal.style.display = 'flex'; };
-    commentsList.appendChild(div);
-  });
-}
-
-// ====== CONFIRM DELETE INDIVIDUEL ======
-confirmDeleteIndiv.onclick = async () => {
-  if(!currentCreation || currentItem===null) return;
-  if(likeModal.style.display==='flex'){
-    currentCreation.likes.splice(currentItem,1);
-    await supabase.from('creations').update({likes: currentCreation.likes}).eq('id',currentCreation.id);
-    openIndividualLikes(currentCreation);
-  } else if(commentModal.style.display==='flex'){
-    currentCreation.comments.splice(currentItem,1);
-    await supabase.from('creations').update({comments: currentCreation.comments}).eq('id',currentCreation.id);
-    openIndividualComments(currentCreation);
-  }
-  deleteIndivModal.style.display='none';
-};
-
-cancelDeleteIndiv.onclick = () => { deleteIndivModal.style.display='none'; currentItem=null; };
-
-// ====== BOUTONS CHOIX INDIVIDUEL ======
-document.getElementById('chooseLikeBtn').onclick = () => renderCreationsForLikes();
-document.getElementById('chooseCommentBtn').onclick = () => renderCreationsForComments();
+// ====== INITIAL ======
+refreshCreations();
 </script>
 
 
