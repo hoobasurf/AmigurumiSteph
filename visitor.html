@@ -179,73 +179,7 @@ async function refreshCreations() {
   render();
 }
 
-document.addEventListener('DOMContentLoaded', function render() {
-  container.innerHTML = '';
-  let page = null;
-
-  creations.forEach((c, i) => {
-    if (i % 6 === 0) {
-      page = document.createElement('div');
-      page.className = 'page';
-      container.appendChild(page);
-    }
-
-    const d = document.createElement('div');
-    d.className = 'visitor-item';
-    d.innerHTML = `
-      <div class="placeholder">?</div>
-      <p>${c.name}</p>
-      <img src="${c.imgUrl || 'placeholder.png'}">
-    `;
-
-    const img = d.querySelector('img');
-    img.onload = () => d.querySelector('.placeholder').style.display = 'none';
-    img.onerror = () => {
-      img.src = 'placeholder.png';
-      d.querySelector('.placeholder').textContent = '';
-    };
-
-    img.onclick = () => openZoom(c);
-
-    page.appendChild(d);
-  });
-}
-
-async function refreshCreations() {
-  const { data, error } = await supabase
-    .from('creations')
-    .select('*')
-    .order('created_at', { ascending: false });
-
-  if (error) return console.error(error);
-
-  creations = data.map(c => {
-    let zoomGroup = [];
-
-    // Plusieurs images
-    if (c.images?.length) {
-      zoomGroup = c.images.map(p => supabase.storage.from('images').getPublicUrl(p).data?.publicUrl || '');
-    }
-    // Une seule image
-    else if (c.image_path) {
-      zoomGroup = [supabase.storage.from('images').getPublicUrl(c.image_path).data?.publicUrl || ''];
-    }
-
-    return {
-      id: c.id,
-      name: c.name,
-      imgUrl: zoomGroup[0] || 'placeholder.png',
-      zoomGroup,
-      likes: Array.isArray(c.likes) ? c.likes : [],
-      comments: Array.isArray(c.comments) ? c.comments : []
-    };
-  });
-
-  render();
-}
-
 document.addEventListener('DOMContentLoaded', refreshCreations);
-
 
 // ===== MESSAGERIE =====
 const chatModal = document.getElementById('chatModal');
