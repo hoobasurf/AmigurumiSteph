@@ -305,13 +305,18 @@ function openZoom(c){
   zoomModal.style.display = 'flex';
 }
 function updateActions(){
-  likeCount.textContent = Array.isArray(currentZoom.likes)
-    ? currentZoom.likes.length
-    : 0;
+  if (!currentZoom) return;
 
-  commentCount.textContent = Array.isArray(currentZoom.comments)
-    ? currentZoom.comments.length
-    : 0;
+  if (!Array.isArray(currentZoom.likes)) {
+    currentZoom.likes = [];
+  }
+
+  if (!Array.isArray(currentZoom.comments)) {
+    currentZoom.comments = [];
+  }
+
+  likeCount.textContent = currentZoom.likes.length;
+  commentCount.textContent = currentZoom.comments.length;
 }
 
 
