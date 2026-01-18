@@ -428,11 +428,126 @@ async function loadOwnerPhoto(){
 document.addEventListener('DOMContentLoaded', loadOwnerPhoto);
 window.addEventListener('pageshow', loadOwnerPhoto);
 
+// ====== MESSAGERIE : UTILISATEUR ACTIF ======
+let currentChatUser = null; // utilisateur avec qui on discute
+
+function selectUser(prenomUser) {
+  currentChatUser = prenomUser;
+  loadMessages(prenomUser);
+}
+
+    // ====== MESSAGERIE : CHARGER MESSAGES (texte + image) ======
+async function loadMessages(receiver) {
+  if(!receiver) return;
+
+  const { data, error } = await supabase
+    .from('messages')
+    .select('*')
+    .or(`and(sender.eq.${prenom},receiver.eq.${receiver}),and(sender.eq.${receiver},receiver.eq.${prenom})`)
+    .order('created_at', { ascending: true });
+
+  if(error){ console.error(error); return; }
+
+  renderChat(data);
+}
+
+    // ====== MESSAGERIE : AFFICHAGE ======
+function renderChat(messages) {
+  const chatMessages = document.getElementById('chatMessages');
+  chatMessages.innerHTML = '';
+  messages.forEach(m => {
+    const div = document.createElement('div');
+    div.className = m.sender === prenom ? 'msg msg-me' : 'msg msg-them';
+    div.innerHTML = `<p>${m.content || ''}</p>`;
+    if(m.images){
+      const img = document.createElement('img');
+      img.src = m.images;
+      img.style.maxWidth = '150px';
+      img.style.display = 'block';
+      img.style.marginTop = '4px';
+      div.appendChild(img);
+    }
+    chatMessages.appendChild(div);
+  });
+  chatMessages.scrollTop = chatMessages.scrollHeight;
+}
+
+    
 // ====== VARIABLES ======
 let creations=[];
 let currentZoom=null;
 let currentDelete=null;
 
+// ====== MESSAGERIE : VARIABLES ======
+const chatUserList = document.getElementById('chatUserList');
+const chatMessages = document.getElementById('chatMessages');
+const chatInput = document.getElementById('chatInput');
+const sendMsgBtn = document.getElementById('sendMsgBtn');
+
+const myPrenom = localStorage.getItem('prenom');
+let currentChatUser = null;
+
+  // ====== MESSAGERIE : CHARGER MESSAGES ======
+async function loadMessages() {
+  if (!currentChatUser) return;
+
+  const { data, error } = await supabase
+    .from('messages')
+    .select('*')
+    .or(
+      `and(sender.eq.${myPrenom},receiver.eq.${currentChatUser}),
+       and(sender.eq.${currentChatUser},receiver.eq.${myPrenom})`
+    )
+    .order('created_at', { ascending: true });
+
+  if (error) {
+    console.error(error);
+    return;
+  }
+
+  chatMessages.innerHTML = '';
+
+  data.forEach(msg => {
+    const div = document.createElement('div');
+    div.className = 'msg ' + (msg.sender === myPrenom ? 'msg-me' : 'msg-them');
+    div.textContent = msg.content;
+    chatMessages.appendChild(div);
+  });
+
+  chatMessages.scrollTop = chatMessages.scrollHeight;
+}
+
+    // ====== MESSAGERIE : ENVOI ======
+sendMsgBtn.onclick = async () => {
+  const text = chatInput.value.trim();
+  if (!text || !currentChatUser) return;
+
+  await supabase.from('messages').insert({
+    sender: myPrenom,
+    receiver: currentChatUser,
+    content: text
+  });
+
+  chatInput.value = '';
+  loadMessages();
+};
+
+  // ====== MESSAGERIE : TEMPS RÉEL ======
+supabase
+  .channel('public:messages')
+  .on('postgres_changes', { event: '*', schema: 'public', table: 'messages' }, payload => {
+    if(!currentChatUser) return;
+    if(
+      payload.new.sender === currentChatUser ||
+      payload.new.receiver === currentChatUser ||
+      payload.new.sender === prenom
+    ){
+      loadMessages(currentChatUser);
+    }
+  })
+  .subscribe();
+
+    
 const container=document.getElementById('visitor-list-container');
 const addModal=document.getElementById('addModal');
 const deleteModal=document.getElementById('deleteModal');
@@ -739,6 +854,7 @@ toggleChatSize.onclick = () => {
 };
 // ====== INITIAL ======
 refreshCreations();
+loadChatUsers();
 </script>
 
 
