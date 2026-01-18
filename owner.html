@@ -415,24 +415,68 @@ document.getElementById('toggleSidebar').onclick=()=>sidebar.classList.toggle('s
 });
 document.querySelector('.closeZoom').onclick=()=>zoomModal.style.display='none';
 
-// ====== REFRESH CREATIONS ======
-async function refreshCreations(){
-  const {data,error}=await supabase.from('creations').select('*').order('created_at',{ascending:false});
-  if(error){console.error(error); return;}
-  creations = data.map(c=>{
-    let zoomGroup=[];
-    if(c.images?.length) zoomGroup=c.images.map(p=>{const {data}=supabase.storage.from('images').getPublicUrl(p); return data?.publicUrl||'';});
-    else if(c.image_path){const {data}=supabase.storage.from('images').getPublicUrl(c.image_path); zoomGroup=[data?.publicUrl||''];}
-    return {
-      id:c.id,
-      name:c.name,
-      imgUrl:zoomGroup[0]||'',
-      zoomGroup,
-      likes:Array.isArray(c.likes)?c.likes.map(like=>({name:like.name||'',photo:like.photo||''})):[],
-      comments:Array.isArray(c.comments)?c.comments.map(cmt=>({name:cmt.name||'',text:cmt.text||'',photo:cmt.photo||''})):[]
-    };
-  });
-  render();
+// ====== REFRESH CREATIONS CORRIGÉ ======
+async function refreshCreations() {
+  try {
+    const { data, error } = await supabase
+      .from('creations')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      console.error('Erreur Supabase refreshCreations:', error);
+      return;
+    }
+
+    creations = data.map(c => {
+      // Générer les URLs des images
+      let zoomGroup = [];
+      if (c.images?.length) {
+        zoomGroup = c.images.map(p => {
+          const { data } = supabase.storage.from('images').getPublicUrl(p);
+          return data?.publicUrl || '';
+        });
+      } else if (c.image_path) {
+        const { data } = supabase.storage.from('images').getPublicUrl(c.image_path);
+        zoomGroup = [data?.publicUrl || ''];
+      }
+
+      // ✅ Likes : parser si string, sinon garder array
+      let likes = [];
+      if (c.likes) {
+        if (typeof c.likes === 'string') {
+          try { likes = JSON.parse(c.likes); } 
+          catch(e){ console.warn('Erreur parsing likes', e); likes = []; }
+        } else if (Array.isArray(c.likes)) {
+          likes = c.likes;
+        }
+      }
+
+      // ✅ Comments : pareil, parser si string
+      let comments = [];
+      if (c.comments) {
+        if (typeof c.comments === 'string') {
+          try { comments = JSON.parse(c.comments); } 
+          catch(e){ console.warn('Erreur parsing comments', e); comments = []; }
+        } else if (Array.isArray(c.comments)) {
+          comments = c.comments;
+        }
+      }
+
+      return {
+        id: c.id,
+        name: c.name,
+        imgUrl: zoomGroup[0] || '',
+        zoomGroup,
+        likes: likes.map(l => ({ name: l.name || '', photo: l.photo || '' })),
+        comments: comments.map(cm => ({ name: cm.name || '', text: cm.text || '', photo: cm.photo || '' }))
+      };
+    });
+
+    render();
+  } catch (err) {
+    console.error('Erreur refreshCreations:', err);
+  }
 }
 
 // ====== INITIAL ======
