@@ -111,6 +111,24 @@ body::before{
   </div>
 </div>
 
+<!-- LIKE MODAL -->
+<div id="likeModal" class="modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);justify-content:center;align-items:center;z-index:20001;">
+  <div class="modal-box" style="background:#ffe6f0;padding:16px;border-radius:20px;border:2px solid #b67385;max-height:60vh;overflow-y:auto;">
+    <h3>Like ❤️</h3>
+    <div style="display:flex;flex-direction:column;gap:6px;" id="likeBubbles"></div>
+    <button id="closeLikeModal">Fermer</button>
+  </div>
+</div>
+
+<!-- COMMENT MODAL -->
+<div id="commentModal" class="modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);justify-content:center;align-items:center;z-index:20001;">
+  <div class="modal-box" style="background:#ffe6f0;padding:16px;border-radius:20px;border:2px solid #b67385;max-height:60vh;overflow-y:auto;">
+    <h3>Commentaires 💬</h3>
+    <div style="display:flex;flex-direction:column;gap:6px;" id="commentBubbles"></div>
+    <button id="closeCommentModal">Fermer</button>
+  </div>
+</div>
+  
 <script type="module">
 import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
 const supabase = createClient("https://jyhbamdcxmpveujjqjla.supabase.co","sb_publishable_sqsxb-3Kl5o3-JQYv9kGFw_-g0EgwMa");
@@ -165,6 +183,52 @@ function openZoom(c){
 
 document.querySelector('.closeZoom').onclick=()=>{zoomModal.style.display='none';};
 
+
+const likeModal = document.getElementById('likeModal');
+const commentModal = document.getElementById('commentModal');
+const likeBubbles = document.getElementById('likeBubbles');
+const commentBubbles = document.getElementById('commentBubbles');
+const likeBtn = document.getElementById('likeBtn');
+const commentBtn = document.getElementById('commentBtn');
+const closeLikeModal = document.getElementById('closeLikeModal');
+const closeCommentModal = document.getElementById('closeCommentModal');
+
+// Ouvrir modal Like
+likeBtn.onclick = () => {
+  if(!currentZoom) return;
+  likeBubbles.innerHTML = '';
+  (currentZoom.likes||[]).forEach(l=>{
+    const div = document.createElement('div');
+    div.style.display='flex'; div.style.alignItems='center'; div.style.gap='6px';
+    div.innerHTML = `${l.photo ? `<img src="${l.photo}" style="width:20px;height:20px;border-radius:50%;">` : ''} <strong>${l.name}</strong>`;
+    likeBubbles.appendChild(div);
+  });
+  likeModal.style.display='flex';
+};
+
+// Ouvrir modal Comment
+commentBtn.onclick = () => {
+  if(!currentZoom) return;
+  commentBubbles.innerHTML = '';
+  (currentZoom.comments||[]).forEach(c=>{
+    const div = document.createElement('div');
+    div.style.display='flex'; div.style.alignItems='center'; div.style.gap='6px';
+    div.innerHTML = `${c.photo ? `<img src="${c.photo}" style="width:20px;height:20px;border-radius:50%;">` : ''} <strong>${c.name}</strong>: ${c.text}`;
+    commentBubbles.appendChild(div);
+  });
+  commentModal.style.display='flex';
+};
+
+// Fermer modals
+closeLikeModal.onclick = () => likeModal.style.display='none';
+closeCommentModal.onclick = () => commentModal.style.display='none';
+
+// Fermer zoom si clic hors image
+zoomModal.addEventListener('click', e => {
+  if(e.target === zoomModal) zoomModal.style.display='none';
+});
+
+  
 async function refreshCreations() {
   const { data, error } = await supabase.from('creations').select('*').order('created_at',{ascending:false});
   if(error) return console.error(error);
