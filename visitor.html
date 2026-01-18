@@ -116,7 +116,6 @@ body::before{
   <div class="modal-box" style="background:#ffe6f0;padding:16px;border-radius:20px;border:2px solid #b67385;max-height:60vh;overflow-y:auto;">
     <h3>Like ❤️</h3>
     <div style="display:flex;flex-direction:column;gap:6px;" id="likeBubbles"></div>
-    <button id="closeLikeModal">Fermer</button>
   </div>
 </div>
 
@@ -124,8 +123,9 @@ body::before{
 <div id="commentModal" class="modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);justify-content:center;align-items:center;z-index:20001;">
   <div class="modal-box" style="background:#ffe6f0;padding:16px;border-radius:20px;border:2px solid #b67385;max-height:60vh;overflow-y:auto;">
     <h3>Commentaires 💬</h3>
-    <div style="display:flex;flex-direction:column;gap:6px;" id="commentBubbles"></div>
-    <button id="closeCommentModal">Fermer</button>
+    <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:8px;" id="commentBubbles"></div>
+    <input type="text" id="commentInput" placeholder="Votre commentaire" style="padding:4px 8px;border:2px solid #b67385;border-radius:8px;">
+    <button id="commentSubmit" style="padding:6px 12px;border:none;background:#ffb6c1;color:#fff;border-radius:8px;cursor:pointer;margin-top:6px;">Valider</button>
   </div>
 </div>
   
@@ -190,42 +190,67 @@ const likeBubbles = document.getElementById('likeBubbles');
 const commentBubbles = document.getElementById('commentBubbles');
 const likeBtn = document.getElementById('likeBtn');
 const commentBtn = document.getElementById('commentBtn');
-const closeLikeModal = document.getElementById('closeLikeModal');
-const closeCommentModal = document.getElementById('closeCommentModal');
+const commentInput = document.getElementById('commentInput');
+const commentSubmit = document.getElementById('commentSubmit');
 
 // Ouvrir modal Like
 likeBtn.onclick = () => {
-  if(!currentZoom) return;
+  if (!currentZoom) return;
   likeBubbles.innerHTML = '';
-  (currentZoom.likes||[]).forEach(l=>{
+  (currentZoom.likes || []).forEach(l => {
     const div = document.createElement('div');
-    div.style.display='flex'; div.style.alignItems='center'; div.style.gap='6px';
+    div.style.display = 'flex';
+    div.style.alignItems = 'center';
+    div.style.gap = '6px';
     div.innerHTML = `${l.photo ? `<img src="${l.photo}" style="width:20px;height:20px;border-radius:50%;">` : ''} <strong>${l.name}</strong>`;
     likeBubbles.appendChild(div);
   });
-  likeModal.style.display='flex';
+  likeModal.style.display = 'flex';
 };
 
 // Ouvrir modal Comment
 commentBtn.onclick = () => {
-  if(!currentZoom) return;
+  if (!currentZoom) return;
+  renderCommentList();
+  commentInput.value = '';
+  commentModal.style.display = 'flex';
+};
+
+// Ajouter un commentaire
+commentSubmit.onclick = async () => {
+  if (!currentZoom) return;
+  const text = commentInput.value.trim();
+  if (!text) return;
+
+  const name = localStorage.getItem('prenom') || 'Visitor';
+  currentZoom.comments = currentZoom.comments || [];
+  currentZoom.comments.push({ name, text, photo: ownerPhoto.src || '' });
+
+  await supabase.from('creations').update({ comments: currentZoom.comments }).eq('id', currentZoom.id);
+
+  renderCommentList();
+  commentInput.value = '';
+  commentCount.textContent = currentZoom.comments.length;
+};
+
+// Fonction pour afficher la liste des commentaires
+function renderCommentList() {
   commentBubbles.innerHTML = '';
-  (currentZoom.comments||[]).forEach(c=>{
+  (currentZoom.comments || []).forEach(c => {
     const div = document.createElement('div');
-    div.style.display='flex'; div.style.alignItems='center'; div.style.gap='6px';
+    div.style.display = 'flex';
+    div.style.alignItems = 'center';
+    div.style.gap = '6px';
     div.innerHTML = `${c.photo ? `<img src="${c.photo}" style="width:20px;height:20px;border-radius:50%;">` : ''} <strong>${c.name}</strong>: ${c.text}`;
     commentBubbles.appendChild(div);
   });
-  commentModal.style.display='flex';
-};
+}
 
-// Fermer modals
-closeLikeModal.onclick = () => likeModal.style.display='none';
-closeCommentModal.onclick = () => commentModal.style.display='none';
-
-// Fermer zoom si clic hors image
-zoomModal.addEventListener('click', e => {
-  if(e.target === zoomModal) zoomModal.style.display='none';
+// Fermer modals si clic en dehors
+[likeModal, commentModal, zoomModal].forEach(modal => {
+  modal.addEventListener('click', e => {
+    if (e.target === modal) modal.style.display = 'none';
+  });
 });
 
   
