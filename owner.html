@@ -428,27 +428,9 @@ async function loadOwnerPhoto(){
 document.addEventListener('DOMContentLoaded', loadOwnerPhoto);
 window.addEventListener('pageshow', loadOwnerPhoto);
 
-// ====== MESSAGERIE : UTILISATEUR ACTIF ======
-let currentChatUser = null; // utilisateur avec qui on discute
-
 function selectUser(prenomUser) {
   currentChatUser = prenomUser;
   loadMessages(prenomUser);
-}
-
-    // ====== MESSAGERIE : CHARGER MESSAGES (texte + image) ======
-async function loadMessages(receiver) {
-  if(!receiver) return;
-
-  const { data, error } = await supabase
-    .from('messages')
-    .select('*')
-    .or(`and(sender.eq.${prenom},receiver.eq.${receiver}),and(sender.eq.${receiver},receiver.eq.${prenom})`)
-    .order('created_at', { ascending: true });
-
-  if(error){ console.error(error); return; }
-
-  renderChat(data);
 }
 
     // ====== MESSAGERIE : AFFICHAGE ======
@@ -852,6 +834,36 @@ toggleChatSize.onclick = () => {
     ? '<path d="M9 4H4v5M15 20h5v-5M20 9V4h-5M4 15v5h5"/>'
     : '<path d="M4 9V4h5M20 15v5h-5M15 4h5v5M9 20H4v-5"/>';
 };
+
+async function loadChatUsers() {
+  try {
+    const { data: users, error } = await supabase
+      .from('profiles')
+      .select('prenom')
+      .neq('prenom', myPrenom);
+
+    if (error) throw error;
+
+    chatUserList.innerHTML = '';
+    users.forEach(u => {
+      const div = document.createElement('div');
+      div.className = 'chat-user';
+      div.textContent = u.prenom;
+      div.onclick = () => {
+        // sélectionner l’utilisateur
+        currentChatUser = u.prenom;
+        loadMessages();
+        // mettre en surbrillance
+        document.querySelectorAll('.chat-user').forEach(el => el.classList.remove('active'));
+        div.classList.add('active');
+      };
+      chatUserList.appendChild(div);
+    });
+  } catch (err) {
+    console.error('Erreur loadChatUsers:', err);
+  }
+}
+    
 // ====== INITIAL ======
 refreshCreations();
 loadChatUsers();
