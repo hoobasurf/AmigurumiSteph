@@ -63,6 +63,17 @@ body::before{
   font-size: 14px;
 }
 
+  /* Bouton toujours visible */
+.chat-icon-btn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+}
+
+
 .chat-overlay {
   position: fixed;
   inset: 0;
@@ -74,26 +85,17 @@ body::before{
 }
 
 .chat-window {
-  width: 720px;
-  height: 460px;
-  background: #ffe6f0;
-  border-radius: 24px;
-  border: 3px solid #b67385;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+  position: relative;
+  max-width: 96vw;
+  max-height: 92vh;
 }
 
+
+/* Header toujours au-dessus */
 .chat-header {
-  height: 48px;
-  background: linear-gradient(#ffd6e6, #ffb6c1);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 12px;
-  font-weight: bold;
-  color: #b84c6f;
+  position: sticky;
+  top: 0;
+  z-index: 10;
 }
 
 .chat-body {
@@ -162,28 +164,36 @@ body::before{
   padding: 6px 10px;
 }
 
-  .fullscreen .chat-window {
+  /* Mode plein écran */
+.fullscreen .chat-window {
   width: 100vw;
   height: 100vh;
+  max-width: none;
+  max-height: none;
   border-radius: 0;
-  font-family: Tahoma, Arial, sans-serif;
 }
 
+/* PLEIN ÉCRAN RÉTRO PASTEL (MSN revisité) */
 .fullscreen .chat-header {
-  background: linear-gradient(#cce0ff, #7aa2ff);
-  color: #003399;
+  background: linear-gradient(#ffe6f0, #ffccd9);
+  color: #b84c6f;
 }
 
 .fullscreen .chat-sidebar {
-  background: #e6ecff;
+  background: #fff5fa;
+}
+
+.fullscreen .chat-messages {
+  background: #fffafa;
 }
 
 .fullscreen .msg-me {
-  background: #cce0ff;
+  background: #ffb6c1;
 }
+
 .fullscreen .msg-them {
   background: #ffffff;
-  border: 1px solid #a0a0a0;
+  border: 1px solid #f3b3c8;
 }
   
 </style>
@@ -346,31 +356,21 @@ body::before{
   <div class="chat-window modal-mode">
 
     <!-- HEADER -->
-    <div class="chat-header">
-      <span class="chat-title">Messagerie</span>
+   <div class="chat-header">
+  <span class="chat-title">Messagerie</span>
 
-      <!-- Bouton agrandir / réduire -->
-      <div id="toggleChatSize" class="chat-icon-btn" title="Agrandir">
-        <!-- SVG -->
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#b84c6f" stroke-width="2">
-          <path d="M4 9V4h5M20 15v5h-5M15 4h5v5M9 20H4v-5"/>
-        </svg>
-      </div>
-    </div>
-
-    <div class="chat-body">
+  <button id="toggleChatSize" class="chat-icon-btn" aria-label="Agrandir / Réduire">
+    <!-- SVG Agrandir / Réduire -->
+    <svg id="chatResizeIcon" width="22" height="22" viewBox="0 0 24 24"
+      fill="none" stroke="#b84c6f" stroke-width="2" stroke-linecap="round">
+      <path d="M4 9V4h5M20 15v5h-5M15 4h5v5M9 20H4v-5"/>
+    </svg>
+  </button>
+</div>
 
       <!-- LISTE DES CONTACTS -->
-      <div class="chat-sidebar">
-        <div class="chat-user active">
-          <img src="https://i.pravatar.cc/40?img=1">
-          <span>Alice</span>
-        </div>
-        <div class="chat-user">
-          <img src="https://i.pravatar.cc/40?img=2">
-          <span>Bob</span>
-        </div>
-      </div>
+      <div class="chat-sidebar" id="chatUserList"></div>
+        
 
       <!-- CONVERSATION -->
       <div class="chat-content">
@@ -674,6 +674,48 @@ chatModal.addEventListener('click', e => {
 
 toggleChatSize.onclick = () => {
   chatModal.classList.toggle('fullscreen');
+};
+
+let initialDistance = null;
+
+chatModal.addEventListener('touchstart', e => {
+  if (e.touches.length === 2) {
+    initialDistance = Math.hypot(
+      e.touches[0].clientX - e.touches[1].clientX,
+      e.touches[0].clientY - e.touches[1].clientY
+    );
+  }
+});
+
+chatModal.addEventListener('touchmove', e => {
+  if (e.touches.length === 2 && initialDistance) {
+    const currentDistance = Math.hypot(
+      e.touches[0].clientX - e.touches[1].clientX,
+      e.touches[0].clientY - e.touches[1].clientY
+    );
+
+    if (currentDistance - initialDistance > 40) {
+      chatModal.classList.add('fullscreen');
+    }
+
+    if (initialDistance - currentDistance > 40) {
+      chatModal.classList.remove('fullscreen');
+    }
+  }
+});
+
+chatModal.addEventListener('touchend', () => {
+  initialDistance = null;
+});
+    // ====== MESSAGERIE : AGRANDIR / RÉDUIRE ======
+const icon = document.getElementById('chatResizeIcon');
+
+toggleChatSize.onclick = () => {
+  chatModal.classList.toggle('fullscreen');
+
+  icon.innerHTML = chatModal.classList.contains('fullscreen')
+    ? '<path d="M9 4H4v5M15 20h5v-5M20 9V4h-5M4 15v5h5"/>'
+    : '<path d="M4 9V4h5M20 15v5h-5M15 4h5v5M9 20H4v-5"/>';
 };
 // ====== INITIAL ======
 refreshCreations();
