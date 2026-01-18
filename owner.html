@@ -282,10 +282,16 @@ function render(){
   });
 }
 
-// ====== ZOOM ======
 function openZoom(c){
-  // 🔑 toujours reprendre l'objet à jour depuis creations
   currentZoom = creations.find(x => x.id === c.id);
+
+  if (!Array.isArray(currentZoom.likes)) {
+    currentZoom.likes = [];
+  }
+
+  if (!Array.isArray(currentZoom.comments)) {
+    currentZoom.comments = [];
+  }
 
   mainZoom.src = currentZoom.imgUrl;
   thumbs.innerHTML = '';
@@ -344,6 +350,11 @@ document.getElementById('likeBtn').onclick = () => {
     alert("Sélectionnez d'abord une image !");
     return;
   }
+
+  if (!Array.isArray(currentZoom.likes)) {
+    currentZoom.likes = [];
+  }
+
   likeNameInput.value = localStorage.getItem('prenom') || '';
   renderLikeList();
   likeModal.style.display = 'flex';
@@ -359,7 +370,7 @@ confirmLike.onclick = async () => {
     currentZoom.likes = [];
   }
 
-  // Bloque double like
+  // Empêche double like
   if (currentZoom.likes.some(l => l.name === name)) {
     likeModal.style.display = 'none';
     return;
@@ -371,14 +382,11 @@ confirmLike.onclick = async () => {
     photo: ownerPhoto.src || ''
   });
 
-  // Sauvegarde Supabase
+  // Sauvegarde Supabase (comme commentaires)
   await supabase
     .from('creations')
     .update({ likes: currentZoom.likes })
     .eq('id', currentZoom.id);
-
-  // ✅ NE PAS refresh ici
-  // Les commentaires fonctionnent pareil
 
   // Mise à jour UI immédiate
   likeCount.textContent = currentZoom.likes.length;
@@ -417,8 +425,13 @@ confirmComment.onclick = async () => {
 // ====== RENDER LIKE LIST ======
 function renderLikeList() {
   if (!currentZoom) return;
+
+  if (!Array.isArray(currentZoom.likes)) {
+    currentZoom.likes = [];
+  }
+
   likeBubbles.innerHTML = '';
-  (currentZoom.likes || []).forEach(like => {
+  currentZoom.likes.forEach(like => {
     const div = document.createElement('div');
     div.className = 'like-item';
     div.innerHTML = `
@@ -427,7 +440,8 @@ function renderLikeList() {
     `;
     likeBubbles.appendChild(div);
   });
-  likeCount.textContent = (currentZoom.likes || []).length;
+
+  likeCount.textContent = currentZoom.likes.length;
 }
 
 // ====== RENDER COMMENT LIST ======
