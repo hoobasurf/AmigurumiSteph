@@ -415,7 +415,7 @@ document.getElementById('toggleSidebar').onclick=()=>sidebar.classList.toggle('s
 });
 document.querySelector('.closeZoom').onclick=()=>zoomModal.style.display='none';
 
-// ====== REFRESH CREATIONS CORRIGÉ ======
+// ====== REFRESH CREATIONS (version tolérante pour likes) ======
 async function refreshCreations() {
   try {
     const { data, error } = await supabase
@@ -424,12 +424,11 @@ async function refreshCreations() {
       .order('created_at', { ascending: false });
 
     if (error) {
-      console.error('Erreur Supabase refreshCreations:', error);
+      console.error(error);
       return;
     }
 
     creations = data.map(c => {
-      // Générer les URLs des images
       let zoomGroup = [];
       if (c.images?.length) {
         zoomGroup = c.images.map(p => {
@@ -441,25 +440,28 @@ async function refreshCreations() {
         zoomGroup = [data?.publicUrl || ''];
       }
 
-      // ✅ Likes : parser si string, sinon garder array
-      let likes = [];
-      if (c.likes) {
-        if (typeof c.likes === 'string') {
-          try { likes = JSON.parse(c.likes); } 
-          catch(e){ console.warn('Erreur parsing likes', e); likes = []; }
-        } else if (Array.isArray(c.likes)) {
-          likes = c.likes;
+      // ✅ Likes et commentaires sécurisés
+      let likesArray = [];
+      if (Array.isArray(c.likes)) {
+        likesArray = c.likes;
+      } else if (typeof c.likes === 'string') {
+        try {
+          likesArray = JSON.parse(c.likes);
+          if (!Array.isArray(likesArray)) likesArray = [];
+        } catch (e) {
+          likesArray = [];
         }
       }
 
-      // ✅ Comments : pareil, parser si string
-      let comments = [];
-      if (c.comments) {
-        if (typeof c.comments === 'string') {
-          try { comments = JSON.parse(c.comments); } 
-          catch(e){ console.warn('Erreur parsing comments', e); comments = []; }
-        } else if (Array.isArray(c.comments)) {
-          comments = c.comments;
+      let commentsArray = [];
+      if (Array.isArray(c.comments)) {
+        commentsArray = c.comments;
+      } else if (typeof c.comments === 'string') {
+        try {
+          commentsArray = JSON.parse(c.comments);
+          if (!Array.isArray(commentsArray)) commentsArray = [];
+        } catch (e) {
+          commentsArray = [];
         }
       }
 
@@ -468,8 +470,15 @@ async function refreshCreations() {
         name: c.name,
         imgUrl: zoomGroup[0] || '',
         zoomGroup,
-        likes: likes.map(l => ({ name: l.name || '', photo: l.photo || '' })),
-        comments: comments.map(cm => ({ name: cm.name || '', text: cm.text || '', photo: cm.photo || '' }))
+        likes: likesArray.map(like => ({
+          name: like.name || '',
+          photo: like.photo || ''
+        })),
+        comments: commentsArray.map(cmt => ({
+          name: cmt.name || '',
+          text: cmt.text || '',
+          photo: cmt.photo || ''
+        }))
       };
     });
 
