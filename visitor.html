@@ -410,31 +410,29 @@ const commentNameInput=document.getElementById('commentName');
 const commentTextInput=document.getElementById('commentText');
 
 // ====== RENDER ======
-function render(){
+functionfunction render(){
   container.innerHTML='';
-  let page = null;
-
+  let page=null;
   creations.forEach((c,i)=>{
-    if(i % 6 === 0){
-      page = document.createElement('div');
-      page.className = 'page';
+    if(i%6===0){
+      page=document.createElement('div');
+      page.className='page';
       container.appendChild(page);
     }
+    const d=document.createElement('div');
+    d.className='visitor-item';
 
-    const d = document.createElement('div');
-    d.className = 'visitor-item';
-
-    // Carte sans la croix
+    // SUPPRIME LA CROIX
     d.innerHTML = `
       <div class="placeholder">?</div>
       <p>${c.name}</p>
       <img src="${c.imgUrl||''}">
     `;
 
-    const img = d.querySelector('img');
-    img.onload = () => d.querySelector('.placeholder').style.display = 'none';
-    img.onerror = () => { img.remove(); d.querySelector('.placeholder').textContent = ''; };
-    img.onclick = () => openZoom(c); // clic pour ouvrir le zoom
+    const img=d.querySelector('img');
+    img.onload = ()=>d.querySelector('.placeholder').style.display='none';
+    img.onerror = ()=>{ img.remove(); d.querySelector('.placeholder').textContent=''; };
+    img.onclick = ()=>openZoom(c);
 
     page.appendChild(d);
   });
