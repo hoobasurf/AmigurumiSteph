@@ -6,27 +6,12 @@
 <title>Visitor</title>
 <style>
 * { box-sizing:border-box;margin:0;padding:0;font-family:'Comic Sans MS',cursive; }
-html, body { height:100%; overflow-x:hidden; background:#fff0f5; color:#b84c6f; }
-
+html,body{height:100%;overflow-x:hidden;}
 body::before{
   content:"";position:fixed;top:0;left:0;width:100vw;height:100vh;
-  background-image:url('Photoroom_20260107_185314.png'); /* <-- met ton fichier exact */
-  background-size:cover;
-  background-position:center center;
-  background-repeat:no-repeat;
-  z-index:-1;
+  background-image:url('Photoroom_20251223_114401.jpeg'); /* fond comme owner */
+  background-size:cover;background-position:center center;background-repeat:no-repeat;z-index:-1;
 }
-
-#ownerPhoto{
-  width:32px;height:32px;border-radius:50%;position:fixed;top:10px;right:10px;
-  z-index:10000;background:#ffe6f0;border:2px solid #b84c6f;
-}
-
-#messagerieBtn{
-  position:fixed;top:10px;right:50px;z-index:10001;
-  background:transparent;border:none;cursor:pointer;
-}
-
 .center-zone{display:flex;justify-content:center;align-items:flex-start;padding-top:3.5cm;overflow:hidden;height:auto;}
 #visitor-list-container{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;-webkit-overflow-scrolling: touch;justify-content:center;padding-left:1cm;}
 .page{display:grid;grid-template-columns:repeat(2,1fr);grid-template-rows:repeat(3,1fr);column-gap:3mm;row-gap:4mm;flex:0 0 auto;width:calc(2*200px+3mm);height:calc(3*200px+8mm);scroll-snap-align:center;padding:4mm;justify-content:center;margin-top:0;}
@@ -36,25 +21,28 @@ body::before{
 .visitor-item img:hover{transform:scale(1.03);}
 .visitor-item::after{content:"";position:absolute;inset:0;background:rgba(255,230,240,0.12);pointer-events:none;z-index:1;}
 .visitor-item p{position:absolute;bottom:2px;width:100%;font-size:14px;color:#b84c6f;font-weight:bold;text-align:center;text-shadow:1px 1px 2px rgba(255,255,255,0.8);z-index:3;}
-.delete-btn{position:absolute;top:2px;right:2px;width:20px;height:20px;background:#ffb6c1;color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:bold;cursor:pointer;z-index:5;font-size:14px;}
+.visitor-item .delete-btn{display:none;} /* pas de suppression côté visitor */
 
 /* MODAL ZOOM */
 #zoomModal{position:fixed;inset:0;background:rgba(0,0,0,0.7);display:none;justify-content:center;align-items:center;flex-direction:column;z-index:10000;}
-#zoomModal img{max-width:80%;max-height:60vh;border:4px solid #b67385;border-radius:24px;margin-bottom:10px;filter:none;}
+#zoomModal img{max-width:80%;max-height:60vh;border:4px solid #b67385;border-radius:24px;margin-bottom:10px;}
 #zoomModal .thumbs{display:flex;gap:8px;max-width:80%;overflow-x:auto;}
 #zoomModal .thumbs img{width:50px;height:50px;object-fit:cover;border-radius:12px;border:2px solid #b67385;cursor:pointer;}
 .closeZoom{position:absolute;top:12px;right:12px;width:28px;height:28px;background:#ffb6c1;color:#fff;border-radius:50%;display:flex;justify-content:center;align-items:center;cursor:pointer;}
-
-/* Likes & Commentaires */
+.actions{display:flex;gap:12px;margin-top:8px;}
 .icon-btn{display:flex;align-items:center;cursor:pointer;gap:4px;}
 .icon-btn span{font-weight:bold;color:#b84c6f;font-size:14px;}
+
+/* PROFIL + MESSAGERIE */
+#ownerPhoto{width:32px;height:32px;border-radius:50%;position:fixed;top:10px;right:10px;z-index:10000;background:#ffe6f0;border:2px solid #b84c6f;}
+#messagerieBtn{position:fixed;top:10px;right:50px;z-index:10001;background:transparent;border:none;cursor:pointer;display:flex;align-items:center;}
 
 /* MESSAGERIE */
 .chat-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.4);display:none;justify-content:center;align-items:center;z-index:20000;}
 .chat-window{width:360px;height:230px;background:#ffe6f0;border-radius:20px;border:2px solid #b67385;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 12px 24px rgba(0,0,0,0.25);position:relative;transition:width 0.3s,height 0.3s;}
-.chat-header{height:40px;background:linear-gradient(#ffd6e6,#ffb6c1);display:flex;align-items:center;justify-content:space-between;padding:0 10px;font-weight:bold;color:#b84c6f;flex-shrink:0;position:sticky;top:0;z-index:10;font-size:14px;}
+.chat-header{height:40px;background:linear-gradient(#ffd6e6,#ffb6c1);display:flex;align-items:center;justify-content:space-between;padding:0 10px;font-weight:bold;color:#b84c6f;font-size:14px;}
 .chat-body{flex:1;display:flex;min-height:0;}
-.chat-sidebar{width:120px;background:#fff5fa;border-right:2px solid #f3b3c8;overflow-y:auto;display:none;} /* on cache la sidebar */
+.chat-sidebar{display:none;} /* supprimée côté visitor */
 .chat-content{flex:1;display:flex;flex-direction:column;min-height:0;}
 .chat-messages{flex:1;padding:6px;overflow-y:auto;background:#fffafa;font-size:12px;}
 .msg{max-width:70%;padding:4px 8px;margin-bottom:4px;border-radius:12px;}
@@ -62,23 +50,19 @@ body::before{
 .msg-them{background:#ffffff;border:1px solid #f3b3c8;}
 .chat-input{display:flex;padding:4px;gap:4px;}
 .chat-input input{flex:1;border-radius:10px;border:2px solid #b67385;padding:4px 6px;font-size:12px;}
-.chat-icon-btn{background:transparent;border:none;cursor:pointer;padding:2px;display:flex;align-items:center;}
 .expanded .chat-window{width:720px;height:460px;border-radius:24px;}
 </style>
 </head>
 <body>
 
-<!-- Mini cercle profil -->
 <img id="ownerPhoto" alt="Owner">
 
-<!-- Bouton messagerie SVG -->
-<button id="messagerieBtn" class="chat-icon-btn" aria-label="Messagerie">
+<button id="messagerieBtn">
 <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#b84c6f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
   <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
 </svg>
 </button>
 
-<!-- Container cartes -->
 <div class="center-zone">
   <div id="visitor-list-container"></div>
 </div>
@@ -89,29 +73,18 @@ body::before{
   <img id="mainZoom">
   <div class="thumbs" id="thumbs"></div>
   <div class="actions">
-    <div class="icon-btn" id="likeBtn">❤️ <span id="likeCount">0</span></div>
-    <div class="icon-btn" id="commentBtn">💬 <span id="commentCount">0</span></div>
-  </div>
-</div>
-
-<!-- MODAL LIKE -->
-<div id="likeModal" class="modal">
-  <div class="modal-box">
-    <h3>Like ❤️</h3>
-    <input type="text" id="likeName" readonly style="flex:1;padding:4px 8px;border:2px solid #b67385;border-radius:8px;background:#ffe6f0;">
-    <button id="confirmLike">Valider</button>
-    <div id="likeBubbles" style="margin-top:12px; max-height:120px; overflow-y:auto;"></div>
-  </div>
-</div>
-
-<!-- MODAL COMMENT -->
-<div id="commentModal" class="modal">
-  <div class="modal-box">
-    <h3>Commentaire 💬</h3>
-    <input type="text" id="commentName" readonly style="padding:4px 8px;border:2px solid #b67385;border-radius:8px;background:#ffe6f0;margin-bottom:4px;">
-    <input type="text" id="commentText" placeholder="Votre commentaire" style="padding:4px 8px;border:2px solid #b67385;border-radius:8px;margin-bottom:4px;">
-    <button id="confirmComment">Envoyer</button>
-    <div id="commentBubbles" style="margin-top:8px; max-height:160px; overflow-y:auto;"></div>
+    <div class="icon-btn" id="likeBtn">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#b84c6f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 21C12 21 4 13.5 4 8.5C4 5.5 6.5 3 9.5 3C11 3 12 4 12 4C12 4 13 3 14.5 3C17.5 3 20 5.5 20 8.5C20 13.5 12 21 12 21Z"></path>
+      </svg>
+      <span id="likeCount">0</span>
+    </div>
+    <div class="icon-btn" id="commentBtn">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#b84c6f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+      </svg>
+      <span id="commentCount">0</span>
+    </div>
   </div>
 </div>
 
@@ -120,14 +93,13 @@ body::before{
   <div class="chat-window">
     <div class="chat-header">
       <span class="chat-title">Messagerie</span>
-      <button id="toggleChatSize" class="chat-icon-btn" aria-label="Agrandir / Réduire">
-        <svg id="chatResizeIcon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#b84c6f" stroke-width="2" stroke-linecap="round">
+      <button id="toggleChatSize">
+        <svg id="chatResizeIcon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#b84c6f" stroke-width="2">
           <path d="M4 9V4h5M20 15v5h-5M15 4h5v5M9 20H4v-5"/>
         </svg>
       </button>
     </div>
     <div class="chat-body">
-      <div class="chat-sidebar"></div> <!-- cachée -->
       <div class="chat-content">
         <div class="chat-messages" id="chatMessages"></div>
         <div class="chat-input">
@@ -146,7 +118,6 @@ const supabase = createClient("https://jyhbamdcxmpveujjqjla.supabase.co","sb_pub
 const ownerPhoto = document.getElementById('ownerPhoto');
 const prenom = localStorage.getItem('prenom')||'Visitor';
 
-// Charger photo owner
 async function loadOwnerPhoto(){
   if(!prenom) return;
   const {data,error} = await supabase.from('profiles').select('photo_url').eq('prenom',prenom).single();
@@ -155,7 +126,6 @@ async function loadOwnerPhoto(){
 }
 document.addEventListener('DOMContentLoaded', loadOwnerPhoto);
 
-// Variables
 let creations=[], currentZoom=null;
 const container=document.getElementById('visitor-list-container');
 const zoomModal=document.getElementById('zoomModal');
@@ -163,23 +133,14 @@ const mainZoom=document.getElementById('mainZoom');
 const thumbs=document.getElementById('thumbs');
 const likeCount=document.getElementById('likeCount');
 const commentCount=document.getElementById('commentCount');
-const likeModal=document.getElementById('likeModal');
-const likeBubbles=document.getElementById('likeBubbles');
-const confirmLike=document.getElementById('confirmLike');
-const likeNameInput=document.getElementById('likeName');
-const commentModal=document.getElementById('commentModal');
-const confirmComment=document.getElementById('confirmComment');
-const commentNameInput=document.getElementById('commentName');
-const commentTextInput=document.getElementById('commentText');
 
-// ===== Render =====
 function render(){
   container.innerHTML='';
   let page=null;
   creations.forEach((c,i)=>{
     if(i%6===0){page=document.createElement('div');page.className='page';container.appendChild(page);}
     const d=document.createElement('div');d.className='visitor-item';
-    d.innerHTML=`<div class="placeholder">?</div><div class="delete-btn">×</div><p>${c.name}</p><img src="${c.imgUrl||'placeholder.png'}">`;
+    d.innerHTML=`<div class="placeholder">?</div><p>${c.name}</p><img src="${c.imgUrl||'placeholder.png'}">`;
     const img=d.querySelector('img');
     img.onload=()=>d.querySelector('.placeholder').style.display='none';
     img.onerror=()=>{img.src='placeholder.png'; d.querySelector('.placeholder').textContent='';};
@@ -188,7 +149,6 @@ function render(){
   });
 }
 
-// ===== Zoom =====
 function openZoom(c){
   currentZoom = creations.find(x => x.id===c.id);
   mainZoom.src = currentZoom.imgUrl;
@@ -198,137 +158,55 @@ function openZoom(c){
     t.onclick=()=>mainZoom.src=u;
     thumbs.appendChild(t);
   });
-  updateActions();
+  likeCount.textContent = (currentZoom.likes||[]).length;
+  commentCount.textContent = (currentZoom.comments||[]).length;
   zoomModal.style.display='flex';
 }
 
-function updateActions(){
-  if(!currentZoom) return;
-  likeCount.textContent = (currentZoom.likes||[]).length;
-  commentCount.textContent = (currentZoom.comments||[]).length;
-}
-
-// ===== Like / Comment =====
-document.getElementById('likeBtn').onclick=()=>{
-  if(!currentZoom){alert("Sélectionnez d'abord une image !"); return;}
-  likeNameInput.value = prenom;
-  renderLikeList();
-  likeModal.style.display='flex';
-};
-confirmLike.onclick=async()=>{
-  if(!currentZoom) return;
-  const name = likeNameInput.value.trim();
-  if(!name) return;
-  currentZoom.likes = currentZoom.likes||[];
-  if(currentZoom.likes.some(l=>l.name===name)){likeModal.style.display='none'; return;}
-  currentZoom.likes.push({name, photo: ownerPhoto.src||''});
-  await supabase.from('creations').update({likes:currentZoom.likes}).eq('id',currentZoom.id);
-  renderLikeList();
-  likeCount.textContent = currentZoom.likes.length;
-  likeModal.style.display='none';
-};
-document.getElementById('commentBtn').onclick=()=>{
-  if(!currentZoom) return;
-  commentNameInput.value = prenom;
-  commentTextInput.value='';
-  renderCommentList();
-  commentModal.style.display='flex';
-};
-confirmComment.onclick=async()=>{
-  if(!currentZoom) return;
-  const name=commentNameInput.value.trim();
-  const text=commentTextInput.value.trim();
-  if(!name||!text) return;
-  currentZoom.comments = currentZoom.comments||[];
-  currentZoom.comments.push({name,text,photo:ownerPhoto.src||''});
-  await supabase.from('creations').update({comments:currentZoom.comments}).eq('id',currentZoom.id);
-  renderCommentList();
-  commentTextInput.value='';
-  commentCount.textContent = currentZoom.comments.length;
-};
-function renderLikeList(){
-  if(!currentZoom) return;
-  likeBubbles.innerHTML='';
-  (currentZoom.likes||[]).forEach(l=>{
-    const b=document.createElement('div');
-    b.style.display='flex';b.style.alignItems='center';b.style.gap='4px';b.style.marginBottom='4px';
-    const img=document.createElement('img'); img.src=l.photo||''; img.width=24; img.height=24; img.style.borderRadius='50%';
-    const n=document.createElement('span'); n.textContent=l.name; n.style.fontSize='12px';
-    b.appendChild(img);b.appendChild(n);
-    likeBubbles.appendChild(b);
-  });
-}
-function renderCommentList(){
-  if(!currentZoom) return;
-  commentBubbles.innerHTML='';
-  (currentZoom.comments||[]).forEach(c=>{
-    const b=document.createElement('div'); b.style.marginBottom='4px';
-    b.textContent=`${c.name}: ${c.text}`;
-    commentBubbles.appendChild(b);
-  });
-}
 document.querySelector('.closeZoom').onclick=()=>{zoomModal.style.display='none';};
 
-// ===== MESSAGERIE =====
-const chatModal = document.getElementById('chatModal');
-const messagerieBtn = document.getElementById('messagerieBtn');
-const toggleChatSize = document.getElementById('toggleChatSize');
-const icon = document.getElementById('chatResizeIcon');
-if(prenom && prenom!=='Visitor'){messagerieBtn.style.display='flex';}
-messagerieBtn.onclick=()=>{chatModal.style.display='flex';};
-chatModal.addEventListener('click',e=>{if(e.target===chatModal) chatModal.style.display='none';});
-toggleChatSize.onclick=()=>{
-  chatModal.classList.toggle('expanded');
-  icon.innerHTML = chatModal.classList.contains('expanded')
-    ? '<path d="M9 4H4v5M15 20h5v-5M20 9V4h-5M4 15v5h5"/>'
-    : '<path d="M4 9V4h5M20 15v5h-5M15 4h5v5M9 20H4v-5"/>';
-};
-let initialDistance=null;
-chatModal.addEventListener('touchstart',e=>{if(e.touches.length===2) initialDistance=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);});
-chatModal.addEventListener('touchmove',e=>{
-  if(e.touches.length===2 && initialDistance){
-    const currentDistance=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);
-    if(currentDistance-initialDistance>30) chatModal.classList.add('expanded');
-    if(initialDistance-currentDistance>30) chatModal.classList.remove('expanded');
-  }
-});
-chatModal.addEventListener('touchend',()=>{initialDistance=null;});
-
-// ===== Load creations =====
 async function refreshCreations() {
-  const { data, error } = await supabase
-    .from('creations')
-    .select('*')
-    .order('created_at', { ascending: false });
+  const { data, error } = await supabase.from('creations').select('*').order('created_at',{ascending:false});
+  if(error) return console.error(error);
 
-  if (error) return console.error(error);
-
-  creations = data.map(c => {
-    let zoomGroup = [];
-    if (c.images && Array.isArray(c.images) && c.images.length > 0) {
-      zoomGroup = c.images.map(p => {
-        const { data: urlData } = supabase.storage.from('images').getPublicUrl(p);
-        return urlData?.publicUrl || 'placeholder.png';
-      });
-    } else if (c.image_path) {
-      const { data: urlData } = supabase.storage.from('images').getPublicUrl(c.image_path);
-      zoomGroup = [urlData?.publicUrl || 'placeholder.png'];
-    }
-    return {
-      id: c.id,
-      name: c.name,
-      imgUrl: zoomGroup[0] || 'placeholder.png',
-      zoomGroup,
-      likes: Array.isArray(c.likes) ? c.likes : [],
-      comments: Array.isArray(c.comments) ? c.comments : []
-    };
+  creations = data.map(c=>{
+    let zoomGroup=[];
+    if(c.images?.length){zoomGroup=c.images.map(p=>supabase.storage.from('images').getPublicUrl(p).data?.publicUrl||'');}
+    else if(c.image_path){zoomGroup=[supabase.storage.from('images').getPublicUrl(c.image_path).data?.publicUrl||''];}
+    return {id:c.id,name:c.name,imgUrl:zoomGroup[0]||'',zoomGroup,likes:Array.isArray(c.likes)?c.likes:[],comments:Array.isArray(c.comments)?c.comments:[]};
   });
 
   render();
 }
 
 document.addEventListener('DOMContentLoaded', refreshCreations);
-</script>
 
+// ===== MESSAGERIE =====
+const chatModal = document.getElementById('chatModal');
+const messagerieBtn = document.getElementById('messagerieBtn');
+const toggleChatSize = document.getElementById('toggleChatSize');
+const icon = document.getElementById('chatResizeIcon');
+
+messagerieBtn.onclick=()=>{chatModal.style.display='flex';};
+chatModal.addEventListener('click', e=>{if(e.target===chatModal) chatModal.style.display='none';});
+
+toggleChatSize.onclick=()=>{
+  chatModal.classList.toggle('expanded');
+  icon.innerHTML=chatModal.classList.contains('expanded')
+    ? '<path d="M9 4H4v5M15 20h5v-5M20 9V4h-5M4 15v5h5"/>'
+    : '<path d="M4 9V4h5M20 15v5h-5M15 4h5v5M9 20H4v-5"/>';
+};
+
+let initialDistance=null;
+chatModal.addEventListener('touchstart', e=>{if(e.touches.length===2){initialDistance=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);}});
+chatModal.addEventListener('touchmove', e=>{
+  if(e.touches.length===2 && initialDistance){
+    const d=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);
+    if(d-initialDistance>30) chatModal.classList.add('expanded');
+    if(initialDistance-d>30) chatModal.classList.remove('expanded');
+  }
+});
+chatModal.addEventListener('touchend',()=>{initialDistance=null;});
+</script>
 </body>
 </html>
