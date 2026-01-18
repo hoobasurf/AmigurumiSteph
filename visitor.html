@@ -1,3 +1,9 @@
+
+Je veux enlever la croix sur les card 
+
+
+
+
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -28,6 +34,8 @@ body::before{
 .visitor-item img:hover{transform:scale(1.03);}
 .visitor-item::after{content:"";position:absolute;inset:0;background:rgba(255,230,240,0.12);pointer-events:none;z-index:1;}
 .visitor-item p{position:absolute;bottom:2px;width:100%;font-size:14px;color:#b84c6f;font-weight:bold;text-align:center;text-shadow:1px 1px 2px rgba(255,255,255,0.8);z-index:3;}
+.delete-btn{position:absolute;top:2px;right:2px;width:20px;height:20px;background:#ffb6c1;color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:bold;cursor:pointer;z-index:5;font-size:14px;transition: background 0.2s;}
+.delete-btn:hover{background:#e94f9a;}
 
 .modal{position:fixed;inset:0;background:rgba(0,0,0,0.6);display:none;justify-content:center;align-items:center;z-index:10001;}
 .modal .modal-box{background:#ffe6f0;padding:16px 24px;border-radius:20px;border:3px solid #b67385;display:flex;flex-direction:column;gap:10px;align-items:center;min-width:200px;font-family:'Comic Sans MS',cursive;}
@@ -245,6 +253,13 @@ body::before{
   </div>
 </div>
 
+<div id="deleteModal" class="modal">
+  <div class="modal-box">
+    <p>Supprimer définitivement ce projet ?</p>
+    <button id="confirmDelete">Oui</button>
+    <button id="cancelDelete">Annuler</button>
+  </div>
+</div>
 
 <!-- ====== LIKE MODAL ====== -->
 <div id="likeModal" class="modal">
@@ -410,7 +425,7 @@ const commentNameInput=document.getElementById('commentName');
 const commentTextInput=document.getElementById('commentText');
 
 // ====== RENDER ======
-functionfunction render(){
+function render(){
   container.innerHTML='';
   let page=null;
   creations.forEach((c,i)=>{
@@ -421,19 +436,15 @@ functionfunction render(){
     }
     const d=document.createElement('div');
     d.className='visitor-item';
-
-    // SUPPRIME LA CROIX
     d.innerHTML = `
       <div class="placeholder">?</div>
       <p>${c.name}</p>
       <img src="${c.imgUrl||''}">
     `;
-
     const img=d.querySelector('img');
-    img.onload = ()=>d.querySelector('.placeholder').style.display='none';
-    img.onerror = ()=>{ img.remove(); d.querySelector('.placeholder').textContent=''; };
-    img.onclick = ()=>openZoom(c);
-
+    img.onload = () => d.querySelector('.placeholder').style.display='none';
+    img.onerror = () => { img.remove(); d.querySelector('.placeholder').textContent=''; };
+    img.onclick = () => openZoom(c);
     page.appendChild(d);
   });
 }
@@ -672,3 +683,9 @@ refreshCreations();
 
 </body>
 </html>
+
+
+
+
+
+
