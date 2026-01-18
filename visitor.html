@@ -110,25 +110,24 @@ body::before{
     </div>
   </div>
   
-<<!-- LIKE MODAL -->
+<!-- LIKE MODAL -->
 <div id="likeModal" class="modal">
   <div class="modal-box">
     <h3>Like ❤️</h3>
-    <!-- Prénom prérempli -->
     <input type="text" id="likeName" readonly style="flex:1;padding:6px 8px;border:2px solid #b67385;border-radius:10px;background:#ffe6f0;margin-bottom:8px;">
     <button id="confirmLike" style="padding:6px 12px;background:#ffb6c1;color:#fff;border:none;border-radius:12px;cursor:pointer;">Valider</button>
-
     <div id="likeBubbles" style="display:flex;flex-direction:column;gap:6px;max-height:200px;overflow-y:auto;margin-top:12px;"></div>
   </div>
 </div>
 
 <!-- COMMENT MODAL -->
-<div id="commentModal" class="modal" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.6);justify-content:center;align-items:center;z-index:20001;">
-  <div class="modal-box" style="background:#ffe6f0;padding:16px;border-radius:20px;border:2px solid #b67385;max-height:60vh;overflow-y:auto;">
-    <h3>Commentaires 💬</h3>
-    <div style="display:flex;flex-direction:column;gap:6px;margin-bottom:8px;" id="commentBubbles"></div>
-    <input type="text" id="commentInput" placeholder="Votre commentaire" style="padding:4px 8px;border:2px solid #b67385;border-radius:8px;">
-    <button id="commentSubmit" style="padding:6px 12px;border:none;background:#ffb6c1;color:#fff;border-radius:8px;cursor:pointer;margin-top:6px;">Valider</button>
+<div id="commentModal" class="modal">
+  <div class="modal-box">
+    <h3>Commentaire 💬</h3>
+    <input type="text" id="commentName" readonly style="flex:1;padding:6px 8px;border:2px solid #b67385;border-radius:10px;background:#ffe6f0;margin-bottom:8px;">
+    <input type="text" id="commentText" placeholder="Votre commentaire" style="flex:1;padding:6px 8px;border:2px solid #b67385;border-radius:10px;margin-bottom:8px;">
+    <button id="confirmComment" style="padding:6px 12px;background:#ffb6c1;color:#fff;border:none;border-radius:12px;cursor:pointer;">Envoyer</button>
+    <div id="commentBubbles" style="display:flex;flex-direction:column;gap:6px;max-height:200px;overflow-y:auto;margin-top:12px;"></div>
   </div>
 </div>
   
@@ -187,70 +186,89 @@ function openZoom(c){
 document.querySelector('.closeZoom').onclick=()=>{zoomModal.style.display='none';};
 
 
+// ===== REFERENCES =====
 const likeModal = document.getElementById('likeModal');
 const likeNameInput = document.getElementById('likeName');
 const confirmLike = document.getElementById('confirmLike');
 const likeBubbles = document.getElementById('likeBubbles');
 
+const commentModal = document.getElementById('commentModal');
+const commentNameInput = document.getElementById('commentName');
+const commentTextInput = document.getElementById('commentText');
+const confirmComment = document.getElementById('confirmComment');
+const commentBubbles = document.getElementById('commentBubbles');
+
+// ===== OPEN MODALS =====
 document.getElementById('likeBtn').onclick = () => {
   if(!currentZoom) return alert("Sélectionnez d'abord une image !");
-  likeNameInput.value = localStorage.getItem('prenom') || 'Visitor';
+  likeNameInput.value = localStorage.getItem('prenom')||'Visitor';
   renderLikeList();
   likeModal.style.display = 'flex';
 };
 
-// Valider le like
+document.getElementById('commentBtn').onclick = () => {
+  if(!currentZoom) return alert("Sélectionnez d'abord une image !");
+  commentNameInput.value = localStorage.getItem('prenom')||'Visitor';
+  commentTextInput.value = '';
+  renderCommentList();
+  commentModal.style.display = 'flex';
+};
+
+// ===== CONFIRM LIKE =====
 confirmLike.onclick = async () => {
   if(!currentZoom) return;
   const name = likeNameInput.value.trim();
   if(!name) return;
-  currentZoom.likes = currentZoom.likes || [];
-  // Empêche double like
-  if(currentZoom.likes.some(l => l.name === name)) {
-    likeModal.style.display = 'none';
-    return;
-  }
-  currentZoom.likes.push({name, photo: ownerPhoto.src || ''});
+  currentZoom.likes = currentZoom.likes||[];
+  if(currentZoom.likes.some(l=>l.name===name)){likeModal.style.display='none'; return;}
+  currentZoom.likes.push({name, photo: ownerPhoto.src||''});
   await supabase.from('creations').update({likes: currentZoom.likes}).eq('id', currentZoom.id);
   renderLikeList();
   likeCount.textContent = currentZoom.likes.length;
-  likeModal.style.display = 'none';
+  likeModal.style.display='none';
 };
 
-// Clic dans le vide ferme la modal
-likeModal.addEventListener('click', e => {
-  if(e.target === likeModal) likeModal.style.display = 'none';
-});
+// ===== CONFIRM COMMENT =====
+confirmComment.onclick = async () => {
+  if(!currentZoom) return;
+  const name = commentNameInput.value.trim();
+  const text = commentTextInput.value.trim();
+  if(!name||!text) return;
+  currentZoom.comments = currentZoom.comments||[];
+  currentZoom.comments.push({name, text, photo: ownerPhoto.src||''});
+  await supabase.from('creations').update({comments: currentZoom.comments}).eq('id', currentZoom.id);
+  renderCommentList();
+  commentTextInput.value='';
+  commentCount.textContent = currentZoom.comments.length;
+  commentModal.style.display='none';
+};
 
-// Fonction pour afficher la liste des likes
+// ===== RENDER LISTS =====
 function renderLikeList(){
   if(!currentZoom) return;
-  likeBubbles.innerHTML = '';
-  (currentZoom.likes || []).forEach(l => {
-    const div = document.createElement('div');
-    div.innerHTML = `${l.photo ? `<img src="${l.photo}" style="width:20px;height:20px;border-radius:50%;margin-right:4px;vertical-align:middle;">` : ''}<strong>${l.name}</strong>`;
+  likeBubbles.innerHTML='';
+  (currentZoom.likes||[]).forEach(l=>{
+    const div=document.createElement('div');
+    div.innerHTML=`${l.photo?`<img src="${l.photo}" style="width:20px;height:20px;border-radius:50%;margin-right:4px;vertical-align:middle;">`:''}<strong>${l.name}</strong>`;
     likeBubbles.appendChild(div);
   });
-  likeCount.textContent = (currentZoom.likes || []).length;
+  likeCount.textContent = (currentZoom.likes||[]).length;
 }
 
-  
-async function refreshCreations() {
-  const { data, error } = await supabase.from('creations').select('*').order('created_at',{ascending:false});
-  if(error) return console.error(error);
-
-  creations = data.map(c=>{
-    let zoomGroup=[];
-    if(c.images?.length){zoomGroup=c.images.map(p=>supabase.storage.from('images').getPublicUrl(p).data?.publicUrl||'');}
-    else if(c.image_path){zoomGroup=[supabase.storage.from('images').getPublicUrl(c.image_path).data?.publicUrl||''];}
-    return {id:c.id,name:c.name,imgUrl:zoomGroup[0]||'',zoomGroup,likes:Array.isArray(c.likes)?c.likes:[],comments:Array.isArray(c.comments)?c.comments:[]};
+function renderCommentList(){
+  if(!currentZoom) return;
+  commentBubbles.innerHTML='';
+  (currentZoom.comments||[]).forEach(c=>{
+    const div=document.createElement('div');
+    div.innerHTML=`${c.photo?`<img src="${c.photo}" style="width:20px;height:20px;border-radius:50%;margin-right:4px;vertical-align:middle;">`:''}<strong>${c.name}</strong>: ${c.text}`;
+    commentBubbles.appendChild(div);
   });
-
-  render();
+  commentCount.textContent = (currentZoom.comments||[]).length;
 }
 
-document.addEventListener('DOMContentLoaded', refreshCreations);
-
+// ===== CLOSE MODALS CLICK DANS LE VIDE =====
+likeModal.addEventListener('click', e=>{if(e.target===likeModal) likeModal.style.display='none';});
+commentModal.addEventListener('click', e=>{if(e.target===commentModal) commentModal.style.display='none';});
 // ===== MESSAGERIE =====
 const chatModal = document.getElementById('chatModal');
 const messagerieBtn = document.getElementById('messagerieBtn');
