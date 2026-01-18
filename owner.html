@@ -334,27 +334,42 @@ document.getElementById('likeBtn').onclick = () => {
 
 confirmLike.onclick = async () => {
   if (!currentZoom) return;
+
   const name = likeNameInput.value.trim();
   if (!name) return;
 
-  if (!Array.isArray(currentZoom.likes)) currentZoom.likes = [];
+  // Initialise si besoin
+  if (!Array.isArray(currentZoom.likes)) {
+    currentZoom.likes = [];
+  }
 
-  // Bloque si déjà liké
+  // Bloquer si déjà liké
   const alreadyLiked = currentZoom.likes.some(l => l.name === name);
   if (alreadyLiked) {
     likeModal.style.display = 'none';
     return;
   }
 
+  // Ajout du like en local
   currentZoom.likes.push({
     name,
     photo: ownerPhoto.src || ''
   });
 
-  await supabase.from('creations').update({ likes: currentZoom.likes }).eq('id', currentZoom.id);
+  // Sauvegarde Supabase
+  await supabase
+    .from('creations')
+    .update({ likes: currentZoom.likes })
+    .eq('id', currentZoom.id);
 
+  // 🔑 REFRESH + RESYNC (LA CORRECTION)
   await refreshCreations();
+  currentZoom = creations.find(c => c.id === currentZoom.id);
+
+  // Mise à jour UI
   renderLikeList();
+  updateActions();
+
   likeModal.style.display = 'none';
 };
 
