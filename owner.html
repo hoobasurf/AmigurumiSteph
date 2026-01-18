@@ -110,13 +110,16 @@ body::before{
   font-weight: bold;
   color: #b84c6f;
   flex-shrink: 0;
+  position: sticky;
+  top: 0;
+  z-index: 10;
 }
 
 /* BODY */
 .chat-body {
   flex: 1;
   display: flex;
-  min-height: 0; /* permet aux scroll de fonctionner */
+  min-height: 0;
 }
 
 /* CONTACTS */
@@ -126,7 +129,6 @@ body::before{
   border-right: 2px solid #f3b3c8;
   overflow-y: auto;
 }
-
 
 .chat-user {
   display: flex;
@@ -147,7 +149,7 @@ body::before{
   flex: 1;
   display: flex;
   flex-direction: column;
-  min-height: 0; /* essentiel pour scroll */
+  min-height: 0;
 }
 
 .chat-messages {
@@ -187,14 +189,12 @@ body::before{
   padding: 6px 10px;
 }
 
-/* MODE AGRANDI (un peu plus grand que la modal) */
+/* MODE AGRANDI (expanded) */
 .expanded .chat-window {
-  width: 880px; /* un peu plus large que la modal normale */
-  height: 560px; /* un peu plus haut que la modal normale */
-  border-radius: 24px; /* garde les coins arrondis */
+  width: 880px;
+  height: 560px;
+  border-radius: 24px;
 }
-
-/* Sur mobile, on reste responsive */
 @media(max-width:1000px){
   .expanded .chat-window {
     width: 90vw;
@@ -202,11 +202,14 @@ body::before{
   }
 }
 
-/* HEADER sticky */
-.chat-header {
-  position: sticky;
-  top: 0;
-  z-index: 10;
+/* BOUTON ICON */
+.chat-icon-btn {
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 4px;
+  display: flex;
+  align-items: center;
 }
   
 </style>
@@ -366,7 +369,7 @@ body::before{
 
 <!-- ====== MESSAGERIE ====== -->
 <div id="chatModal" class="chat-overlay">
-  <div class="chat-window modal-mode">
+  <div class="chat-window">
 
     <!-- HEADER -->
     <div class="chat-header">
@@ -391,7 +394,6 @@ body::before{
 
       <!-- CONVERSATION -->
       <div class="chat-content">
-
         <div class="chat-messages" id="chatMessages">
           <!-- Messages dynamiques -->
         </div>
@@ -400,13 +402,11 @@ body::before{
           <input type="text" id="chatInput" placeholder="Écrire un message…">
           <button id="sendMsgBtn">➤</button>
         </div>
-
       </div>
-    </div>
 
+    </div>
   </div>
 </div>
-
     <!-- HEADER -->
    <div class="chat-header">
   <span class="chat-title">Messagerie</span>
