@@ -62,6 +62,130 @@ body::before{
   color: #b84c6f;
   font-size: 14px;
 }
+
+.chat-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.4);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  z-index: 20000;
+}
+
+.chat-window {
+  width: 720px;
+  height: 460px;
+  background: #ffe6f0;
+  border-radius: 24px;
+  border: 3px solid #b67385;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+}
+
+.chat-header {
+  height: 48px;
+  background: linear-gradient(#ffd6e6, #ffb6c1);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 12px;
+  font-weight: bold;
+  color: #b84c6f;
+}
+
+.chat-body {
+  flex: 1;
+  display: flex;
+}
+
+.chat-sidebar {
+  width: 200px;
+  background: #fff0f6;
+  border-right: 2px solid #f3b3c8;
+  overflow-y: auto;
+}
+
+.chat-user {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px;
+  cursor: pointer;
+}
+.chat-user.active {
+  background: #ffd6e6;
+}
+.chat-user img {
+  border-radius: 50%;
+}
+
+.chat-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.chat-messages {
+  flex: 1;
+  padding: 12px;
+  overflow-y: auto;
+}
+
+.msg {
+  max-width: 70%;
+  padding: 8px 12px;
+  margin-bottom: 6px;
+  border-radius: 16px;
+  font-size: 14px;
+}
+
+.msg-me {
+  background: #ffb6c1;
+  align-self: flex-end;
+}
+.msg-them {
+  background: #fff;
+}
+
+.chat-input {
+  display: flex;
+  padding: 8px;
+  gap: 6px;
+}
+.chat-input input {
+  flex: 1;
+  border-radius: 12px;
+  border: 2px solid #b67385;
+  padding: 6px 10px;
+}
+
+  .fullscreen .chat-window {
+  width: 100vw;
+  height: 100vh;
+  border-radius: 0;
+  font-family: Tahoma, Arial, sans-serif;
+}
+
+.fullscreen .chat-header {
+  background: linear-gradient(#cce0ff, #7aa2ff);
+  color: #003399;
+}
+
+.fullscreen .chat-sidebar {
+  background: #e6ecff;
+}
+
+.fullscreen .msg-me {
+  background: #cce0ff;
+}
+.fullscreen .msg-them {
+  background: #ffffff;
+  border: 1px solid #a0a0a0;
+}
+  
 </style>
 </head>
 <body>
@@ -217,7 +341,55 @@ body::before{
   </div>
 </div>
 
+ <!-- ====== MESSAGERIE ====== -->
+<div id="chatModal" class="chat-overlay">
+  <div class="chat-window modal-mode">
 
+    <!-- HEADER -->
+    <div class="chat-header">
+      <span class="chat-title">Messagerie</span>
+
+      <!-- Bouton agrandir / réduire -->
+      <div id="toggleChatSize" class="chat-icon-btn" title="Agrandir">
+        <!-- SVG -->
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#b84c6f" stroke-width="2">
+          <path d="M4 9V4h5M20 15v5h-5M15 4h5v5M9 20H4v-5"/>
+        </svg>
+      </div>
+    </div>
+
+    <div class="chat-body">
+
+      <!-- LISTE DES CONTACTS -->
+      <div class="chat-sidebar">
+        <div class="chat-user active">
+          <img src="https://i.pravatar.cc/40?img=1">
+          <span>Alice</span>
+        </div>
+        <div class="chat-user">
+          <img src="https://i.pravatar.cc/40?img=2">
+          <span>Bob</span>
+        </div>
+      </div>
+
+      <!-- CONVERSATION -->
+      <div class="chat-content">
+
+        <div class="chat-messages">
+          <div class="msg msg-them">Salut 👋</div>
+          <div class="msg msg-me">Coucou 😊</div>
+        </div>
+
+        <div class="chat-input">
+          <input type="text" placeholder="Écrire un message…">
+          <button>➤</button>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</div>
   <script type="module">
 import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
 const supabase = createClient(
@@ -488,6 +660,21 @@ async function refreshCreations() {
   }
 }
 
+    const chatModal = document.getElementById('chatModal');
+const toggleChatSize = document.getElementById('toggleChatSize');
+const chatWindow = document.querySelector('.chat-window');
+
+document.getElementById('messagerieBtn').onclick = () => {
+  chatModal.style.display = 'flex';
+};
+
+chatModal.addEventListener('click', e => {
+  if (e.target === chatModal) chatModal.style.display = 'none';
+});
+
+toggleChatSize.onclick = () => {
+  chatModal.classList.toggle('fullscreen');
+};
 // ====== INITIAL ======
 refreshCreations();
 </script>
