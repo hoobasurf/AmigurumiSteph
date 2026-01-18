@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
@@ -247,7 +247,6 @@ const zoomModal=document.getElementById('zoomModal');
 const sidebar=document.getElementById('sidebar');
 const mainZoom=document.getElementById('mainZoom');
 const thumbs=document.getElementById('thumbs');
-const likeBtn = document.getElementById('likeBtn');
 const likeCount=document.getElementById('likeCount');
 const commentCount=document.getElementById('commentCount');
 const likeModal=document.getElementById('likeModal');
@@ -318,18 +317,6 @@ function addLongClick(elem, callback){
 }
 
 // =======================
-// ====== LIKES ======
-// =======================
-
-// --- Éléments DOM ---
-const likeBtn = document.getElementById('likeBtn');
-const likeModal = document.getElementById('likeModal');
-const likeBubbles = document.getElementById('likeBubbles');
-const likeCount = document.getElementById('likeCount');
-const confirmLike = document.getElementById('confirmLike');
-const likeNameInput = document.getElementById('likeName');
-
-// =======================
 // OUVRIR MODALE LIKE
 // =======================
 likeBtn.onclick = () => {
@@ -358,28 +345,30 @@ confirmLike.onclick = async () => {
   const name = likeNameInput.value.trim();
   if (!name) return;
 
-  if (!Array.isArray(currentZoom.likes)) currentZoom.likes = [];
+  if (!Array.isArray(currentZoom.likes)) {
+    currentZoom.likes = [];
+  }
 
-  // Anti double-like
+  // 🔒 Anti double-like
   const alreadyLiked = currentZoom.likes.some(l => l.name === name);
   if (alreadyLiked) {
     likeModal.style.display = 'none';
     return;
   }
 
-  // Ajouter le like
+  // ➕ Ajout du like
   currentZoom.likes.push({
     name,
     photo: ownerPhoto?.src || ''
   });
 
-  // Sauvegarder dans Supabase
+  // 💾 Sauvegarde Supabase
   await supabase
     .from('creations')
     .update({ likes: currentZoom.likes })
     .eq('id', currentZoom.id);
 
-  // Rafraîchir les créations
+  // 🔄 Refresh + resync
   await refreshCreations();
   currentZoom = creations.find(c => c.id === currentZoom.id);
 
@@ -388,11 +377,34 @@ confirmLike.onclick = async () => {
 };
 
 // =======================
-// AFFICHER LA LISTE DES LIKES
+// COMPTEUR DE LIKES
 // =======================
+function updateLikeCount() {
+  likeCount.textContent = Array.isArray(currentZoom?.likes)
+    ? currentZoom.likes.length
+    : 0;
+}
+
+// =======================
+// MISE À JOUR UI GLOBALE
+// =======================
+function updateLikeUI() {
+  renderLikeList();
+  updateLikeCount();
+}
+
+// =======================
+// FERMETURE MODALE
+// =======================
+likeModal.onclick = e => {
+  if (e.target === likeModal) {
+    likeModal.style.display = 'none';
+  }
+};
+
+// ====== RENDER LIKE LIST ======
 function renderLikeList() {
   if (!currentZoom) return;
-
   likeBubbles.innerHTML = '';
   (currentZoom.likes || []).forEach(like => {
     const div = document.createElement('div');
@@ -403,23 +415,8 @@ function renderLikeList() {
     `;
     likeBubbles.appendChild(div);
   });
-
   likeCount.textContent = (currentZoom.likes || []).length;
 }
-
-// =======================
-// MISE À JOUR UI GLOBALE
-// =======================
-function updateLikeUI() {
-  renderLikeList();
-}
-
-// =======================
-// FERMETURE MODALE AU CLIC SUR LE FOND
-// =======================
-likeModal.onclick = e => {
-  if (e.target === likeModal) likeModal.style.display = 'none';
-};
 
 // ====== RENDER COMMENT LIST ======
 function renderCommentList() {
@@ -503,7 +500,7 @@ document.getElementById('clearSelectedBtn').onclick = async ()=>{
     for(let c of creations){
       await supabase.from('creations').update({likes:c.likes,comments:c.comments}).eq('id',c.id);
     }
-    await refreshCreations();
+    refresh();
     document.getElementById('selectCreationModal').style.display='none';
   }
 };
