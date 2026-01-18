@@ -3,205 +3,133 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Visitor</title>
 <style>
-*{box-sizing:border-box;margin:0;padding:0;}
-html,body{height:100%;font-family:'Comic Sans MS',cursive;overflow-x:hidden;}
-body::before{
-  content:"";position:fixed;inset:0;
-  background:url('Photoroom_20251223_114401.jpeg') center/cover no-repeat;
-  z-index:-1;
+* { box-sizing:border-box; margin:0; padding:0; font-family:'Comic Sans MS',cursive; }
+html, body { height:100%; background:#fff0f5; }
+
+/* OWNER PHOTO & MESSAGERIE */
+#ownerPhoto {
+  width:32px; height:32px; border-radius:50%; position:fixed; top:10px; right:50px;
+  border:2px solid #b84c6f; background:#ffe6f0; display:none; z-index:1000;
 }
-.center-zone{display:flex;justify-content:center;padding-top:3.5cm}
-#visitor-list-container{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;padding-left:1cm}
-.page{
-  display:grid;grid-template-columns:repeat(2,1fr);grid-template-rows:repeat(3,1fr);
-  gap:4mm;width:calc(2*200px);scroll-snap-align:center;padding:4mm
+
+#messagerieBtn {
+  position:fixed; top:10px; right:10px;
+  width:36px; height:36px; border-radius:50%; border:none; background:#ffb6c1;
+  display:none; justify-content:center; align-items:center; cursor:pointer; z-index:1000;
 }
-.visitor-item{
-  position:relative;width:200px;height:200px;border-radius:12px;
-  border:3px solid #fff;background:#ffe6f0;overflow:hidden
+#messagerieBtn svg { stroke:#fff; stroke-width:2; }
+
+/* MESSAGERIE MODAL */
+.chat-overlay {
+  position: fixed; inset:0; background: rgba(0,0,0,0.4);
+  display:none; justify-content:center; align-items:center; z-index:2000;
 }
-.visitor-item img{width:100%;height:100%;object-fit:cover;cursor:pointer}
-.visitor-item p{
-  position:absolute;bottom:2px;width:100%;text-align:center;
-  font-weight:bold;color:#b84c6f;z-index:3
+.chat-window {
+  width:360px; height:230px;
+  background:#ffe6f0; border-radius:20px; border:2px solid #b67385;
+  display:flex; flex-direction:column; overflow:hidden; box-shadow:0 12px 24px rgba(0,0,0,0.25);
+  transition: width 0.3s, height 0.3s;
 }
-.visitor-item .placeholder{
-  position:absolute;inset:0;display:flex;
-  justify-content:center;align-items:center;
-  font-size:24px;color:#b84c6f;font-weight:bold;z-index:2;
+.chat-header { height:40px; background:linear-gradient(#ffd6e6,#ffb6c1);
+  display:flex; align-items:center; justify-content:space-between;
+  padding:0 10px; font-weight:bold; color:#b84c6f; flex-shrink:0; font-size:14px;
 }
-.modal{position:fixed;inset:0;display:none;justify-content:center;align-items:center;
-  background:rgba(0,0,0,.6);z-index:10001}
-.modal-box{
-  background:#ffe6f0;padding:16px;border-radius:20px;border:3px solid #b67385;
-  display:flex;flex-direction:column;gap:8px;min-width:200px
-}
-#zoomModal{
-  position:fixed;inset:0;display:none;flex-direction:column;
-  justify-content:center;align-items:center;background:rgba(0,0,0,.7);z-index:10000
-}
-#zoomModal img{max-width:80%;max-height:60vh;border-radius:24px}
-.actions{display:flex;gap:16px;margin-top:8px}
-.like-btn,.comment-btn{
-  background:none;border:none;display:flex;gap:6px;
-  font-weight:bold;color:#b84c6f;cursor:pointer
-}
-.like-btn svg,.comment-btn svg{width:16px;height:16px;stroke:#ffb6c1;fill:none}
-.bubble-container{display:flex;gap:6px;overflow-x:auto}
-.bubble{background:rgba(255,182,193,.3);border-radius:12px;padding:4px 8px}
-.closeZoom{
-  position:absolute;top:12px;right:12px;background:#ffb6c1;
-  color:#fff;border-radius:50%;width:28px;height:28px;
-  display:flex;align-items:center;justify-content:center;cursor:pointer
-}
+.chat-body { flex:1; display:flex; min-height:0; }
+.chat-sidebar { width:120px; background:#fff5fa; border-right:2px solid #f3b3c8; overflow-y:auto; }
+.chat-user { display:flex; align-items:center; gap:6px; padding:4px; cursor:pointer; font-size:12px; }
+.chat-user.active { background:#ffd6e6; }
+.chat-user img { border-radius:50%; width:28px; height:28px; object-fit:cover; }
+.chat-content { flex:1; display:flex; flex-direction:column; min-height:0; }
+.chat-messages { flex:1; padding:6px; overflow-y:auto; background:#fffafa; font-size:12px; }
+.msg { max-width:70%; padding:4px 8px; margin-bottom:4px; border-radius:12px; }
+.msg-me { background:#ffb6c1; align-self:flex-end; }
+.msg-them { background:#ffffff; border:1px solid #f3b3c8; }
+.chat-input { display:flex; padding:4px; gap:4px; }
+.chat-input input { flex:1; border-radius:10px; border:2px solid #b67385; padding:4px 6px; font-size:12px; }
+.chat-icon-btn { background:transparent; border:none; cursor:pointer; padding:2px; display:flex; align-items:center; }
+.expanded .chat-window { width:720px; height:460px; border-radius:24px; }
 </style>
 </head>
-
 <body>
 
-<div class="center-zone">
-  <div id="visitor-list-container"></div>
-</div>
+<!-- Mini cercle profil -->
+<img id="ownerPhoto" alt="Owner">
 
-<!-- LIKE MODAL -->
-<div id="likeModal" class="modal">
-  <div class="modal-box">
-    <input id="likeName" placeholder="Votre prénom">
-    <button id="confirmLike">Valider</button>
-    <div id="likeBubbles" class="bubble-container"></div>
-  </div>
-</div>
+<!-- Bouton Messagerie -->
+<button id="messagerieBtn" aria-label="Messagerie">
+<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="none" stroke="#fff" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
+  <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+</svg>
+</button>
 
-<!-- COMMENT MODAL -->
-<div id="commentModal" class="modal">
-  <div class="modal-box">
-    <input id="commentName" placeholder="Votre prénom">
-    <input id="commentText" placeholder="Commentaire">
-    <button id="confirmComment">Valider</button>
-    <div id="commentBubbles" class="bubble-container"></div>
-  </div>
-</div>
-
-<!-- ZOOM -->
-<div id="zoomModal">
-  <div class="closeZoom">×</div>
-  <img id="mainZoom">
-  <div class="actions">
-    <button class="like-btn" id="zoomLike">
-      ❤️ <span id="likeCount">0</span>
-    </button>
-    <button class="comment-btn" id="zoomComment">
-      💬 <span id="commentCount">0</span>
-    </button>
+<!-- Messagerie modal -->
+<div id="chatModal" class="chat-overlay">
+  <div class="chat-window">
+    <div class="chat-header">
+      <span class="chat-title">Messagerie</span>
+      <button id="toggleChatSize" class="chat-icon-btn">
+        <svg id="chatResizeIcon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#b84c6f" stroke-width="2" stroke-linecap="round">
+          <path d="M4 9V4h5M20 15v5h-5M15 4h5v5M9 20H4v-5"/>
+        </svg>
+      </button>
+    </div>
+    <div class="chat-body">
+      <div class="chat-sidebar" id="chatUserList"></div>
+      <div class="chat-content">
+        <div class="chat-messages" id="chatMessages"></div>
+        <div class="chat-input">
+          <input type="text" id="chatInput" placeholder="Écrire un message…">
+          <button id="sendMsgBtn">➤</button>
+        </div>
+      </div>
+    </div>
   </div>
 </div>
 
 <script type="module">
 import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
+const supabase = createClient("https://jyhbamdcxmpveujjqjla.supabase.co", "sb_publishable_sqsxb-3Kl5o3-JQYv9kGFw_-g0EgwMa");
 
-const supabase = createClient(
- "https://jyhbamdcxmpveujjqjla.supabase.co",
- "sb_publishable_sqsxb-3Kl5o3-JQYv9kGFw_-g0EgwMa"
-);
+const ownerPhoto = document.getElementById('ownerPhoto');
+const messagerieBtn = document.getElementById('messagerieBtn');
+const chatModal = document.getElementById('chatModal');
+const toggleChatSize = document.getElementById('toggleChatSize');
+const icon = document.getElementById('chatResizeIcon');
 
-let creations=[], current=null;
-
-const container=document.getElementById('visitor-list-container');
-const zoom=document.getElementById('zoomModal');
-const main=document.getElementById('mainZoom');
-
-const likeModal=document.getElementById('likeModal');
-const commentModal=document.getElementById('commentModal');
-
-const likeCount=document.getElementById('likeCount');
-const commentCount=document.getElementById('commentCount');
-
-function render(){
-  container.innerHTML='';
-  let page;
-  creations.forEach((c,i)=>{
-    if(i%6===0){
-      page=document.createElement('div');
-      page.className='page';
-      container.appendChild(page);
-    }
-    const d=document.createElement('div');
-    d.className='visitor-item';
-
-    // 🔹 ajout du placeholder “?” avant chargement de l'image
-    d.innerHTML=`<p>${c.name}</p>
-                 <div class="placeholder">?</div>
-                 <img src="${c.imgUrl}">`;
-
-    const img = d.querySelector('img');
-    const placeholder = d.querySelector('.placeholder');
-
-    if(img.complete && img.naturalWidth>0){
-      placeholder.style.display='none';
-    } else {
-      img.addEventListener('load',()=>placeholder.style.display='none',{once:true});
-      img.addEventListener('error',()=>placeholder.textContent='?',{once:true});
-    }
-
-    d.onclick=()=>openZoom(c);
-    page.appendChild(d);
-  });
+// Afficher bouton Messagerie et mini cercle uniquement si connecté
+const prenom = localStorage.getItem('prenom');
+if(prenom){
+  ownerPhoto.style.display='block';
+  messagerieBtn.style.display='flex';
 }
 
-function openZoom(c){
-  current=c;
-  main.src=c.imgUrl;
-  likeCount.textContent=c.likes.length;
-  commentCount.textContent=c.comments.length;
-  zoom.style.display='flex';
-}
+// Ouvrir modal
+messagerieBtn.onclick = () => chatModal.style.display='flex';
+chatModal.addEventListener('click', e => { if(e.target===chatModal) chatModal.style.display='none'; });
 
-document.querySelector('.closeZoom').onclick=()=>zoom.style.display='none';
-zoom.onclick=e=>{if(e.target===zoom)zoom.style.display='none'};
-
-document.getElementById('zoomLike').onclick=e=>{
-  e.stopPropagation();
-  likeModal.style.display='flex';
+// Toggle petite/grande taille
+toggleChatSize.onclick = () => {
+  chatModal.classList.toggle('expanded');
+  icon.innerHTML = chatModal.classList.contains('expanded')
+    ? '<path d="M9 4H4v5M15 20h5v-5M20 9V4h-5M4 15v5h5"/>'
+    : '<path d="M4 9V4h5M20 15v5h-5M15 4h5v5M9 20H4v-5"/>';
 };
 
-document.getElementById('zoomComment').onclick=e=>{
-  e.stopPropagation();
-  commentModal.style.display='flex';
-};
+// Pinch pour mobile
+let initialDistance=null;
+chatModal.addEventListener('touchstart', e=>{ if(e.touches.length===2) initialDistance=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY); });
+chatModal.addEventListener('touchmove', e=>{
+  if(e.touches.length===2 && initialDistance){
+    const currentDistance=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);
+    if(currentDistance-initialDistance>30) chatModal.classList.add('expanded');
+    if(initialDistance-currentDistance>30) chatModal.classList.remove('expanded');
+  }
+});
+chatModal.addEventListener('touchend',()=>{ initialDistance=null; });
 
-document.getElementById('confirmLike').onclick=async()=>{
-  const name=document.getElementById('likeName').value.trim();
-  if(!name)return;
-  current.likes.push(name);
-  await supabase.from('creations').update({likes:current.likes}).eq('id',current.id);
-  likeCount.textContent=current.likes.length;
-  document.getElementById('likeName').value='';
-};
-
-document.getElementById('confirmComment').onclick=async()=>{
-  const n=document.getElementById('commentName').value.trim();
-  const t=document.getElementById('commentText').value.trim();
-  if(!n||!t)return;
-  current.comments.push({name:n,text:t});
-  await supabase.from('creations').update({comments:current.comments}).eq('id',current.id);
-  commentCount.textContent=current.comments.length;
-  document.getElementById('commentName').value='';
-  document.getElementById('commentText').value='';
-};
-
-async function load(){
-  const {data}=await supabase.from("creations").select("*").order("created_at",{ascending:false});
-  creations=data.map(c=>({
-    id:c.id,
-    name:c.name,
-    imgUrl:`https://jyhbamdcxmpveujjqjla.supabase.co/storage/v1/object/public/images/${c.image_path}`,
-    likes:c.likes||[],
-    comments:c.comments||[]
-  }));
-  render();
-}
-load();
 </script>
+
 </body>
 </html>
