@@ -1,3 +1,6 @@
+Comme ça ?
+
+
  <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -259,6 +262,11 @@ const commentBubbles=document.getElementById('commentBubbles');
 const expandBtn=document.getElementById('expandComment');
 const commentBox=document.querySelector('.comment-box');
   
+function fillUserInfo() {
+  const prenom = localStorage.getItem('prenom') || '';
+  likeNameInput.value = prenom;
+  commentNameInput.value = prenom;
+}
 
 // ====== RENDER ======
 function render(){
@@ -315,6 +323,18 @@ function addLongClick(elem, callback){
   elem.addEventListener('mouseup', ()=>{clearTimeout(timer)});
   elem.addEventListener('mouseleave', ()=>{clearTimeout(timer)});
 }
+
+// =======================
+// ====== LIKES ======
+// =======================
+
+// --- Éléments DOM ---
+const likeBtn = document.getElementById('likeBtn');
+const likeModal = document.getElementById('likeModal');
+const likeBubbles = document.getElementById('likeBubbles');
+const likeCount = document.getElementById('likeCount');
+const confirmLike = document.getElementById('confirmLike');
+const likeNameInput = document.getElementById('likeName');
 
 // =======================
 // OUVRIR MODALE LIKE
