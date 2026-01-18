@@ -412,16 +412,30 @@ const commentTextInput=document.getElementById('commentText');
 // ====== RENDER ======
 function render(){
   container.innerHTML='';
-  let page=null;
+  let page = null;
+
   creations.forEach((c,i)=>{
-    if(i%6===0){page=document.createElement('div');page.className='page';container.appendChild(page);}
-    const d=document.createElement('div');d.className='visitor-item';
-    d.innerHTML=`<div class="placeholder">?</div><div class="delete-btn">×</div><p>${c.name}</p><img src="${c.imgUrl||''}">`;
-    const img=d.querySelector('img');
-    img.onload=()=>d.querySelector('.placeholder').style.display='none';
-    img.onerror=()=>{img.remove();d.querySelector('.placeholder').textContent='';};
-    img.onclick=()=>openZoom(c);
-    d.querySelector('.delete-btn').onclick=()=>openDeleteModal(c);
+    if(i % 6 === 0){
+      page = document.createElement('div');
+      page.className = 'page';
+      container.appendChild(page);
+    }
+
+    const d = document.createElement('div');
+    d.className = 'visitor-item';
+
+    // Carte sans la croix
+    d.innerHTML = `
+      <div class="placeholder">?</div>
+      <p>${c.name}</p>
+      <img src="${c.imgUrl||''}">
+    `;
+
+    const img = d.querySelector('img');
+    img.onload = () => d.querySelector('.placeholder').style.display = 'none';
+    img.onerror = () => { img.remove(); d.querySelector('.placeholder').textContent = ''; };
+    img.onclick = () => openZoom(c); // clic pour ouvrir le zoom
+
     page.appendChild(d);
   });
 }
