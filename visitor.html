@@ -10,8 +10,11 @@ html, body { height:100%; overflow-x:hidden; background:#fff0f5; color:#b84c6f; 
 
 body::before{
   content:"";position:fixed;top:0;left:0;width:100vw;height:100vh;
-  background-image:url('Photoroom_20251223_114401.jpeg');
-  background-size:cover;background-position:center center;background-repeat:no-repeat;z-index:-1;
+  background-image:url('Photoroom_20260107_185314.png'); /* <-- met ton vrai fichier */
+  background-size:cover;
+  background-position:center center;
+  background-repeat:no-repeat;
+  z-index:-1;
 }
 
 #ownerPhoto{
@@ -330,11 +333,42 @@ chatModal.addEventListener('touchmove',e=>{
 chatModal.addEventListener('touchend',()=>{initialDistance=null;});
 
 // ====== Load creations from Supabase ======
-async function loadCreations(){
-  const {data,error}=await supabase.from('creations').select('*');
-  if(!error){creations=data;render();}
+async function refreshCreations() {
+  const { data, error } = await supabase
+    .from('creations')
+    .select('*')
+    .order('created_at', { ascending: false });
+
+  if (error) return console.error(error);
+
+  creations = data.map(c => {
+    let zoomGroup = [];
+
+    // Si la création a plusieurs images (tableau images)
+    if (Array.isArray(c.images) && c.images.length > 0) {
+      zoomGroup = c.images.map(p => {
+        const { data } = supabase.storage.from('images').getPublicUrl(p);
+        return data?.publicUrl || '';
+      });
+    } 
+    // Si la création a seulement image_path
+    else if (c.image_path) {
+      const { data } = supabase.storage.from('images').getPublicUrl(c.image_path);
+      zoomGroup = [data?.publicUrl || ''];
+    }
+
+    return {
+      id: c.id,
+      name: c.name,
+      imgUrl: zoomGroup[0] || '', // première image pour la card
+      zoomGroup,
+      likes: Array.isArray(c.likes) ? c.likes : [],
+      comments: Array.isArray(c.comments) ? c.comments : []
+    };
+  });
+
+  render(); // afficher les cards
 }
-document.addEventListener('DOMContentLoaded',loadCreations);
 </script>
 
 </body>
