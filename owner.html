@@ -283,24 +283,12 @@ function render(){
 }
 
 function openZoom(c){
-  currentZoom = creations.find(x => x.id === c.id);
-
-  if (!Array.isArray(currentZoom.likes)) {
-    currentZoom.likes = [];
-  }
-
-  if (!Array.isArray(currentZoom.comments)) {
-    currentZoom.comments = [];
-  }
+  currentZoom = c;
 
   mainZoom.src = currentZoom.imgUrl;
   thumbs.innerHTML = '';
 
-  if(!currentZoom.zoomGroup || currentZoom.zoomGroup.length === 0){
-    currentZoom.zoomGroup = [currentZoom.imgUrl];
-  }
-
-  currentZoom.zoomGroup.forEach(u => {
+  (currentZoom.zoomGroup || []).forEach(u => {
     const t = document.createElement('img');
     t.src = u;
     t.onclick = () => mainZoom.src = u;
