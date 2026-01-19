@@ -655,20 +655,22 @@ async function refreshCreations() {
     if (error) return console.error(error);
 
     creations = data.map(c => {
+      // construction du zoomGroup
       let zoomGroup = [];
-      if (c.images?.length) {
+      if (Array.isArray(c.images) && c.images.length) {
         zoomGroup = c.images.map(p => supabase.storage.from('images').getPublicUrl(p).data?.publicUrl || '');
       } else if (c.image_path) {
         zoomGroup = [supabase.storage.from('images').getPublicUrl(c.image_path).data?.publicUrl || ''];
       }
 
-      const likesArray = Array.isArray(c.likes) ? c.likes : JSON.parseSafe(c.likes) || [];
-      const commentsArray = Array.isArray(c.comments) ? c.comments : JSON.parseSafe(c.comments) || [];
+      // likes et comments sécurisés
+      const likesArray = Array.isArray(c.likes) ? c.likes : (JSON.parseSafe(c.likes) || []);
+      const commentsArray = Array.isArray(c.comments) ? c.comments : (JSON.parseSafe(c.comments) || []);
 
       return {
         id: c.id,
-        name: c.name,
-        legend: c.legend || '',       // problème 2 corrigé
+        name: c.name || '',
+        legend: c.legend || '',
         imgUrl: zoomGroup[0] || '',
         zoomGroup,
         likes: likesArray.map(l => ({ name: l.name || '', photo: l.photo || '' })),
@@ -676,21 +678,21 @@ async function refreshCreations() {
       };
     });
 
-    renderCreations(creations); // on passe bien les créations
+    renderCreations(creations);
   } catch (err) {
     console.error('refreshCreations', err);
   }
 }
 
-// Helper pour JSON safe
+// Helper JSON safe
 JSON.parseSafe = str => { try { return JSON.parse(str); } catch(e) { return []; } };
 
 // ====== RENDER CREATIONS ======
 function renderCreations(creations) {
   const page = document.getElementById('page');
-  page.innerHTML = ''; // vide la page avant de rendre les nouvelles créations
+  page.innerHTML = ''; // vide avant rendu
 
-  creations.forEach((c) => {
+  creations.forEach(c => {
     const d = document.createElement('div');
     d.classList.add('creation');
 
@@ -721,11 +723,11 @@ function renderCreations(creations) {
     if (c.zoomGroup && c.zoomGroup.length > 0) {
       const zoomBtn = document.createElement('button');
       zoomBtn.textContent = 'Zoom';
-      zoomBtn.addEventListener('click', () => openZoomModal(c.zoomGroup));
+      zoomBtn.onclick = () => openZoom(c); // utilise la fonction stable avec currentZoom
       d.appendChild(zoomBtn);
     }
 
-    page.appendChild(d); // ajout au DOM
+    page.appendChild(d);
   });
 }
 
