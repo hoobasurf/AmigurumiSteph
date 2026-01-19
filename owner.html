@@ -213,6 +213,23 @@ body::before{
   height: 460px;
   border-radius: 24px;
 }
+
+.pink-file-btn{
+  background: linear-gradient(#ffd6e6, #ffb6c1);
+  border: 2px solid #b67385;
+  border-radius: 16px;
+  padding: 8px 14px;
+  color: #b84c6f;
+  font-weight: bold;
+  cursor: pointer;
+  width: 100%;
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+
+.pink-file-btn:hover{
+  transform: scale(1.03);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+}
   
 </style>
 </head>
@@ -244,8 +261,19 @@ body::before{
   <div class="modal-box">
     <h2>Ajouter des photos</h2>
     <input id="photoName" placeholder="Nom du projet">
-    <input type="file" id="multiPhoto" multiple>
-    <button id="confirmAdd">Valider</button>
+
+<!-- LÉGENDE -->
+<input id="photoLegend" placeholder="Légende (optionnel)">
+
+<!-- INPUT FILE CACHÉ -->
+<input type="file" id="multiPhoto" multiple hidden>
+
+<!-- BOUTON PASTEL ROSE -->
+<button id="fileBtn" class="pink-file-btn">Choisir des photos</button>
+
+<span id="fileInfo" style="font-size:12px;color:#b84c6f;"></span>
+
+<button id="confirmAdd">Valider</button>
   </div>
 </div>
 
@@ -445,7 +473,19 @@ const commentTextInput = document.getElementById('commentText');
 const chatModal = document.getElementById('chatModal');
 const toggleChatSize = document.getElementById('toggleChatSize');
 const icon = document.getElementById('chatResizeIcon');
+const fileBtn = document.getElementById('fileBtn');
+const fileInput = document.getElementById('multiPhoto');
+const fileInfo = document.getElementById('fileInfo');
 
+fileBtn.onclick = () => fileInput.click();
+
+fileInput.onchange = () => {
+  fileInfo.textContent = fileInput.files.length
+    ? `${fileInput.files.length} photo(s) sélectionnée(s)`
+    : '';
+};
+
+    
 let creations = [];
 let currentZoom = null;
 let currentDelete = null;
@@ -531,6 +571,7 @@ supabase.channel('public:messages').on(
   }
 ).subscribe();
 
+    
 // ====== LOAD USERS ======
 async function loadChatUsers() {
   try {
@@ -735,7 +776,8 @@ addModal.addEventListener('click', e => { if (e.target === addModal) addModal.st
 document.getElementById('confirmAdd').onclick = async e => {
   e.stopPropagation();
   const name = document.getElementById('photoName').value.trim();
-  const files = document.getElementById('multiPhoto').files;
+const legend = document.getElementById('photoLegend').value.trim();
+const files = document.getElementById('multiPhoto').files;
   if (!name || !files.length) { alert("Mettre un nom et choisir au moins une photo"); return; }
   const paths = [], urls = [];
   for (let file of files) {
@@ -747,10 +789,18 @@ document.getElementById('confirmAdd').onclick = async e => {
     urls.push(pubData.publicUrl); paths.push(path);
   }
   if (!urls.length) return;
-  await supabase.from('creations').insert([{ name, image_path: paths[0], images: paths, likes: [], comments: [] }]);
+  await supabase.from('creations').insert([{
+  name,
+  legend,
+  image_path: paths[0],
+  images: paths,
+  likes: [],
+  comments: []
+}]);
   addModal.style.display = 'none';
   document.getElementById('photoName').value = '';
   document.getElementById('multiPhoto').value = '';
+  document.getElementById('photoLegend').value = '';
   await refreshCreations();
 };
 
@@ -771,7 +821,18 @@ document.getElementById('videoBtn').onclick = () => { document.body.style.opacit
 document.getElementById('notesBtn').onclick = () => { document.body.style.opacity='0'; setTimeout(()=>window.location.href='notes.html',500); };
 document.getElementById('messagerieBtn').onclick = () => { chatModal.style.display='flex'; };
 document.getElementById('toggleSidebar').onclick = () => sidebar.classList.toggle('sidebar-open');
+// ====== FERMETURE MESSAGERIE AU CLIC DANS LE VIDE ======
+chatModal.addEventListener('click', (e) => {
+  // si on clique sur le fond (overlay)
+  if (e.target === chatModal) {
+    chatModal.style.display = 'none';
+  }
+});
 
+// empêcher la fermeture quand on clique dans la fenêtre
+document.querySelector('.chat-window').addEventListener('click', (e) => {
+  e.stopPropagation();
+});
 // ====== MODALS ======
 [zoomModal, likeModal, commentModal, deleteModal, addModal].forEach(m => {
   m.onclick = e => { if (e.target === m) m.style.display = 'none'; }
