@@ -542,16 +542,28 @@ sendMsgBtn.onclick = async () => {
   // ====== MESSAGERIE : TEMPS RÉEL ======
 supabase
   .channel('public:messages')
-  .on('postgres_changes', { event: '*', schema: 'public', table: 'messages' }, payload => {
-    if(!currentChatUser) return;
-    if(
-      payload.new.sender === currentChatUser ||
-      payload.new.receiver === currentChatUser ||
-      payload.new.sender === prenom
-    ){
-      loadMessages(currentChatUser);
+  .on(
+    'postgres_changes',
+    { event: '*', schema: 'public', table: 'messages' },
+    payload => {
+      const msg = payload.new;
+      if (!msg) return;
+
+      // message reçu
+      if (msg.receiver === prenom) {
+
+        // notification si la conversation n'est pas ouverte
+        if (msg.sender !== currentChatUser) {
+          showInAppNotification(msg.sender, msg.content);
+        }
+
+        // reload si conversation active
+        if (msg.sender === currentChatUser) {
+          loadMessages();
+        }
+      }
     }
-  })
+  )
   .subscribe();
 
     
@@ -860,6 +872,25 @@ toggleChatSize.onclick = () => {
     : '<path d="M4 9V4h5M20 15v5h-5M15 4h5v5M9 20H4v-5"/>';
 };
 
+function showInAppNotification(sender, message) {
+  const notif = document.createElement('div');
+  notif.textContent = `${sender} : ${message}`;
+  notif.style.cssText = `
+    position:fixed;
+    bottom:20px;
+    right:20px;
+    background:#ffb6c1;
+    color:#fff;
+    padding:10px 14px;
+    border-radius:12px;
+    z-index:99999;
+    font-size:12px;
+  `;
+  document.body.appendChild(notif);
+
+  setTimeout(() => notif.remove(), 3000);
+}
+    
 async function loadChatUsers() {
   try {
     const { data: users, error } = await supabase
@@ -887,24 +918,41 @@ async function loadChatUsers() {
       // ASSEMBLAGE
       div.appendChild(img);
       div.appendChild(span);
+div.onclick = () => {
+  currentChatUser = u.prenom;
 
-      // CLICK
-      div.onclick = () => {
-        currentChatUser = u.prenom;
-        loadMessages();
+  // 💾 sauvegarde du contact actif
+  localStorage.setItem('currentChatUser', u.prenom);
 
-        document.querySelectorAll('.chat-user')
-          .forEach(el => el.classList.remove('active'));
+  loadMessages();
 
-        div.classList.add('active');
-      };
+  document.querySelectorAll('.chat-user')
+    .forEach(el => el.classList.remove('active'));
 
+  div.classList.add('active');
+};
       chatUserList.appendChild(div);
     });
 
   } catch (err) {
     console.error('Erreur loadChatUsers:', err);
   }
+}
+
+    const savedChatUser = localStorage.getItem('currentChatUser');
+
+if (savedChatUser) {
+  currentChatUser = savedChatUser;
+  loadMessages();
+
+  // remettre l'utilisateur actif visuellement
+  setTimeout(() => {
+    document.querySelectorAll('.chat-user').forEach(el => {
+      if (el.textContent.includes(savedChatUser)) {
+        el.classList.add('active');
+      }
+    });
+  }, 500);
 }
     
 // ====== INITIAL ======
