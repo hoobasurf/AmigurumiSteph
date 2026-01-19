@@ -314,6 +314,14 @@ body::before{
 <div id="zoomModal">
   <div class="closeZoom">×</div>
   <img id="mainZoom">
+  <div id="zoomLegend" style="
+  max-width: 260px;
+  padding: 10px;
+  color: #b84c6f;
+  font-size: 14px;
+  background: transparent;
+  align-self: flex-start;
+"></div>
   <div class="thumbs" id="thumbs"></div>
   <div class="actions">
     <div class="actions" style="display:flex; gap:12px; align-items:center; margin-top:8px;">
@@ -686,6 +694,16 @@ function renderCreations() {
     img.onclick = () => openZoom(c);
     d.querySelector('.delete-btn').onclick = () => openDeleteModal(c);
     page.appendChild(d);
+
+  return {
+  id: c.id,
+  name: c.name,
+  legend: c.legend || '',
+  imgUrl: zoomGroup[0] || '',
+  zoomGroup,
+  likes: likesArray.map(l => ({ name: l.name || '', photo: l.photo || '' })),
+  comments: commentsArray.map(cmt => ({ name: cmt.name || '', text: cmt.text || '', photo: cmt.photo || '' }))
+};
   });
 }
 
@@ -693,6 +711,7 @@ function renderCreations() {
 function openZoom(c) {
   currentZoom = creations.find(x => x.id === c.id);
   mainZoom.src = currentZoom.imgUrl;
+  document.getElementById('zoomLegend').textContent = currentZoom.legend || '';
   thumbs.innerHTML = '';
   (currentZoom.zoomGroup || []).forEach(u => {
     const t = document.createElement('img'); t.src = u;
