@@ -815,31 +815,52 @@ function renderCommentList() {
 
 // ====== ADD CREATION ======
 document.getElementById('addBtn').onclick = () => addModal.style.display = 'flex';
-addModal.addEventListener('click', e => { if (e.target === addModal) addModal.style.display = 'none'; });
+
+// Fermer modal en cliquant sur le fond
+addModal.addEventListener('click', e => { 
+  if (e.target === addModal) addModal.style.display = 'none'; 
+});
+
 document.getElementById('confirmAdd').onclick = async e => {
   e.stopPropagation();
   const name = document.getElementById('photoName').value.trim();
-const legend = document.getElementById('photoLegend').value.trim();
-const files = document.getElementById('multiPhoto').files;
-  if (!name || !files.length) { alert("Mettre un nom et choisir au moins une photo"); return; }
-  const paths = [], urls = [];
+  const legend = document.getElementById('photoLegend').value.trim();
+  const files = document.getElementById('multiPhoto').files;
+
+  if (!name || !files.length) { 
+    alert("Mettre un nom et choisir au moins une photo"); 
+    return; 
+  }
+
+  const paths = [];
+  const urls = [];
+
   for (let file of files) {
     const path = `${Date.now()}_${file.name}`;
     const { error: uploadError } = await supabase.storage.from('images').upload(path, file);
-    if (uploadError) { console.error(uploadError); continue; }
+    if (uploadError) { 
+      console.error(uploadError); 
+      continue; 
+    }
+
     const { data: pubData } = supabase.storage.from('images').getPublicUrl(path);
     if (!pubData?.publicUrl) continue;
-    urls.push(pubData.publicUrl); paths.push(path);
+    urls.push(pubData.publicUrl);
+    paths.push(path);
   }
+
   if (!urls.length) return;
+
   await supabase.from('creations').insert([{
-  name,
-  legend,
-  image_path: paths[0],
-  images: paths,
-  likes: [],
-  comments: []
-}]);
+    name,
+    legend,
+    image_path: paths[0], // première image pour l'affichage principal
+    images: paths,
+    likes: [],
+    comments: []
+  }]);
+
+  // Reset modal et refresh
   addModal.style.display = 'none';
   document.getElementById('photoName').value = '';
   document.getElementById('multiPhoto').value = '';
@@ -848,11 +869,31 @@ const files = document.getElementById('multiPhoto').files;
 };
 
 // ====== DELETE CREATION ======
-function openDeleteModal(c) { currentDelete = c; deleteModal.style.display = 'flex'; }
-document.getElementById('cancelDelete').onclick = () => { currentDelete = null; deleteModal.style.display = 'none'; };
+let currentDelete = null;
+function openDeleteModal(c) {
+  currentDelete = c;
+  deleteModal.style.display = 'flex';
+}
+
+document.getElementById('cancelDelete').onclick = () => { 
+  currentDelete = null; 
+  deleteModal.style.display = 'none'; 
+};
+
 document.getElementById('confirmDelete').onclick = async () => {
   if (!currentDelete?.id) return;
+
+  // Supprime du storage toutes les images de cette création
+  if (Array.isArray(currentDelete.zoomGroup)) {
+    for (let url of currentDelete.zoomGroup) {
+      const path = url.split('/').pop().split('?')[0]; // récupère le nom du fichier
+      await supabase.storage.from('images').remove([path]).catch(e => console.error(e));
+    }
+  }
+
+  // Supprime de la base de données
   await supabase.from('creations').delete().eq('id', currentDelete.id);
+
   currentDelete = null;
   deleteModal.style.display = 'none';
   await refreshCreations();
