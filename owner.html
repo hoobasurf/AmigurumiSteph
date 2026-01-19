@@ -468,7 +468,8 @@ const sendMsgBtn = document.getElementById('sendMsgBtn');
 
 const myPrenom = localStorage.getItem('prenom');
 let currentChatUser = null;
-
+let userPhotos = {}; // stocke les photos de tous les utilisateurs
+    
   // ====== MESSAGERIE : CHARGER MESSAGES ======
 async function loadMessages() {
   if (!currentChatUser) return;
@@ -502,11 +503,10 @@ async function loadMessages() {
   circle.style.verticalAlign = 'middle';
   // photo de l’envoyeur, si pas de photo, cercle vide
   if (msg.sender === myPrenom) {
-    circle.src = ownerPhoto.src || '';
-  } else {
-    // récupérer photo utilisateur depuis profiles
-    circle.src = ''; // ici tu peux mettre un champ photo si tu l’as
-  }
+  circle.src = ownerPhoto.src || 'icon-152.png';
+} else {
+  circle.src = userPhotos[msg.sender] || 'icon-152.png';
+}
 
   // Contenu du message
   const p = document.createElement('p');
@@ -903,9 +903,11 @@ async function loadChatUsers() {
     chatUserList.innerHTML = '';
 
     users.forEach(u => {
-      const div = document.createElement('div');
-      div.className = 'chat-user';
+  userPhotos[u.prenom] = u.photo_url || 'icon-152.png';
 
+  const div = document.createElement('div');
+  div.className = 'chat-user';
+  
       // PHOTO
       const img = document.createElement('img');
       img.src = u.photo_url || 'icon-152.png'; // image par défaut
@@ -953,6 +955,36 @@ if (savedChatUser) {
       }
     });
   }, 500);
+}
+
+// Notifications système si onglet caché
+function showInAppNotification(sender, message) {
+  if (document.hidden) {
+    if (Notification.permission === 'granted') {
+      new Notification(`${sender}`, { body: message, icon: userPhotos[sender] || 'icon-152.png' });
+    }
+  } else {
+    const notif = document.createElement('div');
+    notif.textContent = `${sender} : ${message}`;
+    notif.style.cssText = `
+      position:fixed;
+      bottom:20px;
+      right:20px;
+      background:#ffb6c1;
+      color:#fff;
+      padding:10px 14px;
+      border-radius:12px;
+      z-index:99999;
+      font-size:12px;
+    `;
+    document.body.appendChild(notif);
+    setTimeout(() => notif.remove(), 3000);
+  }
+}
+
+// demander la permission au chargement
+if ('Notification' in window && Notification.permission !== 'granted') {
+  Notification.requestPermission();
 }
     
 // ====== INITIAL ======
