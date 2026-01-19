@@ -239,16 +239,13 @@ body::before{
 </button>
 </div>
 
-<!-- Modals -->
-<div id="addModal" class="modal">
-  <div class="modal-box">
-    <h2>Ajouter des photos</h2>
-    <input id="photoName" placeholder="Nom du projet">
-    <input type="file" id="multiPhoto" multiple>
-    <button id="confirmAdd">Valider</button>
-  </div>
+ <div id="addModal">
+  <input type="text" id="photoName" placeholder="Nom de la création">
+  <input type="file" id="multiPhoto" multiple>
+  <label for="photoCaption">Légende (optionnel)</label>
+  <input type="text" id="photoCaption" placeholder="Écrire une légende...">
+  <button id="confirmAdd">Ajouter</button>
 </div>
-
 <div id="deleteModal" class="modal">
   <div class="modal-box">
     <p>Supprimer définitivement ce projet ?</p>
@@ -284,28 +281,38 @@ body::before{
 </div>
 
 <div id="zoomModal">
-  <div class="closeZoom">×</div>
-  <img id="mainZoom">
-  <div class="thumbs" id="thumbs"></div>
-  <div class="actions">
-    <div class="actions" style="display:flex; gap:12px; align-items:center; margin-top:8px;">
-  <div class="icon-btn" id="likeBtn" style="display:flex; align-items:center; cursor:pointer; gap:4px;">
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#b84c6f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-      <path d="M12 21C12 21 4 13.5 4 8.5C4 5.5 6.5 3 9.5 3C11 3 12 4 12 4C12 4 13 3 14.5 3C17.5 3 20 5.5 20 8.5C20 13.5 12 21 12 21Z"></path>
-    </svg>
-    <span id="likeCount">0</span>
+  <div id="zoomContainer" style="display:flex; gap:12px; align-items:flex-start;">
+    <!-- Photo principale -->
+    <img id="mainZoom" src="" style="max-width:400px;">
+
+    <!-- Légende à droite -->
+    <div id="zoomCaption" style="max-width:200px; white-space:pre-wrap; color:#000; background:transparent; font-size:14px;"></div>
   </div>
 
-  <div class="icon-btn" id="commentBtn" style="display:flex; align-items:center; cursor:pointer; gap:4px;">
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#b84c6f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-      <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
-    </svg>
-    <span id="commentCount">0</span>
-  </div>
-</div>
-  </div>
-</div>
+  <!-- Miniatures en dessous -->
+  <div id="thumbs" style="margin-top:12px; display:flex; gap:6px;"></div>
 
+  <!-- Bouton fermer -->
+  <button class="closeZoom" style="position:absolute; top:10px; right:10px; font-size:24px;">×</button>
+
+  <!-- Actions like/comment -->
+  <div class="actions" style="display:flex; gap:12px; align-items:center; margin-top:8px;">
+    <div class="icon-btn" id="likeBtn" style="display:flex; align-items:center; cursor:pointer; gap:4px;">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#b84c6f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 21C12 21 4 13.5 4 8.5C4 5.5 6.5 3 9.5 3C11 3 12 4 12 4C12 4 13 3 14.5 3C17.5 3 20 5.5 20 8.5C20 13.5 12 21 12 21Z"></path>
+      </svg>
+      <span id="likeCount">0</span>
+    </div>
+
+    <div class="icon-btn" id="commentBtn" style="display:flex; align-items:center; cursor:pointer; gap:4px;">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#b84c6f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+      </svg>
+      <span id="commentCount">0</span>
+    </div>
+  </div>
+</div>
+  
 <!-- Modal Gestion -->
 <div id="manageModal" class="modal">
   <div class="modal-box">
@@ -443,6 +450,9 @@ const commentBubbles = document.getElementById('commentBubbles');
 const commentNameInput = document.getElementById('commentName');
 const commentTextInput = document.getElementById('commentText');
 const chatModal = document.getElementById('chatModal');
+chatModal.addEventListener('click', e => {
+  if (e.target === chatModal) chatModal.style.display = 'none';
+});
 const toggleChatSize = document.getElementById('toggleChatSize');
 const icon = document.getElementById('chatResizeIcon');
 
@@ -511,9 +521,24 @@ async function loadMessages() {
 sendMsgBtn.onclick = async () => {
   const text = chatInput.value.trim();
   if (!text || !currentChatUser) return;
-  await supabase.from('messages').insert({ sender: myPrenom, receiver: currentChatUser, content: text });
-  chatInput.value = '';
-  loadMessages();
+
+  try {
+    await supabase.from('messages').insert({
+      sender: myPrenom,
+      receiver: currentChatUser,
+      content: text
+    });
+
+    chatInput.value = '';
+
+    // recharge la conversation après envoi
+    await loadMessages();
+
+    // scroll en bas automatiquement
+    chatMessages.scrollTop = chatMessages.scrollHeight;
+  } catch (err) {
+    console.error('Erreur envoi message :', err);
+  }
 };
 
 // Temps réel messagerie
@@ -649,9 +674,14 @@ function renderCreations() {
 }
 
 // ====== ZOOM ======
-function openZoom(c) {
+function openZoom(c){
   currentZoom = creations.find(x => x.id === c.id);
   mainZoom.src = currentZoom.imgUrl;
+
+  // ✅ Ajouter légende
+  const zoomCaption = document.getElementById('zoomCaption');
+  zoomCaption.textContent = currentZoom.caption || '';
+
   thumbs.innerHTML = '';
   (currentZoom.zoomGroup || []).forEach(u => {
     const t = document.createElement('img'); t.src = u;
@@ -726,34 +756,111 @@ function renderCommentList() {
     div.innerHTML = `${c.photo ? `<img src="${c.photo}" style="width:20px;height:20px;border-radius:50%;margin-right:4px;vertical-align:middle;">` : ''}<strong>${c.name}</strong>: ${c.text}`;
     commentBubbles.appendChild(div);
   });
-  commentCount.textContent = (currentZoom.comments || []).length;
-}
-
-// ====== ADD CREATION ======
+  commentCount.textContent = (currentZoom.comments || []).// ====== ADD CREATION ======
 document.getElementById('addBtn').onclick = () => addModal.style.display = 'flex';
-addModal.addEventListener('click', e => { if (e.target === addModal) addModal.style.display = 'none'; });
+
+// fermer modal si clic en dehors
+addModal.addEventListener('click', e => { 
+  if (e.target === addModal) addModal.style.display = 'none'; 
+});
+
 document.getElementById('confirmAdd').onclick = async e => {
   e.stopPropagation();
+
   const name = document.getElementById('photoName').value.trim();
+  const caption = document.getElementById('photoCaption').value.trim(); // <-- ajout légende
   const files = document.getElementById('multiPhoto').files;
-  if (!name || !files.length) { alert("Mettre un nom et choisir au moins une photo"); return; }
+
+  if (!name || !files.length) { 
+    alert("Mettre un nom et choisir au moins une photo"); 
+    return; 
+  }
+
   const paths = [], urls = [];
+
   for (let file of files) {
     const path = `${Date.now()}_${file.name}`;
     const { error: uploadError } = await supabase.storage.from('images').upload(path, file);
     if (uploadError) { console.error(uploadError); continue; }
+
     const { data: pubData } = supabase.storage.from('images').getPublicUrl(path);
     if (!pubData?.publicUrl) continue;
-    urls.push(pubData.publicUrl); paths.push(path);
+
+    urls.push(pubData.publicUrl);
+    paths.push(path);
   }
+
   if (!urls.length) return;
-  await supabase.from('creations').insert([{ name, image_path: paths[0], images: paths, likes: [], comments: [] }]);
+
+  await supabase.from('creations').insert([{
+    name,
+    caption,        // <-- sauvegarde légende ici
+    image_path: paths[0],
+    images: paths,
+    likes: [],
+    comments: []
+  }]);
+
   addModal.style.display = 'none';
   document.getElementById('photoName').value = '';
+  document.getElementById('photoCaption').value = '';
+  document.getElementById('multiPhoto').value = '';
+  await refreshCreations();
+  
+};
+  
+// ====== ADD CREATION ======
+document.getElementById('addBtn').onclick = () => addModal.style.display = 'flex';
+
+// fermer modal si clic en dehors
+addModal.addEventListener('click', e => { 
+  if (e.target === addModal) addModal.style.display = 'none'; 
+});
+
+document.getElementById('confirmAdd').onclick = async e => {
+  e.stopPropagation();
+
+  const name = document.getElementById('photoName').value.trim();
+  const caption = document.getElementById('photoCaption').value.trim(); // <-- ajout légende
+  const files = document.getElementById('multiPhoto').files;
+
+  if (!name || !files.length) { 
+    alert("Mettre un nom et choisir au moins une photo"); 
+    return; 
+  }
+
+  const paths = [], urls = [];
+
+  for (let file of files) {
+    const path = `${Date.now()}_${file.name}`;
+    const { error: uploadError } = await supabase.storage.from('images').upload(path, file);
+    if (uploadError) { console.error(uploadError); continue; }
+
+    const { data: pubData } = supabase.storage.from('images').getPublicUrl(path);
+    if (!pubData?.publicUrl) continue;
+
+    urls.push(pubData.publicUrl);
+    paths.push(path);
+  }
+
+  if (!urls.length) return;
+
+  await supabase.from('creations').insert([{
+    name,
+    caption,        // <-- sauvegarde légende ici
+    image_path: paths[0],
+    images: paths,
+    likes: [],
+    comments: []
+  }]);
+
+  addModal.style.display = 'none';
+  document.getElementById('photoName').value = '';
+  document.getElementById('photoCaption').value = '';
   document.getElementById('multiPhoto').value = '';
   await refreshCreations();
 };
-
+    
 // ====== DELETE CREATION ======
 function openDeleteModal(c) { currentDelete = c; deleteModal.style.display = 'flex'; }
 document.getElementById('cancelDelete').onclick = () => { currentDelete = null; deleteModal.style.display = 'none'; };
