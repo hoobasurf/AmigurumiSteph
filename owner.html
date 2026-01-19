@@ -864,26 +864,44 @@ async function loadChatUsers() {
   try {
     const { data: users, error } = await supabase
       .from('profiles')
-      .select('prenom')
+      .select('prenom, photo_url')
       .neq('prenom', myPrenom);
 
     if (error) throw error;
 
     chatUserList.innerHTML = '';
+
     users.forEach(u => {
       const div = document.createElement('div');
       div.className = 'chat-user';
-      div.textContent = u.prenom;
+
+      // PHOTO
+      const img = document.createElement('img');
+      img.src = u.photo_url || 'icon-152.png'; // image par défaut
+      img.alt = u.prenom;
+
+      // TEXTE
+      const span = document.createElement('span');
+      span.textContent = u.prenom;
+
+      // ASSEMBLAGE
+      div.appendChild(img);
+      div.appendChild(span);
+
+      // CLICK
       div.onclick = () => {
-        // sélectionner l’utilisateur
         currentChatUser = u.prenom;
         loadMessages();
-        // mettre en surbrillance
-        document.querySelectorAll('.chat-user').forEach(el => el.classList.remove('active'));
+
+        document.querySelectorAll('.chat-user')
+          .forEach(el => el.classList.remove('active'));
+
         div.classList.add('active');
       };
+
       chatUserList.appendChild(div);
     });
+
   } catch (err) {
     console.error('Erreur loadChatUsers:', err);
   }
