@@ -213,26 +213,6 @@ body::before{
   height: 460px;
   border-radius: 24px;
 }
-
-#zoomCaption {
-  color: #000;          /* texte noir */
-  background: transparent; /* pas de fond */
-  font-size: 14px;
-  white-space: pre-wrap;
-}
-
-  #addModal {
-  display: none;
-  position: fixed;
-  top:0; left:0; width:100%; height:100%;
-  background: rgba(0,0,0,0.4);
-  justify-content: center;
-  align-items: center;
-  z-index: 9999;
-}
-#addModal input, #addModal button {
-  margin-top: 6px;
-}
   
 </style>
 </head>
@@ -259,25 +239,16 @@ body::before{
 </button>
 </div>
 
- <div id="addModal">
-  <input type="text" id="photoName" placeholder="Nom de la création">
-  <input type="file" id="multiPhoto" multiple>
- <textarea
-  id="photoCaption"
-  placeholder="Ajouter une légende (optionnel)"
-  style="
-    width:100%;
-    border:none;
-    outline:none;
-    resize:none;
-    background:transparent;
-    font-family:inherit;
-  ">
-</textarea>
-  <label for="photoCaption">Légende (optionnel)</label>
-  <input type="text" id="photoCaption" placeholder="Écrire une légende...">
-  <button id="confirmAdd">Ajouter</button>
+<!-- Modals -->
+<div id="addModal" class="modal">
+  <div class="modal-box">
+    <h2>Ajouter des photos</h2>
+    <input id="photoName" placeholder="Nom du projet">
+    <input type="file" id="multiPhoto" multiple>
+    <button id="confirmAdd">Valider</button>
+  </div>
 </div>
+
 <div id="deleteModal" class="modal">
   <div class="modal-box">
     <p>Supprimer définitivement ce projet ?</p>
@@ -314,65 +285,27 @@ body::before{
 
 <div id="zoomModal">
   <div class="closeZoom">×</div>
-
-  <div id="zoomMainRow" style="display:flex; align-items:flex-start; gap:16px;">
-  
   <img id="mainZoom">
-
-  <div id="zoomCaption"
-       style="
-         max-width:220px;
-         font-size:14px;
-         line-height:1.4;
-         color:#b84c6f;
-         background:transparent;
-         white-space:pre-wrap;
-       ">
-  </div>
-
-</div>
-
-  <div id="thumbs"></div>
-
+  <div class="thumbs" id="thumbs"></div>
   <div class="actions">
-    <!-- SVG LIKE -->
-    <div id="likeBtn">
-      <svg>...</svg>
-      <span id="likeCount">0</span>
-    </div>
+    <div class="actions" style="display:flex; gap:12px; align-items:center; margin-top:8px;">
+  <div class="icon-btn" id="likeBtn" style="display:flex; align-items:center; cursor:pointer; gap:4px;">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#b84c6f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M12 21C12 21 4 13.5 4 8.5C4 5.5 6.5 3 9.5 3C11 3 12 4 12 4C12 4 13 3 14.5 3C17.5 3 20 5.5 20 8.5C20 13.5 12 21 12 21Z"></path>
+    </svg>
+    <span id="likeCount">0</span>
+  </div>
 
-    <!-- SVG COMMENT -->
-    <div id="commentBtn">
-      <svg>...</svg>
-      <span id="commentCount">0</span>
-    </div>
+  <div class="icon-btn" id="commentBtn" style="display:flex; align-items:center; cursor:pointer; gap:4px;">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#b84c6f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+    </svg>
+    <span id="commentCount">0</span>
+  </div>
+</div>
   </div>
 </div>
 
-  <!-- Miniatures en dessous -->
-  <div id="thumbs" style="margin-top:12px; display:flex; gap:6px;"></div>
-
-  <!-- Bouton fermer -->
-  <button class="closeZoom" style="position:absolute; top:10px; right:10px; font-size:24px;">×</button>
-
-  <!-- Actions like/comment -->
-  <div class="actions" style="display:flex; gap:12px; align-items:center; margin-top:8px;">
-    <div class="icon-btn" id="likeBtn" style="display:flex; align-items:center; cursor:pointer; gap:4px;">
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#b84c6f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M12 21C12 21 4 13.5 4 8.5C4 5.5 6.5 3 9.5 3C11 3 12 4 12 4C12 4 13 3 14.5 3C17.5 3 20 5.5 20 8.5C20 13.5 12 21 12 21Z"></path>
-      </svg>
-      <span id="likeCount">0</span>
-    </div>
-
-    <div class="icon-btn" id="commentBtn" style="display:flex; align-items:center; cursor:pointer; gap:4px;">
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#b84c6f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
-      </svg>
-      <span id="commentCount">0</span>
-    </div>
-  </div>
-</div>
-  
 <!-- Modal Gestion -->
 <div id="manageModal" class="modal">
   <div class="modal-box">
@@ -527,12 +460,14 @@ async function loadOwnerPhoto() {
   if (!error && data?.photo_url) ownerPhoto.src = data.photo_url;
   ownerPhoto.style.opacity = data?.photo_url ? '1' : '0.3';
 }
+
 document.addEventListener('DOMContentLoaded', loadOwnerPhoto);
 window.addEventListener('pageshow', loadOwnerPhoto);
 
 // ====== MESSAGERIE ======
 async function loadMessages() {
   if (!currentChatUser) return;
+
   const { data, error } = await supabase
     .from('messages')
     .select('*')
@@ -576,14 +511,9 @@ async function loadMessages() {
 sendMsgBtn.onclick = async () => {
   const text = chatInput.value.trim();
   if (!text || !currentChatUser) return;
-  try {
-    await supabase.from('messages').insert({ sender: myPrenom, receiver: currentChatUser, content: text });
-    chatInput.value = '';
-    await loadMessages();
-    chatMessages.scrollTop = chatMessages.scrollHeight;
-  } catch (err) {
-    console.error('Erreur envoi message :', err);
-  }
+  await supabase.from('messages').insert({ sender: myPrenom, receiver: currentChatUser, content: text });
+  chatInput.value = '';
+  loadMessages();
 };
 
 // Temps réel messagerie
@@ -593,6 +523,7 @@ supabase.channel('public:messages').on(
   payload => {
     const msg = payload.new;
     if (!msg) return;
+
     if (msg.receiver === prenom) {
       if (msg.sender !== currentChatUser) showInAppNotification(msg.sender, msg.content);
       if (msg.sender === currentChatUser) loadMessages();
@@ -627,6 +558,7 @@ async function loadChatUsers() {
       chatUserList.appendChild(div);
     });
 
+    // Restore active user
     if (currentChatUser) {
       setTimeout(() => {
         document.querySelectorAll('.chat-user').forEach(el => {
@@ -678,12 +610,13 @@ async function refreshCreations() {
       } else if (c.image_path) {
         zoomGroup = [supabase.storage.from('images').getPublicUrl(c.image_path).data?.publicUrl || ''];
       }
+
       const likesArray = Array.isArray(c.likes) ? c.likes : JSON.parseSafe(c.likes) || [];
       const commentsArray = Array.isArray(c.comments) ? c.comments : JSON.parseSafe(c.comments) || [];
+
       return {
         id: c.id,
         name: c.name,
-        caption: c.caption || '',
         imgUrl: zoomGroup[0] || '',
         zoomGroup,
         likes: likesArray.map(l => ({ name: l.name || '', photo: l.photo || '' })),
@@ -695,6 +628,7 @@ async function refreshCreations() {
   } catch (err) { console.error('refreshCreations', err); }
 }
 
+// Helper pour JSON safe
 JSON.parseSafe = str => { try { return JSON.parse(str); } catch(e) { return []; } };
 
 // ====== RENDER CREATIONS ======
@@ -715,19 +649,15 @@ function renderCreations() {
 }
 
 // ====== ZOOM ======
-function openZoom(c){
+function openZoom(c) {
   currentZoom = creations.find(x => x.id === c.id);
   mainZoom.src = currentZoom.imgUrl;
-  document.getElementById('zoomCaption').textContent = currentZoom.caption || '';
-
   thumbs.innerHTML = '';
   (currentZoom.zoomGroup || []).forEach(u => {
     const t = document.createElement('img'); t.src = u;
-    t.style.cursor = 'pointer';
     t.onclick = () => mainZoom.src = u;
     thumbs.appendChild(t);
   });
-
   updateActions();
   zoomModal.style.display = 'flex';
 }
@@ -737,7 +667,7 @@ function updateActions() {
   commentCount.textContent = (currentZoom.comments || []).length;
 }
 
-// ====== LIKE / COMMENT ======
+// ====== LIKE / COMMENT MODAL ======
 document.getElementById('likeBtn').onclick = () => {
   if (!currentZoom) { alert("Sélectionnez d'abord une image !"); return; }
   likeNameInput.value = myPrenom || '';
@@ -754,17 +684,6 @@ confirmLike.onclick = async () => {
   renderLikeList();
   likeModal.style.display = 'none';
 };
-function renderLikeList() {
-  if (!currentZoom) return;
-  likeBubbles.innerHTML = '';
-  (currentZoom.likes || []).forEach(l => {
-    const div = document.createElement('div');
-    div.className = 'like-item';
-    div.innerHTML = `${l.photo ? `<img src="${l.photo}" style="width:20px;height:20px;border-radius:50%;margin-right:4px;vertical-align:middle;">` : ''}<strong>${l.name}</strong>`;
-    likeBubbles.appendChild(div);
-  });
-  likeCount.textContent = (currentZoom.likes || []).length;
-}
 
 document.getElementById('commentBtn').onclick = () => {
   if (!currentZoom) return;
@@ -783,9 +702,21 @@ confirmComment.onclick = async () => {
   await supabase.from('creations').update({ comments: currentZoom.comments }).eq('id', currentZoom.id);
   renderCommentList();
   commentTextInput.value = '';
+  commentCount.textContent = currentZoom.comments.length;
 };
 
-// ====== COMMENT LIST ======
+function renderLikeList() {
+  if (!currentZoom) return;
+  likeBubbles.innerHTML = '';
+  (currentZoom.likes || []).forEach(l => {
+    const div = document.createElement('div');
+    div.className = 'like-item';
+    div.innerHTML = `${l.photo ? `<img src="${l.photo}" style="width:20px;height:20px;border-radius:50%;margin-right:4px;vertical-align:middle;">` : ''}<strong>${l.name}</strong>`;
+    likeBubbles.appendChild(div);
+  });
+  likeCount.textContent = (currentZoom.likes || []).length;
+}
+
 function renderCommentList() {
   if (!currentZoom) return;
   commentBubbles.innerHTML = '';
@@ -798,17 +729,14 @@ function renderCommentList() {
   commentCount.textContent = (currentZoom.comments || []).length;
 }
 
-// ====== ADD CREATION MODAL ======
+// ====== ADD CREATION ======
 document.getElementById('addBtn').onclick = () => addModal.style.display = 'flex';
-addModal.addEventListener('click', e => { if(e.target === addModal) addModal.style.display = 'none'; });
-
+addModal.addEventListener('click', e => { if (e.target === addModal) addModal.style.display = 'none'; });
 document.getElementById('confirmAdd').onclick = async e => {
   e.stopPropagation();
   const name = document.getElementById('photoName').value.trim();
-  const caption = document.getElementById('photoCaption').value.trim();
   const files = document.getElementById('multiPhoto').files;
   if (!name || !files.length) { alert("Mettre un nom et choisir au moins une photo"); return; }
-
   const paths = [], urls = [];
   for (let file of files) {
     const path = `${Date.now()}_${file.name}`;
@@ -816,15 +744,12 @@ document.getElementById('confirmAdd').onclick = async e => {
     if (uploadError) { console.error(uploadError); continue; }
     const { data: pubData } = supabase.storage.from('images').getPublicUrl(path);
     if (!pubData?.publicUrl) continue;
-    urls.push(pubData.publicUrl);
-    paths.push(path);
+    urls.push(pubData.publicUrl); paths.push(path);
   }
   if (!urls.length) return;
-
-  await supabase.from('creations').insert([{ name, caption, image_path: paths[0], images: paths, likes: [], comments: [] }]);
+  await supabase.from('creations').insert([{ name, image_path: paths[0], images: paths, likes: [], comments: [] }]);
   addModal.style.display = 'none';
   document.getElementById('photoName').value = '';
-  document.getElementById('photoCaption').value = '';
   document.getElementById('multiPhoto').value = '';
   await refreshCreations();
 };
@@ -847,11 +772,11 @@ document.getElementById('notesBtn').onclick = () => { document.body.style.opacit
 document.getElementById('messagerieBtn').onclick = () => { chatModal.style.display='flex'; };
 document.getElementById('toggleSidebar').onclick = () => sidebar.classList.toggle('sidebar-open');
 
-// ====== CLOSE MODALS ======
-document.querySelector('.closeZoom').onclick = () => zoomModal.style.display = 'none';
+// ====== MODALS ======
 [zoomModal, likeModal, commentModal, deleteModal, addModal].forEach(m => {
-  m.onclick = e => { if(e.target === m) m.style.display='none'; }
+  m.onclick = e => { if (e.target === m) m.style.display = 'none'; }
 });
+document.querySelector('.closeZoom').onclick = () => zoomModal.style.display = 'none';
 
 // ====== CHAT MODAL ======
 toggleChatSize.onclick = () => {
@@ -861,22 +786,22 @@ toggleChatSize.onclick = () => {
     : '<path d="M4 9V4h5M20 15v5h-5M15 4h5v5M9 20H4v-5"/>';
 };
 
-// Pinch zoom 2 doigts
+// Pinch zoom deux doigts
 let initialDistance = null;
 chatModal.addEventListener('touchstart', e => { if(e.touches.length===2) initialDistance=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY); });
 chatModal.addEventListener('touchmove', e => {
-  if(e.touches.length===2 && initialDistance){
+  if (e.touches.length===2 && initialDistance) {
     const currentDistance=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);
-    if(currentDistance>initialDistance*1.1) chatModal.classList.add('expanded');
-    if(currentDistance<initialDistance*0.9) chatModal.classList.remove('expanded');
+    if(currentDistance-initialDistance>40) chatModal.classList.add('expanded');
+    if(initialDistance-currentDistance>40) chatModal.classList.remove('expanded');
   }
 });
+chatModal.addEventListener('touchend',()=>{initialDistance=null;});
 
-// ====== INIT ======
-document.addEventListener('DOMContentLoaded', async () => {
-  await refreshCreations();
-  await loadChatUsers();
-});
+// ====== INITIAL LOAD ======
+refreshCreations();
+loadOwnerPhoto();
+loadChatUsers();
 </script>
 
 
