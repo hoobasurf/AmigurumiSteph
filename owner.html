@@ -408,69 +408,63 @@ body::before{
     </div>
   </div>
 </div>
+
   <script type="module">
 import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
+
 const supabase = createClient(
   "https://jyhbamdcxmpveujjqjla.supabase.co",
   "sb_publishable_sqsxb-3Kl5o3-JQYv9kGFw_-g0EgwMa"
 );
 
-// ====== OWNER AVATAR ======
+// ====== VARIABLES GLOBALES ======
 const ownerPhoto = document.getElementById('ownerPhoto');
 const prenom = localStorage.getItem('prenom');
-
-async function loadOwnerPhoto(){
-  if(!prenom) return;
-  const {data,error} = await supabase.from('profiles').select('photo_url').eq('prenom',prenom).single();
-  if(!error && data?.photo_url){ownerPhoto.src=data.photo_url;ownerPhoto.style.opacity='1';} 
-  else{ownerPhoto.style.opacity='0.3';}
-}
-document.addEventListener('DOMContentLoaded', loadOwnerPhoto);
-window.addEventListener('pageshow', loadOwnerPhoto);
-
-function selectUser(prenomUser) {
-  currentChatUser = prenomUser;
-  loadMessages(prenomUser);
-}
-
-    // ====== MESSAGERIE : AFFICHAGE ======
-function renderChat(messages) {
-  const chatMessages = document.getElementById('chatMessages');
-  chatMessages.innerHTML = '';
-  messages.forEach(m => {
-    const div = document.createElement('div');
-    div.className = m.sender === prenom ? 'msg msg-me' : 'msg msg-them';
-    div.innerHTML = `<p>${m.content || ''}</p>`;
-    if(m.images){
-      const img = document.createElement('img');
-      img.src = m.images;
-      img.style.maxWidth = '150px';
-      img.style.display = 'block';
-      img.style.marginTop = '4px';
-      div.appendChild(img);
-    }
-    chatMessages.appendChild(div);
-  });
-  chatMessages.scrollTop = chatMessages.scrollHeight;
-}
-
-    
-// ====== VARIABLES ======
-let creations=[];
-let currentZoom=null;
-let currentDelete=null;
-
-// ====== MESSAGERIE : VARIABLES ======
 const chatUserList = document.getElementById('chatUserList');
 const chatMessages = document.getElementById('chatMessages');
 const chatInput = document.getElementById('chatInput');
 const sendMsgBtn = document.getElementById('sendMsgBtn');
+const container = document.getElementById('visitor-list-container');
+const addModal = document.getElementById('addModal');
+const deleteModal = document.getElementById('deleteModal');
+const zoomModal = document.getElementById('zoomModal');
+const sidebar = document.getElementById('sidebar');
+const mainZoom = document.getElementById('mainZoom');
+const thumbs = document.getElementById('thumbs');
+const likeCount = document.getElementById('likeCount');
+const commentCount = document.getElementById('commentCount');
+const likeModal = document.getElementById('likeModal');
+const likeBubbles = document.getElementById('likeBubbles');
+const confirmLike = document.getElementById('confirmLike');
+const likeNameInput = document.getElementById('likeName');
+const commentModal = document.getElementById('commentModal');
+const confirmComment = document.getElementById('confirmComment');
+const commentBubbles = document.getElementById('commentBubbles');
+const commentNameInput = document.getElementById('commentName');
+const commentTextInput = document.getElementById('commentText');
+const chatModal = document.getElementById('chatModal');
+const toggleChatSize = document.getElementById('toggleChatSize');
+const icon = document.getElementById('chatResizeIcon');
 
+let creations = [];
+let currentZoom = null;
+let currentDelete = null;
 const myPrenom = localStorage.getItem('prenom');
-let currentChatUser = null;
-let userPhotos = {}; // stocke les photos de tous les utilisateurs
-    
-  // ====== MESSAGERIE : CHARGER MESSAGES ======
+let currentChatUser = localStorage.getItem('currentChatUser') || null;
+let userPhotos = {};
+
+// ====== OWNER PHOTO ======
+async function loadOwnerPhoto() {
+  if (!prenom) return;
+  const { data, error } = await supabase.from('profiles').select('photo_url').eq('prenom', prenom).single();
+  if (!error && data?.photo_url) ownerPhoto.src = data.photo_url;
+  ownerPhoto.style.opacity = data?.photo_url ? '1' : '0.3';
+}
+
+document.addEventListener('DOMContentLoaded', loadOwnerPhoto);
+window.addEventListener('pageshow', loadOwnerPhoto);
+
+// ====== MESSAGERIE ======
 async function loadMessages() {
   if (!currentChatUser) return;
 
@@ -483,485 +477,105 @@ async function loadMessages() {
     )
     .order('created_at', { ascending: true });
 
-  if (error) {
-    console.error(error);
-    return;
-  }
+  if (error) return console.error(error);
 
   chatMessages.innerHTML = '';
 
   data.forEach(msg => {
-  const div = document.createElement('div');
-  div.className = 'msg ' + (msg.sender === myPrenom ? 'msg-me' : 'msg-them');
+    const div = document.createElement('div');
+    div.className = 'msg ' + (msg.sender === myPrenom ? 'msg-me' : 'msg-them');
 
-  // Créer le cercle avec photo
-  const circle = document.createElement('img');
-  circle.style.width = '24px';
-  circle.style.height = '24px';
-  circle.style.borderRadius = '50%';
-  circle.style.marginRight = '6px';
-  circle.style.verticalAlign = 'middle';
-  // photo de l’envoyeur, si pas de photo, cercle vide
-  if (msg.sender === myPrenom) {
-  circle.src = ownerPhoto.src || 'icon-152.png';
-} else {
-  circle.src = userPhotos[msg.sender] || 'icon-152.png';
-}
+    const circle = document.createElement('img');
+    circle.style.width = '24px';
+    circle.style.height = '24px';
+    circle.style.borderRadius = '50%';
+    circle.style.marginRight = '6px';
+    circle.style.verticalAlign = 'middle';
+    circle.src = msg.sender === myPrenom ? ownerPhoto.src || 'icon-152.png' : userPhotos[msg.sender] || 'icon-152.png';
 
-  // Contenu du message
-  const p = document.createElement('p');
-  p.style.display = 'inline-block';
-  p.style.margin = 0;
-  p.textContent = msg.content;
+    const p = document.createElement('p');
+    p.style.display = 'inline-block';
+    p.style.margin = 0;
+    p.textContent = msg.content;
 
-  // Ajouter cercle et message dans le div
-  div.appendChild(circle);
-  div.appendChild(p);
+    div.appendChild(circle);
+    div.appendChild(p);
 
-  chatMessages.appendChild(div);
-});
+    chatMessages.appendChild(div);
+  });
 
   chatMessages.scrollTop = chatMessages.scrollHeight;
 }
 
-    // ====== MESSAGERIE : ENVOI ======
+// Envoi message
 sendMsgBtn.onclick = async () => {
   const text = chatInput.value.trim();
   if (!text || !currentChatUser) return;
-
-  await supabase.from('messages').insert({
-    sender: myPrenom,
-    receiver: currentChatUser,
-    content: text
-  });
-
+  await supabase.from('messages').insert({ sender: myPrenom, receiver: currentChatUser, content: text });
   chatInput.value = '';
   loadMessages();
 };
 
-  // ====== MESSAGERIE : TEMPS RÉEL ======
-supabase
-  .channel('public:messages')
-  .on(
-    'postgres_changes',
-    { event: '*', schema: 'public', table: 'messages' },
-    payload => {
-      const msg = payload.new;
-      if (!msg) return;
+// Temps réel messagerie
+supabase.channel('public:messages').on(
+  'postgres_changes',
+  { event: '*', schema: 'public', table: 'messages' },
+  payload => {
+    const msg = payload.new;
+    if (!msg) return;
 
-      // message reçu
-      if (msg.receiver === prenom) {
-
-        // notification si la conversation n'est pas ouverte
-        if (msg.sender !== currentChatUser) {
-          showInAppNotification(msg.sender, msg.content);
-        }
-
-        // reload si conversation active
-        if (msg.sender === currentChatUser) {
-          loadMessages();
-        }
-      }
+    if (msg.receiver === prenom) {
+      if (msg.sender !== currentChatUser) showInAppNotification(msg.sender, msg.content);
+      if (msg.sender === currentChatUser) loadMessages();
     }
-  )
-  .subscribe();
-
-    
-const container=document.getElementById('visitor-list-container');
-const addModal=document.getElementById('addModal');
-const deleteModal=document.getElementById('deleteModal');
-const zoomModal=document.getElementById('zoomModal');
-const sidebar=document.getElementById('sidebar');
-const mainZoom=document.getElementById('mainZoom');
-const thumbs=document.getElementById('thumbs');
-const likeCount=document.getElementById('likeCount');
-const commentCount=document.getElementById('commentCount');
-const likeModal=document.getElementById('likeModal');
-const likeBubbles=document.getElementById('likeBubbles');
-const confirmLike=document.getElementById('confirmLike');
-const likeNameInput=document.getElementById('likeName');
-const commentModal=document.getElementById('commentModal');
-const confirmComment=document.getElementById('confirmComment');
-const commentBubbles=document.getElementById('commentBubbles');
-const commentNameInput=document.getElementById('commentName');
-const commentTextInput=document.getElementById('commentText');
-
-// ====== RENDER ======
-function render(){
-  container.innerHTML='';
-  let page=null;
-  creations.forEach((c,i)=>{
-    if(i%6===0){page=document.createElement('div');page.className='page';container.appendChild(page);}
-    const d=document.createElement('div');d.className='visitor-item';
-    d.innerHTML=`<div class="placeholder">?</div><div class="delete-btn">×</div><p>${c.name}</p><img src="${c.imgUrl||''}">`;
-    const img=d.querySelector('img');
-    img.onload=()=>d.querySelector('.placeholder').style.display='none';
-    img.onerror=()=>{img.remove();d.querySelector('.placeholder').textContent='';};
-    img.onclick=()=>openZoom(c);
-    d.querySelector('.delete-btn').onclick=()=>openDeleteModal(c);
-    page.appendChild(d);
-  });
-}
-
-// ====== ZOOM ======
-function openZoom(c){
-  currentZoom = creations.find(x => x.id === c.id);
-  mainZoom.src = currentZoom.imgUrl;
-  thumbs.innerHTML = '';
-  (currentZoom.zoomGroup || []).forEach(u=>{
-    const t=document.createElement('img'); t.src=u;
-    t.onclick=()=>mainZoom.src=u;
-    thumbs.appendChild(t);
-  });
-  updateActions();
-  zoomModal.style.display='flex';
-}
-
-function updateActions(){
-  if(!currentZoom) return;
-  likeCount.textContent = (currentZoom.likes || []).length;
-  commentCount.textContent = (currentZoom.comments || []).length;
-}
-
-// ====== LIKE MODAL ======
-document.getElementById('likeBtn').onclick=()=>{
-  if(!currentZoom){alert("Sélectionnez d'abord une image !"); return;}
-  likeNameInput.value = localStorage.getItem('prenom')||'';
-  renderLikeList();
-  likeModal.style.display='flex';
-};
-
-confirmLike.onclick=async()=>{
-  if(!currentZoom) return;
-  const name = likeNameInput.value.trim();
-  if(!name) return;
-  currentZoom.likes = currentZoom.likes||[];
-  if(currentZoom.likes.some(l=>l.name===name)){likeModal.style.display='none'; return;}
-  currentZoom.likes.push({name, photo: ownerPhoto.src||''});
-  await supabase.from('creations').update({likes:currentZoom.likes}).eq('id',currentZoom.id);
-  renderLikeList();
-  likeCount.textContent = currentZoom.likes.length;
-  likeModal.style.display='none';
-};
-
-// ====== COMMENT MODAL ======
-document.getElementById('commentBtn').onclick=()=>{
-  if(!currentZoom) return;
-  commentNameInput.value = localStorage.getItem('prenom')||'';
-  commentTextInput.value = '';
-  renderCommentList();
-  commentModal.style.display='flex';
-};
-
-confirmComment.onclick=async()=>{
-  if(!currentZoom) return;
-  const name = commentNameInput.value.trim();
-  const text = commentTextInput.value.trim();
-  if(!name||!text) return;
-  currentZoom.comments = currentZoom.comments||[];
-  currentZoom.comments.push({name, text, photo: ownerPhoto.src||''});
-  await supabase.from('creations').update({comments:currentZoom.comments}).eq('id',currentZoom.id);
-  renderCommentList();
-  commentTextInput.value='';
-  commentCount.textContent = currentZoom.comments.length;
-};
-
-// ====== RENDER LISTS ======
-function renderLikeList(){
-  if(!currentZoom) return;
-  likeBubbles.innerHTML='';
-  (currentZoom.likes||[]).forEach(l=>{
-    const div=document.createElement('div');
-    div.className='like-item';
-    div.innerHTML=`${l.photo?`<img src="${l.photo}" style="width:20px;height:20px;border-radius:50%;margin-right:4px;vertical-align:middle;">`:''}<strong>${l.name}</strong>`;
-    likeBubbles.appendChild(div);
-  });
-  likeCount.textContent = (currentZoom.likes||[]).length;
-}
-
-function renderCommentList(){
-  if(!currentZoom) return;
-  commentBubbles.innerHTML='';
-  (currentZoom.comments||[]).forEach(c=>{
-    const div=document.createElement('div');
-    div.className='comment-item';
-    div.innerHTML=`${c.photo?`<img src="${c.photo}" style="width:20px;height:20px;border-radius:50%;margin-right:4px;vertical-align:middle;">`:''}<strong>${c.name}</strong>: ${c.text}`;
-    commentBubbles.appendChild(div);
-  });
-  commentCount.textContent = (currentZoom.comments||[]).length;
-}
-
-// ====== ADD CREATIONS ======
-document.getElementById('addBtn').onclick=()=>addModal.style.display='flex';
-addModal.addEventListener('click', e=>{if(e.target===addModal)addModal.style.display='none';});
-document.getElementById('confirmAdd').onclick=async e=>{
-  e.stopPropagation();
-  const name=document.getElementById('photoName').value.trim();
-  const files=document.getElementById('multiPhoto').files;
-  if(!name||!files.length){alert("Mettre un nom et choisir au moins une photo");return;}
-  const paths=[],urls=[];
-  for(let file of files){
-    const path=`${Date.now()}_${file.name}`;
-    const {error:uploadError}=await supabase.storage.from('images').upload(path,file);
-    if(uploadError){console.error(uploadError);continue;}
-    const {data:pubData}=supabase.storage.from('images').getPublicUrl(path);
-    if(!pubData?.publicUrl) continue;
-    urls.push(pubData.publicUrl); paths.push(path);
   }
-  if(urls.length===0) return;
-  await supabase.from('creations').insert([{name,image_path:paths[0],images:paths,likes:[],comments:[]}]);
-  addModal.style.display='none';
-  document.getElementById('photoName').value='';
-  document.getElementById('multiPhoto').value='';
-  await refreshCreations();
-};
+).subscribe();
 
-// ====== DELETE CREATION ======
-function openDeleteModal(c){currentDelete=c; deleteModal.style.display='flex';}
-document.getElementById('cancelDelete').onclick=()=>{currentDelete=null; deleteModal.style.display='none';};
-document.getElementById('confirmDelete').onclick=async()=>{
-  if(!currentDelete?.id) return;
-  await supabase.from('creations').delete().eq('id',currentDelete.id);
-  currentDelete=null; deleteModal.style.display='none';
-  await refreshCreations();
-};
-
-// ====== SIDEBAR ======
-document.getElementById('pelotesBtn').onclick=()=>{document.body.style.opacity='0';setTimeout(()=>window.location.href='pelotes.html',500);};
-document.getElementById('videoBtn').onclick=()=>{document.body.style.opacity='0';setTimeout(()=>window.location.href='video.html',500);};
-document.getElementById('notesBtn').onclick=()=>{document.body.style.opacity='0';setTimeout(()=>window.location.href='notes.html',500);};
-document.getElementById('messagerieBtn').onclick=()=>{document.body.style.opacity='0';setTimeout(()=>window.location.href='messagerie.html',500);};
-document.getElementById('toggleSidebar').onclick=()=>sidebar.classList.toggle('sidebar-open');
-
-// ====== MODAL CLICS ======
-[zoomModal, likeModal, commentModal, deleteModal].forEach(m=>{
-  m.onclick=e=>{if(e.target===m)m.style.display='none';}
-});
-document.querySelector('.closeZoom').onclick=()=>zoomModal.style.display='none';
-
-// ====== REFRESH CREATIONS (version tolérante pour likes) ======
-async function refreshCreations() {
-  try {
-    const { data, error } = await supabase
-      .from('creations')
-      .select('*')
-      .order('created_at', { ascending: false });
-
-    if (error) {
-      console.error(error);
-      return;
-    }
-
-    creations = data.map(c => {
-      let zoomGroup = [];
-      if (c.images?.length) {
-        zoomGroup = c.images.map(p => {
-          const { data } = supabase.storage.from('images').getPublicUrl(p);
-          return data?.publicUrl || '';
-        });
-      } else if (c.image_path) {
-        const { data } = supabase.storage.from('images').getPublicUrl(c.image_path);
-        zoomGroup = [data?.publicUrl || ''];
-      }
-
-      // ✅ Likes et commentaires sécurisés
-      let likesArray = [];
-      if (Array.isArray(c.likes)) {
-        likesArray = c.likes;
-      } else if (typeof c.likes === 'string') {
-        try {
-          likesArray = JSON.parse(c.likes);
-          if (!Array.isArray(likesArray)) likesArray = [];
-        } catch (e) {
-          likesArray = [];
-        }
-      }
-
-      let commentsArray = [];
-      if (Array.isArray(c.comments)) {
-        commentsArray = c.comments;
-      } else if (typeof c.comments === 'string') {
-        try {
-          commentsArray = JSON.parse(c.comments);
-          if (!Array.isArray(commentsArray)) commentsArray = [];
-        } catch (e) {
-          commentsArray = [];
-        }
-      }
-
-      return {
-        id: c.id,
-        name: c.name,
-        imgUrl: zoomGroup[0] || '',
-        zoomGroup,
-        likes: likesArray.map(like => ({
-          name: like.name || '',
-          photo: like.photo || ''
-        })),
-        comments: commentsArray.map(cmt => ({
-          name: cmt.name || '',
-          text: cmt.text || '',
-          photo: cmt.photo || ''
-        }))
-      };
-    });
-
-    render();
-  } catch (err) {
-    console.error('Erreur refreshCreations:', err);
-  }
-}
-
-    const chatModal = document.getElementById('chatModal');
-const toggleChatSize = document.getElementById('toggleChatSize');
-
-// Ouvrir la modal
-document.getElementById('messagerieBtn').onclick = () => {
-  chatModal.style.display = 'flex';
-};
-
-// Fermer si clic hors fenêtre
-chatModal.addEventListener('click', e => {
-  if (e.target === chatModal) chatModal.style.display = 'none';
-});
-
-// Bouton agrandir / réduire
-toggleChatSize.onclick = () => {
-  chatModal.classList.toggle('fullscreen');
-};
-
-// PINCH 2 doigts
-let initialDistance = null;
-chatModal.addEventListener('touchstart', e => {
-  if (e.touches.length === 2) {
-    initialDistance = Math.hypot(
-      e.touches[0].clientX - e.touches[1].clientX,
-      e.touches[0].clientY - e.touches[1].clientY
-    );
-  }
-});
-
-chatModal.addEventListener('touchmove', e => {
-  if (e.touches.length === 2 && initialDistance) {
-    const currentDistance = Math.hypot(
-      e.touches[0].clientX - e.touches[1].clientX,
-      e.touches[0].clientY - e.touches[1].clientY
-    );
-    if (currentDistance - initialDistance > 40) {
-  chatModal.classList.add('expanded');
-}
-if (initialDistance - currentDistance > 40) {
-  chatModal.classList.remove('expanded');
-}
-  }
-});
-
-chatModal.addEventListener('touchend', () => {
-  initialDistance = null;
-});
-    // ====== MESSAGERIE : AGRANDIR / RÉDUIRE ======
-const icon = document.getElementById('chatResizeIcon');
-
-toggleChatSize.onclick = () => {
-  // bascule expanded
-  chatModal.classList.toggle('expanded');
-
-  // change l'icône selon l'état
-  icon.innerHTML = chatModal.classList.contains('expanded')
-    ? '<path d="M9 4H4v5M15 20h5v-5M20 9V4h-5M4 15v5h5"/>'
-    : '<path d="M4 9V4h5M20 15v5h-5M15 4h5v5M9 20H4v-5"/>';
-};
-
-function showInAppNotification(sender, message) {
-  const notif = document.createElement('div');
-  notif.textContent = `${sender} : ${message}`;
-  notif.style.cssText = `
-    position:fixed;
-    bottom:20px;
-    right:20px;
-    background:#ffb6c1;
-    color:#fff;
-    padding:10px 14px;
-    border-radius:12px;
-    z-index:99999;
-    font-size:12px;
-  `;
-  document.body.appendChild(notif);
-
-  setTimeout(() => notif.remove(), 3000);
-}
-    
+// ====== LOAD USERS ======
 async function loadChatUsers() {
   try {
-    const { data: users, error } = await supabase
-      .from('profiles')
-      .select('prenom, photo_url')
-      .neq('prenom', myPrenom);
-
+    const { data: users, error } = await supabase.from('profiles').select('prenom, photo_url').neq('prenom', myPrenom);
     if (error) throw error;
-
     chatUserList.innerHTML = '';
-
     users.forEach(u => {
-  userPhotos[u.prenom] = u.photo_url || 'icon-152.png';
-
-  const div = document.createElement('div');
-  div.className = 'chat-user';
-  
-      // PHOTO
+      userPhotos[u.prenom] = u.photo_url || 'icon-152.png';
+      const div = document.createElement('div');
+      div.className = 'chat-user';
       const img = document.createElement('img');
-      img.src = u.photo_url || 'icon-152.png'; // image par défaut
+      img.src = u.photo_url || 'icon-152.png';
       img.alt = u.prenom;
-
-      // TEXTE
       const span = document.createElement('span');
       span.textContent = u.prenom;
-
-      // ASSEMBLAGE
       div.appendChild(img);
       div.appendChild(span);
-div.onclick = () => {
-  currentChatUser = u.prenom;
-
-  // 💾 sauvegarde du contact actif
-  localStorage.setItem('currentChatUser', u.prenom);
-
-  loadMessages();
-
-  document.querySelectorAll('.chat-user')
-    .forEach(el => el.classList.remove('active'));
-
-  div.classList.add('active');
-};
+      div.onclick = () => {
+        currentChatUser = u.prenom;
+        localStorage.setItem('currentChatUser', u.prenom);
+        loadMessages();
+        document.querySelectorAll('.chat-user').forEach(el => el.classList.remove('active'));
+        div.classList.add('active');
+      };
       chatUserList.appendChild(div);
     });
 
-  } catch (err) {
-    console.error('Erreur loadChatUsers:', err);
-  }
+    // Restore active user
+    if (currentChatUser) {
+      setTimeout(() => {
+        document.querySelectorAll('.chat-user').forEach(el => {
+          if (el.textContent.includes(currentChatUser)) el.classList.add('active');
+        });
+      }, 500);
+      loadMessages();
+    }
+
+  } catch (err) { console.error(err); }
 }
 
-    const savedChatUser = localStorage.getItem('currentChatUser');
-
-if (savedChatUser) {
-  currentChatUser = savedChatUser;
-  loadMessages();
-
-  // remettre l'utilisateur actif visuellement
-  setTimeout(() => {
-    document.querySelectorAll('.chat-user').forEach(el => {
-      if (el.textContent.includes(savedChatUser)) {
-        el.classList.add('active');
-      }
-    });
-  }, 500);
-}
-
-// Notifications système si onglet caché
+// ====== NOTIFICATIONS ======
 function showInAppNotification(sender, message) {
   if (document.hidden) {
     if (Notification.permission === 'granted') {
-      new Notification(`${sender}`, { body: message, icon: userPhotos[sender] || 'icon-152.png' });
+      new Notification(sender, { body: message, icon: userPhotos[sender] || 'icon-152.png' });
     }
   } else {
     const notif = document.createElement('div');
@@ -981,14 +595,212 @@ function showInAppNotification(sender, message) {
     setTimeout(() => notif.remove(), 3000);
   }
 }
+if ('Notification' in window && Notification.permission !== 'granted') Notification.requestPermission();
 
-// demander la permission au chargement
-if ('Notification' in window && Notification.permission !== 'granted') {
-  Notification.requestPermission();
+// ====== CREATIONS ======
+async function refreshCreations() {
+  try {
+    const { data, error } = await supabase.from('creations').select('*').order('created_at', { ascending: false });
+    if (error) return console.error(error);
+
+    creations = data.map(c => {
+      let zoomGroup = [];
+      if (c.images?.length) {
+        zoomGroup = c.images.map(p => supabase.storage.from('images').getPublicUrl(p).data?.publicUrl || '');
+      } else if (c.image_path) {
+        zoomGroup = [supabase.storage.from('images').getPublicUrl(c.image_path).data?.publicUrl || ''];
+      }
+
+      const likesArray = Array.isArray(c.likes) ? c.likes : JSON.parseSafe(c.likes) || [];
+      const commentsArray = Array.isArray(c.comments) ? c.comments : JSON.parseSafe(c.comments) || [];
+
+      return {
+        id: c.id,
+        name: c.name,
+        imgUrl: zoomGroup[0] || '',
+        zoomGroup,
+        likes: likesArray.map(l => ({ name: l.name || '', photo: l.photo || '' })),
+        comments: commentsArray.map(cmt => ({ name: cmt.name || '', text: cmt.text || '', photo: cmt.photo || '' }))
+      };
+    });
+
+    renderCreations();
+  } catch (err) { console.error('refreshCreations', err); }
 }
-    
-// ====== INITIAL ======
+
+// Helper pour JSON safe
+JSON.parseSafe = str => { try { return JSON.parse(str); } catch(e) { return []; } };
+
+// ====== RENDER CREATIONS ======
+function renderCreations() {
+  container.innerHTML = '';
+  let page = null;
+  creations.forEach((c, i) => {
+    if (i % 6 === 0) { page = document.createElement('div'); page.className = 'page'; container.appendChild(page); }
+    const d = document.createElement('div'); d.className = 'visitor-item';
+    d.innerHTML = `<div class="placeholder">?</div><div class="delete-btn">×</div><p>${c.name}</p><img src="${c.imgUrl||''}">`;
+    const img = d.querySelector('img');
+    img.onload = () => d.querySelector('.placeholder').style.display='none';
+    img.onerror = () => { img.remove(); d.querySelector('.placeholder').textContent=''; };
+    img.onclick = () => openZoom(c);
+    d.querySelector('.delete-btn').onclick = () => openDeleteModal(c);
+    page.appendChild(d);
+  });
+}
+
+// ====== ZOOM ======
+function openZoom(c) {
+  currentZoom = creations.find(x => x.id === c.id);
+  mainZoom.src = currentZoom.imgUrl;
+  thumbs.innerHTML = '';
+  (currentZoom.zoomGroup || []).forEach(u => {
+    const t = document.createElement('img'); t.src = u;
+    t.onclick = () => mainZoom.src = u;
+    thumbs.appendChild(t);
+  });
+  updateActions();
+  zoomModal.style.display = 'flex';
+}
+function updateActions() {
+  if (!currentZoom) return;
+  likeCount.textContent = (currentZoom.likes || []).length;
+  commentCount.textContent = (currentZoom.comments || []).length;
+}
+
+// ====== LIKE / COMMENT MODAL ======
+document.getElementById('likeBtn').onclick = () => {
+  if (!currentZoom) { alert("Sélectionnez d'abord une image !"); return; }
+  likeNameInput.value = myPrenom || '';
+  renderLikeList();
+  likeModal.style.display = 'flex';
+};
+confirmLike.onclick = async () => {
+  if (!currentZoom) return;
+  const name = likeNameInput.value.trim();
+  if (!name) return;
+  currentZoom.likes = currentZoom.likes || [];
+  if (!currentZoom.likes.some(l => l.name === name)) currentZoom.likes.push({ name, photo: ownerPhoto.src || '' });
+  await supabase.from('creations').update({ likes: currentZoom.likes }).eq('id', currentZoom.id);
+  renderLikeList();
+  likeModal.style.display = 'none';
+};
+
+document.getElementById('commentBtn').onclick = () => {
+  if (!currentZoom) return;
+  commentNameInput.value = myPrenom || '';
+  commentTextInput.value = '';
+  renderCommentList();
+  commentModal.style.display = 'flex';
+};
+confirmComment.onclick = async () => {
+  if (!currentZoom) return;
+  const name = commentNameInput.value.trim();
+  const text = commentTextInput.value.trim();
+  if (!name || !text) return;
+  currentZoom.comments = currentZoom.comments || [];
+  currentZoom.comments.push({ name, text, photo: ownerPhoto.src || '' });
+  await supabase.from('creations').update({ comments: currentZoom.comments }).eq('id', currentZoom.id);
+  renderCommentList();
+  commentTextInput.value = '';
+  commentCount.textContent = currentZoom.comments.length;
+};
+
+function renderLikeList() {
+  if (!currentZoom) return;
+  likeBubbles.innerHTML = '';
+  (currentZoom.likes || []).forEach(l => {
+    const div = document.createElement('div');
+    div.className = 'like-item';
+    div.innerHTML = `${l.photo ? `<img src="${l.photo}" style="width:20px;height:20px;border-radius:50%;margin-right:4px;vertical-align:middle;">` : ''}<strong>${l.name}</strong>`;
+    likeBubbles.appendChild(div);
+  });
+  likeCount.textContent = (currentZoom.likes || []).length;
+}
+
+function renderCommentList() {
+  if (!currentZoom) return;
+  commentBubbles.innerHTML = '';
+  (currentZoom.comments || []).forEach(c => {
+    const div = document.createElement('div');
+    div.className = 'comment-item';
+    div.innerHTML = `${c.photo ? `<img src="${c.photo}" style="width:20px;height:20px;border-radius:50%;margin-right:4px;vertical-align:middle;">` : ''}<strong>${c.name}</strong>: ${c.text}`;
+    commentBubbles.appendChild(div);
+  });
+  commentCount.textContent = (currentZoom.comments || []).length;
+}
+
+// ====== ADD CREATION ======
+document.getElementById('addBtn').onclick = () => addModal.style.display = 'flex';
+addModal.addEventListener('click', e => { if (e.target === addModal) addModal.style.display = 'none'; });
+document.getElementById('confirmAdd').onclick = async e => {
+  e.stopPropagation();
+  const name = document.getElementById('photoName').value.trim();
+  const files = document.getElementById('multiPhoto').files;
+  if (!name || !files.length) { alert("Mettre un nom et choisir au moins une photo"); return; }
+  const paths = [], urls = [];
+  for (let file of files) {
+    const path = `${Date.now()}_${file.name}`;
+    const { error: uploadError } = await supabase.storage.from('images').upload(path, file);
+    if (uploadError) { console.error(uploadError); continue; }
+    const { data: pubData } = supabase.storage.from('images').getPublicUrl(path);
+    if (!pubData?.publicUrl) continue;
+    urls.push(pubData.publicUrl); paths.push(path);
+  }
+  if (!urls.length) return;
+  await supabase.from('creations').insert([{ name, image_path: paths[0], images: paths, likes: [], comments: [] }]);
+  addModal.style.display = 'none';
+  document.getElementById('photoName').value = '';
+  document.getElementById('multiPhoto').value = '';
+  await refreshCreations();
+};
+
+// ====== DELETE CREATION ======
+function openDeleteModal(c) { currentDelete = c; deleteModal.style.display = 'flex'; }
+document.getElementById('cancelDelete').onclick = () => { currentDelete = null; deleteModal.style.display = 'none'; };
+document.getElementById('confirmDelete').onclick = async () => {
+  if (!currentDelete?.id) return;
+  await supabase.from('creations').delete().eq('id', currentDelete.id);
+  currentDelete = null;
+  deleteModal.style.display = 'none';
+  await refreshCreations();
+};
+
+// ====== SIDEBAR ======
+document.getElementById('pelotesBtn').onclick = () => { document.body.style.opacity='0'; setTimeout(()=>window.location.href='pelotes.html',500); };
+document.getElementById('videoBtn').onclick = () => { document.body.style.opacity='0'; setTimeout(()=>window.location.href='video.html',500); };
+document.getElementById('notesBtn').onclick = () => { document.body.style.opacity='0'; setTimeout(()=>window.location.href='notes.html',500); };
+document.getElementById('messagerieBtn').onclick = () => { chatModal.style.display='flex'; };
+document.getElementById('toggleSidebar').onclick = () => sidebar.classList.toggle('sidebar-open');
+
+// ====== MODALS ======
+[zoomModal, likeModal, commentModal, deleteModal, addModal].forEach(m => {
+  m.onclick = e => { if (e.target === m) m.style.display = 'none'; }
+});
+document.querySelector('.closeZoom').onclick = () => zoomModal.style.display = 'none';
+
+// ====== CHAT MODAL ======
+toggleChatSize.onclick = () => {
+  chatModal.classList.toggle('expanded');
+  icon.innerHTML = chatModal.classList.contains('expanded')
+    ? '<path d="M9 4H4v5M15 20h5v-5M20 9V4h-5M4 15v5h5"/>'
+    : '<path d="M4 9V4h5M20 15v5h-5M15 4h5v5M9 20H4v-5"/>';
+};
+
+// Pinch zoom deux doigts
+let initialDistance = null;
+chatModal.addEventListener('touchstart', e => { if(e.touches.length===2) initialDistance=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY); });
+chatModal.addEventListener('touchmove', e => {
+  if (e.touches.length===2 && initialDistance) {
+    const currentDistance=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);
+    if(currentDistance-initialDistance>40) chatModal.classList.add('expanded');
+    if(initialDistance-currentDistance>40) chatModal.classList.remove('expanded');
+  }
+});
+chatModal.addEventListener('touchend',()=>{initialDistance=null;});
+
+// ====== INITIAL LOAD ======
 refreshCreations();
+loadOwnerPhoto();
 loadChatUsers();
 </script>
 
