@@ -618,6 +618,116 @@ function showInAppNotification(sender, message) {
 loadChatUsers();
 </script>
 
+<script type="module" id="chat-module">
+import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
 
+const supabase = createClient(
+  "https://jyhbamdcxmpveujjqjla.supabase.co",
+  "sb_publishable_sqsxb-3Kl5o3-JQYv9kGFw_-g0EgwMa"
+);
+
+// ===== VARIABLES LOCALES (ISOLÉES) =====
+const myPrenom = localStorage.getItem('prenom');
+let currentChatUser = null;
+
+// ===== ELEMENTS UNIQUEMENT DANS LA MODAL =====
+const modal = document.getElementById('modalMessagerie');
+if(!modal) return;
+
+const chatUserList = modal.querySelector('.chat-user-list');
+const chatMessages = modal.querySelector('.chat-messages');
+const chatInput = modal.querySelector('.chat-input');
+const sendBtn = modal.querySelector('.send-btn');
+
+// ===== SELECT USER =====
+function selectUser(prenom){
+  currentChatUser = prenom;
+  loadMessages();
+}
+
+// ===== LOAD USERS =====
+async function loadChatUsers(){
+  const { data } = await supabase
+    .from('profiles')
+    .select('prenom, photo_url')
+    .neq('prenom', myPrenom);
+
+  chatUserList.innerHTML = '';
+
+  data.forEach(u => {
+    const div = document.createElement('div');
+    div.className = 'chat-user';
+    div.innerHTML = `
+      <img src="${u.photo_url || 'icon-152.png'}" class="avatar">
+      <span>${u.prenom}</span>
+    `;
+    div.onclick = () => selectUser(u.prenom);
+    chatUserList.appendChild(div);
+  });
+}
+
+// ===== LOAD MESSAGES =====
+async function loadMessages(){
+  if(!currentChatUser) return;
+
+  const { data } = await supabase
+    .from('messages')
+    .select('*')
+    .or(
+      `and(sender.eq.${myPrenom},receiver.eq.${currentChatUser}),
+       and(sender.eq.${currentChatUser},receiver.eq.${myPrenom})`
+    )
+    .order('created_at');
+
+  chatMessages.innerHTML = '';
+
+  data.forEach(m => {
+    const div = document.createElement('div');
+    div.className = m.sender === myPrenom ? 'msg me' : 'msg them';
+    div.innerHTML = `
+      <img class="avatar" src="icon-152.png">
+      <p>${m.content || ''}</p>
+    `;
+    chatMessages.appendChild(div);
+  });
+}
+
+// ===== SEND =====
+sendBtn.onclick = async () => {
+  if(!currentChatUser) return;
+  const text = chatInput.value.trim();
+  if(!text) return;
+
+  await supabase.from('messages').insert({
+    sender: myPrenom,
+    receiver: currentChatUser,
+    content: text
+  });
+
+  chatInput.value = '';
+};
+
+// ===== REALTIME =====
+supabase
+  .channel('modal-messages')
+  .on('postgres_changes',
+    { event:'INSERT', schema:'public', table:'messages' },
+    payload => {
+      const m = payload.new;
+      if(!m) return;
+
+      if(
+        (m.sender === myPrenom && m.receiver === currentChatUser) ||
+        (m.sender === currentChatUser && m.receiver === myPrenom)
+      ){
+        loadMessages();
+      }
+    }
+  )
+  .subscribe();
+
+// ===== INIT =====
+loadChatUsers();
+</script>
 </body>
 </html>
