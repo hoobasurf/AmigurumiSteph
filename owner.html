@@ -38,39 +38,9 @@ body::before {
 }
 
 /* =================== ZONE CENTRALE =================== */
-.center-zone {
-  display: flex;
-  justify-content: center;
-  align-items: flex-start;
-  padding-top: 3.5cm;
-  overflow: hidden;
-  height: auto;
-}
-
-/* =================== CONTENEUR DES PAGES =================== */
-#visitor-list-container {
-  display: flex;
-  overflow-x: auto;
-  scroll-snap-type: x mandatory;
-  -webkit-overflow-scrolling: touch;
-  justify-content: center;
-  padding-left: 1cm;
-}
-
-/* =================== PAGE : 2 COLONNES × 3 LIGNES =================== */
-.page {
-  display: grid;
-  grid-template-columns: repeat(2, 120px); /* 2 colonnes */
-  grid-template-rows: repeat(3, 120px);    /* 3 lignes */
-  column-gap: 4mm;
-  row-gap: 4mm;
-  flex: 0 0 auto;
-  width: calc(2*120px + 4mm);
-  height: calc(3*120px + 8mm);
-  scroll-snap-align: center;
-  padding: 4mm;
-  justify-items: center; /* centre horizontal des cartes */
-}
+.center-zone{display:flex;justify-content:center;align-items:flex-start;padding-top:3.5cm;overflow:hidden;height:auto;}
+#visitor-list-container{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;-webkit-overflow-scrolling: touch;justify-content:center;padding-left:1cm;}
+.page{display:grid;grid-template-columns:repeat(2,1fr);grid-template-rows:repeat(3,1fr);column-gap:3mm;row-gap:4mm;flex:0 0 auto;width:calc(2*200px+3mm);height:calc(3*200px+8mm);scroll-snap-align:center;padding:4mm;justify-content:center;margin-top:0;}
 
 /* =================== CARTE CREATION =================== */
 .creation {
