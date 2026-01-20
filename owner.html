@@ -44,17 +44,23 @@ body::before{
 /* ====== PAGE = 6 CARTES (3x2) ====== */
 .page{
   display:grid;
-  grid-template-columns:repeat(2, 200px);
-  grid-template-rows:repeat(3, 200px);
-  column-gap:3mm;
+  grid-template-columns:repeat(2, 120px);
+  grid-template-rows:repeat(3, 120px);
+  column-gap:4mm;
   row-gap:4mm;
   flex:0 0 auto;
-  width:calc(2 * 200px + 3mm);
-  height:calc(3 * 200px + 8mm);
+  width:calc(2 * 120px + 4mm);
+  height:calc(3 * 120px + 8mm);
   scroll-snap-align:center;
   padding:4mm;
   justify-content:center;
   margin-top:0;
+}
+
+/* ====== CARDS PETITES ====== */
+.creation{
+  width:120px;
+  height:120px;
 }
 
 /* ====== RESPONSIVE MOBILE ====== */
