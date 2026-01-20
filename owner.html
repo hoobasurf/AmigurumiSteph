@@ -646,7 +646,6 @@ function showInAppNotification(sender, message) {
 }
 if ('Notification' in window && Notification.permission !== 'granted') Notification.requestPermission();
 // ====== CREATIONS ======
-let creations = [];
 
 async function refreshCreations() {
   try {
@@ -705,7 +704,8 @@ function renderCreations(list) {
     const img = document.createElement('img');
     img.src = c.imgUrl;
     d.appendChild(img);
-
+    img.onclick = () => openZoom(c);
+    
     if (c.legend) {
       const p = document.createElement('p');
       p.textContent = c.legend;
@@ -853,7 +853,7 @@ document.getElementById('confirmAdd').onclick = async e => {
 };
 
 // ====== DELETE CREATION ======
-let currentDelete = null;
+
 function openDeleteModal(c) {
   currentDelete = c;
   deleteModal.style.display = 'flex';
@@ -927,8 +927,7 @@ chatModal.addEventListener('touchmove', e => {
 });
 chatModal.addEventListener('touchend',()=>{initialDistance=null;});
 
-document.addEventListener('DOMContentLoaded', () => {
-  refreshCreations();
+
   loadOwnerPhoto();
   loadChatUsers();
 });
