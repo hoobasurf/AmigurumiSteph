@@ -676,36 +676,41 @@ JSON.parseSafe = str => { try { return JSON.parse(str); } catch(e) { return []; 
 
 // ====== RENDER CREATIONS ======
 function renderCreations() {
-  const container = document.getElementById('creationsContainer'); // crée ce div dans ton HTML
-  container.innerHTML = ''; // vider avant de recréer
+  const container = document.getElementById('creationsContainer');
+  container.innerHTML = '';
 
   creations.forEach(c => {
     const div = document.createElement('div');
     div.className = 'creation-item';
 
-    // image principale
+    // 1️⃣ créer l'image
+    const img = document.createElement('img');
+    img.src = c.imgUrl;
+
+    // 2️⃣ créer le placeholder
     const placeholder = document.createElement('div');
-placeholder.className = 'placeholder';
-placeholder.textContent = 'Chargement…';
-div.appendChild(placeholder);
+    placeholder.className = 'placeholder';
+    placeholder.textContent = 'Chargement…';
+    div.appendChild(placeholder);
 
-// gérer la disparition du placeholder quand l'image est chargée
-if (img.complete) {
-  placeholder.style.display = 'none';
-}
+    // 3️⃣ gérer disparition du placeholder
+    if (img.complete) {
+      placeholder.style.display = 'none';
+    }
+    img.onload = () => {
+      placeholder.style.display = 'none';
+    };
 
-img.onload = () => {
-  placeholder.style.display = 'none';
-};
+    // 4️⃣ ajouter l'image dans le div
+    div.appendChild(img);
 
-    // nom
+    // nom et légende
     const nameP = document.createElement('p');
     nameP.textContent = c.name;
     div.appendChild(nameP);
 
-    // légende
     const legendP = document.createElement('p');
-    legendP.textContent = c.legend || ''; // ici c.legend
+    legendP.textContent = c.legend || '';
     div.appendChild(legendP);
 
     // clic pour zoom
