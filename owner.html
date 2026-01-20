@@ -11,8 +11,8 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 
-<style>
-/* ====== GLOBAL ====== */
+  <style>
+/* =================== RESET & FOND =================== */
 * { box-sizing:border-box;margin:0;padding:0;font-family:'Comic Sans MS',cursive; }
 html,body{height:100%;overflow-x:hidden;}
 body::before{
@@ -21,7 +21,7 @@ body::before{
   background-size:cover;background-position:center center;background-repeat:no-repeat;z-index:-1;
 }
 
-/* ====== ZONE CENTRALE ====== */
+/* =================== ZONE CENTRALE =================== */
 .center-zone{
   display:flex;
   justify-content:center;
@@ -31,30 +31,29 @@ body::before{
   height:auto;
 }
 
-/* ====== SCROLL HORIZONTAL DES PAGES ====== */
+/* =================== CONTENEUR DES PAGES (SCROLL HORIZONTAL) =================== */
 #visitor-list-container{
   display:flex;
   overflow-x:auto;
   scroll-snap-type:x mandatory;
   -webkit-overflow-scrolling: touch;
-  padding:20px;
-  gap:10px;
-  justify-content:flex-start;
-  align-items:center;
+  justify-content:center;
+  padding-left:1cm;
 }
 
-/* ====== PAGE 3x2 CARTES ====== */
+/* =================== PAGE 3x2 CARTES =================== */
 .page{
   display:grid;
   grid-template-columns:repeat(2, 120px);
   grid-template-rows:repeat(3, 120px);
-  gap:8px;
+  column-gap:8px;
+  row-gap:8px;
   flex:0 0 auto;
   scroll-snap-align:start;
   padding:4px;
 }
 
-/* ====== CARD CREATION ====== */
+/* =================== CARTE CREATION =================== */
 .creation{
   position:relative;
   width:120px;
@@ -69,26 +68,16 @@ body::before{
     inset 0 0 0 1px rgba(255,255,255,0.4);
   cursor:pointer;
 }
-
-/* IMAGE DANS LA CARD */
 .creation img{
   width:100%;
   height:100%;
   object-fit:cover;
   border-radius:12px;
-  cursor:pointer;
-  display:block;
-  filter:brightness(1.05) contrast(1.05) saturate(0.95);
   transition:transform 0.3s;
   position:relative;
   z-index:2;
 }
-
-.creation img:hover{
-  transform:scale(1.03);
-}
-
-/* SURCOUCHE ROSE */
+.creation img:hover{ transform:scale(1.03); }
 .creation::after{
   content:"";
   position:absolute;
@@ -97,8 +86,6 @@ body::before{
   pointer-events:none;
   z-index:1;
 }
-
-/* LÉGENDE */
 .creation p{
   position:absolute;
   bottom:2px;
@@ -109,99 +96,59 @@ body::before{
   color:#b84c6f;
   z-index:3;
   -webkit-text-stroke:0.6px #000;
-  text-shadow:
-    1px 1px 0 #000,
-   -1px 1px 0 #000,
-    1px -1px 0 #000,
-   -1px -1px 0 #000;
+  text-shadow:1px 1px 0 #000,-1px 1px 0 #000,1px -1px 0 #000,-1px -1px 0 #000;
 }
 
-/* ====== SIDEBAR ====== */
+/* =================== SIDEBAR =================== */
 #sidebar{position:fixed;top:0;left:-220px;width:220px;height:100vh;background:rgba(255,230,240,0.2);border-right:2px solid #b67385;padding:20px;transition:left .3s;z-index:10;}
 #sidebar.sidebar-open{left:0;}
 #toggleSidebar{position:absolute;top:50%;right:-30px;width:30px;height:60px;background:#ffb6c1;border-radius:0 12px 12px 0;display:flex;align-items:center;justify-content:center;cursor:pointer;font-weight:bold;}
 #sidebar button{width:auto;padding:8px 16px;border-radius:16px;border:none;background:#ffb6c1;color:#fff;cursor:pointer;font-weight:bold;display:block;margin-top:10px;}
 
-/* ====== MODAL ====== */
+/* =================== MODALS =================== */
 .modal{position:fixed;inset:0;background:rgba(0,0,0,0.6);display:none;justify-content:center;align-items:center;z-index:10001;}
-.modal .modal-box{background:#ffe6f0;padding:16px 24px;border-radius:20px;border:3px solid #b67385;display:flex;flex-direction:column;gap:10px;align-items:center;min-width:200px;font-family:'Comic Sans MS',cursive;}
+.modal .modal-box{
+  background:#ffe6f0;padding:16px 24px;border-radius:20px;border:3px solid #b67385;
+  display:flex;flex-direction:column;gap:10px;align-items:center;min-width:200px;font-family:'Comic Sans MS',cursive;
+}
 .modal input{padding:6px 12px;border-radius:10px;border:2px solid #b67385;width:100%;}
 .modal button{padding:6px 14px;border:none;background:#ffb6c1;color:#fff;border-radius:12px;cursor:pointer;font-weight:bold;width:100%;}
 
-/* ====== MODAL ZOOM ====== */
+/* =================== ZOOM MODAL =================== */
 #zoomModal{position:fixed;inset:0;background:rgba(0,0,0,0.7);display:none;justify-content:center;align-items:center;flex-direction:column;z-index:10000;}
-#zoomModal img{max-width:80%;max-height:60vh;border:4px solid #b67385;border-radius:24px;margin-bottom:10px;filter:none;}
+#zoomModal img{max-width:80%;max-height:60vh;border:4px solid #b67385;border-radius:24px;margin-bottom:10px;}
 #zoomModal .thumbs{display:flex;gap:8px;max-width:80%;overflow-x:auto;}
 #zoomModal .thumbs img{width:50px;height:50px;object-fit:cover;border-radius:12px;border:2px solid #b67385;cursor:pointer;}
 .closeZoom{position:absolute;top:12px;right:12px;width:28px;height:28px;background:#ffb6c1;color:#fff;border-radius:50%;display:flex;justify-content:center;align-items:center;cursor:pointer;}
 
-/* ====== OWNER PHOTO ====== */
+/* =================== OWNER PHOTO =================== */
 #ownerPhoto{width:32px;height:32px;border-radius:50%;position:fixed;top:10px;right:10px;z-index:10000;background:#ffe6f0;border:2px solid #b84c6f;}
 
-/* ====== CHAT ====== */
-.chat-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.4);
-  display: none;
-  justify-content: center;
-  align-items: center;
-  z-index: 20000;
-}
-
-.chat-window {
-  width: 360px;
-  height: 230px;
-  background: #ffe6f0;
-  border-radius: 20px;
-  border: 2px solid #b67385;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  box-shadow: 0 12px 24px rgba(0,0,0,0.25);
-  position: relative;
-  transition: width 0.3s, height 0.3s;
-}
-
-.chat-header {
-  height: 40px;
-  background: linear-gradient(#ffd6e6, #ffb6c1);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 10px;
-  font-weight: bold;
-  color: #b84c6f;
-  flex-shrink: 0;
-  position: sticky;
-  top: 0;
-  z-index: 10;
-  font-size: 14px;
-}
-
-.chat-body { flex:1; display:flex; min-height:0; }
-.chat-sidebar { width:120px; background:#fff5fa; border-right:2px solid #f3b3c8; overflow-y:auto; }
-.chat-user { display:flex; align-items:center; gap:6px; padding:4px; cursor:pointer; transition: background 0.2s; font-size:12px; }
+/* =================== CHAT =================== */
+.chat-overlay{position: fixed; inset: 0; background: rgba(0,0,0,0.4); display: none; justify-content: center; align-items: center; z-index: 20000;}
+.chat-window{width:360px;height:230px;background:#ffe6f0;border-radius:20px;border:2px solid #b67385;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 12px 24px rgba(0,0,0,0.25);position:relative;transition:width 0.3s,height 0.3s;}
+.chat-header{height:40px;background:linear-gradient(#ffd6e6,#ffb6c1);display:flex;align-items:center;justify-content:space-between;padding:0 10px;font-weight:bold;color:#b84c6f;flex-shrink:0;position:sticky;top:0;z-index:10;font-size:14px;}
+.chat-body{flex:1;display:flex;min-height:0;}
+.chat-sidebar{width:120px;background:#fff5fa;border-right:2px solid #f3b3c8;overflow-y:auto;}
+.chat-user{display:flex;align-items:center;gap:6px;padding:4px;cursor:pointer;transition:background 0.2s;font-size:12px;}
 .chat-user.active{background:#ffd6e6;}
-.chat-user img{border-radius:50%; width:28px; height:28px; object-fit:cover;}
-.chat-content{flex:1; display:flex; flex-direction:column; min-height:0;}
-.chat-messages{flex:1; padding:6px; overflow-y:auto; background:#fffafa; font-size:12px;}
-.msg{max-width:70%; padding:4px 8px; margin-bottom:4px; border-radius:12px;}
-.msg-me{background:#ffb6c1; align-self:flex-end;}
-.msg-them{background:#ffffff; border:1px solid #f3b3c8;}
-.chat-input{display:flex; padding:4px; gap:4px;}
-.chat-input input{flex:1; border-radius:10px; border:2px solid #b67385; padding:4px 6px; font-size:12px;}
+.chat-user img{border-radius:50%;width:28px;height:28px;object-fit:cover;}
+.chat-content{flex:1;display:flex;flex-direction:column;min-height:0;}
+.chat-messages{flex:1;padding:6px;overflow-y:auto;background:#fffafa;font-size:12px;}
+.msg{max-width:70%;padding:4px 8px;margin-bottom:4px;border-radius:12px;}
+.msg-me{background:#ffb6c1;align-self:flex-end;}
+.msg-them{background:#ffffff;border:1px solid #f3b3c8;}
+.chat-input{display:flex;padding:4px;gap:4px;}
+.chat-input input{flex:1;border-radius:10px;border:2px solid #b67385;padding:4px 6px;font-size:12px;}
+.chat-icon-btn{background:transparent;border:none;cursor:pointer;padding:2px;display:flex;align-items:center;}
+.expanded .chat-window{width:720px;height:460px;border-radius:24px;}
 
-/* ====== RESPONSIVE ====== */
+/* =================== RESPONSIVE =================== */
 @media(max-width:480px){
-  .page{
-    grid-template-columns:repeat(2, 120px);
-    grid-template-rows:repeat(3, 120px);
-  }
+  .page{grid-template-columns:repeat(2,120px);grid-template-rows:repeat(3,120px);width:calc(2*120px+8px);height:calc(3*120px+16px);}
   .creation{width:120px;height:120px;}
   .modal .modal-box{min-width:180px;}
 }
-</style>
 </head>
 <body>
 
