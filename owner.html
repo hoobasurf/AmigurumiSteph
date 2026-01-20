@@ -676,25 +676,65 @@ JSON.parseSafe = str => { try { return JSON.parse(str); } catch(e) { return []; 
 
 // ====== RENDER CREATIONS ======
 function renderCreations() {
-  container.innerHTML = '';
-  let page = null;
-  creations.forEach((c, i) => {
-    if (i % 6 === 0) { page = document.createElement('div'); page.className = 'page'; container.appendChild(page); }
-    const d = document.createElement('div'); d.className = 'visitor-item';
-    d.innerHTML = `<div class="placeholder">?</div><div class="delete-btn">×</div><p>${c.name}</p><img src="${c.imgUrl||''}">`;
-    const img = d.querySelector('img');
-    img.onload = () => d.querySelector('.placeholder').style.display='none';
-    img.onerror = () => { img.remove(); d.querySelector('.placeholder').textContent=''; };
-    img.onclick = () => openZoom(c);
-    d.querySelector('.delete-btn').onclick = () => openDeleteModal(c);
-    page.appendChild(d);
+  const container = document.getElementById('creationsContainer'); // crée ce div dans ton HTML
+  container.innerHTML = ''; // vider avant de recréer
+
+  creations.forEach(c => {
+    const div = document.createElement('div');
+    div.className = 'creation-item';
+
+    // image principale
+    const placeholder = document.createElement('div');
+placeholder.className = 'placeholder';
+placeholder.textContent = 'Chargement…';
+div.appendChild(placeholder);
+
+// gérer la disparition du placeholder quand l'image est chargée
+if (img.complete) {
+  placeholder.style.display = 'none';
+}
+
+img.onload = () => {
+  placeholder.style.display = 'none';
+};
+
+    // nom
+    const nameP = document.createElement('p');
+    nameP.textContent = c.name;
+    div.appendChild(nameP);
+
+    // légende
+    const legendP = document.createElement('p');
+    legendP.textContent = c.legend || ''; // ici c.legend
+    div.appendChild(legendP);
+
+    // clic pour zoom
+    div.onclick = () => openZoom(c);
+
+    container.appendChild(div);
   });
 }
+
+  const likesArray = Array.isArray(c.likes) ? c.likes : JSON.parseSafe(c.likes);
+  const commentsArray = Array.isArray(c.comments) ? c.comments : JSON.parseSafe(c.comments);
+
+  return {
+    id: c.id,
+    name: c.name,
+    legend: c.legend || '',
+    imgUrl: zoomGroup[0] || '',
+    zoomGroup,
+    likes: likesArray.map(l => ({ name: l.name || '', photo: l.photo || '' })),
+    comments: commentsArray.map(cmt => ({ name: cmt.name || '', text: cmt.text || '', photo: cmt.photo || '' }))
+  };
+});
+
+renderCreations();
 
 // ====== ZOOM ======
 function openZoom(c) {
   currentZoom = creations.find(x => x.id === c.id);
-  mainZoom.src = currentZoom.imgUrl;
+  mainZoom.src = currentZoom.imgUrl || '';
   thumbs.innerHTML = '';
   (currentZoom.zoomGroup || []).forEach(u => {
     const t = document.createElement('img'); t.src = u;
