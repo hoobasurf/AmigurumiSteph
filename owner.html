@@ -641,84 +641,108 @@ if ('Notification' in window && Notification.permission !== 'granted') Notificat
 Comme ça ?
 
 
-// ====== CREATIONS ======
+// ====== REFRESH CREATIONS ======
 async function refreshCreations() {
   try {
-    const { data, error } = await supabase.from('creations').select('*').order('created_at', { ascending: false });
-    if (error) return console.error(error);
+    const { data, error } = await supabase
+      .from('creations')
+      .select('*')
+      .order('created_at', { ascending: false });
 
+    if (error) {
+      console.error('Supabase error:', error);
+      return;
+    }
+
+    // Map data pour garder même structure
     creations = data.map(c => {
       let zoomGroup = [];
       if (c.images?.length) {
-        zoomGroup = c.images.map(p => supabase.storage.from('images').getPublicUrl(p).data?.publicUrl || '');
+        zoomGroup = c.images.map(p =>
+          supabase.storage.from('images').getPublicUrl(p).data?.publicUrl || ''
+        );
       } else if (c.image_path) {
-        zoomGroup = [supabase.storage.from('images').getPublicUrl(c.image_path).data?.publicUrl || ''];
+        zoomGroup = [
+          supabase.storage.from('images').getPublicUrl(c.image_path).data?.publicUrl || ''
+        ];
       }
 
       const likesArray = Array.isArray(c.likes) ? c.likes : JSON.parseSafe(c.likes) || [];
       const commentsArray = Array.isArray(c.comments) ? c.comments : JSON.parseSafe(c.comments) || [];
 
       return {
-  id: c.id,
-  name: c.name,
-  legend: c.legend || '',
-  imgUrl: zoomGroup[0] || '',
-  zoomGroup,
-  likes: likesArray.map(l => ({ name: l.name || '', photo: l.photo || '' })),
-  comments: commentsArray.map(cmt => ({ name: cmt.name || '', text: cmt.text || '', photo: cmt.photo || '' }))
-};
-    renderCreations();
-  } catch (err) { console.error('refreshCreations', err); }
-}
+        id: c.id,
+        name: c.name,
+        legend: c.legend || '',
+        imgUrl: zoomGroup[0] || '',
+        zoomGroup,
+        likes: likesArray.map(l => ({ name: l.name || '', photo: l.photo || '' })),
+        comments: commentsArray.map(cmt => ({ name: cmt.name || '', text: cmt.text || '', photo: cmt.photo || '' }))
+      };
+    });
 
-// Helper pour JSON safe
-JSON.parseSafe = str => { try { return JSON.parse(str); } catch(e) { return []; } };
+    renderCreations();
+  } catch (err) {
+    console.error('refreshCreations error:', err);
+  }
+}
 
 // ====== RENDER CREATIONS ======
 function renderCreations() {
   const container = document.getElementById('creationsContainer');
-  container.innerHTML = '';
+  if (!container) {
+    console.error('Container #creationsContainer introuvable !');
+    return;
+  }
+
+  container.innerHTML = ''; // vider avant
 
   creations.forEach(c => {
     const div = document.createElement('div');
     div.className = 'creation-item';
 
-    // 1️⃣ créer l'image
-    const img = document.createElement('img');
-    img.src = c.imgUrl;
-
-    // 2️⃣ créer le placeholder
+    // Placeholder
     const placeholder = document.createElement('div');
     placeholder.className = 'placeholder';
     placeholder.textContent = 'Chargement…';
     div.appendChild(placeholder);
 
-    // 3️⃣ gérer disparition du placeholder
-    if (img.complete) {
-      placeholder.style.display = 'none';
-    }
+    // Image
+    const img = document.createElement('img');
+    img.src = c.imgUrl;
+
+    // Si déjà chargée
+    if (img.complete) placeholder.style.display = 'none';
+
+    // Quand l'image charge
     img.onload = () => {
       placeholder.style.display = 'none';
     };
 
-    // 4️⃣ ajouter l'image dans le div
     div.appendChild(img);
 
-    // nom et légende
+    // Nom
     const nameP = document.createElement('p');
     nameP.textContent = c.name;
     div.appendChild(nameP);
 
+    // Légende
     const legendP = document.createElement('p');
     legendP.textContent = c.legend || '';
     div.appendChild(legendP);
 
-    // clic pour zoom
+    // Clic pour zoom
     div.onclick = () => openZoom(c);
 
     container.appendChild(div);
   });
 }
+
+// Helper JSON safe
+JSON.parseSafe = str => {
+  try { return JSON.parse(str); }
+  catch(e) { return []; }
+};
 
   const likesArray = Array.isArray(c.likes) ? c.likes : JSON.parseSafe(c.likes);
   const commentsArray = Array.isArray(c.comments) ? c.comments : JSON.parseSafe(c.comments);
