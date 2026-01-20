@@ -12,34 +12,7 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 
 <style>
-*{
-  box-sizing:border-box;
-  margin:0;
-  padding:0;
-  font-family:'Comic Sans MS',cursive;
-}
-
-html,body{
-  height:100%;
-  overflow-x:hidden;
-}
-
-/* ====== FOND ====== */
-body::before{
-  content:"";
-  position:fixed;
-  top:0;
-  left:0;
-  width:100vw;
-  height:100vh;
-  background-image:url('Photoroom_20251223_114401.jpeg');
-  background-size:cover;
-  background-position:center;
-  background-repeat:no-repeat;
-  z-index:-1;
-}
-
-/* ====== ZONE CENTRALE ====== */
+  /* ====== ZONE CENTRALE ====== */
 .center-zone{
   display:flex;
   justify-content:center;
@@ -49,12 +22,12 @@ body::before{
   height:auto;
 }
 
-/* ====== CONTENEUR SCROLL ====== */
+/* ====== CONTENEUR DES PAGES ====== */
 #visitor-list-container{
   display:flex;
   overflow-x:auto;
   scroll-snap-type:x mandatory;
-  -webkit-overflow-scrolling:touch;
+  -webkit-overflow-scrolling: touch;
   justify-content:center;
   padding-left:1cm;
 }
@@ -62,8 +35,8 @@ body::before{
 /* ====== PAGE = 6 CARTES ====== */
 .page{
   display:grid;
-  grid-template-columns:repeat(2,200px);
-  grid-template-rows:repeat(3,200px);
+  grid-template-columns:repeat(2, 200px);
+  grid-template-rows:repeat(3, 200px);
   column-gap:3mm;
   row-gap:4mm;
   flex:0 0 auto;
@@ -72,47 +45,43 @@ body::before{
   scroll-snap-align:center;
   padding:4mm;
   justify-content:center;
+  margin-top:0;
 }
 
-/* ================================================= */
-/* =============== CARTE CREATION ================= */
-/* ================================================= */
-
+/* ====== CARD CREATION (STYLE FINAL) ====== */
 .creation{
   position:relative;
   width:200px;
   height:200px;
   border-radius:12px;
   overflow:hidden;
-  background:#ffe6f0;
   border:3px solid #fff;
-  cursor:pointer;
-
+  background:#ffe6f0;
   box-shadow:
     0 0 0 3px #f6c2d1,
     0 6px 14px rgba(0,0,0,0.25),
     inset 0 0 0 1px rgba(255,255,255,0.4);
 }
 
-/* IMAGE */
+/* ====== IMAGE ====== */
 .creation img{
   width:100%;
   height:100%;
   object-fit:cover;
   border-radius:12px;
+  cursor:pointer;
   display:block;
-  position:relative;
-  z-index:2;
-
   filter:brightness(1.05) contrast(1.05) saturate(0.95);
   transition:transform 0.3s;
+  position:relative;
+  z-index:2;
 }
 
-.creation:hover img{
+.creation img:hover{
   transform:scale(1.03);
 }
 
-/* SURCOUCHE ROSE */
+/* ====== SURCOUCHE ROSE ====== */
 .creation::after{
   content:"";
   position:absolute;
@@ -122,10 +91,10 @@ body::before{
   z-index:1;
 }
 
-/* LÉGENDE */
+/* ====== LÉGENDE ====== */
 .creation p{
   position:absolute;
-  bottom:4px;
+  bottom:2px;
   width:100%;
   text-align:center;
   font-size:14px;
@@ -133,6 +102,7 @@ body::before{
   color:#b84c6f;
   z-index:3;
 
+  /* contour noir lettres */
   -webkit-text-stroke:0.6px #000;
   text-shadow:
     1px 1px 0 #000,
@@ -141,40 +111,11 @@ body::before{
    -1px -1px 0 #000;
 }
 
-/* ====== SIDEBAR ====== */
-#sidebar{
-  position:fixed;
-  top:0;
-  left:-220px;
-  width:220px;
-  height:100vh;
-  background:rgba(255,230,240,0.2);
-  border-right:2px solid #b67385;
-  padding:20px;
-  transition:left .3s;
-  z-index:10;
-}
-#sidebar.sidebar-open{left:0;}
-#toggleSidebar{
-  position:absolute;
-  top:50%;
-  right:-30px;
-  width:30px;
-  height:60px;
-  background:#ffb6c1;
-  border-radius:0 12px 12px 0;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  cursor:pointer;
-  font-weight:bold;
-}
-
-/* ====== RESPONSIVE ====== */
+/* ====== RESPONSIVE MOBILE ====== */
 @media(max-width:480px){
   .page{
-    grid-template-columns:repeat(2,120px);
-    grid-template-rows:repeat(3,120px);
+    grid-template-columns:repeat(2, 120px);
+    grid-template-rows:repeat(3, 120px);
     width:calc(2 * 120px + 3mm);
     height:calc(3 * 120px + 8mm);
   }
