@@ -241,9 +241,6 @@ body::before{
   <div id="visitor-list-container"></div>
 </div>
 
-<!-- CONTENEUR POUR LES CREATIONS (AJOUTÉ) -->
-<div id="creationsContainer" style="display:flex; flex-wrap:wrap; gap:12px; justify-content:center; margin-top:20px;"></div>
-
 <div id="sidebar">
   <div id="toggleSidebar">☰</div>
   <button id="addBtn">Ajouter</button>
@@ -256,6 +253,7 @@ body::before{
     <circle cx="12" cy="12" r="3"/>
     <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l0 0a2 2 0 1 1-2.83 2.83l0 0a1.65 1.65 0 0 0-1.82.33l0 0a1.65 1.65 0 0 0-.5 1.51l0 0a2 2 0 1 1-3.18 0l0 0a1.65 1.65 0 0 0-1.51-.5l0 0a1.65 1.65 0 0 0-.33-1.82l0 0a2 2 0 1 1 0-2.83l0 0a1.65 1.65 0 0 0 .33-1.82l0 0a1.65 1.65 0 0 0-1.51-.5l0 0a2 2 0 1 1 0-3.18l0 0a1.65 1.65 0 0 0 .5-1.51l0 0a1.65 1.65 0 0 0 1.82-.33l0 0a2 2 0 1 1 2.83 0l0 0a1.65 1.65 0 0 0 1.82.33l0 0a1.65 1.65 0 0 0 .5 1.51l0 0a2 2 0 1 1 3.18 0l0 0a1.65 1.65 0 0 0 1.51.5l0 0a1.65 1.65 0 0 0 .33 1.82l0 0a2 2 0 1 1 0 2.83l0 0a1.65 1.65 0 0 0-.33 1.82l0 0a1.65 1.65 0 0 0 1.51.5z"/>
   </svg>
+</button>
 </div>
 
 <!-- Modals -->
@@ -643,129 +641,60 @@ if ('Notification' in window && Notification.permission !== 'granted') Notificat
 Comme ça ?
 
 
-// ====== REFRESH CREATIONS ======
+// ====== CREATIONS ======
 async function refreshCreations() {
   try {
-    const { data, error } = await supabase
-      .from('creations')
-      .select('*')
-      .order('created_at', { ascending: false });
+    const { data, error } = await supabase.from('creations').select('*').order('created_at', { ascending: false });
+    if (error) return console.error(error);
 
-    if (error) {
-      console.error('Supabase error:', error);
-      return;
-    }
-
-    // Map data pour garder même structure
     creations = data.map(c => {
       let zoomGroup = [];
       if (c.images?.length) {
-        zoomGroup = c.images.map(p =>
-          supabase.storage.from('images').getPublicUrl(p).data?.publicUrl || ''
-        );
+        zoomGroup = c.images.map(p => supabase.storage.from('images').getPublicUrl(p).data?.publicUrl || '');
       } else if (c.image_path) {
-        zoomGroup = [
-          supabase.storage.from('images').getPublicUrl(c.image_path).data?.publicUrl || ''
-        ];
+        zoomGroup = [supabase.storage.from('images').getPublicUrl(c.image_path).data?.publicUrl || ''];
       }
 
       const likesArray = Array.isArray(c.likes) ? c.likes : JSON.parseSafe(c.likes) || [];
       const commentsArray = Array.isArray(c.comments) ? c.comments : JSON.parseSafe(c.comments) || [];
 
       return {
-        id: c.id,
-        name: c.name,
-        legend: c.legend || '',
-        imgUrl: zoomGroup[0] || '',
-        zoomGroup,
-        likes: likesArray.map(l => ({ name: l.name || '', photo: l.photo || '' })),
-        comments: commentsArray.map(cmt => ({ name: cmt.name || '', text: cmt.text || '', photo: cmt.photo || '' }))
-      };
-    });
-
+  id: c.id,
+  name: c.name,
+  legend: c.legend || '',
+  imgUrl: zoomGroup[0] || '',
+  zoomGroup,
+  likes: likesArray.map(l => ({ name: l.name || '', photo: l.photo || '' })),
+  comments: commentsArray.map(cmt => ({ name: cmt.name || '', text: cmt.text || '', photo: cmt.photo || '' }))
+};
     renderCreations();
-  } catch (err) {
-    console.error('refreshCreations error:', err);
-  }
+  } catch (err) { console.error('refreshCreations', err); }
 }
+
+// Helper pour JSON safe
+JSON.parseSafe = str => { try { return JSON.parse(str); } catch(e) { return []; } };
 
 // ====== RENDER CREATIONS ======
 function renderCreations() {
-  const container = document.getElementById('creationsContainer');
-  if (!container) {
-    console.error('Container #creationsContainer introuvable !');
-    return;
-  }
-
-  container.innerHTML = ''; // vider avant
-
-  creations.forEach(c => {
-    const div = document.createElement('div');
-    div.className = 'creation-item';
-
-    // Placeholder
-    const placeholder = document.createElement('div');
-    placeholder.className = 'placeholder';
-    placeholder.textContent = 'Chargement…';
-    div.appendChild(placeholder);
-
-    // Image
-    const img = document.createElement('img');
-    img.src = c.imgUrl;
-
-    // Si déjà chargée
-    if (img.complete) placeholder.style.display = 'none';
-
-    // Quand l'image charge
-    img.onload = () => {
-      placeholder.style.display = 'none';
-    };
-
-    div.appendChild(img);
-
-    // Nom
-    const nameP = document.createElement('p');
-    nameP.textContent = c.name;
-    div.appendChild(nameP);
-
-    // Légende
-    const legendP = document.createElement('p');
-    legendP.textContent = c.legend || '';
-    div.appendChild(legendP);
-
-    // Clic pour zoom
-    div.onclick = () => openZoom(c);
-
-    container.appendChild(div);
+  container.innerHTML = '';
+  let page = null;
+  creations.forEach((c, i) => {
+    if (i % 6 === 0) { page = document.createElement('div'); page.className = 'page'; container.appendChild(page); }
+    const d = document.createElement('div'); d.className = 'visitor-item';
+    d.innerHTML = `<div class="placeholder">?</div><div class="delete-btn">×</div><p>${c.name}</p><img src="${c.imgUrl||''}">`;
+    const img = d.querySelector('img');
+    img.onload = () => d.querySelector('.placeholder').style.display='none';
+    img.onerror = () => { img.remove(); d.querySelector('.placeholder').textContent=''; };
+    img.onclick = () => openZoom(c);
+    d.querySelector('.delete-btn').onclick = () => openDeleteModal(c);
+    page.appendChild(d);
   });
 }
-
-// Helper JSON safe
-JSON.parseSafe = str => {
-  try { return JSON.parse(str); }
-  catch(e) { return []; }
-};
-
-  const likesArray = Array.isArray(c.likes) ? c.likes : JSON.parseSafe(c.likes);
-  const commentsArray = Array.isArray(c.comments) ? c.comments : JSON.parseSafe(c.comments);
-
-  return {
-    id: c.id,
-    name: c.name,
-    legend: c.legend || '',
-    imgUrl: zoomGroup[0] || '',
-    zoomGroup,
-    likes: likesArray.map(l => ({ name: l.name || '', photo: l.photo || '' })),
-    comments: commentsArray.map(cmt => ({ name: cmt.name || '', text: cmt.text || '', photo: cmt.photo || '' }))
-  };
-});
-
-renderCreations();
 
 // ====== ZOOM ======
 function openZoom(c) {
   currentZoom = creations.find(x => x.id === c.id);
-  mainZoom.src = currentZoom.imgUrl || '';
+  mainZoom.src = currentZoom.imgUrl;
   thumbs.innerHTML = '';
   (currentZoom.zoomGroup || []).forEach(u => {
     const t = document.createElement('img'); t.src = u;
