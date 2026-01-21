@@ -681,30 +681,62 @@ async function refreshCreations() {
 JSON.parseSafe = str => { try { return JSON.parse(str); } catch(e) { return []; } };
 
 // ====== RENDER CREATIONS ======
-function renderCreations() {
-  container.innerHTML = '';
-  let page = null;
-  creations.forEach((c, i) => {
-    if (i % 6 === 0) { page = document.createElement('div'); page.className = 'page'; container.appendChild(page); }
-    const d = document.createElement('div'); d.className = 'visitor-item';
-    d.innerHTML = `<div class="placeholder">?</div><div class="delete-btn">×</div><p>${c.name}</p><img src="${c.imgUrl||''}">`;
-    const img = d.querySelector('img');
-    img.onload = () => d.querySelector('.placeholder').style.display='none';
-    img.onerror = () => { img.remove(); d.querySelector('.placeholder').textContent=''; };
-    img.onclick = () => openZoom(c);
-    d.querySelector('.delete-btn').onclick = () => openDeleteModal(c);
-    page.appendChild(d);
+function renderCreations(data) {
+  const pageContainer = document.getElementById('page');
+  pageContainer.innerHTML = '';
 
-  return {
-  id: c.id,
-  name: c.name,
-  legend: c.legend || '',
-  imgUrl: zoomGroup[0] || '',
-  zoomGroup,
-  likes: likesArray.map(l => ({ name: l.name || '', photo: l.photo || '' })),
-  comments: commentsArray.map(cmt => ({ name: cmt.name || '', text: cmt.text || '', photo: cmt.photo || '' }))
-};
+  const flatImages = [];
+
+  // 1 image = 1 card
+  data.forEach(c => {
+    if (c.images && c.images.length) {
+      c.images.forEach(path => {
+        const url = supabase
+          .storage
+          .from('images')
+          .getPublicUrl(path)
+          .data
+          .publicUrl;
+
+        if (url) {
+          flatImages.push({
+            url,
+            legend: c.legend || ''
+          });
+        }
+      });
+    }
   });
+
+  // pages de 6
+  for (let i = 0; i < flatImages.length; i += 6) {
+    const page = document.createElement('div');
+    page.className = 'page';
+
+    flatImages.slice(i, i + 6).forEach(img => {
+      const card = document.createElement('div');
+      card.className = 'creation';
+
+      const image = document.createElement('img');
+      image.src = img.url;
+      image.alt = img.legend;
+
+      const p = document.createElement('p');
+      p.textContent = img.legend;
+
+      card.appendChild(image);
+      card.appendChild(p);
+
+      // zoom
+      card.onclick = () => openZoomModal(img.url, img.legend);
+
+      page.appendChild(card);
+    });
+
+    pageContainer.appendChild(page);
+  }
+
+  console.log('renderCreations OK', flatImages.length);
 }
 
 // ====== ZOOM ======
