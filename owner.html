@@ -240,8 +240,9 @@ body::before{
 <div class="center-zone">
   <div id="visitor-list-container"></div>
 </div>
+<div id="creationsContainer"></div>
 
-<div id="sidebar">
+  <div id="sidebar">
   <div id="toggleSidebar">☰</div>
   <button id="addBtn">Ajouter</button>
   <button id="pelotesBtn">Pelotes</button>
@@ -862,11 +863,13 @@ chatModal.addEventListener('touchmove', e => {
 chatModal.addEventListener('touchend',()=>{initialDistance=null;});
 
 // ====== INITIAL LOAD ======
-refreshCreations();
-loadOwnerPhoto();
-loadChatUsers();
+document.addEventListener('DOMContentLoaded', () => {
+
+  loadOwnerPhoto();
+  loadChatUsers();
+  refreshCreations();
+
+});
 </script>
-
-
 </body>
 </html>
