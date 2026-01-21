@@ -54,32 +54,26 @@ body::before{
 }
 
 /* ====== PAGE = 6 CARTES (3x2) ====== */
-.page{
-  display:grid;
-  grid-template-columns:repeat(2, 200px);
-  grid-template-rows:repeat(3, 200px);
-  column-gap:3mm;
-  row-gap:4mm;
-  flex:0 0 auto;
-  width:calc(2 * 200px + 3mm);
-  height:calc(3 * 200px + 8mm);
-  scroll-snap-align:center;
-  padding:4mm;
-  justify-content:center;
-  margin-top:0;
+.page {
+  display: grid;
+  grid-template-columns: repeat(2, 200px);
+  grid-template-rows: repeat(3, 200px);
+  gap: 8px;
+  justify-content: center; /* centre horizontalement */
+  align-items: center;     /* centre verticalement si nécessaire */
+  margin: auto;
+  padding: 8px;
 }
 
-/* ====== RESPONSIVE MOBILE ====== */
+/* Mobile responsive */
 @media(max-width:480px){
-  .page{
-    grid-template-columns:repeat(2, 120px);
-    grid-template-rows:repeat(3, 120px);
-    width:calc(2 * 120px + 3mm);
-    height:calc(3 * 120px + 8mm);
+  .page {
+    grid-template-columns: repeat(2, 120px);
+    grid-template-rows: repeat(3, 120px);
   }
-  .creation{
-    width:120px;
-    height:120px;
+  .creation {
+    width: 120px;
+    height: 120px;
   }
 }
 .visitor-item{position:relative;width:200px;height:200px;border-radius:12px;overflow:hidden;border:3px solid #fff;box-shadow:0 0 0 3px #f6c2d1,0 6px 14px rgba(0,0,0,0.25),inset 0 0 0 1px rgba(255,255,255,0.4);background:#ffe6f0;}
@@ -448,6 +442,19 @@ body::before{
   </div>
 </div>
 
+<div class="center-zone">
+  <div id="page">
+    <div class="page">
+      <div class="creation"><p>1</p></div>
+      <div class="creation"><p>2</p></div>
+      <div class="creation"><p>3</p></div>
+      <div class="creation"><p>4</p></div>
+      <div class="creation"><p>5</p></div>
+      <div class="creation"><p>6</p></div>
+    </div>
+  </div>
+</div>
+  
 <!-- Modal Gestion -->
 <div id="manageModal" class="modal">
   <div class="modal-box">
