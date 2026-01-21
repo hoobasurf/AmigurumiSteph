@@ -314,6 +314,14 @@ body::before{
 <div id="zoomModal">
   <div class="closeZoom">×</div>
   <img id="mainZoom">
+  <div id="zoomLegend" style="
+  max-width: 260px;
+  padding: 10px;
+  color: #b84c6f;
+  font-size: 14px;
+  background: transparent;
+  align-self: flex-start;
+"></div>
   <div class="thumbs" id="thumbs"></div>
   <div class="actions">
     <div class="actions" style="display:flex; gap:12px; align-items:center; margin-top:8px;">
@@ -437,9 +445,7 @@ body::before{
   </div>
 </div>
 
-
-<script type="module">
-      console.log('SCRIPT CHARGÉ');
+  <script type="module">
 import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
 
 const supabase = createClient(
@@ -639,57 +645,88 @@ function showInAppNotification(sender, message) {
   }
 }
 if ('Notification' in window && Notification.permission !== 'granted') Notification.requestPermission();
-
-Comme ça ?
-
-
 // ====== CREATIONS ======
 async function refreshCreations() {
-  console.log('refreshCreations OK');
   try {
-    const { data, error } = await supabase.from('creations').select('*').order('created_at', { ascending: false });
+    const { data, error } = await supabase
+      .from('creations')
+      .select('*')
+      .order('created_at', { ascending: false });
     if (error) return console.error(error);
 
     creations = data.map(c => {
+      // construction du zoomGroup
       let zoomGroup = [];
-      if (c.images?.length) {
+      if (Array.isArray(c.images) && c.images.length) {
         zoomGroup = c.images.map(p => supabase.storage.from('images').getPublicUrl(p).data?.publicUrl || '');
       } else if (c.image_path) {
         zoomGroup = [supabase.storage.from('images').getPublicUrl(c.image_path).data?.publicUrl || ''];
       }
 
-      const likesArray = Array.isArray(c.likes) ? c.likes : JSON.parseSafe(c.likes) || [];
-      const commentsArray = Array.isArray(c.comments) ? c.comments : JSON.parseSafe(c.comments) || [];
+      // likes et comments sécurisés
+      const likesArray = Array.isArray(c.likes) ? c.likes : (JSON.parseSafe(c.likes) || []);
+      const commentsArray = Array.isArray(c.comments) ? c.comments : (JSON.parseSafe(c.comments) || []);
 
       return {
-  id: c.id,
-  name: c.name,
-  legend: c.legend || '',
-  imgUrl: zoomGroup[0] || '',
-  zoomGroup,
-  likes: likesArray.map(l => ({ name: l.name || '', photo: l.photo || '' })),
-  comments: commentsArray.map(cmt => ({ name: cmt.name || '', text: cmt.text || '', photo: cmt.photo || '' }))
-};
-    renderCreations();
-  } catch (err) { console.error('refreshCreations', err); }
+        id: c.id,
+        name: c.name || '',
+        legend: c.legend || '',
+        imgUrl: zoomGroup[0] || '',
+        zoomGroup,
+        likes: likesArray.map(l => ({ name: l.name || '', photo: l.photo || '' })),
+        comments: commentsArray.map(cmt => ({ name: cmt.name || '', text: cmt.text || '', photo: cmt.photo || '' }))
+      };
+    });
+
+    renderCreations(creations);
+  } catch (err) {
+    console.error('refreshCreations', err);
+  }
 }
 
-// Helper pour JSON safe
+// Helper JSON safe
 JSON.parseSafe = str => { try { return JSON.parse(str); } catch(e) { return []; } };
 
 // ====== RENDER CREATIONS ======
-function renderCreations() {
-  container.innerHTML = '';
-  let page = null;
-  creations.forEach((c, i) => {
-    if (i % 6 === 0) { page = document.createElement('div'); page.className = 'page'; container.appendChild(page); }
-    const d = document.createElement('div'); d.className = 'visitor-item';
-    d.innerHTML = `<div class="placeholder">?</div><div class="delete-btn">×</div><p>${c.name}</p><img src="${c.imgUrl||''}">`;
-    const img = d.querySelector('img');
-    img.onload = () => d.querySelector('.placeholder').style.display='none';
-    img.onerror = () => { img.remove(); d.querySelector('.placeholder').textContent=''; };
-    img.onclick = () => openZoom(c);
-    d.querySelector('.delete-btn').onclick = () => openDeleteModal(c);
+function renderCreations(creations) {
+  const page = document.getElementById('page');
+  page.innerHTML = ''; // vide avant rendu
+
+  creations.forEach(c => {
+    const d = document.createElement('div');
+    d.classList.add('creation');
+
+    // image
+    const img = document.createElement('img');
+    img.src = c.imgUrl || '';
+    img.alt = c.name || '';
+    d.appendChild(img);
+
+    // légende
+    const legend = document.createElement('p');
+    legend.textContent = c.legend || '';
+    d.appendChild(legend);
+
+    // likes
+    const likes = document.createElement('span');
+    likes.textContent = c.likes?.length || 0;
+    likes.classList.add('likes');
+    d.appendChild(likes);
+
+    // commentaires
+    const comments = document.createElement('span');
+    comments.textContent = c.comments?.length || 0;
+    comments.classList.add('comments');
+    d.appendChild(comments);
+
+    // bouton zoom
+    if (c.zoomGroup && c.zoomGroup.length > 0) {
+      const zoomBtn = document.createElement('button');
+      zoomBtn.textContent = 'Zoom';
+      zoomBtn.onclick = () => openZoom(c); // utilise la fonction stable avec currentZoom
+      d.appendChild(zoomBtn);
+    }
+
     page.appendChild(d);
   });
 }
@@ -698,6 +735,7 @@ function renderCreations() {
 function openZoom(c) {
   currentZoom = creations.find(x => x.id === c.id);
   mainZoom.src = currentZoom.imgUrl;
+  document.getElementById('zoomLegend').textContent = currentZoom.legend || '';
   thumbs.innerHTML = '';
   (currentZoom.zoomGroup || []).forEach(u => {
     const t = document.createElement('img'); t.src = u;
@@ -776,63 +814,86 @@ function renderCommentList() {
 }
 
 // ====== ADD CREATION ======
+document.getElementById('addBtn').onclick = () => addModal.style.display = 'flex';
 
-Ton code ne suffit ps ?
+// Fermer modal en cliquant sur le fond
+addModal.addEventListener('click', e => { 
+  if (e.target === addModal) addModal.style.display = 'none'; 
+});
 
 document.getElementById('confirmAdd').onclick = async e => {
   e.stopPropagation();
-
-  // Récupération des valeurs du formulaire
   const name = document.getElementById('photoName').value.trim();
   const legend = document.getElementById('photoLegend').value.trim();
   const files = document.getElementById('multiPhoto').files;
 
-  if (!name || !legend || !files.length) {
-    alert("Merci de mettre un nom, une légende et de choisir au moins une photo");
-    return;
+  if (!name || !files.length) { 
+    alert("Mettre un nom et choisir au moins une photo"); 
+    return; 
   }
 
-  const paths = [], urls = [];
+  const paths = [];
+  const urls = [];
 
   for (let file of files) {
     const path = `${Date.now()}_${file.name}`;
     const { error: uploadError } = await supabase.storage.from('images').upload(path, file);
-    if (uploadError) { console.error(uploadError); continue; }
+    if (uploadError) { 
+      console.error(uploadError); 
+      continue; 
+    }
 
     const { data: pubData } = supabase.storage.from('images').getPublicUrl(path);
     if (!pubData?.publicUrl) continue;
-
     urls.push(pubData.publicUrl);
     paths.push(path);
   }
 
   if (!urls.length) return;
 
-  // Envoi dans Supabase avec la légende
   await supabase.from('creations').insert([{
-    name: name,
-    legend: legend,
-    image_path: paths[0],
+    name,
+    legend,
+    image_path: paths[0], // première image pour l'affichage principal
     images: paths,
     likes: [],
     comments: []
   }]);
 
-  // Reset formulaire et fermeture modal
+  // Reset modal et refresh
   addModal.style.display = 'none';
   document.getElementById('photoName').value = '';
-  document.getElementById('photoLegend').value = '';
   document.getElementById('multiPhoto').value = '';
-
+  document.getElementById('photoLegend').value = '';
   await refreshCreations();
 };
 
 // ====== DELETE CREATION ======
-function openDeleteModal(c) { currentDelete = c; deleteModal.style.display = 'flex'; }
-document.getElementById('cancelDelete').onclick = () => { currentDelete = null; deleteModal.style.display = 'none'; };
+let currentDelete = null;
+function openDeleteModal(c) {
+  currentDelete = c;
+  deleteModal.style.display = 'flex';
+}
+
+document.getElementById('cancelDelete').onclick = () => { 
+  currentDelete = null; 
+  deleteModal.style.display = 'none'; 
+};
+
 document.getElementById('confirmDelete').onclick = async () => {
   if (!currentDelete?.id) return;
+
+  // Supprime du storage toutes les images de cette création
+  if (Array.isArray(currentDelete.zoomGroup)) {
+    for (let url of currentDelete.zoomGroup) {
+      const path = url.split('/').pop().split('?')[0]; // récupère le nom du fichier
+      await supabase.storage.from('images').remove([path]).catch(e => console.error(e));
+    }
+  }
+
+  // Supprime de la base de données
   await supabase.from('creations').delete().eq('id', currentDelete.id);
+
   currentDelete = null;
   deleteModal.style.display = 'none';
   await refreshCreations();
@@ -883,13 +944,11 @@ chatModal.addEventListener('touchmove', e => {
 chatModal.addEventListener('touchend',()=>{initialDistance=null;});
 
 // ====== INITIAL LOAD ======
-document.addEventListener('DOMContentLoaded', () => {
-
-  loadOwnerPhoto();
-  loadChatUsers();
-  refreshCreations();
-
-});
+refreshCreations();
+loadOwnerPhoto();
+loadChatUsers();
 </script>
+
+
 </body>
 </html>
