@@ -655,20 +655,22 @@ async function refreshCreations() {
     if (error) return console.error(error);
 
     creations = data.map(c => {
+      // construction du zoomGroup
       let zoomGroup = [];
-      if (c.images?.length) {
+      if (Array.isArray(c.images) && c.images.length) {
         zoomGroup = c.images.map(p => supabase.storage.from('images').getPublicUrl(p).data?.publicUrl || '');
       } else if (c.image_path) {
         zoomGroup = [supabase.storage.from('images').getPublicUrl(c.image_path).data?.publicUrl || ''];
       }
 
-      const likesArray = Array.isArray(c.likes) ? c.likes : JSON.parseSafe(c.likes) || [];
-      const commentsArray = Array.isArray(c.comments) ? c.comments : JSON.parseSafe(c.comments) || [];
+      // likes et comments sécurisés
+      const likesArray = Array.isArray(c.likes) ? c.likes : (JSON.parseSafe(c.likes) || []);
+      const commentsArray = Array.isArray(c.comments) ? c.comments : (JSON.parseSafe(c.comments) || []);
 
       return {
         id: c.id,
-        name: c.name,
-        legend: c.legend || '',       // problème 2 corrigé
+        name: c.name || '',
+        legend: c.legend || '',
         imgUrl: zoomGroup[0] || '',
         zoomGroup,
         likes: likesArray.map(l => ({ name: l.name || '', photo: l.photo || '' })),
@@ -676,21 +678,21 @@ async function refreshCreations() {
       };
     });
 
-    renderCreations(creations); // on passe bien les créations
+    renderCreations(creations);
   } catch (err) {
     console.error('refreshCreations', err);
   }
 }
 
-// Helper pour JSON safe
+// Helper JSON safe
 JSON.parseSafe = str => { try { return JSON.parse(str); } catch(e) { return []; } };
 
 // ====== RENDER CREATIONS ======
 function renderCreations(creations) {
   const page = document.getElementById('page');
-  page.innerHTML = ''; // vide la page avant de rendre les nouvelles créations
+  page.innerHTML = ''; // vide avant rendu
 
-  creations.forEach((c) => {
+  creations.forEach(c => {
     const d = document.createElement('div');
     d.classList.add('creation');
 
@@ -721,11 +723,11 @@ function renderCreations(creations) {
     if (c.zoomGroup && c.zoomGroup.length > 0) {
       const zoomBtn = document.createElement('button');
       zoomBtn.textContent = 'Zoom';
-      zoomBtn.addEventListener('click', () => openZoomModal(c.zoomGroup));
+      zoomBtn.onclick = () => openZoom(c); // utilise la fonction stable avec currentZoom
       d.appendChild(zoomBtn);
     }
 
-    page.appendChild(d); // ajout au DOM
+    page.appendChild(d);
   });
 }
 
@@ -813,31 +815,52 @@ function renderCommentList() {
 
 // ====== ADD CREATION ======
 document.getElementById('addBtn').onclick = () => addModal.style.display = 'flex';
-addModal.addEventListener('click', e => { if (e.target === addModal) addModal.style.display = 'none'; });
+
+// Fermer modal en cliquant sur le fond
+addModal.addEventListener('click', e => { 
+  if (e.target === addModal) addModal.style.display = 'none'; 
+});
+
 document.getElementById('confirmAdd').onclick = async e => {
   e.stopPropagation();
   const name = document.getElementById('photoName').value.trim();
-const legend = document.getElementById('photoLegend').value.trim();
-const files = document.getElementById('multiPhoto').files;
-  if (!name || !files.length) { alert("Mettre un nom et choisir au moins une photo"); return; }
-  const paths = [], urls = [];
+  const legend = document.getElementById('photoLegend').value.trim();
+  const files = document.getElementById('multiPhoto').files;
+
+  if (!name || !files.length) { 
+    alert("Mettre un nom et choisir au moins une photo"); 
+    return; 
+  }
+
+  const paths = [];
+  const urls = [];
+
   for (let file of files) {
     const path = `${Date.now()}_${file.name}`;
     const { error: uploadError } = await supabase.storage.from('images').upload(path, file);
-    if (uploadError) { console.error(uploadError); continue; }
+    if (uploadError) { 
+      console.error(uploadError); 
+      continue; 
+    }
+
     const { data: pubData } = supabase.storage.from('images').getPublicUrl(path);
     if (!pubData?.publicUrl) continue;
-    urls.push(pubData.publicUrl); paths.push(path);
+    urls.push(pubData.publicUrl);
+    paths.push(path);
   }
+
   if (!urls.length) return;
+
   await supabase.from('creations').insert([{
-  name,
-  legend,
-  image_path: paths[0],
-  images: paths,
-  likes: [],
-  comments: []
-}]);
+    name,
+    legend,
+    image_path: paths[0], // première image pour l'affichage principal
+    images: paths,
+    likes: [],
+    comments: []
+  }]);
+
+  // Reset modal et refresh
   addModal.style.display = 'none';
   document.getElementById('photoName').value = '';
   document.getElementById('multiPhoto').value = '';
@@ -846,11 +869,31 @@ const files = document.getElementById('multiPhoto').files;
 };
 
 // ====== DELETE CREATION ======
-function openDeleteModal(c) { currentDelete = c; deleteModal.style.display = 'flex'; }
-document.getElementById('cancelDelete').onclick = () => { currentDelete = null; deleteModal.style.display = 'none'; };
+let currentDelete = null;
+function openDeleteModal(c) {
+  currentDelete = c;
+  deleteModal.style.display = 'flex';
+}
+
+document.getElementById('cancelDelete').onclick = () => { 
+  currentDelete = null; 
+  deleteModal.style.display = 'none'; 
+};
+
 document.getElementById('confirmDelete').onclick = async () => {
   if (!currentDelete?.id) return;
+
+  // Supprime du storage toutes les images de cette création
+  if (Array.isArray(currentDelete.zoomGroup)) {
+    for (let url of currentDelete.zoomGroup) {
+      const path = url.split('/').pop().split('?')[0]; // récupère le nom du fichier
+      await supabase.storage.from('images').remove([path]).catch(e => console.error(e));
+    }
+  }
+
+  // Supprime de la base de données
   await supabase.from('creations').delete().eq('id', currentDelete.id);
+
   currentDelete = null;
   deleteModal.style.display = 'none';
   await refreshCreations();
