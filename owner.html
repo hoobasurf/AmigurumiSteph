@@ -1,3 +1,7 @@
+Oublis tous on repart de ce code on commence par :
+
+Je veux en ouvrant la du bouton messagerie, le clic dans le vide, referme la
+
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -213,23 +217,6 @@ body::before{
   height: 460px;
   border-radius: 24px;
 }
-
-.pink-file-btn{
-  background: linear-gradient(#ffd6e6, #ffb6c1);
-  border: 2px solid #b67385;
-  border-radius: 16px;
-  padding: 8px 14px;
-  color: #b84c6f;
-  font-weight: bold;
-  cursor: pointer;
-  width: 100%;
-  transition: transform 0.15s, box-shadow 0.15s;
-}
-
-.pink-file-btn:hover{
-  transform: scale(1.03);
-  box-shadow: 0 4px 10px rgba(0,0,0,0.15);
-}
   
 </style>
 </head>
@@ -261,19 +248,8 @@ body::before{
   <div class="modal-box">
     <h2>Ajouter des photos</h2>
     <input id="photoName" placeholder="Nom du projet">
-
-<!-- LÉGENDE -->
-<input id="photoLegend" placeholder="Légende (optionnel)">
-
-<!-- INPUT FILE CACHÉ -->
-<input type="file" id="multiPhoto" multiple hidden>
-
-<!-- BOUTON PASTEL ROSE -->
-<button id="fileBtn" class="pink-file-btn">Choisir des photos</button>
-
-<span id="fileInfo" style="font-size:12px;color:#b84c6f;"></span>
-
-<button id="confirmAdd">Valider</button>
+    <input type="file" id="multiPhoto" multiple>
+    <button id="confirmAdd">Valider</button>
   </div>
 </div>
 
@@ -437,7 +413,7 @@ body::before{
   </div>
 </div>
 
-    <script type="module">
+  <script type="module">
 import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
 
 const supabase = createClient(
@@ -473,19 +449,7 @@ const commentTextInput = document.getElementById('commentText');
 const chatModal = document.getElementById('chatModal');
 const toggleChatSize = document.getElementById('toggleChatSize');
 const icon = document.getElementById('chatResizeIcon');
-const fileBtn = document.getElementById('fileBtn');
-const fileInput = document.getElementById('multiPhoto');
-const fileInfo = document.getElementById('fileInfo');
 
-fileBtn.onclick = () => fileInput.click();
-
-fileInput.onchange = () => {
-  fileInfo.textContent = fileInput.files.length
-    ? `${fileInput.files.length} photo(s) sélectionnée(s)`
-    : '';
-};
-
-    
 let creations = [];
 let currentZoom = null;
 let currentDelete = null;
@@ -571,7 +535,6 @@ supabase.channel('public:messages').on(
   }
 ).subscribe();
 
-    
 // ====== LOAD USERS ======
 async function loadChatUsers() {
   try {
@@ -638,9 +601,6 @@ function showInAppNotification(sender, message) {
 }
 if ('Notification' in window && Notification.permission !== 'granted') Notification.requestPermission();
 
-Comme ça ?
-
-
 // ====== CREATIONS ======
 async function refreshCreations() {
   try {
@@ -659,14 +619,15 @@ async function refreshCreations() {
       const commentsArray = Array.isArray(c.comments) ? c.comments : JSON.parseSafe(c.comments) || [];
 
       return {
-  id: c.id,
-  name: c.name,
-  legend: c.legend || '',
-  imgUrl: zoomGroup[0] || '',
-  zoomGroup,
-  likes: likesArray.map(l => ({ name: l.name || '', photo: l.photo || '' })),
-  comments: commentsArray.map(cmt => ({ name: cmt.name || '', text: cmt.text || '', photo: cmt.photo || '' }))
-};
+        id: c.id,
+        name: c.name,
+        imgUrl: zoomGroup[0] || '',
+        zoomGroup,
+        likes: likesArray.map(l => ({ name: l.name || '', photo: l.photo || '' })),
+        comments: commentsArray.map(cmt => ({ name: cmt.name || '', text: cmt.text || '', photo: cmt.photo || '' }))
+      };
+    });
+
     renderCreations();
   } catch (err) { console.error('refreshCreations', err); }
 }
@@ -676,65 +637,25 @@ JSON.parseSafe = str => { try { return JSON.parse(str); } catch(e) { return []; 
 
 // ====== RENDER CREATIONS ======
 function renderCreations() {
-  const container = document.getElementById('creationsContainer'); // crée ce div dans ton HTML
-  container.innerHTML = ''; // vider avant de recréer
-
-  creations.forEach(c => {
-    const div = document.createElement('div');
-    div.className = 'creation-item';
-
-    // image principale
-    const placeholder = document.createElement('div');
-placeholder.className = 'placeholder';
-placeholder.textContent = 'Chargement…';
-div.appendChild(placeholder);
-
-// gérer la disparition du placeholder quand l'image est chargée
-if (img.complete) {
-  placeholder.style.display = 'none';
-}
-
-img.onload = () => {
-  placeholder.style.display = 'none';
-};
-
-    // nom
-    const nameP = document.createElement('p');
-    nameP.textContent = c.name;
-    div.appendChild(nameP);
-
-    // légende
-    const legendP = document.createElement('p');
-    legendP.textContent = c.legend || ''; // ici c.legend
-    div.appendChild(legendP);
-
-    // clic pour zoom
-    div.onclick = () => openZoom(c);
-
-    container.appendChild(div);
+  container.innerHTML = '';
+  let page = null;
+  creations.forEach((c, i) => {
+    if (i % 6 === 0) { page = document.createElement('div'); page.className = 'page'; container.appendChild(page); }
+    const d = document.createElement('div'); d.className = 'visitor-item';
+    d.innerHTML = `<div class="placeholder">?</div><div class="delete-btn">×</div><p>${c.name}</p><img src="${c.imgUrl||''}">`;
+    const img = d.querySelector('img');
+    img.onload = () => d.querySelector('.placeholder').style.display='none';
+    img.onerror = () => { img.remove(); d.querySelector('.placeholder').textContent=''; };
+    img.onclick = () => openZoom(c);
+    d.querySelector('.delete-btn').onclick = () => openDeleteModal(c);
+    page.appendChild(d);
   });
 }
-
-  const likesArray = Array.isArray(c.likes) ? c.likes : JSON.parseSafe(c.likes);
-  const commentsArray = Array.isArray(c.comments) ? c.comments : JSON.parseSafe(c.comments);
-
-  return {
-    id: c.id,
-    name: c.name,
-    legend: c.legend || '',
-    imgUrl: zoomGroup[0] || '',
-    zoomGroup,
-    likes: likesArray.map(l => ({ name: l.name || '', photo: l.photo || '' })),
-    comments: commentsArray.map(cmt => ({ name: cmt.name || '', text: cmt.text || '', photo: cmt.photo || '' }))
-  };
-});
-
-renderCreations();
 
 // ====== ZOOM ======
 function openZoom(c) {
   currentZoom = creations.find(x => x.id === c.id);
-  mainZoom.src = currentZoom.imgUrl || '';
+  mainZoom.src = currentZoom.imgUrl;
   thumbs.innerHTML = '';
   (currentZoom.zoomGroup || []).forEach(u => {
     const t = document.createElement('img'); t.src = u;
@@ -818,8 +739,7 @@ addModal.addEventListener('click', e => { if (e.target === addModal) addModal.st
 document.getElementById('confirmAdd').onclick = async e => {
   e.stopPropagation();
   const name = document.getElementById('photoName').value.trim();
-const legend = document.getElementById('photoLegend').value.trim();
-const files = document.getElementById('multiPhoto').files;
+  const files = document.getElementById('multiPhoto').files;
   if (!name || !files.length) { alert("Mettre un nom et choisir au moins une photo"); return; }
   const paths = [], urls = [];
   for (let file of files) {
@@ -831,18 +751,10 @@ const files = document.getElementById('multiPhoto').files;
     urls.push(pubData.publicUrl); paths.push(path);
   }
   if (!urls.length) return;
-  await supabase.from('creations').insert([{
-  name,
-  legend,
-  image_path: paths[0],
-  images: paths,
-  likes: [],
-  comments: []
-}]);
+  await supabase.from('creations').insert([{ name, image_path: paths[0], images: paths, likes: [], comments: [] }]);
   addModal.style.display = 'none';
   document.getElementById('photoName').value = '';
   document.getElementById('multiPhoto').value = '';
-  document.getElementById('photoLegend').value = '';
   await refreshCreations();
 };
 
@@ -863,18 +775,7 @@ document.getElementById('videoBtn').onclick = () => { document.body.style.opacit
 document.getElementById('notesBtn').onclick = () => { document.body.style.opacity='0'; setTimeout(()=>window.location.href='notes.html',500); };
 document.getElementById('messagerieBtn').onclick = () => { chatModal.style.display='flex'; };
 document.getElementById('toggleSidebar').onclick = () => sidebar.classList.toggle('sidebar-open');
-// ====== FERMETURE MESSAGERIE AU CLIC DANS LE VIDE ======
-chatModal.addEventListener('click', (e) => {
-  // si on clique sur le fond (overlay)
-  if (e.target === chatModal) {
-    chatModal.style.display = 'none';
-  }
-});
 
-// empêcher la fermeture quand on clique dans la fenêtre
-document.querySelector('.chat-window').addEventListener('click', (e) => {
-  e.stopPropagation();
-});
 // ====== MODALS ======
 [zoomModal, likeModal, commentModal, deleteModal, addModal].forEach(m => {
   m.onclick = e => { if (e.target === m) m.style.display = 'none'; }
