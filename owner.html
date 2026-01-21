@@ -644,6 +644,7 @@ Comme ça ?
 
 // ====== CREATIONS ======
 async function refreshCreations() {
+  console.log('refreshCreations OK');
   try {
     const { data, error } = await supabase.from('creations').select('*').order('created_at', { ascending: false });
     if (error) return console.error(error);
