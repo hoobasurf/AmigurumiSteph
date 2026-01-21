@@ -12,6 +12,20 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 
 <style>
+  /* ====== ZONE CENTRALE ====== */
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Owner</title>
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="favicon.ico" type="image/x-icon">
+<link rel="apple-touch-icon" href="icon-152.png">
+<meta name="theme-color" content="#f2b7c9">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+
 * { box-sizing:border-box;margin:0;padding:0;font-family:'Comic Sans MS',cursive; }
 html,body{height:100%;overflow-x:hidden;}
 body::before{
@@ -19,9 +33,55 @@ body::before{
   background-image:url('Photoroom_20251223_114401.jpeg');
   background-size:cover;background-position:center center;background-repeat:no-repeat;z-index:-1;
 }
-.center-zone{display:flex;justify-content:center;align-items:flex-start;padding-top:3.5cm;overflow:hidden;height:auto;}
-#visitor-list-container{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;-webkit-overflow-scrolling: touch;justify-content:center;padding-left:1cm;}
-.page{display:grid;grid-template-columns:repeat(2,1fr);grid-template-rows:repeat(3,1fr);column-gap:3mm;row-gap:4mm;flex:0 0 auto;width:calc(2*200px+3mm);height:calc(3*200px+8mm);scroll-snap-align:center;padding:4mm;justify-content:center;margin-top:0;}
+/* ====== ZONE CENTRALE ====== */
+.center-zone{
+  display:flex;
+  justify-content:center;
+  align-items:flex-start;
+  padding-top:3.5cm;
+  overflow:hidden;
+  height:auto;
+}
+
+/* ====== CONTENEUR DES PAGES ====== */
+#visitor-list-container{
+  display:flex;
+  overflow-x:auto;
+  scroll-snap-type:x mandatory;
+  -webkit-overflow-scrolling: touch;
+  justify-content:center;
+  padding-left:1cm;
+}
+
+/* ====== PAGE = 6 CARTES (3x2) ====== */
+.page{
+  display:grid;
+  grid-template-columns:repeat(2, 200px);
+  grid-template-rows:repeat(3, 200px);
+  column-gap:3mm;
+  row-gap:4mm;
+  flex:0 0 auto;
+  width:calc(2 * 200px + 3mm);
+  height:calc(3 * 200px + 8mm);
+  scroll-snap-align:center;
+  padding:4mm;
+  justify-content:center;
+  margin-top:0;
+}
+
+/* ====== RESPONSIVE MOBILE ====== */
+@media(max-width:480px){
+  .page{
+    grid-template-columns:repeat(2, 120px);
+    grid-template-rows:repeat(3, 120px);
+    width:calc(2 * 120px + 3mm);
+    height:calc(3 * 120px + 8mm);
+  }
+  .creation{
+    width:120px;
+    height:120px;
+  }
+}
 .visitor-item{position:relative;width:200px;height:200px;border-radius:12px;overflow:hidden;border:3px solid #fff;box-shadow:0 0 0 3px #f6c2d1,0 6px 14px rgba(0,0,0,0.25),inset 0 0 0 1px rgba(255,255,255,0.4);background:#ffe6f0;}
 .visitor-item .placeholder{position:absolute;inset:0;display:flex;justify-content:center;align-items:center;font-size:24px;color:#b84c6f;font-weight:bold;}
 .visitor-item img{width:100%;height:100%;object-fit:cover;border-radius:12px;cursor:pointer;display:block;filter:brightness(1.05) contrast(1.05) saturate(0.95);transition:filter 0.3s, transform 0.3s;position:relative;z-index:2;}
@@ -213,24 +273,70 @@ body::before{
   height: 460px;
   border-radius: 24px;
 }
-
-.pink-file-btn{
-  background: linear-gradient(#ffd6e6, #ffb6c1);
-  border: 2px solid #b67385;
-  border-radius: 16px;
-  padding: 8px 14px;
-  color: #b84c6f;
-  font-weight: bold;
-  cursor: pointer;
-  width: 100%;
-  transition: transform 0.15s, box-shadow 0.15s;
-}
-
-.pink-file-btn:hover{
-  transform: scale(1.03);
-  box-shadow: 0 4px 10px rgba(0,0,0,0.15);
-}
   
+/* ====== CARD CREATION (STYLE FINAL) ====== */
+.creation{
+  position:relative;
+  width:200px;
+  height:200px;
+  border-radius:12px;
+  overflow:hidden;
+  border:3px solid #fff;
+  background:#ffe6f0;
+  box-shadow:
+    0 0 0 3px #f6c2d1,
+    0 6px 14px rgba(0,0,0,0.25),
+    inset 0 0 0 1px rgba(255,255,255,0.4);
+  cursor:pointer;
+}
+
+/* ====== IMAGE ====== */
+.creation img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  border-radius:12px;
+  cursor:pointer;
+  display:block;
+  filter:brightness(1.05) contrast(1.05) saturate(0.95);
+  transition:transform 0.3s;
+  position:relative;
+  z-index:2;
+}
+
+.creation img:hover{
+  transform:scale(1.03);
+}
+
+/* ====== SURCOUCHE ROSE ====== */
+.creation::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  background:rgba(255,230,240,0.12);
+  pointer-events:none;
+  z-index:1;
+}
+
+/* ====== LÉGENDE ====== */
+.creation p{
+  position:absolute;
+  bottom:2px;
+  width:100%;
+  text-align:center;
+  font-size:14px;
+  font-weight:bold;
+  color:#b84c6f;
+  z-index:3;
+
+  /* contour noir lettres */
+  -webkit-text-stroke:0.6px #000;
+  text-shadow:
+    1px 1px 0 #000,
+   -1px 1px 0 #000,
+    1px -1px 0 #000,
+   -1px -1px 0 #000;
+}
 </style>
 </head>
 <body>
@@ -646,7 +752,6 @@ function showInAppNotification(sender, message) {
 }
 if ('Notification' in window && Notification.permission !== 'granted') Notification.requestPermission();
 // ====== CREATIONS ======
-let creations = [];
 
 async function refreshCreations() {
   try {
@@ -694,16 +799,17 @@ async function refreshCreations() {
 // ====== RENDER ======
 function renderCreations(list) {
   const page = document.getElementById('page');
-  if (!page) return;
-
   page.innerHTML = '';
 
   list.forEach(c => {
     const d = document.createElement('div');
     d.className = 'creation';
 
+    // CLICK SUR LA CARD
+    d.onclick = () => openZoom(c);
+
     const img = document.createElement('img');
-    img.src = c.imgUrl;
+    img.src = c.imgUrl || '';
     d.appendChild(img);
 
     if (c.legend) {
@@ -853,7 +959,7 @@ document.getElementById('confirmAdd').onclick = async e => {
 };
 
 // ====== DELETE CREATION ======
-let currentDelete = null;
+
 function openDeleteModal(c) {
   currentDelete = c;
   deleteModal.style.display = 'flex';
@@ -927,11 +1033,10 @@ chatModal.addEventListener('touchmove', e => {
 });
 chatModal.addEventListener('touchend',()=>{initialDistance=null;});
 
-document.addEventListener('DOMContentLoaded', () => {
-  refreshCreations();
-  loadOwnerPhoto();
-  loadChatUsers();
-});
+loadOwnerPhoto();
+loadChatUsers();
+refreshCreations();
+  
 </script>
 
 
