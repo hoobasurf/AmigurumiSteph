@@ -230,6 +230,27 @@ body::before{
   transform: scale(1.03);
   box-shadow: 0 4px 10px rgba(0,0,0,0.15);
 }
+.zoom-row{
+  display:flex;
+  align-items:center;
+  gap:16px;
+}
+
+#mainZoom{
+  max-width:45vw;
+  max-height:65vh;
+  border-radius:16px;
+}
+
+.zoom-legend-box{
+  width:45vw;
+  max-height:65vh;
+  background:#ffd9e6;
+  border-radius:16px;
+  padding:16px;
+  overflow:auto;
+}
+
   
 </style>
 </head>
@@ -312,54 +333,46 @@ body::before{
 </div>
 
 <div id="zoomModal">
-  <div class="closeZoom">×</div>
-  <img id="mainZoom">
-  <div id="legendPanel" style="
-  flex:1;
-  background:#ffe6f0;
-  border-radius:20px;
-  padding:16px;
-  min-height:100%;
-  display:flex;
-  flex-direction:column;
-  justify-content:flex-start;
-">
-  <div id="zoomLegend" style="
-    color:#b84c6f;
-    font-size:16px;
-    line-height:1.4;
-    word-break:break-word;
-  "></div>
-</div>
+
+  <!-- IMAGE + LÉGENDE -->
+  <div class="zoom-row">
+    <img id="mainZoom">
+
+    <div class="zoom-legend-box">
+      <div id="zoomLegend"></div>
+    </div>
+  </div>
+
+  <!-- MINIATURES -->
   <div class="thumbs" id="thumbs"></div>
-  <div class="actions">
-    <div class="actions" style="display:flex; gap:12px; align-items:center; margin-top:8px;">
-  <div class="icon-btn" id="likeBtn" style="display:flex; align-items:center; cursor:pointer; gap:4px;">
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#b84c6f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-      <path d="M12 21C12 21 4 13.5 4 8.5C4 5.5 6.5 3 9.5 3C11 3 12 4 12 4C12 4 13 3 14.5 3C17.5 3 20 5.5 20 8.5C20 13.5 12 21 12 21Z"></path>
-    </svg>
-    <span id="likeCount">0</span>
-  </div>
 
-  <div class="icon-btn" id="commentBtn" style="display:flex; align-items:center; cursor:pointer; gap:4px;">
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#b84c6f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-      <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
-    </svg>
-    <span id="commentCount">0</span>
-  </div>
-</div>
-  </div>
-</div>
-<!-- Modal Commentaires -->
-<div id="commentsModal" class="modal">
-  <div class="modal-box" style="max-height:80vh; overflow-y:auto;">
-    <h2>Commentaires</h2>
-    <button id="chooseCommentBtn">Choisir individuellement</button>
-    <button id="clearCommentsBtn">Tout effacer</button>
-    <div id="commentsList"></div>
-  </div>
-</div>
+  <!-- LIKES / COMMENTAIRES -->
+  <div class="actions" style="display:flex; gap:12px; align-items:center; margin-top:8px; justify-content:center;">
 
+    <div class="icon-btn" id="likeBtn" style="display:flex; align-items:center; cursor:pointer; gap:4px;">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
+        stroke="#b84c6f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M12 21C12 21 4 13.5 4 8.5C4 5.5 6.5 3 9.5 3
+                 C11 3 12 4 12 4
+                 C12 4 13 3 14.5 3
+                 C17.5 3 20 5.5 20 8.5
+                 C20 13.5 12 21 12 21Z"/>
+      </svg>
+      <span id="likeCount">0</span>
+    </div>
+
+    <div class="icon-btn" id="commentBtn" style="display:flex; align-items:center; cursor:pointer; gap:4px;">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
+        stroke="#b84c6f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5
+                 a2 2 0 0 1 2-2h14
+                 a2 2 0 0 1 2 2z"/>
+      </svg>
+      <span id="commentCount">0</span>
+    </div>
+
+  </div>
+</div>
 <!-- Modal suppression individuelle -->
 <div id="deleteIndivModal" class="modal">
   <div class="modal-box">
