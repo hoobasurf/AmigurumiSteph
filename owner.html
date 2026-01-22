@@ -230,80 +230,7 @@ body::before{
   transform: scale(1.03);
   box-shadow: 0 4px 10px rgba(0,0,0,0.15);
 }
-
-.zoom-main{
-  display:flex;
-  gap:16px;
-  max-width:90%;
-  align-items:flex-start;
-}
-
-.zoom-main img{
-  max-width:45%;
-  max-height:60vh;
-  border:4px solid #b67385;
-  border-radius:24px;
-}
-
-#zoomLegend{
-  flex:1;
-  min-height:60vh;
-  background:#ffe6f0;
-  border:4px solid #b67385;
-  border-radius:24px;
-  padding:14px;
-  font-size:14px;
-  color:#b84c6f;
-  overflow-y:auto;
-  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.5);
-}
-
-  /* Fond noir semi-transparent pour le zoom */
-  .overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100vw;
-    height: 100vh;
-    background: rgba(0,0,0,0.7);
-    display: none; /* caché par défaut */
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
-  }
-
-  /* Conteneur centré */
-  .zoom-container {
-    text-align: center;
-    max-width: 90vw; /* pour rester responsive */
-  }
-
-  /* Image zoomée */
-  .zoom-container img {
-    width: 400px;  /* taille fixe de la photo */
-    height: auto;
-    display: block;
-    margin: 0 auto;
-  }
-
-  /* Légende centrée et même taille que l'image */
-  .zoom-container .caption {
-    width: 400px;  /* même largeur que l'image */
-    margin: 10px auto 0 auto;
-    font-size: 16px; /* taille fixe du texte */
-    color: #fff;
-    text-align: center;
-  }
-
-  /* Bouton fermer */
-  .close-btn {
-    position: absolute;
-    top: 20px;
-    right: 30px;
-    font-size: 30px;
-    color: #fff;
-    cursor: pointer;
-
+  
 </style>
 </head>
 <body>
@@ -386,15 +313,8 @@ body::before{
 
 <div id="zoomModal">
   <div class="closeZoom">×</div>
-
-  <!-- ZONE IMAGE + LEGENDE -->
-  <div class="zoom-main">
-    <img id="mainZoom">
-    <div id="zoomLegend"></div>
-  </div>
-
+  <img id="mainZoom">
   <div class="thumbs" id="thumbs"></div>
-
   <div class="actions">
     <div class="actions" style="display:flex; gap:12px; align-items:center; margin-top:8px;">
   <div class="icon-btn" id="likeBtn" style="display:flex; align-items:center; cursor:pointer; gap:4px;">
@@ -736,14 +656,13 @@ async function refreshCreations() {
       const commentsArray = Array.isArray(c.comments) ? c.comments : JSON.parseSafe(c.comments) || [];
 
       return {
-  id: c.id,
-  name: c.name,
-  legend: c.legend || '', 
-  imgUrl: zoomGroup[0] || '',
-  zoomGroup,
-  likes: likesArray.map(l => ({ name: l.name || '', photo: l.photo || '' })),
-  comments: commentsArray.map(cmt => ({ name: cmt.name || '', text: cmt.text || '', photo: cmt.photo || '' }))
-};
+        id: c.id,
+        name: c.name,
+        imgUrl: zoomGroup[0] || '',
+        zoomGroup,
+        likes: likesArray.map(l => ({ name: l.name || '', photo: l.photo || '' })),
+        comments: commentsArray.map(cmt => ({ name: cmt.name || '', text: cmt.text || '', photo: cmt.photo || '' }))
+      };
     });
 
     renderCreations();
@@ -771,62 +690,18 @@ function renderCreations() {
 }
 
 // ====== ZOOM ======
-// ====== ZOOM ======
 function openZoom(c) {
   currentZoom = creations.find(x => x.id === c.id);
-  if (!currentZoom) return;
-
-  // Affiche l'image principale
-  const zoomOverlay = document.getElementById('zoomOverlay');
-  const zoomImage = document.getElementById('zoomImage');
-  const zoomLegend = document.getElementById('zoomLegend');
-  const thumbs = document.getElementById('thumbs');
-
-  zoomOverlay.style.display = 'flex';
-
-  zoomImage.src = currentZoom.imgUrl || '';
-  zoomLegend.textContent = currentZoom.legend || '';
-
-  // Centrage et taille fixe de l'image
-  zoomImage.style.maxWidth = '90%';
-  zoomImage.style.maxHeight = '80%';
-  zoomImage.style.objectFit = 'contain';
-  zoomImage.style.margin = '0 auto';
-  zoomImage.style.display = 'block';
-
-  // Centrage légende
-  zoomLegend.style.textAlign = 'center';
-  zoomLegend.style.marginTop = '12px';
-  zoomLegend.style.fontSize = '16px';
-  zoomLegend.style.color = '#333';
-
-  // Miniatures
+  mainZoom.src = currentZoom.imgUrl;
   thumbs.innerHTML = '';
   (currentZoom.zoomGroup || []).forEach(u => {
-    const t = document.createElement('img');
-    t.src = u;
-    t.style.width = '60px';
-    t.style.height = '60px';
-    t.style.objectFit = 'cover';
-    t.style.margin = '0 6px';
-    t.style.cursor = 'pointer';
-    t.onclick = () => zoomImage.src = u;
+    const t = document.createElement('img'); t.src = u;
+    t.onclick = () => mainZoom.src = u;
     thumbs.appendChild(t);
   });
-
-  // Actions (likes / comments)
   updateActions();
+  zoomModal.style.display = 'flex';
 }
-
-// Fermeture du zoom
-function closeZoom() {
-  const zoomOverlay = document.getElementById('zoomOverlay');
-  zoomOverlay.style.display = 'none';
-}
-
-  function closeZoom() {
-    document.getElementById('zoomOverlay').style.display = 'none';
-    
 function updateActions() {
   if (!currentZoom) return;
   likeCount.textContent = (currentZoom.likes || []).length;
