@@ -517,25 +517,51 @@ body::before{
   </div>
 </div>
 
-  <!-- ZOOM OVERLAY -->
+<!-- ZOOM OVERLAY -->
 <div id="zoomOverlay" class="modal" style="display:none;justify-content:center;align-items:center;position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.8);z-index:10000;">
   <div class="modal-box" style="position:relative;background:#fff;padding:20px;max-width:90%;max-height:90%;overflow:auto;display:flex;flex-direction:column;align-items:center;">
+
+    <!-- Bouton fermer -->
     <span class="closeZoom" style="position:absolute;top:8px;right:12px;font-size:24px;font-weight:bold;cursor:pointer;">×</span>
-    <img id="zoomImage" src="" style="max-width:90%;max-height:80%;object-fit:contain;margin:0 auto;">
-    <div id="zoomLegend" style="text-align:center;margin-top:12px;font-size:16px;color:#333;"></div>
-    <div id="thumbs" style="display:flex;justify-content:center;margin-top:12px;flex-wrap:wrap;"></div>
-    <div style="margin-top:12px;font-size:14px;color:#333;">
-      Likes: <span id="likeCount">0</span> | Commentaires: <span id="commentCount">0</span>
+
+    <!-- ENCADRES GAUCHE / DROITE -->
+    <div style="display:flex; width:100%; gap:20px; margin-bottom:12px;">
+
+      <!-- GAUCHE : IMAGE -->
+      <div style="flex:1; display:flex; justify-content:center; align-items:center;">
+        <img id="zoomImage" src="" style="max-width:100%; max-height:70vh; object-fit:contain;">
+      </div>
+
+      <!-- DROITE : LÉGENDE -->
+      <div style="flex:1; display:flex; flex-direction:column; justify-content:flex-start;">
+        <div id="zoomLegend" style="text-align:left; font-size:16px; color:#333;"></div>
+      </div>
+
     </div>
+
+    <!-- MINIATURES -->
+    <div id="thumbs" style="display:flex; justify-content:center; flex-wrap:wrap; margin-bottom:12px;"></div>
+
+    <!-- LIKES / COMMENTAIRES -->
+    <div style="display:flex; justify-content:center; gap:20px; font-size:14px; color:#333;">
+      <div>
+        <img src="logoSV.png" style="width:20px;height:20px;vertical-align:middle;margin-right:4px;">
+        Likes: <span id="likeCount">0</span>
+      </div>
+      <div>
+        <img src="logoG.png" style="width:20px;height:20px;vertical-align:middle;margin-right:4px;">
+        Commentaires: <span id="commentCount">0</span>
+      </div>
+    </div>
+
   </div>
 </div>
 
-    <script type="module">
-
-      document.addEventListener('DOMContentLoaded', () => {
+<script type="module">
+document.addEventListener('DOMContentLoaded', () => {
   document.querySelector('.closeZoom').onclick = closeZoom;
 });
-    
+
 import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
 
 const supabase = createClient(
