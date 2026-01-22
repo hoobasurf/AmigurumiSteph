@@ -725,21 +725,22 @@ function renderCreations() {
 }
 
 // ====== ZOOM ======
+// ====== ZOOM ======
 function openZoom(c) {
   currentZoom = creations.find(x => x.id === c.id);
-  mainZoom.src = currentZoomfunction openZoom(c) {
-  currentZoom = creations.find(x => x.id === c.id);
-  mainZoom.src = currentZoom.imgUrl;
+  if (!currentZoom) return;
 
+  mainZoom.src = currentZoom.imgUrl || '';
   document.getElementById('zoomLegend').textContent = currentZoom.legend || '';
 
-  thumbs.innerHTML = '';.imgUrl;
   thumbs.innerHTML = '';
   (currentZoom.zoomGroup || []).forEach(u => {
-    const t = document.createElement('img'); t.src = u;
+    const t = document.createElement('img');
+    t.src = u;
     t.onclick = () => mainZoom.src = u;
     thumbs.appendChild(t);
   });
+
   updateActions();
   zoomModal.style.display = 'flex';
 }
