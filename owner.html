@@ -12,225 +12,177 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 
 <style>
-* { box-sizing:border-box;margin:0;padding:0;font-family:'Comic Sans MS',cursive; }
-html,body{height:100%;overflow-x:hidden;}
+*{
+  box-sizing:border-box;
+  margin:0;
+  padding:0;
+  font-family:'Comic Sans MS',cursive;
+}
+
+html,body{
+  height:100%;
+  overflow-x:hidden;
+}
+
+/* ====== FOND ====== */
 body::before{
-  content:"";position:fixed;top:0;left:0;width:100vw;height:100vh;
+  content:"";
+  position:fixed;
+  top:0;
+  left:0;
+  width:100vw;
+  height:100vh;
   background-image:url('Photoroom_20251223_114401.jpeg');
-  background-size:cover;background-position:center center;background-repeat:no-repeat;z-index:-1;
+  background-size:cover;
+  background-position:center;
+  background-repeat:no-repeat;
+  z-index:-1;
 }
-.center-zone{display:flex;justify-content:center;align-items:flex-start;padding-top:3.5cm;overflow:hidden;height:auto;}
-#visitor-list-container{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;-webkit-overflow-scrolling: touch;justify-content:center;padding-left:1cm;}
-.page{display:grid;grid-template-columns:repeat(2,1fr);grid-template-rows:repeat(3,1fr);column-gap:3mm;row-gap:4mm;flex:0 0 auto;width:calc(2*200px+3mm);height:calc(3*200px+8mm);scroll-snap-align:center;padding:4mm;justify-content:center;margin-top:0;}
-.visitor-item{position:relative;width:200px;height:200px;border-radius:12px;overflow:hidden;border:3px solid #fff;box-shadow:0 0 0 3px #f6c2d1,0 6px 14px rgba(0,0,0,0.25),inset 0 0 0 1px rgba(255,255,255,0.4);background:#ffe6f0;}
-.visitor-item .placeholder{position:absolute;inset:0;display:flex;justify-content:center;align-items:center;font-size:24px;color:#b84c6f;font-weight:bold;}
-.visitor-item img{width:100%;height:100%;object-fit:cover;border-radius:12px;cursor:pointer;display:block;filter:brightness(1.05) contrast(1.05) saturate(0.95);transition:filter 0.3s, transform 0.3s;position:relative;z-index:2;}
-.visitor-item img:hover{transform:scale(1.03);}
-.visitor-item::after{content:"";position:absolute;inset:0;background:rgba(255,230,240,0.12);pointer-events:none;z-index:1;}
-.visitor-item p{position:absolute;bottom:2px;width:100%;font-size:14px;color:#b84c6f;font-weight:bold;text-align:center;text-shadow:1px 1px 2px rgba(255,255,255,0.8);z-index:3;}
-.delete-btn{position:absolute;top:2px;right:2px;width:20px;height:20px;background:#ffb6c1;color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:bold;cursor:pointer;z-index:5;font-size:14px;transition: background 0.2s;}
-.delete-btn:hover{background:#e94f9a;}
 
-#sidebar{position:fixed;top:0;left:-220px;width:220px;height:100vh;background:rgba(255,230,240,0.2);border-right:2px solid #b67385;padding:20px;transition:left .3s;z-index:10;}
+/* ====== ZONE CENTRALE ====== */
+.center-zone{
+  display:flex;
+  justify-content:center;
+  align-items:flex-start;
+  padding-top:3.5cm;
+  overflow:hidden;
+  height:auto;
+}
+
+/* ====== CONTENEUR SCROLL ====== */
+#visitor-list-container{
+  display:flex;
+  overflow-x:auto;
+  scroll-snap-type:x mandatory;
+  -webkit-overflow-scrolling:touch;
+  justify-content:center;
+  padding-left:1cm;
+}
+
+/* ====== PAGE = 6 CARTES ====== */
+.page{
+  display:grid;
+  grid-template-columns:repeat(2,200px);
+  grid-template-rows:repeat(3,200px);
+  column-gap:3mm;
+  row-gap:4mm;
+  flex:0 0 auto;
+  width:calc(2 * 200px + 3mm);
+  height:calc(3 * 200px + 8mm);
+  scroll-snap-align:center;
+  padding:4mm;
+  justify-content:center;
+}
+
+/* ================================================= */
+/* =============== CARTE CREATION ================= */
+/* ================================================= */
+
+.creation{
+  position:relative;
+  width:200px;
+  height:200px;
+  border-radius:12px;
+  overflow:hidden;
+  background:#ffe6f0;
+  border:3px solid #fff;
+  cursor:pointer;
+
+  box-shadow:
+    0 0 0 3px #f6c2d1,
+    0 6px 14px rgba(0,0,0,0.25),
+    inset 0 0 0 1px rgba(255,255,255,0.4);
+}
+
+/* IMAGE */
+.creation img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+  border-radius:12px;
+  display:block;
+  position:relative;
+  z-index:2;
+
+  filter:brightness(1.05) contrast(1.05) saturate(0.95);
+  transition:transform 0.3s;
+}
+
+.creation:hover img{
+  transform:scale(1.03);
+}
+
+/* SURCOUCHE ROSE */
+.creation::after{
+  content:"";
+  position:absolute;
+  inset:0;
+  background:rgba(255,230,240,0.12);
+  pointer-events:none;
+  z-index:1;
+}
+
+/* LÉGENDE */
+.creation p{
+  position:absolute;
+  bottom:4px;
+  width:100%;
+  text-align:center;
+  font-size:14px;
+  font-weight:bold;
+  color:#b84c6f;
+  z-index:3;
+
+  -webkit-text-stroke:0.6px #000;
+  text-shadow:
+    1px 1px 0 #000,
+   -1px 1px 0 #000,
+    1px -1px 0 #000,
+   -1px -1px 0 #000;
+}
+
+/* ====== SIDEBAR ====== */
+#sidebar{
+  position:fixed;
+  top:0;
+  left:-220px;
+  width:220px;
+  height:100vh;
+  background:rgba(255,230,240,0.2);
+  border-right:2px solid #b67385;
+  padding:20px;
+  transition:left .3s;
+  z-index:10;
+}
 #sidebar.sidebar-open{left:0;}
-#toggleSidebar{position:absolute;top:50%;right:-30px;width:30px;height:60px;background:#ffb6c1;border-radius:0 12px 12px 0;display:flex;align-items:center;justify-content:center;cursor:pointer;font-weight:bold;}
-#sidebar button{width:auto;padding:8px 16px;border-radius:16px;border:none;background:#ffb6c1;color:#fff;cursor:pointer;font-weight:bold;display:block;margin-top:10px;}
-
-.modal{position:fixed;inset:0;background:rgba(0,0,0,0.6);display:none;justify-content:center;align-items:center;z-index:10001;}
-.modal .modal-box{background:#ffe6f0;padding:16px 24px;border-radius:20px;border:3px solid #b67385;display:flex;flex-direction:column;gap:10px;align-items:center;min-width:200px;font-family:'Comic Sans MS',cursive;}
-.modal input{padding:6px 12px;border-radius:10px;border:2px solid #b67385;width:100%;}
-.modal button{padding:6px 14px;border:none;background:#ffb6c1;color:#fff;border-radius:12px;cursor:pointer;font-weight:bold;width:100%;}
-
-#zoomModal{position:fixed;inset:0;background:rgba(0,0,0,0.7);display:none;justify-content:center;align-items:center;flex-direction:column;z-index:10000;}
-#zoomModal img{max-width:80%;max-height:60vh;border:4px solid #b67385;border-radius:24px;margin-bottom:10px;filter:none;}
-#zoomModal .thumbs{display:flex;gap:8px;max-width:80%;overflow-x:auto;}
-#zoomModal .thumbs img{width:50px;height:50px;object-fit:cover;border-radius:12px;border:2px solid #b67385;cursor:pointer;}
-.closeZoom{position:absolute;top:12px;right:12px;width:28px;height:28px;background:#ffb6c1;color:#fff;border-radius:50%;display:flex;justify-content:center;align-items:center;cursor:pointer;}
-
-#ownerPhoto{width:32px;height:32px;border-radius:50%;position:fixed;top:10px;right:10px;z-index:10000;background:#ffe6f0;border:2px solid #b84c6f;}
-@media(max-width:480px){.page{grid-template-columns:repeat(2,120px);grid-template-rows:repeat(3,120px);}.visitor-item{width:120px;height:120px;}.modal .modal-box{min-width:180px;}}
-
-.icon-btn svg {
-  cursor: pointer;
-  transition: transform 0.2s;
-}
-.icon-btn:hover svg {
-  transform: scale(1.2);
-}
-.icon-btn span {
-  font-weight: bold;
-  color: #b84c6f;
-  font-size: 14px;
+#toggleSidebar{
+  position:absolute;
+  top:50%;
+  right:-30px;
+  width:30px;
+  height:60px;
+  background:#ffb6c1;
+  border-radius:0 12px 12px 0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+  font-weight:bold;
 }
 
-  /* Bouton toujours visible */
-.chat-icon-btn {
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  padding: 4px;
-  display: flex;
-  align-items: center;
+/* ====== RESPONSIVE ====== */
+@media(max-width:480px){
+  .page{
+    grid-template-columns:repeat(2,120px);
+    grid-template-rows:repeat(3,120px);
+    width:calc(2 * 120px + 3mm);
+    height:calc(3 * 120px + 8mm);
+  }
+  .creation{
+    width:120px;
+    height:120px;
+  }
 }
-
-
-/* ====== SURCOUCHE ====== */
-.chat-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.4);
-  display: none; /* caché par défaut */
-  justify-content: center;
-  align-items: center;
-  z-index: 20000;
-}
-
-/* ====== FENÊTRE CHAT ====== */
-.chat-window {
-  width: 360px;  /* Petite modal */
-  height: 230px;
-  background: #ffe6f0;
-  border-radius: 20px;
-  border: 2px solid #b67385;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-  box-shadow: 0 12px 24px rgba(0,0,0,0.25);
-  position: relative;
-  transition: width 0.3s, height 0.3s;
-}
-
-/* ====== HEADER ====== */
-.chat-header {
-  height: 40px;
-  background: linear-gradient(#ffd6e6, #ffb6c1);
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 10px;
-  font-weight: bold;
-  color: #b84c6f;
-  flex-shrink: 0;
-  position: sticky;
-  top: 0;
-  z-index: 10;
-  font-size: 14px;
-}
-
-/* ====== BODY ====== */
-.chat-body {
-  flex: 1;
-  display: flex;
-  min-height: 0;
-}
-
-/* ====== CONTACTS ====== */
-.chat-sidebar {
-  width: 120px;  /* réduit pour petite modal */
-  background: #fff5fa;
-  border-right: 2px solid #f3b3c8;
-  overflow-y: auto;
-}
-
-.chat-user {
-  display: flex;
-  align-items: center;
-  gap: 6px;
-  padding: 4px;
-  cursor: pointer;
-  transition: background 0.2s;
-  font-size: 12px;
-}
-.chat-user.active {
-  background: #ffd6e6;
-}
-.chat-user img {
-  border-radius: 50%;
-  width: 28px;
-  height: 28px;
-  object-fit: cover;
-}
-
-/* ====== CONVERSATION ====== */
-.chat-content {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  min-height: 0;
-}
-
-.chat-messages {
-  flex: 1;
-  padding: 6px;
-  overflow-y: auto;
-  background: #fffafa;
-  font-size: 12px;
-}
-
-.msg {
-  max-width: 70%;
-  padding: 4px 8px;
-  margin-bottom: 4px;
-  border-radius: 12px;
-}
-
-.msg-me {
-  background: #ffb6c1;
-  align-self: flex-end;
-}
-.msg-them {
-  background: #ffffff;
-  border: 1px solid #f3b3c8;
-}
-
-/* ====== INPUT ====== */
-.chat-input {
-  display: flex;
-  padding: 4px;
-  gap: 4px;
-}
-.chat-input input {
-  flex: 1;
-  border-radius: 10px;
-  border: 2px solid #b67385;
-  padding: 4px 6px;
-  font-size: 12px;
-}
-
-/* ====== BOUTON ICON ====== */
-.chat-icon-btn {
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  padding: 2px;
-  display: flex;
-  align-items: center;
-}
-
-/* ====== MODE AGRANDI ====== */
-.expanded .chat-window {
-  width: 720px;  /* double taille de la petite modal */
-  height: 460px;
-  border-radius: 24px;
-}
-
-.pink-file-btn{
-  background: linear-gradient(#ffd6e6, #ffb6c1);
-  border: 2px solid #b67385;
-  border-radius: 16px;
-  padding: 8px 14px;
-  color: #b84c6f;
-  font-weight: bold;
-  cursor: pointer;
-  width: 100%;
-  transition: transform 0.15s, box-shadow 0.15s;
-}
-
-.pink-file-btn:hover{
-  transform: scale(1.03);
-  box-shadow: 0 4px 10px rgba(0,0,0,0.15);
-}
-  
 </style>
 </head>
 <body>
@@ -238,7 +190,7 @@ body::before{
 <img id="ownerPhoto" alt="Owner">
 
 <div class="center-zone">
-  <div id="visitor-list-container"></div>
+  <div id="page"></div>
 </div>
 
 <div id="sidebar">
@@ -645,100 +597,76 @@ function showInAppNotification(sender, message) {
   }
 }
 if ('Notification' in window && Notification.permission !== 'granted') Notification.requestPermission();
-
 // ====== CREATIONS ======
+
 async function refreshCreations() {
   try {
-    const { data, error } = await supabase.from('creations').select('*').order('created_at', { ascending: false });
-    if (error) return console.error(error);
+    const { data, error } = await supabase
+      .from('creations')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      console.error(error);
+      return;
+    }
 
     creations = data.map(c => {
       let zoomGroup = [];
-      if (c.images?.length) {
-        zoomGroup = c.images.map(p => supabase.storage.from('images').getPublicUrl(p).data?.publicUrl || '');
-      } else if (c.image_path) {
-        zoomGroup = [supabase.storage.from('images').getPublicUrl(c.image_path).data?.publicUrl || ''];
-      }
 
-      const likesArray = Array.isArray(c.likes) ? c.likes : JSON.parseSafe(c.likes) || [];
-      const commentsArray = Array.isArray(c.comments) ? c.comments : JSON.parseSafe(c.comments) || [];
+      if (Array.isArray(c.images) && c.images.length) {
+        zoomGroup = c.images.map(p =>
+          supabase.storage.from('images').getPublicUrl(p).data.publicUrl
+        );
+      } else if (c.image_path) {
+        zoomGroup = [
+          supabase.storage.from('images').getPublicUrl(c.image_path).data.publicUrl
+        ];
+      }
 
       return {
         id: c.id,
-        name: c.name,
+        name: c.name || '',
+        legend: c.legend || '',
         imgUrl: zoomGroup[0] || '',
         zoomGroup,
-        likes: likesArray.map(l => ({ name: l.name || '', photo: l.photo || '' })),
-        comments: commentsArray.map(cmt => ({ name: cmt.name || '', text: cmt.text || '', photo: cmt.photo || '' }))
+        likes: Array.isArray(c.likes) ? c.likes : [],
+        comments: Array.isArray(c.comments) ? c.comments : []
       };
     });
 
-    renderCreations();
-  } catch (err) { console.error('refreshCreations', err); }
-}
+    renderCreations(creations);
 
-// Helper pour JSON safe
-JSON.parseSafe = str => { try { return JSON.parse(str); } catch(e) { return []; } };
-
-// ====== RENDER CREATIONS ======
-function renderCreations(data) {
-  const pageContainer = document.getElementById('page');
-  pageContainer.innerHTML = '';
-
-  const flatImages = [];
-
-  // 1 image = 1 card
-  data.forEach(c => {
-    if (c.images && c.images.length) {
-      c.images.forEach(path => {
-        const url = supabase
-          .storage
-          .from('images')
-          .getPublicUrl(path)
-          .data
-          .publicUrl;
-
-        if (url) {
-          flatImages.push({
-            url,
-            legend: c.legend || ''
-          });
-        }
-      });
-    }
-  });
-
-  // pages de 6
-  for (let i = 0; i < flatImages.length; i += 6) {
-    const page = document.createElement('div');
-    page.className = 'page';
-
-    flatImages.slice(i, i + 6).forEach(img => {
-      const card = document.createElement('div');
-      card.className = 'creation';
-
-      const image = document.createElement('img');
-      image.src = img.url;
-      image.alt = img.legend;
-
-      const p = document.createElement('p');
-      p.textContent = img.legend;
-
-      card.appendChild(image);
-      card.appendChild(p);
-
-      // zoom
-      card.onclick = () => openZoomModal(img.url, img.legend);
-
-      page.appendChild(card);
-    });
-
-    pageContainer.appendChild(page);
+  } catch (e) {
+    console.error('refreshCreations crash', e);
   }
-
-  console.log('renderCreations OK', flatImages.length);
 }
 
+// ====== RENDER ======
+function renderCreations(list) {
+  const page = document.getElementById('page');
+  page.innerHTML = '';
+
+  list.forEach(c => {
+    const d = document.createElement('div');
+    d.className = 'creation';
+
+    // CLICK SUR LA CARD
+    d.onclick = () => openZoom(c);
+
+    const img = document.createElement('img');
+    img.src = c.imgUrl || '';
+    d.appendChild(img);
+
+    if (c.legend) {
+      const p = document.createElement('p');
+      p.textContent = c.legend;
+      d.appendChild(p);
+    }
+
+    page.appendChild(d);
+  });
+}
 // ====== ZOOM ======
 function openZoom(c) {
   currentZoom = creations.find(x => x.id === c.id);
@@ -823,31 +751,52 @@ function renderCommentList() {
 
 // ====== ADD CREATION ======
 document.getElementById('addBtn').onclick = () => addModal.style.display = 'flex';
-addModal.addEventListener('click', e => { if (e.target === addModal) addModal.style.display = 'none'; });
+
+// Fermer modal en cliquant sur le fond
+addModal.addEventListener('click', e => { 
+  if (e.target === addModal) addModal.style.display = 'none'; 
+});
+
 document.getElementById('confirmAdd').onclick = async e => {
   e.stopPropagation();
   const name = document.getElementById('photoName').value.trim();
-const legend = document.getElementById('photoLegend').value.trim();
-const files = document.getElementById('multiPhoto').files;
-  if (!name || !files.length) { alert("Mettre un nom et choisir au moins une photo"); return; }
-  const paths = [], urls = [];
+  const legend = document.getElementById('photoLegend').value.trim();
+  const files = document.getElementById('multiPhoto').files;
+
+  if (!name || !files.length) { 
+    alert("Mettre un nom et choisir au moins une photo"); 
+    return; 
+  }
+
+  const paths = [];
+  const urls = [];
+
   for (let file of files) {
     const path = `${Date.now()}_${file.name}`;
     const { error: uploadError } = await supabase.storage.from('images').upload(path, file);
-    if (uploadError) { console.error(uploadError); continue; }
+    if (uploadError) { 
+      console.error(uploadError); 
+      continue; 
+    }
+
     const { data: pubData } = supabase.storage.from('images').getPublicUrl(path);
     if (!pubData?.publicUrl) continue;
-    urls.push(pubData.publicUrl); paths.push(path);
+    urls.push(pubData.publicUrl);
+    paths.push(path);
   }
+
   if (!urls.length) return;
+
   await supabase.from('creations').insert([{
-  name,
-  legend,
-  image_path: paths[0],
-  images: paths,
-  likes: [],
-  comments: []
-}]);
+    name,
+    legend,
+    image_path: paths[0], // première image pour l'affichage principal
+    images: paths,
+    likes: [],
+    comments: []
+  }]);
+
+  // Reset modal et refresh
   addModal.style.display = 'none';
   document.getElementById('photoName').value = '';
   document.getElementById('multiPhoto').value = '';
@@ -856,11 +805,31 @@ const files = document.getElementById('multiPhoto').files;
 };
 
 // ====== DELETE CREATION ======
-function openDeleteModal(c) { currentDelete = c; deleteModal.style.display = 'flex'; }
-document.getElementById('cancelDelete').onclick = () => { currentDelete = null; deleteModal.style.display = 'none'; };
+
+function openDeleteModal(c) {
+  currentDelete = c;
+  deleteModal.style.display = 'flex';
+}
+
+document.getElementById('cancelDelete').onclick = () => { 
+  currentDelete = null; 
+  deleteModal.style.display = 'none'; 
+};
+
 document.getElementById('confirmDelete').onclick = async () => {
   if (!currentDelete?.id) return;
+
+  // Supprime du storage toutes les images de cette création
+  if (Array.isArray(currentDelete.zoomGroup)) {
+    for (let url of currentDelete.zoomGroup) {
+      const path = url.split('/').pop().split('?')[0]; // récupère le nom du fichier
+      await supabase.storage.from('images').remove([path]).catch(e => console.error(e));
+    }
+  }
+
+  // Supprime de la base de données
   await supabase.from('creations').delete().eq('id', currentDelete.id);
+
   currentDelete = null;
   deleteModal.style.display = 'none';
   await refreshCreations();
@@ -910,10 +879,10 @@ chatModal.addEventListener('touchmove', e => {
 });
 chatModal.addEventListener('touchend',()=>{initialDistance=null;});
 
-// ====== INITIAL LOAD ======
-refreshCreations();
 loadOwnerPhoto();
 loadChatUsers();
+refreshCreations();
+  
 </script>
 
 
