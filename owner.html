@@ -770,31 +770,31 @@ function renderCreations() {
   });
 }
 
-// ====== ZOOM COMPLET ======
+// ====== ZOOM ======
+// ====== ZOOM ======
 function openZoom(c) {
-  // Trouver la création sélectionnée
   currentZoom = creations.find(x => x.id === c.id);
   if (!currentZoom) return;
 
-  // Récupérer les éléments HTML
+  // Affiche l'image principale
   const zoomOverlay = document.getElementById('zoomOverlay');
   const zoomImage = document.getElementById('zoomImage');
   const zoomLegend = document.getElementById('zoomLegend');
   const thumbs = document.getElementById('thumbs');
 
-  // Afficher l'overlay
   zoomOverlay.style.display = 'flex';
 
-  // Image principale
   zoomImage.src = currentZoom.imgUrl || '';
+  zoomLegend.textContent = currentZoom.legend || '';
+
+  // Centrage et taille fixe de l'image
   zoomImage.style.maxWidth = '90%';
   zoomImage.style.maxHeight = '80%';
   zoomImage.style.objectFit = 'contain';
-  zoomImage.style.display = 'block';
   zoomImage.style.margin = '0 auto';
+  zoomImage.style.display = 'block';
 
-  // Légende
-  zoomLegend.textContent = currentZoom.legend || '';
+  // Centrage légende
   zoomLegend.style.textAlign = 'center';
   zoomLegend.style.marginTop = '12px';
   zoomLegend.style.fontSize = '16px';
@@ -814,15 +814,18 @@ function openZoom(c) {
     thumbs.appendChild(t);
   });
 
-  // Actions likes / commentaires
+  // Actions (likes / comments)
   updateActions();
 }
 
-// Fermeture zoom
+// Fermeture du zoom
 function closeZoom() {
   const zoomOverlay = document.getElementById('zoomOverlay');
-  if (zoomOverlay) zoomOverlay.style.display = 'none';
+  zoomOverlay.style.display = 'none';
 }
+
+  function closeZoom() {
+    document.getElementById('zoomOverlay').style.display = 'none';
     
 function updateActions() {
   if (!currentZoom) return;
