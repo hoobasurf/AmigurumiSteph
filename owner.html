@@ -704,10 +704,10 @@ async function refreshCreations() {
   imgUrl: zoomGroup[0] || '',
   zoomGroup,
   likes: likesArray.map(l => ({ name: l.name || '', photo: l.photo || '' })),
-  comments: commentsArray.map(cmt => ({ name: cmt.name || '', text: cmt.text || '', photo: cmt.photo || '' }))
-};
-
-
+  comments: commentsArray.map(cmt => ({ name: cmt.name || '', text: cmt.text || '', photo: 
+   };
+    });
+    
     renderCreations();
   } catch (err) { console.error('refreshCreations', err); }
 }
