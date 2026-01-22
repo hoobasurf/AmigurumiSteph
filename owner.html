@@ -313,54 +313,7 @@ body::before{
 
 <div id="zoomModal">
   <div class="closeZoom">×</div>
-  <div style="
-  display:flex;
-  gap:16px;
-  justify-content:center;
-  align-items:flex-start;
-">
-
-  <!-- CADRE PHOTO (GAUCHE) -->
-  <div style="
-    flex:1;
-    max-width:45%;
-    border:2px solid #e5b6c8;
-    border-radius:18px;
-    padding:8px;
-    background:transparent;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-  ">
-    <img
-      id="mainZoom"
-      style="
-        max-width:100%;
-        max-height:65vh;
-        object-fit:contain;
-        border-radius:14px;
-      "
-    >
-  </div>
-
-  <!-- CADRE LÉGENDE (DROITE) -->
-  <div
-    id="zoomLegend"
-    style="
-      flex:1;
-      max-width:45%;
-      max-height:65vh;
-      border:2px solid #e5b6c8;
-      border-radius:18px;
-      padding:14px;
-      background:#ffd6e6;
-      font-size:16px;
-      color:#333;
-      overflow-y:auto;
-    "
-  ></div>
-
-</div>
+  <img id="mainZoom">
   <div class="thumbs" id="thumbs"></div>
   <div class="actions">
     <div class="actions" style="display:flex; gap:12px; align-items:center; margin-top:8px;">
@@ -380,26 +333,6 @@ body::before{
 </div>
   </div>
 </div>
-
-<!-- Modal Gestion -->
-<div id="manageModal" class="modal">
-  <div class="modal-box">
-    <h2>Gestion Likes, Commentaires</h2>
-    <button id="manageLikesBtn">Likes</button>
-    <button id="manageCommentsBtn">Commentaires</button>
-  </div>
-</div>
-
-<!-- Modal Likes -->
-<div id="likesModal" class="modal">
-  <div class="modal-box" style="max-height:80vh; overflow-y:auto;">
-    <h2>Likes</h2>
-    <button id="chooseLikeBtn">Choisir individuellement</button>
-    <button id="clearLikesBtn">Tout effacer</button>
-    <div id="likesList"></div>
-  </div>
-</div>
-
 <!-- Modal Commentaires -->
 <div id="commentsModal" class="modal">
   <div class="modal-box" style="max-height:80vh; overflow-y:auto;">
