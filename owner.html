@@ -230,6 +230,38 @@ body::before{
   transform: scale(1.03);
   box-shadow: 0 4px 10px rgba(0,0,0,0.15);
 }
+
+/* ====== ZOOM LAYOUT ====== */
+.zoom-top{
+  display:flex;
+  gap:16px;
+  align-items:flex-start;
+}
+
+/* image = même taille / même encadrement */
+.zoom-image-box{
+  flex:0 0 auto;
+}
+
+/* légende à droite */
+.zoom-legend-box{
+  min-width:200px;
+  max-width:260px;
+  background:#ffe6f0;
+  border:3px solid #b67385;
+  border-radius:16px;
+  padding:12px;
+  color:#b84c6f;
+  font-size:14px;
+}
+
+/* mobile : retour colonne */
+@media(max-width:600px){
+  .zoom-top{
+    flex-direction:column;
+    align-items:center;
+  }
+}
   
 </style>
 </head>
@@ -313,24 +345,32 @@ body::before{
 
 <div id="zoomModal">
   <div class="closeZoom">×</div>
-  <img id="mainZoom">
-  <div class="thumbs" id="thumbs"></div>
-  <div class="actions">
-    <div class="actions" style="display:flex; gap:12px; align-items:center; margin-top:8px;">
-  <div class="icon-btn" id="likeBtn" style="display:flex; align-items:center; cursor:pointer; gap:4px;">
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#b84c6f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-      <path d="M12 21C12 21 4 13.5 4 8.5C4 5.5 6.5 3 9.5 3C11 3 12 4 12 4C12 4 13 3 14.5 3C17.5 3 20 5.5 20 8.5C20 13.5 12 21 12 21Z"></path>
-    </svg>
-    <span id="likeCount">0</span>
+
+  <!-- IMAGE + LEGENDE -->
+  <div class="zoom-top">
+    <div class="zoom-image-box">
+      <img id="mainZoom">
+    </div>
+
+    <div class="zoom-legend-box">
+      <div id="zoomLegend"></div>
+    </div>
   </div>
 
-  <div class="icon-btn" id="commentBtn" style="display:flex; align-items:center; cursor:pointer; gap:4px;">
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#b84c6f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-      <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
-    </svg>
-    <span id="commentCount">0</span>
-  </div>
-</div>
+  <!-- MINIATURES -->
+  <div class="thumbs" id="thumbs"></div>
+
+  <!-- ACTIONS -->
+  <div class="actions" style="display:flex; gap:12px; align-items:center; margin-top:8px;">
+    <div class="icon-btn" id="likeBtn">
+      <svg>...</svg>
+      <span id="likeCount">0</span>
+    </div>
+
+    <div class="icon-btn" id="commentBtn">
+      <svg>...</svg>
+      <span id="commentCount">0</span>
+    </div>
   </div>
 </div>
 
@@ -656,14 +696,15 @@ async function refreshCreations() {
       const commentsArray = Array.isArray(c.comments) ? c.comments : JSON.parseSafe(c.comments) || [];
 
       return {
-        id: c.id,
-        name: c.name,
-        imgUrl: zoomGroup[0] || '',
-        zoomGroup,
-        likes: likesArray.map(l => ({ name: l.name || '', photo: l.photo || '' })),
-        comments: commentsArray.map(cmt => ({ name: cmt.name || '', text: cmt.text || '', photo: cmt.photo || '' }))
-      };
-    });
+  id: c.id,
+  name: c.name,
+  legend: c.legend || '',   // ✅ ICI
+  imgUrl: zoomGroup[0] || '',
+  zoomGroup,
+  likes: likesArray.map(l => ({ name: l.name || '', photo: l.photo || '' })),
+  comments: commentsArray.map(cmt => ({ name: cmt.name || '', text: cmt.text || '', photo: cmt.photo || '' }))
+};
+
 
     renderCreations();
   } catch (err) { console.error('refreshCreations', err); }
