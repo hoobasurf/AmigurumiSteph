@@ -876,6 +876,26 @@ loadOwnerPhoto();
 loadChatUsers();
 </script>
 
+<!-- ZOOM MODAL (DOIT ÊTRE TOUT EN BAS DU BODY) -->
+<div id="zoomModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.6); z-index:9999;">
+  <div style="background:#fff7fa; max-width:90%; margin:5vh auto; padding:16px; border-radius:14px;">
+    
+    <div class="zoom-row" style="display:flex; gap:16px; align-items:flex-start;">
+      <img id="mainZoom" style="max-width:60%; border-radius:12px;">
 
+      <div class="zoom-legend-box" style="flex:1; background:#ffe6f0; border-radius:12px; padding:12px;">
+        <div id="zoomLegend"></div>
+      </div>
+    </div>
+
+    <div class="thumbs" id="thumbs"></div>
+
+    <div class="actions" style="display:flex; gap:12px; margin-top:10px;">
+      <div id="likeBtn">❤️ <span id="likeCount">0</span></div>
+      <div id="commentBtn">💬 <span id="commentCount">0</span></div>
+    </div>
+
+  </div>
+</div>
 </body>
 </html>
