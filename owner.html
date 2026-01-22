@@ -776,26 +776,53 @@ function openZoom(c) {
   currentZoom = creations.find(x => x.id === c.id);
   if (!currentZoom) return;
 
-  mainZoom.src = currentZoom.imgUrl || '';
-  document.getElementById('zoomLegend').textContent = currentZoom.legend || '';
+  // Affiche l'image principale
+  const zoomOverlay = document.getElementById('zoomOverlay');
+  const zoomImage = document.getElementById('zoomImage');
+  const zoomLegend = document.getElementById('zoomLegend');
+  const thumbs = document.getElementById('thumbs');
 
+  zoomOverlay.style.display = 'flex';
+
+  zoomImage.src = currentZoom.imgUrl || '';
+  zoomLegend.textContent = currentZoom.legend || '';
+
+  // Centrage et taille fixe de l'image
+  zoomImage.style.maxWidth = '90%';
+  zoomImage.style.maxHeight = '80%';
+  zoomImage.style.objectFit = 'contain';
+  zoomImage.style.margin = '0 auto';
+  zoomImage.style.display = 'block';
+
+  // Centrage légende
+  zoomLegend.style.textAlign = 'center';
+  zoomLegend.style.marginTop = '12px';
+  zoomLegend.style.fontSize = '16px';
+  zoomLegend.style.color = '#333';
+
+  // Miniatures
   thumbs.innerHTML = '';
   (currentZoom.zoomGroup || []).forEach(u => {
     const t = document.createElement('img');
     t.src = u;
-    t.onclick = () => mainZoom.src = u;
+    t.style.width = '60px';
+    t.style.height = '60px';
+    t.style.objectFit = 'cover';
+    t.style.margin = '0 6px';
+    t.style.cursor = 'pointer';
+    t.onclick = () => zoomImage.src = u;
     thumbs.appendChild(t);
   });
 
+  // Actions (likes / comments)
   updateActions();
-  zoomModal.style.display = 'flex';
 }
 
-function openZoom(src, caption) {
-    document.getElementById('zoomImage').src = src;
-    document.getElementById('zoomCaption').textContent = caption;
-    document.getElementById('zoomOverlay').style.display = 'flex';
-  }
+// Fermeture du zoom
+function closeZoom() {
+  const zoomOverlay = document.getElementById('zoomOverlay');
+  zoomOverlay.style.display = 'none';
+}
 
   function closeZoom() {
     document.getElementById('zoomOverlay').style.display = 'none';
