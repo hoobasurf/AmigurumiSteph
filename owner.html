@@ -346,30 +346,32 @@ body::before{
 <div id="zoomModal">
   <div class="closeZoom">×</div>
 
-  <!-- IMAGE + LEGENDE -->
-  <div class="zoom-top">
-    <div class="zoom-image-box">
+  <!-- HAUT : IMAGE + LEGENDE -->
+  <div class="zoom-top" style="display:flex; gap:16px;">
+    
+    <!-- IMAGE (ID INCHANGÉ) -->
+    <div style="flex:1;">
       <img id="mainZoom">
     </div>
 
-    <div class="zoom-legend-box">
+    <!-- LEGENDE -->
+    <div style="flex:1; padding:12px;">
       <div id="zoomLegend"></div>
     </div>
+
   </div>
 
-  <!-- MINIATURES -->
+  <!-- MINIATURES (ID INCHANGÉ) -->
   <div class="thumbs" id="thumbs"></div>
 
-  <!-- ACTIONS -->
-  <div class="actions" style="display:flex; gap:12px; align-items:center; margin-top:8px;">
+  <!-- ACTIONS (ID INCHANGÉS) -->
+  <div class="actions">
     <div class="icon-btn" id="likeBtn">
-      <svg>...</svg>
-      <span id="likeCount">0</span>
+      ❤️ <span id="likeCount">0</span>
     </div>
 
     <div class="icon-btn" id="commentBtn">
-      <svg>...</svg>
-      <span id="commentCount">0</span>
+      💬 <span id="commentCount">0</span>
     </div>
   </div>
 </div>
@@ -695,10 +697,10 @@ async function refreshCreations() {
       const likesArray = Array.isArray(c.likes) ? c.likes : JSON.parseSafe(c.likes) || [];
       const commentsArray = Array.isArray(c.comments) ? c.comments : JSON.parseSafe(c.comments) || [];
 
-      return {
+     return {
   id: c.id,
   name: c.name,
-  legend: c.legend || '',   // ✅ ICI
+  legend: c.legend || '', // ✅ AJOUT UNIQUE, RIEN D’AUTRE
   imgUrl: zoomGroup[0] || '',
   zoomGroup,
   likes: likesArray.map(l => ({ name: l.name || '', photo: l.photo || '' })),
@@ -732,6 +734,7 @@ function renderCreations() {
 
 // ====== ZOOM ======
 function openZoom(c) {
+  document.getElementById('zoomLegend').textContent = c.legend || '';
   currentZoom = creations.find(x => x.id === c.id);
   mainZoom.src = currentZoom.imgUrl;
   thumbs.innerHTML = '';
