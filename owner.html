@@ -257,7 +257,53 @@ body::before{
   overflow-y:auto;
   box-shadow: inset 0 0 0 1px rgba(255,255,255,0.5);
 }
-  
+
+  /* Fond noir semi-transparent pour le zoom */
+  .overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0,0,0,0.7);
+    display: none; /* caché par défaut */
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+  }
+
+  /* Conteneur centré */
+  .zoom-container {
+    text-align: center;
+    max-width: 90vw; /* pour rester responsive */
+  }
+
+  /* Image zoomée */
+  .zoom-container img {
+    width: 400px;  /* taille fixe de la photo */
+    height: auto;
+    display: block;
+    margin: 0 auto;
+  }
+
+  /* Légende centrée et même taille que l'image */
+  .zoom-container .caption {
+    width: 400px;  /* même largeur que l'image */
+    margin: 10px auto 0 auto;
+    font-size: 16px; /* taille fixe du texte */
+    color: #fff;
+    text-align: center;
+  }
+
+  /* Bouton fermer */
+  .close-btn {
+    position: absolute;
+    top: 20px;
+    right: 30px;
+    font-size: 30px;
+    color: #fff;
+    cursor: pointer;
+
 </style>
 </head>
 <body>
@@ -744,6 +790,16 @@ function openZoom(c) {
   updateActions();
   zoomModal.style.display = 'flex';
 }
+
+function openZoom(src, caption) {
+    document.getElementById('zoomImage').src = src;
+    document.getElementById('zoomCaption').textContent = caption;
+    document.getElementById('zoomOverlay').style.display = 'flex';
+  }
+
+  function closeZoom() {
+    document.getElementById('zoomOverlay').style.display = 'none';
+    
 function updateActions() {
   if (!currentZoom) return;
   likeCount.textContent = (currentZoom.likes || []).length;
