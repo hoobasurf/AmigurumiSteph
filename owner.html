@@ -311,20 +311,35 @@ body::before{
   </div>
 </div>
 
-<div id="zoomModal">
-  <div class="closeZoom">×</div>
-  <div style="
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  border:2px solid #e5b6c8;
-  border-radius:12px;
-  padding:10px;
-  background:#fff7fa;
-  max-width:90%;
-  margin:0 auto;
-">
-  <img id="mainZoom" src="" style="max-width:100%; max-height:65vh; object-fit:contain;">
+<div style="display:flex; gap:16px; justify-content:center; align-items:flex-start;">
+
+  <!-- IMAGE : PAS D’ENCADRÉ, JUSTE LA PHOTO -->
+  <img
+    id="mainZoom"
+    style="
+      max-width:45%;
+      max-height:65vh;
+      object-fit:contain;
+      border-radius:12px;
+    "
+  >
+
+  <!-- LÉGENDE : MÊME TAILLE VISUELLE + CONTOUR -->
+  <div
+    style="
+      max-width:45%;
+      max-height:65vh;
+      border:2px solid #e5b6c8;
+      border-radius:12px;
+      padding:12px;
+      background:#fff7fa;
+      overflow-y:auto;
+      font-size:16px;
+      color:#333;
+    "
+    id="zoomLegend"
+  ></div>
+
 </div>
   <div class="thumbs" id="thumbs"></div>
   <div class="actions">
