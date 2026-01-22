@@ -517,7 +517,25 @@ body::before{
   </div>
 </div>
 
+  <!-- ZOOM OVERLAY -->
+<div id="zoomOverlay" class="modal" style="display:none;justify-content:center;align-items:center;position:fixed;top:0;left:0;width:100vw;height:100vh;background:rgba(0,0,0,0.8);z-index:10000;">
+  <div class="modal-box" style="position:relative;background:#fff;padding:20px;max-width:90%;max-height:90%;overflow:auto;display:flex;flex-direction:column;align-items:center;">
+    <span class="closeZoom" style="position:absolute;top:8px;right:12px;font-size:24px;font-weight:bold;cursor:pointer;">×</span>
+    <img id="zoomImage" src="" style="max-width:90%;max-height:80%;object-fit:contain;margin:0 auto;">
+    <div id="zoomLegend" style="text-align:center;margin-top:12px;font-size:16px;color:#333;"></div>
+    <div id="thumbs" style="display:flex;justify-content:center;margin-top:12px;flex-wrap:wrap;"></div>
+    <div style="margin-top:12px;font-size:14px;color:#333;">
+      Likes: <span id="likeCount">0</span> | Commentaires: <span id="commentCount">0</span>
+    </div>
+  </div>
+</div>
+
     <script type="module">
+
+      document.addEventListener('DOMContentLoaded', () => {
+  document.querySelector('.closeZoom').onclick = closeZoom;
+});
+    
 import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
 
 const supabase = createClient(
@@ -980,13 +998,12 @@ chatModal.addEventListener('touchmove', e => {
   }
 });
 chatModal.addEventListener('touchend',()=>{initialDistance=null;});
-
+    
 // ====== INITIAL LOAD ======
 refreshCreations();
 loadOwnerPhoto();
 loadChatUsers();
 </script>
-
-
+  
 </body>
 </html>
