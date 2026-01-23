@@ -238,7 +238,6 @@ body::before{
 <img id="ownerPhoto" alt="Owner">
 
 <div class="center-zone">
-  <div id="creationsContainer" style="display:flex; flex-wrap:wrap; gap:12px; justify-content:center; margin-top:20px;"></div>
   <div id="visitor-list-container"></div>
 </div>
 
@@ -642,108 +641,79 @@ if ('Notification' in window && Notification.permission !== 'granted') Notificat
 Comme ça ?
 
 
-// ====== REFRESH CREATIONS ======
+// ====== CREATIONS ======
 async function refreshCreations() {
   try {
-    const { data, error } = await supabase
-      .from('creations')
-      .select('*')
-      .order('created_at', { ascending: false });
+    const { data, error } = await supabase.from('creations').select('*').order('created_at', { ascending: false });
+    if (error) return console.error(error);
 
-    if (error) {
-      console.error('Supabase error:', error);
-      return;
-    }
-
-    // Map data pour garder même structure
     creations = data.map(c => {
       let zoomGroup = [];
       if (c.images?.length) {
-        zoomGroup = c.images.map(p =>
-          supabase.storage.from('images').getPublicUrl(p).data?.publicUrl || ''
-        );
+        zoomGroup = c.images.map(p => supabase.storage.from('images').getPublicUrl(p).data?.publicUrl || '');
       } else if (c.image_path) {
-        zoomGroup = [
-          supabase.storage.from('images').getPublicUrl(c.image_path).data?.publicUrl || ''
-        ];
+        zoomGroup = [supabase.storage.from('images').getPublicUrl(c.image_path).data?.publicUrl || ''];
       }
 
       const likesArray = Array.isArray(c.likes) ? c.likes : JSON.parseSafe(c.likes) || [];
       const commentsArray = Array.isArray(c.comments) ? c.comments : JSON.parseSafe(c.comments) || [];
 
       return {
-        id: c.id,
-        name: c.name,
-        legend: c.legend || '',
-        imgUrl: zoomGroup[0] || '',
-        zoomGroup,
-        likes: likesArray.map(l => ({ name: l.name || '', photo: l.photo || '' })),
-        comments: commentsArray.map(cmt => ({ name: cmt.name || '', text: cmt.text || '', photo: cmt.photo || '' }))
-      };
-    });
-
+  id: c.id,
+  name: c.name,
+  legend: c.legend || '',
+  imgUrl: zoomGroup[0] || '',
+  zoomGroup,
+  likes: likesArray.map(l => ({ name: l.name || '', photo: l.photo || '' })),
+  comments: commentsArray.map(cmt => ({ name: cmt.name || '', text: cmt.text || '', photo: cmt.photo || '' }))
+};
     renderCreations();
-  } catch (err) {
-    console.error('refreshCreations error:', err);
-  }
+  } catch (err) { console.error('refreshCreations', err); }
 }
+
+// Helper pour JSON safe
+JSON.parseSafe = str => { try { return JSON.parse(str); } catch(e) { return []; } };
 
 // ====== RENDER CREATIONS ======
 function renderCreations() {
-  const container = document.getElementById('creationsContainer');
-  if (!container) {
-    console.error('Container #creationsContainer introuvable !');
-    return;
-  }
-
-  container.innerHTML = ''; // vider avant
+  const container = document.getElementById('creationsContainer'); // crée ce div dans ton HTML
+  container.innerHTML = ''; // vider avant de recréer
 
   creations.forEach(c => {
     const div = document.createElement('div');
     div.className = 'creation-item';
 
-    // Placeholder
+    // image principale
     const placeholder = document.createElement('div');
-    placeholder.className = 'placeholder';
-    placeholder.textContent = 'Chargement…';
-    div.appendChild(placeholder);
+placeholder.className = 'placeholder';
+placeholder.textContent = 'Chargement…';
+div.appendChild(placeholder);
 
-    // Image
-    const img = document.createElement('img');
-    img.src = c.imgUrl;
+// gérer la disparition du placeholder quand l'image est chargée
+if (img.complete) {
+  placeholder.style.display = 'none';
+}
 
-    // Si déjà chargée
-    if (img.complete) placeholder.style.display = 'none';
+img.onload = () => {
+  placeholder.style.display = 'none';
+};
 
-    // Quand l'image charge
-    img.onload = () => {
-      placeholder.style.display = 'none';
-    };
-
-    div.appendChild(img);
-
-    // Nom
+    // nom
     const nameP = document.createElement('p');
     nameP.textContent = c.name;
     div.appendChild(nameP);
 
-    // Légende
+    // légende
     const legendP = document.createElement('p');
-    legendP.textContent = c.legend || '';
+    legendP.textContent = c.legend || ''; // ici c.legend
     div.appendChild(legendP);
 
-    // Clic pour zoom
+    // clic pour zoom
     div.onclick = () => openZoom(c);
 
     container.appendChild(div);
   });
 }
-
-// Helper JSON safe
-JSON.parseSafe = str => {
-  try { return JSON.parse(str); }
-  catch(e) { return []; }
-};
 
   const likesArray = Array.isArray(c.likes) ? c.likes : JSON.parseSafe(c.likes);
   const commentsArray = Array.isArray(c.comments) ? c.comments : JSON.parseSafe(c.comments);
