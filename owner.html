@@ -233,16 +233,17 @@ body::before{
 
 .zoom-images{
   display: flex;
-  gap: 16px;
+  gap: 20px;
+  justify-content: center;
+  align-items: center;
   max-width: 90vw;
 }
 
-.zoom-images img{
-  max-width: 40vw;
-  max-height: 60vh;
-  border: 4px solid #b67385;
-  border-radius: 24px;
-  object-fit: contain;
+.zoom-images img,
+#legendBox{
+  width: 40vw;
+  max-width: 420px;
+  max-height: 65vh;
 }
 
 #legendBox{
@@ -262,6 +263,17 @@ body::before{
   justify-content: center;
   text-align: center;
   line-height: 1.4;
+}
+
+#zoomModal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.75);
+  display: none;              /* 🔥 IMPORTANT */
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  z-index: 99999;             /* 🔥 AU-DESSUS DE TOUT */
 }
   
 </style>
@@ -346,31 +358,21 @@ body::before{
 
 <div id="zoomModal">
   <div class="closeZoom">×</div>
+
   <div class="zoom-images">
-  <!-- GAUCHE : IMAGE -->
-  <img id="mainZoomLeft">
+    <img id="mainZoomLeft" />
+    <div id="legendBox"></div>
+  </div>
 
-  <!-- DROITE : LÉGENDE -->
-  <div id="legendBox"></div>
-</div>
-</div>
   <div class="thumbs" id="thumbs"></div>
-  <div class="actions">
-    <div class="actions" style="display:flex; gap:12px; align-items:center; margin-top:8px;">
-  <div class="icon-btn" id="likeBtn" style="display:flex; align-items:center; cursor:pointer; gap:4px;">
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#b84c6f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-      <path d="M12 21C12 21 4 13.5 4 8.5C4 5.5 6.5 3 9.5 3C11 3 12 4 12 4C12 4 13 3 14.5 3C17.5 3 20 5.5 20 8.5C20 13.5 12 21 12 21Z"></path>
-    </svg>
-    <span id="likeCount">0</span>
-  </div>
 
-  <div class="icon-btn" id="commentBtn" style="display:flex; align-items:center; cursor:pointer; gap:4px;">
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#b84c6f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-      <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
-    </svg>
-    <span id="commentCount">0</span>
-  </div>
-</div>
+  <div class="actions" style="display:flex; gap:12px; align-items:center; margin-top:8px;">
+    <div class="icon-btn" id="likeBtn">
+      ❤️ <span id="likeCount">0</span>
+    </div>
+    <div class="icon-btn" id="commentBtn">
+      💬 <span id="commentCount">0</span>
+    </div>
   </div>
 </div>
 <!-- Modal Commentaires -->
