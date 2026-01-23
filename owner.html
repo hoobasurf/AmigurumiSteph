@@ -275,6 +275,25 @@ body::before{
   flex-direction: column;
   z-index: 99999;             /* 🔥 AU-DESSUS DE TOUT */
 }
+
+.visitor-item,
+.visitor-item img {
+  pointer-events: auto !important;
+  position: relative;
+  z-index: 5;
+}
+
+.modal,
+#zoomModal,
+.chat-overlay {
+  pointer-events: none;
+}
+
+  .modal[style*="display: flex"],
+#zoomModal[style*="display: flex"],
+.chat-overlay[style*="display: flex"] {
+  pointer-events: auto;
+}
   
 </style>
 </head>
@@ -709,7 +728,10 @@ function renderCreations() {
     const img = d.querySelector('img');
     img.onload = () => d.querySelector('.placeholder').style.display='none';
     img.onerror = () => { img.remove(); d.querySelector('.placeholder').textContent=''; };
-    img.onclick = () => openZoom(c);
+    img.onclick = () => {
+  console.log("CLICK IMAGE", c.id);
+  openZoom(c);
+};
     d.querySelector('.delete-btn').onclick = () => openDeleteModal(c);
     page.appendChild(d);
   });
