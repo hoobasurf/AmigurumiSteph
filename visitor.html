@@ -230,92 +230,19 @@ body::before{
   transform: scale(1.03);
   box-shadow: 0 4px 10px rgba(0,0,0,0.15);
 }
-
-.zoom-images{
-  display: flex;
-  gap: 20px;
-  justify-content: center;
-  align-items: center;
-  max-width: 90vw;
-}
-
-.zoom-images img,
-#legendBox{
-  width: 40vw;
-  max-width: 420px;
-  max-height: 65vh;
-}
-
-#legendBox{
-  width: 40vw;
-  max-width: 420px;
-  max-height: 65vh;
-  padding: 20px;
-  background: #ffe6f0; /* rose pastel clair */
-  border: 4px solid #b67385;
-  border-radius: 24px;
-  color: #b84c6f;
-  font-size: 16px;
-  font-weight: bold;
-  overflow-y: auto;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  line-height: 1.4;
-}
-
-#zoomModal {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.75);
-  display: none;              /* 🔥 IMPORTANT */
-  justify-content: center;
-  align-items: center;
-  flex-direction: column;
-  z-index: 99999;             /* 🔥 AU-DESSUS DE TOUT */
-}
-
-#zoomModal {
-  display: none;
-  pointer-events: none;
-}
-#zoomModal[style*="display: flex"] {
-  pointer-events: auto;
-}
-  
-.visitor-item,
-.visitor-item img {
-  pointer-events: auto !important;
-  position: relative;
-  z-index: 5;
-}
-
-
-  .modal {
-  display: none;
-  pointer-events: auto;
-}
-
-body::before {
-  pointer-events: none;
-}
-
-  .modal,
-#zoomModal,
-.chat-overlay {
-  outline: 2px solid red;
-}
   
 </style>
 </head>
 <body>
-  
+
 <img id="ownerPhoto" alt="Owner">
 
 <div class="center-zone">
   <div id="visitor-list-container"></div>
 </div>
+
+<!-- CONTENEUR POUR LES CREATIONS (AJOUTÉ) -->
+<div id="creationsContainer" style="display:flex; flex-wrap:wrap; gap:12px; justify-content:center; margin-top:20px;"></div>
 
 <div id="sidebar">
   <div id="toggleSidebar">☰</div>
@@ -329,7 +256,6 @@ body::before {
     <circle cx="12" cy="12" r="3"/>
     <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l0 0a2 2 0 1 1-2.83 2.83l0 0a1.65 1.65 0 0 0-1.82.33l0 0a1.65 1.65 0 0 0-.5 1.51l0 0a2 2 0 1 1-3.18 0l0 0a1.65 1.65 0 0 0-1.51-.5l0 0a1.65 1.65 0 0 0-.33-1.82l0 0a2 2 0 1 1 0-2.83l0 0a1.65 1.65 0 0 0 .33-1.82l0 0a1.65 1.65 0 0 0-1.51-.5l0 0a2 2 0 1 1 0-3.18l0 0a1.65 1.65 0 0 0 .5-1.51l0 0a1.65 1.65 0 0 0 1.82-.33l0 0a2 2 0 1 1 2.83 0l0 0a1.65 1.65 0 0 0 1.82.33l0 0a1.65 1.65 0 0 0 .5 1.51l0 0a2 2 0 1 1 3.18 0l0 0a1.65 1.65 0 0 0 1.51.5l0 0a1.65 1.65 0 0 0 .33 1.82l0 0a2 2 0 1 1 0 2.83l0 0a1.65 1.65 0 0 0-.33 1.82l0 0a1.65 1.65 0 0 0 1.51.5z"/>
   </svg>
-</button>
 </div>
 
 <!-- Modals -->
@@ -389,23 +315,46 @@ body::before {
 
 <div id="zoomModal">
   <div class="closeZoom">×</div>
-
-  <div class="zoom-images">
-    <img id="mainZoomLeft" />
-    <div id="legendBox"></div>
+  <img id="mainZoom">
+  <div class="thumbs" id="thumbs"></div>
+  <div class="actions">
+    <div class="actions" style="display:flex; gap:12px; align-items:center; margin-top:8px;">
+  <div class="icon-btn" id="likeBtn" style="display:flex; align-items:center; cursor:pointer; gap:4px;">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#b84c6f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M12 21C12 21 4 13.5 4 8.5C4 5.5 6.5 3 9.5 3C11 3 12 4 12 4C12 4 13 3 14.5 3C17.5 3 20 5.5 20 8.5C20 13.5 12 21 12 21Z"></path>
+    </svg>
+    <span id="likeCount">0</span>
   </div>
 
-  <div class="thumbs" id="thumbs"></div>
-
-  <div class="actions" style="display:flex; gap:12px; align-items:center; margin-top:8px;">
-    <div class="icon-btn" id="likeBtn">
-      ❤️ <span id="likeCount">0</span>
-    </div>
-    <div class="icon-btn" id="commentBtn">
-      💬 <span id="commentCount">0</span>
-    </div>
+  <div class="icon-btn" id="commentBtn" style="display:flex; align-items:center; cursor:pointer; gap:4px;">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#b84c6f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+    </svg>
+    <span id="commentCount">0</span>
   </div>
 </div>
+  </div>
+</div>
+
+<!-- Modal Gestion -->
+<div id="manageModal" class="modal">
+  <div class="modal-box">
+    <h2>Gestion Likes, Commentaires</h2>
+    <button id="manageLikesBtn">Likes</button>
+    <button id="manageCommentsBtn">Commentaires</button>
+  </div>
+</div>
+
+<!-- Modal Likes -->
+<div id="likesModal" class="modal">
+  <div class="modal-box" style="max-height:80vh; overflow-y:auto;">
+    <h2>Likes</h2>
+    <button id="chooseLikeBtn">Choisir individuellement</button>
+    <button id="clearLikesBtn">Tout effacer</button>
+    <div id="likesList"></div>
+  </div>
+</div>
+
 <!-- Modal Commentaires -->
 <div id="commentsModal" class="modal">
   <div class="modal-box" style="max-height:80vh; overflow-y:auto;">
@@ -490,7 +439,6 @@ body::before {
   </div>
 </div>
 
-
     <script type="module">
 import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
 
@@ -530,10 +478,7 @@ const icon = document.getElementById('chatResizeIcon');
 const fileBtn = document.getElementById('fileBtn');
 const fileInput = document.getElementById('multiPhoto');
 const fileInfo = document.getElementById('fileInfo');
-const mainZoomLeft = document.getElementById('mainZoomLeft');
-const mainZoomRight = document.getElementById('mainZoomRight');
-const legendBox = document.getElementById('legendBox');
-      
+
 fileBtn.onclick = () => fileInput.click();
 
 fileInput.onchange = () => {
@@ -695,18 +640,33 @@ function showInAppNotification(sender, message) {
 }
 if ('Notification' in window && Notification.permission !== 'granted') Notification.requestPermission();
 
-// ====== CREATIONS ======
+Comme ça ?
+
+
+// ====== REFRESH CREATIONS ======
 async function refreshCreations() {
   try {
-    const { data, error } = await supabase.from('creations').select('*').order('created_at', { ascending: false });
-    if (error) return console.error(error);
+    const { data, error } = await supabase
+      .from('creations')
+      .select('*')
+      .order('created_at', { ascending: false });
 
+    if (error) {
+      console.error('Supabase error:', error);
+      return;
+    }
+
+    // Map data pour garder même structure
     creations = data.map(c => {
       let zoomGroup = [];
       if (c.images?.length) {
-        zoomGroup = c.images.map(p => supabase.storage.from('images').getPublicUrl(p).data?.publicUrl || '');
+        zoomGroup = c.images.map(p =>
+          supabase.storage.from('images').getPublicUrl(p).data?.publicUrl || ''
+        );
       } else if (c.image_path) {
-        zoomGroup = [supabase.storage.from('images').getPublicUrl(c.image_path).data?.publicUrl || ''];
+        zoomGroup = [
+          supabase.storage.from('images').getPublicUrl(c.image_path).data?.publicUrl || ''
+        ];
       }
 
       const likesArray = Array.isArray(c.likes) ? c.likes : JSON.parseSafe(c.likes) || [];
@@ -715,6 +675,7 @@ async function refreshCreations() {
       return {
         id: c.id,
         name: c.name,
+        legend: c.legend || '',
         imgUrl: zoomGroup[0] || '',
         zoomGroup,
         likes: likesArray.map(l => ({ name: l.name || '', photo: l.photo || '' })),
@@ -723,57 +684,101 @@ async function refreshCreations() {
     });
 
     renderCreations();
-  } catch (err) { console.error('refreshCreations', err); }
+  } catch (err) {
+    console.error('refreshCreations error:', err);
+  }
 }
-
-// Helper pour JSON safe
-JSON.parseSafe = str => { try { return JSON.parse(str); } catch(e) { return []; } };
 
 // ====== RENDER CREATIONS ======
 function renderCreations() {
-  container.innerHTML = '';
-  let page = null;
-  creations.forEach((c, i) => {
-    if (i % 6 === 0) { page = document.createElement('div'); page.className = 'page'; container.appendChild(page); }
-    const d = document.createElement('div'); d.className = 'visitor-item';
-    d.innerHTML = `<div class="placeholder">?</div><div class="delete-btn">×</div><p>${c.name}</p><img src="${c.imgUrl||''}">`;
-    const img = d.querySelector('img');
-    img.onload = () => d.querySelector('.placeholder').style.display='none';
-    img.onerror = () => { img.remove(); d.querySelector('.placeholder').textContent=''; };
-    img.onclick = () => {
-  console.log("CLICK IMAGE", c.id);
-  openZoom(c);
-};
-    d.querySelector('.delete-btn').onclick = () => openDeleteModal(c);
-    page.appendChild(d);
+  const container = document.getElementById('creationsContainer');
+  if (!container) {
+    console.error('Container #creationsContainer introuvable !');
+    return;
+  }
+
+  container.innerHTML = ''; // vider avant
+
+  creations.forEach(c => {
+    const div = document.createElement('div');
+    div.className = 'creation-item';
+
+    // Placeholder
+    const placeholder = document.createElement('div');
+    placeholder.className = 'placeholder';
+    placeholder.textContent = 'Chargement…';
+    div.appendChild(placeholder);
+
+    // Image
+    const img = document.createElement('img');
+    img.src = c.imgUrl;
+
+    // Si déjà chargée
+    if (img.complete) placeholder.style.display = 'none';
+
+    // Quand l'image charge
+    img.onload = () => {
+      placeholder.style.display = 'none';
+    };
+
+    div.appendChild(img);
+
+    // Nom
+    const nameP = document.createElement('p');
+    nameP.textContent = c.name;
+    div.appendChild(nameP);
+
+    // Légende
+    const legendP = document.createElement('p');
+    legendP.textContent = c.legend || '';
+    div.appendChild(legendP);
+
+    // Clic pour zoom
+    div.onclick = () => openZoom(c);
+
+    container.appendChild(div);
   });
 }
+
+// Helper JSON safe
+JSON.parseSafe = str => {
+  try { return JSON.parse(str); }
+  catch(e) { return []; }
+};
+
+  const likesArray = Array.isArray(c.likes) ? c.likes : JSON.parseSafe(c.likes);
+  const commentsArray = Array.isArray(c.comments) ? c.comments : JSON.parseSafe(c.comments);
+
+  return {
+    id: c.id,
+    name: c.name,
+    legend: c.legend || '',
+    imgUrl: zoomGroup[0] || '',
+    zoomGroup,
+    likes: likesArray.map(l => ({ name: l.name || '', photo: l.photo || '' })),
+    comments: commentsArray.map(cmt => ({ name: cmt.name || '', text: cmt.text || '', photo: cmt.photo || '' }))
+  };
+});
+
+renderCreations();
 
 // ====== ZOOM ======
 function openZoom(c) {
   currentZoom = creations.find(x => x.id === c.id);
-
-  // image à gauche
-  mainZoomLeft.src = currentZoom.imgUrl;
-
-  // légende à droite
-  legendBox.textContent = currentZoom.legend || "Aucune légende";
-
+  mainZoom.src = currentZoom.imgUrl || '';
   thumbs.innerHTML = '';
-
   (currentZoom.zoomGroup || []).forEach(u => {
-    const t = document.createElement('img');
-    t.src = u;
-
-    t.onclick = () => {
-      mainZoomLeft.src = u;
-    };
-
+    const t = document.createElement('img'); t.src = u;
+    t.onclick = () => mainZoom.src = u;
     thumbs.appendChild(t);
   });
-
   updateActions();
   zoomModal.style.display = 'flex';
+}
+function updateActions() {
+  if (!currentZoom) return;
+  likeCount.textContent = (currentZoom.likes || []).length;
+  commentCount.textContent = (currentZoom.comments || []).length;
 }
 
 // ====== LIKE / COMMENT MODAL ======
