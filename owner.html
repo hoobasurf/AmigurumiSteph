@@ -13,7 +13,20 @@
 
 <style>
   /* ====== ZONE CENTRALE ====== */
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Owner</title>
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="favicon.ico" type="image/x-icon">
+<link rel="apple-touch-icon" href="icon-152.png">
+<meta name="theme-color" content="#f2b7c9">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
 
+<style>
 * { box-sizing:border-box;margin:0;padding:0;font-family:'Comic Sans MS',cursive; }
 html,body{height:100%;overflow-x:hidden;}
 body::before{
@@ -44,23 +57,17 @@ body::before{
 /* ====== PAGE = 6 CARTES (3x2) ====== */
 .page{
   display:grid;
-  grid-template-columns:repeat(2, 120px);
-  grid-template-rows:repeat(3, 120px);
-  column-gap:4mm;
+  grid-template-columns:repeat(2, 200px);
+  grid-template-rows:repeat(3, 200px);
+  column-gap:3mm;
   row-gap:4mm;
   flex:0 0 auto;
-  width:calc(2 * 120px + 4mm);
-  height:calc(3 * 120px + 8mm);
+  width:calc(2 * 200px + 3mm);
+  height:calc(3 * 200px + 8mm);
   scroll-snap-align:center;
   padding:4mm;
   justify-content:center;
   margin-top:0;
-}
-
-/* ====== CARDS PETITES ====== */
-.creation{
-  width:120px;
-  height:120px;
 }
 
 /* ====== RESPONSIVE MOBILE ====== */
