@@ -31,6 +31,11 @@ body::before{
 .delete-btn{position:absolute;top:2px;right:2px;width:20px;height:20px;background:#ffb6c1;color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:bold;cursor:pointer;z-index:5;font-size:14px;transition: background 0.2s;}
 .delete-btn:hover{background:#e94f9a;}
 
+#sidebar{position:fixed;top:0;left:-220px;width:220px;height:100vh;background:rgba(255,230,240,0.2);border-right:2px solid #b67385;padding:20px;transition:left .3s;z-index:10;}
+#sidebar.sidebar-open{left:0;}
+#toggleSidebar{position:absolute;top:50%;right:-30px;width:30px;height:60px;background:#ffb6c1;border-radius:0 12px 12px 0;display:flex;align-items:center;justify-content:center;cursor:pointer;font-weight:bold;}
+#sidebar button{width:auto;padding:8px 16px;border-radius:16px;border:none;background:#ffb6c1;color:#fff;cursor:pointer;font-weight:bold;display:block;margin-top:10px;}
+
 .modal{position:fixed;inset:0;background:rgba(0,0,0,0.6);display:none;justify-content:center;align-items:center;z-index:10001;}
 .modal .modal-box{background:#ffe6f0;padding:16px 24px;border-radius:20px;border:3px solid #b67385;display:flex;flex-direction:column;gap:10px;align-items:center;min-width:200px;font-family:'Comic Sans MS',cursive;}
 .modal input{padding:6px 12px;border-radius:10px;border:2px solid #b67385;width:100%;}
@@ -209,41 +214,142 @@ body::before{
   border-radius: 24px;
 }
 
-#messagerieBtn{
+.pink-file-btn{
+  background: linear-gradient(#ffd6e6, #ffb6c1);
+  border: 2px solid #b67385;
+  border-radius: 16px;
+  padding: 8px 14px;
+  color: #b84c6f;
+  font-weight: bold;
+  cursor: pointer;
+  width: 100%;
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+
+.pink-file-btn:hover{
+  transform: scale(1.03);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+}
+
+.zoom-images{
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+  align-items: center;
+  max-width: 90vw;
+}
+
+.zoom-images img,
+#legendBox{
+  width: 40vw;
+  max-width: 420px;
+  max-height: 65vh;
+}
+
+#legendBox{
+  width: 40vw;
+  max-width: 420px;
+  max-height: 65vh;
+  padding: 20px;
+  background: #ffe6f0; /* rose pastel clair */
+  border: 4px solid #b67385;
+  border-radius: 24px;
+  color: #b84c6f;
+  font-size: 16px;
+  font-weight: bold;
+  overflow-y: auto;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  line-height: 1.4;
+}
+
+#zoomModal {
   position: fixed;
-  top: 10px;
-  right: 50px; /* juste à gauche de la photo profil */
-  z-index: 10001;
+  inset: 0;
+  background: rgba(0,0,0,0.75);
+  display: none;              /* 🔥 IMPORTANT */
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  z-index: 99999;             /* 🔥 AU-DESSUS DE TOUT */
+}
+
+#zoomModal {
+  display: none;
+  pointer-events: none;
+}
+#zoomModal[style*="display: flex"] {
+  pointer-events: auto;
+}
+  
+.visitor-item,
+.visitor-item img {
+  pointer-events: auto !important;
+  position: relative;
+  z-index: 5;
+}
+
+
+  .modal {
+  display: none;
+  pointer-events: auto;
+}
+
+body::before {
+  pointer-events: none;
+}
+
+  .modal,
+#zoomModal,
+.chat-overlay {
+  outline: 2px solid red;
 }
   
 </style>
 </head>
 <body>
-
+  
 <img id="ownerPhoto" alt="Owner">
 
-<button id="messagerieBtn" class="chat-icon-btn" aria-label="Messagerie">
-  <svg width="26" height="26" viewBox="0 0 24 24"
-    fill="none" stroke="#b84c6f" stroke-width="2"
-    stroke-linecap="round" stroke-linejoin="round">
-    <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5
-             a2 2 0 0 1 2-2h14
-             a2 2 0 0 1 2 2z"/>
-  </svg>
-</button>
-  
 <div class="center-zone">
   <div id="visitor-list-container"></div>
 </div>
 
+<div id="sidebar">
+  <div id="toggleSidebar">☰</div>
+  <button id="addBtn">Ajouter</button>
+  <button id="pelotesBtn">Pelotes</button>
+  <button id="videoBtn">Vidéo</button>
+  <button id="notesBtn">Notes</button>
+  <button id="messagerieBtn">Messagerie</button>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="#ffb6c1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-settings">
+    <circle cx="12" cy="12" r="3"/>
+    <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l0 0a2 2 0 1 1-2.83 2.83l0 0a1.65 1.65 0 0 0-1.82.33l0 0a1.65 1.65 0 0 0-.5 1.51l0 0a2 2 0 1 1-3.18 0l0 0a1.65 1.65 0 0 0-1.51-.5l0 0a1.65 1.65 0 0 0-.33-1.82l0 0a2 2 0 1 1 0-2.83l0 0a1.65 1.65 0 0 0 .33-1.82l0 0a1.65 1.65 0 0 0-1.51-.5l0 0a2 2 0 1 1 0-3.18l0 0a1.65 1.65 0 0 0 .5-1.51l0 0a1.65 1.65 0 0 0 1.82-.33l0 0a2 2 0 1 1 2.83 0l0 0a1.65 1.65 0 0 0 1.82.33l0 0a1.65 1.65 0 0 0 .5 1.51l0 0a2 2 0 1 1 3.18 0l0 0a1.65 1.65 0 0 0 1.51.5l0 0a1.65 1.65 0 0 0 .33 1.82l0 0a2 2 0 1 1 0 2.83l0 0a1.65 1.65 0 0 0-.33 1.82l0 0a1.65 1.65 0 0 0 1.51.5z"/>
+  </svg>
+</button>
+</div>
 
 <!-- Modals -->
 <div id="addModal" class="modal">
   <div class="modal-box">
     <h2>Ajouter des photos</h2>
     <input id="photoName" placeholder="Nom du projet">
-    <input type="file" id="multiPhoto" multiple>
-    <button id="confirmAdd">Valider</button>
+
+<!-- LÉGENDE -->
+<input id="photoLegend" placeholder="Légende (optionnel)">
+
+<!-- INPUT FILE CACHÉ -->
+<input type="file" id="multiPhoto" multiple hidden>
+
+<!-- BOUTON PASTEL ROSE -->
+<button id="fileBtn" class="pink-file-btn">Choisir des photos</button>
+
+<span id="fileInfo" style="font-size:12px;color:#b84c6f;"></span>
+
+<button id="confirmAdd">Valider</button>
   </div>
 </div>
 
@@ -283,38 +389,23 @@ body::before{
 
 <div id="zoomModal">
   <div class="closeZoom">×</div>
-  <img id="mainZoom">
+
+  <div class="zoom-images">
+    <img id="mainZoomLeft" />
+    <div id="legendBox"></div>
+  </div>
+
   <div class="thumbs" id="thumbs"></div>
-  <div class="actions">
-    <div class="actions" style="display:flex; gap:12px; align-items:center; margin-top:8px;">
-  <div class="icon-btn" id="likeBtn" style="display:flex; align-items:center; cursor:pointer; gap:4px;">
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#b84c6f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-      <path d="M12 21C12 21 4 13.5 4 8.5C4 5.5 6.5 3 9.5 3C11 3 12 4 12 4C12 4 13 3 14.5 3C17.5 3 20 5.5 20 8.5C20 13.5 12 21 12 21Z"></path>
-    </svg>
-    <span id="likeCount">0</span>
-  </div>
 
-  <div class="icon-btn" id="commentBtn" style="display:flex; align-items:center; cursor:pointer; gap:4px;">
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#b84c6f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-      <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
-    </svg>
-    <span id="commentCount">0</span>
+  <div class="actions" style="display:flex; gap:12px; align-items:center; margin-top:8px;">
+    <div class="icon-btn" id="likeBtn">
+      ❤️ <span id="likeCount">0</span>
+    </div>
+    <div class="icon-btn" id="commentBtn">
+      💬 <span id="commentCount">0</span>
+    </div>
   </div>
 </div>
-  </div>
-</div>
-
-  
-<!-- Modal Likes -->
-<div id="likesModal" class="modal">
-  <div class="modal-box" style="max-height:80vh; overflow-y:auto;">
-    <h2>Likes</h2>
-    <button id="chooseLikeBtn">Choisir individuellement</button>
-    <button id="clearLikesBtn">Tout effacer</button>
-    <div id="likesList"></div>
-  </div>
-</div>
-
 <!-- Modal Commentaires -->
 <div id="commentsModal" class="modal">
   <div class="modal-box" style="max-height:80vh; overflow-y:auto;">
@@ -325,6 +416,30 @@ body::before{
   </div>
 </div>
 
+<!-- Modal suppression individuelle -->
+<div id="deleteIndivModal" class="modal">
+  <div class="modal-box">
+    <p>Supprimer définitivement ce Like/Commentaire ?</p>
+    <button id="confirmDeleteIndiv">Oui</button>
+    <button id="cancelDeleteIndiv">Annuler</button>
+  </div>
+</div>
+
+<!-- Modal Supprimer Like -->
+<div id="deleteLikeModal" class="modal">
+  <div class="modal-box">
+    <h3>Supprimer Like</h3>
+    <button id="chooseLikesBtn">Choisir</button>
+  </div>
+</div>
+
+<!-- Modal Supprimer Commentaire -->
+<div id="deleteCommentModal" class="modal">
+  <div class="modal-box">
+    <h3>Supprimer Commentaire</h3>
+    <button id="chooseCommentsBtn">Choisir</button>
+  </div>
+</div>
 
 <!-- Modal Sélection Créations -->
 <div id="selectCreationModal" class="modal">
@@ -374,312 +489,450 @@ body::before{
     </div>
   </div>
 </div>
-  <script type="module">
+
+
+    <script type="module">
 import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
+
 const supabase = createClient(
   "https://jyhbamdcxmpveujjqjla.supabase.co",
   "sb_publishable_sqsxb-3Kl5o3-JQYv9kGFw_-g0EgwMa"
 );
 
-// ====== OWNER AVATAR ======
+// ====== VARIABLES GLOBALES ======
 const ownerPhoto = document.getElementById('ownerPhoto');
 const prenom = localStorage.getItem('prenom');
+const chatUserList = document.getElementById('chatUserList');
+const chatMessages = document.getElementById('chatMessages');
+const chatInput = document.getElementById('chatInput');
+const sendMsgBtn = document.getElementById('sendMsgBtn');
+const container = document.getElementById('visitor-list-container');
+const addModal = document.getElementById('addModal');
+const deleteModal = document.getElementById('deleteModal');
+const zoomModal = document.getElementById('zoomModal');
+const sidebar = document.getElementById('sidebar');
+const mainZoom = document.getElementById('mainZoom');
+const thumbs = document.getElementById('thumbs');
+const likeCount = document.getElementById('likeCount');
+const commentCount = document.getElementById('commentCount');
+const likeModal = document.getElementById('likeModal');
+const likeBubbles = document.getElementById('likeBubbles');
+const confirmLike = document.getElementById('confirmLike');
+const likeNameInput = document.getElementById('likeName');
+const commentModal = document.getElementById('commentModal');
+const confirmComment = document.getElementById('confirmComment');
+const commentBubbles = document.getElementById('commentBubbles');
+const commentNameInput = document.getElementById('commentName');
+const commentTextInput = document.getElementById('commentText');
+const chatModal = document.getElementById('chatModal');
+const toggleChatSize = document.getElementById('toggleChatSize');
+const icon = document.getElementById('chatResizeIcon');
+const fileBtn = document.getElementById('fileBtn');
+const fileInput = document.getElementById('multiPhoto');
+const fileInfo = document.getElementById('fileInfo');
+const mainZoomLeft = document.getElementById('mainZoomLeft');
+const mainZoomRight = document.getElementById('mainZoomRight');
+const legendBox = document.getElementById('legendBox');
+      
+fileBtn.onclick = () => fileInput.click();
 
-async function loadOwnerPhoto(){
-  if(!prenom) return;
-  const {data,error} = await supabase.from('profiles').select('photo_url').eq('prenom',prenom).single();
-  if(!error && data?.photo_url){ownerPhoto.src=data.photo_url;ownerPhoto.style.opacity='1';} 
-  else{ownerPhoto.style.opacity='0.3';}
+fileInput.onchange = () => {
+  fileInfo.textContent = fileInput.files.length
+    ? `${fileInput.files.length} photo(s) sélectionnée(s)`
+    : '';
+};
+
+    
+let creations = [];
+let currentZoom = null;
+let currentDelete = null;
+const myPrenom = localStorage.getItem('prenom');
+let currentChatUser = localStorage.getItem('currentChatUser') || null;
+let userPhotos = {};
+
+// ====== OWNER PHOTO ======
+async function loadOwnerPhoto() {
+  if (!prenom) return;
+  const { data, error } = await supabase.from('profiles').select('photo_url').eq('prenom', prenom).single();
+  if (!error && data?.photo_url) ownerPhoto.src = data.photo_url;
+  ownerPhoto.style.opacity = data?.photo_url ? '1' : '0.3';
 }
+
 document.addEventListener('DOMContentLoaded', loadOwnerPhoto);
 window.addEventListener('pageshow', loadOwnerPhoto);
 
-// ====== VARIABLES ======
-let creations=[];
-let currentZoom=null;
-let currentDelete=null;
+// ====== MESSAGERIE ======
+async function loadMessages() {
+  if (!currentChatUser) return;
 
-const container=document.getElementById('visitor-list-container');
-const addModal=document.getElementById('addModal');
-const deleteModal=document.getElementById('deleteModal');
-const zoomModal=document.getElementById('zoomModal');
-const sidebar=document.getElementById('sidebar');
-const mainZoom=document.getElementById('mainZoom');
-const thumbs=document.getElementById('thumbs');
-const likeCount=document.getElementById('likeCount');
-const commentCount=document.getElementById('commentCount');
-const likeModal=document.getElementById('likeModal');
-const likeBubbles=document.getElementById('likeBubbles');
-const confirmLike=document.getElementById('confirmLike');
-const likeNameInput=document.getElementById('likeName');
-const commentModal=document.getElementById('commentModal');
-const confirmComment=document.getElementById('confirmComment');
-const commentBubbles=document.getElementById('commentBubbles');
-const commentNameInput=document.getElementById('commentName');
-const commentTextInput=document.getElementById('commentText');
+  const { data, error } = await supabase
+    .from('messages')
+    .select('*')
+    .or(
+      `and(sender.eq.${myPrenom},receiver.eq.${currentChatUser}),
+       and(sender.eq.${currentChatUser},receiver.eq.${myPrenom})`
+    )
+    .order('created_at', { ascending: true });
 
-// ====== RENDER ======
-function render(){
-  container.innerHTML='';
-  let page=null;
-  creations.forEach((c,i)=>{
-    if(i%6===0){
-      page=document.createElement('div');
-      page.className='page';
-      container.appendChild(page);
+  if (error) return console.error(error);
+
+  chatMessages.innerHTML = '';
+
+  data.forEach(msg => {
+    const div = document.createElement('div');
+    div.className = 'msg ' + (msg.sender === myPrenom ? 'msg-me' : 'msg-them');
+
+    const circle = document.createElement('img');
+    circle.style.width = '24px';
+    circle.style.height = '24px';
+    circle.style.borderRadius = '50%';
+    circle.style.marginRight = '6px';
+    circle.style.verticalAlign = 'middle';
+    circle.src = msg.sender === myPrenom ? ownerPhoto.src || 'icon-152.png' : userPhotos[msg.sender] || 'icon-152.png';
+
+    const p = document.createElement('p');
+    p.style.display = 'inline-block';
+    p.style.margin = 0;
+    p.textContent = msg.content;
+
+    div.appendChild(circle);
+    div.appendChild(p);
+
+    chatMessages.appendChild(div);
+  });
+
+  chatMessages.scrollTop = chatMessages.scrollHeight;
+}
+
+// Envoi message
+sendMsgBtn.onclick = async () => {
+  const text = chatInput.value.trim();
+  if (!text || !currentChatUser) return;
+  await supabase.from('messages').insert({ sender: myPrenom, receiver: currentChatUser, content: text });
+  chatInput.value = '';
+  loadMessages();
+};
+
+// Temps réel messagerie
+supabase.channel('public:messages').on(
+  'postgres_changes',
+  { event: '*', schema: 'public', table: 'messages' },
+  payload => {
+    const msg = payload.new;
+    if (!msg) return;
+
+    if (msg.receiver === prenom) {
+      if (msg.sender !== currentChatUser) showInAppNotification(msg.sender, msg.content);
+      if (msg.sender === currentChatUser) loadMessages();
     }
-    const d=document.createElement('div');
-    d.className='visitor-item';
-    d.innerHTML = `
-      <div class="placeholder">?</div>
-      <p>${c.name}</p>
-      <img src="${c.imgUrl||''}">
+  }
+).subscribe();
+
+    
+// ====== LOAD USERS ======
+async function loadChatUsers() {
+  try {
+    const { data: users, error } = await supabase.from('profiles').select('prenom, photo_url').neq('prenom', myPrenom);
+    if (error) throw error;
+    chatUserList.innerHTML = '';
+    users.forEach(u => {
+      userPhotos[u.prenom] = u.photo_url || 'icon-152.png';
+      const div = document.createElement('div');
+      div.className = 'chat-user';
+      const img = document.createElement('img');
+      img.src = u.photo_url || 'icon-152.png';
+      img.alt = u.prenom;
+      const span = document.createElement('span');
+      span.textContent = u.prenom;
+      div.appendChild(img);
+      div.appendChild(span);
+      div.onclick = () => {
+        currentChatUser = u.prenom;
+        localStorage.setItem('currentChatUser', u.prenom);
+        loadMessages();
+        document.querySelectorAll('.chat-user').forEach(el => el.classList.remove('active'));
+        div.classList.add('active');
+      };
+      chatUserList.appendChild(div);
+    });
+
+    // Restore active user
+    if (currentChatUser) {
+      setTimeout(() => {
+        document.querySelectorAll('.chat-user').forEach(el => {
+          if (el.textContent.includes(currentChatUser)) el.classList.add('active');
+        });
+      }, 500);
+      loadMessages();
+    }
+
+  } catch (err) { console.error(err); }
+}
+
+// ====== NOTIFICATIONS ======
+function showInAppNotification(sender, message) {
+  if (document.hidden) {
+    if (Notification.permission === 'granted') {
+      new Notification(sender, { body: message, icon: userPhotos[sender] || 'icon-152.png' });
+    }
+  } else {
+    const notif = document.createElement('div');
+    notif.textContent = `${sender} : ${message}`;
+    notif.style.cssText = `
+      position:fixed;
+      bottom:20px;
+      right:20px;
+      background:#ffb6c1;
+      color:#fff;
+      padding:10px 14px;
+      border-radius:12px;
+      z-index:99999;
+      font-size:12px;
     `;
-    const img=d.querySelector('img');
-    img.onload = () => d.querySelector('.placeholder').style.display='none';
-    img.onerror = () => { img.remove(); d.querySelector('.placeholder').textContent=''; };
-    img.onclick = () => openZoom(c);
-    page.appendChild(d);
-  });
+    document.body.appendChild(notif);
+    setTimeout(() => notif.remove(), 3000);
+  }
 }
+if ('Notification' in window && Notification.permission !== 'granted') Notification.requestPermission();
 
-// ====== ZOOM ======
-function openZoom(c){
-  currentZoom = creations.find(x => x.id === c.id);
-  mainZoom.src = currentZoom.imgUrl;
-  thumbs.innerHTML = '';
-  (currentZoom.zoomGroup || []).forEach(u=>{
-    const t=document.createElement('img'); t.src=u;
-    t.onclick=()=>mainZoom.src=u;
-    thumbs.appendChild(t);
-  });
-  updateActions();
-  zoomModal.style.display='flex';
-}
-
-function updateActions(){
-  if(!currentZoom) return;
-  likeCount.textContent = (currentZoom.likes || []).length;
-  commentCount.textContent = (currentZoom.comments || []).length;
-}
-
-// ====== LIKE MODAL ======
-document.getElementById('likeBtn').onclick=()=>{
-  if(!currentZoom){alert("Sélectionnez d'abord une image !"); return;}
-  likeNameInput.value = localStorage.getItem('prenom')||'';
-  renderLikeList();
-  likeModal.style.display='flex';
-};
-
-confirmLike.onclick=async()=>{
-  if(!currentZoom) return;
-  const name = likeNameInput.value.trim();
-  if(!name) return;
-  currentZoom.likes = currentZoom.likes||[];
-  if(currentZoom.likes.some(l=>l.name===name)){likeModal.style.display='none'; return;}
-  currentZoom.likes.push({name, photo: ownerPhoto.src||''});
-  await supabase.from('creations').update({likes:currentZoom.likes}).eq('id',currentZoom.id);
-  renderLikeList();
-  likeCount.textContent = currentZoom.likes.length;
-  likeModal.style.display='none';
-};
-
-// ====== COMMENT MODAL ======
-document.getElementById('commentBtn').onclick=()=>{
-  if(!currentZoom) return;
-  commentNameInput.value = localStorage.getItem('prenom')||'';
-  commentTextInput.value = '';
-  renderCommentList();
-  commentModal.style.display='flex';
-};
-
-confirmComment.onclick=async()=>{
-  if(!currentZoom) return;
-  const name = commentNameInput.value.trim();
-  const text = commentTextInput.value.trim();
-  if(!name||!text) return;
-  currentZoom.comments = currentZoom.comments||[];
-  currentZoom.comments.push({name, text, photo: ownerPhoto.src||''});
-  await supabase.from('creations').update({comments:currentZoom.comments}).eq('id',currentZoom.id);
-  renderCommentList();
-  commentTextInput.value='';
-  commentCount.textContent = currentZoom.comments.length;
-};
-
-// ====== RENDER LISTS ======
-function renderLikeList(){
-  if(!currentZoom) return;
-  likeBubbles.innerHTML='';
-  (currentZoom.likes||[]).forEach(l=>{
-    const div=document.createElement('div');
-    div.className='like-item';
-    div.innerHTML=`${l.photo?`<img src="${l.photo}" style="width:20px;height:20px;border-radius:50%;margin-right:4px;vertical-align:middle;">`:''}<strong>${l.name}</strong>`;
-    likeBubbles.appendChild(div);
-  });
-  likeCount.textContent = (currentZoom.likes||[]).length;
-}
-
-function renderCommentList(){
-  if(!currentZoom) return;
-  commentBubbles.innerHTML='';
-  (currentZoom.comments||[]).forEach(c=>{
-    const div=document.createElement('div');
-    div.className='comment-item';
-    div.innerHTML=`${c.photo?`<img src="${c.photo}" style="width:20px;height:20px;border-radius:50%;margin-right:4px;vertical-align:middle;">`:''}<strong>${c.name}</strong>: ${c.text}`;
-    commentBubbles.appendChild(div);
-  });
-  commentCount.textContent = (currentZoom.comments||[]).length;
-}
-
-
-// ====== MODAL CLICS ======
-[zoomModal, likeModal, commentModal, deleteModal].forEach(m=>{
-  m.onclick=e=>{if(e.target===m)m.style.display='none';}
-});
-document.querySelector('.closeZoom').onclick=()=>zoomModal.style.display='none';
-
-// ====== REFRESH CREATIONS (version tolérante pour likes) ======
+// ====== CREATIONS ======
 async function refreshCreations() {
   try {
-    const { data, error } = await supabase
-      .from('creations')
-      .select('*')
-      .order('created_at', { ascending: false });
-
-    if (error) {
-      console.error(error);
-      return;
-    }
+    const { data, error } = await supabase.from('creations').select('*').order('created_at', { ascending: false });
+    if (error) return console.error(error);
 
     creations = data.map(c => {
       let zoomGroup = [];
       if (c.images?.length) {
-        zoomGroup = c.images.map(p => {
-          const { data } = supabase.storage.from('images').getPublicUrl(p);
-          return data?.publicUrl || '';
-        });
+        zoomGroup = c.images.map(p => supabase.storage.from('images').getPublicUrl(p).data?.publicUrl || '');
       } else if (c.image_path) {
-        const { data } = supabase.storage.from('images').getPublicUrl(c.image_path);
-        zoomGroup = [data?.publicUrl || ''];
+        zoomGroup = [supabase.storage.from('images').getPublicUrl(c.image_path).data?.publicUrl || ''];
       }
 
-      // ✅ Likes et commentaires sécurisés
-      let likesArray = [];
-      if (Array.isArray(c.likes)) {
-        likesArray = c.likes;
-      } else if (typeof c.likes === 'string') {
-        try {
-          likesArray = JSON.parse(c.likes);
-          if (!Array.isArray(likesArray)) likesArray = [];
-        } catch (e) {
-          likesArray = [];
-        }
-      }
-
-      let commentsArray = [];
-      if (Array.isArray(c.comments)) {
-        commentsArray = c.comments;
-      } else if (typeof c.comments === 'string') {
-        try {
-          commentsArray = JSON.parse(c.comments);
-          if (!Array.isArray(commentsArray)) commentsArray = [];
-        } catch (e) {
-          commentsArray = [];
-        }
-      }
+      const likesArray = Array.isArray(c.likes) ? c.likes : JSON.parseSafe(c.likes) || [];
+      const commentsArray = Array.isArray(c.comments) ? c.comments : JSON.parseSafe(c.comments) || [];
 
       return {
         id: c.id,
         name: c.name,
         imgUrl: zoomGroup[0] || '',
         zoomGroup,
-        likes: likesArray.map(like => ({
-          name: like.name || '',
-          photo: like.photo || ''
-        })),
-        comments: commentsArray.map(cmt => ({
-          name: cmt.name || '',
-          text: cmt.text || '',
-          photo: cmt.photo || ''
-        }))
+        likes: likesArray.map(l => ({ name: l.name || '', photo: l.photo || '' })),
+        comments: commentsArray.map(cmt => ({ name: cmt.name || '', text: cmt.text || '', photo: cmt.photo || '' }))
       };
     });
 
-    render();
-  } catch (err) {
-    console.error('Erreur refreshCreations:', err);
-  }
+    renderCreations();
+  } catch (err) { console.error('refreshCreations', err); }
 }
 
-    const chatModal = document.getElementById('chatModal');
-const toggleChatSize = document.getElementById('toggleChatSize');
+// Helper pour JSON safe
+JSON.parseSafe = str => { try { return JSON.parse(str); } catch(e) { return []; } };
 
-// Ouvrir la modal
-document.getElementById('messagerieBtn').onclick = () => {
-  chatModal.style.display = 'flex';
+// ====== RENDER CREATIONS ======
+function renderCreations() {
+  container.innerHTML = '';
+  let page = null;
+  creations.forEach((c, i) => {
+    if (i % 6 === 0) { page = document.createElement('div'); page.className = 'page'; container.appendChild(page); }
+    const d = document.createElement('div'); d.className = 'visitor-item';
+    d.innerHTML = `<div class="placeholder">?</div><div class="delete-btn">×</div><p>${c.name}</p><img src="${c.imgUrl||''}">`;
+    const img = d.querySelector('img');
+    img.onload = () => d.querySelector('.placeholder').style.display='none';
+    img.onerror = () => { img.remove(); d.querySelector('.placeholder').textContent=''; };
+    img.onclick = () => {
+  console.log("CLICK IMAGE", c.id);
+  openZoom(c);
+};
+    d.querySelector('.delete-btn').onclick = () => openDeleteModal(c);
+    page.appendChild(d);
+  });
+}
+
+// ====== ZOOM ======
+function openZoom(c) {
+  currentZoom = creations.find(x => x.id === c.id);
+
+  // image à gauche
+  mainZoomLeft.src = currentZoom.imgUrl;
+
+  // légende à droite
+  legendBox.textContent = currentZoom.legend || "Aucune légende";
+
+  thumbs.innerHTML = '';
+
+  (currentZoom.zoomGroup || []).forEach(u => {
+    const t = document.createElement('img');
+    t.src = u;
+
+    t.onclick = () => {
+      mainZoomLeft.src = u;
+    };
+
+    thumbs.appendChild(t);
+  });
+
+  updateActions();
+  zoomModal.style.display = 'flex';
+}
+
+// ====== LIKE / COMMENT MODAL ======
+document.getElementById('likeBtn').onclick = () => {
+  if (!currentZoom) { alert("Sélectionnez d'abord une image !"); return; }
+  likeNameInput.value = myPrenom || '';
+  renderLikeList();
+  likeModal.style.display = 'flex';
+};
+confirmLike.onclick = async () => {
+  if (!currentZoom) return;
+  const name = likeNameInput.value.trim();
+  if (!name) return;
+  currentZoom.likes = currentZoom.likes || [];
+  if (!currentZoom.likes.some(l => l.name === name)) currentZoom.likes.push({ name, photo: ownerPhoto.src || '' });
+  await supabase.from('creations').update({ likes: currentZoom.likes }).eq('id', currentZoom.id);
+  renderLikeList();
+  likeModal.style.display = 'none';
 };
 
-// Fermer si clic hors fenêtre
-chatModal.addEventListener('click', e => {
-  if (e.target === chatModal) chatModal.style.display = 'none';
-});
-
-// Bouton agrandir / réduire
-toggleChatSize.onclick = () => {
-  chatModal.classList.toggle('fullscreen');
+document.getElementById('commentBtn').onclick = () => {
+  if (!currentZoom) return;
+  commentNameInput.value = myPrenom || '';
+  commentTextInput.value = '';
+  renderCommentList();
+  commentModal.style.display = 'flex';
+};
+confirmComment.onclick = async () => {
+  if (!currentZoom) return;
+  const name = commentNameInput.value.trim();
+  const text = commentTextInput.value.trim();
+  if (!name || !text) return;
+  currentZoom.comments = currentZoom.comments || [];
+  currentZoom.comments.push({ name, text, photo: ownerPhoto.src || '' });
+  await supabase.from('creations').update({ comments: currentZoom.comments }).eq('id', currentZoom.id);
+  renderCommentList();
+  commentTextInput.value = '';
+  commentCount.textContent = currentZoom.comments.length;
 };
 
-// PINCH 2 doigts
-let initialDistance = null;
-chatModal.addEventListener('touchstart', e => {
-  if (e.touches.length === 2) {
-    initialDistance = Math.hypot(
-      e.touches[0].clientX - e.touches[1].clientX,
-      e.touches[0].clientY - e.touches[1].clientY
-    );
+function renderLikeList() {
+  if (!currentZoom) return;
+  likeBubbles.innerHTML = '';
+  (currentZoom.likes || []).forEach(l => {
+    const div = document.createElement('div');
+    div.className = 'like-item';
+    div.innerHTML = `${l.photo ? `<img src="${l.photo}" style="width:20px;height:20px;border-radius:50%;margin-right:4px;vertical-align:middle;">` : ''}<strong>${l.name}</strong>`;
+    likeBubbles.appendChild(div);
+  });
+  likeCount.textContent = (currentZoom.likes || []).length;
+}
+
+function renderCommentList() {
+  if (!currentZoom) return;
+  commentBubbles.innerHTML = '';
+  (currentZoom.comments || []).forEach(c => {
+    const div = document.createElement('div');
+    div.className = 'comment-item';
+    div.innerHTML = `${c.photo ? `<img src="${c.photo}" style="width:20px;height:20px;border-radius:50%;margin-right:4px;vertical-align:middle;">` : ''}<strong>${c.name}</strong>: ${c.text}`;
+    commentBubbles.appendChild(div);
+  });
+  commentCount.textContent = (currentZoom.comments || []).length;
+}
+
+// ====== ADD CREATION ======
+document.getElementById('addBtn').onclick = () => addModal.style.display = 'flex';
+addModal.addEventListener('click', e => { if (e.target === addModal) addModal.style.display = 'none'; });
+document.getElementById('confirmAdd').onclick = async e => {
+  e.stopPropagation();
+  const name = document.getElementById('photoName').value.trim();
+const legend = document.getElementById('photoLegend').value.trim();
+const files = document.getElementById('multiPhoto').files;
+  if (!name || !files.length) { alert("Mettre un nom et choisir au moins une photo"); return; }
+  const paths = [], urls = [];
+  for (let file of files) {
+    const path = `${Date.now()}_${file.name}`;
+    const { error: uploadError } = await supabase.storage.from('images').upload(path, file);
+    if (uploadError) { console.error(uploadError); continue; }
+    const { data: pubData } = supabase.storage.from('images').getPublicUrl(path);
+    if (!pubData?.publicUrl) continue;
+    urls.push(pubData.publicUrl); paths.push(path);
+  }
+  if (!urls.length) return;
+  await supabase.from('creations').insert([{
+  name,
+  legend,
+  image_path: paths[0],
+  images: paths,
+  likes: [],
+  comments: []
+}]);
+  addModal.style.display = 'none';
+  document.getElementById('photoName').value = '';
+  document.getElementById('multiPhoto').value = '';
+  document.getElementById('photoLegend').value = '';
+  await refreshCreations();
+};
+
+// ====== DELETE CREATION ======
+function openDeleteModal(c) { currentDelete = c; deleteModal.style.display = 'flex'; }
+document.getElementById('cancelDelete').onclick = () => { currentDelete = null; deleteModal.style.display = 'none'; };
+document.getElementById('confirmDelete').onclick = async () => {
+  if (!currentDelete?.id) return;
+  await supabase.from('creations').delete().eq('id', currentDelete.id);
+  currentDelete = null;
+  deleteModal.style.display = 'none';
+  await refreshCreations();
+};
+
+// ====== SIDEBAR ======
+document.getElementById('pelotesBtn').onclick = () => { document.body.style.opacity='0'; setTimeout(()=>window.location.href='pelotes.html',500); };
+document.getElementById('videoBtn').onclick = () => { document.body.style.opacity='0'; setTimeout(()=>window.location.href='video.html',500); };
+document.getElementById('notesBtn').onclick = () => { document.body.style.opacity='0'; setTimeout(()=>window.location.href='notes.html',500); };
+document.getElementById('messagerieBtn').onclick = () => { chatModal.style.display='flex'; };
+document.getElementById('toggleSidebar').onclick = () => sidebar.classList.toggle('sidebar-open');
+// ====== FERMETURE MESSAGERIE AU CLIC DANS LE VIDE ======
+chatModal.addEventListener('click', (e) => {
+  // si on clique sur le fond (overlay)
+  if (e.target === chatModal) {
+    chatModal.style.display = 'none';
   }
 });
 
-chatModal.addEventListener('touchmove', e => {
-  if (e.touches.length === 2 && initialDistance) {
-    const currentDistance = Math.hypot(
-      e.touches[0].clientX - e.touches[1].clientX,
-      e.touches[0].clientY - e.touches[1].clientY
-    );
-    if (currentDistance - initialDistance > 40) {
-  chatModal.classList.add('expanded');
-}
-if (initialDistance - currentDistance > 40) {
-  chatModal.classList.remove('expanded');
-}
-  }
+// empêcher la fermeture quand on clique dans la fenêtre
+document.querySelector('.chat-window').addEventListener('click', (e) => {
+  e.stopPropagation();
 });
-
-chatModal.addEventListener('touchend', () => {
-  initialDistance = null;
+// ====== MODALS ======
+[zoomModal, likeModal, commentModal, deleteModal, addModal].forEach(m => {
+  m.onclick = e => { if (e.target === m) m.style.display = 'none'; }
 });
-    // ====== MESSAGERIE : AGRANDIR / RÉDUIRE ======
-const icon = document.getElementById('chatResizeIcon');
+document.querySelector('.closeZoom').onclick = () => zoomModal.style.display = 'none';
 
+// ====== CHAT MODAL ======
 toggleChatSize.onclick = () => {
-  // bascule expanded
   chatModal.classList.toggle('expanded');
-
-  // change l'icône selon l'état
   icon.innerHTML = chatModal.classList.contains('expanded')
     ? '<path d="M9 4H4v5M15 20h5v-5M20 9V4h-5M4 15v5h5"/>'
     : '<path d="M4 9V4h5M20 15v5h-5M15 4h5v5M9 20H4v-5"/>';
 };
-// ====== INITIAL ======
+
+// Pinch zoom deux doigts
+let initialDistance = null;
+chatModal.addEventListener('touchstart', e => { if(e.touches.length===2) initialDistance=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY); });
+chatModal.addEventListener('touchmove', e => {
+  if (e.touches.length===2 && initialDistance) {
+    const currentDistance=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);
+    if(currentDistance-initialDistance>40) chatModal.classList.add('expanded');
+    if(initialDistance-currentDistance>40) chatModal.classList.remove('expanded');
+  }
+});
+chatModal.addEventListener('touchend',()=>{initialDistance=null;});
+
+// ====== INITIAL LOAD ======
 refreshCreations();
+loadOwnerPhoto();
+loadChatUsers();
 </script>
 
 
 </body>
 </html>
-
-
-
-
-
-
