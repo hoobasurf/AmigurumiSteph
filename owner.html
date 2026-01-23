@@ -632,40 +632,28 @@ async function refreshCreations() {
 
 // ====== RENDER ======
 function renderCreations(list) {
-  const container = document.getElementById('visitor-list-container');
-  container.innerHTML = '';
+  const page = document.getElementById('page');
+  page.innerHTML = '';
 
-  const perPage = 6;
+  list.forEach(c => {
+    const d = document.createElement('div');
+    d.className = 'creation';
 
-  for (let i = 0; i < list.length; i += perPage) {
-    const page = document.createElement('div');
-    page.className = 'page';
+    // CLICK SUR LA CARD
+    d.onclick = () => openZoom(c);
 
-    list.slice(i, i + perPage).forEach(c => {
-      if (!c.imgUrl) return; // sécurité
+    const img = document.createElement('img');
+    img.src = c.imgUrl || '';
+    d.appendChild(img);
 
-      const d = document.createElement('div');
-      d.className = 'creation';
-      d.onclick = () => openZoom(c);
+    if (c.legend) {
+      const p = document.createElement('p');
+      p.textContent = c.legend;
+      d.appendChild(p);
+    }
 
-      const img = document.createElement('img');
-      img.src = c.imgUrl;
-      img.style.width = '100%';
-      img.style.height = '100%';
-      img.style.objectFit = 'cover';
-      d.appendChild(img);
-
-      if (c.legend) {
-        const p = document.createElement('p');
-        p.textContent = c.legend;
-        d.appendChild(p);
-      }
-
-      page.appendChild(d);
-    });
-
-    container.appendChild(page);
-  }
+    page.appendChild(d);
+  });
 }
 // ====== ZOOM ======
 function openZoom(c) {
