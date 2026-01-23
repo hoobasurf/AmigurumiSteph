@@ -272,6 +272,16 @@ body::before{
   overflow-y:auto;
   box-shadow: inset 0 0 0 1px rgba(255,255,255,0.5);
 }
+
+#visitor-list-container{
+  pointer-events:none;
+}
+
+.visitor-item,
+.visitor-item img,
+.visitor-item *{
+  pointer-events:auto;
+}
   
 </style>
 </head>
@@ -340,7 +350,6 @@ body::before{
 </div>
 
 <!-- ====== COMMENT MODAL ====== -->
-<div id="commentModal" class="modal">
   <div class="modal-box comment-box">
     <div class="expand-btn" id="expandComment">⤢</div>
     <h3>Commentaire 💬</h3>
