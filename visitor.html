@@ -11,83 +11,327 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 
-<style>
-* { box-sizing:border-box;margin:0;padding:0;font-family:'Comic Sans MS',cursive; }
-html,body{height:100%;overflow-x:hidden;}
-body::before{
-  content:"";position:fixed;top:0;left:0;width:100vw;height:100vh;
-  background-image:url('Photoroom_20251223_114401.jpeg');
-  background-size:cover;background-position:center center;background-repeat:no-repeat;z-index:-1;
+  <style>
+/* =================== GLOBAL =================== */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+  font-family: 'Comic Sans MS', cursive;
 }
+html, body {
+  height: 100%;
+  overflow-x: hidden;
+}
+body::before {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background-image: url('Photoroom_20251223_114401.jpeg');
+  background-size: cover;
+  background-position: center center;
+  background-repeat: no-repeat;
+  z-index: -1;
+}
+
+/* =================== ZONE CENTRALE =================== */
 .center-zone{display:flex;justify-content:center;align-items:flex-start;padding-top:3.5cm;overflow:hidden;height:auto;}
 #visitor-list-container{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;-webkit-overflow-scrolling: touch;justify-content:center;padding-left:1cm;}
 .page{display:grid;grid-template-columns:repeat(2,1fr);grid-template-rows:repeat(3,1fr);column-gap:3mm;row-gap:4mm;flex:0 0 auto;width:calc(2*200px+3mm);height:calc(3*200px+8mm);scroll-snap-align:center;padding:4mm;justify-content:center;margin-top:0;}
-.visitor-item{position:relative;width:200px;height:200px;border-radius:12px;overflow:hidden;border:3px solid #fff;box-shadow:0 0 0 3px #f6c2d1,0 6px 14px rgba(0,0,0,0.25),inset 0 0 0 1px rgba(255,255,255,0.4);background:#ffe6f0;}
-.visitor-item .placeholder{position:absolute;inset:0;display:flex;justify-content:center;align-items:center;font-size:24px;color:#b84c6f;font-weight:bold;}
-.visitor-item img{width:100%;height:100%;object-fit:cover;border-radius:12px;cursor:pointer;display:block;filter:brightness(1.05) contrast(1.05) saturate(0.95);transition:filter 0.3s, transform 0.3s;position:relative;z-index:2;}
-.visitor-item img:hover{transform:scale(1.03);}
-.visitor-item::after{content:"";position:absolute;inset:0;background:rgba(255,230,240,0.12);pointer-events:none;z-index:1;}
-.visitor-item p{position:absolute;bottom:2px;width:100%;font-size:14px;color:#b84c6f;font-weight:bold;text-align:center;text-shadow:1px 1px 2px rgba(255,255,255,0.8);z-index:3;}
-.delete-btn{position:absolute;top:2px;right:2px;width:20px;height:20px;background:#ffb6c1;color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:bold;cursor:pointer;z-index:5;font-size:14px;transition: background 0.2s;}
-.delete-btn:hover{background:#e94f9a;}
 
-#sidebar{position:fixed;top:0;left:-220px;width:220px;height:100vh;background:rgba(255,230,240,0.2);border-right:2px solid #b67385;padding:20px;transition:left .3s;z-index:10;}
-#sidebar.sidebar-open{left:0;}
-#toggleSidebar{position:absolute;top:50%;right:-30px;width:30px;height:60px;background:#ffb6c1;border-radius:0 12px 12px 0;display:flex;align-items:center;justify-content:center;cursor:pointer;font-weight:bold;}
-#sidebar button{width:auto;padding:8px 16px;border-radius:16px;border:none;background:#ffb6c1;color:#fff;cursor:pointer;font-weight:bold;display:block;margin-top:10px;}
-
-.modal{position:fixed;inset:0;background:rgba(0,0,0,0.6);display:none;justify-content:center;align-items:center;z-index:10001;}
-.modal .modal-box{background:#ffe6f0;padding:16px 24px;border-radius:20px;border:3px solid #b67385;display:flex;flex-direction:column;gap:10px;align-items:center;min-width:200px;font-family:'Comic Sans MS',cursive;}
-.modal input{padding:6px 12px;border-radius:10px;border:2px solid #b67385;width:100%;}
-.modal button{padding:6px 14px;border:none;background:#ffb6c1;color:#fff;border-radius:12px;cursor:pointer;font-weight:bold;width:100%;}
-
-#zoomModal{position:fixed;inset:0;background:rgba(0,0,0,0.7);display:none;justify-content:center;align-items:center;flex-direction:column;z-index:10000;}
-#zoomModal img{max-width:80%;max-height:60vh;border:4px solid #b67385;border-radius:24px;margin-bottom:10px;filter:none;}
-#zoomModal .thumbs{display:flex;gap:8px;max-width:80%;overflow-x:auto;}
-#zoomModal .thumbs img{width:50px;height:50px;object-fit:cover;border-radius:12px;border:2px solid #b67385;cursor:pointer;}
-.closeZoom{position:absolute;top:12px;right:12px;width:28px;height:28px;background:#ffb6c1;color:#fff;border-radius:50%;display:flex;justify-content:center;align-items:center;cursor:pointer;}
-
-#ownerPhoto{width:32px;height:32px;border-radius:50%;position:fixed;top:10px;right:10px;z-index:10000;background:#ffe6f0;border:2px solid #b84c6f;}
-@media(max-width:480px){.page{grid-template-columns:repeat(2,120px);grid-template-rows:repeat(3,120px);}.visitor-item{width:120px;height:120px;}.modal .modal-box{min-width:180px;}}
-
-.icon-btn svg {
+/* =================== CARTE CREATION =================== */
+.creation {
+  position: relative;
+  width: 120px;
+  height: 120px;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 3px solid #fff;
+  background: #ffe6f0;
+  box-shadow:
+    0 0 0 3px #f6c2d1,
+    0 6px 14px rgba(0,0,0,0.25),
+    inset 0 0 0 1px rgba(255,255,255,0.4);
   cursor: pointer;
-  transition: transform 0.2s;
 }
-.icon-btn:hover svg {
-  transform: scale(1.2);
+.creation img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 12px;
+  transition: transform 0.3s;
+  position: relative;
+  z-index: 2;
 }
-.icon-btn span {
+.creation img:hover {
+  transform: scale(1.03);
+}
+.creation::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(255,230,240,0.12);
+  pointer-events: none;
+  z-index: 1;
+}
+.creation p {
+  position: absolute;
+  bottom: 2px;
+  width: 100%;
+  text-align: center;
+  font-size: 14px;
   font-weight: bold;
   color: #b84c6f;
-  font-size: 14px;
+  z-index: 3;
+  -webkit-text-stroke: 0.6px #000;
+  text-shadow: 1px 1px 0 #000, -1px 1px 0 #000, 1px -1px 0 #000, -1px -1px 0 #000;
 }
 
-  /* Bouton toujours visible */
-.chat-icon-btn {
-  background: transparent;
-  border: none;
+/* =================== RESPONSIVE MOBILE =================== */
+@media(max-width:480px) {
+  .page {
+    grid-template-columns: repeat(2, 100px);
+    grid-template-rows: repeat(3, 100px);
+    width: calc(2*100px + 4mm);
+    height: calc(3*100px + 8mm);
+  }
+  .creation {
+    width: 100px;
+    height: 100px;
+  }
+}
+
+/* =================== VISITOR ITEM (si tu l’utilises encore) =================== */
+.visitor-item {
+  position: relative;
+  width: 120px;
+  height: 120px;
+  border-radius: 12px;
+  overflow: hidden;
+  border: 3px solid #fff;
+  box-shadow:
+    0 0 0 3px #f6c2d1,
+    0 6px 14px rgba(0,0,0,0.25),
+    inset 0 0 0 1px rgba(255,255,255,0.4);
+  background: #ffe6f0;
+}
+.visitor-item .placeholder {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 24px;
+  color: #b84c6f;
+  font-weight: bold;
+}
+.visitor-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 12px;
   cursor: pointer;
-  padding: 4px;
+  display: block;
+  filter: brightness(1.05) contrast(1.05) saturate(0.95);
+  transition: filter 0.3s, transform 0.3s;
+  position: relative;
+  z-index: 2;
+}
+.visitor-item img:hover { transform: scale(1.03); }
+.visitor-item::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: rgba(255,230,240,0.12);
+  pointer-events: none;
+  z-index: 1;
+}
+.visitor-item p {
+  position: absolute;
+  bottom: 2px;
+  width: 100%;
+  font-size: 14px;
+  color: #b84c6f;
+  font-weight: bold;
+  text-align: center;
+  text-shadow: 1px 1px 2px rgba(255,255,255,0.8);
+  z-index: 3;
+}
+.delete-btn {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  width: 20px;
+  height: 20px;
+  background: #ffb6c1;
+  color: #fff;
+  border-radius: 50%;
   display: flex;
   align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  cursor: pointer;
+  z-index: 5;
+  font-size: 14px;
+  transition: background 0.2s;
+}
+.delete-btn:hover { background: #e94f9a; }
+
+/* =================== SIDEBAR =================== */
+#sidebar {
+  position: fixed;
+  top: 0;
+  left: -220px;
+  width: 220px;
+  height: 100vh;
+  background: rgba(255,230,240,0.2);
+  border-right: 2px solid #b67385;
+  padding: 20px;
+  transition: left .3s;
+  z-index: 10;
+}
+#sidebar.sidebar-open { left: 0; }
+#toggleSidebar {
+  position: absolute;
+  top: 50%;
+  right: -30px;
+  width: 30px;
+  height: 60px;
+  background: #ffb6c1;
+  border-radius: 0 12px 12px 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-weight: bold;
+}
+#sidebar button {
+  width: auto;
+  padding: 8px 16px;
+  border-radius: 16px;
+  border: none;
+  background: #ffb6c1;
+  color: #fff;
+  cursor: pointer;
+  font-weight: bold;
+  display: block;
+  margin-top: 10px;
 }
 
+/* =================== MODAL =================== */
+.modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.6);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  z-index: 10001;
+}
+.modal .modal-box {
+  background: #ffe6f0;
+  padding: 16px 24px;
+  border-radius: 20px;
+  border: 3px solid #b67385;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  align-items: center;
+  min-width: 200px;
+}
+.modal input {
+  padding: 6px 12px;
+  border-radius: 10px;
+  border: 2px solid #b67385;
+  width: 100%;
+}
+.modal button {
+  padding: 6px 14px;
+  border: none;
+  background: #ffb6c1;
+  color: #fff;
+  border-radius: 12px;
+  cursor: pointer;
+  font-weight: bold;
+  width: 100%;
+}
 
-/* ====== SURCOUCHE ====== */
+/* =================== ZOOM MODAL =================== */
+#zoomModal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.7);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  z-index: 10000;
+}
+#zoomModal img {
+  max-width: 80%;
+  max-height: 60vh;
+  border: 4px solid #b67385;
+  border-radius: 24px;
+  margin-bottom: 10px;
+  filter: none;
+}
+#zoomModal .thumbs {
+  display: flex;
+  gap: 8px;
+  max-width: 80%;
+  overflow-x: auto;
+}
+#zoomModal .thumbs img {
+  width: 50px;
+  height: 50px;
+  object-fit: cover;
+  border-radius: 12px;
+  border: 2px solid #b67385;
+  cursor: pointer;
+}
+.closeZoom {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 28px;
+  height: 28px;
+  background: #ffb6c1;
+  color: #fff;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+}
+
+/* =================== OWNER PHOTO =================== */
+#ownerPhoto {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  position: fixed;
+  top: 10px;
+  right: 10px;
+  z-index: 10000;
+  background: #ffe6f0;
+  border: 2px solid #b84c6f;
+}
+
+/* =================== CHAT =================== */
 .chat-overlay {
   position: fixed;
   inset: 0;
   background: rgba(0,0,0,0.4);
-  display: none; /* caché par défaut */
+  display: none;
   justify-content: center;
   align-items: center;
   z-index: 20000;
 }
-
-/* ====== FENÊTRE CHAT ====== */
 .chat-window {
-  width: 360px;  /* Petite modal */
+  width: 360px;
   height: 230px;
   background: #ffe6f0;
   border-radius: 20px;
@@ -99,8 +343,6 @@ body::before{
   position: relative;
   transition: width 0.3s, height 0.3s;
 }
-
-/* ====== HEADER ====== */
 .chat-header {
   height: 40px;
   background: linear-gradient(#ffd6e6, #ffb6c1);
@@ -116,22 +358,17 @@ body::before{
   z-index: 10;
   font-size: 14px;
 }
-
-/* ====== BODY ====== */
 .chat-body {
   flex: 1;
   display: flex;
   min-height: 0;
 }
-
-/* ====== CONTACTS ====== */
 .chat-sidebar {
-  width: 120px;  /* réduit pour petite modal */
+  width: 120px;
   background: #fff5fa;
   border-right: 2px solid #f3b3c8;
   overflow-y: auto;
 }
-
 .chat-user {
   display: flex;
   align-items: center;
@@ -141,24 +378,19 @@ body::before{
   transition: background 0.2s;
   font-size: 12px;
 }
-.chat-user.active {
-  background: #ffd6e6;
-}
+.chat-user.active { background: #ffd6e6; }
 .chat-user img {
   border-radius: 50%;
   width: 28px;
   height: 28px;
   object-fit: cover;
 }
-
-/* ====== CONVERSATION ====== */
 .chat-content {
   flex: 1;
   display: flex;
   flex-direction: column;
   min-height: 0;
 }
-
 .chat-messages {
   flex: 1;
   padding: 6px;
@@ -166,24 +398,14 @@ body::before{
   background: #fffafa;
   font-size: 12px;
 }
-
 .msg {
   max-width: 70%;
   padding: 4px 8px;
   margin-bottom: 4px;
   border-radius: 12px;
 }
-
-.msg-me {
-  background: #ffb6c1;
-  align-self: flex-end;
-}
-.msg-them {
-  background: #ffffff;
-  border: 1px solid #f3b3c8;
-}
-
-/* ====== INPUT ====== */
+.msg-me { background: #ffb6c1; align-self: flex-end; }
+.msg-them { background: #ffffff; border: 1px solid #f3b3c8; }
 .chat-input {
   display: flex;
   padding: 4px;
@@ -196,9 +418,7 @@ body::before{
   padding: 4px 6px;
   font-size: 12px;
 }
-
-/* ====== BOUTON ICON ====== */
-.chat-icon-btn {
+.icon-btn {
   background: transparent;
   border: none;
   cursor: pointer;
@@ -206,43 +426,27 @@ body::before{
   display: flex;
   align-items: center;
 }
-
-/* ====== MODE AGRANDI ====== */
+.icon-btn svg { cursor: pointer; transition: transform 0.2s; }
+.icon-btn:hover svg { transform: scale(1.2); }
+.icon-btn span {
+  font-weight: bold;
+  color: #b84c6f;
+  font-size: 14px;
+}
 .expanded .chat-window {
-  width: 720px;  /* double taille de la petite modal */
+  width: 720px;
   height: 460px;
   border-radius: 24px;
 }
-
-.pink-file-btn{
-  background: linear-gradient(#ffd6e6, #ffb6c1);
-  border: 2px solid #b67385;
-  border-radius: 16px;
-  padding: 8px 14px;
-  color: #b84c6f;
-  font-weight: bold;
-  cursor: pointer;
-  width: 100%;
-  transition: transform 0.15s, box-shadow 0.15s;
-}
-
-.pink-file-btn:hover{
-  transform: scale(1.03);
-  box-shadow: 0 4px 10px rgba(0,0,0,0.15);
-}
-  
-</style>
+    </style>
 </head>
 <body>
 
 <img id="ownerPhoto" alt="Owner">
 
 <div class="center-zone">
-  <div id="visitor-list-container"></div>
+  <div id="page"></div>
 </div>
-
-<!-- CONTENEUR POUR LES CREATIONS (AJOUTÉ) -->
-<div id="creationsContainer" style="display:flex; flex-wrap:wrap; gap:12px; justify-content:center; margin-top:20px;"></div>
 
 <div id="sidebar">
   <div id="toggleSidebar">☰</div>
@@ -256,6 +460,7 @@ body::before{
     <circle cx="12" cy="12" r="3"/>
     <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l0 0a2 2 0 1 1-2.83 2.83l0 0a1.65 1.65 0 0 0-1.82.33l0 0a1.65 1.65 0 0 0-.5 1.51l0 0a2 2 0 1 1-3.18 0l0 0a1.65 1.65 0 0 0-1.51-.5l0 0a1.65 1.65 0 0 0-.33-1.82l0 0a2 2 0 1 1 0-2.83l0 0a1.65 1.65 0 0 0 .33-1.82l0 0a1.65 1.65 0 0 0-1.51-.5l0 0a2 2 0 1 1 0-3.18l0 0a1.65 1.65 0 0 0 .5-1.51l0 0a1.65 1.65 0 0 0 1.82-.33l0 0a2 2 0 1 1 2.83 0l0 0a1.65 1.65 0 0 0 1.82.33l0 0a1.65 1.65 0 0 0 .5 1.51l0 0a2 2 0 1 1 3.18 0l0 0a1.65 1.65 0 0 0 1.51.5l0 0a1.65 1.65 0 0 0 .33 1.82l0 0a2 2 0 1 1 0 2.83l0 0a1.65 1.65 0 0 0-.33 1.82l0 0a1.65 1.65 0 0 0 1.51.5z"/>
   </svg>
+</button>
 </div>
 
 <!-- Modals -->
@@ -316,6 +521,14 @@ body::before{
 <div id="zoomModal">
   <div class="closeZoom">×</div>
   <img id="mainZoom">
+  <div id="zoomLegend" style="
+  max-width: 260px;
+  padding: 10px;
+  color: #b84c6f;
+  font-size: 14px;
+  background: transparent;
+  align-self: flex-start;
+"></div>
   <div class="thumbs" id="thumbs"></div>
   <div class="actions">
     <div class="actions" style="display:flex; gap:12px; align-items:center; margin-top:8px;">
@@ -439,7 +652,7 @@ body::before{
   </div>
 </div>
 
-    <script type="module">
+  <script type="module">
 import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
 
 const supabase = createClient(
@@ -639,11 +852,8 @@ function showInAppNotification(sender, message) {
   }
 }
 if ('Notification' in window && Notification.permission !== 'granted') Notification.requestPermission();
+// ====== CREATIONS ======
 
-Comme ça ?
-
-
-// ====== REFRESH CREATIONS ======
 async function refreshCreations() {
   try {
     const { data, error } = await supabase
@@ -652,120 +862,71 @@ async function refreshCreations() {
       .order('created_at', { ascending: false });
 
     if (error) {
-      console.error('Supabase error:', error);
+      console.error(error);
       return;
     }
 
-    // Map data pour garder même structure
     creations = data.map(c => {
       let zoomGroup = [];
-      if (c.images?.length) {
+
+      if (Array.isArray(c.images) && c.images.length) {
         zoomGroup = c.images.map(p =>
-          supabase.storage.from('images').getPublicUrl(p).data?.publicUrl || ''
+          supabase.storage.from('images').getPublicUrl(p).data.publicUrl
         );
       } else if (c.image_path) {
         zoomGroup = [
-          supabase.storage.from('images').getPublicUrl(c.image_path).data?.publicUrl || ''
+          supabase.storage.from('images').getPublicUrl(c.image_path).data.publicUrl
         ];
       }
 
-      const likesArray = Array.isArray(c.likes) ? c.likes : JSON.parseSafe(c.likes) || [];
-      const commentsArray = Array.isArray(c.comments) ? c.comments : JSON.parseSafe(c.comments) || [];
-
       return {
         id: c.id,
-        name: c.name,
+        name: c.name || '',
         legend: c.legend || '',
         imgUrl: zoomGroup[0] || '',
         zoomGroup,
-        likes: likesArray.map(l => ({ name: l.name || '', photo: l.photo || '' })),
-        comments: commentsArray.map(cmt => ({ name: cmt.name || '', text: cmt.text || '', photo: cmt.photo || '' }))
+        likes: Array.isArray(c.likes) ? c.likes : [],
+        comments: Array.isArray(c.comments) ? c.comments : []
       };
     });
 
-    renderCreations();
-  } catch (err) {
-    console.error('refreshCreations error:', err);
+    renderCreations(creations);
+
+  } catch (e) {
+    console.error('refreshCreations crash', e);
   }
 }
 
-// ====== RENDER CREATIONS ======
-function renderCreations() {
-  const container = document.getElementById('creationsContainer');
-  if (!container) {
-    console.error('Container #creationsContainer introuvable !');
-    return;
-  }
+// ====== RENDER ======
+function renderCreations(list) {
+  const page = document.getElementById('page');
+  page.innerHTML = '';
 
-  container.innerHTML = ''; // vider avant
+  list.forEach(c => {
+    const d = document.createElement('div');
+    d.className = 'creation';
 
-  creations.forEach(c => {
-    const div = document.createElement('div');
-    div.className = 'creation-item';
+    // CLICK SUR LA CARD
+    d.onclick = () => openZoom(c);
 
-    // Placeholder
-    const placeholder = document.createElement('div');
-    placeholder.className = 'placeholder';
-    placeholder.textContent = 'Chargement…';
-    div.appendChild(placeholder);
-
-    // Image
     const img = document.createElement('img');
-    img.src = c.imgUrl;
+    img.src = c.imgUrl || '';
+    d.appendChild(img);
 
-    // Si déjà chargée
-    if (img.complete) placeholder.style.display = 'none';
+    if (c.legend) {
+      const p = document.createElement('p');
+      p.textContent = c.legend;
+      d.appendChild(p);
+    }
 
-    // Quand l'image charge
-    img.onload = () => {
-      placeholder.style.display = 'none';
-    };
-
-    div.appendChild(img);
-
-    // Nom
-    const nameP = document.createElement('p');
-    nameP.textContent = c.name;
-    div.appendChild(nameP);
-
-    // Légende
-    const legendP = document.createElement('p');
-    legendP.textContent = c.legend || '';
-    div.appendChild(legendP);
-
-    // Clic pour zoom
-    div.onclick = () => openZoom(c);
-
-    container.appendChild(div);
+    page.appendChild(d);
   });
 }
-
-// Helper JSON safe
-JSON.parseSafe = str => {
-  try { return JSON.parse(str); }
-  catch(e) { return []; }
-};
-
-  const likesArray = Array.isArray(c.likes) ? c.likes : JSON.parseSafe(c.likes);
-  const commentsArray = Array.isArray(c.comments) ? c.comments : JSON.parseSafe(c.comments);
-
-  return {
-    id: c.id,
-    name: c.name,
-    legend: c.legend || '',
-    imgUrl: zoomGroup[0] || '',
-    zoomGroup,
-    likes: likesArray.map(l => ({ name: l.name || '', photo: l.photo || '' })),
-    comments: commentsArray.map(cmt => ({ name: cmt.name || '', text: cmt.text || '', photo: cmt.photo || '' }))
-  };
-});
-
-renderCreations();
-
 // ====== ZOOM ======
 function openZoom(c) {
   currentZoom = creations.find(x => x.id === c.id);
-  mainZoom.src = currentZoom.imgUrl || '';
+  mainZoom.src = currentZoom.imgUrl;
+  document.getElementById('zoomLegend').textContent = currentZoom.legend || '';
   thumbs.innerHTML = '';
   (currentZoom.zoomGroup || []).forEach(u => {
     const t = document.createElement('img'); t.src = u;
@@ -845,31 +1006,52 @@ function renderCommentList() {
 
 // ====== ADD CREATION ======
 document.getElementById('addBtn').onclick = () => addModal.style.display = 'flex';
-addModal.addEventListener('click', e => { if (e.target === addModal) addModal.style.display = 'none'; });
+
+// Fermer modal en cliquant sur le fond
+addModal.addEventListener('click', e => { 
+  if (e.target === addModal) addModal.style.display = 'none'; 
+});
+
 document.getElementById('confirmAdd').onclick = async e => {
   e.stopPropagation();
   const name = document.getElementById('photoName').value.trim();
-const legend = document.getElementById('photoLegend').value.trim();
-const files = document.getElementById('multiPhoto').files;
-  if (!name || !files.length) { alert("Mettre un nom et choisir au moins une photo"); return; }
-  const paths = [], urls = [];
+  const legend = document.getElementById('photoLegend').value.trim();
+  const files = document.getElementById('multiPhoto').files;
+
+  if (!name || !files.length) { 
+    alert("Mettre un nom et choisir au moins une photo"); 
+    return; 
+  }
+
+  const paths = [];
+  const urls = [];
+
   for (let file of files) {
     const path = `${Date.now()}_${file.name}`;
     const { error: uploadError } = await supabase.storage.from('images').upload(path, file);
-    if (uploadError) { console.error(uploadError); continue; }
+    if (uploadError) { 
+      console.error(uploadError); 
+      continue; 
+    }
+
     const { data: pubData } = supabase.storage.from('images').getPublicUrl(path);
     if (!pubData?.publicUrl) continue;
-    urls.push(pubData.publicUrl); paths.push(path);
+    urls.push(pubData.publicUrl);
+    paths.push(path);
   }
+
   if (!urls.length) return;
+
   await supabase.from('creations').insert([{
-  name,
-  legend,
-  image_path: paths[0],
-  images: paths,
-  likes: [],
-  comments: []
-}]);
+    name,
+    legend,
+    image_path: paths[0], // première image pour l'affichage principal
+    images: paths,
+    likes: [],
+    comments: []
+  }]);
+
+  // Reset modal et refresh
   addModal.style.display = 'none';
   document.getElementById('photoName').value = '';
   document.getElementById('multiPhoto').value = '';
@@ -878,11 +1060,31 @@ const files = document.getElementById('multiPhoto').files;
 };
 
 // ====== DELETE CREATION ======
-function openDeleteModal(c) { currentDelete = c; deleteModal.style.display = 'flex'; }
-document.getElementById('cancelDelete').onclick = () => { currentDelete = null; deleteModal.style.display = 'none'; };
+
+function openDeleteModal(c) {
+  currentDelete = c;
+  deleteModal.style.display = 'flex';
+}
+
+document.getElementById('cancelDelete').onclick = () => { 
+  currentDelete = null; 
+  deleteModal.style.display = 'none'; 
+};
+
 document.getElementById('confirmDelete').onclick = async () => {
   if (!currentDelete?.id) return;
+
+  // Supprime du storage toutes les images de cette création
+  if (Array.isArray(currentDelete.zoomGroup)) {
+    for (let url of currentDelete.zoomGroup) {
+      const path = url.split('/').pop().split('?')[0]; // récupère le nom du fichier
+      await supabase.storage.from('images').remove([path]).catch(e => console.error(e));
+    }
+  }
+
+  // Supprime de la base de données
   await supabase.from('creations').delete().eq('id', currentDelete.id);
+
   currentDelete = null;
   deleteModal.style.display = 'none';
   await refreshCreations();
@@ -932,10 +1134,10 @@ chatModal.addEventListener('touchmove', e => {
 });
 chatModal.addEventListener('touchend',()=>{initialDistance=null;});
 
-// ====== INITIAL LOAD ======
-refreshCreations();
 loadOwnerPhoto();
 loadChatUsers();
+refreshCreations();
+  
 </script>
 
 
