@@ -753,7 +753,10 @@ function renderCreations() {
     const img = d.querySelector('img');
     img.onload = () => d.querySelector('.placeholder').style.display='none';
     img.onerror = () => { img.remove(); d.querySelector('.placeholder').textContent=''; };
-    img.onclick = () => openZoom(c);
+    img.onclick = (e) => {
+  e.stopPropagation();
+  openZoom(c);
+};
     d.querySelector('.delete-btn').onclick = () => openDeleteModal(c);
     page.appendChild(d);
   });
