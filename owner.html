@@ -276,6 +276,14 @@ body::before{
   z-index: 99999;             /* 🔥 AU-DESSUS DE TOUT */
 }
 
+#zoomModal {
+  display: none;
+  pointer-events: none;
+}
+#zoomModal[style*="display: flex"] {
+  pointer-events: auto;
+}
+  
 .visitor-item,
 .visitor-item img {
   pointer-events: auto !important;
@@ -284,22 +292,25 @@ body::before{
 }
 
 
+  .modal {
+  display: none;
+  pointer-events: auto;
+}
+
+body::before {
+  pointer-events: none;
+}
+
   .modal,
 #zoomModal,
 .chat-overlay {
-  display: none !important;
-}
-
-  .modal[style*="display: flex"],
-#zoomModal[style*="display: flex"],
-.chat-overlay[style*="display: flex"] {
-  pointer-events: auto;
+  outline: 2px solid red;
 }
   
 </style>
 </head>
 <body>
-
+  
 <img id="ownerPhoto" alt="Owner">
 
 <div class="center-zone">
