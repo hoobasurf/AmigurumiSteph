@@ -716,7 +716,9 @@ async function refreshCreations() {
     creations = data.map(c => {
       let zoomGroup = [];
       if (c.images?.length) {
-        zoomGroup = c.images.map(p => supabase.storage.from('images').getPublicUrl(p).data?.publicUrl || '');
+        zoomGroup = c.images.map(p =>
+  supabase.storage.from('images').getPublicUrl(p).publicUrl
+);
       } else if (c.image_path) {
         zoomGroup = [supabase.storage.from('images').getPublicUrl(c.image_path).data?.publicUrl || ''];
       }
