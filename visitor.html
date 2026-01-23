@@ -38,6 +38,13 @@ body::before{
   pointer-events:auto;
 }
 
+  .visitor-item .placeholder{
+  pointer-events:none;
+}
+
+.visitor-item p{
+  pointer-events:none;
+}
   
 .visitor-item::after{
   pointer-events:none;
@@ -278,6 +285,11 @@ body::before{
 .visitor-item img,
 .visitor-item *{
   pointer-events:auto;
+}
+
+.visitor-item::before,
+.visitor-item::after {
+  display:none !important;
 }
   
 </style>
