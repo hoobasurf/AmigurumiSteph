@@ -358,14 +358,16 @@ body::before{
   </div>
 </div>
 
-<!-- ====== COMMENT MODAL ====== -->
+
+  <!-- ====== COMMENT MODAL ====== -->
+<div id="commentModal" class="modal">
   <div class="modal-box comment-box">
     <div class="expand-btn" id="expandComment">⤢</div>
     <h3>Commentaire 💬</h3>
     <div class="comment-list" id="commentBubbles" style="max-height:160px; overflow-y:auto; margin-bottom:8px;"></div>
     <div style="display:flex; flex-direction:column; gap:6px;">
-      <input type="text" id="commentName" readonly style="flex:1; padding:4px 8px; border:2px solid #b67385; border-radius:8px; background:#ffe6f0; margin-bottom:8px;">
-      <input type="text" id="commentText" placeholder="Votre commentaire" style="padding:4px 8px; border:2px solid #b67385; border-radius:8px;">
+      <input type="text" id="commentName" readonly>
+      <input type="text" id="commentText">
       <button id="confirmComment">Envoyer</button>
     </div>
   </div>
