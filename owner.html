@@ -230,109 +230,8 @@ body::before{
   transform: scale(1.03);
   box-shadow: 0 4px 10px rgba(0,0,0,0.15);
 }
-
-#page{
-  display:grid;
-  grid-template-columns: repeat(2, 200px);
-  grid-template-rows: repeat(3, 200px);
-  gap: 6px;
-}
-
-/* IMAGE */
-.creation img{
-  width: 120px;
-  height: 100%;
-  object-fit: cover;
-  flex-shrink: 0;
-}
-
-/* LÉGENDE À DROITE */
-.creation p{
-  flex: 1;
-  padding: 10px;
-  font-size: 14px;
-  font-weight: bold;
-  color: #b84c6f;
-  text-align: center;
-
-  /* contour noir des lettres */
-  -webkit-text-stroke: 0.6px #000;
-  text-shadow:
-    1px 1px 0 #000,
-   -1px 1px 0 #000,
-    1px -1px 0 #000,
-   -1px -1px 0 #000;
-}
-
-/* ====== CREATION CARD (copie visitor-item) ====== */
-.creation {
-  position: relative;
-  width: 200px;
-  height: 200px;
-  border-radius: 12px;
-  overflow: hidden;
-
-  border: 3px solid #fff;
-  box-shadow:
-    0 0 0 3px #f6c2d1,
-    0 6px 14px rgba(0,0,0,0.25),
-    inset 0 0 0 1px rgba(255,255,255,0.4);
-
-  background: #ffe6f0;
-  cursor: pointer;
-}
-
-/* IMAGE */
-.creation img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  border-radius: 12px;
-  display: block;
-
-  filter: brightness(1.05) contrast(1.05) saturate(0.95);
-  transition: transform 0.3s, filter 0.3s;
-  position: relative;
-  z-index: 2;
-}
-
-.creation:hover img {
-  transform: scale(1.03);
-}
-
-/* SURCOUCHE DOUCE */
-.creation::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: rgba(255,230,240,0.12);
-  pointer-events: none;
-  z-index: 1;
-}
-
-/* LÉGENDE */
-.creation p {
-  position: absolute;
-  bottom: 4px;
-  width: 100%;
-  text-align: center;
-
-  font-size: 14px;
-  font-weight: bold;
-  color: #b84c6f;
-  z-index: 3;
-
-  /* contour noir lettres */
-  -webkit-text-stroke: 0.6px #000;
-  text-shadow:
-    1px 1px 0 #000,
-   -1px 1px 0 #000,
-    1px -1px 0 #000,
-   -1px -1px 0 #000;
-}
   
 </style>
-
 </head>
 <body>
 
@@ -747,6 +646,7 @@ function showInAppNotification(sender, message) {
 }
 if ('Notification' in window && Notification.permission !== 'granted') Notification.requestPermission();
 // ====== CREATIONS ======
+let creations = [];
 
 async function refreshCreations() {
   try {
@@ -794,17 +694,16 @@ async function refreshCreations() {
 // ====== RENDER ======
 function renderCreations(list) {
   const page = document.getElementById('page');
+  if (!page) return;
+
   page.innerHTML = '';
 
   list.forEach(c => {
     const d = document.createElement('div');
     d.className = 'creation';
 
-    // CLICK SUR LA CARD
-    d.onclick = () => openZoom(c);
-
     const img = document.createElement('img');
-    img.src = c.imgUrl || '';
+    img.src = c.imgUrl;
     d.appendChild(img);
 
     if (c.legend) {
@@ -954,7 +853,7 @@ document.getElementById('confirmAdd').onclick = async e => {
 };
 
 // ====== DELETE CREATION ======
-
+let currentDelete = null;
 function openDeleteModal(c) {
   currentDelete = c;
   deleteModal.style.display = 'flex';
@@ -1028,10 +927,11 @@ chatModal.addEventListener('touchmove', e => {
 });
 chatModal.addEventListener('touchend',()=>{initialDistance=null;});
 
-loadOwnerPhoto();
-loadChatUsers();
-refreshCreations();
-  
+document.addEventListener('DOMContentLoaded', () => {
+  refreshCreations();
+  loadOwnerPhoto();
+  loadChatUsers();
+});
 </script>
 
 
