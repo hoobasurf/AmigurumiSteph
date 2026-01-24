@@ -633,65 +633,85 @@ function showInAppNotification(sender, message) {
 if ('Notification' in window && Notification.permission !== 'granted') Notification.requestPermission();
 
 // ====== CREATIONS ======
+
 async function refreshCreations() {
   try {
-    const { data, error } = await supabase.from('creations').select('*').order('created_at', { ascending: false });
-    if (error) return console.error(error);
+    const { data, error } = await supabase
+      .from('creations')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      console.error(error);
+      return;
+    }
 
     creations = data.map(c => {
       let zoomGroup = [];
-      if (c.images?.length) {
-        zoomGroup = c.images.map(p => supabase.storage.from('images').getPublicUrl(p).data?.publicUrl || '');
-      } else if (c.image_path) {
-        zoomGroup = [supabase.storage.from('images').getPublicUrl(c.image_path).data?.publicUrl || ''];
-      }
 
-      const likesArray = Array.isArray(c.likes) ? c.likes : JSON.parseSafe(c.likes) || [];
-      const commentsArray = Array.isArray(c.comments) ? c.comments : JSON.parseSafe(c.comments) || [];
+      if (Array.isArray(c.images) && c.images.length) {
+        zoomGroup = c.images.map(p =>
+          supabase.storage.from('images').getPublicUrl(p).data.publicUrl
+        );
+      } else if (c.image_path) {
+        zoomGroup = [
+          supabase.storage.from('images').getPublicUrl(c.image_path).data.publicUrl
+        ];
+      }
 
       return {
         id: c.id,
-        name: c.name,
+        name: c.name || '',
+        legend: c.legend || '',
         imgUrl: zoomGroup[0] || '',
         zoomGroup,
-        likes: likesArray.map(l => ({ name: l.name || '', photo: l.photo || '' })),
-        comments: commentsArray.map(cmt => ({ name: cmt.name || '', text: cmt.text || '', photo: cmt.photo || '' }))
+        likes: Array.isArray(c.likes) ? c.likes : [],
+        comments: Array.isArray(c.comments) ? c.comments : []
       };
     });
 
-    renderCreations();
-  } catch (err) { console.error('refreshCreations', err); }
+    renderCreations(creations);
+
+  } catch (e) {
+    console.error('refreshCreations crash', e);
+  }
 }
 
-// Helper pour JSON safe
-JSON.parseSafe = str => { try { return JSON.parse(str); } catch(e) { return []; } };
-
-// ====== RENDER CREATIONS ======
-function renderCreations() {
+// ====== RENDER ======
+function renderCreations(list) {
+  const container = document.getElementById('visitor-list-container');
   container.innerHTML = '';
-  let page = null;
-  creations.forEach((c, i) => {
-    if (i % 6 === 0) { page = document.createElement('div'); page.className = 'page'; container.appendChild(page); }
-    const d = document.createElement('div'); d.className = 'visitor-item';
-    d.innerHTML = `<div class="placeholder">?</div><div class="delete-btn">×</div><p>${c.name}</p><img src="${c.imgUrl||''}">`;
-    const img = d.querySelector('img');
-    img.onload = () => d.querySelector('.placeholder').style.display='none';
-    img.onerror = () => { img.remove(); d.querySelector('.placeholder').textContent=''; };
-    img.onclick = () => openZoom(c);
-    d.querySelector('.delete-btn').onclick = () => openDeleteModal(c);
-    page.appendChild(d);
-  });
-}
 
+  let pageDiv = document.createElement('div');
+  pageDiv.className = 'page';
+
+  list.forEach((c, index) => {
+
+    if (index % 6 === 0 && index !== 0) {
+      container.appendChild(pageDiv);
+      pageDiv = document.createElement('div');
+      pageDiv.className = 'page';
+    }
+
+    const d = document.createElement('div');
+d.className = 'creation';
+
+const img = document.createElement('img');
+img.src = c.imgUrl || '';
+d.appendChild(img);
+
+pageDiv.appendChild(d);
+
+  container.appendChild(pageDiv);
+}
 // ====== ZOOM ======
 function openZoom(c) {
   currentZoom = creations.find(x => x.id === c.id);
   mainZoom.src = currentZoom.imgUrl;
-  document.getElementById('zoomLegend').textContent = currentZoom.legend || ''; // <-- Ici la légende
+  document.getElementById('zoomLegend').textContent = currentZoom.legend || '';
   thumbs.innerHTML = '';
   (currentZoom.zoomGroup || []).forEach(u => {
-    const t = document.createElement('img'); 
-    t.src = u;
+    const t = document.createElement('img'); t.src = u;
     t.onclick = () => mainZoom.src = u;
     thumbs.appendChild(t);
   });
@@ -748,7 +768,7 @@ function renderLikeList() {
   (currentZoom.likes || []).forEach(l => {
     const div = document.createElement('div');
     div.className = 'like-item';
-    div.innerHTML = `${l.photo ? `<img src="${l.photo}" style="width:20px;height:20px;border-radius:50%;margin-right:4px;vertical-align:middle;">` : ''}<strong>${l.name}</strong>`;
+    div.innerHTML = ${l.photo ? <img src="${l.photo}" style="width:20px;height:20px;border-radius:50%;margin-right:4px;vertical-align:middle;"> : ''}<strong>${l.name}</strong>;
     likeBubbles.appendChild(div);
   });
   likeCount.textContent = (currentZoom.likes || []).length;
@@ -760,7 +780,7 @@ function renderCommentList() {
   (currentZoom.comments || []).forEach(c => {
     const div = document.createElement('div');
     div.className = 'comment-item';
-    div.innerHTML = `${c.photo ? `<img src="${c.photo}" style="width:20px;height:20px;border-radius:50%;margin-right:4px;vertical-align:middle;">` : ''}<strong>${c.name}</strong>: ${c.text}`;
+    div.innerHTML = ${c.photo ? <img src="${c.photo}" style="width:20px;height:20px;border-radius:50%;margin-right:4px;vertical-align:middle;"> : ''}<strong>${c.name}</strong>: ${c.text};
     commentBubbles.appendChild(div);
   });
   commentCount.textContent = (currentZoom.comments || []).length;
@@ -768,31 +788,52 @@ function renderCommentList() {
 
 // ====== ADD CREATION ======
 document.getElementById('addBtn').onclick = () => addModal.style.display = 'flex';
-addModal.addEventListener('click', e => { if (e.target === addModal) addModal.style.display = 'none'; });
+
+// Fermer modal en cliquant sur le fond
+addModal.addEventListener('click', e => { 
+  if (e.target === addModal) addModal.style.display = 'none'; 
+});
+
 document.getElementById('confirmAdd').onclick = async e => {
   e.stopPropagation();
   const name = document.getElementById('photoName').value.trim();
-const legend = document.getElementById('photoLegend').value.trim();
-const files = document.getElementById('multiPhoto').files;
-  if (!name || !files.length) { alert("Mettre un nom et choisir au moins une photo"); return; }
-  const paths = [], urls = [];
+  const legend = document.getElementById('photoLegend').value.trim();
+  const files = document.getElementById('multiPhoto').files;
+
+  if (!name || !files.length) { 
+    alert("Mettre un nom et choisir au moins une photo"); 
+    return; 
+  }
+
+  const paths = [];
+  const urls = [];
+
   for (let file of files) {
-    const path = `${Date.now()}_${file.name}`;
+    const path = ${Date.now()}_${file.name};
     const { error: uploadError } = await supabase.storage.from('images').upload(path, file);
-    if (uploadError) { console.error(uploadError); continue; }
+    if (uploadError) { 
+      console.error(uploadError); 
+      continue; 
+    }
+
     const { data: pubData } = supabase.storage.from('images').getPublicUrl(path);
     if (!pubData?.publicUrl) continue;
-    urls.push(pubData.publicUrl); paths.push(path);
+    urls.push(pubData.publicUrl);
+    paths.push(path);
   }
+
   if (!urls.length) return;
+
   await supabase.from('creations').insert([{
-  name,
-  legend,
-  image_path: paths[0],
-  images: paths,
-  likes: [],
-  comments: []
-}]);
+    name,
+    legend,
+    image_path: paths[0], // première image pour l'affichage principal
+    images: paths,
+    likes: [],
+    comments: []
+  }]);
+
+  // Reset modal et refresh
   addModal.style.display = 'none';
   document.getElementById('photoName').value = '';
   document.getElementById('multiPhoto').value = '';
