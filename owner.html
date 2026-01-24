@@ -858,18 +858,24 @@ function renderCreations(list) {
     const d = document.createElement('div');
     d.className = 'creation';
 
-    // CLICK SUR LA CARD
+    // CLICK ZOOM
     d.onclick = () => openZoom(c);
 
     const img = document.createElement('img');
     img.src = c.imgUrl || '';
     d.appendChild(img);
 
-    if (c.legend) {
-      const p = document.createElement('p');
-      p.textContent = c.legend;
-      d.appendChild(p);
-    }
+    // ❌ BOUTON SUPPRIMER
+    const del = document.createElement('div');
+    del.className = 'delete-btn';
+    del.textContent = '×';
+
+    del.onclick = (e) => {
+      e.stopPropagation(); // empêche le zoom
+      openDeleteModal(c);
+    };
+
+    d.appendChild(del);
 
     page.appendChild(d);
   });
