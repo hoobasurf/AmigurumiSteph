@@ -20,7 +20,25 @@ body::before{
   background-size:cover;background-position:center center;background-repeat:no-repeat;z-index:-1;
 }
 .center-zone{display:flex;justify-content:center;align-items:flex-start;padding-top:3.5cm;overflow:hidden;height:auto;}
-#visitor-list-container{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;-webkit-overflow-scrolling: touch;justify-content:center;padding-left:1cm;}
+#visitor-list-container{
+  display:flex;
+  overflow-x:auto;
+  scroll-snap-type:x mandatory;
+  -webkit-overflow-scrolling: touch;
+  gap:12px;
+  padding-left:1cm;
+}
+
+/* UNE PAGE = 3 lignes x 2 cartes */
+.page{
+  display:grid;
+  grid-template-columns: repeat(2, 200px);
+  grid-template-rows: repeat(3, 200px);
+  gap:6px;
+
+  flex:0 0 auto;
+  scroll-snap-align:center;
+}
 .page{display:grid;grid-template-columns:repeat(2,1fr);grid-template-rows:repeat(3,1fr);column-gap:3mm;row-gap:4mm;flex:0 0 auto;width:calc(2*200px+3mm);height:calc(3*200px+8mm);scroll-snap-align:center;padding:4mm;justify-content:center;margin-top:0;}
 .visitor-item{position:relative;width:200px;height:200px;border-radius:12px;overflow:hidden;border:3px solid #fff;box-shadow:0 0 0 3px #f6c2d1,0 6px 14px rgba(0,0,0,0.25),inset 0 0 0 1px rgba(255,255,255,0.4);background:#ffe6f0;}
 .visitor-item .placeholder{position:absolute;inset:0;display:flex;justify-content:center;align-items:center;font-size:24px;color:#b84c6f;font-weight:bold;}
@@ -851,34 +869,42 @@ async function refreshCreations() {
 
 // ====== RENDER ======
 function renderCreations(list) {
-  const page = document.getElementById('page');
-  page.innerHTML = '';
+  const container = document.getElementById('visitor-list-container');
+  container.innerHTML = '';
 
-  list.forEach(c => {
+  let pageDiv = document.createElement('div');
+  pageDiv.className = 'page';
+
+  list.forEach((c, index) => {
+
+    if (index % 6 === 0 && index !== 0) {
+      container.appendChild(pageDiv);
+      pageDiv = document.createElement('div');
+      pageDiv.className = 'page';
+    }
+
     const d = document.createElement('div');
     d.className = 'creation';
-
-    // CLICK ZOOM
     d.onclick = () => openZoom(c);
 
     const img = document.createElement('img');
     img.src = c.imgUrl || '';
     d.appendChild(img);
 
-    // ❌ BOUTON SUPPRIMER
+    // bouton suppression
     const del = document.createElement('div');
     del.className = 'delete-btn';
     del.textContent = '×';
-
     del.onclick = (e) => {
-      e.stopPropagation(); // empêche le zoom
+      e.stopPropagation();
       openDeleteModal(c);
     };
-
     d.appendChild(del);
 
-    page.appendChild(d);
+    pageDiv.appendChild(d);
   });
+
+  container.appendChild(pageDiv);
 }
 // ====== ZOOM ======
 function openZoom(c) {
