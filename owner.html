@@ -469,22 +469,21 @@ body::before {
 /* ====== ZONE CENTRALE ====== */
 .center-zone {
   display: flex;
-  justify-content: center;      /* centre horizontalement */
-  align-items: center;          /* centre verticalement */
+  justify-content: center;   /* centre horizontalement */
+  align-items: flex-start;   /* top de la page, on peut ajuster */
   width: 100vw;
-  height: 100vh;                /* prend toute la hauteur de l'écran */
-  overflow: hidden;             /* pas de scroll visible */
-  padding: 0;                   /* pas de padding qui décale */
+  min-height: 100vh;
+  padding-top: 3.5cm;       /* espace haut pour la grille */
+  overflow: visible;         /* important pour que la modal s'affiche au-dessus */
 }
 
 /* ====== CONTENEUR DE LA GRILLE ====== */
 #visitor-list-container {
   display: flex;
-  justify-content: center;      /* centre la page dans le conteneur */
-  align-items: center;
-  overflow: hidden;             /* cache le scroll horizontal */
+  justify-content: center;
+  align-items: flex-start;
   width: 100%;
-  height: 100%;
+  overflow: hidden;          /* empêche le scroll horizontal d'afficher la prochaine page */
 }
 
 /* ====== PAGE (grille) ====== */
@@ -492,11 +491,12 @@ body::before {
   display: grid;
   grid-template-columns: repeat(2, 200px); /* 2 colonnes */
   grid-template-rows: repeat(3, 200px);    /* 3 lignes */
-  gap: 2mm;                                /* espacement horizontal et vertical */
-  justify-content: center;                  /* centre la grille dans la page */
-  align-content: center;                    /* centre verticalement les cartes */
-  width: max-content;                       /* largeur minimum selon contenu */
-  height: max-content;                      /* hauteur minimum selon contenu */
+  column-gap: 2mm;
+  row-gap: 2mm;
+  justify-content: center;     /* centre horizontalement */
+  align-content: center;       /* centre verticalement */
+  width: max-content;
+  height: max-content;
 }
 /* ====== CARD CREATION ====== */
 .creation {
