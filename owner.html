@@ -486,6 +486,10 @@ body::before {
   overflow: hidden;          /* empêche le scroll horizontal d'afficher la prochaine page */
 }
 
+#deleteModal {
+  z-index: 10001;
+}
+  
 /* ====== PAGE (grille) ====== */
 .page {
   display: grid;
@@ -497,6 +501,7 @@ body::before {
   align-content: center;       /* centre verticalement */
   width: max-content;
   height: max-content;
+  z-index: 1;
 }
 /* ====== CARD CREATION ====== */
 .creation {
@@ -870,6 +875,22 @@ body::before {
   width: 720px;
   height: 460px;
   border-radius: 24px;
+}
+
+#visitor-list-container,
+.page {
+  pointer-events: auto;
+}
+
+.creation {
+  position: relative;
+  z-index: 5;
+  pointer-events: auto;
+}
+
+.creation img {
+  pointer-events: auto;
+  cursor: pointer;
 }
   
 </style>
