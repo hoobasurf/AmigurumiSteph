@@ -349,6 +349,53 @@ body::before{
     1px -1px 0 #000,
    -1px -1px 0 #000;
 }
+
+#zoomModal{
+  position:fixed;
+  inset:0;
+  background:rgba(0,0,0,0.7);
+  display:none;
+  justify-content:center;
+  align-items:center;
+  flex-direction:column;
+  z-index:10000;
+}
+
+/* conteneur image + légende */
+.zoom-content{
+  display:flex;
+  gap:16px;
+  align-items:flex-start;
+}
+
+/* image zoom */
+#mainZoom{
+  max-width:60vw;
+  max-height:60vh;
+  border:4px solid #b67385;
+  border-radius:24px;
+}
+
+/* encadré légende */
+.legend-box{
+  width:260px;
+  min-height:120px;
+  padding:12px;
+
+  background:#ffe6f0;
+  border:3px solid #b67385;
+  border-radius:16px;
+
+  color:#b84c6f;
+  font-size:14px;
+  font-weight:bold;
+
+  box-shadow:
+    0 0 0 3px #ffffff,
+    0 6px 14px rgba(0,0,0,0.25);
+
+  text-align:center;
+}
   
 </style>
 
@@ -433,33 +480,16 @@ body::before{
 
 <div id="zoomModal">
   <div class="closeZoom">×</div>
-  <img id="mainZoom">
-  <div id="zoomLegend" style="
-  max-width: 260px;
-  padding: 10px;
-  color: #b84c6f;
-  font-size: 14px;
-  background: transparent;
-  align-self: flex-start;
-"></div>
-  <div class="thumbs" id="thumbs"></div>
-  <div class="actions">
-    <div class="actions" style="display:flex; gap:12px; align-items:center; margin-top:8px;">
-  <div class="icon-btn" id="likeBtn" style="display:flex; align-items:center; cursor:pointer; gap:4px;">
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#b84c6f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-      <path d="M12 21C12 21 4 13.5 4 8.5C4 5.5 6.5 3 9.5 3C11 3 12 4 12 4C12 4 13 3 14.5 3C17.5 3 20 5.5 20 8.5C20 13.5 12 21 12 21Z"></path>
-    </svg>
-    <span id="likeCount">0</span>
+
+  <div class="zoom-content">
+    <img id="mainZoom">
+
+    <div id="zoomLegend" class="legend-box"></div>
   </div>
 
-  <div class="icon-btn" id="commentBtn" style="display:flex; align-items:center; cursor:pointer; gap:4px;">
-    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#b84c6f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-      <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
-    </svg>
-    <span id="commentCount">0</span>
-  </div>
-</div>
-  </div>
+  <div class="thumbs" id="thumbs"></div>
+
+  <div class="actions">...</div>
 </div>
 
 <!-- Modal Gestion -->
