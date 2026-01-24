@@ -884,7 +884,7 @@ function renderCreations(list) {
   pageDiv.className = 'page';
 
   list.forEach((c, index) => {
-
+    // Nouvelle page tous les 6 éléments
     if (index % 6 === 0 && index !== 0) {
       container.appendChild(pageDiv);
       pageDiv = document.createElement('div');
@@ -893,7 +893,6 @@ function renderCreations(list) {
 
     const d = document.createElement('div');
     d.className = 'creation';
-    d.onclick = () => openZoom(c);
 
     const img = document.createElement('img');
     img.src = c.imgUrl || '';
@@ -904,14 +903,18 @@ function renderCreations(list) {
     del.className = 'delete-btn';
     del.textContent = '×';
     del.onclick = (e) => {
-      e.stopPropagation(); // pour ne pas ouvrir le zoom
-      openDeleteModal(c);
+      e.stopPropagation();
+      if (confirm("Supprimer cette création ?")) {
+        list.splice(list.indexOf(c), 1);
+        renderCreations(list);
+      }
     };
     d.appendChild(del);
 
     pageDiv.appendChild(d);
   });
 
+  // ajouter la dernière page
   container.appendChild(pageDiv);
 }
 // ====== ZOOM ======
