@@ -39,31 +39,37 @@ body::before {
 }
 
 /* ====== ZONE CENTRÉE ====== */
-.center-zone {
-  display: flex;
-  justify-content: center;
-  align-items: flex-start;
-  padding-top: 3.5cm;
-  overflow: hidden;
-  width: 100vw;
+.center-zone{
+  display:flex;
+  justify-content:center;  /* centre la grille horizontalement */
+  align-items:flex-start;
+  padding-top:3.5cm;
+  overflow:hidden;
+  width:100vw;  /* prend toute la largeur */
 }
-
+  
 #visitor-list-container {
   display: flex;
-  justify-content: center;
-  padding: 3.5cm 12px 0 12px;
   overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  gap: 12px;
+  scroll-behavior: smooth;
+
+  padding-left: 100px; /* décalage global à droite */
+  padding-right: 100px; /* décalage à gauche */
 }
 
-/* ====== PAGE (GRID) ====== */
 .page {
   display: grid;
   grid-template-columns: repeat(2, 200px);
   grid-template-rows: repeat(3, 200px);
-  column-gap: 2mm;
-  row-gap: 2mm;
-  margin: 0 10px; /* espacement entre pages */
+  gap: 6px;
+
   flex: 0 0 auto;
+  scroll-snap-align: center;
+
+  margin-left: auto;
+  margin-right: auto; /* <-- centre chaque page */
 }
 
 /* ====== CARD CREATION ====== */
