@@ -28,16 +28,14 @@ body::before{
   width:100vw;  /* prend toute la largeur */
 }
 
-#visitor-list-container {
-  display: flex;
-  overflow-x: auto;
-  scroll-snap-type: x mandatory;
+#visitor-list-container{
+  display:flex;
+  overflow-x:auto;
+  scroll-snap-type:x mandatory;
   -webkit-overflow-scrolling: touch;
-  gap: 12px;
-  scroll-behavior: smooth;
-
-  padding-left: 800px; /* <-- décale la grille vers la droite */
-  padding-right: 12px; /* garde le padding à droite */
+  gap:12px;
+  padding:0 12px; /* padding pour centrer la première et dernière page */
+  scroll-behavior:smooth;
 }
 
 .page{
@@ -47,6 +45,8 @@ body::before{
   gap:6px;
   flex:0 0 auto;       /* important pour que la page ait sa largeur fixe */
   scroll-snap-align:center;
+}
+.page{display:grid;grid-template-columns:repeat(2,1fr);grid-template-rows:repeat(3,1fr);column-gap:3mm;row-gap:4mm;flex:0 0 auto;width:calc(2*200px+3mm);height:calc(3*200px+8mm);scroll-snap-align:center;padding:4mm;justify-content:center;margin-top:0;}
 .visitor-item{position:relative;width:200px;height:200px;border-radius:12px;overflow:hidden;border:3px solid #fff;box-shadow:0 0 0 3px #f6c2d1,0 6px 14px rgba(0,0,0,0.25),inset 0 0 0 1px rgba(255,255,255,0.4);background:#ffe6f0;}
 .visitor-item .placeholder{position:absolute;inset:0;display:flex;justify-content:center;align-items:center;font-size:24px;color:#b84c6f;font-weight:bold;}
 .visitor-item img{width:100%;height:100%;object-fit:cover;border-radius:12px;cursor:pointer;display:block;filter:brightness(1.05) contrast(1.05) saturate(0.95);transition:filter 0.3s, transform 0.3s;position:relative;z-index:2;}
@@ -434,6 +434,7 @@ body::before{
     <div id="page"></div>
   </div>
 </div>
+  
 <div id="sidebar">
   <div id="toggleSidebar">☰</div>
   <button id="addBtn">Ajouter</button>
@@ -523,6 +524,7 @@ body::before{
     <span id="commentCount">0</span>
   </div>
 </div>
+
   
 <!-- Modal Gestion -->
 <div id="manageModal" class="modal">
@@ -530,26 +532,6 @@ body::before{
     <h2>Gestion Likes, Commentaires</h2>
     <button id="manageLikesBtn">Likes</button>
     <button id="manageCommentsBtn">Commentaires</button>
-  </div>
-</div>
-
-<!-- Modal Likes -->
-<div id="likesModal" class="modal">
-  <div class="modal-box" style="max-height:80vh; overflow-y:auto;">
-    <h2>Likes</h2>
-    <button id="chooseLikeBtn">Choisir individuellement</button>
-    <button id="clearLikesBtn">Tout effacer</button>
-    <div id="likesList"></div>
-  </div>
-</div>
-
-<!-- Modal Commentaires -->
-<div id="commentsModal" class="modal">
-  <div class="modal-box" style="max-height:80vh; overflow-y:auto;">
-    <h2>Commentaires</h2>
-    <button id="chooseCommentBtn">Choisir individuellement</button>
-    <button id="clearCommentsBtn">Tout effacer</button>
-    <div id="commentsList"></div>
   </div>
 </div>
 
@@ -894,34 +876,42 @@ async function refreshCreations() {
 
 // ====== RENDER ======
 function renderCreations(list) {
-  const page = document.getElementById('page');
-  page.innerHTML = '';
+  const container = document.getElementById('visitor-list-container');
+  container.innerHTML = '';
 
-  list.forEach(c => {
+  let pageDiv = document.createElement('div');
+  pageDiv.className = 'page';
+
+  list.forEach((c, index) => {
+
+    if (index % 6 === 0 && index !== 0) {
+      container.appendChild(pageDiv);
+      pageDiv = document.createElement('div');
+      pageDiv.className = 'page';
+    }
+
     const d = document.createElement('div');
     d.className = 'creation';
-
-    // CLICK ZOOM
     d.onclick = () => openZoom(c);
 
     const img = document.createElement('img');
     img.src = c.imgUrl || '';
     d.appendChild(img);
 
-    // ❌ BOUTON SUPPRIMER
+    // bouton suppression
     const del = document.createElement('div');
     del.className = 'delete-btn';
     del.textContent = '×';
-
     del.onclick = (e) => {
-      e.stopPropagation(); // empêche le zoom
+      e.stopPropagation(); // pour ne pas ouvrir le zoom
       openDeleteModal(c);
     };
-
     d.appendChild(del);
 
-    page.appendChild(d);
+    pageDiv.appendChild(d);
   });
+
+  container.appendChild(pageDiv);
 }
 // ====== ZOOM ======
 function openZoom(c) {
@@ -1144,3 +1134,5 @@ refreshCreations();
 
 </body>
 </html>
+
+
