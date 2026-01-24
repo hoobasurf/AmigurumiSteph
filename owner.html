@@ -45,8 +45,8 @@ body::before{
   grid-template-rows: repeat(3, 200px);
   gap:6px;
   scroll-snap-align:center;
-  margin: 0 auto;
-  min-width: 100%;   /* ← CETTE LIGNE MANQUE */
+  margin:0 auto;
+  min-width:100%;
 }
  
 .visitor-item{position:relative;width:200px;height:200px;border-radius:12px;overflow:hidden;border:3px solid #fff;box-shadow:0 0 0 3px #f6c2d1,0 6px 14px rgba(0,0,0,0.25),inset 0 0 0 1px rgba(255,255,255,0.4);background:#ffe6f0;}
@@ -885,23 +885,8 @@ function renderCreations(list) {
 
     const d = document.createElement('div');
     d.className = 'creation';
-    d.onclick = () => openZoom(c);
 
-    const img = document.createElement('img');
-    img.src = c.imgUrl || '';
-    d.appendChild(img);
-
-    // bouton suppression
-    const del = document.createElement('div');
-    del.className = 'delete-btn';
-    del.textContent = '×';
-    del.onclick = (e) => {
-      e.stopPropagation(); // pour ne pas ouvrir le zoom
-      openDeleteModal(c);
-    };
-    d.appendChild(del);
-
-    pageDiv.appendChild(d);
+    pageDiv.appendChild(d);   // ← IMPORTANT
   });
 
   container.appendChild(pageDiv);
