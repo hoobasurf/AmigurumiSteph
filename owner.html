@@ -30,24 +30,23 @@ body::before{
 
 #visitor-list-container {
   display: flex;
+  justify-content: center;  /* centre la grille dans la zone */
+  padding: 3.5cm 12px 0 12px; /* padding haut et côtés */
   overflow-x: auto;
-  scroll-snap-type: x mandatory;
-  -webkit-overflow-scrolling: touch;
-  gap: 12px;
-  scroll-behavior: smooth;
-
-  padding-left: 400px; /* <-- décale la grille vers la droite */
-  padding-right: 12px; /* garde le padding à droite */
 }
 
-.page{
-  display:grid;
-  grid-template-columns: repeat(2, 200px);
-  grid-template-rows: repeat(3, 200px);
-  gap:6px;
-  flex:0 0 auto;       /* important pour que la page ait sa largeur fixe */
-  scroll-snap-align:center;
+.page {
+  display: grid;
+  grid-template-columns: repeat(2, 200px); /* 2 colonnes de 200px */
+  grid-template-rows: repeat(3, 200px);    /* 3 lignes de 200px */
+  column-gap: 2mm; /* espace horizontal entre les cartes */
+  row-gap: 2mm;    /* espace vertical entre les cartes */
+  
+  margin-left: auto;
+  margin-right: auto;  /* centre chaque page */
+  flex: 0 0 auto;      /* important pour que la largeur de la page reste fixe */
 }
+  
 .page{display:grid;grid-template-columns:repeat(2,1fr);grid-template-rows:repeat(3,1fr);column-gap:3mm;row-gap:4mm;flex:0 0 auto;width:calc(2*200px+3mm);height:calc(3*200px+8mm);scroll-snap-align:center;padding:4mm;justify-content:center;margin-top:0;}
 .visitor-item{position:relative;width:200px;height:200px;border-radius:12px;overflow:hidden;border:3px solid #fff;box-shadow:0 0 0 3px #f6c2d1,0 6px 14px rgba(0,0,0,0.25),inset 0 0 0 1px rgba(255,255,255,0.4);background:#ffe6f0;}
 .visitor-item .placeholder{position:absolute;inset:0;display:flex;justify-content:center;align-items:center;font-size:24px;color:#b84c6f;font-weight:bold;}
