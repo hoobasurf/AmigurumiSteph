@@ -19,36 +19,9 @@ body::before{
   background-image:url('Photoroom_20251223_114401.jpeg');
   background-size:cover;background-position:center center;background-repeat:no-repeat;z-index:-1;
 }
-.center-zone{
-  display:flex;
-  justify-content:center;  /* centre la grille horizontalement */
-  align-items:flex-start;
-  padding-top:3.5cm;
-  overflow:hidden;
-  width:100vw;  /* prend toute la largeur */
-}
-
-#visitor-list-container{
-  display:flex;
-  justify-content: center;
-  overflow-x:auto;
-  scroll-snap-type:x mandatory;
-  -webkit-overflow-scrolling: touch;
-  gap:12px;
-  padding:0 12px; /* padding pour centrer la première et dernière page */
-  scroll-behavior:smooth;
-}
-
-.page{
-  display:grid;
-  grid-template-columns: repeat(2, 200px);
-  grid-template-rows: repeat(3, 200px);
-  gap:6px;
-  scroll-snap-align:center;
-  margin:0 auto;
-  min-width:100%;
-}
- 
+.center-zone{display:flex;justify-content:center;align-items:flex-start;padding-top:3.5cm;overflow:hidden;height:auto;}
+#visitor-list-container{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;-webkit-overflow-scrolling: touch;justify-content:center;padding-left:1cm;}
+.page{display:grid;grid-template-columns:repeat(2,1fr);grid-template-rows:repeat(3,1fr);column-gap:3mm;row-gap:4mm;flex:0 0 auto;width:calc(2*200px+3mm);height:calc(3*200px+8mm);scroll-snap-align:center;padding:4mm;justify-content:center;margin-top:0;}
 .visitor-item{position:relative;width:200px;height:200px;border-radius:12px;overflow:hidden;border:3px solid #fff;box-shadow:0 0 0 3px #f6c2d1,0 6px 14px rgba(0,0,0,0.25),inset 0 0 0 1px rgba(255,255,255,0.4);background:#ffe6f0;}
 .visitor-item .placeholder{position:absolute;inset:0;display:flex;justify-content:center;align-items:center;font-size:24px;color:#b84c6f;font-weight:bold;}
 .visitor-item img{width:100%;height:100%;object-fit:cover;border-radius:12px;cursor:pointer;display:block;filter:brightness(1.05) contrast(1.05) saturate(0.95);transition:filter 0.3s, transform 0.3s;position:relative;z-index:2;}
@@ -257,132 +230,8 @@ body::before{
   transform: scale(1.03);
   box-shadow: 0 4px 10px rgba(0,0,0,0.15);
 }
-
-  /* contour noir des lettres */
-  -webkit-text-stroke: 0.6px #000;
-  text-shadow:
-    1px 1px 0 #000,
-   -1px 1px 0 #000,
-    1px -1px 0 #000,
-   -1px -1px 0 #000;
-}
-
-/* ====== CREATION CARD (copie visitor-item) ====== */
-.creation {
-  position: relative;
-  width: 200px;
-  height: 200px;
-  border-radius: 12px;
-  overflow: hidden;
-
-  border: 3px solid #fff;
-  box-shadow:
-    0 0 0 3px #f6c2d1,
-    0 6px 14px rgba(0,0,0,0.25),
-    inset 0 0 0 1px rgba(255,255,255,0.4);
-
-  background: #ffe6f0;
-  cursor: pointer;
-}
-
-/* IMAGE */
-.creation img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  border-radius: 12px;
-  display: block;
-
-  filter: brightness(1.05) contrast(1.05) saturate(0.95);
-  transition: transform 0.3s, filter 0.3s;
-  position: relative;
-  z-index: 2;
-}
-
-.creation:hover img {
-  transform: scale(1.03);
-}
-
-/* SURCOUCHE DOUCE */
-.creation::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background: rgba(255,230,240,0.12);
-  pointer-events: none;
-  z-index: 1;
-}
-
-/* LÉGENDE */
-.creation p {
-  position: absolute;
-  bottom: 4px;
-  width: 100%;
-  text-align: center;
-
-  font-size: 14px;
-  font-weight: bold;
-  color: #b84c6f;
-  z-index: 3;
-
-  /* contour noir lettres */
-  -webkit-text-stroke: 0.6px #000;
-  text-shadow:
-    1px 1px 0 #000,
-   -1px 1px 0 #000,
-    1px -1px 0 #000,
-   -1px -1px 0 #000;
-}
-
-#zoomModal{
-  position:fixed;
-  inset:0;
-  background:rgba(0,0,0,0.7);
-  display:none;
-  justify-content:center;
-  align-items:center;
-  flex-direction:column;
-  z-index:10000;
-}
-
-/* conteneur image + légende */
-.zoom-content{
-  display:flex;
-  gap:16px;
-  align-items:flex-start;
-}
-
-/* image zoom */
-#mainZoom{
-  max-width:60vw;
-  max-height:60vh;
-  border:4px solid #b67385;
-  border-radius:24px;
-}
-
-/* encadré légende */
-.legend-box{
-  width:260px;
-  min-height:120px;
-  padding:12px;
-
-  background:#ffe6f0;
-  border:3px solid #b67385;
-  border-radius:16px;
-
-  color:#b84c6f;
-  font-size:14px;
-  font-weight:bold;
-
-  box-shadow:
-    0 0 0 3px #ffffff,
-    0 6px 14px rgba(0,0,0,0.25);
-
-  text-align:center;
-}
   
 </style>
-
 </head>
 <body>
 
@@ -390,7 +239,8 @@ body::before{
 
 <div class="center-zone">
   <div id="visitor-list-container"></div>
-  
+</div>
+
 <div id="sidebar">
   <div id="toggleSidebar">☰</div>
   <button id="addBtn">Ajouter</button>
@@ -399,12 +249,12 @@ body::before{
   <button id="notesBtn">Notes</button>
   <button id="messagerieBtn">Messagerie</button>
   
-  <button>
-<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="#ffb6c1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-settings">
-  <circle cx="12" cy="12" r="3"/>
-  <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82 ..."/>
-</svg>
+  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="#ffb6c1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-settings">
+    <circle cx="12" cy="12" r="3"/>
+    <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l0 0a2 2 0 1 1-2.83 2.83l0 0a1.65 1.65 0 0 0-1.82.33l0 0a1.65 1.65 0 0 0-.5 1.51l0 0a2 2 0 1 1-3.18 0l0 0a1.65 1.65 0 0 0-1.51-.5l0 0a1.65 1.65 0 0 0-.33-1.82l0 0a2 2 0 1 1 0-2.83l0 0a1.65 1.65 0 0 0 .33-1.82l0 0a1.65 1.65 0 0 0-1.51-.5l0 0a2 2 0 1 1 0-3.18l0 0a1.65 1.65 0 0 0 .5-1.51l0 0a1.65 1.65 0 0 0 1.82-.33l0 0a2 2 0 1 1 2.83 0l0 0a1.65 1.65 0 0 0 1.82.33l0 0a1.65 1.65 0 0 0 .5 1.51l0 0a2 2 0 1 1 3.18 0l0 0a1.65 1.65 0 0 0 1.51.5l0 0a1.65 1.65 0 0 0 .33 1.82l0 0a2 2 0 1 1 0 2.83l0 0a1.65 1.65 0 0 0-.33 1.82l0 0a1.65 1.65 0 0 0 1.51.5z"/>
+  </svg>
 </button>
+</div>
 
 <!-- Modals -->
 <div id="addModal" class="modal">
@@ -463,25 +313,27 @@ body::before{
 
 <div id="zoomModal">
   <div class="closeZoom">×</div>
-
-  <div class="zoom-content">
-    <img id="mainZoom">
-
-    <div id="zoomLegend" class="legend-box"></div>
+  <img id="mainZoom">
+  <div class="thumbs" id="thumbs"></div>
+  <div class="actions">
+    <div class="actions" style="display:flex; gap:12px; align-items:center; margin-top:8px;">
+  <div class="icon-btn" id="likeBtn" style="display:flex; align-items:center; cursor:pointer; gap:4px;">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#b84c6f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M12 21C12 21 4 13.5 4 8.5C4 5.5 6.5 3 9.5 3C11 3 12 4 12 4C12 4 13 3 14.5 3C17.5 3 20 5.5 20 8.5C20 13.5 12 21 12 21Z"></path>
+    </svg>
+    <span id="likeCount">0</span>
   </div>
 
-  <div class="thumbs" id="thumbs"></div>
-
-  <div class="actions">
-    <button id="likeBtn">❤️</button>
-    <span id="likeCount">0</span>
-
-    <button id="commentBtn">💬</button>
+  <div class="icon-btn" id="commentBtn" style="display:flex; align-items:center; cursor:pointer; gap:4px;">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#b84c6f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+    </svg>
     <span id="commentCount">0</span>
   </div>
 </div>
+  </div>
+</div>
 
-  
 <!-- Modal Gestion -->
 <div id="manageModal" class="modal">
   <div class="modal-box">
@@ -585,7 +437,7 @@ body::before{
   </div>
 </div>
 
-  <script type="module">
+    <script type="module">
 import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
 
 const supabase = createClient(
@@ -785,83 +637,62 @@ function showInAppNotification(sender, message) {
   }
 }
 if ('Notification' in window && Notification.permission !== 'granted') Notification.requestPermission();
-// ====== CREATIONS ======
 
+// ====== CREATIONS ======
 async function refreshCreations() {
   try {
-    const { data, error } = await supabase
-      .from('creations')
-      .select('*')
-      .order('created_at', { ascending: false });
-
-    if (error) {
-      console.error(error);
-      return;
-    }
+    const { data, error } = await supabase.from('creations').select('*').order('created_at', { ascending: false });
+    if (error) return console.error(error);
 
     creations = data.map(c => {
       let zoomGroup = [];
-
-      if (Array.isArray(c.images) && c.images.length) {
-        zoomGroup = c.images.map(p =>
-          supabase.storage.from('images').getPublicUrl(p).data.publicUrl
-        );
+      if (c.images?.length) {
+        zoomGroup = c.images.map(p => supabase.storage.from('images').getPublicUrl(p).data?.publicUrl || '');
       } else if (c.image_path) {
-        zoomGroup = [
-          supabase.storage.from('images').getPublicUrl(c.image_path).data.publicUrl
-        ];
+        zoomGroup = [supabase.storage.from('images').getPublicUrl(c.image_path).data?.publicUrl || ''];
       }
+
+      const likesArray = Array.isArray(c.likes) ? c.likes : JSON.parseSafe(c.likes) || [];
+      const commentsArray = Array.isArray(c.comments) ? c.comments : JSON.parseSafe(c.comments) || [];
 
       return {
         id: c.id,
-        name: c.name || '',
-        legend: c.legend || '',
+        name: c.name,
         imgUrl: zoomGroup[0] || '',
         zoomGroup,
-        likes: Array.isArray(c.likes) ? c.likes : [],
-        comments: Array.isArray(c.comments) ? c.comments : []
+        likes: likesArray.map(l => ({ name: l.name || '', photo: l.photo || '' })),
+        comments: commentsArray.map(cmt => ({ name: cmt.name || '', text: cmt.text || '', photo: cmt.photo || '' }))
       };
     });
 
-    renderCreations(creations);
-
-  } catch (e) {
-    console.error('refreshCreations crash', e);
-  }
+    renderCreations();
+  } catch (err) { console.error('refreshCreations', err); }
 }
 
-// ====== RENDER ======
-function renderCreations(list) {
-  const container = document.getElementById('visitor-list-container');
+// Helper pour JSON safe
+JSON.parseSafe = str => { try { return JSON.parse(str); } catch(e) { return []; } };
+
+// ====== RENDER CREATIONS ======
+function renderCreations() {
   container.innerHTML = '';
-
-  let pageDiv = document.createElement('div');
-  pageDiv.className = 'page';
-
-  list.forEach((c, index) => {
-
-    if (index % 6 === 0 && index !== 0) {
-      container.appendChild(pageDiv);
-      pageDiv = document.createElement('div');
-      pageDiv.className = 'page';
-    }
-
-    const d = document.createElement('div');
-d.className = 'creation';
-
-const img = document.createElement('img');
-img.src = c.imgUrl || '';
-d.appendChild(img);
-
-pageDiv.appendChild(d);
-
-  container.appendChild(pageDiv);
+  let page = null;
+  creations.forEach((c, i) => {
+    if (i % 6 === 0) { page = document.createElement('div'); page.className = 'page'; container.appendChild(page); }
+    const d = document.createElement('div'); d.className = 'visitor-item';
+    d.innerHTML = `<div class="placeholder">?</div><div class="delete-btn">×</div><p>${c.name}</p><img src="${c.imgUrl||''}">`;
+    const img = d.querySelector('img');
+    img.onload = () => d.querySelector('.placeholder').style.display='none';
+    img.onerror = () => { img.remove(); d.querySelector('.placeholder').textContent=''; };
+    img.onclick = () => openZoom(c);
+    d.querySelector('.delete-btn').onclick = () => openDeleteModal(c);
+    page.appendChild(d);
+  });
 }
+
 // ====== ZOOM ======
 function openZoom(c) {
   currentZoom = creations.find(x => x.id === c.id);
   mainZoom.src = currentZoom.imgUrl;
-  document.getElementById('zoomLegend').textContent = currentZoom.legend || '';
   thumbs.innerHTML = '';
   (currentZoom.zoomGroup || []).forEach(u => {
     const t = document.createElement('img'); t.src = u;
@@ -941,52 +772,31 @@ function renderCommentList() {
 
 // ====== ADD CREATION ======
 document.getElementById('addBtn').onclick = () => addModal.style.display = 'flex';
-
-// Fermer modal en cliquant sur le fond
-addModal.addEventListener('click', e => { 
-  if (e.target === addModal) addModal.style.display = 'none'; 
-});
-
+addModal.addEventListener('click', e => { if (e.target === addModal) addModal.style.display = 'none'; });
 document.getElementById('confirmAdd').onclick = async e => {
   e.stopPropagation();
   const name = document.getElementById('photoName').value.trim();
-  const legend = document.getElementById('photoLegend').value.trim();
-  const files = document.getElementById('multiPhoto').files;
-
-  if (!name || !files.length) { 
-    alert("Mettre un nom et choisir au moins une photo"); 
-    return; 
-  }
-
-  const paths = [];
-  const urls = [];
-
+const legend = document.getElementById('photoLegend').value.trim();
+const files = document.getElementById('multiPhoto').files;
+  if (!name || !files.length) { alert("Mettre un nom et choisir au moins une photo"); return; }
+  const paths = [], urls = [];
   for (let file of files) {
     const path = `${Date.now()}_${file.name}`;
     const { error: uploadError } = await supabase.storage.from('images').upload(path, file);
-    if (uploadError) { 
-      console.error(uploadError); 
-      continue; 
-    }
-
+    if (uploadError) { console.error(uploadError); continue; }
     const { data: pubData } = supabase.storage.from('images').getPublicUrl(path);
     if (!pubData?.publicUrl) continue;
-    urls.push(pubData.publicUrl);
-    paths.push(path);
+    urls.push(pubData.publicUrl); paths.push(path);
   }
-
   if (!urls.length) return;
-
   await supabase.from('creations').insert([{
-    name,
-    legend,
-    image_path: paths[0], // première image pour l'affichage principal
-    images: paths,
-    likes: [],
-    comments: []
-  }]);
-
-  // Reset modal et refresh
+  name,
+  legend,
+  image_path: paths[0],
+  images: paths,
+  likes: [],
+  comments: []
+}]);
   addModal.style.display = 'none';
   document.getElementById('photoName').value = '';
   document.getElementById('multiPhoto').value = '';
@@ -995,31 +805,11 @@ document.getElementById('confirmAdd').onclick = async e => {
 };
 
 // ====== DELETE CREATION ======
-
-function openDeleteModal(c) {
-  currentDelete = c;
-  deleteModal.style.display = 'flex';
-}
-
-document.getElementById('cancelDelete').onclick = () => { 
-  currentDelete = null; 
-  deleteModal.style.display = 'none'; 
-};
-
+function openDeleteModal(c) { currentDelete = c; deleteModal.style.display = 'flex'; }
+document.getElementById('cancelDelete').onclick = () => { currentDelete = null; deleteModal.style.display = 'none'; };
 document.getElementById('confirmDelete').onclick = async () => {
   if (!currentDelete?.id) return;
-
-  // Supprime du storage toutes les images de cette création
-  if (Array.isArray(currentDelete.zoomGroup)) {
-    for (let url of currentDelete.zoomGroup) {
-      const path = url.split('/').pop().split('?')[0]; // récupère le nom du fichier
-      await supabase.storage.from('images').remove([path]).catch(e => console.error(e));
-    }
-  }
-
-  // Supprime de la base de données
   await supabase.from('creations').delete().eq('id', currentDelete.id);
-
   currentDelete = null;
   deleteModal.style.display = 'none';
   await refreshCreations();
@@ -1069,17 +859,12 @@ chatModal.addEventListener('touchmove', e => {
 });
 chatModal.addEventListener('touchend',()=>{initialDistance=null;});
 
+// ====== INITIAL LOAD ======
+refreshCreations();
 loadOwnerPhoto();
 loadChatUsers();
-refreshCreations();
-  
 </script>
 
 
 </body>
 </html>
-
-
-
-
-
