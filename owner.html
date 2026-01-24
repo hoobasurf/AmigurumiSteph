@@ -405,9 +405,11 @@ body::before{
 <img id="ownerPhoto" alt="Owner">
 
 <div class="center-zone">
-  <div id="page"></div>
+  <div id="visitor-list-container">
+    <div id="page"></div>
+  </div>
 </div>
-
+  
 <div id="sidebar">
   <div id="toggleSidebar">☰</div>
   <button id="addBtn">Ajouter</button>
@@ -489,9 +491,16 @@ body::before{
 
   <div class="thumbs" id="thumbs"></div>
 
-  <div class="actions">...</div>
+  <div class="actions">
+    <button id="likeBtn">❤️</button>
+    <span id="likeCount">0</span>
+
+    <button id="commentBtn">💬</button>
+    <span id="commentCount">0</span>
+  </div>
 </div>
 
+  
 <!-- Modal Gestion -->
 <div id="manageModal" class="modal">
   <div class="modal-box">
