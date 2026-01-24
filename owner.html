@@ -28,27 +28,24 @@ body::before{
   width:100vw;  /* prend toute la largeur */
 }
 
-#visitor-list-container {
-  display: flex;
-  overflow-x: auto;
-  scroll-snap-type: x mandatory;
-  gap: 16px;
-  padding: 20px 0;
-  width: 100%;
-  justify-content: center;
-  scroll-behavior: smooth;
+#visitor-list-container{
+  display:flex;
+  overflow-x:auto;
+  scroll-snap-type:x mandatory;
+  -webkit-overflow-scrolling: touch;
+  gap:12px;
+  padding:0 12px; /* padding pour centrer la première et dernière page */
+  scroll-behavior:smooth;
 }
 
-.page {
-  display: grid;
+.page{
+  display:grid;
   grid-template-columns: repeat(2, 200px);
   grid-template-rows: repeat(3, 200px);
-  gap: 12px;
-  flex: 0 0 auto;
-  scroll-snap-align: center;
-  justify-content: center;
+  gap:6px;
+  flex:0 0 auto;       /* important pour que la page ait sa largeur fixe */
+  scroll-snap-align:center;
 }
-
 .page{display:grid;grid-template-columns:repeat(2,1fr);grid-template-rows:repeat(3,1fr);column-gap:3mm;row-gap:4mm;flex:0 0 auto;width:calc(2*200px+3mm);height:calc(3*200px+8mm);scroll-snap-align:center;padding:4mm;justify-content:center;margin-top:0;}
 .visitor-item{position:relative;width:200px;height:200px;border-radius:12px;overflow:hidden;border:3px solid #fff;box-shadow:0 0 0 3px #f6c2d1,0 6px 14px rgba(0,0,0,0.25),inset 0 0 0 1px rgba(255,255,255,0.4);background:#ffe6f0;}
 .visitor-item .placeholder{position:absolute;inset:0;display:flex;justify-content:center;align-items:center;font-size:24px;color:#b84c6f;font-weight:bold;}
@@ -508,19 +505,21 @@ body::before{
   </div>
 </div>
 
-<div id="visitor-list-container"></div>
-
-<!-- ZOOM MODAL -->
 <div id="zoomModal">
   <div class="closeZoom">×</div>
+
   <div class="zoom-content">
     <img id="mainZoom">
-    <!-- on supprime la légende -->
+
+    <div id="zoomLegend" class="legend-box"></div>
   </div>
+
   <div class="thumbs" id="thumbs"></div>
+
   <div class="actions">
     <button id="likeBtn">❤️</button>
     <span id="likeCount">0</span>
+
     <button id="commentBtn">💬</button>
     <span id="commentCount">0</span>
   </div>
@@ -669,12 +668,7 @@ const icon = document.getElementById('chatResizeIcon');
 const fileBtn = document.getElementById('fileBtn');
 const fileInput = document.getElementById('multiPhoto');
 const fileInfo = document.getElementById('fileInfo');
-const container = document.getElementById('visitor-list-container');
-const zoomModal = document.getElementById('zoomModal');
-const mainZoom = document.getElementById('mainZoom');
-const thumbs = document.getElementById('thumbs');
 
-    
 fileBtn.onclick = () => fileInput.click();
 
 fileInput.onchange = () => {
@@ -691,13 +685,6 @@ const myPrenom = localStorage.getItem('prenom');
 let currentChatUser = localStorage.getItem('currentChatUser') || null;
 let userPhotos = {};
 
-// Exemple : données test
-creations = Array.from({length: 12}, (_, i) => ({
-  id: i+1,
-  imgUrl: `https://picsum.photos/200?random=${i+1}`
-}));
-
-    
 // ====== OWNER PHOTO ======
 async function loadOwnerPhoto() {
   if (!prenom) return;
@@ -889,11 +876,14 @@ async function refreshCreations() {
 
 // ====== RENDER ======
 function renderCreations(list) {
+  const container = document.getElementById('visitor-list-container');
   container.innerHTML = '';
+
   let pageDiv = document.createElement('div');
   pageDiv.className = 'page';
 
   list.forEach((c, index) => {
+
     if (index % 6 === 0 && index !== 0) {
       container.appendChild(pageDiv);
       pageDiv = document.createElement('div');
@@ -905,18 +895,16 @@ function renderCreations(list) {
     d.onclick = () => openZoom(c);
 
     const img = document.createElement('img');
-    img.src = c.imgUrl;
+    img.src = c.imgUrl || '';
     d.appendChild(img);
 
+    // bouton suppression
     const del = document.createElement('div');
     del.className = 'delete-btn';
     del.textContent = '×';
-    del.onclick = e => {
-      e.stopPropagation();
-      if(confirm("Supprimer cette création ?")) {
-        list.splice(list.indexOf(c),1);
-        renderCreations(list);
-      }
+    del.onclick = (e) => {
+      e.stopPropagation(); // pour ne pas ouvrir le zoom
+      openDeleteModal(c);
     };
     d.appendChild(del);
 
@@ -924,7 +912,7 @@ function renderCreations(list) {
   });
 
   container.appendChild(pageDiv);
-
+}
 // ====== ZOOM ======
 function openZoom(c) {
   currentZoom = creations.find(x => x.id === c.id);
