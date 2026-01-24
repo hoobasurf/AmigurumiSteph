@@ -27,29 +27,26 @@ body::before{
   overflow:hidden;
   width:100vw;  /* prend toute la largeur */
 }
-  
+
 #visitor-list-container {
   display: flex;
   overflow-x: auto;
   scroll-snap-type: x mandatory;
+  -webkit-overflow-scrolling: touch;
   gap: 12px;
   scroll-behavior: smooth;
 
-  padding-left: 100px; /* décalage global à droite */
-  padding-right: 100px; /* décalage à gauche */
+  padding-left: 400px; /* <-- décale la grille vers la droite */
+  padding-right: 12px; /* garde le padding à droite */
 }
 
-.page {
-  display: grid;
+.page{
+  display:grid;
   grid-template-columns: repeat(2, 200px);
   grid-template-rows: repeat(3, 200px);
-  gap: 6px;
-
-  flex: 0 0 auto;
-  scroll-snap-align: center;
-
-  margin-left: auto;
-  margin-right: auto; /* <-- centre chaque page */
+  gap:6px;
+  flex:0 0 auto;       /* important pour que la page ait sa largeur fixe */
+  scroll-snap-align:center;
 }
 .page{display:grid;grid-template-columns:repeat(2,1fr);grid-template-rows:repeat(3,1fr);column-gap:3mm;row-gap:4mm;flex:0 0 auto;width:calc(2*200px+3mm);height:calc(3*200px+8mm);scroll-snap-align:center;padding:4mm;justify-content:center;margin-top:0;}
 .visitor-item{position:relative;width:200px;height:200px;border-radius:12px;overflow:hidden;border:3px solid #fff;box-shadow:0 0 0 3px #f6c2d1,0 6px 14px rgba(0,0,0,0.25),inset 0 0 0 1px rgba(255,255,255,0.4);background:#ffe6f0;}
@@ -1139,5 +1136,3 @@ refreshCreations();
 
 </body>
 </html>
-
-
