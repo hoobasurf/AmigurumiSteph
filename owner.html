@@ -1,3 +1,6 @@
+Reprends se code
+Et centre juste la grille de 6 création 
+
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -25,33 +28,28 @@ body::before{
   align-items:flex-start;
   padding-top:3.5cm;
   overflow:hidden;
+  width:100vw;  /* prend toute la largeur */
+}
+
 #visitor-list-container {
   display: flex;
   overflow-x: auto;
   scroll-snap-type: x mandatory;
   -webkit-overflow-scrolling: touch;
   gap: 12px;
-  padding: 0 12px;
   scroll-behavior: smooth;
 
-  justify-content: center; /* centre les pages horizontalement */
+  padding-left: 100px; /* <-- décale la grille vers la droite */
+  padding-right: 12px; /* garde le padding à droite */
 }
 
-.page {
-  display: grid;
+.page{
+  display:grid;
   grid-template-columns: repeat(2, 200px);
   grid-template-rows: repeat(3, 200px);
-  gap: 6px;
-
-  flex: 0 0 auto;
-  scroll-snap-align: center;
-
-  /* CENTRAGE de la grille à l'intérieur de chaque page */
-  justify-content: center;  /* centre horizontalement les 2 colonnes */
-  align-content: center;    /* centre verticalement les 3 lignes */
-
-  padding: 4mm;
-  margin-top: 0;
+  gap:6px;
+  flex:0 0 auto;       /* important pour que la page ait sa largeur fixe */
+  scroll-snap-align:center;
 }
 .page{display:grid;grid-template-columns:repeat(2,1fr);grid-template-rows:repeat(3,1fr);column-gap:3mm;row-gap:4mm;flex:0 0 auto;width:calc(2*200px+3mm);height:calc(3*200px+8mm);scroll-snap-align:center;padding:4mm;justify-content:center;margin-top:0;}
 .visitor-item{position:relative;width:200px;height:200px;border-radius:12px;overflow:hidden;border:3px solid #fff;box-shadow:0 0 0 3px #f6c2d1,0 6px 14px rgba(0,0,0,0.25),inset 0 0 0 1px rgba(255,255,255,0.4);background:#ffe6f0;}
@@ -1141,3 +1139,5 @@ refreshCreations();
 
 </body>
 </html>
+
+
