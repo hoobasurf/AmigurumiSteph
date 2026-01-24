@@ -19,24 +19,31 @@ body::before{
   background-image:url('Photoroom_20251223_114401.jpeg');
   background-size:cover;background-position:center center;background-repeat:no-repeat;z-index:-1;
 }
-.center-zone{display:flex;justify-content:center;align-items:flex-start;padding-top:3.5cm;overflow:hidden;height:auto;}
+.center-zone{
+  display:flex;
+  justify-content:center;  /* centre la grille horizontalement */
+  align-items:flex-start;
+  padding-top:3.5cm;
+  overflow:hidden;
+  width:100vw;  /* prend toute la largeur */
+}
+
 #visitor-list-container{
   display:flex;
   overflow-x:auto;
   scroll-snap-type:x mandatory;
   -webkit-overflow-scrolling: touch;
   gap:12px;
-  padding-left:1cm;
+  padding:0 12px; /* padding pour centrer la première et dernière page */
+  scroll-behavior:smooth;
 }
 
-/* UNE PAGE = 3 lignes x 2 cartes */
 .page{
   display:grid;
   grid-template-columns: repeat(2, 200px);
   grid-template-rows: repeat(3, 200px);
   gap:6px;
-
-  flex:0 0 auto;
+  flex:0 0 auto;       /* important pour que la page ait sa largeur fixe */
   scroll-snap-align:center;
 }
 .page{display:grid;grid-template-columns:repeat(2,1fr);grid-template-rows:repeat(3,1fr);column-gap:3mm;row-gap:4mm;flex:0 0 auto;width:calc(2*200px+3mm);height:calc(3*200px+8mm);scroll-snap-align:center;padding:4mm;justify-content:center;margin-top:0;}
@@ -896,7 +903,7 @@ function renderCreations(list) {
     del.className = 'delete-btn';
     del.textContent = '×';
     del.onclick = (e) => {
-      e.stopPropagation();
+      e.stopPropagation(); // pour ne pas ouvrir le zoom
       openDeleteModal(c);
     };
     d.appendChild(del);
