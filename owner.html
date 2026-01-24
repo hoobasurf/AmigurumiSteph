@@ -793,7 +793,8 @@ function showInAppNotification(sender, message) {
 if ('Notification' in window && Notification.permission !== 'granted') Notification.requestPermission();
 // ====== CREATIONS ======
 
-async function refreshCreations() {
+// ====== REFRESH CREATIONS SAFE ======
+async function refreshCreationsSafe() {
   try {
     const { data, error } = await supabase
       .from('creations')
@@ -801,44 +802,62 @@ async function refreshCreations() {
       .order('created_at', { ascending: false });
 
     if (error) {
-      console.error(error);
-      return;
+      console.error("Erreur Supabase :", error);
+      data = []; // on continue avec une liste vide
     }
 
-    creations = data.map(c => {
+    creations = (data || []).map(c => {
       let zoomGroup = [];
-
-      if (Array.isArray(c.images) && c.images.length) {
-        zoomGroup = c.images.map(p =>
-          supabase.storage.from('images').getPublicUrl(p).data.publicUrl
-        );
-      } else if (c.image_path) {
-        zoomGroup = [
-          supabase.storage.from('images').getPublicUrl(c.image_path).data.publicUrl
-        ];
+      try {
+        if (Array.isArray(c.images) && c.images.length) {
+          zoomGroup = c.images.map(p => {
+            const url = supabase.storage.from('images').getPublicUrl(p).data?.publicUrl;
+            return url || 'https://via.placeholder.com/200?text=Image+manquante';
+          });
+        } else if (c.image_path) {
+          const url = supabase.storage.from('images').getPublicUrl(c.image_path).data?.publicUrl;
+          zoomGroup = [url || 'https://via.placeholder.com/200?text=Image+manquante'];
+        } else {
+          zoomGroup = ['https://via.placeholder.com/200?text=Pas+d+image'];
+        }
+      } catch (e) {
+        console.error("Erreur traitement images :", e);
+        zoomGroup = ['https://via.placeholder.com/200?text=Erreur+image'];
       }
 
       return {
         id: c.id,
-        name: c.name || '',
+        name: c.name || 'Projet sans nom',
         legend: c.legend || '',
-        imgUrl: zoomGroup[0] || '',
+        imgUrl: zoomGroup[0],
         zoomGroup,
         likes: Array.isArray(c.likes) ? c.likes : [],
         comments: Array.isArray(c.comments) ? c.comments : []
       };
     });
 
-    renderCreations(creations);
+    renderCreationsSafe(creations);
 
   } catch (e) {
-    console.error('refreshCreations crash', e);
+    console.error("refreshCreationsSafe crash :", e);
+    creations = [{
+      id: 0,
+      name: "Aucune création",
+      legend: "Impossible de charger les créations",
+      imgUrl: 'https://via.placeholder.com/200?text=Erreur',
+      zoomGroup: [],
+      likes: [],
+      comments: []
+    }];
+    renderCreationsSafe(creations);
   }
 }
 
-// ====== RENDER ======
-function renderCreations(list) {
+// ====== RENDER SAFE ======
+function renderCreationsSafe(list) {
   const container = document.getElementById('visitor-list-container');
+  if (!container) return;
+
   container.innerHTML = '';
 
   let pageDiv = document.createElement('div');
@@ -853,15 +872,35 @@ function renderCreations(list) {
     }
 
     const d = document.createElement('div');
-d.className = 'creation';
+    d.className = 'creation';
 
-const img = document.createElement('img');
-img.src = c.imgUrl || '';
-d.appendChild(img);
+    const img = document.createElement('img');
+    img.src = c.imgUrl;
+    img.alt = c.name || "Projet";
+    d.appendChild(img);
 
-pageDiv.appendChild(d);
+    const p = document.createElement('p');
+    p.textContent = c.name;
+    d.appendChild(p);
 
-  container.appendChild(pageDiv);
+    // clic pour zoom (safe)
+    d.onclick = () => {
+      try {
+        openZoom(c);
+      } catch (e) {
+        console.error("Impossible d'ouvrir le zoom :", e);
+      }
+    };
+
+    pageDiv.appendChild(d);
+
+    container.appendChild(pageDiv);
+  });
+
+  // si rien n'est dans la liste
+  if (list.length === 0) {
+    container.innerHTML = '<p style="color:#b84c6f;text-align:center;width:100%;">Aucune création à afficher</p>';
+  }
 }
 // ====== ZOOM ======
 function openZoom(c) {
