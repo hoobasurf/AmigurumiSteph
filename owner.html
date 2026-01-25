@@ -288,15 +288,14 @@ body::before{
 }
 
 #likeCount, #commentCount {
-  font-family: 'Courier New', monospace; /* police largeur fixe */
-  font-style: italic;                     /* italique pour effet biffé */
-  color: #b84c6f;
+  font-family: 'Courier New', monospace; /* simple, lisible */
+  font-style: normal;                     /* pas d'italique si tu veux */
   font-weight: bold;
+  text-decoration: none;                  /* IMPORTANT : enlève toute barre */
+  color: #b84c6f;
   font-size: 14px;
   min-width: 18px;
   text-align: center;
-  opacity: 0.85;                          /* léger effet “biffé” */
-  transform: rotate(-2deg);               /* légère inclinaison pour style */
 }
   
 </style>
