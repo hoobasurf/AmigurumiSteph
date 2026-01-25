@@ -363,7 +363,28 @@ body::before{
   box-shadow: 0 4px 10px rgba(0,0,0,0.15);
 }
   
-
+.delete-btn {
+  position: absolute;
+  top: 6px;
+  right: 6px;
+  width: 24px;
+  height: 24px;
+  background: #ffb6c1; /* rose pastel */
+  color: #fff;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-weight: bold;
+  font-size: 16px;
+  cursor: pointer;
+  z-index: 5;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.delete-btn:hover {
+  transform: scale(1.2);
+  box-shadow: 0 2px 6px rgba(0,0,0,0.25);
+}
   
 
 </style>
@@ -835,7 +856,6 @@ function renderCreations(list) {
   pageDiv.className = 'page';
 
   list.forEach((c, index) => {
-
     if (index % 6 === 0 && index !== 0) {
       container.appendChild(pageDiv);
       pageDiv = document.createElement('div');
@@ -844,6 +864,16 @@ function renderCreations(list) {
 
     const d = document.createElement('div');
     d.className = 'visitor-item';
+
+    // CROIX SUPPRESSION
+    const delBtn = document.createElement('div');
+    delBtn.className = 'delete-btn';
+    delBtn.textContent = '×';
+    delBtn.onclick = (e) => {
+      e.stopPropagation(); // ne pas ouvrir le zoom
+      openDeleteModal(c);
+    };
+    d.appendChild(delBtn);
 
     const img = document.createElement('img');
     img.src = c.imgUrl || '';
@@ -854,7 +884,9 @@ function renderCreations(list) {
   });
 
   container.appendChild(pageDiv);
-}// ====== ZOOM ======
+}
+  }
+      // ====== ZOOM ======
 function openZoom(c) {
   // on récupère la création complète
   currentZoom = creations.find(x => x.id === c.id) || c;
