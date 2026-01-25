@@ -230,6 +230,22 @@ body::before{
   transform: scale(1.03);
   box-shadow: 0 4px 10px rgba(0,0,0,0.15);
 }
+
+.zoom-content {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.legend-box {
+  min-width: 150px;
+  background: #ffe6f0;
+  border: 2px solid #b84c6f;
+  border-radius: 12px;
+  padding: 8px;
+  color: #b84c6f;
+  font-size: 14px;
+}
   
 </style>
 </head>
@@ -694,28 +710,51 @@ function renderCreations(list) {
     }
 
     const d = document.createElement('div');
-d.className = 'creation';
+    d.className = 'visitor-item';
 
-const img = document.createElement('img');
-img.src = c.imgUrl || '';
-d.appendChild(img);
+    const img = document.createElement('img');
+    img.src = c.imgUrl || '';
+    img.onclick = () => openZoom(c);
 
-pageDiv.appendChild(d);
+    d.appendChild(img);
+    pageDiv.appendChild(d);
+  });
 
   container.appendChild(pageDiv);
-}
-// ====== ZOOM ======
+}// ====== ZOOM ======
 function openZoom(c) {
-  currentZoom = creations.find(x => x.id === c.id);
-  mainZoom.src = currentZoom.imgUrl;
-  document.getElementById('zoomLegend').textContent = currentZoom.legend || '';
+  // on récupère la création complète
+  currentZoom = creations.find(x => x.id === c.id) || c;
+
+  // sécurité si jamais ça n'existe pas
+  if (!currentZoom) return;
+
+  // image principale
+  mainZoom.src = currentZoom.imgUrl || '';
+
+  // légende à droite
+  const legendBox = document.getElementById('zoomLegend');
+  if (legendBox) {
+    legendBox.textContent = currentZoom.legend ? currentZoom.legend : 'Aucune légende';
+  }
+
+  // miniatures
   thumbs.innerHTML = '';
-  (currentZoom.zoomGroup || []).forEach(u => {
-    const t = document.createElement('img'); t.src = u;
-    t.onclick = () => mainZoom.src = u;
-    thumbs.appendChild(t);
-  });
-  updateActions();
+  if (Array.isArray(currentZoom.zoomGroup)) {
+    currentZoom.zoomGroup.forEach(u => {
+      const t = document.createElement('img');
+      t.src = u;
+      t.style.cursor = 'pointer';
+      t.onclick = () => mainZoom.src = u;
+      thumbs.appendChild(t);
+    });
+  }
+
+  // likes + commentaires
+  renderLikeList();
+  renderCommentList();
+
+  // affichage du zoom
   zoomModal.style.display = 'flex';
 }
 function updateActions() {
@@ -815,7 +854,7 @@ document.getElementById('confirmAdd').onclick = async e => {
   const urls = [];
 
   for (let file of files) {
-    const path = ${Date.now()}_${file.name};
+    const path = `${Date.now()}_${file.name}`;
     const { error: uploadError } = await supabase.storage.from('images').upload(path, file);
     if (uploadError) { 
       console.error(uploadError); 
