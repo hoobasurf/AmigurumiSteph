@@ -298,14 +298,15 @@ body::before{
 
 
 #likeCount, #commentCount {
-  font-family: 'Courier New', monospace; /* simple, lisible */
-  font-style: normal;                     /* pas d'italique si tu veux */
+  font-style: italic;           /* italique */
+  text-decoration: line-through; /* biffé */
   font-weight: bold;
-  text-decoration: none;                  /* IMPORTANT : enlève toute barre */
   color: #b84c6f;
-  font-size: 14px;
-  min-width: 18px;
-  text-align: /* ====== CROIX ROSE POUR FERMER LES MODALS ====== */
+  margin-left: 4px;
+  text-align: left;             /* mettre une valeur valide */
+}
+
+/* ====== CROIX ROSE POUR FERMER LES MODALS ====== */
 .modal .closeModal,
 .closeZoom {
   position: absolute;
@@ -325,12 +326,12 @@ body::before{
   z-index: 1001;
   transition: transform 0.2s, box-shadow 0.2s;
 }
+
 .modal .closeModal:hover,
 .closeZoom:hover {
   transform: scale(1.2);
   box-shadow: 0 2px 8px rgba(0,0,0,0.25);
 }
-
 /* ====== BOUTONS VALIDER ROSE ====== */
 .modal button#confirmAdd,
 .modal button#confirmLike,
