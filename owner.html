@@ -26,8 +26,11 @@ body::before{
   overflow-y: hidden;        /* bloque le scroll vertical */
   scroll-snap-type: x mandatory;
   -webkit-overflow-scrolling: touch;
-  padding-left: calc(1cm + 3cm + 2cm); /* ancien padding + 3cm + 2cm décalage supplémentaire */
-  gap: 5cm;                  /* nouvel espacement entre les grilles */
+
+  /* padding-left = ancien 1cm + décalage précédent 5cm + nouveau décalage 5cm */
+  padding-left: calc(1cm + 5cm + 5cm); 
+
+  gap: 10cm;                 /* nouvel espacement entre les grilles */
   justify-content: flex-start;
 }
 
@@ -35,7 +38,7 @@ body::before{
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   grid-template-rows: repeat(3, 1fr);
-  column-gap: 3mm;           /* si tu veux, on peut aussi transformer en cm */
+  column-gap: 3mm;
   row-gap: 4mm;
   flex: 0 0 auto;            /* important pour le scroll horizontal */
   scroll-snap-align: start;  /* chaque page “snap” parfaitement */
