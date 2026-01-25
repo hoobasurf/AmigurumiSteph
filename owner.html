@@ -266,43 +266,56 @@ body::before{
   color: #b84c6f;
   font-size: 14px;
 }
-/* ====== BOUTONS ICONES ====== */
 .icon-btn {
-  background: transparent;  /* pas de fond */
-  border: none;             /* pas de bordure */
-  padding: 0;               /* supprime le padding rose */
+  background: transparent; /* pas de fond pour le bouton */
+  border: none;            /* pas de bordure */
+  padding: 4px;
   display: flex;
   align-items: center;
   justify-content: center;
-  cursor: pointer;
 }
 
 .icon-btn svg {
-  background: transparent; /* supprime fond */
-  fill: none;              /* pas de remplissage */
-  stroke: #b84c6f;        /* couleur icône */
+  background: transparent; /* pas de fond pour le svg */
+  fill: none;              /* assure que le remplissage est vide */
+  stroke: #b84c6f;
   width: 22px;
   height: 22px;
   transition: transform 0.2s;
 }
-
-/* ====== COMPTEURS LIKE / COMMENT ====== */
-#likeCount,
-#commentCount {
-  font-family: 'Courier New', monospace; /* simple et lisible */
-  font-style: normal;                     /* pas d'italique */
+#likeCount, #commentCount {
+  font-style: italic;      /* italique */
+  text-decoration: line-through; /* biffé */
   font-weight: bold;
-  text-decoration: none;                  /* supprime le biffé */
   color: #b84c6f;
-  font-size: 14px;
-  margin-left: 4px;                       /* espace après bouton */
-  min-width: 18px;
-  text-align: left;
-  background: transparent;                /* supprime tout fond */
-  padding: 0;
+  margin-left: 4px;        /* un petit espace après le bouton */
 }
 
-/* ====== CROIX ROSE POUR FERMER LES MODALS ====== */
+#zoomModal#zoomModal .actions {
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  margin-top: 10px;
+}
+
+.icon-btn {
+  background: transparent;
+  border: none;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#likeCount, #commentCount {
+  font-family: 'Courier New', monospace; /* simple, lisible */
+  font-style: normal;                     /* pas d'italique si tu veux */
+  font-weight: bold;
+  text-decoration: none;                  /* IMPORTANT : enlève toute barre */
+  color: #b84c6f;
+  font-size: 14px;
+  min-width: 18px;
+  text-align: /* ====== CROIX ROSE POUR FERMER LES MODALS ====== */
 .modal .closeModal,
 .closeZoom {
   position: absolute;
