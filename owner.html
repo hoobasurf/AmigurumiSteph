@@ -70,10 +70,7 @@ body::before{
 #ownerPhoto{width:32px;height:32px;border-radius:50%;position:fixed;top:10px;right:10px;z-index:10000;background:#ffe6f0;border:2px solid #b84c6f;}
 @media(max-width:480px){.page{grid-template-columns:repeat(2,120px);grid-template-rows:repeat(3,120px);}.visitor-item{width:120px;height:120px;}.modal .modal-box{min-width:180px;}}
 
-.icon-btn svg {
-  cursor: pointer;
-  transition: transform 0.2s;
-}
+
 .icon-btn:hover svg {
   transform: scale(1.2);
 }
@@ -276,13 +273,14 @@ body::before{
 }
 
 .icon-btn svg {
-  background: transparent; /* pas de fond pour le svg */
-  fill: none;              /* assure que le remplissage est vide */
+  background: transparent !important; /* supprime tout fond */
+  fill: none !important;               /* supprime le remplissage blanc */
   stroke: #b84c6f;
   width: 22px;
   height: 22px;
   transition: transform 0.2s;
 }
+  
 #likeCount, #commentCount {
   font-style: italic;      /* italique */
   text-decoration: line-through; /* biffé */
@@ -298,14 +296,6 @@ body::before{
   margin-top: 10px;
 }
 
-.icon-btn {
-  background: transparent;
-  border: none;
-  padding: 4px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
 
 #likeCount, #commentCount {
   font-family: 'Courier New', monospace; /* simple, lisible */
@@ -1074,43 +1064,37 @@ document.getElementById('confirmDelete').onclick = async () => {
   deleteModal.style.display = 'none';
   await refreshCreations();
 };
-document.addEventListener('DOMContentLoaded', () => {
-  document.addEventListener('DOMContentLoaded', () => {
-  const sidebar = document.getElementById('sidebar');
-  const chatModal = document.getElementById('chatModal');
+// ====== SIDEBAR & BOUTONS ======
+const sidebar = document.getElementById('sidebar');
+const chatModal = document.getElementById('chatModal');
 
-  // SIDEBAR NAV
-  document.getElementById('pelotesBtn').onclick = () => {
-    document.body.style.opacity = '0';
-    setTimeout(() => window.location.href='pelotes.html', 500);
-  };
+document.getElementById('pelotesBtn').onclick = () => {
+  document.body.style.opacity = '0';
+  setTimeout(() => window.location.href='pelotes.html', 500);
+};
 
-  document.getElementById('videoBtn').onclick = () => {
-    document.body.style.opacity = '0';
-    setTimeout(() => window.location.href='video.html', 500);
-  };
+document.getElementById('videoBtn').onclick = () => {
+  document.body.style.opacity = '0';
+  setTimeout(() => window.location.href='video.html', 500);
+};
 
-  document.getElementById('notesBtn').onclick = () => {
-    document.body.style.opacity = '0';
-    setTimeout(() => window.location.href='notes.html', 500);
-  };
+document.getElementById('notesBtn').onclick = () => {
+  document.body.style.opacity = '0';
+  setTimeout(() => window.location.href='notes.html', 500);
+};
 
-  const actualiteBtn = document.getElementById('actualiteBtn');
-  if(actualiteBtn){
-    actualiteBtn.onclick = () => {
-      document.body.style.opacity = '0';
-      setTimeout(() => window.location.href='actualite.html', 300);
-    };
-  }
+document.getElementById('actualiteBtn').onclick = () => {
+  document.body.style.opacity = '0';
+  setTimeout(() => window.location.href='actualite.html', 300);
+};
 
-  document.getElementById('messagerieBtn').onclick = () => {
-    chatModal.style.display='flex';
-  };
+document.getElementById('messagerieBtn').onclick = () => {
+  chatModal.style.display='flex';
+};
 
-  document.getElementById('toggleSidebar').onclick = () => {
-    sidebar.classList.toggle('sidebar-open');
-  };
-});
+document.getElementById('toggleSidebar').onclick = () => {
+  sidebar.classList.toggle('sidebar-open');
+};
   const actualiteBtn = document.getElementById('actualiteBtn');
   if(actualiteBtn){
     actualiteBtn.onclick = () => {
