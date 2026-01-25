@@ -875,15 +875,18 @@ async function refreshCreations() {
       }
 
       return {
-        id: c.id,
-        name: c.name || '',
-        legend: c.legend || '',
-        imgUrl: zoomGroup[0] || '',
-        zoomGroup,
-        likes: Array.isArray(c.likes) ? c.likes : [],
-        comments: Array.isArray(c.comments) ? c.comments : []
-      };
-    });
+        creations = data.map(c => ({
+  id: c.id,
+  name: c.name || '',
+  legend: c.legend || '',
+  imgUrl: zoomGroup[0] || '',
+  zoomGroup,
+  likes: Array.isArray(c.likes) ? c.likes : [],
+  comments: Array.isArray(c.comments) ? c.comments : [],
+  x: c.x || 0,
+  y: c.y || 0,
+  scale: c.scale || 1
+}));
 
     renderCreations(creations);
 
