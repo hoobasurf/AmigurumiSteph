@@ -70,7 +70,10 @@ body::before{
 #ownerPhoto{width:32px;height:32px;border-radius:50%;position:fixed;top:10px;right:10px;z-index:10000;background:#ffe6f0;border:2px solid #b84c6f;}
 @media(max-width:480px){.page{grid-template-columns:repeat(2,120px);grid-template-rows:repeat(3,120px);}.visitor-item{width:120px;height:120px;}.modal .modal-box{min-width:180px;}}
 
-
+.icon-btn svg {
+  cursor: pointer;
+  transition: transform 0.2s;
+}
 .icon-btn:hover svg {
   transform: scale(1.2);
 }
@@ -273,14 +276,13 @@ body::before{
 }
 
 .icon-btn svg {
-  background: transparent !important; /* supprime tout fond */
-  fill: none !important;               /* supprime le remplissage blanc */
+  background: transparent; /* pas de fond pour le svg */
+  fill: none;              /* assure que le remplissage est vide */
   stroke: #b84c6f;
   width: 22px;
   height: 22px;
   transition: transform 0.2s;
 }
-  
 #likeCount, #commentCount {
   font-style: italic;      /* italique */
   text-decoration: line-through; /* biffé */
@@ -296,17 +298,24 @@ body::before{
   margin-top: 10px;
 }
 
-
-#likeCount, #commentCount {
-  font-style: italic;           /* italique */
-  text-decoration: line-through; /* biffé */
-  font-weight: bold;
-  color: #b84c6f;
-  margin-left: 4px;
-  text-align: left;             /* mettre une valeur valide */
+.icon-btn {
+  background: transparent;
+  border: none;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-/* ====== CROIX ROSE POUR FERMER LES MODALS ====== */
+#likeCount, #commentCount {
+  font-family: 'Courier New', monospace; /* simple, lisible */
+  font-style: normal;                     /* pas d'italique si tu veux */
+  font-weight: bold;
+  text-decoration: none;                  /* IMPORTANT : enlève toute barre */
+  color: #b84c6f;
+  font-size: 14px;
+  min-width: 18px;
+  text-align: /* ====== CROIX ROSE POUR FERMER LES MODALS ====== */
 .modal .closeModal,
 .closeZoom {
   position: absolute;
@@ -326,12 +335,12 @@ body::before{
   z-index: 1001;
   transition: transform 0.2s, box-shadow 0.2s;
 }
-
 .modal .closeModal:hover,
 .closeZoom:hover {
   transform: scale(1.2);
   box-shadow: 0 2px 8px rgba(0,0,0,0.25);
 }
+
 /* ====== BOUTONS VALIDER ROSE ====== */
 .modal button#confirmAdd,
 .modal button#confirmLike,
@@ -407,9 +416,8 @@ body::before{
   <button id="pelotesBtn">Pelotes</button>
   <button id="videoBtn">Vidéo</button>
   <button id="notesBtn">Notes</button>
-  <button id="actualiteBtn">Actualité</button>
   <button id="messagerieBtn">Messagerie</button>
-</div>
+  <button id="actualiteBtn">Actualité</button>
   
     
 <!-- Modals -->
@@ -1065,45 +1073,20 @@ document.getElementById('confirmDelete').onclick = async () => {
   currentDelete = null;
   deleteModal.style.display = 'none';
   await refreshCreations();
-};// ====== SIDEBAR & BOUTONS ======
-const sidebar = document.getElementById('sidebar');
-const chatModal = document.getElementById('chatModal');
-
-document.getElementById('pelotesBtn').onclick = () => {
-  document.body.style.opacity = '0';
-  setTimeout(() => window.location.href='pelotes.html', 500);
 };
 
-document.getElementById('videoBtn').onclick = () => {
-  document.body.style.opacity = '0';
-  setTimeout(() => window.location.href='video.html', 500);
-};
-
-document.getElementById('notesBtn').onclick = () => {
-  document.body.style.opacity = '0';
-  setTimeout(() => window.location.href='notes.html', 500);
-};
-
+// ====== SIDEBAR ======
+document.getElementById('pelotesBtn').onclick = () => { document.body.style.opacity='0'; setTimeout(()=>window.location.href='pelotes.html',500); };
+document.getElementById('videoBtn').onclick = () => { document.body.style.opacity='0'; setTimeout(()=>window.location.href='video.html',500); };
+document.getElementById('notesBtn').onclick = () => { document.body.style.opacity='0'; setTimeout(()=>window.location.href='notes.html',500); };
+document.getElementById('messagerieBtn').onclick = () => { chatModal.style.display='flex'; };
+document.getElementById('toggleSidebar').onclick = () => sidebar.classList.toggle('sidebar-open');
 document.getElementById('actualiteBtn').onclick = () => {
   document.body.style.opacity = '0';
-  setTimeout(() => window.location.href='actualite.html', 300);
+  setTimeout(() => {
+    window.location.href = 'actualite.html';
+  }, 300);
 };
-
-document.getElementById('messagerieBtn').onclick = () => {
-  chatModal.style.display = 'flex';
-};
-
-document.getElementById('toggleSidebar').onclick = () => {
-  sidebar.classList.toggle('sidebar-open');
-};
-      
-  const actualiteBtn = document.getElementById('actualiteBtn');
-  if(actualiteBtn){
-    actualiteBtn.onclick = () => {
-      document.body.style.opacity = '0';
-      setTimeout(() => window.location.href='actualite.html', 300);
-    };
-  }
       
      
 // ====== FERMETURE MESSAGERIE AU CLIC DANS LE VIDE ======
