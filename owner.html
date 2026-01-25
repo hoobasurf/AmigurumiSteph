@@ -370,7 +370,7 @@ body::before{
   z-index: 5;
   transition: transform 0.2s, box-shadow 0.2s;
 }
-..delete-btn:hover {
+.delete-btn:hover {
   transform: scale(1.2);
   box-shadow: 0 2px 6px rgba(0,0,0,0.25);
   width: auto;
@@ -436,7 +436,7 @@ body::before{
   <button id="notesBtn">Notes</button>
   <button id="messagerieBtn">Messagerie</button>
   <button id="actualiteBtn">Actualité</button>
-  
+  </div>
     
 <!-- Modals -->
 <div id="addModal" class="modal">
@@ -668,7 +668,6 @@ const fileInput = document.getElementById('multiPhoto');
 const fileInfo = document.getElementById('fileInfo');
 const zoomContent = document.querySelector('.zoom-content');
 const zoomLegend = document.getElementById('zoomLegend');
-const mainZoom = document.getElementById('mainZoom');
       
 fileBtn.onclick = () => fileInput.click();
 
@@ -835,39 +834,6 @@ zoomLegend.style.position = 'absolute';
 zoomLegend.style.top = '10px';
 zoomLegend.style.left = '10px';
 zoomLegend.style.cursor = 'grab';
-
-
-
-// Empêcher scroll du body pendant zoom
-zoomContent.addEventListener('touchmove', e => e.preventDefault(), {passive:false});
-
-  el.addEventListener('touchstart', e => {
-    if (e.touches.length === 2) {
-      initialDistance = Math.hypot(
-        e.touches[0].clientX - e.touches[1].clientX,
-        e.touches[0].clientY - e.touches[1].clientY
-      );
-      initialScale = el.dataset.scale ? parseFloat(el.dataset.scale) : 1;
-    }
-  });
-
-  el.addEventListener('touchmove', e => {
-    if (e.touches.length === 2 && initialDistance) {
-      const currentDistance = Math.hypot(
-        e.touches[0].clientX - e.touches[1].clientX,
-        e.touches[0].clientY - e.touches[1].clientY
-      );
-      let scale = initialScale * (currentDistance / initialDistance);
-      scale = Math.max(0.5, Math.min(3, scale)); // min 0.5x, max 3x
-      el.style.transform = `scale(${scale})`;
-      el.dataset.scale = scale;
-    }
-  });
-
-  el.addEventListener('touchend', e => {
-    if (e.touches.length < 2) initialDistance = null;
-  });
-}
 
       
 // ====== CREATIONS ======
