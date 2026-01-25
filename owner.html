@@ -22,13 +22,13 @@ body::before{
 .center-zone{display:flex;justify-content:center;align-items:flex-start;padding-top:3.5cm;overflow:hidden;height:auto;}
 #visitor-list-container {
   display: flex;
-  overflow-x: auto;
+  overflow-x: auto;          /* scroll horizontal uniquement */
+  overflow-y: hidden;        /* bloque le scroll vertical */
   scroll-snap-type: x mandatory;
   -webkit-overflow-scrolling: touch;
-  justify-content: center;
-  padding-left: 1cm;
-
-  margin-left: 5cm; /* <-- ajoute ce décalage */
+  padding-left: calc(1cm + 3cm); /* ancien padding + 3cm de décalage */
+  margin: 0;                 /* pas de marge supplémentaire */
+  justify-content: flex-start; /* alignement à gauche pour respecter le décalage */
 }
 .page {
   display: grid;
