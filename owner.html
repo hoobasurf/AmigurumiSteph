@@ -271,10 +271,10 @@ body::before{
   margin-left: 4px;        /* un petit espace après le bouton */
 }
 
-#zoomModal .actions {
-  display: flex;           /* les éléments enfants en ligne */
-  gap: 12px;               /* espace entre chaque bouton+compteur */
-  align-items: center;     /* centrer verticalement le svg et le texte */
+#zoomModal#zoomModal .actions {
+  display: flex;
+  gap: 12px;
+  align-items: center;
   margin-top: 10px;
 }
 
@@ -288,13 +288,14 @@ body::before{
 }
 
 #likeCount, #commentCount {
-  font-style: italic;      
-  text-decoration: line-through; 
+  font-family: 'Courier New', monospace; /* police à largeur fixe */
+  font-style: italic;                     /* italique */
+  text-decoration: line-through;          /* biffé */
   font-weight: bold;
   color: #b84c6f;
   font-size: 14px;
-  min-width: 18px;        /* éviter que le texte bouge quand ça change */
-  text-align: center;
+  min-width: 18px;                        /* espace fixe pour le compteur */
+  text-align: center;                     /* centrer le texte */
 }
   
 </style>
