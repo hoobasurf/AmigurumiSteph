@@ -315,9 +315,57 @@ body::before{
   color: #b84c6f;
   font-size: 14px;
   min-width: 18px;
-  text-align: center;
+  text-align: /* ====== CROIX ROSE POUR FERMER LES MODALS ====== */
+.modal .closeModal,
+.closeZoom {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 28px;
+  height: 28px;
+  background: #ffb6c1;   /* rose pastel */
+  color: #fff;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 18px;
+  font-weight: bold;
+  cursor: pointer;
+  z-index: 1001;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+.modal .closeModal:hover,
+.closeZoom:hover {
+  transform: scale(1.2);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.25);
+}
+
+/* ====== BOUTONS VALIDER ROSE ====== */
+.modal button#confirmAdd,
+.modal button#confirmLike,
+.modal button#confirmComment,
+.modal button#confirmDelete {
+  background: linear-gradient(#ffd6e6, #ffb6c1);
+  border: 2px solid #b67385;
+  border-radius: 16px;
+  padding: 8px 14px;
+  color: #b84c6f;
+  font-weight: bold;
+  cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.15s;
+}
+.modal button#confirmAdd:hover,
+.modal button#confirmLike:hover,
+.modal button#confirmComment:hover,
+.modal button#confirmDelete:hover {
+  transform: scale(1.03);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.15);
 }
   
+
+  
+
 </style>
 </head>
 <body>
