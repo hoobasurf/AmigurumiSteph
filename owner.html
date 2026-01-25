@@ -404,13 +404,16 @@ body::before{
 
 .zoom-content {
   display: flex;
-  gap: 12px; /* c’est ici que tu peux réduire aussi */
+  gap: 12px;          /* espace image → légende */
   align-items: flex-start;
 }
 
- #zoomLegend {
-  margin-left: -30px; /* plus le nombre est grand, plus la légende se rapproche de l’image */
+#zoomLegend {
+  min-width: 120px;   /* réduire si trop large */
+  margin-left: -40px; /* rapproche de l’image */
+  flex-shrink: 0;     /* empêche le rétrécissement */
 }
+
   
 </style>
 </head>
