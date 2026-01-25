@@ -246,7 +246,31 @@ body::before{
   color: #b84c6f;
   font-size: 14px;
 }
-  
+.icon-btn {
+  background: transparent; /* pas de fond pour le bouton */
+  border: none;            /* pas de bordure */
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.icon-btn svg {
+  background: transparent; /* pas de fond pour le svg */
+  fill: none;              /* assure que le remplissage est vide */
+  stroke: #b84c6f;
+  width: 22px;
+  height: 22px;
+  transition: transform 0.2s;
+}
+#likeCount, #commentCount {
+  font-style: italic;      /* italique */
+  text-decoration: line-through; /* biffé */
+  font-weight: bold;
+  color: #b84c6f;
+  margin-left: 4px;        /* un petit espace après le bouton */
+}
+
 </style>
 </head>
 <body>
