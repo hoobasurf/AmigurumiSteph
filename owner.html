@@ -914,46 +914,56 @@ function makePinchZoom(el) {
   });
 }
 
-function makeDraggable(el) {
-  let startX=0, startY=0, x=0, y=0, dragging=false;
+function makePinchZoom(el) {
+  let initialDistance = null;
+  let initialScale = 1;
 
-  el.addEventListener('mousedown', e=>{
-    dragging=true;
-    startX=e.clientX-x;
-    startY=e.clientY-y;
-  });
+  el.dataset.scale = 1;
 
-  document.addEventListener('mousemove', e=>{
-    if(!dragging) return;
-    x=e.clientX-startX;
-    y=e.clientY-startY;
-    el.style.transform = `translate(${x}px, ${y}px) scale(${el.dataset.scale||1})`;
-  });
-
-  document.addEventListener('mouseup', ()=>dragging=false);
-
-  el.addEventListener('touchstart', e=>{
-    dragging=true;
-    startX=e.touches[0].clientX-x;
-    startY=e.touches[0].clientY-y;
-  });
-
-  el.addEventListener('touchmove', e=>{
-    if(!dragging) return;
-    x=e.touches[0].clientX-startX;
-    y=e.touches[0].clientY-startY;
-    el.style.transform = `translate(${x}px, ${y}px) scale(${el.dataset.scale||1})`;
+  el.addEventListener('wheel', e => {
     e.preventDefault();
-  }, {passive:false});
+    let scale = parseFloat(el.dataset.scale);
+    scale += e.deltaY * -0.001;
+    scale = Math.min(Math.max(0.5, scale), 3);
+    el.dataset.scale = scale;
+    el.style.transform = `translate(${el.dataset.x||0}px, ${el.dataset.y||0}px) scale(${scale})`;
+  }, { passive:false });
 
-  el.addEventListener('touchend', ()=>dragging=false);
+  el.addEventListener('touchstart', e => {
+    if (e.touches.length === 2) {
+      initialDistance = Math.hypot(
+        e.touches[0].clientX - e.touches[1].clientX,
+        e.touches[0].clientY - e.touches[1].clientY
+      );
+      initialScale = parseFloat(el.dataset.scale);
+    }
+  });
+
+  el.addEventListener('touchmove', e => {
+    if (e.touches.length === 2 && initialDistance) {
+      e.preventDefault();
+      const currentDistance = Math.hypot(
+        e.touches[0].clientX - e.touches[1].clientX,
+        e.touches[0].clientY - e.touches[1].clientY
+      );
+      let scale = initialScale * (currentDistance / initialDistance);
+      scale = Math.min(Math.max(0.5, scale), 3);
+      el.dataset.scale = scale;
+      el.style.transform = `translate(${el.dataset.x||0}px, ${el.dataset.y||0}px) scale(${scale})`;
+    }
+  }, { passive:false });
+
+  el.addEventListener('touchend', () => {
+    initialDistance = null;
+  });
 }
       
 // Appliquer drag + pinch
 makeDraggable(mainZoom);
 makeDraggable(zoomLegend);
 makePinchZoom(mainZoom);
-
+makePinchZoom(zoomLegend);
+      
 // Valeur initiale
 mainZoom.dataset.scale = 1;
       
