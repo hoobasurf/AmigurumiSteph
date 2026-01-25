@@ -505,31 +505,34 @@ body::before{
   <div class="closeZoom">×</div>
 
   <div class="zoom-content">
-    <img id="mainZoom">          <!-- l'image principale -->
-    <div id="zoomLegend" class="legend-box"></div>  <!-- ici la légende s'affiche -->
+    <img id="mainZoom">
+    <div id="zoomLegend" class="legend-box"></div>
   </div>
 
   <div class="thumbs" id="thumbs"></div>
-  <div class="actions">
-  <button id="likeBtn" class="icon-btn">
-    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22"
-         fill="none" stroke="#b84c6f" stroke-width="2"
-         stroke-linecap="round" stroke-linejoin="round"
-         viewBox="0 0 24 24">
-      <path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8z"/>
-    </svg>
-  </button>
-  <span id="likeCount">0</span>
 
-  <button id="commentBtn" class="icon-btn">
-    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22"
-         fill="none" stroke="#b84c6f" stroke-width="2"
-         stroke-linecap="round" stroke-linejoin="round"
-         viewBox="0 0 24 24">
-      <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
-    </svg>
-  </button>
-  <span id="commentCount">0</span>
+  <!-- Déplacer actions en bas -->
+  <div class="actions" style="position:absolute; bottom:12px; left:50%; transform:translateX(-50%); display:flex; gap:12px; align-items:center;">
+    <button id="likeBtn" class="icon-btn">
+      <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22"
+           fill="none" stroke="#b84c6f" stroke-width="2"
+           stroke-linecap="round" stroke-linejoin="round"
+           viewBox="0 0 24 24">
+        <path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8z"/>
+      </svg>
+    </button>
+    <span id="likeCount">0</span>
+
+    <button id="commentBtn" class="icon-btn">
+      <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22"
+           fill="none" stroke="#b84c6f" stroke-width="2"
+           stroke-linecap="round" stroke-linejoin="round"
+           viewBox="0 0 24 24">
+        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+      </svg>
+    </button>
+    <span id="commentCount">0</span>
+  </div>
 </div>
 
 <!-- Modal Gestion -->
@@ -1071,11 +1074,10 @@ function openZoom(c) {
   zoomModal.style.display = 'flex';
 
 // BLOQUE SCROLL ARRIÈRE-PLAN
-document.querySelectorAll('.visitor-item img').forEach(img => {
-  img.style.pointerEvents = 'none';
-});
 document.body.style.overflow = 'hidden';
-}
+document.querySelectorAll('#visitor-list-container, .page').forEach(el => {
+  el.style.pointerEvents = 'none';
+});
       
 function updateActions() {
   if (!currentZoom) return;
