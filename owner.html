@@ -271,6 +271,32 @@ body::before{
   margin-left: 4px;        /* un petit espace après le bouton */
 }
 
+#zoomModal .actions {
+  display: flex;           /* les éléments enfants en ligne */
+  gap: 12px;               /* espace entre chaque bouton+compteur */
+  align-items: center;     /* centrer verticalement le svg et le texte */
+  margin-top: 10px;
+}
+
+.icon-btn {
+  background: transparent;
+  border: none;
+  padding: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+#likeCount, #commentCount {
+  font-style: italic;      
+  text-decoration: line-through; 
+  font-weight: bold;
+  color: #b84c6f;
+  font-size: 14px;
+  min-width: 18px;        /* éviter que le texte bouge quand ça change */
+  text-align: center;
+}
+  
 </style>
 </head>
 <body>
