@@ -874,8 +874,7 @@ async function refreshCreations() {
         ];
       }
 
-      return {
-        creations = data.map(c => ({
+return {
   id: c.id,
   name: c.name || '',
   legend: c.legend || '',
@@ -885,8 +884,11 @@ async function refreshCreations() {
   comments: Array.isArray(c.comments) ? c.comments : [],
   x: c.x || 0,
   y: c.y || 0,
-  scale: c.scale || 1
-}));
+  scale: c.scale || 1,
+  x_legend: c.x_legend || 0,
+  y_legend: c.y_legend || 0,
+  scale_legend: c.scale_legend || 1
+};
 
     renderCreations(creations);
 
@@ -924,14 +926,23 @@ function makeDraggable(el, isLegend = false) {
 
     // 🔹 Sauvegarde Supabase
     if(currentZoom) {
-  currentZoom.x_legend = parseFloat(zoomLegend.dataset.x);
-  currentZoom.y_legend = parseFloat(zoomLegend.dataset.y);
-  currentZoom.scale_legend = parseFloat(zoomLegend.dataset.scale);
+  if(isLegend){
+    currentZoom.x_legend = parseFloat(el.dataset.x);
+    currentZoom.y_legend = parseFloat(el.dataset.y);
+    currentZoom.scale_legend = parseFloat(el.dataset.scale);
 
-  supabase.from('creations')
-    .update({ x_legend: currentZoom.x_legend, y_legend: currentZoom.y_legend, scale_legend: currentZoom.scale_legend })
-    .eq('id', currentZoom.id)
-    .catch(err => console.error('Erreur sauvegarde légende:', err));
+    supabase.from('creations')
+      .update({ x_legend: currentZoom.x_legend, y_legend: currentZoom.y_legend, scale_legend: currentZoom.scale_legend })
+      .eq('id', currentZoom.id);
+  } else {
+    currentZoom.x = parseFloat(el.dataset.x);
+    currentZoom.y = parseFloat(el.dataset.y);
+    currentZoom.scale = parseFloat(el.dataset.scale);
+
+    supabase.from('creations')
+      .update({ x: currentZoom.x, y: currentZoom.y, scale: currentZoom.scale })
+      .eq('id', currentZoom.id);
+  }
 }
 
         supabase.from('creations')
@@ -1081,27 +1092,13 @@ function makePinchZoom(el, isLegend = false) {
 
   el.addEventListener('touchend', () => { initialDistance = null; });
 }
-  el.addEventListener('touchmove', e => {
-    if (e.touches.length === 2 && initialDistance) {
-      e.preventDefault();
-      const currentDistance = Math.hypot(
-        e.touches[0].clientX - e.touches[1].clientX,
-        e.touches[0].clientY - e.touches[1].clientY
-      );
-      let scale = initialScale * (currentDistance / initialDistance);
-      scale = Math.min(Math.max(0.5, scale), 3);
-      el.dataset.scale = scale;
-      el.style.transform = `translate(${el.dataset.x||0}px,${el.dataset.y||0}px) scale(${scale})`;
-    }
-  }, { passive: false });
-  el.addEventListener('touchend', () => { if(event.touches.length<2) initialDistance=null; });
-}
+  
 
 // ====== APPLIQUER SUR IMAGE + LÉGENDE ======
-makeDraggable(mainZoom);
-makeDraggable(zoomLegend);
-makePinchZoom(mainZoom);
-makePinchZoom(zoomLegend);
+makeDraggable(mainZoom, false);
+makeDraggable(zoomLegend, true);
+makePinchZoom(mainZoom, false);
+makePinchZoom(zoomLegend, true);
       
 // Valeur initiale
 mainZoom.dataset.scale = 1;
