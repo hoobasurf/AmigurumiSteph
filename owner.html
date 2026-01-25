@@ -893,8 +893,8 @@ async function refreshCreations() {
 }
 
 // ====== DRAG SIMPLE ======
-function makeDraggable(el) {
-  let isDragging = false, startX, startY, origX = 0, origY = 0;
+function makeDraggable(el, isLegend = false) {
+  let isDragging = false, startX, startY;
 
   el.style.transform = 'translate(0px,0px) scale(1)';
   el.dataset.x = 0;
@@ -906,6 +906,7 @@ function makeDraggable(el) {
     startY = e.clientY;
     el.style.cursor = 'grabbing';
   });
+
   document.addEventListener('mousemove', e => {
     if (!isDragging) return;
     let dx = e.clientX - startX;
@@ -917,7 +918,31 @@ function makeDraggable(el) {
     el.style.transform = `translate(${newX}px,${newY}px) scale(${el.dataset.scale||1})`;
     startX = e.clientX;
     startY = e.clientY;
+
+    // 🔹 Sauvegarde Supabase
+    if(currentZoom) {
+      if(isLegend){
+        currentZoom.x_legend = parseFloat(el.dataset.x);
+        currentZoom.y_legend = parseFloat(el.dataset.y);
+        currentZoom.scale_legend = parseFloat(el.dataset.scale);
+
+        supabase.from('creations')
+          .update({ x_legend: currentZoom.x_legend, y_legend: currentZoom.y_legend, scale_legend: currentZoom.scale_legend })
+          .eq('id', currentZoom.id)
+          .catch(err => console.error('Erreur sauvegarde légende:', err));
+      } else {
+        currentZoom.x = parseFloat(el.dataset.x);
+        currentZoom.y = parseFloat(el.dataset.y);
+        currentZoom.scale = parseFloat(el.dataset.scale);
+
+        supabase.from('creations')
+          .update({ x: currentZoom.x, y: currentZoom.y, scale: currentZoom.scale })
+          .eq('id', currentZoom.id)
+          .catch(err => console.error('Erreur sauvegarde zoom:', err));
+      }
+    }
   });
+
   document.addEventListener('mouseup', () => {
     isDragging = false;
     el.style.cursor = 'grab';
@@ -931,6 +956,7 @@ function makeDraggable(el) {
       startY = e.touches[0].clientY;
     }
   });
+
   el.addEventListener('touchmove', e => {
     if (!isDragging || e.touches.length !== 1) return;
     let dx = e.touches[0].clientX - startX;
@@ -942,12 +968,37 @@ function makeDraggable(el) {
     el.style.transform = `translate(${newX}px,${newY}px) scale(${el.dataset.scale||1})`;
     startX = e.touches[0].clientX;
     startY = e.touches[0].clientY;
+
+    // 🔹 Sauvegarde Supabase
+    if(currentZoom) {
+      if(isLegend){
+        currentZoom.x_legend = parseFloat(el.dataset.x);
+        currentZoom.y_legend = parseFloat(el.dataset.y);
+        currentZoom.scale_legend = parseFloat(el.dataset.scale);
+
+        supabase.from('creations')
+          .update({ x_legend: currentZoom.x_legend, y_legend: currentZoom.y_legend, scale_legend: currentZoom.scale_legend })
+          .eq('id', currentZoom.id)
+          .catch(err => console.error('Erreur sauvegarde légende:', err));
+      } else {
+        currentZoom.x = parseFloat(el.dataset.x);
+        currentZoom.y = parseFloat(el.dataset.y);
+        currentZoom.scale = parseFloat(el.dataset.scale);
+
+        supabase.from('creations')
+          .update({ x: currentZoom.x, y: currentZoom.y, scale: currentZoom.scale })
+          .eq('id', currentZoom.id)
+          .catch(err => console.error('Erreur sauvegarde zoom:', err));
+      }
+    }
   });
+
   el.addEventListener('touchend', () => { isDragging = false; });
 }
 
+
 // ====== PINCH / WHEEL ZOOM ======
-function makePinchZoom(el) {
+function makePinchZoom(el, isLegend = false) {
   el.dataset.scale = 1;
   let initialDistance = null;
   let initialScale = 1;
@@ -960,6 +1011,23 @@ function makePinchZoom(el) {
     scale = Math.min(Math.max(0.5, scale), 3);
     el.dataset.scale = scale;
     el.style.transform = `translate(${el.dataset.x||0}px,${el.dataset.y||0}px) scale(${scale})`;
+
+    // 🔹 Sauvegarde Supabase
+    if(currentZoom) {
+      if(isLegend){
+        currentZoom.scale_legend = scale;
+        supabase.from('creations')
+          .update({ scale_legend: currentZoom.scale_legend })
+          .eq('id', currentZoom.id)
+          .catch(err => console.error('Erreur sauvegarde légende:', err));
+      } else {
+        currentZoom.scale = scale;
+        supabase.from('creations')
+          .update({ scale: currentZoom.scale })
+          .eq('id', currentZoom.id)
+          .catch(err => console.error('Erreur sauvegarde zoom:', err));
+      }
+    }
   }, { passive: false });
 
   // Touch pinch
@@ -972,6 +1040,39 @@ function makePinchZoom(el) {
       initialScale = parseFloat(el.dataset.scale);
     }
   });
+
+  el.addEventListener('touchmove', e => {
+    if (e.touches.length === 2 && initialDistance !== null) {
+      let currentDistance = Math.hypot(
+        e.touches[0].clientX - e.touches[1].clientX,
+        e.touches[0].clientY - e.touches[1].clientY
+      );
+      let scale = initialScale * (currentDistance / initialDistance);
+      scale = Math.min(Math.max(0.5, scale), 3);
+      el.dataset.scale = scale;
+      el.style.transform = `translate(${el.dataset.x||0}px,${el.dataset.y||0}px) scale(${scale})`;
+
+      // 🔹 Sauvegarde Supabase
+      if(currentZoom) {
+        if(isLegend){
+          currentZoom.scale_legend = scale;
+          supabase.from('creations')
+            .update({ scale_legend: scale })
+            .eq('id', currentZoom.id)
+            .catch(err => console.error('Erreur sauvegarde légende:', err));
+        } else {
+          currentZoom.scale = scale;
+          supabase.from('creations')
+            .update({ scale: scale })
+            .eq('id', currentZoom.id)
+            .catch(err => console.error('Erreur sauvegarde zoom:', err));
+        }
+      }
+    }
+  });
+
+  el.addEventListener('touchend', () => { initialDistance = null; });
+}
   el.addEventListener('touchmove', e => {
     if (e.touches.length === 2 && initialDistance) {
       e.preventDefault();
@@ -1050,15 +1151,15 @@ function openZoom(c) {
   zoomLegend.textContent = currentZoom.legend || 'Aucune légende';
 
   // RESET POSITION + ZOOM
-  mainZoom.dataset.x = 0;
-  mainZoom.dataset.y = 0;
-  mainZoom.dataset.scale = 1;
-  mainZoom.style.transform = 'translate(0px,0px) scale(1)';
+  mainZoom.dataset.x = currentZoom.x || 0;
+mainZoom.dataset.y = currentZoom.y || 0;
+mainZoom.dataset.scale = currentZoom.scale || 1;
+mainZoom.style.transform = `translate(${mainZoom.dataset.x}px,${mainZoom.dataset.y}px) scale(${mainZoom.dataset.scale})`;
 
-  zoomLegend.dataset.x = 0;
-  zoomLegend.dataset.y = 0;
-  zoomLegend.dataset.scale = 1;
-  zoomLegend.style.transform = 'translate(0px,0px) scale(1)';
+zoomLegend.dataset.x = 0;
+zoomLegend.dataset.y = 0;
+zoomLegend.dataset.scale = 1;
+zoomLegend.style.transform = 'translate(0px,0px) scale(1)';
 
   thumbs.innerHTML = '';
   (currentZoom.zoomGroup || []).forEach(u => {
@@ -1073,11 +1174,8 @@ function openZoom(c) {
 
   zoomModal.style.display = 'flex';
 
-// BLOQUE SCROLL ARRIÈRE-PLAN
+// Bloquer le scroll arrière-plan
 document.body.style.overflow = 'hidden';
-document.querySelectorAll('#visitor-list-container, .page').forEach(el => {
-  el.style.pointerEvents = 'none';
-});
       
 function updateActions() {
   if (!currentZoom) return;
