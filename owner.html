@@ -405,25 +405,17 @@ body::before{
   border-radius: 24px;
 }
 
-/* Image et légende déplaçables */
-#mainZoom, #zoomLegend {
-  position: absolute;      /* permet de bouger partout */
-  top: 0;
-  left: 0;
-  cursor: grab;
-  user-select: none;       /* pas de sélection de texte pendant le drag */
-  transition: transform 0.1s;
-}
-
 #mainZoom {
-  width: auto;
-  height: 100%;
+  position: absolute;
   top: 100px;        /* position initiale */
   left: 100px;       /* position initiale */
-  position: absolute;
+  width: auto;
+  height: 60%;
   cursor: grab;
+  user-select: none;
   transform: scale(1);
 }
+
 #zoomLegend {
   position: absolute;
   top: 10px;
@@ -846,168 +838,14 @@ const zoomContent = document.querySelector('.zoom-content');
 const mainZoom = document.getElementById('mainZoom');
 const zoomLegend = document.getElementById('zoomLegend');
 
-// ====== DRAG ======
-function makeDraggable(el) {
-  let startX=0, startY=0, origX=0, origY=0, dragging=false;
-
-  const startDrag = (x, y) => {
-    dragging = true;
-    startX = x;
-    startY = y;
-    const rect = el.getBoundingClientRect();
-    origX = rect.left;
-    origY = rect.top;
-  };
-
-  const moveDrag = (x, y) => {
-    if(!dragging) return;
-    const dx = x - startX;
-    const dy = y - startY;
-    el.style.left = origX + dx + 'px';
-    el.style.top = origY + dy + 'px';
-  };
-
-  const endDrag = () => { dragging=false; };
-
-  // souris
-  el.addEventListener('mousedown', e => startDrag(e.clientX, e.clientY));
-  document.addEventListener('mousemove', e => moveDrag(e.clientX, e.clientY));
-  document.addEventListener('mouseup', endDrag);
-
-  // tactile
-  el.addEventListener('touchstart', e => {
-    if(e.touches.length===1) startDrag(e.touches[0].clientX, e.touches[0].clientY);
-  });
-  el.addEventListener('touchmove', e => {
-    if(e.touches.length===1) {
-      moveDrag(e.touches[0].clientX, e.touches[0].clientY);
-      e.preventDefault();
-    }
-  });
-  el.addEventListener('touchend', endDrag);
-}
-
-// Appliquer drag
-makeDraggable(mainZoom);
-makeDraggable(zoomLegend);
-
-// ====== PINCH ZOOM ======
-function makePinchZoom(el) {
-  let initialDistance = null;
-  let initialScale = 1;
-
-  el.addEventListener('touchstart', e => {
-    if(e.touches.length === 2){
-      initialDistance = Math.hypot(
-        e.touches[0].clientX - e.touches[1].clientX,
-        e.touches[0].clientY - e.touches[1].clientY
-      );
-      initialScale = parseFloat(el.dataset.scale) || 1;
-    }
-  });
-
-  el.addEventListener('touchmove', e => {
-    if(e.touches.length === 2 && initialDistance){
-      const currentDistance = Math.hypot(
-        e.touches[0].clientX - e.touches[1].clientX,
-        e.touches[0].clientY - e.touches[1].clientY
-      );
-      let scale = initialScale * (currentDistance / initialDistance);
-      scale = Math.max(0.5, Math.min(3, scale));
-      el.dataset.scale = scale;
-      el.style.transform = `scale(${scale})`;
-      e.preventDefault();
-    }
-  });
-
-  el.addEventListener('touchend', e => {
-    if(e.touches.length < 2) initialDistance = null;
-  });
-}
-
-// Appliquer pinch zoom
-makePinchZoom(mainZoom);
       
-// Valeurs initiales
-mainZoom.dataset.scale = 1;
-mainZoom.style.transformOrigin = 'center center';
-mainZoom.style.position = 'absolute';
-mainZoom.style.top = '50%';
-mainZoom.style.left = '50%';
-mainZoom.style.transform = 'translate(-50%, -50%) scale(1)';
 
 zoomLegend.style.position = 'absolute';
 zoomLegend.style.top = '10px';
 zoomLegend.style.left = '10px';
 zoomLegend.style.cursor = 'grab';
 
-// Drag touch / souris
-function makeDraggable(el, isTouch = true) {
-  let startX=0, startY=0, origX=0, origY=0, dragging=false;
 
-  const startDrag = (x, y) => {
-    dragging = true;
-    startX = x;
-    startY = y;
-    const rect = el.getBoundingClientRect();
-    origX = rect.left;
-    origY = rect.top;
-  };
-
-  const moveDrag = (x, y) => {
-    if(!dragging) return;
-    const dx = x - startX;
-    const dy = y - startY;
-    el.style.left = origX + dx + 'px';
-    el.style.top = origY + dy + 'px';
-  };
-
-  const endDrag = () => { dragging=false; };
-
-  if(isTouch){
-    el.addEventListener('touchstart', e => {
-      if(e.touches.length===1) startDrag(e.touches[0].clientX, e.touches[0].clientY);
-    });
-    el.addEventListener('touchmove', e => { moveDrag(e.touches[0].clientX, e.touches[0].clientY); e.preventDefault(); });
-    el.addEventListener('touchend', endDrag);
-  } else {
-    el.addEventListener('mousedown', e => startDrag(e.clientX, e.clientY));
-    document.addEventListener('mousemove', e => moveDrag(e.clientX, e.clientY));
-    document.addEventListener('mouseup', endDrag);
-  }
-}
-
-// Pinch zoom pour image
-function makePinchZoom(img) {
-  let initialDistance = null;
-  let initialScale = 1;
-
-  img.addEventListener('touchstart', e => {
-    if(e.touches.length===2){
-      initialDistance = Math.hypot(
-        e.touches[0].clientX - e.touches[1].clientX,
-        e.touches[0].clientY - e.touches[1].clientY
-      );
-      initialScale = parseFloat(img.dataset.scale) || 1;
-    }
-  });
-
-  img.addEventListener('touchmove', e => {
-    if(e.touches.length===2 && initialDistance){
-      const currentDistance = Math.hypot(
-        e.touches[0].clientX - e.touches[1].clientX,
-        e.touches[0].clientY - e.touches[1].clientY
-      );
-      let scale = initialScale * (currentDistance / initialDistance);
-      scale = Math.max(0.3, Math.min(3, scale));
-      img.dataset.scale = scale;
-      img.style.transform = `translate(-50%, -50%) scale(${scale})`;
-      e.preventDefault();
-    }
-  });
-
-  img.addEventListener('touchend', () => { if(event.touches.length<2) initialDistance=null; });
-}
 
 // Empêcher scroll du body pendant zoom
 zoomContent.addEventListener('touchmove', e => e.preventDefault(), {passive:false});
@@ -1090,6 +928,48 @@ async function refreshCreations() {
   }
 }
 
+// ====== PINCH ZOOM ======
+function makePinchZoom(el) {
+  let initialDistance = null;
+  let initialScale = parseFloat(el.dataset.scale) || 1;
+
+  el.addEventListener('touchstart', e => {
+    if(e.touches.length === 2){
+      initialDistance = Math.hypot(
+        e.touches[0].clientX - e.touches[1].clientX,
+        e.touches[0].clientY - e.touches[1].clientY
+      );
+      initialScale = parseFloat(el.dataset.scale) || 1;
+    }
+  });
+
+  el.addEventListener('touchmove', e => {
+    if(e.touches.length === 2 && initialDistance){
+      const currentDistance = Math.hypot(
+        e.touches[0].clientX - e.touches[1].clientX,
+        e.touches[0].clientY - e.touches[1].clientY
+      );
+      let scale = initialScale * (currentDistance / initialDistance);
+      scale = Math.max(0.5, Math.min(3, scale)); // min 0.5x, max 3x
+      el.dataset.scale = scale;
+      el.style.transform = `scale(${scale})`;
+      e.preventDefault();
+    }
+  });
+
+  el.addEventListener('touchend', e => {
+    if(e.touches.length < 2) initialDistance = null;
+  });
+}
+
+// Appliquer drag + pinch
+makeDraggable(mainZoom);
+makeDraggable(zoomLegend);
+makePinchZoom(mainZoom);
+
+// Valeur initiale
+mainZoom.dataset.scale = 1;
+      
 // ====== RENDER ======
 function renderCreations(list) {
   const container = document.getElementById('visitor-list-container');
