@@ -302,7 +302,9 @@ body::before{
   color: #b84c6f;
   font-size: 14px;
   min-width: 18px;
-  text-align: center;====== CROIX ROSE POUR FERMER LES MODALS ====== */
+}
+
+/* ====== CROIX ROSE POUR FERMER LES MODALS ====== */
 .modal .closeModal,
 .closeZoom {
   position: absolute;
@@ -368,9 +370,9 @@ body::before{
   z-index: 5;
   transition: transform 0.2s, box-shadow 0.2s;
 }
-.delete-btn:hover {
+..delete-btn:hover {
   transform: scale(1.2);
-  box-shadow: 0 2px 6px rgba(#sidebar button {
+  box-shadow: 0 2px 6px rgba(0,0,0,0.25);
   width: auto;
   padding: 8px 16px;
   border-radius: 16px;
@@ -664,7 +666,10 @@ const icon = document.getElementById('chatResizeIcon');
 const fileBtn = document.getElementById('fileBtn');
 const fileInput = document.getElementById('multiPhoto');
 const fileInfo = document.getElementById('fileInfo');
-
+const zoomContent = document.querySelector('.zoom-content');
+const zoomLegend = document.getElementById('zoomLegend');
+const mainZoom = document.getElementById('mainZoom');
+      
 fileBtn.onclick = () => fileInput.click();
 
 fileInput.onchange = () => {
@@ -835,10 +840,6 @@ zoomLegend.style.cursor = 'grab';
 
 // Empêcher scroll du body pendant zoom
 zoomContent.addEventListener('touchmove', e => e.preventDefault(), {passive:false});
-// Pinch zoom
-function makePinchZoom(el) {
-  let initialDistance = null;
-  let initialScale = 1;
 
   el.addEventListener('touchstart', e => {
     if (e.touches.length === 2) {
@@ -948,6 +949,41 @@ function makePinchZoom(el) {
   });
 }
 
+function makeDraggable(el) {
+  let startX=0, startY=0, x=0, y=0, dragging=false;
+
+  el.addEventListener('mousedown', e=>{
+    dragging=true;
+    startX=e.clientX-x;
+    startY=e.clientY-y;
+  });
+
+  document.addEventListener('mousemove', e=>{
+    if(!dragging) return;
+    x=e.clientX-startX;
+    y=e.clientY-startY;
+    el.style.transform = `translate(${x}px, ${y}px) scale(${el.dataset.scale||1})`;
+  });
+
+  document.addEventListener('mouseup', ()=>dragging=false);
+
+  el.addEventListener('touchstart', e=>{
+    dragging=true;
+    startX=e.touches[0].clientX-x;
+    startY=e.touches[0].clientY-y;
+  });
+
+  el.addEventListener('touchmove', e=>{
+    if(!dragging) return;
+    x=e.touches[0].clientX-startX;
+    y=e.touches[0].clientY-startY;
+    el.style.transform = `translate(${x}px, ${y}px) scale(${el.dataset.scale||1})`;
+    e.preventDefault();
+  }, {passive:false});
+
+  el.addEventListener('touchend', ()=>dragging=false);
+}
+      
 // Appliquer drag + pinch
 makeDraggable(mainZoom);
 makeDraggable(zoomLegend);
