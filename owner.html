@@ -1110,11 +1110,12 @@ zoomLegend.style.transform =
   renderLikeList();
   renderCommentList();
 
-  zoomModal.style.display = 'flex';
+    zoomModal.style.display = 'flex';
 
-// Bloquer le scroll arrière-plan
-document.body.style.overflow = 'hidden';
-      
+  // Bloquer le scroll arrière-plan
+  document.body.style.overflow = 'hidden';
+}   // <<< AJOUTE CETTE ACCOLADE ICI (FIN DE openZoom)
+
 function updateActions() {
   if (!currentZoom) return;
   likeCount.textContent = (currentZoom.likes || []).length;
