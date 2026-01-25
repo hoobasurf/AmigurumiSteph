@@ -874,21 +874,22 @@ async function refreshCreations() {
         ];
       }
 
-return {
-  id: c.id,
-  name: c.name || '',
-  legend: c.legend || '',
-  imgUrl: zoomGroup[0] || '',
-  zoomGroup,
-  likes: Array.isArray(c.likes) ? c.likes : [],
-  comments: Array.isArray(c.comments) ? c.comments : [],
-  x: c.x || 0,
-  y: c.y || 0,
-  scale: c.scale || 1,
-  x_legend: c.x_legend || 0,
-  y_legend: c.y_legend || 0,
-  scale_legend: c.scale_legend || 1
-};
+      return {
+        id: c.id,
+        name: c.name || '',
+        legend: c.legend || '',
+        imgUrl: zoomGroup[0] || '',
+        zoomGroup,
+        likes: Array.isArray(c.likes) ? c.likes : [],
+        comments: Array.isArray(c.comments) ? c.comments : [],
+        x: c.x || 0,
+        y: c.y || 0,
+        scale: c.scale || 1,
+        x_legend: c.x_legend || 0,
+        y_legend: c.y_legend || 0,
+        scale_legend: c.scale_legend || 1
+      };
+    });
 
     renderCreations(creations);
 
@@ -944,23 +945,6 @@ function makeDraggable(el, isLegend = false) {
       .eq('id', currentZoom.id);
   }
 }
-
-        supabase.from('creations')
-          .update({ x_legend: currentZoom.x_legend, y_legend: currentZoom.y_legend, scale_legend: currentZoom.scale_legend })
-          .eq('id', currentZoom.id)
-          .catch(err => console.error('Erreur sauvegarde légende:', err));
-      } else {
-        currentZoom.x = parseFloat(el.dataset.x);
-        currentZoom.y = parseFloat(el.dataset.y);
-        currentZoom.scale = parseFloat(el.dataset.scale);
-
-        supabase.from('creations')
-          .update({ x: currentZoom.x, y: currentZoom.y, scale: currentZoom.scale })
-          .eq('id', currentZoom.id)
-          .catch(err => console.error('Erreur sauvegarde zoom:', err));
-      }
-    }
-  });
 
   document.addEventListener('mouseup', () => {
     isDragging = false;
