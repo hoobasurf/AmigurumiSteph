@@ -267,8 +267,8 @@ body::before{
   font-size: 14px;
 }
 .icon-btn {
-  background: transparent; /* pas de fond pour le bouton */
-  border: none;            /* pas de bordure */
+  background: none !important;  /* supprime tout fond hérité */
+  border: none;
   padding: 4px;
   display: flex;
   align-items: center;
@@ -276,8 +276,8 @@ body::before{
 }
 
 .icon-btn svg {
-  background: transparent; /* pas de fond pour le svg */
-  fill: none;              /* assure que le remplissage est vide */
+  background: none !important;  /* supprime tout fond rose */
+  fill: none;                   /* juste le contour */
   stroke: #b84c6f;
   width: 22px;
   height: 22px;
@@ -298,14 +298,6 @@ body::before{
   margin-top: 10px;
 }
 
-.icon-btn {
-  background: transparent;
-  border: none;
-  padding: 4px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
 
 #likeCount, #commentCount {
   font-family: 'Courier New', monospace; /* simple, lisible */
