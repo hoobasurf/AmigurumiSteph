@@ -1159,15 +1159,19 @@ function openZoom(c) {
   zoomLegend.textContent = currentZoom.legend || 'Aucune légende';
 
   // RESET POSITION + ZOOM
-  mainZoom.dataset.x = currentZoom.x || 0;
-mainZoom.dataset.y = currentZoom.y || 0;
-mainZoom.dataset.scale = currentZoom.scale || 1;
-mainZoom.style.transform = `translate(${mainZoom.dataset.x}px,${mainZoom.dataset.y}px) scale(${mainZoom.dataset.scale})`;
+  mainZoom.dataset.x = currentZoom.x ?? 0;
+mainZoom.dataset.y = currentZoom.y ?? 0;
+mainZoom.dataset.scale = currentZoom.scale ?? 1;
 
-zoomLegend.dataset.x = 0;
-zoomLegend.dataset.y = 0;
-zoomLegend.dataset.scale = 1;
-zoomLegend.style.transform = 'translate(0px,0px) scale(1)';
+mainZoom.style.transform =
+  `translate(${mainZoom.dataset.x}px, ${mainZoom.dataset.y}px) scale(${mainZoom.dataset.scale})`;
+
+  zoomLegend.dataset.x = currentZoom.x_legend ?? 0;
+zoomLegend.dataset.y = currentZoom.y_legend ?? 0;
+zoomLegend.dataset.scale = currentZoom.scale_legend ?? 1;
+
+zoomLegend.style.transform =
+  `translate(${zoomLegend.dataset.x}px, ${zoomLegend.dataset.y}px) scale(${zoomLegend.dataset.scale})`;
 
   thumbs.innerHTML = '';
   (currentZoom.zoomGroup || []).forEach(u => {
