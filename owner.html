@@ -297,10 +297,9 @@ body::before{
 
 #zoomModal .actions {
   display: flex;
-  flex-direction: column; /* vertical */
-  align-items: center;    /* centré horizontalement */
-  gap: 6px;
-  margin-top: 12px;
+  flex-direction: row;   /* côte à côte */
+  align-items: center;
+  gap: 12px;
 }
 
 
@@ -409,20 +408,20 @@ body::before{
   border-radius: 0;
 }
 
-#mainZoom {
+  #mainZoom {
   position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%) scale(1);
+  top: 0;
+  left: 0;
   max-width: 80%;
   max-height: 60vh;
   cursor: grab;
   user-select: none;
 }
+
 #zoomLegend {
   position: absolute;
-  top: 10px;
-  left: 10px;
+  top: 0;
+  left: 0;
   cursor: grab;
 }
   
@@ -1092,13 +1091,12 @@ mainZoom.dataset.scale = currentZoom.scale ?? 1;
 mainZoom.style.transform =
   `translate(${mainZoom.dataset.x}px, ${mainZoom.dataset.y}px) scale(${mainZoom.dataset.scale})`;
 
-  zoomLegend.dataset.x = currentZoom.x_legend ?? 0;
+zoomLegend.dataset.x = currentZoom.x_legend ?? 0;
 zoomLegend.dataset.y = currentZoom.y_legend ?? 0;
 zoomLegend.dataset.scale = currentZoom.scale_legend ?? 1;
 
 zoomLegend.style.transform =
   `translate(${zoomLegend.dataset.x}px, ${zoomLegend.dataset.y}px) scale(${zoomLegend.dataset.scale})`;
-
   thumbs.innerHTML = '';
   (currentZoom.zoomGroup || []).forEach(u => {
     const t = document.createElement('img');
