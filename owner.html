@@ -921,10 +921,15 @@ function makeDraggable(el, isLegend = false) {
 
     // 🔹 Sauvegarde Supabase
     if(currentZoom) {
-      if(isLegend){
-        currentZoom.x_legend = parseFloat(el.dataset.x);
-        currentZoom.y_legend = parseFloat(el.dataset.y);
-        currentZoom.scale_legend = parseFloat(el.dataset.scale);
+  currentZoom.x_legend = parseFloat(zoomLegend.dataset.x);
+  currentZoom.y_legend = parseFloat(zoomLegend.dataset.y);
+  currentZoom.scale_legend = parseFloat(zoomLegend.dataset.scale);
+
+  supabase.from('creations')
+    .update({ x_legend: currentZoom.x_legend, y_legend: currentZoom.y_legend, scale_legend: currentZoom.scale_legend })
+    .eq('id', currentZoom.id)
+    .catch(err => console.error('Erreur sauvegarde légende:', err));
+}
 
         supabase.from('creations')
           .update({ x_legend: currentZoom.x_legend, y_legend: currentZoom.y_legend, scale_legend: currentZoom.scale_legend })
