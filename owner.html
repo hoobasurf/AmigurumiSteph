@@ -1075,30 +1075,42 @@ document.getElementById('confirmDelete').onclick = async () => {
   await refreshCreations();
 };
 document.addEventListener('DOMContentLoaded', () => {
+  document.addEventListener('DOMContentLoaded', () => {
+  const sidebar = document.getElementById('sidebar');
+  const chatModal = document.getElementById('chatModal');
+
   // SIDEBAR NAV
   document.getElementById('pelotesBtn').onclick = () => {
     document.body.style.opacity = '0';
     setTimeout(() => window.location.href='pelotes.html', 500);
   };
-  
+
   document.getElementById('videoBtn').onclick = () => {
     document.body.style.opacity = '0';
     setTimeout(() => window.location.href='video.html', 500);
   };
-  
+
   document.getElementById('notesBtn').onclick = () => {
     document.body.style.opacity = '0';
     setTimeout(() => window.location.href='notes.html', 500);
   };
-  
+
+  const actualiteBtn = document.getElementById('actualiteBtn');
+  if(actualiteBtn){
+    actualiteBtn.onclick = () => {
+      document.body.style.opacity = '0';
+      setTimeout(() => window.location.href='actualite.html', 300);
+    };
+  }
+
   document.getElementById('messagerieBtn').onclick = () => {
     chatModal.style.display='flex';
   };
-  
+
   document.getElementById('toggleSidebar').onclick = () => {
     sidebar.classList.toggle('sidebar-open');
   };
-  
+});
   const actualiteBtn = document.getElementById('actualiteBtn');
   if(actualiteBtn){
     actualiteBtn.onclick = () => {
