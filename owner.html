@@ -284,14 +284,7 @@ body::before{
   width: 22px;
   height: 22px;
   transition: transform 0.2s;
-}
-#likeCount, #commentCount {
-  font-style: italic;      /* italique */
-  text-decoration: line-through; /* biffé */
-  font-weight: bold;
-  color: #b84c6f;
-  margin-left: 4px;        /* un petit espace après le bouton */
-}
+}      /* un petit espace après le bouton */
 
 #zoomModal#zoomModal .actions {
   display: flex;
@@ -309,7 +302,7 @@ body::before{
   color: #b84c6f;
   font-size: 14px;
   min-width: 18px;
-  text-align: /* ====== CROIX ROSE POUR FERMER LES MODALS ====== */
+  text-align: center;====== CROIX ROSE POUR FERMER LES MODALS ====== */
 .modal .closeModal,
 .closeZoom {
   position: absolute;
@@ -831,14 +824,7 @@ function showInAppNotification(sender, message) {
     setTimeout(() => notif.remove(), 3000);
   }
 }
-if ('Notification' in window && Notification.permission !== 'granted') Notification.requestPermission();
-
-
-const zoomContent = document.querySelector('.zoom-content');
-const mainZoom = document.getElementById('mainZoom');
-const zoomLegend = document.getElementById('zoomLegend');
-
-      
+if ('Notification' in window && Notification.permission !== 'granted') Notification.requestPermission();  
 
 zoomLegend.style.position = 'absolute';
 zoomLegend.style.top = '10px';
