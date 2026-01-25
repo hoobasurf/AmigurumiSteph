@@ -295,11 +295,12 @@ body::before{
   transition: transform 0.2s;
 }      /* un petit espace après le bouton */
 
-#zoomModal#zoomModal .actions {
+#zoomModal .actions {
   display: flex;
-  gap: 12px;
-  align-items: center;
-  margin-top: 10px;
+  flex-direction: column; /* vertical */
+  align-items: center;    /* centré horizontalement */
+  gap: 6px;
+  margin-top: 12px;
 }
 
 
@@ -1069,9 +1070,13 @@ function openZoom(c) {
 
   zoomModal.style.display = 'flex';
 
-  // BLOQUE SCROLL ARRIÈRE-PLAN
-  document.body.style.overflow = 'hidden';
+// BLOQUE SCROLL ARRIÈRE-PLAN
+document.querySelectorAll('.visitor-item img').forEach(img => {
+  img.style.pointerEvents = 'none';
+});
+document.body.style.overflow = 'hidden';
 }
+      
 function updateActions() {
   if (!currentZoom) return;
   likeCount.textContent = (currentZoom.likes || []).length;
