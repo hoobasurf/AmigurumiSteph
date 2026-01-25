@@ -910,21 +910,16 @@ function makeDraggable(el, isLegend = false) {
     isDragging = true;
     startX = e.clientX;
     startY = e.clientY;
-    el.style.cursor = 'grabbing';
   });
 
   document.addEventListener('mousemove', e => {
     if (!isDragging) return;
 
-    let dx = e.clientX - startX;
-    let dy = e.clientY - startY;
-
-    let newX = parseFloat(el.dataset.x) + dx;
-    let newY = parseFloat(el.dataset.y) + dy;
+    let newX = parseFloat(el.dataset.x) + (e.clientX - startX);
+    let newY = parseFloat(el.dataset.y) + (e.clientY - startY);
 
     el.dataset.x = newX;
     el.dataset.y = newY;
-
     el.style.transform = `translate(${newX}px, ${newY}px) scale(${el.dataset.scale})`;
 
     startX = e.clientX;
@@ -933,19 +928,11 @@ function makeDraggable(el, isLegend = false) {
     if (currentZoom) {
       if (isLegend) {
         supabase.from('creations')
-          .update({
-            x_legend: newX,
-            y_legend: newY,
-            scale_legend: parseFloat(el.dataset.scale)
-          })
+          .update({ x_legend: newX, y_legend: newY, scale_legend: el.dataset.scale })
           .eq('id', currentZoom.id);
       } else {
         supabase.from('creations')
-          .update({
-            x: newX,
-            y: newY,
-            scale: parseFloat(el.dataset.scale)
-          })
+          .update({ x: newX, y: newY, scale: el.dataset.scale })
           .eq('id', currentZoom.id);
       }
     }
@@ -953,60 +940,9 @@ function makeDraggable(el, isLegend = false) {
 
   document.addEventListener('mouseup', () => {
     isDragging = false;
-    el.style.cursor = 'grab';
   });
 }
-    isDragging = false;
-    el.style.cursor = 'grab';
-  });
-
-  // Touch
-  el.addEventListener('touchstart', e => {
-    if (e.touches.length === 1) {
-      isDragging = true;
-      startX = e.touches[0].clientX;
-      startY = e.touches[0].clientY;
-    }
-  });
-
-  el.addEventListener('touchmove', e => {
-    if (!isDragging || e.touches.length !== 1) return;
-    let dx = e.touches[0].clientX - startX;
-    let dy = e.touches[0].clientY - startY;
-    let newX = parseFloat(el.dataset.x) + dx;
-    let newY = parseFloat(el.dataset.y) + dy;
-    el.dataset.x = newX;
-    el.dataset.y = newY;
-    el.style.transform = `translate(${newX}px,${newY}px) scale(${el.dataset.scale||1})`;
-    startX = e.touches[0].clientX;
-    startY = e.touches[0].clientY;
-
-    // 🔹 Sauvegarde Supabase
-    if(currentZoom) {
-      if(isLegend){
-        currentZoom.x_legend = parseFloat(el.dataset.x);
-        currentZoom.y_legend = parseFloat(el.dataset.y);
-        currentZoom.scale_legend = parseFloat(el.dataset.scale);
-
-        supabase.from('creations')
-          .update({ x_legend: currentZoom.x_legend, y_legend: currentZoom.y_legend, scale_legend: currentZoom.scale_legend })
-          .eq('id', currentZoom.id)
-          .catch(err => console.error('Erreur sauvegarde légende:', err));
-      } else {
-        currentZoom.x = parseFloat(el.dataset.x);
-        currentZoom.y = parseFloat(el.dataset.y);
-        currentZoom.scale = parseFloat(el.dataset.scale);
-
-        supabase.from('creations')
-          .update({ x: currentZoom.x, y: currentZoom.y, scale: currentZoom.scale })
-          .eq('id', currentZoom.id)
-          .catch(err => console.error('Erreur sauvegarde zoom:', err));
-      }
-    }
-  });
-
-  el.addEventListener('touchend', () => { isDragging = false; });
-}
+  
 
 
 // ====== PINCH / WHEEL ZOOM ======
