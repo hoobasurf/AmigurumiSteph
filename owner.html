@@ -288,14 +288,15 @@ body::before{
 }
 
 #likeCount, #commentCount {
-  font-family: 'Courier New', monospace; /* police à largeur fixe */
-  font-style: italic;                     /* italique */
-  text-decoration: line-through;          /* biffé */
-  font-weight: bold;
+  font-family: 'Courier New', monospace; /* police largeur fixe */
+  font-style: italic;                     /* italique pour effet biffé */
   color: #b84c6f;
+  font-weight: bold;
   font-size: 14px;
-  min-width: 18px;                        /* espace fixe pour le compteur */
-  text-align: center;                     /* centrer le texte */
+  min-width: 18px;
+  text-align: center;
+  opacity: 0.85;                          /* léger effet “biffé” */
+  transform: rotate(-2deg);               /* légère inclinaison pour style */
 }
   
 </style>
