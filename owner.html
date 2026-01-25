@@ -902,9 +902,9 @@ async function refreshCreations() {
 function makeDraggable(el, isLegend = false) {
   let isDragging = false, startX, startY;
 
-  el.style.transform = 'translate(0px,0px) scale(1)';
-  el.dataset.x = 0;
-  el.dataset.y = 0;
+  el.dataset.x = el.dataset.x || 0;
+  el.dataset.y = el.dataset.y || 0;
+  el.dataset.scale = el.dataset.scale || 1;
 
   el.addEventListener('mousedown', e => {
     isDragging = true;
@@ -915,38 +915,47 @@ function makeDraggable(el, isLegend = false) {
 
   document.addEventListener('mousemove', e => {
     if (!isDragging) return;
+
     let dx = e.clientX - startX;
     let dy = e.clientY - startY;
+
     let newX = parseFloat(el.dataset.x) + dx;
     let newY = parseFloat(el.dataset.y) + dy;
+
     el.dataset.x = newX;
     el.dataset.y = newY;
-    el.style.transform = `translate(${newX}px,${newY}px) scale(${el.dataset.scale||1})`;
+
+    el.style.transform = `translate(${newX}px, ${newY}px) scale(${el.dataset.scale})`;
+
     startX = e.clientX;
     startY = e.clientY;
 
-    // 🔹 Sauvegarde Supabase
-    if(currentZoom) {
-  if(isLegend){
-    currentZoom.x_legend = parseFloat(el.dataset.x);
-    currentZoom.y_legend = parseFloat(el.dataset.y);
-    currentZoom.scale_legend = parseFloat(el.dataset.scale);
-
-    supabase.from('creations')
-      .update({ x_legend: currentZoom.x_legend, y_legend: currentZoom.y_legend, scale_legend: currentZoom.scale_legend })
-      .eq('id', currentZoom.id);
-  } else {
-    currentZoom.x = parseFloat(el.dataset.x);
-    currentZoom.y = parseFloat(el.dataset.y);
-    currentZoom.scale = parseFloat(el.dataset.scale);
-
-    supabase.from('creations')
-      .update({ x: currentZoom.x, y: currentZoom.y, scale: currentZoom.scale })
-      .eq('id', currentZoom.id);
-  }
-}
+    if (currentZoom) {
+      if (isLegend) {
+        supabase.from('creations')
+          .update({
+            x_legend: newX,
+            y_legend: newY,
+            scale_legend: parseFloat(el.dataset.scale)
+          })
+          .eq('id', currentZoom.id);
+      } else {
+        supabase.from('creations')
+          .update({
+            x: newX,
+            y: newY,
+            scale: parseFloat(el.dataset.scale)
+          })
+          .eq('id', currentZoom.id);
+      }
+    }
+  });
 
   document.addEventListener('mouseup', () => {
+    isDragging = false;
+    el.style.cursor = 'grab';
+  });
+}
     isDragging = false;
     el.style.cursor = 'grab';
   });
