@@ -1064,8 +1064,10 @@ document.getElementById('confirmDelete').onclick = async () => {
   currentDelete = null;
   deleteModal.style.display = 'none';
   await refreshCreations();
-};
-// ====== SIDEBAR & BOUTONS ======
+};// ====== SIDEBAR & BOUTONS ======
+const sidebar = document.getElementById('sidebar');
+const chatModal = document.getElementById('chatModal');
+
 document.getElementById('pelotesBtn').onclick = () => {
   document.body.style.opacity = '0';
   setTimeout(() => window.location.href='pelotes.html', 500);
@@ -1093,6 +1095,7 @@ document.getElementById('messagerieBtn').onclick = () => {
 document.getElementById('toggleSidebar').onclick = () => {
   sidebar.classList.toggle('sidebar-open');
 };
+      
   const actualiteBtn = document.getElementById('actualiteBtn');
   if(actualiteBtn){
     actualiteBtn.onclick = () => {
@@ -1100,7 +1103,6 @@ document.getElementById('toggleSidebar').onclick = () => {
       setTimeout(() => window.location.href='actualite.html', 300);
     };
   }
-});
       
      
 // ====== FERMETURE MESSAGERIE AU CLIC DANS LE VIDE ======
