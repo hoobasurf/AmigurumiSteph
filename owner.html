@@ -418,16 +418,17 @@ body::before{
 #mainZoom {
   width: auto;
   height: 100%;
+  top: 100px;        /* position initiale */
+  left: 100px;       /* position initiale */
+  position: absolute;
+  cursor: grab;
+  transform: scale(1);
 }
-
 #zoomLegend {
-  min-width: 150px;
-  background: #ffe6f0;
-  border: 2px solid #b84c6f;
-  border-radius: 12px;
-  padding: 8px;
-  color: #b84c6f;
-  font-size: 14px;
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  cursor: grab;
 }
   
 </style>
@@ -845,6 +846,88 @@ const zoomContent = document.querySelector('.zoom-content');
 const mainZoom = document.getElementById('mainZoom');
 const zoomLegend = document.getElementById('zoomLegend');
 
+// ====== DRAG ======
+function makeDraggable(el) {
+  let startX=0, startY=0, origX=0, origY=0, dragging=false;
+
+  const startDrag = (x, y) => {
+    dragging = true;
+    startX = x;
+    startY = y;
+    const rect = el.getBoundingClientRect();
+    origX = rect.left;
+    origY = rect.top;
+  };
+
+  const moveDrag = (x, y) => {
+    if(!dragging) return;
+    const dx = x - startX;
+    const dy = y - startY;
+    el.style.left = origX + dx + 'px';
+    el.style.top = origY + dy + 'px';
+  };
+
+  const endDrag = () => { dragging=false; };
+
+  // souris
+  el.addEventListener('mousedown', e => startDrag(e.clientX, e.clientY));
+  document.addEventListener('mousemove', e => moveDrag(e.clientX, e.clientY));
+  document.addEventListener('mouseup', endDrag);
+
+  // tactile
+  el.addEventListener('touchstart', e => {
+    if(e.touches.length===1) startDrag(e.touches[0].clientX, e.touches[0].clientY);
+  });
+  el.addEventListener('touchmove', e => {
+    if(e.touches.length===1) {
+      moveDrag(e.touches[0].clientX, e.touches[0].clientY);
+      e.preventDefault();
+    }
+  });
+  el.addEventListener('touchend', endDrag);
+}
+
+// Appliquer drag
+makeDraggable(mainZoom);
+makeDraggable(zoomLegend);
+
+// ====== PINCH ZOOM ======
+function makePinchZoom(el) {
+  let initialDistance = null;
+  let initialScale = 1;
+
+  el.addEventListener('touchstart', e => {
+    if(e.touches.length === 2){
+      initialDistance = Math.hypot(
+        e.touches[0].clientX - e.touches[1].clientX,
+        e.touches[0].clientY - e.touches[1].clientY
+      );
+      initialScale = parseFloat(el.dataset.scale) || 1;
+    }
+  });
+
+  el.addEventListener('touchmove', e => {
+    if(e.touches.length === 2 && initialDistance){
+      const currentDistance = Math.hypot(
+        e.touches[0].clientX - e.touches[1].clientX,
+        e.touches[0].clientY - e.touches[1].clientY
+      );
+      let scale = initialScale * (currentDistance / initialDistance);
+      scale = Math.max(0.5, Math.min(3, scale));
+      el.dataset.scale = scale;
+      el.style.transform = `scale(${scale})`;
+      e.preventDefault();
+    }
+  });
+
+  el.addEventListener('touchend', e => {
+    if(e.touches.length < 2) initialDistance = null;
+  });
+}
+
+// Appliquer pinch zoom
+makePinchZoom(mainZoom);
+      
 // Valeurs initiales
 mainZoom.dataset.scale = 1;
 mainZoom.style.transformOrigin = 'center center';
@@ -926,13 +1009,6 @@ function makePinchZoom(img) {
   img.addEventListener('touchend', () => { if(event.touches.length<2) initialDistance=null; });
 }
 
-// Appliquer
-makeDraggable(mainZoom, true);
-makeDraggable(mainZoom, false);
-makeDraggable(zoomLegend, true);
-makeDraggable(zoomLegend, false);
-makePinchZoom(mainZoom);
-
 // Empêcher scroll du body pendant zoom
 zoomContent.addEventListener('touchmove', e => e.preventDefault(), {passive:false});
 // Pinch zoom
@@ -968,10 +1044,6 @@ function makePinchZoom(el) {
   });
 }
 
-// Appliquer aux deux éléments
-makeTouchDraggable(mainZoom);
-makeTouchDraggable(document.getElementById('zoomLegend'));
-makePinchZoom(mainZoom);
       
 // ====== CREATIONS ======
 
