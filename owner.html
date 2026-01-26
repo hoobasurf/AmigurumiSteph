@@ -931,49 +931,78 @@ async function refreshCreations() {
 
 // ====== DRAG SIMPLE ======
 function makeDraggable(el, isLegend = false) {
-  let isDragging = false, startX, startY;
+  let isDragging = false;
+  let startX = 0, startY = 0;
 
   el.dataset.x = el.dataset.x || 0;
   el.dataset.y = el.dataset.y || 0;
   el.dataset.scale = el.dataset.scale || 1;
 
-  el.addEventListener('mousedown', e => {
+  function startDrag(clientX, clientY) {
     isDragging = true;
-    startX = e.clientX;
-    startY = e.clientY;
-  });
+    startX = clientX;
+    startY = clientY;
+  }
 
-  document.addEventListener('mousemove', e => {
+  function moveDrag(clientX, clientY) {
     if (!isDragging) return;
 
-    let newX = parseFloat(el.dataset.x) + (e.clientX - startX);
-    let newY = parseFloat(el.dataset.y) + (e.clientY - startY);
+    let newX = parseFloat(el.dataset.x) + (clientX - startX);
+    let newY = parseFloat(el.dataset.y) + (clientY - startY);
 
     el.dataset.x = newX;
     el.dataset.y = newY;
-    el.style.transform = `translate(${newX}px, ${newY}px) scale(${el.dataset.scale})`;
 
-    startX = e.clientX;
-    startY = e.clientY;
+    el.style.transform =
+      `translate(${newX}px, ${newY}px) scale(${el.dataset.scale})`;
+
+    startX = clientX;
+    startY = clientY;
 
     if (currentZoom) {
       if (isLegend) {
         supabase.from('creations')
-          .update({ x_legend: newX, y_legend: newY, scale_legend: el.dataset.scale })
+          .update({ x_legend: newX, y_legend: newY })
           .eq('id', currentZoom.id);
       } else {
         supabase.from('creations')
-          .update({ x: newX, y: newY, scale: el.dataset.scale })
+          .update({ x: newX, y: newY })
           .eq('id', currentZoom.id);
       }
     }
+  }
+
+  function endDrag() {
+    isDragging = false;
+  }
+
+  // 🖱️ souris
+  el.addEventListener('mousedown', e => {
+    e.preventDefault();
+    startDrag(e.clientX, e.clientY);
   });
 
-  document.addEventListener('mouseup', () => {
-    isDragging = false;
+  document.addEventListener('mousemove', e => {
+    moveDrag(e.clientX, e.clientY);
   });
+
+  document.addEventListener('mouseup', endDrag);
+
+  // 📱 tactile
+  el.addEventListener('touchstart', e => {
+    e.preventDefault();
+    const t = e.touches[0];
+    startDrag(t.clientX, t.clientY);
+  }, { passive: false });
+
+  el.addEventListener('touchmove', e => {
+    e.preventDefault();
+    const t = e.touches[0];
+    moveDrag(t.clientX, t.clientY);
+  }, { passive: false });
+
+  el.addEventListener('touchend', endDrag);
 }
-  
 
 
 // ====== PINCH / WHEEL ZOOM ======
