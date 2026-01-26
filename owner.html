@@ -894,9 +894,10 @@ async function refreshCreations() {
     }
 
     creations = data.map(c => {
-      const zoomGroup = Array.isArray(c.images) ? c.images.map(p =>
-        supabase.storage.from('images').getPublicUrl(p).data.publicUrl
-      ) : [];
+const zoomGroup = Array.isArray(c.images) ? c.images.map(p => {
+    const { data } = supabase.storage.from('images').getPublicUrl(p);
+    return data?.publicUrl || '';
+}) : [];
 
       return {
         id: c.id,
