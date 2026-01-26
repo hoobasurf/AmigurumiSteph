@@ -1195,31 +1195,96 @@ mainZoom.addEventListener('click', () => {
   }
 });  
 
-function resetZoomPosition() {
-  if (!currentZoom) return;
+// 🔹 mémorise la position par défaut à l'ouverture
+defaultZoomState = {
+  x: mainZoom.dataset.x,
+  y: mainZoom.dataset.y,
+  scale: mainZoom.dataset.scale,
+  xLegend: zoomLegend.dataset.x,
+  yLegend: zoomLegend.dataset.y,
+  scaleLegend: zoomLegend.dataset.scale
+};
+
+      let gesturePoints = [];
+let gestureStartTime = 0;
+
+zoomModal.addEventListener('touchstart', e => {
+  if (e.touches.length !== 1) return;
+  gesturePoints = [];
+  gestureStartTime = Date.now();
+
+  const t = e.touches[0];
+  gesturePoints.push({ x: t.clientX, y: t.clientY });
+});
+
+zoomModal.addEventListener('touchmove', e => {
+  if (e.touches.length !== 1) return;
+
+  const t = e.touches[0];
+  gesturePoints.push({ x: t.clientX, y: t.clientY });
+});
+
+zoomModal.addEventListener('touchend', () => {
+  if (gesturePoints.length < 12) return;
+
+  const duration = Date.now() - gestureStartTime;
+  if (duration > 1500) return;
+
+  if (isCircleGesture(gesturePoints)) {
+    resetToDefaultZoom();
+  }
+
+  gesturePoints = [];
+});
+
+      function isCircleGesture(points) {
+  let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity;
+
+  points.forEach(p => {
+    minX = Math.min(minX, p.x);
+    minY = Math.min(minY, p.y);
+    maxX = Math.max(maxX, p.x);
+    maxY = Math.max(maxY, p.y);
+  });
+
+  const w = maxX - minX;
+  const h = maxY - minY;
+
+  if (w < 80 || h < 80) return false;
+
+  const ratio = w / h;
+  if (ratio < 0.6 || ratio > 1.4) return false;
+
+  return true;
+}
+      
+function resetToDefaultZoom() {
+  if (!currentZoom || !defaultZoomState) return;
 
   // IMAGE
-  mainZoom.dataset.x = 0;
-  mainZoom.dataset.y = 0;
-  mainZoom.dataset.scale = 1;
+  mainZoom.dataset.x = defaultZoomState.x;
+  mainZoom.dataset.y = defaultZoomState.y;
+  mainZoom.dataset.scale = defaultZoomState.scale;
 
-  mainZoom.style.transform = `translate(0px, 0px) scale(1)`;
+  mainZoom.style.transform =
+    `translate(${defaultZoomState.x}px, ${defaultZoomState.y}px) scale(${defaultZoomState.scale})`;
 
   // LÉGENDE
-  zoomLegend.dataset.x = 0;
-  zoomLegend.dataset.y = 0;
-  zoomLegend.dataset.scale = 1;
+  zoomLegend.dataset.x = defaultZoomState.xLegend;
+  zoomLegend.dataset.y = defaultZoomState.yLegend;
+  zoomLegend.dataset.scale = defaultZoomState.scaleLegend;
 
-  zoomLegend.style.transform = `translate(0px, 0px) scale(1)`;
+  zoomLegend.style.transform =
+    `translate(${defaultZoomState.xLegend}px, ${defaultZoomState.yLegend}px) scale(${defaultZoomState.scaleLegend})`;
 
-  // ✅ Sauvegarde Supabase
+  // 💾 sauvegarde Supabase
   supabase.from('creations').update({
-    x: 0,
-    y: 0,
-    scale: 1,
-    x_legend: 0,
-    y_legend: 0,
-    scale_legend: 1
+    x: defaultZoomState.x,
+    y: defaultZoomState.y,
+    scale: defaultZoomState.scale,
+    x_legend: defaultZoomState.xLegend,
+    y_legend: defaultZoomState.yLegend,
+    scale_legend: defaultZoomState.scaleLegend
   }).eq('id', currentZoom.id);
 }
       
