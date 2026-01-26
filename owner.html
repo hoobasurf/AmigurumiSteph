@@ -444,6 +444,13 @@ body.modal-open {
   overflow: hidden;
   touch-action: none;
 }
+
+#toggleSidebar {
+  position: fixed;
+  top: 50%;
+  left: 0; /* plutôt que right:-30px */
+  z-index: 20;
+}
   
 </style>
 </head>
@@ -888,22 +895,22 @@ async function refreshCreations() {
       .select('*')
       .order('created_at', { ascending: false });
 
-    if (error) {
-      console.error(error);
-      return;
-    }
+    if (error) { console.error(error); return; }
 
     creations = data.map(c => {
-const zoomGroup = Array.isArray(c.images) ? c.images.map(p => {
-    const { data } = supabase.storage.from('images').getPublicUrl(p);
-    return data?.publicUrl || '';
-}) : [];
+      let zoomGroup = [];
+      if (Array.isArray(c.images) && c.images.length > 0) {
+        zoomGroup = c.images.map(p => {
+          const { data } = supabase.storage.from('images').getPublicUrl(p);
+          return data?.publicUrl || '';
+        }).filter(u => u); // supprime les vides
+      }
 
       return {
         id: c.id,
         name: c.name || '',
         legend: c.legend || '',
-        imgUrl: zoomGroup[0] || '',
+        imgUrl: zoomGroup[0] || 'placeholder.png', // ⚠️ mettre une image par défaut si vide
         zoomGroup,
         likes: Array.isArray(c.likes) ? c.likes : [],
         comments: Array.isArray(c.comments) ? c.comments : [],
@@ -916,13 +923,11 @@ const zoomGroup = Array.isArray(c.images) ? c.images.map(p => {
       };
     });
 
-    renderCreations(creations); // 🔹 Appel obligatoire pour afficher les créations
+    console.log('Creations chargées:', creations); // vérifie dans la console
+    renderCreations(creations);
 
-  } catch (e) {
-    console.error('refreshCreations crash', e);
-  }
+  } catch (e) { console.error('refreshCreations crash', e); }
 }
-
 // ====== AFFICHER LES CRÉATIONS ======
 function renderCreations(list) {
   const container = document.getElementById('visitor-list-container');
