@@ -708,9 +708,19 @@ const fileBtn = document.getElementById('fileBtn');
 const fileInput = document.getElementById('multiPhoto');
 const fileInfo = document.getElementById('fileInfo');
 const zoomContent = document.querySelector('.zoom-content');
-const zoomLegend = document.getElementById('zoomLegend');
+const zoomLegend = document.getElementById('zoomLegend')    
+
+    // Empêche la fermeture du zoom quand on drag l'image ou la légende
+mainZoom.addEventListener('mousedown', e => e.stopPropagation());
+mainZoom.addEventListener('touchstart', e => e.stopPropagation());
+
+zoomLegend.addEventListener('mousedown', e => e.stopPropagation());
+zoomLegend.addEventListener('touchstart', e => e.stopPropagation());
+
+zoomContent.addEventListener('mousedown', e => e.stopPropagation());
+zoomContent.addEventListener('touchstart', e => e.stopPropagation());  
       
-fileBtn.onclick = () => fileInput.click();
+  fileBtn.onclick = () => fileInput.click();
 
 fileInput.onchange = () => {
   fileInfo.textContent = fileInput.files.length
