@@ -1176,6 +1176,54 @@ zoomLegend.style.transform =
   document.body.style.overflow = 'hidden';
 }   // <<< AJOUTE CETTE ACCOLADE ICI (FIN DE openZoom)
 
+
+    let clickCount = 0;
+let clickTimer = null;
+
+mainZoom.addEventListener('click', () => {
+  clickCount++;
+
+  clearTimeout(clickTimer);
+
+  clickTimer = setTimeout(() => {
+    clickCount = 0;
+  }, 600);
+
+  if (clickCount === 3) {
+    resetZoomPosition();
+    clickCount = 0;
+  }
+});  
+
+function resetZoomPosition() {
+  if (!currentZoom) return;
+
+  // IMAGE
+  mainZoom.dataset.x = 0;
+  mainZoom.dataset.y = 0;
+  mainZoom.dataset.scale = 1;
+
+  mainZoom.style.transform = `translate(0px, 0px) scale(1)`;
+
+  // LÉGENDE
+  zoomLegend.dataset.x = 0;
+  zoomLegend.dataset.y = 0;
+  zoomLegend.dataset.scale = 1;
+
+  zoomLegend.style.transform = `translate(0px, 0px) scale(1)`;
+
+  // ✅ Sauvegarde Supabase
+  supabase.from('creations').update({
+    x: 0,
+    y: 0,
+    scale: 1,
+    x_legend: 0,
+    y_legend: 0,
+    scale_legend: 1
+  }).eq('id', currentZoom.id);
+}
+      
+
 function updateActions() {
   if (!currentZoom) return;
   likeCount.textContent = (currentZoom.likes || []).length;
