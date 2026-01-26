@@ -442,6 +442,7 @@ body::before{
   
 body.modal-open {
   overflow: hidden;
+  touch-action: none;
 }
   
 </style>
@@ -707,7 +708,9 @@ mainZoom.addEventListener('touchstart', e => e.stopPropagation());
 zoomLegend.addEventListener('mousedown', e => e.stopPropagation());
 zoomLegend.addEventListener('touchstart', e => e.stopPropagation());
 
-
+zoomContent.addEventListener('mousedown', e => e.stopPropagation());
+zoomContent.addEventListener('touchstart', e => e.stopPropagation());  
+      
   fileBtn.onclick = () => fileInput.click();
 
 fileInput.onchange = () => {
@@ -1050,6 +1053,12 @@ function makePinchZoom(el, isLegend = false) {
   el.addEventListener('touchend', () => { initialDistance = null; });
 }
   
+
+// ====== APPLIQUER SUR IMAGE + LÉGENDE ======
+makeDraggable(mainZoom, false);
+makeDraggable(zoomLegend, true);
+makePinchZoom(mainZoom, false);
+makePinchZoom(zoomLegend, true);
       
 // Valeur initiale
 mainZoom.dataset.scale = 1;
@@ -1138,12 +1147,6 @@ zoomLegend.style.transform =
   document.body.style.overflow = 'hidden';
 }   // <<< AJOUTE CETTE ACCOLADE ICI (FIN DE openZoom)
 
-makeDraggable(mainZoom, false);
-makeDraggable(zoomLegend, true);
-
-makePinchZoom(mainZoom, false);
-makePinchZoom(zoomLegend, true);
-      
 function updateActions() {
   if (!currentZoom) return;
   likeCount.textContent = (currentZoom.likes || []).length;
@@ -1310,14 +1313,10 @@ chatModal.addEventListener('click', (e) => {
 document.querySelector('.chat-window').addEventListener('click', (e) => {
   e.stopPropagation();
 });
-
-zoomModal.onclick = (e) => {
-  if (e.target === zoomModal) {
-    zoomModal.style.display = 'none';
-    document.body.style.overflow = '';
-  }
-};
-      
+// ====== MODALS ======
+[zoomModal, likeModal, commentModal, deleteModal, addModal].forEach(m => {
+  m.onclick = e => { if (e.target === m) m.style.display = 'none'; }
+});
 // Clique sur la croix
 document.querySelector('.closeZoom').onclick = () => {
   zoomModal.style.display = 'none';
