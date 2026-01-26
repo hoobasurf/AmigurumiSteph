@@ -880,6 +880,7 @@ zoomLegend.style.cursor = 'grab';
       
 // ====== CREATIONS ======
 
+// ====== RAFRAÎCHIR LES CRÉATIONS ======
 async function refreshCreations() {
   try {
     const { data, error } = await supabase
@@ -893,17 +894,9 @@ async function refreshCreations() {
     }
 
     creations = data.map(c => {
-      let zoomGroup = [];
-
-      if (Array.isArray(c.images) && c.images.length) {
-        zoomGroup = c.images.map(p =>
-          supabase.storage.from('images').getPublicUrl(p).data.publicUrl
-        );
-      } else if (c.image_path) {
-        zoomGroup = [
-          supabase.storage.from('images').getPublicUrl(c.image_path).data.publicUrl
-        ];
-      }
+      const zoomGroup = Array.isArray(c.images) ? c.images.map(p =>
+        supabase.storage.from('images').getPublicUrl(p).data.publicUrl
+      ) : [];
 
       return {
         id: c.id,
@@ -922,11 +915,60 @@ async function refreshCreations() {
       };
     });
 
-    renderCreations(creations);
+    renderCreations(creations); // 🔹 Appel obligatoire pour afficher les créations
 
   } catch (e) {
     console.error('refreshCreations crash', e);
   }
+}
+
+// ====== AFFICHER LES CRÉATIONS ======
+function renderCreations(list) {
+  const container = document.getElementById('visitor-list-container');
+  container.innerHTML = '';
+
+  let pageDiv = document.createElement('div');
+  pageDiv.className = 'page';
+
+  list.forEach((c, index) => {
+
+    // Nouvelle page toutes les 6 images
+    if (index % 6 === 0 && index !== 0) {
+      container.appendChild(pageDiv);
+      pageDiv = document.createElement('div');
+      pageDiv.className = 'page';
+    }
+
+    const d = document.createElement('div');
+    d.className = 'visitor-item';
+
+    // CROIX SUPPRESSION
+    const delBtn = document.createElement('div');
+    delBtn.className = 'delete-btn';
+    delBtn.textContent = '×';
+    delBtn.onclick = (e) => {
+      e.stopPropagation(); // empêche d'ouvrir le zoom
+      openDeleteModal(c);
+    };
+    d.appendChild(delBtn);
+
+    // IMAGE
+    const img = document.createElement('img');
+    img.src = c.imgUrl || '';
+    img.onclick = () => openZoom(c);
+    d.appendChild(img);
+
+    // OPTIONNEL : légende sous l'image
+    if (c.legend) {
+      const p = document.createElement('p');
+      p.textContent = c.legend;
+      d.appendChild(p);
+    }
+
+    pageDiv.appendChild(d);
+  });
+
+  if (pageDiv.children.length > 0) container.appendChild(pageDiv);
 }
 
 // ====== DRAG SIMPLE ======
@@ -1092,50 +1134,7 @@ makePinchZoom(zoomLegend, true);
 // Valeur initiale
 mainZoom.dataset.scale = 1;
       
-// ====== RENDER ======
-function renderCreations(list) {
-  const container = document.getElementById('visitor-list-container');
-  container.innerHTML = '';
 
-  let pageDiv = document.createElement('div');
-  pageDiv.className = 'page';
-
-  list.forEach((c, index) => {
-
-    // Nouvelle page toutes les 6 images
-    if (index % 6 === 0 && index !== 0) {
-      container.appendChild(pageDiv);
-      pageDiv = document.createElement('div');
-      pageDiv.className = 'page';
-    }
-
-    const d = document.createElement('div');
-    d.className = 'visitor-item';
-
-    // CROIX SUPPRESSION
-    const delBtn = document.createElement('div');
-    delBtn.className = 'delete-btn';
-    delBtn.textContent = '×';
-    delBtn.onclick = (e) => {
-      e.stopPropagation(); // empêche d'ouvrir le zoom
-      openDeleteModal(c);
-    };
-    d.appendChild(delBtn);
-
-    // IMAGE
-    const img = document.createElement('img');
-    img.src = c.imgUrl || '';
-    img.onclick = () => openZoom(c);
-
-    d.appendChild(img);
-
-    // Ajouter la carte à la page
-    pageDiv.appendChild(d);
-  });
-
-  // Ajouter la dernière page
-  if (pageDiv.children.length > 0) container.appendChild(pageDiv);
-}
       // ====== ZOOM ======
 function openZoom(c) {
   currentZoom = creations.find(x => x.id === c.id) || c;
