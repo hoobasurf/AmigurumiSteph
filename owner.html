@@ -998,6 +998,11 @@ async function savePosition(x, y, isLegend){
   if(!currentZoom || !currentZoom.id) return;
 
   if(isLegend){
+    // ⭐ Met à jour l'objet local
+    currentZoom.x_legend = x;
+    currentZoom.y_legend = y;
+    currentZoom.scale_legend = zoomLegend.dataset.scale || 1;
+    
     await supabase.from('creations')
       .update({
         x_legend: x,
@@ -1005,7 +1010,13 @@ async function savePosition(x, y, isLegend){
         scale_legend: zoomLegend.dataset.scale || 1
       })
       .eq('id', currentZoom.id);
+      
   } else {
+    // ⭐ Met à jour l'objet local
+    currentZoom.x = x;
+    currentZoom.y = y;
+    currentZoom.scale = mainZoom.dataset.scale || 1;
+    
     await supabase.from('creations')
       .update({
         x: x,
@@ -1014,7 +1025,22 @@ async function savePosition(x, y, isLegend){
       })
       .eq('id', currentZoom.id);
   }
+  
+  // ⭐ Met aussi à jour le tableau creations
+  const index = creations.findIndex(c => c.id === currentZoom.id);
+  if(index !== -1) {
+    if(isLegend) {
+      creations[index].x_legend = x;
+      creations[index].y_legend = y;
+      creations[index].scale_legend = zoomLegend.dataset.scale || 1;
+    } else {
+      creations[index].x = x;
+      creations[index].y = y;
+      creations[index].scale = mainZoom.dataset.scale || 1;
+    }
+  }
 }
+
 
 // ====== PINCH / WHEEL ZOOM ======
 function makePinchZoom(el, isLegend = false) {
