@@ -999,11 +999,19 @@ function savePosition(x, y, isLegend){
 
   if(isLegend){
     supabase.from('creations')
-      .update({ x_legend: x, y_legend: y })
+      .update({
+        x_legend: x,
+        y_legend: y,
+        scale_legend: zoomLegend.dataset.scale || 1
+      })
       .eq('id', currentZoom.id);
   } else {
     supabase.from('creations')
-      .update({ x: x, y: y })
+      .update({
+        x: x,
+        y: y,
+        scale: mainZoom.dataset.scale || 1
+      })
       .eq('id', currentZoom.id);
   }
 }
@@ -1021,7 +1029,16 @@ function makePinchZoom(el, isLegend = false) {
     scale += e.deltaY * -0.001;
     scale = Math.min(Math.max(0.5, scale), 3);
     el.dataset.scale = scale;
-    el.style.transform = `translate(${el.dataset.x||0}px,${el.dataset.y||0}px) scale(${scale})`;
+el.style.transform =
+  `translate(${el.dataset.x||0}px,${el.dataset.y||0}px) scale(${scale})`;
+
+if (isLegend) {
+  zoomLegend.dataset.scale = scale;
+  savePosition(zoomLegend.dataset.x, zoomLegend.dataset.y, true);
+} else {
+  mainZoom.dataset.scale = scale;
+  savePosition(mainZoom.dataset.x, mainZoom.dataset.y, false);
+}
 
     // 🔹 Sauvegarde Supabase
     if(currentZoom) {
@@ -1058,11 +1075,17 @@ function makePinchZoom(el, isLegend = false) {
         e.touches[0].clientX - e.touches[1].clientX,
         e.touches[0].clientY - e.touches[1].clientY
       );
-      let scale = initialScale * (currentDistance / initialDistance);
-      scale = Math.min(Math.max(0.5, scale), 3);
       el.dataset.scale = scale;
-      el.style.transform = `translate(${el.dataset.x||0}px,${el.dataset.y||0}px) scale(${scale})`;
+el.style.transform =
+  `translate(${el.dataset.x||0}px,${el.dataset.y||0}px) scale(${scale})`;
 
+if (isLegend) {
+  zoomLegend.dataset.scale = scale;
+  savePosition(zoomLegend.dataset.x, zoomLegend.dataset.y, true);
+} else {
+  mainZoom.dataset.scale = scale;
+  savePosition(mainZoom.dataset.x, mainZoom.dataset.y, false);
+}
       // 🔹 Sauvegarde Supabase
       if(currentZoom) {
         if(isLegend){
@@ -1148,16 +1171,20 @@ function openZoom(c) {
   zoomLegend.textContent = currentZoom.legend || 'Aucune légende';
 
   // RESET POSITION + ZOOM
-  mainZoom.dataset.x = currentZoom.x ?? 0;
-mainZoom.dataset.y = currentZoom.y ?? 0;
-mainZoom.dataset.scale = currentZoom.scale ?? 1;
+  currentZoom = c;
+
+// IMAGE
+mainZoom.dataset.x = c.x ?? 0;
+mainZoom.dataset.y = c.y ?? 0;
+mainZoom.dataset.scale = c.scale ?? 1;
 
 mainZoom.style.transform =
   `translate(${mainZoom.dataset.x}px, ${mainZoom.dataset.y}px) scale(${mainZoom.dataset.scale})`;
 
-zoomLegend.dataset.x = currentZoom.x_legend ?? 0;
-zoomLegend.dataset.y = currentZoom.y_legend ?? 0;
-zoomLegend.dataset.scale = currentZoom.scale_legend ?? 1;
+// LÉGENDE
+zoomLegend.dataset.x = c.x_legend ?? 0;
+zoomLegend.dataset.y = c.y_legend ?? 0;
+zoomLegend.dataset.scale = c.scale_legend ?? 1;
 
 zoomLegend.style.transform =
   `translate(${zoomLegend.dataset.x}px, ${zoomLegend.dataset.y}px) scale(${zoomLegend.dataset.scale})`;
