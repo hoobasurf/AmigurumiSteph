@@ -880,54 +880,30 @@ zoomLegend.style.cursor = 'grab';
       
 // ====== CREATIONS ======
 
-async function refreshCreations() {
-  try {
-    const { data, error } = await supabase
-      .from('creations')
-      .select('*')
-      .order('created_at', { ascending: false });
+let userPhotos = {};
 
-    if (error) {
-      console.error(error);
-      return;
-    }
-
-    creations = data.map(c => {
-      let zoomGroup = [];
-
-      if (Array.isArray(c.images) && c.images.length) {
-        zoomGroup = c.images.map(p =>
-          supabase.storage.from('images').getPublicUrl(p).data.publicUrl
-        );
-      } else if (c.image_path) {
-        zoomGroup = [
-          supabase.storage.from('images').getPublicUrl(c.image_path).data.publicUrl
-        ];
-      }
-
-      return {
-        id: c.id,
-        name: c.name || '',
-        legend: c.legend || '',
-        imgUrl: zoomGroup[0] || '',
-        zoomGroup,
-        likes: Array.isArray(c.likes) ? c.likes : [],
-        comments: Array.isArray(c.comments) ? c.comments : [],
-        x: c.x || 0,
-        y: c.y || 0,
-        scale: c.scale || 1,
-        x_legend: c.x_legend || 0,
-        y_legend: c.y_legend || 0,
-        scale_legend: c.scale_legend || 1
-      };
-    });
-
-    renderCreations(creations);
-
-  } catch (e) {
-    console.error('refreshCreations crash', e);
-  }
+// ⭐ AJOUTE ICI
+function showLog(message, type = 'info') {
+  const log = document.createElement('div');
+  log.textContent = message;
+  log.style.cssText = `
+    position: fixed;
+    bottom: ${document.querySelectorAll('.screen-log').length * 50 + 20}px;
+    left: 10px;
+    right: 10px;
+    background: ${type === 'error' ? '#ff4444' : type === 'success' ? '#44ff44' : '#ffb6c1'};
+    color: ${type === 'error' || type === 'success' ? '#fff' : '#000'};
+    padding: 10px;
+    border-radius: 8px;
+    z-index: 99999;
+    font-size: 12px;
+    word-wrap: break-word;
+  `;
+  log.className = 'screen-log';
+  document.body.appendChild(log);
+  setTimeout(() => log.remove(), 5000);
 }
+
 
 // ====== DRAG SIMPLE ======
 function makeDraggable(el, isLegend = false) {
