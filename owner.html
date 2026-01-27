@@ -1271,28 +1271,39 @@ document.getElementById('confirmAdd').onclick = async e => {
       continue; 
     }
 
-    const { data: pubData } = supabase.storage.from('images').getPublicUrl(path);
+    // Récupération correcte de l'URL publique
+    const { data: pubData, error: urlError } = supabase.storage.from('images').getPublicUrl(path);
+    if (urlError) {
+      console.error(urlError);
+      continue;
+    }
     if (!pubData?.publicUrl) continue;
+
     urls.push(pubData.publicUrl);
     paths.push(path);
   }
 
   if (!urls.length) return;
 
+  // Insertion création avec image principale et miniatures
   await supabase.from('creations').insert([{
     name,
     legend,
-    image_path: paths[0], // première image pour l'affichage principal
-    images: paths,
+    image_path: paths[0], // première image pour l’affichage principal
+    images: paths,        // toutes les images
     likes: [],
-    comments: []
+    comments: [],
+    x: 0, y: 0, scale: 1,       // position initiale image
+    x_legend: 0, y_legend: 0, scale_legend: 1  // position initiale légende
   }]);
 
-  // Reset modal et refresh
+  // Reset modal
   addModal.style.display = 'none';
   document.getElementById('photoName').value = '';
   document.getElementById('multiPhoto').value = '';
   document.getElementById('photoLegend').value = '';
+
+  // Recharge les créations
   await refreshCreations();
 };
 
