@@ -994,11 +994,11 @@ function makeDraggable(el, isLegend = false) {
   });
 }
   
-function savePosition(x, y, isLegend){
-  if(!currentZoom) return;
+async function savePosition(x, y, isLegend){
+  if(!currentZoom || !currentZoom.id) return;
 
   if(isLegend){
-    supabase.from('creations')
+    await supabase.from('creations')
       .update({
         x_legend: x,
         y_legend: y,
@@ -1006,7 +1006,7 @@ function savePosition(x, y, isLegend){
       })
       .eq('id', currentZoom.id);
   } else {
-    supabase.from('creations')
+    await supabase.from('creations')
       .update({
         x: x,
         y: y,
