@@ -1130,30 +1130,28 @@ function renderCreations(list) {
 }
       // ====== ZOOM ======
 function openZoom(c) {
-  currentZoom = creations.find(x => x.id === c.id) || c;
+  currentZoom = creations.find(x => x.id === c.id);
   if (!currentZoom) return;
 
   mainZoom.src = currentZoom.imgUrl || '';
   zoomLegend.textContent = currentZoom.legend || 'Aucune légende';
 
-  // RESET POSITION + ZOOM
-  currentZoom = c;
+  // IMAGE
+  mainZoom.dataset.x = currentZoom.x ?? 0;
+  mainZoom.dataset.y = currentZoom.y ?? 0;
+  mainZoom.dataset.scale = currentZoom.scale ?? 1;
 
-// IMAGE
-mainZoom.dataset.x = c.x ?? 0;
-mainZoom.dataset.y = c.y ?? 0;
-mainZoom.dataset.scale = c.scale ?? 1;
+  mainZoom.style.transform =
+    `translate(${mainZoom.dataset.x}px, ${mainZoom.dataset.y}px) scale(${mainZoom.dataset.scale})`;
 
-mainZoom.style.transform =
-  `translate(${mainZoom.dataset.x}px, ${mainZoom.dataset.y}px) scale(${mainZoom.dataset.scale})`;
+  // LÉGENDE
+  zoomLegend.dataset.x = currentZoom.x_legend ?? 0;
+  zoomLegend.dataset.y = currentZoom.y_legend ?? 0;
+  zoomLegend.dataset.scale = currentZoom.scale_legend ?? 1;
 
-// LÉGENDE
-zoomLegend.dataset.x = c.x_legend ?? 0;
-zoomLegend.dataset.y = c.y_legend ?? 0;
-zoomLegend.dataset.scale = c.scale_legend ?? 1;
+  zoomLegend.style.transform =
+    `translate(${zoomLegend.dataset.x}px, ${zoomLegend.dataset.y}px) scale(${zoomLegend.dataset.scale})`;
 
-zoomLegend.style.transform =
-  `translate(${zoomLegend.dataset.x}px, ${zoomLegend.dataset.y}px) scale(${zoomLegend.dataset.scale})`;
   thumbs.innerHTML = '';
   (currentZoom.zoomGroup || []).forEach(u => {
     const t = document.createElement('img');
@@ -1165,13 +1163,10 @@ zoomLegend.style.transform =
   renderLikeList();
   renderCommentList();
 
-    zoomModal.style.display = 'flex';
+  zoomModal.style.display = 'flex';
   document.body.classList.add('modal-open');
-
-  // Bloquer le scroll arrière-plan
   document.body.style.overflow = 'hidden';
-}   // <<< AJOUTE CETTE ACCOLADE ICI (FIN DE openZoom)
-
+}
 function updateActions() {
   if (!currentZoom) return;
   likeCount.textContent = (currentZoom.likes || []).length;
