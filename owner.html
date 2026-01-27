@@ -896,9 +896,14 @@ async function refreshCreations() {
       let zoomGroup = [];
 
       if (Array.isArray(c.images) && c.images.length) {
-        zoomGroup = c.images.map(p =>
-          supabase.storage.from('images').getPublicUrl(p).data.publicUrl
-        );
+        zoomGroup = (c.images || []).map(p =>
+  supabase.storage.from('images').getPublicUrl(p)?.data?.publicUrl || ''
+).filter(u => u); // supprime les vides
+
+if (zoomGroup.length === 0 && c.image_path) {
+  const url = supabase.storage.from('images').getPublicUrl(c.image_path)?.data?.publicUrl;
+  if (url) zoomGroup.push(url);
+}
       } else if (c.image_path) {
         zoomGroup = [
           supabase.storage.from('images').getPublicUrl(c.image_path).data.publicUrl
@@ -1002,16 +1007,14 @@ async function savePosition(x, y, isLegend){
       .update({
         x_legend: x,
         y_legend: y,
-        scale_legend: zoomLegend.dataset.scale || 1
-      })
+        scale_legend: parseFloat(zoomLegend.dataset.scale) || 1
       .eq('id', currentZoom.id);
   } else {
     await supabase.from('creations')
       .update({
         x: x,
         y: y,
-        scale: mainZoom.dataset.scale || 1
-      })
+        scale: parseFloat(mainZoom.dataset.scale) || 1
       .eq('id', currentZoom.id);
   }
 }
@@ -1162,6 +1165,8 @@ function openZoom(c) {
 
   renderLikeList();
   renderCommentList();
+
+  updateActions();
 
   zoomModal.style.display = 'flex';
   document.body.classList.add('modal-open');
