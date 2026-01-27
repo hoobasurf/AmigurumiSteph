@@ -1277,64 +1277,100 @@ document.querySelector('#addModal .modal-box').addEventListener('click', e => {
 
 // Fermer modal en cliquant sur le fond uniquement
 addModal.addEventListener('click', e => { 
-  if (e.target === addModal) addModal.style.display = 'none'; 
+  if (e.target === addModal) {
+    addModal.style.display = 'none';
+    // Reset au cas où
+    document.getElementById('photoName').value = '';
+    document.getElementById('photoLegend').value = '';
+    document.getElementById('multiPhoto').value = '';
+    document.getElementById('fileInfo').textContent = '';
+  }
 });
 
-document.getElementById('confirmAdd').onclick = async e => {
-  // ⭐ Enlève le stopPropagation ici, il n'est plus nécessaire
+document.getElementById('confirmAdd').onclick = async () => {
   const name = document.getElementById('photoName').value.trim();
   const legend = document.getElementById('photoLegend').value.trim();
   const files = document.getElementById('multiPhoto').files;
+
+  console.log('Name:', name, 'Files:', files.length);
 
   if (!name || !files.length) { 
     alert("Mettre un nom et choisir au moins une photo"); 
     return; 
   }
 
-  const paths = [];
-  const urls = [];
+  try {
+    const paths = [];
 
-  for (let file of files) {
-    const path = `${Date.now()}_${file.name}`;
-    const { error: uploadError } = await supabase.storage.from('images').upload(path, file);
-    if (uploadError) { 
-      console.error(uploadError); 
-      continue; 
+    // Upload des fichiers
+    for (let file of files) {
+      const path = `${Date.now()}_${Math.random().toString(36).substr(2, 9)}_${file.name}`;
+      console.log('Uploading:', path);
+      
+      const { data: uploadData, error: uploadError } = await supabase.storage
+        .from('images')
+        .upload(path, file);
+      
+      if (uploadError) { 
+        console.error('Upload error:', uploadError); 
+        alert('Erreur upload: ' + uploadError.message);
+        continue; 
+      }
+
+      console.log('Upload success:', uploadData);
+      paths.push(path);
     }
 
-    const { data: pubData, error: urlError } = supabase.storage.from('images').getPublicUrl(path);
-    if (urlError) {
-      console.error(urlError);
-      continue;
+    if (!paths.length) {
+      alert('Aucune image uploadée avec succès');
+      return;
     }
-    if (!pubData?.publicUrl) continue;
 
-    urls.push(pubData.publicUrl);
-    paths.push(path);
+    console.log('Paths uploaded:', paths);
+
+    // Insertion en base
+    const { data: insertData, error: insertError } = await supabase
+      .from('creations')
+      .insert([{
+        name,
+        legend: legend || '',
+        image_path: paths[0],
+        images: paths,
+        likes: [],
+        comments: [],
+        x: 0, 
+        y: 0, 
+        scale: 1,
+        x_legend: 0, 
+        y_legend: 0, 
+        scale_legend: 1
+      }])
+      .select();
+
+    if (insertError) {
+      console.error('Insert error:', insertError);
+      alert('Erreur insertion: ' + insertError.message);
+      return;
+    }
+
+    console.log('Insert success:', insertData);
+
+    // Reset modal
+    addModal.style.display = 'none';
+    document.getElementById('photoName').value = '';
+    document.getElementById('photoLegend').value = '';
+    document.getElementById('multiPhoto').value = '';
+    document.getElementById('fileInfo').textContent = '';
+
+    // Recharge les créations
+    await refreshCreations();
+    
+    alert('Création ajoutée avec succès !');
+
+  } catch (error) {
+    console.error('Error in confirmAdd:', error);
+    alert('Erreur: ' + error.message);
   }
-
-  if (!urls.length) return;
-
-  await supabase.from('creations').insert([{
-    name,
-    legend,
-    image_path: paths[0],
-    images: paths,
-    likes: [],
-    comments: [],
-    x: 0, y: 0, scale: 1,
-    x_legend: 0, y_legend: 0, scale_legend: 1
-  }]);
-
-  // Reset modal
-  addModal.style.display = 'none';
-  document.getElementById('photoName').value = '';
-  document.getElementById('multiPhoto').value = '';
-  document.getElementById('photoLegend').value = '';
-  document.getElementById('fileInfo').textContent = '';
-
-  // Recharge les créations
-  await refreshCreations();
 };
 
 // ====== DELETE CREATION ======
