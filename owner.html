@@ -1411,9 +1411,11 @@ document.querySelector('.chat-window').addEventListener('click', (e) => {
   e.stopPropagation();
 });
 // ====== MODALS ======
-[zoomModal, likeModal, commentModal, deleteModal, addModal].forEach(m => {
+// ====== MODALS ======
+[zoomModal, likeModal, commentModal, deleteModal].forEach(m => {
   m.onclick = e => { if (e.target === m) m.style.display = 'none'; }
 });
+
 // Clique sur la croix
 document.querySelector('.closeZoom').onclick = () => {
   zoomModal.style.display = 'none';
