@@ -1270,13 +1270,18 @@ function renderCommentList() {
 // ====== ADD CREATION ======
 document.getElementById('addBtn').onclick = () => addModal.style.display = 'flex';
 
-// Fermer modal en cliquant sur le fond
+// ⭐ EMPÊCHE LA FERMETURE en cliquant dans la modal-box
+document.querySelector('#addModal .modal-box').addEventListener('click', e => {
+  e.stopPropagation();
+});
+
+// Fermer modal en cliquant sur le fond uniquement
 addModal.addEventListener('click', e => { 
   if (e.target === addModal) addModal.style.display = 'none'; 
 });
 
 document.getElementById('confirmAdd').onclick = async e => {
-  e.stopPropagation();
+  // ⭐ Enlève le stopPropagation ici, il n'est plus nécessaire
   const name = document.getElementById('photoName').value.trim();
   const legend = document.getElementById('photoLegend').value.trim();
   const files = document.getElementById('multiPhoto').files;
@@ -1297,7 +1302,6 @@ document.getElementById('confirmAdd').onclick = async e => {
       continue; 
     }
 
-    // Récupération correcte de l'URL publique
     const { data: pubData, error: urlError } = supabase.storage.from('images').getPublicUrl(path);
     if (urlError) {
       console.error(urlError);
@@ -1311,16 +1315,15 @@ document.getElementById('confirmAdd').onclick = async e => {
 
   if (!urls.length) return;
 
-  // Insertion création avec image principale et miniatures
   await supabase.from('creations').insert([{
     name,
     legend,
-    image_path: paths[0], // première image pour l’affichage principal
-    images: paths,        // toutes les images
+    image_path: paths[0],
+    images: paths,
     likes: [],
     comments: [],
-    x: 0, y: 0, scale: 1,       // position initiale image
-    x_legend: 0, y_legend: 0, scale_legend: 1  // position initiale légende
+    x: 0, y: 0, scale: 1,
+    x_legend: 0, y_legend: 0, scale_legend: 1
   }]);
 
   // Reset modal
@@ -1328,6 +1331,7 @@ document.getElementById('confirmAdd').onclick = async e => {
   document.getElementById('photoName').value = '';
   document.getElementById('multiPhoto').value = '';
   document.getElementById('photoLegend').value = '';
+  document.getElementById('fileInfo').textContent = '';
 
   // Recharge les créations
   await refreshCreations();
