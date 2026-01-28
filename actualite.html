@@ -11,9 +11,9 @@
 * { box-sizing:border-box; margin:0; padding:0; font-family:'Comic Sans MS',cursive; }
 html, body { 
 min-height:100%; 
-background: url('2A108385-A26A-4390-A0F8-635DD2C93625.png') center top no-repeat;
-background-size: contain;
-background-attachment: scroll;
+background: url('2A108385-A26A-4390-A0F8-635DD2C93625.png') center top;
+background-size: cover;
+background-attachment: fixed;
 overflow-y:auto; 
 }
 
@@ -827,8 +827,7 @@ headerName.textContent = `${myPrenom}, quoi de neuf ?`;
 
 // Retour
 backBtn.onclick = () => {
-  document.body.style.opacity = '0';
-  setTimeout(() => window.location.href = 'owner.html', 500);
+  window.location.href = 'owner.html';
 };
 
 // Charger les photos des utilisateurs
