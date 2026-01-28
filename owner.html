@@ -851,34 +851,80 @@ document.getElementById('confirmAdd').onclick = async () => {
   const legend = document.getElementById('photoLegend').value.trim();
   const files = document.getElementById('multiPhoto').files;
 
-  if (!name || !files.length) { alert("Mettre un nom et choisir au moins une photo"); return; }
+  if (!name || !files.length) { 
+    alert("Mettre un nom et choisir au moins une photo"); 
+    return; 
+  }
+
+  alert(`Début: ${files.length} fichiers à uploader`);
 
   try {
     const paths = [];
+    
     for (let i = 0; i < files.length; i++) {
       const file = files[i];
       const path = `${Date.now()}_${Math.random().toString(36).substr(2, 9)}_${file.name}`;
-      const { error: uploadError } = await supabase.storage.from('images').upload(path, file, { cacheControl: '3600', upsert: false });
-      if (uploadError) { console.error('Upload error:', uploadError); continue; }
+      
+      const { data: uploadData, error: uploadError } = await supabase.storage
+        .from('images')
+        .upload(path, file);
+      
+      if (uploadError) { 
+        alert(`ERREUR UPLOAD ${i+1}:\n${uploadError.message}`);
+        continue; 
+      }
+      
       paths.push(path);
     }
 
-    if (!paths.length) { alert('Aucune image uploadée avec succès'); return; }
+    if (!paths.length) {
+      alert('Aucune image uploadée');
+      return;
+    }
 
-    const { error: insertError } = await supabase.from('creations').insert([{
-      name, legend: legend || '', image_path: paths[0], images: paths, likes: [], comments: [],
-      x: 0, y: 0, scale: 1, x_legend: 0, y_legend: 0, scale_legend: 1
-    }]);
+    alert(`${paths.length} images uploadées ✓\nMaintenant insertion en base...`);
 
-    if (insertError) { console.error('Insert error:', insertError); alert('Erreur insertion: ' + insertError.message); return; }
+    const payload = {
+      name,
+      legend: legend || '',
+      image_path: paths[0],
+      images: paths,
+      likes: [],
+      comments: [],
+      x: 0, 
+      y: 0, 
+      scale: 1,
+      x_legend: 0, 
+      y_legend: 0, 
+      scale_legend: 1
+    };
 
+    const { data: insertData, error: insertError } = await supabase
+      .from('creations')
+      .insert([payload])
+      .select();
+
+    if (insertError) {
+      alert(`ERREUR INSERTION:\nCode: ${insertError.code}\nMessage: ${insertError.message}\nDétails: ${insertError.details || 'aucun'}`);
+      return;
+    }
+
+    alert('Insertion réussie ✓\nMaintenant refresh...');
+
+    // Reset modal
     addModal.style.display = 'none';
     document.getElementById('photoName').value = '';
     document.getElementById('photoLegend').value = '';
     document.getElementById('multiPhoto').value = '';
     fileInfo.textContent = '';
+
     await refreshCreations();
-  } catch (error) { console.error('Error:', error); alert('Erreur: ' + error.message); }
+    
+    alert('✅ Tout est OK ! Création ajoutée');
+
+  } catch (error) {
+    alert(`CRASH TOTAL:\n${error.message}\n\nStack:\n${error.stack}`);
+  }
 };
 
 // Delete creation
