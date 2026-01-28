@@ -1,8 +1,10 @@
 <!DOCTYPE html>
+
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mes Laines</title>
 
 <style>
 html, body {
@@ -35,66 +37,121 @@ body::before{
 /* BOUTON TIROIR */
 .drawer{
   position:absolute;
-  width: calc(18% + 1mm); /* +1 mm en longueur */
+  width: calc(18% + 1mm);
   height:4%;
   background:transparent;
   border:none;
   cursor:pointer;
+  transition:all 0.3s;
 }
 
-/* feedback tactile */
+/* feedback tactile avec glow */
 .drawer:active{
-  background:rgba(255,182,193,0.25);
+  background:rgba(255,182,193,0.4);
+  box-shadow: 0 0 20px rgba(255,182,193,0.8);
 }
 
-/* DEBUG (à enlever quand ok)
-.drawer{
-  outline:2px dashed red;
-  background:rgba(255,0,0,0.12);
-}
-*/
-
-/* ===== MODAL ===== */
+/* ===== MODAL INVENTAIRE ===== */
 .modal{
   position:fixed;
   inset:0;
   display:none;
   justify-content:center;
   align-items:center;
-  background:rgba(255,240,245,0.95);
+  background:rgba(0,0,0,0.6);
+  backdrop-filter:blur(8px);
   z-index:50;
+  animation:fadeIn 0.3s;
+}
+
+@keyframes fadeIn{
+  from{opacity:0;}
+  to{opacity:1;}
 }
 
 .modal-content{
-  background:white;
-  padding:20px;
-  border-radius:20px;
+  background:rgba(255,255,255,0.95);
+  backdrop-filter:blur(10px);
+  padding:30px;
+  border-radius:25px;
   width:90%;
+  max-width:500px;
+  max-height:80vh;
+  overflow-y:auto;
   text-align:center;
+  border:4px solid;
+  box-shadow: 0 0 40px rgba(0,0,0,0.3);
+  animation:slideUp 0.3s;
+}
+
+@keyframes slideUp{
+  from{transform:translateY(50px); opacity:0;}
+  to{transform:translateY(0); opacity:1;}
+}
+
+.modal-content h2{
+  margin:0 0 20px 0;
+  font-size:28px;
+  text-shadow:2px 2px 4px rgba(0,0,0,0.1);
+}
+
+.modal-content p{
+  margin:10px 0;
+  font-size:16px;
+  line-height:1.6;
+}
+
+/* Liste inventaire */
+.inventory-list{
+  text-align:left;
+  margin:20px 0;
+  padding:15px;
+  background:rgba(255,255,255,0.5);
+  border-radius:15px;
+}
+
+.inventory-item{
+  padding:8px;
+  margin:5px 0;
+  background:white;
+  border-radius:10px;
+  border-left:4px solid;
+  box-shadow:0 2px 5px rgba(0,0,0,0.1);
 }
 
 .modal-content button{
-  margin-top:15px;
-  padding:8px 16px;
+  margin-top:20px;
+  padding:12px 30px;
   border:none;
-  border-radius:16px;
+  border-radius:20px;
   background:#ffb6c1;
   color:white;
   cursor:pointer;
+  font-weight:bold;
+  font-size:16px;
+  transition:all 0.3s;
+  box-shadow:0 4px 15px rgba(255,182,193,0.4);
+}
+
+.modal-content button:hover{
+  transform:scale(1.05);
+  box-shadow:0 6px 20px rgba(255,182,193,0.6);
 }
 
 /* ===== SIDEBAR ===== */
 #sidebar{
   position:fixed;
   top:0;
-  left:-220px;
-  width:220px;
+  left:-250px;
+  width:250px;
   height:100vh;
-  background:rgba(255,230,240,0.2);
-  border-right:2px solid #b67385;
+  background:rgba(255,230,240,0.95);
+  backdrop-filter:blur(10px);
+  border-right:3px solid #ffb6c1;
   padding:20px;
   transition:left .3s;
   z-index:100;
+  box-shadow:3px 0 20px rgba(255,182,193,0.4);
 }
 
 #sidebar.sidebar-open{
@@ -104,83 +161,160 @@ body::before{
 #toggleSidebar{
   position:absolute;
   top:50%;
-  right:-30px;
-  width:30px;
-  height:60px;
+  right:-35px;
+  width:35px;
+  height:70px;
   background:#ffb6c1;
-  border-radius:0 12px 12px 0;
+  border-radius:0 15px 15px 0;
   display:flex;
   align-items:center;
   justify-content:center;
   cursor:pointer;
   font-weight:bold;
   color:white;
+  font-size:22px;
+  transition:all 0.3s;
+  box-shadow:3px 0 15px rgba(255,182,193,0.5);
 }
 
-#backBtn{
-  width:auto;
-  padding:8px 16px;
+#toggleSidebar:hover{
+  background:#ff69b4;
+  box-shadow:3px 0 25px rgba(255,182,193,0.8);
+}
+
+.sidebar-btn{
+  width:100%;
+  padding:12px 20px;
   border-radius:16px;
-  border:none;
-  background:#ffb6c1;
-  color:#fff;
+  border:2px solid #ffb6c1;
+  background:white;
+  color:#ffb6c1;
   cursor:pointer;
   font-weight:bold;
-  margin-top:10px;
+  margin-top:15px;
+  transition:all 0.3s;
+  font-size:15px;
+  box-shadow:0 3px 10px rgba(255,182,193,0.3);
 }
 
+.sidebar-btn:hover{
+  background:#ffb6c1;
+  color:white;
+  transform:scale(1.05);
+  box-shadow:0 5px 20px rgba(255,182,193,0.6);
+}
+
+#sidebar h3{
+  color:#ffb6c1;
+  margin:0 0 20px 0;
+  font-size:22px;
+  text-align:center;
+  text-shadow:2px 2px 4px rgba(255,182,193,0.3);
+}
+
+/* Couleurs des tiroirs */
+.drawer-red { border-color: #ff6b6b; }
+.drawer-orange { border-color: #ffa500; }
+.drawer-yellow { border-color: #ffd700; }
+.drawer-green { border-color: #90ee90; }
+.drawer-blue { border-color: #87ceeb; }
+.drawer-purple { border-color: #dda0dd; }
+.drawer-pink { border-color: #ffb6c1; }
+.drawer-brown { border-color: #d2691e; }
+.drawer-gray { border-color: #c0c0c0; }
+.drawer-white { border-color: #f5f5f5; }
+.drawer-black { border-color: #4a4a4a; }
+.drawer-beige { border-color: #f5deb3; }
+.drawer-turquoise { border-color: #40e0d0; }
+.drawer-coral { border-color: #ff7f50; }
+.drawer-lavender { border-color: #e6e6fa; }
+.drawer-mint { border-color: #98ff98; }
+
 </style>
+
 </head>
 
 <body>
 
   <!-- ===== SIDEBAR ===== -->
+
 <div id="sidebar">
   <div id="toggleSidebar">☰</div>
-  <button id="backBtn">Retour</button>
+  <h3>🧶 Menu</h3>
+  <button class="sidebar-btn" id="hobbiiBtn">
+    🛒 Hobbii
+  </button>
+  <button class="sidebar-btn" id="backBtn">
+    ← Retour
+  </button>
 </div>
 
 <!-- ===== TIROIRS (16) ===== -->
+
 <div id="drawer-overlay">
 
   <!-- LIGNE 1 -->
-  <button class="drawer" style="top:40%; left:11%" onclick="openModal(1)"></button>
-  <button class="drawer" style="top:40%; left:30%" onclick="openModal(2)"></button>
-  <button class="drawer" style="top:40%; left:49%" onclick="openModal(3)"></button>
-  <button class="drawer" style="top:40%; left:68%" onclick="openModal(4)"></button>
+
+<button class="drawer" style="top:40%; left:11%" onclick="openDrawer(1, 'Rouge', 'drawer-red', ['Laine rouge vif - 5 pelotes', 'Laine bordeaux - 3 pelotes', 'Laine rose foncé - 2 pelotes'])"></button>
+<button class="drawer" style="top:40%; left:30%" onclick="openDrawer(2, 'Orange', 'drawer-orange', ['Laine orange - 4 pelotes', 'Laine pêche - 6 pelotes', 'Laine abricot - 2 pelotes'])"></button>
+<button class="drawer" style="top:40%; left:49%" onclick="openDrawer(3, 'Jaune', 'drawer-yellow', ['Laine jaune soleil - 5 pelotes', 'Laine moutarde - 3 pelotes', 'Laine citron - 4 pelotes'])"></button>
+<button class="drawer" style="top:40%; left:68%" onclick="openDrawer(4, 'Vert', 'drawer-green', ['Laine vert pomme - 3 pelotes', 'Laine vert forêt - 5 pelotes', 'Laine menthe - 4 pelotes'])"></button>
 
   <!-- LIGNE 2 -->
-  <button class="drawer" style="top:45.8%; left:11%" onclick="openModal(5)"></button>
-  <button class="drawer" style="top:45.8%; left:30%" onclick="openModal(6)"></button>
-  <button class="drawer" style="top:45.8%; left:49%" onclick="openModal(7)"></button>
-  <button class="drawer" style="top:45.8%; left:68%" onclick="openModal(8)"></button>
+
+<button class="drawer" style="top:45.8%; left:11%" onclick="openDrawer(5, 'Bleu', 'drawer-blue', ['Laine bleu ciel - 6 pelotes', 'Laine bleu marine - 4 pelotes', 'Laine turquoise - 3 pelotes'])"></button>
+<button class="drawer" style="top:45.8%; left:30%" onclick="openDrawer(6, 'Violet', 'drawer-purple', ['Laine lavande - 4 pelotes', 'Laine prune - 2 pelotes', 'Laine lilas - 5 pelotes'])"></button>
+<button class="drawer" style="top:45.8%; left:49%" onclick="openDrawer(7, 'Rose', 'drawer-pink', ['Laine rose pastel - 8 pelotes', 'Laine fuchsia - 3 pelotes', 'Laine rose poudré - 5 pelotes'])"></button>
+<button class="drawer" style="top:45.8%; left:68%" onclick="openDrawer(8, 'Marron', 'drawer-brown', ['Laine chocolat - 4 pelotes', 'Laine caramel - 3 pelotes', 'Laine noisette - 2 pelotes'])"></button>
 
   <!-- LIGNE 3 -->
-  <button class="drawer" style="top:51.6%; left:11%" onclick="openModal(9)"></button>
-  <button class="drawer" style="top:51.6%; left:30%" onclick="openModal(10)"></button>
-  <button class="drawer" style="top:51.6%; left:49%" onclick="openModal(11)"></button>
-  <button class="drawer" style="top:51.6%; left:68%" onclick="openModal(12)"></button>
+
+<button class="drawer" style="top:51.6%; left:11%" onclick="openDrawer(9, 'Gris', 'drawer-gray', ['Laine gris perle - 5 pelotes', 'Laine gris foncé - 4 pelotes', 'Laine gris clair - 6 pelotes'])"></button>
+<button class="drawer" style="top:51.6%; left:30%" onclick="openDrawer(10, 'Blanc', 'drawer-white', ['Laine blanc neige - 10 pelotes', 'Laine écru - 5 pelotes', 'Laine ivoire - 4 pelotes'])"></button>
+<button class="drawer" style="top:51.6%; left:49%" onclick="openDrawer(11, 'Noir', 'drawer-black', ['Laine noir ébène - 6 pelotes', 'Laine anthracite - 4 pelotes'])"></button>
+<button class="drawer" style="top:51.6%; left:68%" onclick="openDrawer(12, 'Beige', 'drawer-beige', ['Laine beige sable - 5 pelotes', 'Laine taupe - 3 pelotes', 'Laine crème - 4 pelotes'])"></button>
 
   <!-- LIGNE 4 -->
-  <button class="drawer" style="top:57.4%; left:11%" onclick="openModal(13)"></button>
-  <button class="drawer" style="top:57.4%; left:30%" onclick="openModal(14)"></button>
-  <button class="drawer" style="top:57.4%; left:49%" onclick="openModal(15)"></button>
-  <button class="drawer" style="top:57.4%; left:68%" onclick="openModal(16)"></button>
+
+<button class="drawer" style="top:57.4%; left:11%" onclick="openDrawer(13, 'Turquoise', 'drawer-turquoise', ['Laine turquoise - 3 pelotes', 'Laine cyan - 4 pelotes'])"></button>
+<button class="drawer" style="top:57.4%; left:30%" onclick="openDrawer(14, 'Corail', 'drawer-coral', ['Laine corail - 5 pelotes', 'Laine saumon - 3 pelotes'])"></button>
+<button class="drawer" style="top:57.4%; left:49%" onclick="openDrawer(15, 'Lavande', 'drawer-lavender', ['Laine lavande - 4 pelotes', 'Laine parme - 3 pelotes'])"></button>
+<button class="drawer" style="top:57.4%; left:68%" onclick="openDrawer(16, 'Menthe', 'drawer-mint', ['Laine vert menthe - 6 pelotes', 'Laine vert d\'eau - 4 pelotes'])"></button>
 
 </div>
 
 <!-- ===== MODAL UNIQUE ===== -->
+
 <div id="modal" class="modal" onclick="closeModal()">
-  <div class="modal-content" onclick="event.stopPropagation()">
+  <div class="modal-content" id="modalContent" onclick="event.stopPropagation()">
     <h2 id="modalTitle"></h2>
-    <p>Contenu du tiroir ✨</p>
+    <div class="inventory-list" id="inventoryList"></div>
     <button onclick="closeModal()">Fermer</button>
   </div>
 </div>
 
 <script>
-function openModal(n){
-  document.getElementById('modalTitle').innerText = 'Tiroir ' + n;
+// Données des tiroirs
+function openDrawer(num, colorName, colorClass, items){
+  const modalContent = document.getElementById('modalContent');
+  const modalTitle = document.getElementById('modalTitle');
+  const inventoryList = document.getElementById('inventoryList');
+  
+  // Définir le titre
+  modalTitle.innerHTML = `🧶 Tiroir ${num} - ${colorName}`;
+  
+  // Appliquer la couleur à la bordure
+  modalContent.className = 'modal-content ' + colorClass;
+  
+  // Créer la liste d'inventaire
+  inventoryList.innerHTML = '<h3 style="margin-top:0;">Inventaire :</h3>';
+  items.forEach(item => {
+    const div = document.createElement('div');
+    div.className = 'inventory-item ' + colorClass;
+    div.textContent = '• ' + item;
+    inventoryList.appendChild(div);
+  });
+  
   document.getElementById('modal').style.display = 'flex';
 }
 
@@ -193,6 +327,11 @@ document.getElementById('toggleSidebar').onclick = () => {
   document.getElementById('sidebar').classList.toggle('sidebar-open');
 };
 
+// Bouton Hobbii - ouvre le site Hobbii
+document.getElementById('hobbiiBtn').onclick = () => {
+  window.open('https://hobbii.fr', '_blank');
+};
+
 // Bouton Retour avec fondu
 document.getElementById('backBtn').onclick = () => {
   document.body.style.transition = 'opacity 0.5s';
@@ -201,6 +340,11 @@ document.getElementById('backBtn').onclick = () => {
     window.location.href = 'owner.html';
   }, 500);
 };
+
+// Fermer modal avec Échap
+document.addEventListener('keydown', (e) => {
+  if(e.key === 'Escape') closeModal();
+});
   
 </script>
 
