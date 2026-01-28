@@ -4,7 +4,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Mes Laines</title>
+<title>Éditeur de Position - Tiroirs</title>
 
 <style>
 html, body {
@@ -12,6 +12,7 @@ html, body {
   padding: 0;
   height: 100%;
   font-family: 'Comic Sans MS', cursive;
+  overflow: hidden;
 }
 
 /* FOND IMAGE */
@@ -26,478 +27,343 @@ body::before{
   z-index:-1;
 }
 
-/* ===== ZONE TIROIRS ===== */
-#drawer-overlay{
+/* Zone de travail */
+#workspace{
   position: fixed;
   inset: 0;
   z-index: 10;
 }
 
-/* BOUTON TABLEAU HOBBII - zone cliquable sur l'image */
+/* Tiroirs draggables */
+.drawer{
+  position: absolute;
+  width: 200px;
+  height: 70px;
+  background: rgba(255, 0, 0, 0.4);
+  border: 3px solid red;
+  cursor: move;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  color: white;
+  text-shadow: 2px 2px 4px black;
+  font-size: 14px;
+  user-select: none;
+  transition: background 0.2s;
+}
+
+.drawer:hover{
+  background: rgba(255, 255, 0, 0.5);
+  border-color: yellow;
+}
+
+.drawer.dragging{
+  opacity: 0.7;
+  z-index: 1000;
+}
+
+/* Cadre Hobbii */
 #hobbii-board{
   position: absolute;
-  top: 8%;
-  left: 28%;
-  width: 44%;
-  height: 22%;
-  background: rgba(0,255,0,0.3); /* VERT VISIBLE POUR POSITIONNEMENT */
-  border: 3px solid lime; /* CONTOUR VERT VISIBLE */
-  cursor: pointer;
-  z-index: 11;
-  transition: all 0.3s;
+  width: 400px;
+  height: 150px;
+  background: rgba(0, 255, 0, 0.4);
+  border: 3px solid lime;
+  cursor: move;
   border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  color: white;
+  text-shadow: 2px 2px 4px black;
+  font-size: 20px;
+  user-select: none;
+  top: 10%;
+  left: 30%;
 }
 
 #hobbii-board:hover{
   background: rgba(255, 255, 0, 0.5);
-  box-shadow: 0 0 30px rgba(255, 255, 0, 0.8);
+  border-color: yellow;
 }
 
-#hobbii-board:active{
-  background: rgba(255, 182, 193, 0.4);
-  box-shadow: 0 0 40px rgba(255, 182, 193, 1);
+/* Panel de contrôle */
+#control-panel{
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  background: rgba(255, 230, 240, 0.98);
+  border: 3px solid #ffb6c1;
+  border-radius: 15px;
+  padding: 20px;
+  z-index: 2000;
+  max-width: 400px;
+  max-height: 80vh;
+  overflow-y: auto;
+  box-shadow: 0 5px 25px rgba(0,0,0,0.3);
 }
 
-/* BOUTON TIROIR */
-.drawer{
-  position:absolute;
-  width:10.5%;
-  height:6.5%;
-  background:rgba(255,0,0,0.3); /* ROUGE VISIBLE POUR POSITIONNEMENT */
-  border:3px solid red; /* CONTOUR ROUGE VISIBLE */
-  cursor:pointer;
-  transition:all 0.3s;
-  border-radius:8px;
+#control-panel h3{
+  margin: 0 0 15px 0;
+  color: #ffb6c1;
+  font-size: 18px;
 }
 
-/* feedback tactile avec glow */
-.drawer:active{
-  background:rgba(255,182,193,0.5);
-  box-shadow: 0 0 25px rgba(255,182,193,0.9);
-}
-
-.drawer:hover{
-  background:rgba(255,255,0,0.5); /* JAUNE au survol */
-  box-shadow: 0 0 15px rgba(255,182,193,0.7);
-  transform:scale(1.02);
-}
-
-/* ===== MODAL INVENTAIRE ===== */
-.modal{
-  position:fixed;
-  inset:0;
-  display:none;
-  justify-content:center;
-  align-items:center;
-  background:rgba(0,0,0,0.6);
-  backdrop-filter:blur(8px);
-  z-index:50;
-  animation:fadeIn 0.3s;
-}
-
-@keyframes fadeIn{
-  from{opacity:0;}
-  to{opacity:1;}
-}
-
-.modal-content{
-  background:rgba(255,255,255,0.95);
-  backdrop-filter:blur(10px);
-  padding:30px;
-  border-radius:25px;
-  width:90%;
-  max-width:500px;
-  max-height:80vh;
-  overflow-y:auto;
-  text-align:center;
-  border:4px solid;
-  box-shadow: 0 0 40px rgba(0,0,0,0.3);
-  animation:slideUp 0.3s;
-}
-
-@keyframes slideUp{
-  from{transform:translateY(50px); opacity:0;}
-  to{transform:translateY(0); opacity:1;}
-}
-
-.modal-content h2{
-  margin:0 0 20px 0;
-  font-size:28px;
-  text-shadow:2px 2px 4px rgba(0,0,0,0.1);
-}
-
-.modal-content p{
-  margin:10px 0;
-  font-size:16px;
-  line-height:1.6;
-}
-
-/* Liste inventaire */
-.inventory-list{
-  text-align:left;
-  margin:20px 0;
-  padding:15px;
-  background:rgba(255,255,255,0.5);
-  border-radius:15px;
-}
-
-.inventory-item{
-  display: flex;
-  align-items: center;
-  gap: 15px;
-  padding: 12px;
-  margin: 10px 0;
-  background: white;
-  border-radius: 12px;
-  border-left: 5px solid;
-  box-shadow: 0 3px 8px rgba(0,0,0,0.1);
-  transition: all 0.3s;
-}
-
-.inventory-item:hover{
-  transform: translateX(5px);
-  box-shadow: 0 5px 15px rgba(0,0,0,0.2);
-}
-
-.yarn-photo{
-  width: 80px;
-  height: 80px;
-  object-fit: cover;
-  border-radius: 10px;
+#code-output{
+  background: #f5f5f5;
   border: 2px solid #ddd;
-  flex-shrink: 0;
-}
-
-.yarn-info{
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 5px;
-}
-
-.yarn-name{
-  font-weight: bold;
-  font-size: 16px;
+  border-radius: 8px;
+  padding: 10px;
+  font-family: monospace;
+  font-size: 11px;
+  max-height: 300px;
+  overflow-y: auto;
+  white-space: pre;
   color: #333;
 }
 
-.yarn-ref{
-  font-size: 13px;
-  color: #666;
-  font-style: italic;
-}
-
-.yarn-quantity{
-  font-size: 14px;
-  color: #555;
-}
-
-.buy-btn{
-  padding: 8px 16px;
+.button{
+  width: 100%;
+  padding: 10px;
+  margin-top: 10px;
   background: #ffb6c1;
-  color: white;
   border: none;
   border-radius: 10px;
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.3s;
+}
+
+.button:hover{
+  background: #ff69b4;
+  transform: scale(1.02);
+}
+
+.info{
+  background: #fff;
+  padding: 10px;
+  border-radius: 8px;
+  margin-bottom: 10px;
+  font-size: 12px;
+  border-left: 4px solid #ffb6c1;
+}
+
+/* Instructions */
+#instructions{
+  position: fixed;
+  top: 20px;
+  left: 20px;
+  background: rgba(255, 230, 240, 0.95);
+  border: 3px solid #ffb6c1;
+  border-radius: 15px;
+  padding: 15px;
+  z-index: 2000;
+  max-width: 300px;
+}
+
+#instructions h4{
+  margin: 0 0 10px 0;
+  color: #ffb6c1;
+}
+
+#instructions ul{
+  margin: 5px 0;
+  padding-left: 20px;
+  font-size: 13px;
+}
+
+.close-btn{
+  float: right;
+  background: #ffb6c1;
+  border: none;
+  color: white;
+  width: 25px;
+  height: 25px;
+  border-radius: 50%;
   cursor: pointer;
   font-weight: bold;
-  font-size: 13px;
-  transition: all 0.3s;
-  box-shadow: 0 2px 8px rgba(255,182,193,0.4);
-  text-decoration: none;
-  display: inline-block;
-  white-space: nowrap;
 }
-
-.buy-btn:hover{
-  background: #ff69b4;
-  transform: scale(1.05);
-  box-shadow: 0 4px 12px rgba(255,182,193,0.6);
-}
-
-.modal-content button{
-  margin-top:20px;
-  padding:12px 30px;
-  border:none;
-  border-radius:20px;
-  background:#ffb6c1;
-  color:white;
-  cursor:pointer;
-  font-weight:bold;
-  font-size:16px;
-  transition:all 0.3s;
-  box-shadow:0 4px 15px rgba(255,182,193,0.4);
-}
-
-.modal-content button:hover{
-  transform:scale(1.05);
-  box-shadow:0 6px 20px rgba(255,182,193,0.6);
-}
-
-/* ===== SIDEBAR ===== */
-#sidebar{
-  position:fixed;
-  top:0;
-  left:-250px;
-  width:250px;
-  height:100vh;
-  background:#FFE6F0;
-  border-right:3px solid #ffb6c1;
-  padding:20px;
-  transition:left .3s;
-  z-index:100;
-  box-shadow:3px 0 20px rgba(255,182,193,0.4);
-}
-
-#sidebar.sidebar-open{
-  left:0;
-}
-
-#toggleSidebar{
-  position:absolute;
-  top:50%;
-  right:-35px;
-  width:35px;
-  height:70px;
-  background:#ffb6c1;
-  border-radius:0 15px 15px 0;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  cursor:pointer;
-  font-weight:bold;
-  color:white;
-  font-size:22px;
-  transition:all 0.3s;
-  box-shadow:3px 0 15px rgba(255,182,193,0.5);
-}
-
-#toggleSidebar:hover{
-  background:#ff69b4;
-  box-shadow:3px 0 25px rgba(255,182,193,0.8);
-}
-
-.sidebar-btn{
-  width:100%;
-  padding:12px 20px;
-  border-radius:16px;
-  border:2px solid #ffb6c1;
-  background:white;
-  color:#ffb6c1;
-  cursor:pointer;
-  font-weight:bold;
-  margin-top:15px;
-  transition:all 0.3s;
-  font-size:15px;
-  box-shadow:0 3px 10px rgba(255,182,193,0.3);
-}
-
-.sidebar-btn:hover{
-  background:#ffb6c1;
-  color:white;
-  transform:scale(1.05);
-  box-shadow:0 5px 20px rgba(255,182,193,0.6);
-}
-
-#sidebar h3{
-  color:#ffb6c1;
-  margin:0 0 20px 0;
-  font-size:22px;
-  text-align:center;
-  text-shadow:2px 2px 4px rgba(255,182,193,0.3);
-}
-
-/* Couleurs des tiroirs */
-.drawer-red { border-color: #ff6b6b; }
-.drawer-orange { border-color: #ffa500; }
-.drawer-yellow { border-color: #ffd700; }
-.drawer-green { border-color: #90ee90; }
-.drawer-blue { border-color: #87ceeb; }
-.drawer-purple { border-color: #dda0dd; }
-.drawer-pink { border-color: #ffb6c1; }
-.drawer-brown { border-color: #d2691e; }
-.drawer-gray { border-color: #c0c0c0; }
-.drawer-white { border-color: #f5f5f5; }
-.drawer-black { border-color: #4a4a4a; }
-.drawer-beige { border-color: #f5deb3; }
-.drawer-turquoise { border-color: #40e0d0; }
-.drawer-coral { border-color: #ff7f50; }
-.drawer-lavender { border-color: #e6e6fa; }
-.drawer-mint { border-color: #98ff98; }
-
 </style>
 
 </head>
 
 <body>
 
-  <!-- ===== SIDEBAR ===== -->
-
-<div id="sidebar">
-  <div id="toggleSidebar">☰</div>
-  <h3>🧶 Menu</h3>
-  <button class="sidebar-btn" id="hobbiiBtn">
-    🛒 Hobbii
-  </button>
-  <button class="sidebar-btn" id="backBtn">
-    ← Retour
-  </button>
+<div id="instructions">
+  <button class="close-btn" onclick="this.parentElement.style.display='none'">×</button>
+  <h4>🎯 Mode Éditeur</h4>
+  <ul>
+    <li><strong>Glissez</strong> les rectangles sur les tiroirs</li>
+    <li><strong>Rectangle VERT</strong> = Cadre Hobbii</li>
+    <li><strong>Rectangles ROUGES</strong> = Tiroirs (16)</li>
+    <li>Cliquez sur <strong>"Générer le Code"</strong> quand c'est bon</li>
+    <li><strong>Copiez</strong> le code généré</li>
+  </ul>
 </div>
 
-<!-- ===== TIROIRS (16) ===== -->
-
-<div id="drawer-overlay">
-
-  <!-- BOUTON TABLEAU HOBBII -->
-
-<button id="hobbii-board" onclick="window.open('https://hobbii.fr', '_blank')"></button>
-
-  <!-- LIGNE 1 (de gauche à droite: Blanc, Écru/Ivoire, Beige, Marron) -->
-
-<button class="drawer" style="top:40.5%; left:14.5%" onclick="openDrawer(1, 'Blanc', 'drawer-white', [
-{name: 'Rainbow Cotton 8/4', ref: 'RC84-001', quantity: '10 pelotes', photo: 'https://hobbii.fr/cdn/shop/products/RC-8-4-001_1200x1200.jpg', link: 'https://hobbii.fr/rainbow-cotton-8-4'}
-])"></button>
-
-<button class="drawer" style="top:40.5%; left:31%" onclick="openDrawer(2, 'Écru/Ivoire', 'drawer-beige', [
-{name: 'Baby Snuggle', ref: 'BS-002', quantity: '5 pelotes', photo: 'https://hobbii.fr/cdn/shop/products/BS-002_1200x1200.jpg', link: 'https://hobbii.fr/baby-snuggle'}
-])"></button>
-
-<button class="drawer" style="top:40.5%; left:47.5%" onclick="openDrawer(3, 'Beige', 'drawer-beige', [
-{name: 'Friends Cotton 8/4', ref: 'FC84-111', quantity: '5 pelotes', photo: 'https://hobbii.fr/cdn/shop/products/FC-8-4-111_1200x1200.jpg', link: 'https://hobbii.fr/friends-cotton-8-4'}
-])"></button>
-
-<button class="drawer" style="top:40.5%; left:64%" onclick="openDrawer(4, 'Marron', 'drawer-brown', [
-{name: 'Amigo XL', ref: 'AXL-072', quantity: '4 pelotes', photo: 'https://hobbii.fr/cdn/shop/products/AXL-072_1200x1200.jpg', link: 'https://hobbii.fr/amigo-xl'}
-])"></button>
-
-  <!-- LIGNE 2 (de gauche à droite: Gris, Noir, Jaune, Orange) -->
-
-<button class="drawer" style="top:47.8%; left:14.5%" onclick="openDrawer(5, 'Gris', 'drawer-gray', [
-{name: 'Rainbow Cotton 8/4', ref: 'RC84-080', quantity: '5 pelotes', photo: 'https://hobbii.fr/cdn/shop/products/RC-8-4-080_1200x1200.jpg', link: 'https://hobbii.fr/rainbow-cotton-8-4'}
-])"></button>
-
-<button class="drawer" style="top:47.8%; left:31%" onclick="openDrawer(6, 'Noir', 'drawer-black', [
-{name: 'Rainbow Cotton 8/4', ref: 'RC84-099', quantity: '6 pelotes', photo: 'https://hobbii.fr/cdn/shop/products/RC-8-4-099_1200x1200.jpg', link: 'https://hobbii.fr/rainbow-cotton-8-4'}
-])"></button>
-
-<button class="drawer" style="top:47.8%; left:47.5%" onclick="openDrawer(7, 'Jaune', 'drawer-yellow', [
-{name: 'Diablo', ref: 'DB-020', quantity: '5 pelotes', photo: 'https://hobbii.fr/cdn/shop/products/DB-020_1200x1200.jpg', link: 'https://hobbii.fr/diablo'}
-])"></button>
-
-<button class="drawer" style="top:47.8%; left:64%" onclick="openDrawer(8, 'Orange', 'drawer-orange', [
-{name: 'Baby Snuggle', ref: 'BS-010', quantity: '4 pelotes', photo: 'https://hobbii.fr/cdn/shop/products/BS-010_1200x1200.jpg', link: 'https://hobbii.fr/baby-snuggle'}
-])"></button>
-
-  <!-- LIGNE 3 (de gauche à droite: Rouge, Rose, Violet, Bleu) -->
-
-<button class="drawer" style="top:55.1%; left:14.5%" onclick="openDrawer(9, 'Rouge', 'drawer-red', [
-{name: 'Rainbow Cotton 8/4', ref: 'RC84-001', quantity: '5 pelotes', photo: 'https://hobbii.fr/cdn/shop/products/RC-8-4-001_1200x1200.jpg', link: 'https://hobbii.fr/rainbow-cotton-8-4'}
-])"></button>
-
-<button class="drawer" style="top:55.1%; left:31%" onclick="openDrawer(10, 'Rose', 'drawer-pink', [
-{name: 'Rainbow Cotton 8/4', ref: 'RC84-060', quantity: '8 pelotes', photo: 'https://hobbii.fr/cdn/shop/products/RC-8-4-060_1200x1200.jpg', link: 'https://hobbii.fr/rainbow-cotton-8-4'}
-])"></button>
-
-<button class="drawer" style="top:55.1%; left:47.5%" onclick="openDrawer(11, 'Violet', 'drawer-lavender', [
-{name: 'Friends Cotton 8/8', ref: 'FC88-140', quantity: '4 pelotes', photo: 'https://hobbii.fr/cdn/shop/products/FC-8-8-140_1200x1200.jpg', link: 'https://hobbii.fr/friends-cotton-8-8'}
-])"></button>
-
-<button class="drawer" style="top:55.1%; left:64%" onclick="openDrawer(12, 'Bleu', 'drawer-blue', [
-{name: 'Rainbow Cotton 8/4', ref: 'RC84-040', quantity: '6 pelotes', photo: 'https://hobbii.fr/cdn/shop/products/RC-8-4-040_1200x1200.jpg', link: 'https://hobbii.fr/rainbow-cotton-8-4'}
-])"></button>
-
-  <!-- LIGNE 4 (de gauche à droite: Vert, Turquoise, Multicolore, Metal/Argent) -->
-
-<button class="drawer" style="top:62.4%; left:14.5%" onclick="openDrawer(13, 'Vert', 'drawer-green', [
-{name: 'Baby Snuggle', ref: 'BS-032', quantity: '4 pelotes', photo: 'https://hobbii.fr/cdn/shop/products/BS-032_1200x1200.jpg', link: 'https://hobbii.fr/baby-snuggle'}
-])"></button>
-
-<button class="drawer" style="top:62.4%; left:31%" onclick="openDrawer(14, 'Turquoise', 'drawer-turquoise', [
-{name: 'Rainbow Cotton 8/4', ref: 'RC84-120', quantity: '3 pelotes', photo: 'https://hobbii.fr/cdn/shop/products/RC-8-4-120_1200x1200.jpg', link: 'https://hobbii.fr/rainbow-cotton-8-4'}
-])"></button>
-
-<button class="drawer" style="top:62.4%; left:47.5%" onclick="openDrawer(15, 'Multicolore', 'drawer-coral', [
-{name: 'Twister', ref: 'TW-112', quantity: '4 pelotes', photo: 'https://hobbii.fr/cdn/shop/products/TW-112_1200x1200.jpg', link: 'https://hobbii.fr/twister'}
-])"></button>
-
-<button class="drawer" style="top:62.4%; left:64%" onclick="openDrawer(16, 'Metal/Argent', 'drawer-gray', [
-{name: 'Amigo', ref: 'AM-131', quantity: '3 pelotes', photo: 'https://hobbii.fr/cdn/shop/products/AM-131_1200x1200.jpg', link: 'https://hobbii.fr/amigo'}
-])"></button>
-
-</div>
-
-<!-- ===== MODAL UNIQUE ===== -->
-
-<div id="modal" class="modal" onclick="closeModal()">
-  <div class="modal-content" id="modalContent" onclick="event.stopPropagation()">
-    <h2 id="modalTitle"></h2>
-    <div class="inventory-list" id="inventoryList"></div>
-    <button onclick="closeModal()">Fermer</button>
+<div id="workspace">
+  <!-- Cadre Hobbii -->
+  <div id="hobbii-board" draggable="true">
+    🛒 HOBBII
   </div>
+
+  <!-- 16 Tiroirs -->
+
+  <div class="drawer" data-id="1" style="top:40%; left:15%">1. Blanc</div>
+  <div class="drawer" data-id="2" style="top:40%; left:30%">2. Écru/Ivoire</div>
+  <div class="drawer" data-id="3" style="top:40%; left:45%">3. Beige</div>
+  <div class="drawer" data-id="4" style="top:40%; left:60%">4. Marron</div>
+
+  <div class="drawer" data-id="5" style="top:48%; left:15%">5. Gris</div>
+  <div class="drawer" data-id="6" style="top:48%; left:30%">6. Noir</div>
+  <div class="drawer" data-id="7" style="top:48%; left:45%">7. Jaune</div>
+  <div class="drawer" data-id="8" style="top:48%; left:60%">8. Orange</div>
+
+  <div class="drawer" data-id="9" style="top:56%; left:15%">9. Rouge</div>
+  <div class="drawer" data-id="10" style="top:56%; left:30%">10. Rose</div>
+  <div class="drawer" data-id="11" style="top:56%; left:45%">11. Violet</div>
+  <div class="drawer" data-id="12" style="top:56%; left:60%">12. Bleu</div>
+
+  <div class="drawer" data-id="13" style="top:64%; left:15%">13. Vert</div>
+  <div class="drawer" data-id="14" style="top:64%; left:30%">14. Turquoise</div>
+  <div class="drawer" data-id="15" style="top:64%; left:45%">15. Multicolore</div>
+  <div class="drawer" data-id="16" style="top:64%; left:60%">16. Metal/Argent</div>
+</div>
+
+<!-- Panel de contrôle -->
+
+<div id="control-panel">
+  <h3>📋 Positions des tiroirs</h3>
+
+  <div class="info">
+    ✨ Positionnez tous les rectangles, puis cliquez sur "Générer le Code"
+  </div>
+
+<button class="button" onclick="generateCode()">🔧 Générer le Code</button>
+<button class="button" onclick="copyCode()">📋 Copier le Code</button>
+<button class="button" onclick="resetPositions()">🔄 Réinitialiser</button>
+
+  <div id="code-output" style="margin-top:15px; display:none;"></div>
 </div>
 
 <script>
-// Données des tiroirs avec photos, références et liens
-function openDrawer(num, colorName, colorClass, items){
-  const modalContent = document.getElementById('modalContent');
-  const modalTitle = document.getElementById('modalTitle');
-  const inventoryList = document.getElementById('inventoryList');
+let draggedElement = null;
+let offsetX = 0;
+let offsetY = 0;
+
+// Initialiser le drag and drop
+document.querySelectorAll('.drawer, #hobbii-board').forEach(element => {
+  element.addEventListener('mousedown', startDrag);
+});
+
+function startDrag(e) {
+  draggedElement = e.target;
+  const rect = draggedElement.getBoundingClientRect();
+  offsetX = e.clientX - rect.left;
+  offsetY = e.clientY - rect.top;
   
-  // Définir le titre
-  modalTitle.innerHTML = `🧶 Tiroir ${num} - ${colorName}`;
+  draggedElement.classList.add('dragging');
   
-  // Appliquer la couleur à la bordure
-  modalContent.className = 'modal-content ' + colorClass;
+  document.addEventListener('mousemove', drag);
+  document.addEventListener('mouseup', stopDrag);
+}
+
+function drag(e) {
+  if (!draggedElement) return;
   
-  // Créer la liste d'inventaire
-  inventoryList.innerHTML = '<h3 style="margin-top:0;">Inventaire :</h3>';
-  items.forEach(item => {
-    const div = document.createElement('div');
-    div.className = 'inventory-item ' + colorClass;
+  const x = e.clientX - offsetX;
+  const y = e.clientY - offsetY;
+  
+  draggedElement.style.left = x + 'px';
+  draggedElement.style.top = y + 'px';
+}
+
+function stopDrag() {
+  if (draggedElement) {
+    draggedElement.classList.remove('dragging');
+    draggedElement = null;
+  }
+  
+  document.removeEventListener('mousemove', drag);
+  document.removeEventListener('mouseup', stopDrag);
+}
+
+// Générer le code
+function generateCode() {
+  const output = document.getElementById('code-output');
+  let code = '<!-- POSITIONS DES TIROIRS -->\n\n';
+  
+  // Cadre Hobbii
+  const hobbii = document.getElementById('hobbii-board');
+  const hobbiiRect = hobbii.getBoundingClientRect();
+  const hobbiiTop = (hobbiiRect.top / window.innerHeight * 100).toFixed(1);
+  const hobbiiLeft = (hobbiiRect.left / window.innerWidth * 100).toFixed(1);
+  const hobbiiWidth = (hobbiiRect.width / window.innerWidth * 100).toFixed(1);
+  const hobbiiHeight = (hobbiiRect.height / window.innerHeight * 100).toFixed(1);
+  
+  code += `<!-- Cadre Hobbii -->\n`;
+  code += `<button id="hobbii-board" style="top:${hobbiiTop}%; left:${hobbiiLeft}%; width:${hobbiiWidth}%; height:${hobbiiHeight}%"></button>\n\n`;
+  
+  // Tiroirs
+  const drawers = document.querySelectorAll('.drawer');
+  drawers.forEach(drawer => {
+    const rect = drawer.getBoundingClientRect();
+    const top = (rect.top / window.innerHeight * 100).toFixed(1);
+    const left = (rect.left / window.innerWidth * 100).toFixed(1);
+    const width = (rect.width / window.innerWidth * 100).toFixed(1);
+    const height = (rect.height / window.innerHeight * 100).toFixed(1);
+    const id = drawer.getAttribute('data-id');
+    const name = drawer.textContent.trim();
     
-    div.innerHTML = `
-      <img src="${item.photo}" alt="${item.name}" class="yarn-photo" onerror="this.src='icon-152.png'">
-      <div class="yarn-info">
-        <div class="yarn-name">${item.name}</div>
-        <div class="yarn-ref">Réf: ${item.ref}</div>
-        <div class="yarn-quantity">📦 ${item.quantity}</div>
-      </div>
-      <a href="${item.link}" target="_blank" class="buy-btn">🛒 Acheter</a>
-    `;
-    
-    inventoryList.appendChild(div);
+    code += `<!-- ${name} -->\n`;
+    code += `<button class="drawer" style="top:${top}%; left:${left}%; width:${width}%; height:${height}%" onclick="openDrawer(${id}, ...)"></button>\n\n`;
   });
   
-  document.getElementById('modal').style.display = 'flex';
+  output.textContent = code;
+  output.style.display = 'block';
 }
 
-function closeModal(){
-  document.getElementById('modal').style.display = 'none';
-}
-
-// ===== SIDEBAR =====
-document.getElementById('toggleSidebar').onclick = () => {
-  document.getElementById('sidebar').classList.toggle('sidebar-open');
-};
-
-// Bouton Hobbii - ouvre le site Hobbii
-document.getElementById('hobbiiBtn').onclick = () => {
-  window.open('https://hobbii.fr', '_blank');
-};
-
-// Bouton Retour avec fondu
-document.getElementById('backBtn').onclick = () => {
-  document.body.style.transition = 'opacity 0.5s';
-  document.body.style.opacity = '0';
-  setTimeout(() => {
-    window.location.href = 'owner.html';
-  }, 500);
-};
-
-// Fermer modal avec Échap
-document.addEventListener('keydown', (e) => {
-  if(e.key === 'Escape') closeModal();
-});
+// Copier le code
+function copyCode() {
+  const output = document.getElementById('code-output');
+  const text = output.textContent;
   
+  navigator.clipboard.writeText(text).then(() => {
+    alert('✅ Code copié dans le presse-papier !');
+  }).catch(err => {
+    alert('❌ Erreur lors de la copie : ' + err);
+  });
+}
+
+// Réinitialiser les positions
+function resetPositions() {
+  if (confirm('Voulez-vous vraiment réinitialiser toutes les positions ?')) {
+    location.reload();
+  }
+}
+
+// Redimensionner les tiroirs avec molette
+document.addEventListener('wheel', (e) => {
+  if (e.ctrlKey || e.metaKey) {
+    e.preventDefault();
+    
+    const hoveredElement = document.elementFromPoint(e.clientX, e.clientY);
+    if (hoveredElement && (hoveredElement.classList.contains('drawer') || hoveredElement.id === 'hobbii-board')) {
+      const currentWidth = hoveredElement.offsetWidth;
+      const currentHeight = hoveredElement.offsetHeight;
+      
+      const delta = e.deltaY > 0 ? -5 : 5;
+      
+      hoveredElement.style.width = (currentWidth + delta) + 'px';
+      hoveredElement.style.height = (currentHeight + delta * 0.35) + 'px';
+    }
+  }
+}, { passive: false });
 </script>
 
 </body>
