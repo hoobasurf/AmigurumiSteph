@@ -19,7 +19,7 @@ body::before{
   content:"";
   position:fixed;
   inset:0;
-  background-image:url('Photoroom_20260118_214442.png');
+  background-image:url('IMG_1925.jpeg');
   background-size:cover;
   background-position:center;
   background-repeat:no-repeat;
@@ -31,49 +31,55 @@ body::before{
   position: fixed;
   inset: 0;
   z-index: 10;
-  transform: translateX(0.3cm) translateY(2.03cm);
 }
 
 /* BOUTON TABLEAU HOBBII - zone cliquable sur l'image */
 #hobbii-board{
   position: absolute;
-  top: 15%;
-  left: 15%;
-  width: 70%;
-  height: 20%;
+  top: 8%;
+  left: 28%;
+  width: 44%;
+  height: 22%;
   background: transparent;
   border: none;
   cursor: pointer;
   z-index: 11;
   transition: all 0.3s;
+  border-radius: 10px;
 }
 
 #hobbii-board:hover{
-  background: rgba(255, 182, 193, 0.2);
-  box-shadow: 0 0 30px rgba(255, 182, 193, 0.6);
-  border-radius: 20px;
+  background: rgba(255, 182, 193, 0.25);
+  box-shadow: 0 0 30px rgba(255, 182, 193, 0.8);
 }
 
 #hobbii-board:active{
   background: rgba(255, 182, 193, 0.4);
-  box-shadow: 0 0 40px rgba(255, 182, 193, 0.9);
+  box-shadow: 0 0 40px rgba(255, 182, 193, 1);
 }
 
 /* BOUTON TIROIR */
 .drawer{
   position:absolute;
-  width: calc(18% + 1mm);
-  height:4%;
+  width:10.5%;
+  height:6.5%;
   background:transparent;
   border:none;
   cursor:pointer;
   transition:all 0.3s;
+  border-radius:8px;
 }
 
 /* feedback tactile avec glow */
 .drawer:active{
-  background:rgba(255,182,193,0.4);
-  box-shadow: 0 0 20px rgba(255,182,193,0.8);
+  background:rgba(255,182,193,0.5);
+  box-shadow: 0 0 25px rgba(255,182,193,0.9);
+}
+
+.drawer:hover{
+  background:rgba(255,182,193,0.3);
+  box-shadow: 0 0 15px rgba(255,182,193,0.7);
+  transform:scale(1.02);
 }
 
 /* ===== MODAL INVENTAIRE ===== */
@@ -346,91 +352,76 @@ body::before{
 
 <button id="hobbii-board" onclick="window.open('https://hobbii.fr', '_blank')"></button>
 
-  <!-- LIGNE 1 -->
+  <!-- LIGNE 1 (de gauche à droite: Blanc, Écru/Ivoire, Beige, Marron) -->
 
-<button class="drawer" style="top:40%; left:11%" onclick="openDrawer(1, 'Rouge', 'drawer-red', [
-{name: 'Rainbow Cotton 8/4', ref: 'RC84-001', quantity: '5 pelotes', photo: 'https://hobbii.fr/cdn/shop/products/RC-8-4-001_1200x1200.jpg', link: 'https://hobbii.fr/rainbow-cotton-8-4'},
-{name: 'Friends Cotton 8/4', ref: 'FC84-002', quantity: '3 pelotes', photo: 'https://hobbii.fr/cdn/shop/products/FC-8-4-002_1200x1200.jpg', link: 'https://hobbii.fr/friends-cotton-8-4'},
-{name: 'Amigo XL', ref: 'AXL-003', quantity: '2 pelotes', photo: 'https://hobbii.fr/cdn/shop/products/AXL-003_1200x1200.jpg', link: 'https://hobbii.fr/amigo-xl'}
+<button class="drawer" style="top:40.5%; left:14.5%" onclick="openDrawer(1, 'Blanc', 'drawer-white', [
+{name: 'Rainbow Cotton 8/4', ref: 'RC84-001', quantity: '10 pelotes', photo: 'https://hobbii.fr/cdn/shop/products/RC-8-4-001_1200x1200.jpg', link: 'https://hobbii.fr/rainbow-cotton-8-4'}
 ])"></button>
-<button class="drawer" style="top:40%; left:30%" onclick="openDrawer(2, 'Orange', 'drawer-orange', [
-{name: 'Baby Snuggle', ref: 'BS-010', quantity: '4 pelotes', photo: 'https://hobbii.fr/cdn/shop/products/BS-010_1200x1200.jpg', link: 'https://hobbii.fr/baby-snuggle'},
-{name: 'Rainbow Cotton 8/8', ref: 'RC88-011', quantity: '6 pelotes', photo: 'https://hobbii.fr/cdn/shop/products/RC-8-8-011_1200x1200.jpg', link: 'https://hobbii.fr/rainbow-cotton-8-8'},
-{name: 'Twister', ref: 'TW-012', quantity: '2 pelotes', photo: 'https://hobbii.fr/cdn/shop/products/TW-012_1200x1200.jpg', link: 'https://hobbii.fr/twister'}
+
+<button class="drawer" style="top:40.5%; left:31%" onclick="openDrawer(2, 'Écru/Ivoire', 'drawer-beige', [
+{name: 'Baby Snuggle', ref: 'BS-002', quantity: '5 pelotes', photo: 'https://hobbii.fr/cdn/shop/products/BS-002_1200x1200.jpg', link: 'https://hobbii.fr/baby-snuggle'}
 ])"></button>
-<button class="drawer" style="top:40%; left:49%" onclick="openDrawer(3, 'Jaune', 'drawer-yellow', [
-{name: 'Diablo', ref: 'DB-020', quantity: '5 pelotes', photo: 'https://hobbii.fr/cdn/shop/products/DB-020_1200x1200.jpg', link: 'https://hobbii.fr/diablo'},
-{name: 'Rainbow Cotton 8/4', ref: 'RC84-021', quantity: '3 pelotes', photo: 'https://hobbii.fr/cdn/shop/products/RC-8-4-021_1200x1200.jpg', link: 'https://hobbii.fr/rainbow-cotton-8-4'},
-{name: 'Friends Cotton 8/8', ref: 'FC88-022', quantity: '4 pelotes', photo: 'https://hobbii.fr/cdn/shop/products/FC-8-8-022_1200x1200.jpg', link: 'https://hobbii.fr/friends-cotton-8-8'}
+
+<button class="drawer" style="top:40.5%; left:47.5%" onclick="openDrawer(3, 'Beige', 'drawer-beige', [
+{name: 'Friends Cotton 8/4', ref: 'FC84-111', quantity: '5 pelotes', photo: 'https://hobbii.fr/cdn/shop/products/FC-8-4-111_1200x1200.jpg', link: 'https://hobbii.fr/friends-cotton-8-4'}
 ])"></button>
-<button class="drawer" style="top:40%; left:68%" onclick="openDrawer(4, 'Vert', 'drawer-green', [
-{name: 'Amigo', ref: 'AM-030', quantity: '3 pelotes', photo: 'https://hobbii.fr/cdn/shop/products/AM-030_1200x1200.jpg', link: 'https://hobbii.fr/amigo'},
-{name: 'Rainbow Cotton 8/4', ref: 'RC84-031', quantity: '5 pelotes', photo: 'https://hobbii.fr/cdn/shop/products/RC-8-4-031_1200x1200.jpg', link: 'https://hobbii.fr/rainbow-cotton-8-4'},
+
+<button class="drawer" style="top:40.5%; left:64%" onclick="openDrawer(4, 'Marron', 'drawer-brown', [
+{name: 'Amigo XL', ref: 'AXL-072', quantity: '4 pelotes', photo: 'https://hobbii.fr/cdn/shop/products/AXL-072_1200x1200.jpg', link: 'https://hobbii.fr/amigo-xl'}
+])"></button>
+
+  <!-- LIGNE 2 (de gauche à droite: Gris, Noir, Jaune, Orange) -->
+
+<button class="drawer" style="top:47.8%; left:14.5%" onclick="openDrawer(5, 'Gris', 'drawer-gray', [
+{name: 'Rainbow Cotton 8/4', ref: 'RC84-080', quantity: '5 pelotes', photo: 'https://hobbii.fr/cdn/shop/products/RC-8-4-080_1200x1200.jpg', link: 'https://hobbii.fr/rainbow-cotton-8-4'}
+])"></button>
+
+<button class="drawer" style="top:47.8%; left:31%" onclick="openDrawer(6, 'Noir', 'drawer-black', [
+{name: 'Rainbow Cotton 8/4', ref: 'RC84-099', quantity: '6 pelotes', photo: 'https://hobbii.fr/cdn/shop/products/RC-8-4-099_1200x1200.jpg', link: 'https://hobbii.fr/rainbow-cotton-8-4'}
+])"></button>
+
+<button class="drawer" style="top:47.8%; left:47.5%" onclick="openDrawer(7, 'Jaune', 'drawer-yellow', [
+{name: 'Diablo', ref: 'DB-020', quantity: '5 pelotes', photo: 'https://hobbii.fr/cdn/shop/products/DB-020_1200x1200.jpg', link: 'https://hobbii.fr/diablo'}
+])"></button>
+
+<button class="drawer" style="top:47.8%; left:64%" onclick="openDrawer(8, 'Orange', 'drawer-orange', [
+{name: 'Baby Snuggle', ref: 'BS-010', quantity: '4 pelotes', photo: 'https://hobbii.fr/cdn/shop/products/BS-010_1200x1200.jpg', link: 'https://hobbii.fr/baby-snuggle'}
+])"></button>
+
+  <!-- LIGNE 3 (de gauche à droite: Rouge, Rose, Violet, Bleu) -->
+
+<button class="drawer" style="top:55.1%; left:14.5%" onclick="openDrawer(9, 'Rouge', 'drawer-red', [
+{name: 'Rainbow Cotton 8/4', ref: 'RC84-001', quantity: '5 pelotes', photo: 'https://hobbii.fr/cdn/shop/products/RC-8-4-001_1200x1200.jpg', link: 'https://hobbii.fr/rainbow-cotton-8-4'}
+])"></button>
+
+<button class="drawer" style="top:55.1%; left:31%" onclick="openDrawer(10, 'Rose', 'drawer-pink', [
+{name: 'Rainbow Cotton 8/4', ref: 'RC84-060', quantity: '8 pelotes', photo: 'https://hobbii.fr/cdn/shop/products/RC-8-4-060_1200x1200.jpg', link: 'https://hobbii.fr/rainbow-cotton-8-4'}
+])"></button>
+
+<button class="drawer" style="top:55.1%; left:47.5%" onclick="openDrawer(11, 'Violet', 'drawer-lavender', [
+{name: 'Friends Cotton 8/8', ref: 'FC88-140', quantity: '4 pelotes', photo: 'https://hobbii.fr/cdn/shop/products/FC-8-8-140_1200x1200.jpg', link: 'https://hobbii.fr/friends-cotton-8-8'}
+])"></button>
+
+<button class="drawer" style="top:55.1%; left:64%" onclick="openDrawer(12, 'Bleu', 'drawer-blue', [
+{name: 'Rainbow Cotton 8/4', ref: 'RC84-040', quantity: '6 pelotes', photo: 'https://hobbii.fr/cdn/shop/products/RC-8-4-040_1200x1200.jpg', link: 'https://hobbii.fr/rainbow-cotton-8-4'}
+])"></button>
+
+  <!-- LIGNE 4 (de gauche à droite: Vert, Turquoise, Multicolore, Metal/Argent) -->
+
+<button class="drawer" style="top:62.4%; left:14.5%" onclick="openDrawer(13, 'Vert', 'drawer-green', [
 {name: 'Baby Snuggle', ref: 'BS-032', quantity: '4 pelotes', photo: 'https://hobbii.fr/cdn/shop/products/BS-032_1200x1200.jpg', link: 'https://hobbii.fr/baby-snuggle'}
 ])"></button>
 
-  <!-- LIGNE 2 -->
-
-<button class="drawer" style="top:45.8%; left:11%" onclick="openDrawer(5, 'Bleu', 'drawer-blue', [
-{name: 'Rainbow Cotton 8/4', ref: 'RC84-040', quantity: '6 pelotes', photo: 'https://hobbii.fr/cdn/shop/products/RC-8-4-040_1200x1200.jpg', link: 'https://hobbii.fr/rainbow-cotton-8-4'},
-{name: 'Amigo XL', ref: 'AXL-041', quantity: '4 pelotes', photo: 'https://hobbii.fr/cdn/shop/products/AXL-041_1200x1200.jpg', link: 'https://hobbii.fr/amigo-xl'},
-{name: 'Friends Cotton 8/8', ref: 'FC88-042', quantity: '3 pelotes', photo: 'https://hobbii.fr/cdn/shop/products/FC-8-8-042_1200x1200.jpg', link: 'https://hobbii.fr/friends-cotton-8-8'}
-])"></button>
-<button class="drawer" style="top:45.8%; left:30%" onclick="openDrawer(6, 'Violet', 'drawer-purple', [
-{name: 'Baby Snuggle', ref: 'BS-050', quantity: '4 pelotes', photo: 'https://hobbii.fr/cdn/shop/products/BS-050_1200x1200.jpg', link: 'https://hobbii.fr/baby-snuggle'},
-{name: 'Twister', ref: 'TW-051', quantity: '2 pelotes', photo: 'https://hobbii.fr/cdn/shop/products/TW-051_1200x1200.jpg', link: 'https://hobbii.fr/twister'},
-{name: 'Diablo', ref: 'DB-052', quantity: '5 pelotes', photo: 'https://hobbii.fr/cdn/shop/products/DB-052_1200x1200.jpg', link: 'https://hobbii.fr/diablo'}
-])"></button>
-<button class="drawer" style="top:45.8%; left:49%" onclick="openDrawer(7, 'Rose', 'drawer-pink', [
-{name: 'Rainbow Cotton 8/4', ref: 'RC84-060', quantity: '8 pelotes', photo: 'https://hobbii.fr/cdn/shop/products/RC-8-4-060_1200x1200.jpg', link: 'https://hobbii.fr/rainbow-cotton-8-4'},
-{name: 'Friends Cotton 8/4', ref: 'FC84-061', quantity: '3 pelotes', photo: 'https://hobbii.fr/cdn/shop/products/FC-8-4-061_1200x1200.jpg', link: 'https://hobbii.fr/friends-cotton-8-4'},
-{name: 'Amigo', ref: 'AM-062', quantity: '5 pelotes', photo: 'https://hobbii.fr/cdn/shop/products/AM-062_1200x1200.jpg', link: 'https://hobbii.fr/amigo'}
-])"></button>
-<button class="drawer" style="top:45.8%; left:68%" onclick="openDrawer(8, 'Marron', 'drawer-brown', [
-{name: 'Baby Snuggle', ref: 'BS-070', quantity: '4 pelotes', photo: 'https://hobbii.fr/cdn/shop/products/BS-070_1200x1200.jpg', link: 'https://hobbii.fr/baby-snuggle'},
-{name: 'Rainbow Cotton 8/8', ref: 'RC88-071', quantity: '3 pelotes', photo: 'https://hobbii.fr/cdn/shop/products/RC-8-8-071_1200x1200.jpg', link: 'https://hobbii.fr/rainbow-cotton-8-8'},
-{name: 'Amigo XL', ref: 'AXL-072', quantity: '2 pelotes', photo: 'https://hobbii.fr/cdn/shop/products/AXL-072_1200x1200.jpg', link: 'https://hobbii.fr/amigo-xl'}
+<button class="drawer" style="top:62.4%; left:31%" onclick="openDrawer(14, 'Turquoise', 'drawer-turquoise', [
+{name: 'Rainbow Cotton 8/4', ref: 'RC84-120', quantity: '3 pelotes', photo: 'https://hobbii.fr/cdn/shop/products/RC-8-4-120_1200x1200.jpg', link: 'https://hobbii.fr/rainbow-cotton-8-4'}
 ])"></button>
 
-  <!-- LIGNE 3 -->
-
-<button class="drawer" style="top:51.6%; left:11%" onclick="openDrawer(9, 'Gris', 'drawer-gray', [
-{name: 'Rainbow Cotton 8/4', ref: 'RC84-080', quantity: '5 pelotes', photo: 'https://hobbii.fr/cdn/shop/products/RC-8-4-080_1200x1200.jpg', link: 'https://hobbii.fr/rainbow-cotton-8-4'},
-{name: 'Diablo', ref: 'DB-081', quantity: '4 pelotes', photo: 'https://hobbii.fr/cdn/shop/products/DB-081_1200x1200.jpg', link: 'https://hobbii.fr/diablo'},
-{name: 'Friends Cotton 8/8', ref: 'FC88-082', quantity: '6 pelotes', photo: 'https://hobbii.fr/cdn/shop/products/FC-8-8-082_1200x1200.jpg', link: 'https://hobbii.fr/friends-cotton-8-8'}
-])"></button>
-<button class="drawer" style="top:51.6%; left:30%" onclick="openDrawer(10, 'Blanc', 'drawer-white', [
-{name: 'Rainbow Cotton 8/4', ref: 'RC84-001', quantity: '10 pelotes', photo: 'https://hobbii.fr/cdn/shop/products/RC-8-4-001_1200x1200.jpg', link: 'https://hobbii.fr/rainbow-cotton-8-4'},
-{name: 'Baby Snuggle', ref: 'BS-002', quantity: '5 pelotes', photo: 'https://hobbii.fr/cdn/shop/products/BS-002_1200x1200.jpg', link: 'https://hobbii.fr/baby-snuggle'},
-{name: 'Amigo', ref: 'AM-003', quantity: '4 pelotes', photo: 'https://hobbii.fr/cdn/shop/products/AM-003_1200x1200.jpg', link: 'https://hobbii.fr/amigo'}
-])"></button>
-<button class="drawer" style="top:51.6%; left:49%" onclick="openDrawer(11, 'Noir', 'drawer-black', [
-{name: 'Rainbow Cotton 8/4', ref: 'RC84-099', quantity: '6 pelotes', photo: 'https://hobbii.fr/cdn/shop/products/RC-8-4-099_1200x1200.jpg', link: 'https://hobbii.fr/rainbow-cotton-8-4'},
-{name: 'Amigo XL', ref: 'AXL-098', quantity: '4 pelotes', photo: 'https://hobbii.fr/cdn/shop/products/AXL-098_1200x1200.jpg', link: 'https://hobbii.fr/amigo-xl'}
-])"></button>
-<button class="drawer" style="top:51.6%; left:68%" onclick="openDrawer(12, 'Beige', 'drawer-beige', [
-{name: 'Baby Snuggle', ref: 'BS-110', quantity: '5 pelotes', photo: 'https://hobbii.fr/cdn/shop/products/BS-110_1200x1200.jpg', link: 'https://hobbii.fr/baby-snuggle'},
-{name: 'Friends Cotton 8/4', ref: 'FC84-111', quantity: '3 pelotes', photo: 'https://hobbii.fr/cdn/shop/products/FC-8-4-111_1200x1200.jpg', link: 'https://hobbii.fr/friends-cotton-8-4'},
+<button class="drawer" style="top:62.4%; left:47.5%" onclick="openDrawer(15, 'Multicolore', 'drawer-coral', [
 {name: 'Twister', ref: 'TW-112', quantity: '4 pelotes', photo: 'https://hobbii.fr/cdn/shop/products/TW-112_1200x1200.jpg', link: 'https://hobbii.fr/twister'}
 ])"></button>
 
-  <!-- LIGNE 4 -->
-
-<button class="drawer" style="top:57.4%; left:11%" onclick="openDrawer(13, 'Turquoise', 'drawer-turquoise', [
-{name: 'Rainbow Cotton 8/4', ref: 'RC84-120', quantity: '3 pelotes', photo: 'https://hobbii.fr/cdn/shop/products/RC-8-4-120_1200x1200.jpg', link: 'https://hobbii.fr/rainbow-cotton-8-4'},
-{name: 'Diablo', ref: 'DB-121', quantity: '4 pelotes', photo: 'https://hobbii.fr/cdn/shop/products/DB-121_1200x1200.jpg', link: 'https://hobbii.fr/diablo'}
-])"></button>
-<button class="drawer" style="top:57.4%; left:30%" onclick="openDrawer(14, 'Corail', 'drawer-coral', [
-{name: 'Baby Snuggle', ref: 'BS-130', quantity: '5 pelotes', photo: 'https://hobbii.fr/cdn/shop/products/BS-130_1200x1200.jpg', link: 'https://hobbii.fr/baby-snuggle'},
+<button class="drawer" style="top:62.4%; left:64%" onclick="openDrawer(16, 'Metal/Argent', 'drawer-gray', [
 {name: 'Amigo', ref: 'AM-131', quantity: '3 pelotes', photo: 'https://hobbii.fr/cdn/shop/products/AM-131_1200x1200.jpg', link: 'https://hobbii.fr/amigo'}
-])"></button>
-<button class="drawer" style="top:57.4%; left:49%" onclick="openDrawer(15, 'Lavande', 'drawer-lavender', [
-{name: 'Friends Cotton 8/8', ref: 'FC88-140', quantity: '4 pelotes', photo: 'https://hobbii.fr/cdn/shop/products/FC-8-8-140_1200x1200.jpg', link: 'https://hobbii.fr/friends-cotton-8-8'},
-{name: 'Rainbow Cotton 8/4', ref: 'RC84-141', quantity: '3 pelotes', photo: 'https://hobbii.fr/cdn/shop/products/RC-8-4-141_1200x1200.jpg', link: 'https://hobbii.fr/rainbow-cotton-8-4'}
-])"></button>
-<button class="drawer" style="top:57.4%; left:68%" onclick="openDrawer(16, 'Menthe', 'drawer-mint', [
-{name: 'Baby Snuggle', ref: 'BS-150', quantity: '6 pelotes', photo: 'https://hobbii.fr/cdn/shop/products/BS-150_1200x1200.jpg', link: 'https://hobbii.fr/baby-snuggle'},
-{name: 'Amigo XL', ref: 'AXL-151', quantity: '4 pelotes', photo: 'https://hobbii.fr/cdn/shop/products/AXL-151_1200x1200.jpg', link: 'https://hobbii.fr/amigo-xl'}
 ])"></button>
 
 </div>
