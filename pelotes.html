@@ -4,189 +4,144 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Éditeur de Position - Tiroirs</title>
+<title>Éditeur Simple - Tiroirs</title>
 
 <style>
-html, body {
+* {
   margin: 0;
   padding: 0;
-  height: 100%;
+  box-sizing: border-box;
+}
+
+body {
   font-family: 'Comic Sans MS', cursive;
   overflow: hidden;
+  background: #000;
 }
 
 /* FOND IMAGE */
-body::before{
-  content:"";
-  position:fixed;
-  inset:0;
-  background-image:url('Photoroom_20260118_214442.png');
-  background-size:cover;
-  background-position:center;
-  background-repeat:no-repeat;
-  z-index:-1;
+#background{
+  position: fixed;
+  inset: 0;
+  background-image: url('Photoroom_20260118_214442.png');
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  z-index: 1;
 }
 
 /* Zone de travail */
 #workspace{
   position: fixed;
   inset: 0;
-  z-index: 10;
+  z-index: 2;
 }
 
-/* Tiroirs draggables */
-.drawer{
+/* Éléments draggables */
+.draggable{
   position: absolute;
-  width: 200px;
-  height: 70px;
-  background: rgba(255, 0, 0, 0.4);
-  border: 3px solid red;
+  border: 3px solid;
   cursor: move;
-  border-radius: 8px;
   display: flex;
   align-items: center;
   justify-content: center;
   font-weight: bold;
   color: white;
-  text-shadow: 2px 2px 4px black;
-  font-size: 14px;
+  text-shadow: 1px 1px 3px black;
+  font-size: 12px;
   user-select: none;
-  transition: background 0.2s;
+  touch-action: none;
 }
 
-.drawer:hover{
-  background: rgba(255, 255, 0, 0.5);
-  border-color: yellow;
-}
-
-.drawer.dragging{
-  opacity: 0.7;
+.draggable.active{
+  opacity: 0.8;
   z-index: 1000;
 }
 
 /* Cadre Hobbii */
-#hobbii-board{
-  position: absolute;
+#hobbii{
+  background: rgba(0, 255, 0, 0.5);
+  border-color: lime;
   width: 400px;
-  height: 150px;
-  background: rgba(0, 255, 0, 0.4);
-  border: 3px solid lime;
-  cursor: move;
+  height: 120px;
+  top: 50px;
+  left: 500px;
+  font-size: 18px;
   border-radius: 10px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: bold;
-  color: white;
-  text-shadow: 2px 2px 4px black;
-  font-size: 20px;
-  user-select: none;
-  top: 10%;
-  left: 30%;
 }
 
-#hobbii-board:hover{
-  background: rgba(255, 255, 0, 0.5);
+/* Tiroirs */
+.drawer{
+  background: rgba(255, 0, 0, 0.5);
+  border-color: red;
+  width: 160px;
+  height: 60px;
+  border-radius: 5px;
+}
+
+.drawer:hover{
+  background: rgba(255, 255, 0, 0.6);
   border-color: yellow;
 }
 
-/* Panel de contrôle */
-#control-panel{
+/* Panel */
+#panel{
   position: fixed;
-  bottom: 20px;
-  right: 20px;
-  background: rgba(255, 230, 240, 0.98);
+  top: 10px;
+  right: 10px;
+  background: rgba(255, 255, 255, 0.95);
   border: 3px solid #ffb6c1;
   border-radius: 15px;
-  padding: 20px;
-  z-index: 2000;
-  max-width: 400px;
-  max-height: 80vh;
-  overflow-y: auto;
-  box-shadow: 0 5px 25px rgba(0,0,0,0.3);
+  padding: 15px;
+  z-index: 3000;
+  max-width: 450px;
+  box-shadow: 0 5px 20px rgba(0,0,0,0.3);
 }
 
-#control-panel h3{
-  margin: 0 0 15px 0;
+#panel h3{
   color: #ffb6c1;
-  font-size: 18px;
+  margin-bottom: 10px;
+  font-size: 16px;
 }
 
-#code-output{
+.btn{
+  width: 100%;
+  padding: 10px;
+  margin: 5px 0;
+  background: #ffb6c1;
+  border: none;
+  border-radius: 8px;
+  color: white;
+  font-weight: bold;
+  cursor: pointer;
+  font-size: 13px;
+}
+
+.btn:hover{
+  background: #ff69b4;
+}
+
+#output{
   background: #f5f5f5;
   border: 2px solid #ddd;
   border-radius: 8px;
   padding: 10px;
   font-family: monospace;
-  font-size: 11px;
-  max-height: 300px;
+  font-size: 10px;
+  max-height: 400px;
   overflow-y: auto;
   white-space: pre;
-  color: #333;
-}
-
-.button{
-  width: 100%;
-  padding: 10px;
   margin-top: 10px;
-  background: #ffb6c1;
-  border: none;
-  border-radius: 10px;
-  color: white;
-  font-weight: bold;
-  cursor: pointer;
-  font-size: 14px;
-  transition: all 0.3s;
-}
-
-.button:hover{
-  background: #ff69b4;
-  transform: scale(1.02);
+  display: none;
 }
 
 .info{
-  background: #fff;
-  padding: 10px;
-  border-radius: 8px;
+  background: #fffacd;
+  padding: 8px;
+  border-radius: 5px;
   margin-bottom: 10px;
-  font-size: 12px;
-  border-left: 4px solid #ffb6c1;
-}
-
-/* Instructions */
-#instructions{
-  position: fixed;
-  top: 20px;
-  left: 20px;
-  background: rgba(255, 230, 240, 0.95);
-  border: 3px solid #ffb6c1;
-  border-radius: 15px;
-  padding: 15px;
-  z-index: 2000;
-  max-width: 300px;
-}
-
-#instructions h4{
-  margin: 0 0 10px 0;
-  color: #ffb6c1;
-}
-
-#instructions ul{
-  margin: 5px 0;
-  padding-left: 20px;
-  font-size: 13px;
-}
-
-.close-btn{
-  float: right;
-  background: #ffb6c1;
-  border: none;
-  color: white;
-  width: 25px;
-  height: 25px;
-  border-radius: 50%;
-  cursor: pointer;
-  font-weight: bold;
+  font-size: 11px;
+  border-left: 3px solid #ffb6c1;
 }
 </style>
 
@@ -194,176 +149,176 @@ body::before{
 
 <body>
 
-<div id="instructions">
-  <button class="close-btn" onclick="this.parentElement.style.display='none'">×</button>
-  <h4>🎯 Mode Éditeur</h4>
-  <ul>
-    <li><strong>Glissez</strong> les rectangles sur les tiroirs</li>
-    <li><strong>Rectangle VERT</strong> = Cadre Hobbii</li>
-    <li><strong>Rectangles ROUGES</strong> = Tiroirs (16)</li>
-    <li>Cliquez sur <strong>"Générer le Code"</strong> quand c'est bon</li>
-    <li><strong>Copiez</strong> le code généré</li>
-  </ul>
-</div>
+<div id="background"></div>
 
 <div id="workspace">
   <!-- Cadre Hobbii -->
-  <div id="hobbii-board" draggable="true">
-    🛒 HOBBII
-  </div>
+  <div id="hobbii" class="draggable">🛒 HOBBII</div>
 
-  <!-- 16 Tiroirs -->
+  <!-- 16 Tiroirs avec positions initiales approximatives -->
 
-  <div class="drawer" data-id="1" style="top:40%; left:15%">1. Blanc</div>
-  <div class="drawer" data-id="2" style="top:40%; left:30%">2. Écru/Ivoire</div>
-  <div class="drawer" data-id="3" style="top:40%; left:45%">3. Beige</div>
-  <div class="drawer" data-id="4" style="top:40%; left:60%">4. Marron</div>
+  <div class="drawer draggable" data-num="1" data-name="Blanc" style="top:380px; left:220px">1-Blanc</div>
+  <div class="drawer draggable" data-num="2" data-name="Écru/Ivoire" style="top:380px; left:410px">2-Écru</div>
+  <div class="drawer draggable" data-num="3" data-name="Beige" style="top:380px; left:600px">3-Beige</div>
+  <div class="drawer draggable" data-num="4" data-name="Marron" style="top:380px; left:790px">4-Marron</div>
 
-  <div class="drawer" data-id="5" style="top:48%; left:15%">5. Gris</div>
-  <div class="drawer" data-id="6" style="top:48%; left:30%">6. Noir</div>
-  <div class="drawer" data-id="7" style="top:48%; left:45%">7. Jaune</div>
-  <div class="drawer" data-id="8" style="top:48%; left:60%">8. Orange</div>
+  <div class="drawer draggable" data-num="5" data-name="Gris" style="top:455px; left:220px">5-Gris</div>
+  <div class="drawer draggable" data-num="6" data-name="Noir" style="top:455px; left:410px">6-Noir</div>
+  <div class="drawer draggable" data-num="7" data-name="Jaune" style="top:455px; left:600px">7-Jaune</div>
+  <div class="drawer draggable" data-num="8" data-name="Orange" style="top:455px; left:790px">8-Orange</div>
 
-  <div class="drawer" data-id="9" style="top:56%; left:15%">9. Rouge</div>
-  <div class="drawer" data-id="10" style="top:56%; left:30%">10. Rose</div>
-  <div class="drawer" data-id="11" style="top:56%; left:45%">11. Violet</div>
-  <div class="drawer" data-id="12" style="top:56%; left:60%">12. Bleu</div>
+  <div class="drawer draggable" data-num="9" data-name="Rouge" style="top:530px; left:220px">9-Rouge</div>
+  <div class="drawer draggable" data-num="10" data-name="Rose" style="top:530px; left:410px">10-Rose</div>
+  <div class="drawer draggable" data-num="11" data-name="Violet" style="top:530px; left:600px">11-Violet</div>
+  <div class="drawer draggable" data-num="12" data-name="Bleu" style="top:530px; left:790px">12-Bleu</div>
 
-  <div class="drawer" data-id="13" style="top:64%; left:15%">13. Vert</div>
-  <div class="drawer" data-id="14" style="top:64%; left:30%">14. Turquoise</div>
-  <div class="drawer" data-id="15" style="top:64%; left:45%">15. Multicolore</div>
-  <div class="drawer" data-id="16" style="top:64%; left:60%">16. Metal/Argent</div>
+  <div class="drawer draggable" data-num="13" data-name="Vert" style="top:605px; left:220px">13-Vert</div>
+  <div class="drawer draggable" data-num="14" data-name="Turquoise" style="top:605px; left:410px">14-Turquoise</div>
+  <div class="drawer draggable" data-num="15" data-name="Multicolore" style="top:605px; left:600px">15-Multi</div>
+  <div class="drawer draggable" data-num="16" data-name="Metal/Argent" style="top:605px; left:790px">16-Metal</div>
 </div>
 
-<!-- Panel de contrôle -->
-
-<div id="control-panel">
-  <h3>📋 Positions des tiroirs</h3>
+<div id="panel">
+  <h3>🎯 Éditeur de Position</h3>
 
   <div class="info">
-    ✨ Positionnez tous les rectangles, puis cliquez sur "Générer le Code"
+    <strong>Instructions :</strong><br>
+    • Cliquez et glissez les rectangles<br>
+    • VERT = Hobbii | ROUGE = Tiroirs<br>
+    • Cliquez "Générer" quand c'est bon
   </div>
 
-<button class="button" onclick="generateCode()">🔧 Générer le Code</button>
-<button class="button" onclick="copyCode()">📋 Copier le Code</button>
-<button class="button" onclick="resetPositions()">🔄 Réinitialiser</button>
+<button class="btn" onclick="generate()">🔧 Générer le Code</button>
+<button class="btn" onclick="copy()">📋 Copier</button>
+<button class="btn" onclick="location.reload()">🔄 Reset</button>
 
-  <div id="code-output" style="margin-top:15px; display:none;"></div>
+  <div id="output"></div>
 </div>
 
 <script>
-let draggedElement = null;
-let offsetX = 0;
-let offsetY = 0;
+let activeElement = null;
+let startX = 0;
+let startY = 0;
+let startLeft = 0;
+let startTop = 0;
 
-// Initialiser le drag and drop
-document.querySelectorAll('.drawer, #hobbii-board').forEach(element => {
-  element.addEventListener('mousedown', startDrag);
+// Initialiser tous les draggables
+document.querySelectorAll('.draggable').forEach(elem => {
+  elem.addEventListener('mousedown', startDrag);
 });
 
 function startDrag(e) {
-  draggedElement = e.target;
-  const rect = draggedElement.getBoundingClientRect();
-  offsetX = e.clientX - rect.left;
-  offsetY = e.clientY - rect.top;
+  activeElement = e.target;
+  activeElement.classList.add('active');
   
-  draggedElement.classList.add('dragging');
+  startX = e.clientX;
+  startY = e.clientY;
   
-  document.addEventListener('mousemove', drag);
+  const style = window.getComputedStyle(activeElement);
+  startLeft = parseInt(style.left);
+  startTop = parseInt(style.top);
+  
+  document.addEventListener('mousemove', doDrag);
   document.addEventListener('mouseup', stopDrag);
+  
+  e.preventDefault();
 }
 
-function drag(e) {
-  if (!draggedElement) return;
+function doDrag(e) {
+  if (!activeElement) return;
   
-  const x = e.clientX - offsetX;
-  const y = e.clientY - offsetY;
+  const dx = e.clientX - startX;
+  const dy = e.clientY - startY;
   
-  draggedElement.style.left = x + 'px';
-  draggedElement.style.top = y + 'px';
+  activeElement.style.left = (startLeft + dx) + 'px';
+  activeElement.style.top = (startTop + dy) + 'px';
 }
 
 function stopDrag() {
-  if (draggedElement) {
-    draggedElement.classList.remove('dragging');
-    draggedElement = null;
+  if (activeElement) {
+    activeElement.classList.remove('active');
+    activeElement = null;
   }
   
-  document.removeEventListener('mousemove', drag);
+  document.removeEventListener('mousemove', doDrag);
   document.removeEventListener('mouseup', stopDrag);
 }
 
 // Générer le code
-function generateCode() {
-  const output = document.getElementById('code-output');
-  let code = '<!-- POSITIONS DES TIROIRS -->\n\n';
+function generate() {
+  const W = window.innerWidth;
+  const H = window.innerHeight;
   
-  // Cadre Hobbii
-  const hobbii = document.getElementById('hobbii-board');
-  const hobbiiRect = hobbii.getBoundingClientRect();
-  const hobbiiTop = (hobbiiRect.top / window.innerHeight * 100).toFixed(1);
-  const hobbiiLeft = (hobbiiRect.left / window.innerWidth * 100).toFixed(1);
-  const hobbiiWidth = (hobbiiRect.width / window.innerWidth * 100).toFixed(1);
-  const hobbiiHeight = (hobbiiRect.height / window.innerHeight * 100).toFixed(1);
+  let code = '<!-- ZONES CLIQUABLES -->\n\n';
+  
+  // Hobbii
+  const hobbii = document.getElementById('hobbii');
+  const hRect = hobbii.getBoundingClientRect();
+  const hTop = (hRect.top / H * 100).toFixed(1);
+  const hLeft = (hRect.left / W * 100).toFixed(1);
+  const hWidth = (hRect.width / W * 100).toFixed(1);
+  const hHeight = (hRect.height / H * 100).toFixed(1);
   
   code += `<!-- Cadre Hobbii -->\n`;
-  code += `<button id="hobbii-board" style="top:${hobbiiTop}%; left:${hobbiiLeft}%; width:${hobbiiWidth}%; height:${hobbiiHeight}%"></button>\n\n`;
+  code += `<button id="hobbii-board" style="top:${hTop}%; left:${hLeft}%; width:${hWidth}%; height:${hHeight}%" onclick="window.open('https://hobbii.fr', '_blank')"></button>\n\n`;
   
   // Tiroirs
   const drawers = document.querySelectorAll('.drawer');
+  const drawerData = [];
+  
   drawers.forEach(drawer => {
     const rect = drawer.getBoundingClientRect();
-    const top = (rect.top / window.innerHeight * 100).toFixed(1);
-    const left = (rect.left / window.innerWidth * 100).toFixed(1);
-    const width = (rect.width / window.innerWidth * 100).toFixed(1);
-    const height = (rect.height / window.innerHeight * 100).toFixed(1);
-    const id = drawer.getAttribute('data-id');
-    const name = drawer.textContent.trim();
+    const num = drawer.getAttribute('data-num');
+    const name = drawer.getAttribute('data-name');
+    const top = (rect.top / H * 100).toFixed(1);
+    const left = (rect.left / W * 100).toFixed(1);
+    const width = (rect.width / W * 100).toFixed(1);
+    const height = (rect.height / H * 100).toFixed(1);
     
-    code += `<!-- ${name} -->\n`;
-    code += `<button class="drawer" style="top:${top}%; left:${left}%; width:${width}%; height:${height}%" onclick="openDrawer(${id}, ...)"></button>\n\n`;
+    drawerData.push({ num, name, top, left, width, height });
   });
   
+  // Trier par numéro
+  drawerData.sort((a, b) => parseInt(a.num) - parseInt(b.num));
+  
+  // Générer le code
+  drawerData.forEach(d => {
+    code += `<!-- Tiroir ${d.num}: ${d.name} -->\n`;
+    code += `<button class="drawer" style="top:${d.top}%; left:${d.left}%; width:${d.width}%; height:${d.height}%" onclick="openDrawer(${d.num}, '${d.name}', ...)"></button>\n\n`;
+  });
+  
+  // Afficher
+  const output = document.getElementById('output');
   output.textContent = code;
   output.style.display = 'block';
 }
 
-// Copier le code
-function copyCode() {
-  const output = document.getElementById('code-output');
-  const text = output.textContent;
+// Copier
+function copy() {
+  const output = document.getElementById('output');
+  if (output.style.display === 'none') {
+    alert('⚠️ Générez le code d\'abord !');
+    return;
+  }
   
-  navigator.clipboard.writeText(text).then(() => {
-    alert('✅ Code copié dans le presse-papier !');
-  }).catch(err => {
-    alert('❌ Erreur lors de la copie : ' + err);
+  navigator.clipboard.writeText(output.textContent).then(() => {
+    alert('✅ Code copié !');
+  }).catch(() => {
+    // Fallback
+    const textarea = document.createElement('textarea');
+    textarea.value = output.textContent;
+    document.body.appendChild(textarea);
+    textarea.select();
+    document.execCommand('copy');
+    document.body.removeChild(textarea);
+    alert('✅ Code copié !');
   });
 }
 
-// Réinitialiser les positions
-function resetPositions() {
-  if (confirm('Voulez-vous vraiment réinitialiser toutes les positions ?')) {
-    location.reload();
-  }
-}
-
-// Redimensionner les tiroirs avec molette
-document.addEventListener('wheel', (e) => {
-  if (e.ctrlKey || e.metaKey) {
-    e.preventDefault();
-    
-    const hoveredElement = document.elementFromPoint(e.clientX, e.clientY);
-    if (hoveredElement && (hoveredElement.classList.contains('drawer') || hoveredElement.id === 'hobbii-board')) {
-      const currentWidth = hoveredElement.offsetWidth;
-      const currentHeight = hoveredElement.offsetHeight;
-      
-      const delta = e.deltaY > 0 ? -5 : 5;
-      
-      hoveredElement.style.width = (currentWidth + delta) + 'px';
-      hoveredElement.style.height = (currentHeight + delta * 0.35) + 'px';
-    }
-  }
-}, { passive: false });
+// Empêcher la sélection de texte pendant le drag
+document.addEventListener('selectstart', (e) => {
+  if (activeElement) e.preventDefault();
+});
 </script>
 
 </body>
