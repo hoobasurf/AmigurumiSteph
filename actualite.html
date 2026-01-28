@@ -19,13 +19,47 @@ background: linear-gradient(135deg, #ffd6e6,#ffb6c1);
 height:60px;
 display:flex;
 align-items:center;
-justify-content:center;
+justify-content:space-between;
+padding:0 20px;
 font-weight:bold;
 color:#b84c6f;
 font-size:22px;
 border-bottom:3px solid #b67385;
 z-index:100;
 box-shadow: 0 2px 8px rgba(184,76,111,0.2);
+}
+
+.header-left {
+display:flex;
+align-items:center;
+gap:12px;
+}
+
+.back-btn {
+background:#fff;
+border:2px solid #b67385;
+border-radius:50%;
+width:40px;
+height:40px;
+display:flex;
+align-items:center;
+justify-content:center;
+cursor:pointer;
+font-size:20px;
+transition:all 0.2s;
+}
+
+.back-btn:hover {
+transform:scale(1.1);
+background:#ffe6f0;
+}
+
+#ownerPhoto {
+width:40px;
+height:40px;
+border-radius:50%;
+border:2px solid #fff;
+object-fit:cover;
 }
 
 /* ====== NEW POST BOX ====== */
@@ -53,6 +87,12 @@ width:40px;
 height:40px;
 border-radius:50%;
 border:2px solid #ffb6c1;
+object-fit:cover;
+}
+
+.new-post-header span {
+font-weight:bold;
+color:#b84c6f;
 }
 
 #newPostBox textarea {
@@ -72,10 +112,69 @@ outline:none;
 border-color:#ff69b4;
 }
 
-.post-footer {
+.post-actions-new {
 display:flex;
-justify-content:flex-end;
+justify-content:space-between;
+align-items:center;
 margin-top:12px;
+}
+
+.photo-upload-btn {
+display:flex;
+align-items:center;
+gap:8px;
+background:#fff;
+border:2px solid #b67385;
+border-radius:12px;
+padding:8px 16px;
+cursor:pointer;
+transition:all 0.2s;
+color:#b84c6f;
+font-weight:bold;
+}
+
+.photo-upload-btn:hover {
+background:#ffe6f0;
+transform:scale(1.05);
+}
+
+#photoPreview {
+display:flex;
+gap:8px;
+margin-top:12px;
+flex-wrap:wrap;
+}
+
+.preview-item {
+position:relative;
+width:80px;
+height:80px;
+border-radius:8px;
+overflow:hidden;
+border:2px solid #b67385;
+}
+
+.preview-item img {
+width:100%;
+height:100%;
+object-fit:cover;
+}
+
+.preview-remove {
+position:absolute;
+top:2px;
+right:2px;
+background:#ffb6c1;
+color:#fff;
+border-radius:50%;
+width:20px;
+height:20px;
+display:flex;
+align-items:center;
+justify-content:center;
+cursor:pointer;
+font-size:14px;
+font-weight:bold;
 }
 
 #postBtn {
@@ -140,6 +239,7 @@ width:40px;
 height:40px;
 border-radius:50%;
 border:2px solid #ffb6c1;
+object-fit:cover;
 }
 
 .post-author-info {
@@ -180,6 +280,46 @@ color:#333;
 line-height:1.5;
 margin-bottom:12px;
 word-wrap:break-word;
+}
+
+.post-photos {
+display:grid;
+gap:8px;
+margin-bottom:12px;
+border-radius:12px;
+overflow:hidden;
+}
+
+.post-photos.single {
+grid-template-columns: 1fr;
+}
+
+.post-photos.double {
+grid-template-columns: 1fr 1fr;
+}
+
+.post-photos.triple {
+grid-template-columns: 1fr 1fr;
+}
+
+.post-photos.triple img:first-child {
+grid-column: 1 / -1;
+}
+
+.post-photos.multiple {
+grid-template-columns: 1fr 1fr;
+}
+
+.post-photos img {
+width:100%;
+height:200px;
+object-fit:cover;
+cursor:pointer;
+transition:transform 0.2s;
+}
+
+.post-photos img:hover {
+transform:scale(1.02);
 }
 
 /* ====== STATS BAR ====== */
@@ -254,6 +394,7 @@ width:32px;
 height:32px;
 border-radius:50%;
 border:2px solid #ffb6c1;
+object-fit:cover;
 }
 
 .comment-input-area input {
@@ -303,6 +444,7 @@ height:32px;
 border-radius:50%;
 border:2px solid #ffb6c1;
 flex-shrink:0;
+object-fit:cover;
 }
 
 .comment-content {
@@ -435,12 +577,36 @@ width:40px;
 height:40px;
 border-radius:50%;
 border:2px solid #ffb6c1;
+object-fit:cover;
 }
 
 .like-item .name {
 font-weight:bold;
 color:#b84c6f;
 font-size:15px;
+}
+
+/* ====== PHOTO VIEWER ====== */
+#photoViewer {
+position:fixed;
+inset:0;
+background:rgba(0,0,0,0.9);
+display:none;
+justify-content:center;
+align-items:center;
+z-index:2000;
+}
+
+#photoViewer img {
+max-width:90%;
+max-height:90%;
+border-radius:12px;
+}
+
+#photoViewer .closeModal {
+position:absolute;
+top:20px;
+right:20px;
 }
 
 /* ====== EMPTY STATE ====== */
@@ -468,23 +634,38 @@ width:95%;
 header {
 font-size:18px;
 }
+
+.post-photos img {
+height:150px;
+}
 }
 </style>
 
 </head>
 <body>
 
-<header>📰 Actualité</header>
+<header>
+  <div class="header-left">
+    <div class="back-btn" id="backBtn">←</div>
+    <span>📰 Actualité</span>
+  </div>
+  <img id="ownerPhoto" src="icon-152.png" alt="Photo">
+</header>
 
 <!-- ====== NOUVEAU POST ====== -->
 
 <div id="newPostBox">
   <div class="new-post-header">
     <img id="headerPhoto" src="icon-152.png" alt="Photo">
-    <span id="headerName" style="font-weight:bold;color:#b84c6f;">Quoi de neuf ?</span>
+    <span id="headerName">Quoi de neuf ?</span>
   </div>
   <textarea id="postInput" placeholder="Exprimez-vous..."></textarea>
-  <div class="post-footer">
+  <div id="photoPreview"></div>
+  <div class="post-actions-new">
+    <label class="photo-upload-btn">
+      📷 Photo
+      <input type="file" id="photoInput" multiple accept="image/*" style="display:none;">
+    </label>
     <button id="postBtn">Publier</button>
   </div>
 </div>
@@ -495,6 +676,7 @@ font-size:18px;
   <div class="empty-state">
     <div class="emoji">🌸</div>
     <p>Aucune publication pour le moment</p>
+    <p style="font-size:13px;margin-top:8px;">Soyez le premier à partager quelque chose !</p>
   </div>
 </div>
 
@@ -510,34 +692,96 @@ font-size:18px;
   </div>
 </div>
 
+<!-- ====== PHOTO VIEWER ====== -->
+
+<div id="photoViewer">
+  <button class="closeModal">×</button>
+  <img id="viewerImage" src="" alt="">
+</div>
+
 <script type="module">
 import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
 
 const supabase = createClient(
   "https://jyhbamdcxmpveujjqjla.supabase.co",
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp5aGJhbWRjeG1wdmV1ampxamxhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzczOTczOTAsImV4cCI6MjA1Mjk3MzM5MH0.sqsxb-3Kl5o3-JQYv9kGFw_-g0EgwMa"
+  "sb_publishable_sqsxb-3Kl5o3-JQYv9kGFw_-g0EgwMa"
 );
 
 const myPrenom = localStorage.getItem('prenom') || 'Utilisateur';
-const ownerPhoto = localStorage.getItem('ownerPhoto') || 'icon-152.png';
+const ownerPhotoUrl = localStorage.getItem('ownerPhoto') || 'icon-152.png';
 
 const feed = document.getElementById('feed');
 const postBtn = document.getElementById('postBtn');
 const postInput = document.getElementById('postInput');
+const photoInput = document.getElementById('photoInput');
+const photoPreview = document.getElementById('photoPreview');
 const likesModal = document.getElementById('likesModal');
 const likesContent = document.getElementById('likesContent');
 const headerPhoto = document.getElementById('headerPhoto');
 const headerName = document.getElementById('headerName');
+const ownerPhoto = document.getElementById('ownerPhoto');
+const backBtn = document.getElementById('backBtn');
+const photoViewer = document.getElementById('photoViewer');
+const viewerImage = document.getElementById('viewerImage');
+
+let selectedFiles = [];
+let userPhotos = {};
 
 // Initialiser le header
-headerPhoto.src = ownerPhoto;
+headerPhoto.src = ownerPhotoUrl;
+ownerPhoto.src = ownerPhotoUrl;
 headerName.textContent = `${myPrenom}, quoi de neuf ?`;
+
+// Retour
+backBtn.onclick = () => {
+  document.body.style.opacity = '0';
+  setTimeout(() => window.location.href = 'owner.html', 500);
+};
+
+// Charger les photos des utilisateurs
+async function loadUserPhotos() {
+  const { data, error } = await supabase.from('profiles').select('prenom, photo_url');
+  if (!error && data) {
+    data.forEach(u => {
+      userPhotos[u.prenom] = u.photo_url || 'icon-152.png';
+    });
+  }
+}
+
+// Sélection de photos
+photoInput.onchange = () => {
+  selectedFiles = Array.from(photoInput.files);
+  renderPhotoPreview();
+};
+
+function renderPhotoPreview() {
+  photoPreview.innerHTML = '';
+  selectedFiles.forEach((file, index) => {
+    const div = document.createElement('div');
+    div.className = 'preview-item';
+    
+    const img = document.createElement('img');
+    img.src = URL.createObjectURL(file);
+    
+    const remove = document.createElement('div');
+    remove.className = 'preview-remove';
+    remove.textContent = '×';
+    remove.onclick = () => {
+      selectedFiles.splice(index, 1);
+      renderPhotoPreview();
+    };
+    
+    div.appendChild(img);
+    div.appendChild(remove);
+    photoPreview.appendChild(div);
+  });
+}
 
 // ====== FORMATER TIMESTAMP ======
 function formatTime(timestamp) {
   const date = new Date(timestamp);
   const now = new Date();
-  const diff = Math.floor((now - date) / 1000); // en secondes
+  const diff = Math.floor((now - date) / 1000);
 
   if (diff < 60) return 'À l\'instant';
   if (diff < 3600) return `Il y a ${Math.floor(diff / 60)} min`;
@@ -578,12 +822,22 @@ async function loadPosts() {
     
     const likes = post.likes || [];
     const comments = post.comments || [];
+    const photos = post.photos || [];
     const isLiked = likes.some(l => l.name === myPrenom);
+    
+    const authorPhoto = userPhotos[post.name] || post.photo || 'icon-152.png';
+    
+    // Déterminer la classe grid pour les photos
+    let photoGridClass = '';
+    if (photos.length === 1) photoGridClass = 'single';
+    else if (photos.length === 2) photoGridClass = 'double';
+    else if (photos.length === 3) photoGridClass = 'triple';
+    else photoGridClass = 'multiple';
     
     div.innerHTML = `
       <div class="post-header">
         <div class="post-author">
-          <img src="${post.photo || ownerPhoto}" alt="${post.name}">
+          <img src="${authorPhoto}" alt="${post.name}">
           <div class="post-author-info">
             <div class="post-author-name">${post.name}</div>
             <div class="post-timestamp">${formatTime(post.created_at)}</div>
@@ -592,7 +846,13 @@ async function loadPosts() {
         ${post.name === myPrenom ? '<button class="post-delete" title="Supprimer">🗑️</button>' : ''}
       </div>
       
-      <div class="post-content">${post.content}</div>
+      ${post.content ? `<div class="post-content">${post.content}</div>` : ''}
+      
+      ${photos.length > 0 ? `
+        <div class="post-photos ${photoGridClass}">
+          ${photos.map(p => `<img src="${p}" alt="Photo">`).join('')}
+        </div>
+      ` : ''}
       
       ${likes.length > 0 || comments.length > 0 ? `
         <div class="post-stats">
@@ -611,7 +871,7 @@ async function loadPosts() {
       <div class="comment-section" style="display:${comments.length > 0 ? 'block' : 'none'}">
         <div class="comments-list"></div>
         <div class="comment-input-area">
-          <img src="${ownerPhoto}" alt="${myPrenom}">
+          <img src="${ownerPhotoUrl}" alt="${myPrenom}">
           <input type="text" placeholder="Écrivez un commentaire..." class="commentInput">
           <button class="sendCommentBtn">➤</button>
         </div>
@@ -629,6 +889,14 @@ async function loadPosts() {
       };
     }
 
+    // PHOTOS CLICK
+    div.querySelectorAll('.post-photos img').forEach(img => {
+      img.onclick = () => {
+        viewerImage.src = img.src;
+        photoViewer.style.display = 'flex';
+      };
+    });
+
     // LIKE
     const likeBtn = div.querySelector('.likeBtn');
     likeBtn.onclick = async () => {
@@ -638,7 +906,7 @@ async function loadPosts() {
       if (existingIndex !== -1) {
         newLikes.splice(existingIndex, 1);
       } else {
-        newLikes.push({ name: myPrenom, photo: ownerPhoto });
+        newLikes.push({ name: myPrenom, photo: ownerPhotoUrl });
       }
       
       await supabase.from('posts').update({ likes: newLikes }).eq('id', post.id);
@@ -655,8 +923,9 @@ async function loadPosts() {
         likes.forEach(like => {
           const item = document.createElement('div');
           item.className = 'like-item';
+          const likePhoto = userPhotos[like.name] || like.photo || 'icon-152.png';
           item.innerHTML = `
-            <img src="${like.photo || ownerPhoto}" alt="${like.name}">
+            <img src="${likePhoto}" alt="${like.name}">
             <span class="name">${like.name}</span>
           `;
           likesContent.appendChild(item);
@@ -686,7 +955,7 @@ async function loadPosts() {
       
       const newComments = [...comments, {
         name: myPrenom,
-        photo: ownerPhoto,
+        photo: ownerPhotoUrl,
         text: text,
         timestamp: new Date().toISOString()
       }];
@@ -706,8 +975,9 @@ async function loadPosts() {
     comments.forEach((comment, index) => {
       const cm = document.createElement('div');
       cm.className = 'comment';
+      const commentPhoto = userPhotos[comment.name] || comment.photo || 'icon-152.png';
       cm.innerHTML = `
-        <img src="${comment.photo || ownerPhoto}" alt="${comment.name}">
+        <img src="${commentPhoto}" alt="${comment.name}">
         <div class="comment-content">
           <div class="comment-author">${comment.name}</div>
           <div class="comment-text">${comment.text}</div>
@@ -735,19 +1005,50 @@ async function loadPosts() {
 // ====== NOUVEAU POST ======
 postBtn.onclick = async () => {
   const content = postInput.value.trim();
-  if (!content) return;
+  if (!content && selectedFiles.length === 0) {
+    alert('Écrivez quelque chose ou ajoutez une photo !');
+    return;
+  }
   
-  await supabase.from('posts').insert([{
-    name: myPrenom,
-    content: content,
-    photo: ownerPhoto,
-    likes: [],
-    comments: [],
-    created_at: new Date().toISOString()
-  }]);
+  postBtn.disabled = true;
+  postBtn.textContent = 'Publication...';
   
-  postInput.value = '';
-  loadPosts();
+  try {
+    // Upload des photos
+    const photoUrls = [];
+    for (const file of selectedFiles) {
+      const path = `posts/${Date.now()}_${Math.random().toString(36).substr(2, 9)}_${file.name}`;
+      const { error: uploadError } = await supabase.storage.from('images').upload(path, file);
+      
+      if (!uploadError) {
+        const { data } = supabase.storage.from('images').getPublicUrl(path);
+        photoUrls.push(data.publicUrl);
+      }
+    }
+    
+    // Créer le post
+    await supabase.from('posts').insert([{
+      name: myPrenom,
+      content: content,
+      photo: ownerPhotoUrl,
+      photos: photoUrls,
+      likes: [],
+      comments: [],
+      created_at: new Date().toISOString()
+    }]);
+    
+    postInput.value = '';
+    selectedFiles = [];
+    photoPreview.innerHTML = '';
+    photoInput.value = '';
+    loadPosts();
+  } catch (error) {
+    console.error(error);
+    alert('Erreur lors de la publication');
+  }
+  
+  postBtn.disabled = false;
+  postBtn.textContent = 'Publier';
 };
 
 // ENTER pour publier
@@ -762,6 +1063,7 @@ postInput.onkeypress = (e) => {
 document.querySelectorAll('.closeModal').forEach(btn => {
   btn.onclick = () => {
     likesModal.style.display = 'none';
+    photoViewer.style.display = 'none';
   };
 });
 
@@ -769,11 +1071,15 @@ likesModal.onclick = (e) => {
   if (e.target === likesModal) likesModal.style.display = 'none';
 };
 
+photoViewer.onclick = (e) => {
+  if (e.target === photoViewer) photoViewer.style.display = 'none';
+};
+
 // ====== INIT ======
-loadPosts();
+loadUserPhotos().then(() => loadPosts());
 
 // ====== RAFRAICHISSEMENT AUTO ======
-setInterval(loadPosts, 30000); // Rafraîchir toutes les 30 secondes
+setInterval(loadPosts, 30000);
 </script>
 
 </body>
