@@ -1,3 +1,6 @@
+J.ai toujours le fond blanc des icône et les. Biffer un peu italique 
+
+
 <!DOCTYPE html>
 <html lang="fr">
 <head>
@@ -20,186 +23,74 @@ body::before{
   background-size:cover;background-position:center center;background-repeat:no-repeat;z-index:-1;
 }
 .center-zone{display:flex;justify-content:center;align-items:flex-start;padding-top:3.5cm;overflow:hidden;height:auto;}
-#visitor-list-container {
-  display: flex;
-  overflow-x: auto;
-  overflow-y: hidden;
-  scroll-snap-type: x mandatory;
-  -webkit-overflow-scrolling: touch;
-  padding: 0 5cm;
-  gap: 10cm;
-  justify-content: flex-start;
-}
-
-.page {
-  display: grid;
-  grid-template-columns: repeat(2, 200px);
-  grid-template-rows: repeat(3, 200px);
-  column-gap: 3mm;
-  row-gap: 4mm;
-  flex: 0 0 auto;
-  scroll-snap-align: center;
-  justify-content: center;
-  padding: 0;
-}
+#visitor-list-container{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;-webkit-overflow-scrolling: touch;justify-content:center;padding-left:1cm;}
+.page{display:grid;grid-template-columns:repeat(2,1fr);grid-template-rows:repeat(3,1fr);column-gap:3mm;row-gap:4mm;flex:0 0 auto;width:calc(2*200px+3mm);height:calc(3*200px+8mm);scroll-snap-align:center;padding:4mm;justify-content:center;margin-top:0;}
 .visitor-item{position:relative;width:200px;height:200px;border-radius:12px;overflow:hidden;border:3px solid #fff;box-shadow:0 0 0 3px #f6c2d1,0 6px 14px rgba(0,0,0,0.25),inset 0 0 0 1px rgba(255,255,255,0.4);background:#ffe6f0;}
+.visitor-item .placeholder{position:absolute;inset:0;display:flex;justify-content:center;align-items:center;font-size:24px;color:#b84c6f;font-weight:bold;}
 .visitor-item img{width:100%;height:100%;object-fit:cover;border-radius:12px;cursor:pointer;display:block;filter:brightness(1.05) contrast(1.05) saturate(0.95);transition:filter 0.3s, transform 0.3s;position:relative;z-index:2;}
 .visitor-item img:hover{transform:scale(1.03);}
 .visitor-item::after{content:"";position:absolute;inset:0;background:rgba(255,230,240,0.12);pointer-events:none;z-index:1;}
-
-.delete-btn{position:absolute;top:6px;right:6px;width:24px;height:24px;background:#ffb6c1;color:#fff;border-radius:50%;display:flex;justify-content:center;align-items:center;font-weight:bold;font-size:16px;cursor:pointer;z-index:5;transition:transform 0.2s, box-shadow 0.2s;}
-.delete-btn:hover{transform:scale(1.2);box-shadow:0 2px 6px rgba(0,0,0,0.25);}
+.visitor-item p{position:absolute;bottom:2px;width:100%;font-size:14px;color:#b84c6f;font-weight:bold;text-align:center;text-shadow:1px 1px 2px rgba(255,255,255,0.8);z-index:3;}
+.delete-btn{position:absolute;top:2px;right:2px;width:20px;height:20px;background:#ffb6c1;color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:bold;cursor:pointer;z-index:5;font-size:14px;transition: background 0.2s;}
+.delete-btn:hover{background:#e94f9a;}
 
 #sidebar{position:fixed;top:0;left:-220px;width:220px;height:100vh;background:rgba(255,230,240,0.2);border-right:2px solid #b67385;padding:20px;transition:left .3s;z-index:10;}
 #sidebar.sidebar-open{left:0;}
 #toggleSidebar{position:absolute;top:50%;right:-30px;width:30px;height:60px;background:#ffb6c1;border-radius:0 12px 12px 0;display:flex;align-items:center;justify-content:center;cursor:pointer;font-weight:bold;}
 #sidebar button{width:auto;padding:8px 16px;border-radius:16px;border:none;background:#ffb6c1;color:#fff;cursor:pointer;font-weight:bold;display:block;margin-top:10px;}
-#sidebar button:hover{transform:scale(1.03);}
 
 .modal{position:fixed;inset:0;background:rgba(0,0,0,0.6);display:none;justify-content:center;align-items:center;z-index:10001;}
 .modal .modal-box{background:#ffe6f0;padding:16px 24px;border-radius:20px;border:3px solid #b67385;display:flex;flex-direction:column;gap:10px;align-items:center;min-width:200px;font-family:'Comic Sans MS',cursive;}
 .modal input{padding:6px 12px;border-radius:10px;border:2px solid #b67385;width:100%;}
 .modal button{padding:6px 14px;border:none;background:#ffb6c1;color:#fff;border-radius:12px;cursor:pointer;font-weight:bold;width:100%;}
 
-#zoomModal {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.7);
-  display: none;
-  justify-content: center;
-  align-items: center;
-  overflow: hidden;
-  z-index: 10000;
-}
-
-.zoom-content {
-  position: relative;
-  width: 80vw;
-  height: 60vh;
-  overflow: hidden;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 8px;
-}
-
-#mainZoom {
-  position: absolute;
-  top: 0;
-  left: 0;
-  cursor: grab;
-  user-select: none;
-  max-width:80%;
-  max-height:60vh;
-  border:4px solid #b67385;
-  border-radius:24px;
-  filter:none;
-}
-
-#zoomLegend {
-  position: absolute;
-  top: 10px;
-  left: 10px;
-  cursor: grab;
-  user-select: none;
-  min-width: 150px;
-  background: #ffe6f0;
-  border: 2px solid #b84c6f;
-  border-radius: 12px;
-  padding: 8px;
-  color: #b84c6f;
-  font-size: 14px;
-  z-index: 2;
-}
-
-.thumbs {
-  display: flex;
-  gap: 8px;
-  overflow-x: auto;
-  max-width: 80%;
-}
-.thumbs img {
-  width: 50px;
-  height: 50px;
-  object-fit: cover;
-  border-radius: 12px;
-  border: 2px solid #b67385;
-  cursor: pointer;
-}
-
-.closeZoom{position:absolute;top:12px;right:12px;width:28px;height:28px;background:#ffb6c1;color:#fff;border-radius:50%;display:flex;justify-content:center;align-items:center;cursor:pointer;font-size:18px;font-weight:bold;z-index:1001;transition:transform 0.2s, box-shadow 0.2s;}
-.closeZoom:hover{transform:scale(1.2);box-shadow:0 2px 8px rgba(0,0,0,0.25);}
+#zoomModal{position:fixed;inset:0;background:rgba(0,0,0,0.7);display:none;justify-content:center;align-items:center;flex-direction:column;z-index:10000;}
+#zoomModal img{max-width:80%;max-height:60vh;border:4px solid #b67385;border-radius:24px;margin-bottom:10px;filter:none;}
+#zoomModal .thumbs{display:flex;gap:8px;max-width:80%;overflow-x:auto;}
+#zoomModal .thumbs img{width:50px;height:50px;object-fit:cover;border-radius:12px;border:2px solid #b67385;cursor:pointer;}
+.closeZoom{position:absolute;top:12px;right:12px;width:28px;height:28px;background:#ffb6c1;color:#fff;border-radius:50%;display:flex;justify-content:center;align-items:center;cursor:pointer;}
 
 #ownerPhoto{width:32px;height:32px;border-radius:50%;position:fixed;top:10px;right:10px;z-index:10000;background:#ffe6f0;border:2px solid #b84c6f;}
+@media(max-width:480px){.page{grid-template-columns:repeat(2,120px);grid-template-rows:repeat(3,120px);}.visitor-item{width:120px;height:120px;}.modal .modal-box{min-width:180px;}}
 
-.icon-btn {
-  background: none !important;
+.icon-btn svg {
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+.icon-btn:hover svg {
+  transform: scale(1.2);
+}
+.icon-btn span {
+  font-weight: bold;
+  color: #b84c6f;
+  font-size: 14px;
+}
+
+  /* Bouton toujours visible */
+.chat-icon-btn {
+  background: transparent;
   border: none;
+  cursor: pointer;
   padding: 4px;
   display: flex;
   align-items: center;
-  justify-content: center;
 }
 
-.icon-btn svg {
-  background: none !important;
-  fill: none;
-  stroke: #b84c6f;
-  width: 22px;
-  height: 22px;
-  transition: transform 0.2s;
-  cursor: pointer;
-}
 
-#zoomModal .actions {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  gap: 12px;
-  position:absolute;
-  bottom:12px;
-  left:50%;
-  transform:translateX(-50%);
-}
-
-#likeCount, #commentCount {
-  font-family: 'Courier New', monospace;
-  font-style: normal;
-  font-weight: bold;
-  text-decoration: none;
-  color: #b84c6f;
-  font-size: 14px;
-  min-width: 18px;
-}
-
-.pink-file-btn{
-  background: linear-gradient(#ffd6e6, #ffb6c1);
-  border: 2px solid #b67385;
-  border-radius: 16px;
-  padding: 8px 14px;
-  color: #b84c6f;
-  font-weight: bold;
-  cursor: pointer;
-  width: 100%;
-  transition: transform 0.15s, box-shadow 0.15s;
-}
-.pink-file-btn:hover{
-  transform: scale(1.03);
-  box-shadow: 0 4px 10px rgba(0,0,0,0.15);
-}
-
+/* ====== SURCOUCHE ====== */
 .chat-overlay {
   position: fixed;
   inset: 0;
   background: rgba(0,0,0,0.4);
-  display: none;
+  display: none; /* caché par défaut */
   justify-content: center;
   align-items: center;
   z-index: 20000;
 }
 
+/* ====== FENÊTRE CHAT ====== */
 .chat-window {
-  width: 360px;
+  width: 360px;  /* Petite modal */
   height: 230px;
   background: #ffe6f0;
   border-radius: 20px;
@@ -212,6 +103,7 @@ body::before{
   transition: width 0.3s, height 0.3s;
 }
 
+/* ====== HEADER ====== */
 .chat-header {
   height: 40px;
   background: linear-gradient(#ffd6e6, #ffb6c1);
@@ -222,17 +114,22 @@ body::before{
   font-weight: bold;
   color: #b84c6f;
   flex-shrink: 0;
+  position: sticky;
+  top: 0;
+  z-index: 10;
   font-size: 14px;
 }
 
+/* ====== BODY ====== */
 .chat-body {
   flex: 1;
   display: flex;
   min-height: 0;
 }
 
+/* ====== CONTACTS ====== */
 .chat-sidebar {
-  width: 120px;
+  width: 120px;  /* réduit pour petite modal */
   background: #fff5fa;
   border-right: 2px solid #f3b3c8;
   overflow-y: auto;
@@ -257,6 +154,7 @@ body::before{
   object-fit: cover;
 }
 
+/* ====== CONVERSATION ====== */
 .chat-content {
   flex: 1;
   display: flex;
@@ -288,6 +186,7 @@ body::before{
   border: 1px solid #f3b3c8;
 }
 
+/* ====== INPUT ====== */
 .chat-input {
   display: flex;
   padding: 4px;
@@ -301,6 +200,7 @@ body::before{
   font-size: 12px;
 }
 
+/* ====== BOUTON ICON ====== */
 .chat-icon-btn {
   background: transparent;
   border: none;
@@ -310,22 +210,46 @@ body::before{
   align-items: center;
 }
 
+/* ====== MODE AGRANDI ====== */
 .expanded .chat-window {
-  width: 720px;
+  width: 720px;  /* double taille de la petite modal */
   height: 460px;
   border-radius: 24px;
 }
 
-body.modal-open {
-  overflow: hidden;
-  touch-action: none;
+.pink-file-btn{
+  background: linear-gradient(#ffd6e6, #ffb6c1);
+  border: 2px solid #b67385;
+  border-radius: 16px;
+  padding: 8px 14px;
+  color: #b84c6f;
+  font-weight: bold;
+  cursor: pointer;
+  width: 100%;
+  transition: transform 0.15s, box-shadow 0.15s;
 }
 
-@media(max-width:480px){
-  .page{grid-template-columns:repeat(2,120px);grid-template-rows:repeat(3,120px);}
-  .visitor-item{width:120px;height:120px;}
-  .modal .modal-box{min-width:180px;}
+.pink-file-btn:hover{
+  transform: scale(1.03);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.15);
 }
+
+.zoom-content {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.legend-box {
+  min-width: 150px;
+  background: #ffe6f0;
+  border: 2px solid #b84c6f;
+  border-radius: 12px;
+  padding: 8px;
+  color: #b84c6f;
+  font-size: 14px;
+}
+  
 </style>
 </head>
 <body>
@@ -343,18 +267,32 @@ body.modal-open {
   <button id="videoBtn">Vidéo</button>
   <button id="notesBtn">Notes</button>
   <button id="messagerieBtn">Messagerie</button>
-  <button id="actualiteBtn">Actualité</button>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" fill="none" stroke="#ffb6c1" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-settings">
+    <circle cx="12" cy="12" r="3"/>
+    <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l0 0a2 2 0 1 1-2.83 2.83l0 0a1.65 1.65 0 0 0-1.82.33l0 0a1.65 1.65 0 0 0-.5 1.51l0 0a2 2 0 1 1-3.18 0l0 0a1.65 1.65 0 0 0-1.51-.5l0 0a1.65 1.65 0 0 0-.33-1.82l0 0a2 2 0 1 1 0-2.83l0 0a1.65 1.65 0 0 0 .33-1.82l0 0a1.65 1.65 0 0 0-1.51-.5l0 0a2 2 0 1 1 0-3.18l0 0a1.65 1.65 0 0 0 .5-1.51l0 0a1.65 1.65 0 0 0 1.82-.33l0 0a2 2 0 1 1 2.83 0l0 0a1.65 1.65 0 0 0 1.82.33l0 0a1.65 1.65 0 0 0 .5 1.51l0 0a2 2 0 1 1 3.18 0l0 0a1.65 1.65 0 0 0 1.51.5l0 0a1.65 1.65 0 0 0 .33 1.82l0 0a2 2 0 1 1 0 2.83l0 0a1.65 1.65 0 0 0-.33 1.82l0 0a1.65 1.65 0 0 0 1.51.5z"/>
+  </svg>
+</button>
 </div>
-    
+
+<!-- Modals -->
 <div id="addModal" class="modal">
   <div class="modal-box">
     <h2>Ajouter des photos</h2>
     <input id="photoName" placeholder="Nom du projet">
-    <input id="photoLegend" placeholder="Légende (optionnel)">
-    <input type="file" id="multiPhoto" multiple hidden>
-    <button id="fileBtn" class="pink-file-btn">Choisir des photos</button>
-    <span id="fileInfo" style="font-size:12px;color:#b84c6f;"></span>
-    <button id="confirmAdd">Valider</button>
+
+<!-- LÉGENDE -->
+<input id="photoLegend" placeholder="Légende (optionnel)">
+
+<!-- INPUT FILE CACHÉ -->
+<input type="file" id="multiPhoto" multiple hidden>
+
+<!-- BOUTON PASTEL ROSE -->
+<button id="fileBtn" class="pink-file-btn">Choisir des photos</button>
+
+<span id="fileInfo" style="font-size:12px;color:#b84c6f;"></span>
+
+<button id="confirmAdd">Valider</button>
   </div>
 </div>
 
@@ -366,72 +304,167 @@ body.modal-open {
   </div>
 </div>
 
+<!-- ====== LIKE MODAL ====== -->
 <div id="likeModal" class="modal">
   <div class="modal-box">
     <h3>Like ❤️</h3>
-    <input type="text" id="likeName" readonly style="padding:4px 8px; border:2px solid #b67385; border-radius:8px; background:#ffe6f0; margin-bottom:8px;">
+    <div style="display:flex; align-items:center; gap:6px; margin-bottom:8px;">
+      <input type="text" id="likeName" readonly style="flex:1; padding:4px 8px; border:2px solid #b67385; border-radius:8px; background:#ffe6f0;">
+    </div>
     <button id="confirmLike">Valider</button>
-    <div id="likeBubbles" style="margin-top:12px; max-height:120px; overflow-y:auto;"></div>
+    <div class="bubble-container" id="likeBubbles" style="margin-top:12px; max-height:120px; overflow-y:auto;"></div>
   </div>
 </div>
 
+<!-- ====== COMMENT MODAL ====== -->
 <div id="commentModal" class="modal">
-  <div class="modal-box">
+  <div class="modal-box comment-box">
+    <div class="expand-btn" id="expandComment">⤢</div>
     <h3>Commentaire 💬</h3>
-    <div id="commentBubbles" style="max-height:160px; overflow-y:auto; margin-bottom:8px;"></div>
-    <input type="text" id="commentName" readonly style="padding:4px 8px; border:2px solid #b67385; border-radius:8px; background:#ffe6f0; margin-bottom:8px;">
-    <input type="text" id="commentText" placeholder="Votre commentaire" style="padding:4px 8px; border:2px solid #b67385; border-radius:8px;">
-    <button id="confirmComment">Envoyer</button>
+    <div class="comment-list" id="commentBubbles" style="max-height:160px; overflow-y:auto; margin-bottom:8px;"></div>
+    <div style="display:flex; flex-direction:column; gap:6px;">
+      <input type="text" id="commentName" readonly style="flex:1; padding:4px 8px; border:2px solid #b67385; border-radius:8px; background:#ffe6f0; margin-bottom:8px;">
+      <input type="text" id="commentText" placeholder="Votre commentaire" style="padding:4px 8px; border:2px solid #b67385; border-radius:8px;">
+      <button id="confirmComment">Envoyer</button>
+    </div>
   </div>
 </div>
 
 <div id="zoomModal">
   <div class="closeZoom">×</div>
+
   <div class="zoom-content">
-    <img id="mainZoom">
-    <div id="zoomLegend"></div>
-    <div class="thumbs" id="thumbs"></div>
+    <img id="mainZoom">          <!-- l'image principale -->
+    <div id="zoomLegend" class="legend-box"></div>  <!-- ici la légende s'affiche -->
   </div>
+
+  <div class="thumbs" id="thumbs"></div>
   <div class="actions">
-    <button id="likeBtn" class="icon-btn">
-      <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="none" stroke="#b84c6f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
-        <path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8z"/>
-      </svg>
-    </button>
-    <span id="likeCount">0</span>
-    <button id="commentBtn" class="icon-btn">
-      <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="none" stroke="#b84c6f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24">
-        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
-      </svg>
-    </button>
-    <span id="commentCount">0</span>
+  <button id="likeBtn" class="icon-btn">
+    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22"
+         fill="none" stroke="#b84c6f" stroke-width="2"
+         stroke-linecap="round" stroke-linejoin="round"
+         viewBox="0 0 24 24">
+      <path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8z"/>
+    </svg>
+  </button>
+  <span id="likeCount">0</span>
+
+  <button id="commentBtn" class="icon-btn">
+    <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22"
+         fill="none" stroke="#b84c6f" stroke-width="2"
+         stroke-linecap="round" stroke-linejoin="round"
+         viewBox="0 0 24 24">
+      <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+    </svg>
+  </button>
+  <span id="commentCount">0</span>
+</div>
+
+<!-- Modal Gestion -->
+<div id="manageModal" class="modal">
+  <div class="modal-box">
+    <h2>Gestion Likes, Commentaires</h2>
+    <button id="manageLikesBtn">Likes</button>
+    <button id="manageCommentsBtn">Commentaires</button>
   </div>
 </div>
 
+<!-- Modal Likes -->
+<div id="likesModal" class="modal">
+  <div class="modal-box" style="max-height:80vh; overflow-y:auto;">
+    <h2>Likes</h2>
+    <button id="chooseLikeBtn">Choisir individuellement</button>
+    <button id="clearLikesBtn">Tout effacer</button>
+    <div id="likesList"></div>
+  </div>
+</div>
+
+<!-- Modal Commentaires -->
+<div id="commentsModal" class="modal">
+  <div class="modal-box" style="max-height:80vh; overflow-y:auto;">
+    <h2>Commentaires</h2>
+    <button id="chooseCommentBtn">Choisir individuellement</button>
+    <button id="clearCommentsBtn">Tout effacer</button>
+    <div id="commentsList"></div>
+  </div>
+</div>
+
+<!-- Modal suppression individuelle -->
+<div id="deleteIndivModal" class="modal">
+  <div class="modal-box">
+    <p>Supprimer définitivement ce Like/Commentaire ?</p>
+    <button id="confirmDeleteIndiv">Oui</button>
+    <button id="cancelDeleteIndiv">Annuler</button>
+  </div>
+</div>
+
+<!-- Modal Supprimer Like -->
+<div id="deleteLikeModal" class="modal">
+  <div class="modal-box">
+    <h3>Supprimer Like</h3>
+    <button id="chooseLikesBtn">Choisir</button>
+  </div>
+</div>
+
+<!-- Modal Supprimer Commentaire -->
+<div id="deleteCommentModal" class="modal">
+  <div class="modal-box">
+    <h3>Supprimer Commentaire</h3>
+    <button id="chooseCommentsBtn">Choisir</button>
+  </div>
+</div>
+
+<!-- Modal Sélection Créations -->
+<div id="selectCreationModal" class="modal">
+  <div class="modal-box">
+    <h3>Sélectionner les créations</h3>
+    <div id="selectCreationList" style="max-height:60vh;overflow-y:auto;display:flex;flex-direction:column;gap:6px;"></div>
+    <button id="clearSelectedBtn">Tout effacer</button>
+  </div>
+</div>
+
+<!-- ====== MESSAGERIE ====== -->
 <div id="chatModal" class="chat-overlay">
   <div class="chat-window">
+
+    <!-- HEADER -->
     <div class="chat-header">
       <span class="chat-title">Messagerie</span>
-      <button id="toggleChatSize" class="chat-icon-btn">
-        <svg id="chatResizeIcon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#b84c6f" stroke-width="2" stroke-linecap="round">
+
+      <button id="toggleChatSize" class="chat-icon-btn" aria-label="Agrandir / Réduire">
+        <svg id="chatResizeIcon" width="20" height="20" viewBox="0 0 24 24"
+          fill="none" stroke="#b84c6f" stroke-width="2" stroke-linecap="round">
           <path d="M4 9V4h5M20 15v5h-5M15 4h5v5M9 20H4v-5"/>
         </svg>
       </button>
     </div>
+
+    <!-- BODY -->
     <div class="chat-body">
-      <div class="chat-sidebar" id="chatUserList"></div>
+
+      <!-- CONTACTS -->
+      <div class="chat-sidebar" id="chatUserList">
+        <!-- Liste vide par défaut -->
+      </div>
+
+      <!-- CONVERSATION -->
       <div class="chat-content">
-        <div class="chat-messages" id="chatMessages"></div>
+        <div class="chat-messages" id="chatMessages">
+          <!-- Messages dynamiques -->
+        </div>
+
         <div class="chat-input">
           <input type="text" id="chatInput" placeholder="Écrire un message…">
           <button id="sendMsgBtn">➤</button>
         </div>
       </div>
+
     </div>
   </div>
 </div>
 
-<script type="module">
+    <script type="module">
 import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
 
 const supabase = createClient(
@@ -439,22 +472,14 @@ const supabase = createClient(
   "sb_publishable_sqsxb-3Kl5o3-JQYv9kGFw_-g0EgwMa"
 );
 
-// Variables globales
-let creations = [];
-let currentZoom = null;
-let currentDelete = null;
-let currentChatUser = localStorage.getItem('currentChatUser') || null;
-let userPhotos = {};
-
+// ====== VARIABLES GLOBALES ======
 const ownerPhoto = document.getElementById('ownerPhoto');
 const prenom = localStorage.getItem('prenom');
-const myPrenom = prenom;
-
-// Éléments DOM
 const chatUserList = document.getElementById('chatUserList');
 const chatMessages = document.getElementById('chatMessages');
 const chatInput = document.getElementById('chatInput');
 const sendMsgBtn = document.getElementById('sendMsgBtn');
+const container = document.getElementById('visitor-list-container');
 const addModal = document.getElementById('addModal');
 const deleteModal = document.getElementById('deleteModal');
 const zoomModal = document.getElementById('zoomModal');
@@ -478,20 +503,24 @@ const icon = document.getElementById('chatResizeIcon');
 const fileBtn = document.getElementById('fileBtn');
 const fileInput = document.getElementById('multiPhoto');
 const fileInfo = document.getElementById('fileInfo');
-const zoomLegend = document.getElementById('zoomLegend');
-
-// Empêche fermeture zoom sur drag
-mainZoom.addEventListener('mousedown', e => e.stopPropagation());
-mainZoom.addEventListener('touchstart', e => e.stopPropagation());
-zoomLegend.addEventListener('mousedown', e => e.stopPropagation());
-zoomLegend.addEventListener('touchstart', e => e.stopPropagation());
 
 fileBtn.onclick = () => fileInput.click();
+
 fileInput.onchange = () => {
-  fileInfo.textContent = fileInput.files.length ? `${fileInput.files.length} photo(s) sélectionnée(s)` : '';
+  fileInfo.textContent = fileInput.files.length
+    ? `${fileInput.files.length} photo(s) sélectionnée(s)`
+    : '';
 };
 
-// Owner photo
+    
+let creations = [];
+let currentZoom = null;
+let currentDelete = null;
+const myPrenom = localStorage.getItem('prenom');
+let currentChatUser = localStorage.getItem('currentChatUser') || null;
+let userPhotos = {};
+
+// ====== OWNER PHOTO ======
 async function loadOwnerPhoto() {
   if (!prenom) return;
   const { data, error } = await supabase.from('profiles').select('photo_url').eq('prenom', prenom).single();
@@ -499,31 +528,53 @@ async function loadOwnerPhoto() {
   ownerPhoto.style.opacity = data?.photo_url ? '1' : '0.3';
 }
 
-// Messagerie
+document.addEventListener('DOMContentLoaded', loadOwnerPhoto);
+window.addEventListener('pageshow', loadOwnerPhoto);
+
+// ====== MESSAGERIE ======
 async function loadMessages() {
   if (!currentChatUser) return;
-  const { data, error } = await supabase.from('messages').select('*')
-    .or(`and(sender.eq.${myPrenom},receiver.eq.${currentChatUser}),and(sender.eq.${currentChatUser},receiver.eq.${myPrenom})`)
+
+  const { data, error } = await supabase
+    .from('messages')
+    .select('*')
+    .or(
+      `and(sender.eq.${myPrenom},receiver.eq.${currentChatUser}),
+       and(sender.eq.${currentChatUser},receiver.eq.${myPrenom})`
+    )
     .order('created_at', { ascending: true });
+
   if (error) return console.error(error);
 
   chatMessages.innerHTML = '';
+
   data.forEach(msg => {
     const div = document.createElement('div');
     div.className = 'msg ' + (msg.sender === myPrenom ? 'msg-me' : 'msg-them');
+
     const circle = document.createElement('img');
-    circle.style.cssText = 'width:24px;height:24px;border-radius:50%;margin-right:6px;vertical-align:middle;';
+    circle.style.width = '24px';
+    circle.style.height = '24px';
+    circle.style.borderRadius = '50%';
+    circle.style.marginRight = '6px';
+    circle.style.verticalAlign = 'middle';
     circle.src = msg.sender === myPrenom ? ownerPhoto.src || 'icon-152.png' : userPhotos[msg.sender] || 'icon-152.png';
+
     const p = document.createElement('p');
-    p.style.cssText = 'display:inline-block;margin:0;';
+    p.style.display = 'inline-block';
+    p.style.margin = 0;
     p.textContent = msg.content;
+
     div.appendChild(circle);
     div.appendChild(p);
+
     chatMessages.appendChild(div);
   });
+
   chatMessages.scrollTop = chatMessages.scrollHeight;
 }
 
+// Envoi message
 sendMsgBtn.onclick = async () => {
   const text = chatInput.value.trim();
   if (!text || !currentChatUser) return;
@@ -532,13 +583,23 @@ sendMsgBtn.onclick = async () => {
   loadMessages();
 };
 
-supabase.channel('public:messages').on('postgres_changes', { event: '*', schema: 'public', table: 'messages' }, payload => {
-  const msg = payload.new;
-  if (!msg || msg.receiver !== prenom) return;
-  if (msg.sender !== currentChatUser) showInAppNotification(msg.sender, msg.content);
-  if (msg.sender === currentChatUser) loadMessages();
-}).subscribe();
+// Temps réel messagerie
+supabase.channel('public:messages').on(
+  'postgres_changes',
+  { event: '*', schema: 'public', table: 'messages' },
+  payload => {
+    const msg = payload.new;
+    if (!msg) return;
 
+    if (msg.receiver === prenom) {
+      if (msg.sender !== currentChatUser) showInAppNotification(msg.sender, msg.content);
+      if (msg.sender === currentChatUser) loadMessages();
+    }
+  }
+).subscribe();
+
+    
+// ====== LOAD USERS ======
 async function loadChatUsers() {
   try {
     const { data: users, error } = await supabase.from('profiles').select('prenom, photo_url').neq('prenom', myPrenom);
@@ -565,6 +626,7 @@ async function loadChatUsers() {
       chatUserList.appendChild(div);
     });
 
+    // Restore active user
     if (currentChatUser) {
       setTimeout(() => {
         document.querySelectorAll('.chat-user').forEach(el => {
@@ -573,9 +635,11 @@ async function loadChatUsers() {
       }, 500);
       loadMessages();
     }
+
   } catch (err) { console.error(err); }
 }
 
+// ====== NOTIFICATIONS ======
 function showInAppNotification(sender, message) {
   if (document.hidden) {
     if (Notification.permission === 'granted') {
@@ -584,25 +648,48 @@ function showInAppNotification(sender, message) {
   } else {
     const notif = document.createElement('div');
     notif.textContent = `${sender} : ${message}`;
-    notif.style.cssText = 'position:fixed;bottom:20px;right:20px;background:#ffb6c1;color:#fff;padding:10px 14px;border-radius:12px;z-index:99999;font-size:12px;';
+    notif.style.cssText = `
+      position:fixed;
+      bottom:20px;
+      right:20px;
+      background:#ffb6c1;
+      color:#fff;
+      padding:10px 14px;
+      border-radius:12px;
+      z-index:99999;
+      font-size:12px;
+    `;
     document.body.appendChild(notif);
     setTimeout(() => notif.remove(), 3000);
   }
 }
 if ('Notification' in window && Notification.permission !== 'granted') Notification.requestPermission();
 
-// Créations
+// ====== CREATIONS ======
+
 async function refreshCreations() {
   try {
-    const { data, error } = await supabase.from('creations').select('*').order('created_at', { ascending: false });
-    if (error) { console.error(error); return; }
+    const { data, error } = await supabase
+      .from('creations')
+      .select('*')
+      .order('created_at', { ascending: false });
+
+    if (error) {
+      console.error(error);
+      return;
+    }
 
     creations = data.map(c => {
       let zoomGroup = [];
+
       if (Array.isArray(c.images) && c.images.length) {
-        zoomGroup = c.images.map(p => supabase.storage.from('images').getPublicUrl(p).data.publicUrl);
+        zoomGroup = c.images.map(p =>
+          supabase.storage.from('images').getPublicUrl(p).data.publicUrl
+        );
       } else if (c.image_path) {
-        zoomGroup = [supabase.storage.from('images').getPublicUrl(c.image_path).data.publicUrl];
+        zoomGroup = [
+          supabase.storage.from('images').getPublicUrl(c.image_path).data.publicUrl
+        ];
       }
 
       return {
@@ -612,113 +699,27 @@ async function refreshCreations() {
         imgUrl: zoomGroup[0] || '',
         zoomGroup,
         likes: Array.isArray(c.likes) ? c.likes : [],
-        comments: Array.isArray(c.comments) ? c.comments : [],
-        x: c.x || 0, y: c.y || 0, scale: c.scale || 1,
-        x_legend: c.x_legend || 0, y_legend: c.y_legend || 0, scale_legend: c.scale_legend || 1
+        comments: Array.isArray(c.comments) ? c.comments : []
       };
     });
 
     renderCreations(creations);
-  } catch (e) { console.error('refreshCreations crash', e); }
-}
 
-function makeDraggable(el, isLegend = false) {
-  let isDragging = false, startX, startY;
-  el.dataset.x = el.dataset.x || 0;
-  el.dataset.y = el.dataset.y || 0;
-  el.dataset.scale = el.dataset.scale || 1;
-
-  el.addEventListener('mousedown', e => { isDragging = true; startX = e.clientX; startY = e.clientY; });
-  document.addEventListener('mousemove', e => {
-    if (!isDragging) return;
-    let newX = parseFloat(el.dataset.x) + (e.clientX - startX);
-    let newY = parseFloat(el.dataset.y) + (e.clientY - startY);
-    el.dataset.x = newX; el.dataset.y = newY;
-    el.style.transform = `translate(${newX}px, ${newY}px) scale(${el.dataset.scale})`;
-    startX = e.clientX; startY = e.clientY;
-    savePosition(newX, newY, isLegend);
-  });
-  document.addEventListener('mouseup', () => { isDragging = false; });
-
-  el.addEventListener('touchstart', e => { isDragging = true; startX = e.touches[0].clientX; startY = e.touches[0].clientY; });
-  el.addEventListener('touchmove', e => {
-    if (!isDragging) return;
-    e.preventDefault();
-    let newX = parseFloat(el.dataset.x) + (e.touches[0].clientX - startX);
-    let newY = parseFloat(el.dataset.y) + (e.touches[0].clientY - startY);
-    el.dataset.x = newX; el.dataset.y = newY;
-    el.style.transform = `translate(${newX}px, ${newY}px) scale(${el.dataset.scale})`;
-    startX = e.touches[0].clientX; startY = e.touches[0].clientY;
-    savePosition(newX, newY, isLegend);
-  }, { passive: false });
-  el.addEventListener('touchend', () => { isDragging = false; });
-}
-
-async function savePosition(x, y, isLegend) {
-  if (!currentZoom || !currentZoom.id) return;
-  if (isLegend) {
-    currentZoom.x_legend = x; currentZoom.y_legend = y; currentZoom.scale_legend = zoomLegend.dataset.scale || 1;
-    await supabase.from('creations').update({ x_legend: x, y_legend: y, scale_legend: zoomLegend.dataset.scale || 1 }).eq('id', currentZoom.id);
-  } else {
-    currentZoom.x = x; currentZoom.y = y; currentZoom.scale = mainZoom.dataset.scale || 1;
-    await supabase.from('creations').update({ x: x, y: y, scale: mainZoom.dataset.scale || 1 }).eq('id', currentZoom.id);
-  }
-  const index = creations.findIndex(c => c.id === currentZoom.id);
-  if (index !== -1) {
-    if (isLegend) { creations[index].x_legend = x; creations[index].y_legend = y; creations[index].scale_legend = zoomLegend.dataset.scale || 1; }
-    else { creations[index].x = x; creations[index].y = y; creations[index].scale = mainZoom.dataset.scale || 1; }
+  } catch (e) {
+    console.error('refreshCreations crash', e);
   }
 }
 
-function makePinchZoom(el, isLegend = false) {
-  el.dataset.scale = el.dataset.scale || 1;
-  let initialDistance = null, initialScale = 1;
-
-  el.addEventListener('wheel', e => {
-    e.preventDefault();
-    let scale = parseFloat(el.dataset.scale);
-    scale += e.deltaY * -0.001;
-    scale = Math.min(Math.max(0.5, scale), 3);
-    el.dataset.scale = scale;
-    el.style.transform = `translate(${el.dataset.x || 0}px,${el.dataset.y || 0}px) scale(${scale})`;
-    savePosition(el.dataset.x, el.dataset.y, isLegend);
-  }, { passive: false });
-
-  el.addEventListener('touchstart', e => {
-    if (e.touches.length === 2) {
-      initialDistance = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
-      initialScale = parseFloat(el.dataset.scale);
-    }
-  });
-
-  el.addEventListener('touchmove', e => {
-    if (e.touches.length === 2 && initialDistance) {
-      e.preventDefault();
-      let currentDistance = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
-      let scale = initialScale * (currentDistance / initialDistance);
-      scale = Math.min(Math.max(0.5, scale), 3);
-      el.dataset.scale = scale;
-      el.style.transform = `translate(${el.dataset.x || 0}px,${el.dataset.y || 0}px) scale(${scale})`;
-      savePosition(el.dataset.x, el.dataset.y, isLegend);
-    }
-  }, { passive: false });
-
-  el.addEventListener('touchend', () => { initialDistance = null; });
-}
-
-makeDraggable(mainZoom, false);
-makeDraggable(zoomLegend, true);
-makePinchZoom(mainZoom, false);
-makePinchZoom(zoomLegend, true);
-mainZoom.dataset.scale = 1;
-
+// ====== RENDER ======
 function renderCreations(list) {
   const container = document.getElementById('visitor-list-container');
   container.innerHTML = '';
+
   let pageDiv = document.createElement('div');
   pageDiv.className = 'page';
 
   list.forEach((c, index) => {
+
     if (index % 6 === 0 && index !== 0) {
       container.appendChild(pageDiv);
       pageDiv = document.createElement('div');
@@ -727,58 +728,65 @@ function renderCreations(list) {
 
     const d = document.createElement('div');
     d.className = 'visitor-item';
-    const delBtn = document.createElement('div');
-    delBtn.className = 'delete-btn';
-    delBtn.textContent = '×';
-    delBtn.onclick = (e) => { e.stopPropagation(); openDeleteModal(c); };
-    d.appendChild(delBtn);
 
     const img = document.createElement('img');
     img.src = c.imgUrl || '';
     img.onclick = () => openZoom(c);
+
     d.appendChild(img);
     pageDiv.appendChild(d);
   });
 
-  if (pageDiv.children.length > 0) container.appendChild(pageDiv);
-}
-
+  container.appendChild(pageDiv);
+}// ====== ZOOM ======
 function openZoom(c) {
-  currentZoom = creations.find(x => x.id === c.id);
+  // on récupère la création complète
+  currentZoom = creations.find(x => x.id === c.id) || c;
+
+  // sécurité si jamais ça n'existe pas
   if (!currentZoom) return;
 
+  // image principale
   mainZoom.src = currentZoom.imgUrl || '';
-  zoomLegend.textContent = currentZoom.legend || 'Aucune légende';
 
-  mainZoom.dataset.x = currentZoom.x ?? 0; mainZoom.dataset.y = currentZoom.y ?? 0; mainZoom.dataset.scale = currentZoom.scale ?? 1;
-  mainZoom.style.transform = `translate(${mainZoom.dataset.x}px, ${mainZoom.dataset.y}px) scale(${mainZoom.dataset.scale})`;
+  // légende à droite
+  const legendBox = document.getElementById('zoomLegend');
+  if (legendBox) {
+    legendBox.textContent = currentZoom.legend ? currentZoom.legend : 'Aucune légende';
+  }
 
-  zoomLegend.dataset.x = currentZoom.x_legend ?? 0; zoomLegend.dataset.y = currentZoom.y_legend ?? 0; zoomLegend.dataset.scale = currentZoom.scale_legend ?? 1;
-  zoomLegend.style.transform = `translate(${zoomLegend.dataset.x}px, ${zoomLegend.dataset.y}px) scale(${zoomLegend.dataset.scale})`;
-
+  // miniatures
   thumbs.innerHTML = '';
-  (currentZoom.zoomGroup || []).forEach(u => {
-    const t = document.createElement('img');
-    t.src = u;
-    t.onclick = () => mainZoom.src = u;
-    thumbs.appendChild(t);
-  });
+  if (Array.isArray(currentZoom.zoomGroup)) {
+    currentZoom.zoomGroup.forEach(u => {
+      const t = document.createElement('img');
+      t.src = u;
+      t.style.cursor = 'pointer';
+      t.onclick = () => mainZoom.src = u;
+      thumbs.appendChild(t);
+    });
+  }
 
+  // likes + commentaires
   renderLikeList();
   renderCommentList();
+
+  // affichage du zoom
   zoomModal.style.display = 'flex';
-  document.body.classList.add('modal-open');
-  document.body.style.overflow = 'hidden';
+}
+function updateActions() {
+  if (!currentZoom) return;
+  likeCount.textContent = (currentZoom.likes || []).length;
+  commentCount.textContent = (currentZoom.comments || []).length;
 }
 
-// Likes et commentaires
+// ====== LIKE / COMMENT MODAL ======
 document.getElementById('likeBtn').onclick = () => {
   if (!currentZoom) { alert("Sélectionnez d'abord une image !"); return; }
   likeNameInput.value = myPrenom || '';
   renderLikeList();
   likeModal.style.display = 'flex';
 };
-
 confirmLike.onclick = async () => {
   if (!currentZoom) return;
   const name = likeNameInput.value.trim();
@@ -797,7 +805,6 @@ document.getElementById('commentBtn').onclick = () => {
   renderCommentList();
   commentModal.style.display = 'flex';
 };
-
 confirmComment.onclick = async () => {
   if (!currentZoom) return;
   const name = commentNameInput.value.trim();
@@ -816,7 +823,11 @@ function renderLikeList() {
   likeBubbles.innerHTML = '';
   (currentZoom.likes || []).forEach(l => {
     const div = document.createElement('div');
-    div.innerHTML = `${l.photo ? `<img src="${l.photo}" style="width:20px;height:20px;border-radius:50%;margin-right:4px;vertical-align:middle;">` : ''}<strong>${l.name}</strong>`;
+    div.className = 'like-item';
+    div.innerHTML = `
+  ${l.photo ? `<img src="${l.photo}" style="width:20px;height:20px;border-radius:50%;margin-right:4px;vertical-align:middle;">` : ''}
+  <strong>${l.name}</strong>
+`;
     likeBubbles.appendChild(div);
   });
   likeCount.textContent = (currentZoom.likes || []).length;
@@ -827,26 +838,26 @@ function renderCommentList() {
   commentBubbles.innerHTML = '';
   (currentZoom.comments || []).forEach(c => {
     const div = document.createElement('div');
-    div.innerHTML = `${c.photo ? `<img src="${c.photo}" style="width:20px;height:20px;border-radius:50%;margin-right:4px;vertical-align:middle;">` : ''}<strong>${c.name}</strong>: ${c.text}`;
+    div.className = 'comment-item';
+    div.innerHTML = `
+  ${c.photo ? `<img src="${c.photo}" style="width:20px;height:20px;border-radius:50%;margin-right:4px;vertical-align:middle;">` : ''}
+  <strong>${c.name}</strong>: ${c.text}
+`;
     commentBubbles.appendChild(div);
   });
   commentCount.textContent = (currentZoom.comments || []).length;
 }
 
-// Add creation
+// ====== ADD CREATION ======
 document.getElementById('addBtn').onclick = () => addModal.style.display = 'flex';
-document.querySelector('#addModal .modal-box').addEventListener('click', e => e.stopPropagation());
-addModal.addEventListener('click', e => {
-  if (e.target === addModal) {
-    addModal.style.display = 'none';
-    document.getElementById('photoName').value = '';
-    document.getElementById('photoLegend').value = '';
-    document.getElementById('multiPhoto').value = '';
-    fileInfo.textContent = '';
-  }
+
+// Fermer modal en cliquant sur le fond
+addModal.addEventListener('click', e => { 
+  if (e.target === addModal) addModal.style.display = 'none'; 
 });
 
-document.getElementById('confirmAdd').onclick = async () => {
+document.getElementById('confirmAdd').onclick = async e => {
+  e.stopPropagation();
   const name = document.getElementById('photoName').value.trim();
   const legend = document.getElementById('photoLegend').value.trim();
   const files = document.getElementById('multiPhoto').files;
@@ -856,78 +867,43 @@ document.getElementById('confirmAdd').onclick = async () => {
     return; 
   }
 
-  alert(`Début: ${files.length} fichiers à uploader`);
+  const paths = [];
+  const urls = [];
 
-  try {
-    const paths = [];
-    
-    for (let i = 0; i < files.length; i++) {
-      const file = files[i];
-      const path = `${Date.now()}_${Math.random().toString(36).substr(2, 9)}_${file.name}`;
-      
-      const { data: uploadData, error: uploadError } = await supabase.storage
-        .from('images')
-        .upload(path, file);
-      
-      if (uploadError) { 
-        alert(`ERREUR UPLOAD ${i+1}:\n${uploadError.message}`);
-        continue; 
-      }
-      
-      paths.push(path);
+  for (let file of files) {
+    const path = `${Date.now()}_${file.name}`;
+    const { error: uploadError } = await supabase.storage.from('images').upload(path, file);
+    if (uploadError) { 
+      console.error(uploadError); 
+      continue; 
     }
 
-    if (!paths.length) {
-      alert('Aucune image uploadée');
-      return;
-    }
-
-    alert(`${paths.length} images uploadées ✓\nMaintenant insertion en base...`);
-
-    const payload = {
-      name,
-      legend: legend || '',
-      image_path: paths[0],
-      images: paths,
-      likes: [],
-      comments: [],
-      x: 0, 
-      y: 0, 
-      scale: 1,
-      x_legend: 0, 
-      y_legend: 0, 
-      scale_legend: 1
-    };
-
-    const { data: insertData, error: insertError } = await supabase
-      .from('creations')
-      .insert([payload])
-      .select();
-
-    if (insertError) {
-      alert(`ERREUR INSERTION:\nCode: ${insertError.code}\nMessage: ${insertError.message}\nDétails: ${insertError.details || 'aucun'}`);
-      return;
-    }
-
-    alert('Insertion réussie ✓\nMaintenant refresh...');
-
-    // Reset modal
-    addModal.style.display = 'none';
-    document.getElementById('photoName').value = '';
-    document.getElementById('photoLegend').value = '';
-    document.getElementById('multiPhoto').value = '';
-    fileInfo.textContent = '';
-
-    await refreshCreations();
-    
-    alert('✅ Tout est OK ! Création ajoutée');
-
-  } catch (error) {
-    alert(`CRASH TOTAL:\n${error.message}\n\nStack:\n${error.stack}`);
+    const { data: pubData } = supabase.storage.from('images').getPublicUrl(path);
+    if (!pubData?.publicUrl) continue;
+    urls.push(pubData.publicUrl);
+    paths.push(path);
   }
+
+  if (!urls.length) return;
+
+  await supabase.from('creations').insert([{
+    name,
+    legend,
+    image_path: paths[0], // première image pour l'affichage principal
+    images: paths,
+    likes: [],
+    comments: []
+  }]);
+
+  // Reset modal et refresh
+  addModal.style.display = 'none';
+  document.getElementById('photoName').value = '';
+  document.getElementById('multiPhoto').value = '';
+  document.getElementById('photoLegend').value = '';
+  await refreshCreations();
 };
 
-// Delete creation
+// ====== DELETE CREATION ======
 function openDeleteModal(c) { currentDelete = c; deleteModal.style.display = 'flex'; }
 document.getElementById('cancelDelete').onclick = () => { currentDelete = null; deleteModal.style.display = 'none'; };
 document.getElementById('confirmDelete').onclick = async () => {
@@ -938,49 +914,56 @@ document.getElementById('confirmDelete').onclick = async () => {
   await refreshCreations();
 };
 
-// Sidebar
-document.getElementById('pelotesBtn').onclick = () => { document.body.style.opacity = '0'; setTimeout(() => window.location.href = 'pelotes.html', 500); };
-document.getElementById('videoBtn').onclick = () => { document.body.style.opacity = '0'; setTimeout(() => window.location.href = 'video.html', 500); };
-document.getElementById('notesBtn').onclick = () => { document.body.style.opacity = '0'; setTimeout(() => window.location.href = 'notes.html', 500); };
-document.getElementById('messagerieBtn').onclick = () => { chatModal.style.display = 'flex'; };
+// ====== SIDEBAR ======
+document.getElementById('pelotesBtn').onclick = () => { document.body.style.opacity='0'; setTimeout(()=>window.location.href='pelotes.html',500); };
+document.getElementById('videoBtn').onclick = () => { document.body.style.opacity='0'; setTimeout(()=>window.location.href='video.html',500); };
+document.getElementById('notesBtn').onclick = () => { document.body.style.opacity='0'; setTimeout(()=>window.location.href='notes.html',500); };
+document.getElementById('messagerieBtn').onclick = () => { chatModal.style.display='flex'; };
 document.getElementById('toggleSidebar').onclick = () => sidebar.classList.toggle('sidebar-open');
-document.getElementById('actualiteBtn').onclick = () => { document.body.style.opacity = '0'; setTimeout(() => window.location.href = 'actualite.html', 300); };
-
-// Modals fermeture
-chatModal.addEventListener('click', (e) => { if (e.target === chatModal) chatModal.style.display = 'none'; });
-document.querySelector('.chat-window').addEventListener('click', (e) => e.stopPropagation());
-
-[zoomModal, likeModal, commentModal, deleteModal].forEach(m => {
-  m.onclick = e => { if (e.target === m) m.style.display = 'none'; }
-});
-
-document.querySelector('.closeZoom').onclick = () => { zoomModal.style.display = 'none'; document.body.style.overflow = ''; };
-zoomModal.addEventListener('click', (e) => { if (e.target === zoomModal) { zoomModal.style.display = 'none'; document.body.style.overflow = ''; } });
-
-// Chat resize
-toggleChatSize.onclick = () => {
-  chatModal.classList.toggle('expanded');
-  icon.innerHTML = chatModal.classList.contains('expanded') ? '<path d="M9 4H4v5M15 20h5v-5M20 9V4h-5M4 15v5h5"/>' : '<path d="M4 9V4h5M20 15v5h-5M15 4h5v5M9 20H4v-5"/>';
-};
-
-let initialDistance = null;
-chatModal.addEventListener('touchstart', e => { if (e.touches.length === 2) initialDistance = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY); });
-chatModal.addEventListener('touchmove', e => {
-  if (e.touches.length === 2 && initialDistance) {
-    const currentDistance = Math.hypot(e.touches[0].clientX - e.touches[1].clientX, e.touches[0].clientY - e.touches[1].clientY);
-    if (currentDistance - initialDistance > 40) chatModal.classList.add('expanded');
-    if (initialDistance - currentDistance > 40) chatModal.classList.remove('expanded');
+// ====== FERMETURE MESSAGERIE AU CLIC DANS LE VIDE ======
+chatModal.addEventListener('click', (e) => {
+  // si on clique sur le fond (overlay)
+  if (e.target === chatModal) {
+    chatModal.style.display = 'none';
   }
 });
-chatModal.addEventListener('touchend', () => { initialDistance = null; });
 
-// Initial load
-document.addEventListener('DOMContentLoaded', loadOwnerPhoto);
-window.addEventListener('pageshow', loadOwnerPhoto);
+// empêcher la fermeture quand on clique dans la fenêtre
+document.querySelector('.chat-window').addEventListener('click', (e) => {
+  e.stopPropagation();
+});
+// ====== MODALS ======
+[zoomModal, likeModal, commentModal, deleteModal, addModal].forEach(m => {
+  m.onclick = e => { if (e.target === m) m.style.display = 'none'; }
+});
+document.querySelector('.closeZoom').onclick = () => zoomModal.style.display = 'none';
+
+// ====== CHAT MODAL ======
+toggleChatSize.onclick = () => {
+  chatModal.classList.toggle('expanded');
+  icon.innerHTML = chatModal.classList.contains('expanded')
+    ? '<path d="M9 4H4v5M15 20h5v-5M20 9V4h-5M4 15v5h5"/>'
+    : '<path d="M4 9V4h5M20 15v5h-5M15 4h5v5M9 20H4v-5"/>';
+};
+
+// Pinch zoom deux doigts
+let initialDistance = null;
+chatModal.addEventListener('touchstart', e => { if(e.touches.length===2) initialDistance=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY); });
+chatModal.addEventListener('touchmove', e => {
+  if (e.touches.length===2 && initialDistance) {
+    const currentDistance=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);
+    if(currentDistance-initialDistance>40) chatModal.classList.add('expanded');
+    if(initialDistance-currentDistance>40) chatModal.classList.remove('expanded');
+  }
+});
+chatModal.addEventListener('touchend',()=>{initialDistance=null;});
+
+// ====== INITIAL LOAD ======
 refreshCreations();
 loadOwnerPhoto();
 loadChatUsers();
 </script>
+
 
 </body>
 </html>
