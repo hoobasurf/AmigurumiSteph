@@ -11,8 +11,9 @@
 * { box-sizing:border-box; margin:0; padding:0; font-family:'Comic Sans MS',cursive; }
 html, body { 
 min-height:100%; 
-background: url('2A108385-A26A-4390-A0F8-635DD2C93625.png') center center fixed;
-background-size: cover;
+background: url('2A108385-A26A-4390-A0F8-635DD2C93625.png') center top no-repeat;
+background-size: contain;
+background-attachment: scroll;
 overflow-y:auto; 
 }
 
@@ -88,8 +89,8 @@ box-shadow: 0 0 15px rgba(255,182,193,0.8);
 margin:20px auto;
 width:90%;
 max-width:600px;
-background:rgba(255,255,255,0.5);
-backdrop-filter: blur(8px);
+background:transparent;
+backdrop-filter: none;
 border:3px solid #FFB6C1;
 border-radius:20px;
 padding:20px;
@@ -253,12 +254,12 @@ padding-bottom:40px;
 
 /* ====== POST ====== */
 .post {
-background:rgba(255,255,255,0.4);
-backdrop-filter: blur(8px);
+background:transparent;
+backdrop-filter: none;
 border:3px solid #FFB6C1;
 border-radius:20px;
 padding:20px;
-box-shadow: 0 0 25px rgba(255,182,193,0.6);
+animation: neonPulse 2s ease-in-out infinite;
 transition: all 0.3s;
 }
 
@@ -363,14 +364,14 @@ grid-template-columns: 1fr 1fr;
 .post-photos img {
 width:100%;
 height:auto;
-max-height:500px;
-object-fit:contain;
+min-height:400px;
+max-height:800px;
+object-fit:cover;
 cursor:pointer;
 transition:all 0.3s;
 border:3px solid #FFB6C1;
 border-radius:10px;
 box-shadow: 0 0 15px rgba(255,182,193,0.5);
-background:#000;
 }
 
 .post-photos img:hover {
