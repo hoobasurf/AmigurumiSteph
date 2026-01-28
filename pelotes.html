@@ -61,6 +61,63 @@ body {
   box-shadow: 0 0 20px rgba(255,255,255,0.8);
 }
 
+/* Poignées de redimensionnement */
+.resize-handle {
+  position: absolute;
+  background: rgba(255, 255, 255, 0.8);
+  border: 2px solid #333;
+  z-index: 10;
+  pointer-events: auto;
+}
+
+/* Poignée coin bas-droit (les deux dimensions) */
+.resize-se {
+  bottom: -6px;
+  right: -6px;
+  width: 12px;
+  height: 12px;
+  cursor: nwse-resize;
+  border-radius: 50%;
+  background: rgba(0, 255, 0, 0.9);
+}
+
+/* Poignée droite (largeur) */
+.resize-e {
+  top: 50%;
+  right: -6px;
+  width: 12px;
+  height: 12px;
+  transform: translateY(-50%);
+  cursor: ew-resize;
+  border-radius: 50%;
+  background: rgba(255, 200, 0, 0.9);
+}
+
+/* Poignée bas (hauteur) */
+.resize-s {
+  bottom: -6px;
+  left: 50%;
+  width: 12px;
+  height: 12px;
+  transform: translateX(-50%);
+  cursor: ns-resize;
+  border-radius: 50%;
+  background: rgba(0, 200, 255, 0.9);
+}
+
+.resize-handle:hover {
+  transform: scale(1.3);
+  box-shadow: 0 0 10px rgba(255,255,255,0.8);
+}
+
+.resize-e:hover {
+  transform: translateY(-50%) scale(1.3);
+}
+
+.resize-s:hover {
+  transform: translateX(-50%) scale(1.3);
+}
+
 /* Cadre Hobbii */
 #hobbii{
   background: rgba(0, 255, 0, 0.6);
@@ -182,32 +239,117 @@ body {
 
 <div id="workspace">
   <!-- Cadre Hobbii -->
-  <div id="hobbii" class="draggable">🛒 HOBBII</div>
+  <div id="hobbii" class="draggable">
+    🛒 HOBBII
+    <div class="resize-handle resize-se"></div>
+    <div class="resize-handle resize-e"></div>
+    <div class="resize-handle resize-s"></div>
+  </div>
 
   <!-- 16 Tiroirs - Disposition en grille 4x4 -->
   <!-- Ligne 1 -->
-  <div class="drawer draggable" data-num="1" data-name="Blanc" style="top:200px; left:100px">1-Blanc</div>
-  <div class="drawer draggable" data-num="2" data-name="Écru/Ivoire" style="top:200px; left:230px">2-Écru</div>
-  <div class="drawer draggable" data-num="3" data-name="Beige" style="top:200px; left:360px">3-Beige</div>
-  <div class="drawer draggable" data-num="4" data-name="Marron" style="top:200px; left:490px">4-Marron</div>
+  <div class="drawer draggable" data-num="1" data-name="Blanc" style="top:200px; left:100px">
+    1-Blanc
+    <div class="resize-handle resize-se"></div>
+    <div class="resize-handle resize-e"></div>
+    <div class="resize-handle resize-s"></div>
+  </div>
+  <div class="drawer draggable" data-num="2" data-name="Écru/Ivoire" style="top:200px; left:230px">
+    2-Écru
+    <div class="resize-handle resize-se"></div>
+    <div class="resize-handle resize-e"></div>
+    <div class="resize-handle resize-s"></div>
+  </div>
+  <div class="drawer draggable" data-num="3" data-name="Beige" style="top:200px; left:360px">
+    3-Beige
+    <div class="resize-handle resize-se"></div>
+    <div class="resize-handle resize-e"></div>
+    <div class="resize-handle resize-s"></div>
+  </div>
+  <div class="drawer draggable" data-num="4" data-name="Marron" style="top:200px; left:490px">
+    4-Marron
+    <div class="resize-handle resize-se"></div>
+    <div class="resize-handle resize-e"></div>
+    <div class="resize-handle resize-s"></div>
+  </div>
 
   <!-- Ligne 2 -->
-  <div class="drawer draggable" data-num="5" data-name="Gris" style="top:260px; left:100px">5-Gris</div>
-  <div class="drawer draggable" data-num="6" data-name="Noir" style="top:260px; left:230px">6-Noir</div>
-  <div class="drawer draggable" data-num="7" data-name="Jaune" style="top:260px; left:360px">7-Jaune</div>
-  <div class="drawer draggable" data-num="8" data-name="Orange" style="top:260px; left:490px">8-Orange</div>
+  <div class="drawer draggable" data-num="5" data-name="Gris" style="top:260px; left:100px">
+    5-Gris
+    <div class="resize-handle resize-se"></div>
+    <div class="resize-handle resize-e"></div>
+    <div class="resize-handle resize-s"></div>
+  </div>
+  <div class="drawer draggable" data-num="6" data-name="Noir" style="top:260px; left:230px">
+    6-Noir
+    <div class="resize-handle resize-se"></div>
+    <div class="resize-handle resize-e"></div>
+    <div class="resize-handle resize-s"></div>
+  </div>
+  <div class="drawer draggable" data-num="7" data-name="Jaune" style="top:260px; left:360px">
+    7-Jaune
+    <div class="resize-handle resize-se"></div>
+    <div class="resize-handle resize-e"></div>
+    <div class="resize-handle resize-s"></div>
+  </div>
+  <div class="drawer draggable" data-num="8" data-name="Orange" style="top:260px; left:490px">
+    8-Orange
+    <div class="resize-handle resize-se"></div>
+    <div class="resize-handle resize-e"></div>
+    <div class="resize-handle resize-s"></div>
+  </div>
 
   <!-- Ligne 3 -->
-  <div class="drawer draggable" data-num="9" data-name="Rouge" style="top:320px; left:100px">9-Rouge</div>
-  <div class="drawer draggable" data-num="10" data-name="Rose" style="top:320px; left:230px">10-Rose</div>
-  <div class="drawer draggable" data-num="11" data-name="Violet" style="top:320px; left:360px">11-Violet</div>
-  <div class="drawer draggable" data-num="12" data-name="Bleu" style="top:320px; left:490px">12-Bleu</div>
+  <div class="drawer draggable" data-num="9" data-name="Rouge" style="top:320px; left:100px">
+    9-Rouge
+    <div class="resize-handle resize-se"></div>
+    <div class="resize-handle resize-e"></div>
+    <div class="resize-handle resize-s"></div>
+  </div>
+  <div class="drawer draggable" data-num="10" data-name="Rose" style="top:320px; left:230px">
+    10-Rose
+    <div class="resize-handle resize-se"></div>
+    <div class="resize-handle resize-e"></div>
+    <div class="resize-handle resize-s"></div>
+  </div>
+  <div class="drawer draggable" data-num="11" data-name="Violet" style="top:320px; left:360px">
+    11-Violet
+    <div class="resize-handle resize-se"></div>
+    <div class="resize-handle resize-e"></div>
+    <div class="resize-handle resize-s"></div>
+  </div>
+  <div class="drawer draggable" data-num="12" data-name="Bleu" style="top:320px; left:490px">
+    12-Bleu
+    <div class="resize-handle resize-se"></div>
+    <div class="resize-handle resize-e"></div>
+    <div class="resize-handle resize-s"></div>
+  </div>
 
   <!-- Ligne 4 -->
-  <div class="drawer draggable" data-num="13" data-name="Vert" style="top:380px; left:100px">13-Vert</div>
-  <div class="drawer draggable" data-num="14" data-name="Turquoise" style="top:380px; left:230px">14-Turquoise</div>
-  <div class="drawer draggable" data-num="15" data-name="Multicolore" style="top:380px; left:360px">15-Multi</div>
-  <div class="drawer draggable" data-num="16" data-name="Metal/Argent" style="top:380px; left:490px">16-Metal</div>
+  <div class="drawer draggable" data-num="13" data-name="Vert" style="top:380px; left:100px">
+    13-Vert
+    <div class="resize-handle resize-se"></div>
+    <div class="resize-handle resize-e"></div>
+    <div class="resize-handle resize-s"></div>
+  </div>
+  <div class="drawer draggable" data-num="14" data-name="Turquoise" style="top:380px; left:230px">
+    14-Turquoise
+    <div class="resize-handle resize-se"></div>
+    <div class="resize-handle resize-e"></div>
+    <div class="resize-handle resize-s"></div>
+  </div>
+  <div class="drawer draggable" data-num="15" data-name="Multicolore" style="top:380px; left:360px">
+    15-Multi
+    <div class="resize-handle resize-se"></div>
+    <div class="resize-handle resize-e"></div>
+    <div class="resize-handle resize-s"></div>
+  </div>
+  <div class="drawer draggable" data-num="16" data-name="Metal/Argent" style="top:380px; left:490px">
+    16-Metal
+    <div class="resize-handle resize-se"></div>
+    <div class="resize-handle resize-e"></div>
+    <div class="resize-handle resize-s"></div>
+  </div>
 </div>
 
 <!-- Bouton pour cacher/afficher le panel -->
@@ -219,9 +361,10 @@ body {
   <div class="info">
     <strong>Instructions :</strong><br>
     • Glissez les rectangles sur l'image<br>
-    • VERT = zone Hobbii<br>
-    • ROUGE = tiroirs<br>
-    • Cliquez "Générer" pour obtenir le code
+    • <span style="color:lime">●</span> Vert = coin (L+H)<br>
+    • <span style="color:orange">●</span> Orange = largeur<br>
+    • <span style="color:cyan">●</span> Cyan = hauteur<br>
+    • Cliquez "Générer" pour le code
   </div>
 
   <button class="btn" onclick="generate()">🔧 Générer le Code</button>
@@ -233,10 +376,14 @@ body {
 
 <script>
 let activeElement = null;
+let resizeElement = null;
+let resizeType = null;
 let startX = 0;
 let startY = 0;
 let startLeft = 0;
 let startTop = 0;
+let startWidth = 0;
+let startHeight = 0;
 
 // Initialiser tous les draggables
 document.querySelectorAll('.draggable').forEach(elem => {
@@ -244,9 +391,15 @@ document.querySelectorAll('.draggable').forEach(elem => {
   elem.addEventListener('touchstart', startDrag);
 });
 
+// Initialiser toutes les poignées de redimensionnement
+document.querySelectorAll('.resize-handle').forEach(handle => {
+  handle.addEventListener('mousedown', startResize);
+  handle.addEventListener('touchstart', startResize);
+});
+
 function startDrag(e) {
-  // Ignorer si on clique sur le panel
-  if (e.target.closest('#panel')) return;
+  // Ignorer si on clique sur le panel ou une poignée
+  if (e.target.closest('#panel') || e.target.closest('.resize-handle')) return;
   
   activeElement = e.target.closest('.draggable');
   if (!activeElement) return;
@@ -294,6 +447,81 @@ function stopDrag() {
   document.removeEventListener('mouseup', stopDrag);
   document.removeEventListener('touchmove', doDrag);
   document.removeEventListener('touchend', stopDrag);
+}
+
+// REDIMENSIONNEMENT
+function startResize(e) {
+  e.stopPropagation();
+  
+  resizeElement = e.target.closest('.draggable');
+  if (!resizeElement) return;
+  
+  resizeElement.classList.add('active');
+  
+  // Déterminer le type de redimensionnement
+  if (e.target.classList.contains('resize-se')) {
+    resizeType = 'se'; // Les deux dimensions
+  } else if (e.target.classList.contains('resize-e')) {
+    resizeType = 'e'; // Largeur seulement
+  } else if (e.target.classList.contains('resize-s')) {
+    resizeType = 's'; // Hauteur seulement
+  }
+  
+  const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+  const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+  
+  startX = clientX;
+  startY = clientY;
+  
+  const style = window.getComputedStyle(resizeElement);
+  startWidth = parseInt(style.width);
+  startHeight = parseInt(style.height);
+  
+  document.addEventListener('mousemove', doResize);
+  document.addEventListener('mouseup', stopResize);
+  document.addEventListener('touchmove', doResize);
+  document.addEventListener('touchend', stopResize);
+  
+  e.preventDefault();
+}
+
+function doResize(e) {
+  if (!resizeElement) return;
+  
+  const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+  const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+  
+  const dx = clientX - startX;
+  const dy = clientY - startY;
+  
+  if (resizeType === 'se') {
+    // Redimensionner largeur et hauteur
+    const newWidth = Math.max(50, startWidth + dx);
+    const newHeight = Math.max(30, startHeight + dy);
+    resizeElement.style.width = newWidth + 'px';
+    resizeElement.style.height = newHeight + 'px';
+  } else if (resizeType === 'e') {
+    // Redimensionner largeur seulement
+    const newWidth = Math.max(50, startWidth + dx);
+    resizeElement.style.width = newWidth + 'px';
+  } else if (resizeType === 's') {
+    // Redimensionner hauteur seulement
+    const newHeight = Math.max(30, startHeight + dy);
+    resizeElement.style.height = newHeight + 'px';
+  }
+}
+
+function stopResize() {
+  if (resizeElement) {
+    resizeElement.classList.remove('active');
+    resizeElement = null;
+    resizeType = null;
+  }
+  
+  document.removeEventListener('mousemove', doResize);
+  document.removeEventListener('mouseup', stopResize);
+  document.removeEventListener('touchmove', doResize);
+  document.removeEventListener('touchend', stopResize);
 }
 
 // Toggle panel
@@ -375,7 +603,7 @@ function copy() {
 
 // Empêcher la sélection de texte pendant le drag
 document.addEventListener('selectstart', (e) => {
-  if (activeElement) e.preventDefault();
+  if (activeElement || resizeElement) e.preventDefault();
 });
 </script>
 
