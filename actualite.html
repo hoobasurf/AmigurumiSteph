@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
@@ -8,193 +9,504 @@
 <style>
 /* ====== RESET ====== */
 * { box-sizing:border-box; margin:0; padding:0; font-family:'Comic Sans MS',cursive; }
-html, body { height:100%; background:#ffe6f0; overflow-y:auto; }
+html, body { min-height:100%; background:#ffe6f0; overflow-y:auto; }
 
 /* ====== HEADER ====== */
 header {
-  position: sticky;
-  top:0;
-  background: linear-gradient(#ffd6e6,#ffb6c1);
-  height:60px;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  font-weight:bold;
-  color:#b84c6f;
-  font-size:22px;
-  border-bottom:2px solid #b67385;
-  z-index:100;
+position: sticky;
+top:0;
+background: linear-gradient(135deg, #ffd6e6,#ffb6c1);
+height:60px;
+display:flex;
+align-items:center;
+justify-content:center;
+font-weight:bold;
+color:#b84c6f;
+font-size:22px;
+border-bottom:3px solid #b67385;
+z-index:100;
+box-shadow: 0 2px 8px rgba(184,76,111,0.2);
 }
 
 /* ====== NEW POST BOX ====== */
 #newPostBox {
-  margin:16px auto;
-  width:90%;
-  background:rgba(255,245,250,0.8);
-  backdrop-filter: blur(6px);
-  border:2px solid #b67385;
-  border-radius:16px;
-  padding:12px;
-  display:flex;
-  flex-direction:column;
-  gap:8px;
+margin:20px auto;
+width:90%;
+max-width:600px;
+background:rgba(255,255,255,0.95);
+backdrop-filter: blur(10px);
+border:2px solid #b67385;
+border-radius:16px;
+padding:16px;
+box-shadow: 0 4px 12px rgba(184,76,111,0.15);
 }
+
+.new-post-header {
+display:flex;
+align-items:center;
+gap:12px;
+margin-bottom:12px;
+}
+
+.new-post-header img {
+width:40px;
+height:40px;
+border-radius:50%;
+border:2px solid #ffb6c1;
+}
+
 #newPostBox textarea {
-  width:100%;
-  border-radius:12px;
-  border:2px solid #b67385;
-  padding:6px 10px;
-  font-size:14px;
-  resize:none;
-  height:80px;
-  background:#fff;
+width:100%;
+border-radius:12px;
+border:2px solid #b67385;
+padding:12px;
+font-size:15px;
+resize:none;
+min-height:80px;
+background:#fff;
+font-family:‘Comic Sans MS’,cursive;
 }
-#newPostBox button {
-  align-self:flex-end;
-  background:#ffb6c1;
-  border:none;
-  color:#fff;
-  font-weight:bold;
-  border-radius:12px;
-  padding:6px 12px;
-  cursor:pointer;
-  transition:transform 0.15s;
+
+#newPostBox textarea:focus {
+outline:none;
+border-color:#ff69b4;
 }
-#newPostBox button:hover { transform: scale(1.05); }
+
+.post-footer {
+display:flex;
+justify-content:flex-end;
+margin-top:12px;
+}
+
+#postBtn {
+background:linear-gradient(135deg, #ffb6c1, #ff69b4);
+border:none;
+color:#fff;
+font-weight:bold;
+border-radius:12px;
+padding:10px 24px;
+cursor:pointer;
+transition:all 0.2s;
+font-size:15px;
+}
+
+#postBtn:hover {
+transform: scale(1.05);
+box-shadow: 0 4px 12px rgba(255,105,180,0.4);
+}
 
 /* ====== FEED ====== */
 #feed {
-  margin:16px auto;
-  width:90%;
-  display:flex;
-  flex-direction:column;
-  gap:16px;
+margin:20px auto;
+width:90%;
+max-width:600px;
+display:flex;
+flex-direction:column;
+gap:20px;
+padding-bottom:40px;
 }
 
 /* ====== POST ====== */
 .post {
-  background:rgba(255,245,250,0.85);
-  backdrop-filter: blur(6px);
-  border:2px solid #b67385;
-  border-radius:16px;
-  padding:12px;
-  display:flex;
-  flex-direction:column;
-  gap:8px;
+background:rgba(255,255,255,0.95);
+backdrop-filter: blur(10px);
+border:2px solid #b67385;
+border-radius:16px;
+padding:16px;
+box-shadow: 0 4px 12px rgba(184,76,111,0.15);
+transition: transform 0.2s;
+}
+
+.post:hover {
+transform: translateY(-2px);
+box-shadow: 0 6px 16px rgba(184,76,111,0.2);
 }
 
 .post-header {
-  display:flex;
-  align-items:center;
-  gap:8px;
+display:flex;
+align-items:center;
+justify-content:space-between;
+margin-bottom:12px;
 }
-.post-header img {
-  width:32px;
-  height:32px;
-  border-radius:50%;
+
+.post-author {
+display:flex;
+align-items:center;
+gap:12px;
 }
-.post-header .name { font-weight:bold; color:#b84c6f; }
 
-.post-content { font-size:14px; color:#b84c6f; }
+.post-author img {
+width:40px;
+height:40px;
+border-radius:50%;
+border:2px solid #ffb6c1;
+}
 
+.post-author-info {
+display:flex;
+flex-direction:column;
+}
+
+.post-author-name {
+font-weight:bold;
+color:#b84c6f;
+font-size:15px;
+}
+
+.post-timestamp {
+font-size:12px;
+color:#999;
+}
+
+.post-delete {
+background:transparent;
+border:none;
+color:#999;
+cursor:pointer;
+font-size:20px;
+padding:4px 8px;
+border-radius:8px;
+transition:all 0.2s;
+}
+
+.post-delete:hover {
+background:#ffe6f0;
+color:#b84c6f;
+}
+
+.post-content {
+font-size:15px;
+color:#333;
+line-height:1.5;
+margin-bottom:12px;
+word-wrap:break-word;
+}
+
+/* ====== STATS BAR ====== */
+.post-stats {
+display:flex;
+justify-content:space-between;
+padding:8px 0;
+border-bottom:1px solid #ffe6f0;
+margin-bottom:8px;
+font-size:13px;
+color:#666;
+}
+
+.likes-count, .comments-count {
+cursor:pointer;
+transition:color 0.2s;
+}
+
+.likes-count:hover, .comments-count:hover {
+color:#b84c6f;
+text-decoration:underline;
+}
+
+/* ====== POST ACTIONS ====== */
 .post-actions {
-  display:flex;
-  align-items:center;
-  gap:16px;
+display:flex;
+gap:8px;
+padding:8px 0;
+border-bottom:1px solid #ffe6f0;
 }
-.post-actions button {
-  background:transparent;
-  border:none;
-  cursor:pointer;
-  color:#b84c6f;
-  font-weight:bold;
-  display:flex;
-  align-items:center;
-  gap:4px;
-  font-size:14px;
-}
-.post-actions button:hover { transform: scale(1.1); }
 
-.comments {
-  margin-top:8px;
-  display:flex;
-  flex-direction:column;
-  gap:4px;
+.post-actions button {
+flex:1;
+background:transparent;
+border:none;
+cursor:pointer;
+color:#666;
+font-weight:bold;
+display:flex;
+align-items:center;
+justify-content:center;
+gap:6px;
+font-size:14px;
+padding:8px;
+border-radius:8px;
+transition:all 0.2s;
 }
+
+.post-actions button:hover {
+background:#ffe6f0;
+color:#b84c6f;
+}
+
+.post-actions button.liked {
+color:#ff1493;
+}
+
+/* ====== COMMENT SECTION ====== */
+.comment-section {
+margin-top:12px;
+}
+
+.comment-input-area {
+display:flex;
+align-items:center;
+gap:8px;
+margin-bottom:12px;
+}
+
+.comment-input-area img {
+width:32px;
+height:32px;
+border-radius:50%;
+border:2px solid #ffb6c1;
+}
+
+.comment-input-area input {
+flex:1;
+border-radius:20px;
+border:1px solid #ddd;
+padding:8px 16px;
+font-size:14px;
+background:#f0f2f5;
+font-family:‘Comic Sans MS’,cursive;
+}
+
+.comment-input-area input:focus {
+outline:none;
+border-color:#ff69b4;
+background:#fff;
+}
+
+.comment-input-area button {
+background:transparent;
+border:none;
+color:#ff69b4;
+cursor:pointer;
+font-size:20px;
+padding:4px 8px;
+transition:transform 0.2s;
+}
+
+.comment-input-area button:hover {
+transform:scale(1.2);
+}
+
+.comments-list {
+display:flex;
+flex-direction:column;
+gap:8px;
+}
+
 .comment {
-  display:flex;
-  align-items:center;
-  gap:6px;
-  font-size:13px;
-  color:#b84c6f;
+display:flex;
+gap:8px;
 }
+
 .comment img {
-  width:24px;
-  height:24px;
-  border-radius:50%;
+width:32px;
+height:32px;
+border-radius:50%;
+border:2px solid #ffb6c1;
+flex-shrink:0;
+}
+
+.comment-content {
+flex:1;
+background:#f0f2f5;
+border-radius:16px;
+padding:8px 12px;
+position:relative;
+}
+
+.comment-author {
+font-weight:bold;
+color:#b84c6f;
+font-size:13px;
+margin-bottom:2px;
+}
+
+.comment-text {
+font-size:14px;
+color:#333;
+line-height:1.4;
+}
+
+.comment-delete {
+position:absolute;
+top:4px;
+right:4px;
+background:transparent;
+border:none;
+color:#999;
+cursor:pointer;
+font-size:16px;
+padding:2px 6px;
+border-radius:50%;
+opacity:0;
+transition:all 0.2s;
+}
+
+.comment:hover .comment-delete {
+opacity:1;
+}
+
+.comment-delete:hover {
+background:#fff;
+color:#b84c6f;
 }
 
 /* ====== MODALS ====== */
 .modal {
-  position:fixed;
-  inset:0;
-  background:rgba(0,0,0,0.6);
-  display:none;
-  justify-content:center;
-  align-items:center;
-  z-index:1000;
-}
-.modal .modal-box {
-  background:rgba(255,245,250,0.9);
-  backdrop-filter: blur(8px);
-  border:2px solid #b67385;
-  border-radius:16px;
-  padding:16px;
-  width:90%;
-  max-width:400px;
-  display:flex;
-  flex-direction:column;
-  gap:8px;
+position:fixed;
+inset:0;
+background:rgba(0,0,0,0.7);
+display:none;
+justify-content:center;
+align-items:center;
+z-index:1000;
+padding:20px;
 }
 
-/* MODAL CLOSE */
-.modal .closeModal {
-  position:absolute;
-  top:12px;
-  right:12px;
-  background:#ffb6c1;
-  color:#fff;
-  width:28px;
-  height:28px;
-  border-radius:50%;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  cursor:pointer;
-  font-weight:bold;
-  font-size:18px;
+.modal-box {
+background:rgba(255,255,255,0.98);
+backdrop-filter: blur(10px);
+border:2px solid #b67385;
+border-radius:16px;
+padding:24px;
+width:100%;
+max-width:400px;
+max-height:80vh;
+overflow-y:auto;
+position:relative;
+box-shadow: 0 8px 32px rgba(0,0,0,0.3);
+}
+
+.modal-header {
+display:flex;
+justify-content:space-between;
+align-items:center;
+margin-bottom:16px;
+padding-bottom:12px;
+border-bottom:2px solid #ffe6f0;
+}
+
+.modal-header h3 {
+color:#b84c6f;
+font-size:18px;
+}
+
+.closeModal {
+background:#ffb6c1;
+color:#fff;
+width:32px;
+height:32px;
+border-radius:50%;
+display:flex;
+align-items:center;
+justify-content:center;
+cursor:pointer;
+font-weight:bold;
+font-size:20px;
+border:none;
+transition:all 0.2s;
+}
+
+.closeModal:hover {
+background:#ff69b4;
+transform:scale(1.1);
+}
+
+.likes-list {
+display:flex;
+flex-direction:column;
+gap:12px;
+}
+
+.like-item {
+display:flex;
+align-items:center;
+gap:12px;
+padding:8px;
+border-radius:8px;
+transition:background 0.2s;
+}
+
+.like-item:hover {
+background:#ffe6f0;
+}
+
+.like-item img {
+width:40px;
+height:40px;
+border-radius:50%;
+border:2px solid #ffb6c1;
+}
+
+.like-item .name {
+font-weight:bold;
+color:#b84c6f;
+font-size:15px;
+}
+
+/* ====== EMPTY STATE ====== */
+.empty-state {
+text-align:center;
+padding:40px 20px;
+color:#999;
+}
+
+.empty-state .emoji {
+font-size:48px;
+margin-bottom:12px;
+}
+
+.empty-state p {
+font-size:16px;
+}
+
+/* ====== RESPONSIVE ====== */
+@media (max-width: 600px) {
+#newPostBox, #feed {
+width:95%;
+}
+
+header {
+font-size:18px;
+}
 }
 </style>
+
 </head>
 <body>
 
-<header>Actualité</header>
+<header>📰 Actualité</header>
 
 <!-- ====== NOUVEAU POST ====== -->
+
 <div id="newPostBox">
-  <textarea id="postInput" placeholder="Quoi de neuf ?"></textarea>
-  <button id="postBtn">Publier</button>
+  <div class="new-post-header">
+    <img id="headerPhoto" src="icon-152.png" alt="Photo">
+    <span id="headerName" style="font-weight:bold;color:#b84c6f;">Quoi de neuf ?</span>
+  </div>
+  <textarea id="postInput" placeholder="Exprimez-vous..."></textarea>
+  <div class="post-footer">
+    <button id="postBtn">Publier</button>
+  </div>
 </div>
 
 <!-- ====== FEED ====== -->
-<div id="feed"></div>
 
-<!-- ====== MODAL LIKE / COMMENT ====== -->
-<div id="likeCommentModal" class="modal">
+<div id="feed">
+  <div class="empty-state">
+    <div class="emoji">🌸</div>
+    <p>Aucune publication pour le moment</p>
+  </div>
+</div>
+
+<!-- ====== MODAL LIKES ====== -->
+
+<div id="likesModal" class="modal">
   <div class="modal-box">
-    <div class="closeModal">×</div>
-    <h3 id="modalTitle">Likes / Commentaires</h3>
-    <div id="modalContent" style="max-height:300px; overflow-y:auto;"></div>
+    <div class="modal-header">
+      <h3>❤️ J'aime</h3>
+      <button class="closeModal">×</button>
+    </div>
+    <div id="likesContent" class="likes-list"></div>
   </div>
 </div>
 
@@ -203,74 +515,218 @@ import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js
 
 const supabase = createClient(
   "https://jyhbamdcxmpveujjqjla.supabase.co",
-  "sb_publishable_sqsxb-3Kl5o3-JQYv9kGFw_-g0EgwMa"
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp5aGJhbWRjeG1wdmV1ampxamxhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzczOTczOTAsImV4cCI6MjA1Mjk3MzM5MH0.sqsxb-3Kl5o3-JQYv9kGFw_-g0EgwMa"
 );
 
-const myPrenom = localStorage.getItem('prenom') || 'Moi';
+const myPrenom = localStorage.getItem('prenom') || 'Utilisateur';
 const ownerPhoto = localStorage.getItem('ownerPhoto') || 'icon-152.png';
 
 const feed = document.getElementById('feed');
 const postBtn = document.getElementById('postBtn');
 const postInput = document.getElementById('postInput');
-const modal = document.getElementById('likeCommentModal');
-const modalContent = document.getElementById('modalContent');
-const modalTitle = document.getElementById('modalTitle');
-const closeModal = document.querySelector('.closeModal');
+const likesModal = document.getElementById('likesModal');
+const likesContent = document.getElementById('likesContent');
+const headerPhoto = document.getElementById('headerPhoto');
+const headerName = document.getElementById('headerName');
+
+// Initialiser le header
+headerPhoto.src = ownerPhoto;
+headerName.textContent = `${myPrenom}, quoi de neuf ?`;
+
+// ====== FORMATER TIMESTAMP ======
+function formatTime(timestamp) {
+  const date = new Date(timestamp);
+  const now = new Date();
+  const diff = Math.floor((now - date) / 1000); // en secondes
+
+  if (diff < 60) return 'À l\'instant';
+  if (diff < 3600) return `Il y a ${Math.floor(diff / 60)} min`;
+  if (diff < 86400) return `Il y a ${Math.floor(diff / 3600)} h`;
+  if (diff < 604800) return `Il y a ${Math.floor(diff / 86400)} j`;
+  
+  return date.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' });
+}
 
 // ====== CHARGER POSTS ======
 async function loadPosts() {
-  const { data, error } = await supabase.from('posts').select('*').order('created_at',{ascending:false});
-  if(error) return console.error(error);
+  const { data, error } = await supabase
+    .from('posts')
+    .select('*')
+    .order('created_at', { ascending: false });
+  
+  if (error) {
+    console.error(error);
+    return;
+  }
 
   feed.innerHTML = '';
+  
+  if (!data || data.length === 0) {
+    feed.innerHTML = `
+      <div class="empty-state">
+        <div class="emoji">🌸</div>
+        <p>Aucune publication pour le moment</p>
+        <p style="font-size:13px;margin-top:8px;">Soyez le premier à partager quelque chose !</p>
+      </div>
+    `;
+    return;
+  }
+
   data.forEach(post => {
     const div = document.createElement('div');
     div.className = 'post';
+    
+    const likes = post.likes || [];
+    const comments = post.comments || [];
+    const isLiked = likes.some(l => l.name === myPrenom);
+    
     div.innerHTML = `
       <div class="post-header">
-        <img src="${post.photo || ownerPhoto}">
-        <span class="name">${post.name}</span>
+        <div class="post-author">
+          <img src="${post.photo || ownerPhoto}" alt="${post.name}">
+          <div class="post-author-info">
+            <div class="post-author-name">${post.name}</div>
+            <div class="post-timestamp">${formatTime(post.created_at)}</div>
+          </div>
+        </div>
+        ${post.name === myPrenom ? '<button class="post-delete" title="Supprimer">🗑️</button>' : ''}
       </div>
+      
       <div class="post-content">${post.content}</div>
+      
+      ${likes.length > 0 || comments.length > 0 ? `
+        <div class="post-stats">
+          <div class="likes-count">${likes.length > 0 ? `❤️ ${likes.length}` : ''}</div>
+          <div class="comments-count">${comments.length > 0 ? `${comments.length} commentaire${comments.length > 1 ? 's' : ''}` : ''}</div>
+        </div>
+      ` : ''}
+      
       <div class="post-actions">
-        <button class="likeBtn">❤️ <span>${post.likes?.length||0}</span></button>
-        <button class="commentBtn">💬 <span>${post.comments?.length||0}</span></button>
+        <button class="likeBtn ${isLiked ? 'liked' : ''}">
+          ${isLiked ? '❤️' : '🤍'} J'aime
+        </button>
+        <button class="toggleCommentBtn">💬 Commenter</button>
       </div>
-      <div class="comments"></div>
+      
+      <div class="comment-section" style="display:${comments.length > 0 ? 'block' : 'none'}">
+        <div class="comments-list"></div>
+        <div class="comment-input-area">
+          <img src="${ownerPhoto}" alt="${myPrenom}">
+          <input type="text" placeholder="Écrivez un commentaire..." class="commentInput">
+          <button class="sendCommentBtn">➤</button>
+        </div>
+      </div>
     `;
 
+    // DELETE POST
+    const deleteBtn = div.querySelector('.post-delete');
+    if (deleteBtn) {
+      deleteBtn.onclick = async () => {
+        if (confirm('Voulez-vous vraiment supprimer cette publication ?')) {
+          await supabase.from('posts').delete().eq('id', post.id);
+          loadPosts();
+        }
+      };
+    }
+
     // LIKE
-    div.querySelector('.likeBtn').onclick = async () => {
-      post.likes = post.likes||[];
-      if(!post.likes.includes(myPrenom)) post.likes.push(myPrenom);
-      await supabase.from('posts').update({likes:post.likes}).eq('id',post.id);
+    const likeBtn = div.querySelector('.likeBtn');
+    likeBtn.onclick = async () => {
+      let newLikes = [...likes];
+      const existingIndex = newLikes.findIndex(l => l.name === myPrenom);
+      
+      if (existingIndex !== -1) {
+        newLikes.splice(existingIndex, 1);
+      } else {
+        newLikes.push({ name: myPrenom, photo: ownerPhoto });
+      }
+      
+      await supabase.from('posts').update({ likes: newLikes }).eq('id', post.id);
       loadPosts();
     };
 
-    // COMMENT
-    const commentBtn = div.querySelector('.commentBtn');
-    const commentsDiv = div.querySelector('.comments');
-    commentBtn.onclick = () => {
-      modalTitle.textContent = "Commentaires";
-      modalContent.innerHTML = '';
-      (post.comments||[]).forEach(c=>{
-        const cm = document.createElement('div');
-        cm.className='comment';
-        cm.innerHTML=`<img src="${c.photo||ownerPhoto}"> <strong>${c.name}</strong>: ${c.text}`;
-        modalContent.appendChild(cm);
-      });
-      modal.style.display='flex';
+    // SHOW LIKES
+    const likesCountEl = div.querySelector('.likes-count');
+    if (likesCountEl) {
+      likesCountEl.onclick = () => {
+        if (likes.length === 0) return;
+        
+        likesContent.innerHTML = '';
+        likes.forEach(like => {
+          const item = document.createElement('div');
+          item.className = 'like-item';
+          item.innerHTML = `
+            <img src="${like.photo || ownerPhoto}" alt="${like.name}">
+            <span class="name">${like.name}</span>
+          `;
+          likesContent.appendChild(item);
+        });
+        
+        likesModal.style.display = 'flex';
+      };
+    }
+
+    // TOGGLE COMMENT SECTION
+    const toggleCommentBtn = div.querySelector('.toggleCommentBtn');
+    const commentSection = div.querySelector('.comment-section');
+    toggleCommentBtn.onclick = () => {
+      commentSection.style.display = commentSection.style.display === 'none' ? 'block' : 'none';
+      if (commentSection.style.display === 'block') {
+        commentSection.querySelector('.commentInput').focus();
+      }
     };
 
-    // Afficher les commentaires en bas du post
-    if(post.comments?.length){
-      post.comments.forEach(c=>{
-        const cm = document.createElement('div');
-        cm.className='comment';
-        cm.innerHTML=`<img src="${c.photo||ownerPhoto}"> <strong>${c.name}</strong>: ${c.text}`;
-        commentsDiv.appendChild(cm);
-      });
-    }
+    // SEND COMMENT
+    const sendCommentBtn = div.querySelector('.sendCommentBtn');
+    const commentInput = div.querySelector('.commentInput');
+    
+    const addComment = async () => {
+      const text = commentInput.value.trim();
+      if (!text) return;
+      
+      const newComments = [...comments, {
+        name: myPrenom,
+        photo: ownerPhoto,
+        text: text,
+        timestamp: new Date().toISOString()
+      }];
+      
+      await supabase.from('posts').update({ comments: newComments }).eq('id', post.id);
+      commentInput.value = '';
+      loadPosts();
+    };
+    
+    sendCommentBtn.onclick = addComment;
+    commentInput.onkeypress = (e) => {
+      if (e.key === 'Enter') addComment();
+    };
+
+    // DISPLAY COMMENTS
+    const commentsList = div.querySelector('.comments-list');
+    comments.forEach((comment, index) => {
+      const cm = document.createElement('div');
+      cm.className = 'comment';
+      cm.innerHTML = `
+        <img src="${comment.photo || ownerPhoto}" alt="${comment.name}">
+        <div class="comment-content">
+          <div class="comment-author">${comment.name}</div>
+          <div class="comment-text">${comment.text}</div>
+          ${comment.name === myPrenom ? `<button class="comment-delete" data-index="${index}">×</button>` : ''}
+        </div>
+      `;
+      
+      // DELETE COMMENT
+      const deleteCommentBtn = cm.querySelector('.comment-delete');
+      if (deleteCommentBtn) {
+        deleteCommentBtn.onclick = async () => {
+          const newComments = comments.filter((_, i) => i !== index);
+          await supabase.from('posts').update({ comments: newComments }).eq('id', post.id);
+          loadPosts();
+        };
+      }
+      
+      commentsList.appendChild(cm);
+    });
 
     feed.appendChild(div);
   });
@@ -279,18 +735,45 @@ async function loadPosts() {
 // ====== NOUVEAU POST ======
 postBtn.onclick = async () => {
   const content = postInput.value.trim();
-  if(!content) return;
-  await supabase.from('posts').insert([{name:myPrenom,content,photo:ownerPhoto,likes:[],comments:[]}]);
-  postInput.value='';
+  if (!content) return;
+  
+  await supabase.from('posts').insert([{
+    name: myPrenom,
+    content: content,
+    photo: ownerPhoto,
+    likes: [],
+    comments: [],
+    created_at: new Date().toISOString()
+  }]);
+  
+  postInput.value = '';
   loadPosts();
 };
 
-// ====== FERMER MODAL ======
-closeModal.onclick=()=> modal.style.display='none';
-modal.onclick=e=>{if(e.target===modal) modal.style.display='none';}
+// ENTER pour publier
+postInput.onkeypress = (e) => {
+  if (e.key === 'Enter' && !e.shiftKey) {
+    e.preventDefault();
+    postBtn.click();
+  }
+};
+
+// ====== FERMER MODALS ======
+document.querySelectorAll('.closeModal').forEach(btn => {
+  btn.onclick = () => {
+    likesModal.style.display = 'none';
+  };
+});
+
+likesModal.onclick = (e) => {
+  if (e.target === likesModal) likesModal.style.display = 'none';
+};
 
 // ====== INIT ======
 loadPosts();
+
+// ====== RAFRAICHISSEMENT AUTO ======
+setInterval(loadPosts, 30000); // Rafraîchir toutes les 30 secondes
 </script>
 
 </body>
