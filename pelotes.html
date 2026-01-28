@@ -1,5 +1,4 @@
 <!DOCTYPE html>
-
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
@@ -35,6 +34,7 @@ body {
   position: fixed;
   inset: 0;
   z-index: 2;
+  pointer-events: none;
 }
 
 /* Éléments draggables */
@@ -48,73 +48,78 @@ body {
   font-weight: bold;
   color: white;
   text-shadow: 1px 1px 3px black;
-  font-size: 12px;
+  font-size: 11px;
   user-select: none;
   touch-action: none;
+  pointer-events: auto;
+  z-index: 100;
 }
 
 .draggable.active{
   opacity: 0.8;
-  z-index: 1000;
+  z-index: 9999 !important;
+  box-shadow: 0 0 20px rgba(255,255,255,0.8);
 }
 
 /* Cadre Hobbii */
 #hobbii{
-  background: rgba(0, 255, 0, 0.5);
+  background: rgba(0, 255, 0, 0.6);
   border-color: lime;
-  width: 400px;
-  height: 120px;
+  width: 250px;
+  height: 70px;
   top: 50px;
-  left: 500px;
-  font-size: 18px;
-  border-radius: 10px;
+  left: 100px;
+  font-size: 14px;
+  border-radius: 8px;
 }
 
-/* Tiroirs */
+/* Tiroirs - Taille réduite et bien espacés */
 .drawer{
-  background: rgba(255, 0, 0, 0.5);
+  background: rgba(255, 0, 0, 0.6);
   border-color: red;
-  width: 160px;
-  height: 60px;
+  width: 110px;
+  height: 40px;
   border-radius: 5px;
+  font-size: 10px;
 }
 
 .drawer:hover{
-  background: rgba(255, 255, 0, 0.6);
+  background: rgba(255, 255, 0, 0.7);
   border-color: yellow;
 }
 
-/* Panel */
+/* Panel - compact et semi-transparent */
 #panel{
   position: fixed;
-  top: 10px;
+  bottom: 10px;
   right: 10px;
-  background: rgba(255, 255, 255, 0.95);
+  background: rgba(255, 255, 255, 0.92);
   border: 3px solid #ffb6c1;
-  border-radius: 15px;
-  padding: 15px;
-  z-index: 3000;
-  max-width: 450px;
-  box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+  border-radius: 12px;
+  padding: 10px;
+  z-index: 10000;
+  max-width: 260px;
+  box-shadow: 0 5px 20px rgba(0,0,0,0.4);
 }
 
 #panel h3{
   color: #ffb6c1;
-  margin-bottom: 10px;
-  font-size: 16px;
+  margin-bottom: 8px;
+  font-size: 13px;
 }
 
 .btn{
   width: 100%;
-  padding: 10px;
-  margin: 5px 0;
+  padding: 8px;
+  margin: 4px 0;
   background: #ffb6c1;
   border: none;
   border-radius: 8px;
   color: white;
   font-weight: bold;
   cursor: pointer;
-  font-size: 13px;
+  font-size: 11px;
+  pointer-events: auto;
 }
 
 .btn:hover{
@@ -125,23 +130,47 @@ body {
   background: #f5f5f5;
   border: 2px solid #ddd;
   border-radius: 8px;
-  padding: 10px;
+  padding: 8px;
   font-family: monospace;
-  font-size: 10px;
-  max-height: 400px;
+  font-size: 9px;
+  max-height: 250px;
   overflow-y: auto;
   white-space: pre;
-  margin-top: 10px;
+  margin-top: 8px;
   display: none;
 }
 
 .info{
   background: #fffacd;
-  padding: 8px;
+  padding: 6px;
   border-radius: 5px;
-  margin-bottom: 10px;
-  font-size: 11px;
+  margin-bottom: 8px;
+  font-size: 10px;
   border-left: 3px solid #ffb6c1;
+}
+
+/* Toggle button */
+#togglePanel {
+  position: fixed;
+  bottom: 10px;
+  right: 280px;
+  background: #ffb6c1;
+  border: none;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  font-size: 18px;
+  cursor: pointer;
+  z-index: 10001;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.3);
+}
+
+#togglePanel:hover {
+  background: #ff69b4;
+}
+
+#panel.hidden {
+  display: none;
 }
 </style>
 
@@ -155,42 +184,49 @@ body {
   <!-- Cadre Hobbii -->
   <div id="hobbii" class="draggable">🛒 HOBBII</div>
 
-  <!-- 16 Tiroirs avec positions initiales approximatives -->
+  <!-- 16 Tiroirs - Disposition en grille 4x4 -->
+  <!-- Ligne 1 -->
+  <div class="drawer draggable" data-num="1" data-name="Blanc" style="top:200px; left:100px">1-Blanc</div>
+  <div class="drawer draggable" data-num="2" data-name="Écru/Ivoire" style="top:200px; left:230px">2-Écru</div>
+  <div class="drawer draggable" data-num="3" data-name="Beige" style="top:200px; left:360px">3-Beige</div>
+  <div class="drawer draggable" data-num="4" data-name="Marron" style="top:200px; left:490px">4-Marron</div>
 
-  <div class="drawer draggable" data-num="1" data-name="Blanc" style="top:380px; left:220px">1-Blanc</div>
-  <div class="drawer draggable" data-num="2" data-name="Écru/Ivoire" style="top:380px; left:410px">2-Écru</div>
-  <div class="drawer draggable" data-num="3" data-name="Beige" style="top:380px; left:600px">3-Beige</div>
-  <div class="drawer draggable" data-num="4" data-name="Marron" style="top:380px; left:790px">4-Marron</div>
+  <!-- Ligne 2 -->
+  <div class="drawer draggable" data-num="5" data-name="Gris" style="top:260px; left:100px">5-Gris</div>
+  <div class="drawer draggable" data-num="6" data-name="Noir" style="top:260px; left:230px">6-Noir</div>
+  <div class="drawer draggable" data-num="7" data-name="Jaune" style="top:260px; left:360px">7-Jaune</div>
+  <div class="drawer draggable" data-num="8" data-name="Orange" style="top:260px; left:490px">8-Orange</div>
 
-  <div class="drawer draggable" data-num="5" data-name="Gris" style="top:455px; left:220px">5-Gris</div>
-  <div class="drawer draggable" data-num="6" data-name="Noir" style="top:455px; left:410px">6-Noir</div>
-  <div class="drawer draggable" data-num="7" data-name="Jaune" style="top:455px; left:600px">7-Jaune</div>
-  <div class="drawer draggable" data-num="8" data-name="Orange" style="top:455px; left:790px">8-Orange</div>
+  <!-- Ligne 3 -->
+  <div class="drawer draggable" data-num="9" data-name="Rouge" style="top:320px; left:100px">9-Rouge</div>
+  <div class="drawer draggable" data-num="10" data-name="Rose" style="top:320px; left:230px">10-Rose</div>
+  <div class="drawer draggable" data-num="11" data-name="Violet" style="top:320px; left:360px">11-Violet</div>
+  <div class="drawer draggable" data-num="12" data-name="Bleu" style="top:320px; left:490px">12-Bleu</div>
 
-  <div class="drawer draggable" data-num="9" data-name="Rouge" style="top:530px; left:220px">9-Rouge</div>
-  <div class="drawer draggable" data-num="10" data-name="Rose" style="top:530px; left:410px">10-Rose</div>
-  <div class="drawer draggable" data-num="11" data-name="Violet" style="top:530px; left:600px">11-Violet</div>
-  <div class="drawer draggable" data-num="12" data-name="Bleu" style="top:530px; left:790px">12-Bleu</div>
-
-  <div class="drawer draggable" data-num="13" data-name="Vert" style="top:605px; left:220px">13-Vert</div>
-  <div class="drawer draggable" data-num="14" data-name="Turquoise" style="top:605px; left:410px">14-Turquoise</div>
-  <div class="drawer draggable" data-num="15" data-name="Multicolore" style="top:605px; left:600px">15-Multi</div>
-  <div class="drawer draggable" data-num="16" data-name="Metal/Argent" style="top:605px; left:790px">16-Metal</div>
+  <!-- Ligne 4 -->
+  <div class="drawer draggable" data-num="13" data-name="Vert" style="top:380px; left:100px">13-Vert</div>
+  <div class="drawer draggable" data-num="14" data-name="Turquoise" style="top:380px; left:230px">14-Turquoise</div>
+  <div class="drawer draggable" data-num="15" data-name="Multicolore" style="top:380px; left:360px">15-Multi</div>
+  <div class="drawer draggable" data-num="16" data-name="Metal/Argent" style="top:380px; left:490px">16-Metal</div>
 </div>
+
+<!-- Bouton pour cacher/afficher le panel -->
+<button id="togglePanel" onclick="togglePanel()">⚙️</button>
 
 <div id="panel">
   <h3>🎯 Éditeur de Position</h3>
 
   <div class="info">
     <strong>Instructions :</strong><br>
-    • Cliquez et glissez les rectangles<br>
-    • VERT = Hobbii | ROUGE = Tiroirs<br>
-    • Cliquez "Générer" quand c'est bon
+    • Glissez les rectangles sur l'image<br>
+    • VERT = zone Hobbii<br>
+    • ROUGE = tiroirs<br>
+    • Cliquez "Générer" pour obtenir le code
   </div>
 
-<button class="btn" onclick="generate()">🔧 Générer le Code</button>
-<button class="btn" onclick="copy()">📋 Copier</button>
-<button class="btn" onclick="location.reload()">🔄 Reset</button>
+  <button class="btn" onclick="generate()">🔧 Générer le Code</button>
+  <button class="btn" onclick="copy()">📋 Copier</button>
+  <button class="btn" onclick="location.reload()">🔄 Reset</button>
 
   <div id="output"></div>
 </div>
@@ -205,14 +241,23 @@ let startTop = 0;
 // Initialiser tous les draggables
 document.querySelectorAll('.draggable').forEach(elem => {
   elem.addEventListener('mousedown', startDrag);
+  elem.addEventListener('touchstart', startDrag);
 });
 
 function startDrag(e) {
-  activeElement = e.target;
+  // Ignorer si on clique sur le panel
+  if (e.target.closest('#panel')) return;
+  
+  activeElement = e.target.closest('.draggable');
+  if (!activeElement) return;
+  
   activeElement.classList.add('active');
   
-  startX = e.clientX;
-  startY = e.clientY;
+  const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+  const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+  
+  startX = clientX;
+  startY = clientY;
   
   const style = window.getComputedStyle(activeElement);
   startLeft = parseInt(style.left);
@@ -220,6 +265,8 @@ function startDrag(e) {
   
   document.addEventListener('mousemove', doDrag);
   document.addEventListener('mouseup', stopDrag);
+  document.addEventListener('touchmove', doDrag);
+  document.addEventListener('touchend', stopDrag);
   
   e.preventDefault();
 }
@@ -227,8 +274,11 @@ function startDrag(e) {
 function doDrag(e) {
   if (!activeElement) return;
   
-  const dx = e.clientX - startX;
-  const dy = e.clientY - startY;
+  const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+  const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+  
+  const dx = clientX - startX;
+  const dy = clientY - startY;
   
   activeElement.style.left = (startLeft + dx) + 'px';
   activeElement.style.top = (startTop + dy) + 'px';
@@ -242,6 +292,14 @@ function stopDrag() {
   
   document.removeEventListener('mousemove', doDrag);
   document.removeEventListener('mouseup', stopDrag);
+  document.removeEventListener('touchmove', doDrag);
+  document.removeEventListener('touchend', stopDrag);
+}
+
+// Toggle panel
+function togglePanel() {
+  const panel = document.getElementById('panel');
+  panel.classList.toggle('hidden');
 }
 
 // Générer le code
@@ -284,7 +342,7 @@ function generate() {
   // Générer le code
   drawerData.forEach(d => {
     code += `<!-- Tiroir ${d.num}: ${d.name} -->\n`;
-    code += `<button class="drawer" style="top:${d.top}%; left:${d.left}%; width:${d.width}%; height:${d.height}%" onclick="openDrawer(${d.num}, '${d.name}', ...)"></button>\n\n`;
+    code += `<button class="drawer" style="top:${d.top}%; left:${d.left}%; width:${d.width}%; height:${d.height}%" onclick="openDrawer(${d.num}, '${d.name}')"></button>\n\n`;
   });
   
   // Afficher
