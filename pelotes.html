@@ -1,619 +1,392 @@
 <!DOCTYPE html>
 <html lang="fr">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Tiroirs Hobbii</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Organisateur de Pelotes</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
-<style>
-* {
-  margin: 0;
-  padding: 0;
-  box-sizing: border-box;
-}
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
 
-body {
-  font-family: 'Comic Sans MS', cursive;
-  overflow: hidden;
-  background: #000;
-}
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
 
-/* FOND IMAGE */
-#background{
-  position: fixed;
-  inset: 0;
-  background-image: url('Photoroom_20260118_214442.png');
-  background-size: cover;
-  background-position: center;
-  background-repeat: no-repeat;
-  z-index: 1;
-}
+        h1 {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+            font-size: 2.5em;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
 
-/* Container pour les boutons */
-#button-container {
-  position: fixed;
-  inset: 0;
-  z-index: 2;
-}
+        .drawers-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+        }
 
-/* Style des boutons invisibles */
-.clickable-btn {
-  position: absolute;
-  background: transparent;
-  border: none;
-  cursor: pointer;
-  transition: all 0.2s;
-}
+        .drawer {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            padding: 20px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            transition: all 0.3s ease;
+            cursor: pointer;
+        }
 
-/* Effet hover pour visualiser les zones */
-.clickable-btn:hover {
-  background: rgba(255, 255, 0, 0.3);
-}
+        .drawer:hover {
+            background: rgba(255, 255, 255, 0.3);
+            transform: translateY(-5px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.2);
+        }
 
-/* ===== SIDEBAR ===== */
-#sidebar{
-  position:fixed;
-  top:0;
-  left:-220px;
-  width:220px;
-  height:100vh;
-  background:rgba(255,230,240,0.2);
-  border-right:2px solid #b67385;
-  padding:20px;
-  transition:left .3s;
-  z-index:5000;
-}
-#sidebar.sidebar-open{left:0}
+        .drawer-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
 
-#toggleSidebar{
-  position:absolute;
-  top:50%;
-  right:-30px;
-  width:30px;
-  height:60px;
-  background:#ffb6c1;
-  border-radius:0 12px 12px 0;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  cursor:pointer;
-  font-weight:bold;
-}
+        .drawer-title {
+            color: white;
+            font-size: 1.3em;
+            font-weight: 600;
+        }
 
-#sidebar button{
-  padding:8px 16px;
-  border-radius:16px;
-  border:none;
-  background:#ffb6c1;
-  color:#fff;
-  cursor:pointer;
-  font-weight:bold;
-  margin-top:10px;
-  width:100%;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  gap:8px;
-}
+        .drawer-count {
+            background: rgba(255, 255, 255, 0.4);
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-weight: bold;
+            font-size: 1.1em;
+        }
 
-#sidebar button:hover{
-  background:#ff69b4;
-}
+        .drawer-content {
+            color: rgba(255, 255, 255, 0.95);
+            font-size: 0.95em;
+            line-height: 1.5;
+        }
 
-/* ===== MODALE TIROIR ===== */
-.drawer-modal {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  background: linear-gradient(145deg, #ffe6f0, #ffd6e8);
-  padding: 30px;
-  border-radius: 20px;
-  box-shadow: 
-    0 10px 40px rgba(0,0,0,0.3),
-    inset 0 2px 10px rgba(255,255,255,0.8),
-    inset 0 -2px 10px rgba(0,0,0,0.1);
-  z-index: 10000;
-  min-width: 350px;
-  max-width: 500px;
-  border: 3px solid #ffb6c1;
-}
+        /* Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.3);
+            z-index: 1000;
+            animation: fadeIn 0.3s ease;
+        }
 
-.drawer-modal h2 {
-  color: #ff69b4;
-  margin-bottom: 20px;
-  text-align: center;
-  font-size: 24px;
-  text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
-}
+        .modal.active {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
 
-.modal-content {
-  display: flex;
-  flex-direction: column;
-  gap: 15px;
-}
+        .modal-content {
+            background: rgba(255, 255, 255, 0.25);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            border-radius: 16px;
+            padding: 30px;
+            max-width: 500px;
+            width: 90%;
+            max-height: 80vh;
+            overflow-y: auto;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            animation: slideUp 0.3s ease;
+        }
 
-/* Zone photo */
-.photo-section {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-}
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid rgba(255, 255, 255, 0.5);
+        }
 
-.photo-preview {
-  width: 100%;
-  height: 200px;
-  background: #fff0f5;
-  border: 2px dashed #ffb6c1;
-  border-radius: 12px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  overflow: hidden;
-  position: relative;
-}
+        .modal-title {
+            color: white;
+            font-size: 1.8em;
+            font-weight: 600;
+        }
 
-.photo-preview img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 2em;
+            color: white;
+            cursor: pointer;
+            transition: all 0.3s;
+            line-height: 1;
+            opacity: 0.8;
+        }
 
-.photo-preview-empty {
-  color: #ffb6c1;
-  font-size: 14px;
-  text-align: center;
-}
+        .close-btn:hover {
+            opacity: 1;
+            transform: scale(1.1);
+        }
 
-.photo-btn {
-  padding: 8px 16px;
-  background: #ffb6c1;
-  border: none;
-  border-radius: 8px;
-  color: white;
-  cursor: pointer;
-  font-size: 12px;
-  font-weight: bold;
-  transition: all 0.2s;
-}
+        .counter-section {
+            background: rgba(255, 255, 255, 0.25);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 25px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
 
-.photo-btn:hover {
-  background: #ff69b4;
-  transform: scale(1.05);
-}
+        .counter-label {
+            color: white;
+            font-size: 1.1em;
+            margin-bottom: 15px;
+            font-weight: 500;
+        }
 
-/* Zone texte */
-.notes-section {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
+        .counter-controls {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 20px;
+        }
 
-.notes-section label {
-  color: #b67385;
-  font-weight: bold;
-  font-size: 14px;
-}
+        .counter-btn {
+            background: rgba(255, 255, 255, 0.3);
+            color: white;
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            font-size: 1.8em;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: bold;
+        }
 
-.notes-section textarea {
-  width: 100%;
-  min-height: 120px;
-  padding: 12px;
-  border: 2px solid #ffb6c1;
-  border-radius: 12px;
-  background: #fff0f5;
-  color: #b84c6f;
-  font-family: 'Comic Sans MS', cursive;
-  font-size: 14px;
-  resize: vertical;
-  box-shadow: inset 0 2px 5px rgba(0,0,0,0.1);
-}
+        .counter-btn:hover {
+            background: rgba(255, 255, 255, 0.5);
+            transform: scale(1.1);
+        }
 
-.notes-section textarea:focus {
-  outline: none;
-  border-color: #ff69b4;
-  box-shadow: inset 0 2px 5px rgba(0,0,0,0.1), 0 0 10px rgba(255,105,180,0.3);
-}
+        .counter-value {
+            background: rgba(255, 255, 255, 0.35);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            color: white;
+            padding: 10px 30px;
+            border-radius: 30px;
+            font-size: 2em;
+            font-weight: bold;
+            min-width: 80px;
+        }
 
-/* Boutons de la modale */
-.modal-buttons {
-  display: flex;
-  gap: 10px;
-  margin-top: 10px;
-}
+        .modal-body {
+            color: white;
+            line-height: 1.8;
+        }
 
-.modal-buttons button {
-  flex: 1;
-  padding: 12px;
-  border: none;
-  border-radius: 10px;
-  font-weight: bold;
-  cursor: pointer;
-  font-size: 14px;
-  transition: all 0.2s;
-}
+        .info-item {
+            margin-bottom: 15px;
+            background: rgba(255, 255, 255, 0.15);
+            padding: 12px;
+            border-radius: 8px;
+        }
 
-.save-btn {
-  background: #ffb6c1;
-  color: white;
-}
+        .info-label {
+            color: white;
+            font-weight: 600;
+            margin-bottom: 5px;
+            opacity: 0.9;
+        }
 
-.save-btn:hover {
-  background: #ff69b4;
-  transform: translateY(-2px);
-  box-shadow: 0 4px 12px rgba(255,105,180,0.4);
-}
+        .info-value {
+            color: white;
+            opacity: 0.95;
+        }
 
-.close-btn {
-  background: #ddd;
-  color: #666;
-}
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
 
-.close-btn:hover {
-  background: #ccc;
-}
-
-/* Overlay */
-.overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(0,0,0,0.7);
-  z-index: 9999;
-  backdrop-filter: blur(3px);
-}
-
-/* ===== VUE ENSEMBLE DES TIROIRS ===== */
-.drawers-grid-modal {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  background: linear-gradient(145deg, #ffe6f0, #ffd6e8);
-  padding: 30px;
-  border-radius: 20px;
-  box-shadow: 
-    0 10px 40px rgba(0,0,0,0.3),
-    inset 0 2px 10px rgba(255,255,255,0.8),
-    inset 0 -2px 10px rgba(0,0,0,0.1);
-  z-index: 10000;
-  width: 90%;
-  max-width: 800px;
-  max-height: 85vh;
-  overflow-y: auto;
-  border: 3px solid #ffb6c1;
-}
-
-.drawers-grid-modal h2 {
-  color: #ff69b4;
-  margin-bottom: 20px;
-  text-align: center;
-  font-size: 24px;
-  text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
-}
-
-.drawers-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-  gap: 15px;
-  margin-bottom: 20px;
-}
-
-.drawer-card {
-  background: white;
-  border: 2px solid #ffb6c1;
-  border-radius: 12px;
-  padding: 15px;
-  cursor: pointer;
-  transition: all 0.2s;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-}
-
-.drawer-card:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 6px 16px rgba(255,105,180,0.3);
-  border-color: #ff69b4;
-}
-
-.drawer-card-num {
-  font-size: 18px;
-  font-weight: bold;
-  color: #ff69b4;
-  margin-bottom: 5px;
-}
-
-.drawer-card-name {
-  font-size: 14px;
-  color: #b67385;
-}
-
-.drawer-card-preview {
-  margin-top: 10px;
-  width: 100%;
-  height: 80px;
-  background: #fff0f5;
-  border-radius: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 12px;
-  color: #ffb6c1;
-  overflow: hidden;
-}
-
-.drawer-card-preview img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-input[type="file"] {
-  display: none;
-}
-</style>
-
+        @keyframes slideUp {
+            from {
+                transform: translateY(50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
+        }
+    </style>
 </head>
-
 <body>
+    <div class="container">
+        <h1>🧶 Organisateur de Pelotes</h1>
+        
+        <div class="drawers-grid">
+            <div class="drawer" onclick="openModal('drawer1')">
+                <div class="drawer-header">
+                    <div class="drawer-title">Tiroir Laine</div>
+                    <div class="drawer-count" id="count-drawer1">0</div>
+                </div>
+                <div class="drawer-content">
+                    Pelotes de laine pour tricot
+                </div>
+            </div>
 
-<!-- FOND IMAGE -->
-<div id="background"></div>
+            <div class="drawer" onclick="openModal('drawer2')">
+                <div class="drawer-header">
+                    <div class="drawer-title">Tiroir Coton</div>
+                    <div class="drawer-count" id="count-drawer2">0</div>
+                </div>
+                <div class="drawer-content">
+                    Pelotes de coton pour crochet
+                </div>
+            </div>
 
-<!-- ===== SIDEBAR ===== -->
-<div id="sidebar">
-  <div id="toggleSidebar">☰</div>
-  <button id="backBtn">← Retour</button>
-  <button id="viewAllBtn">
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-      <rect x="3" y="3" width="7" height="7" rx="1"/>
-      <rect x="14" y="3" width="7" height="7" rx="1"/>
-      <rect x="3" y="14" width="7" height="7" rx="1"/>
-      <rect x="14" y="14" width="7" height="7" rx="1"/>
-    </svg>
-    Tous les tiroirs
-  </button>
-</div>
+            <div class="drawer" onclick="openModal('drawer3')">
+                <div class="drawer-header">
+                    <div class="drawer-title">Tiroir Acrylique</div>
+                    <div class="drawer-count" id="count-drawer3">0</div>
+                </div>
+                <div class="drawer-content">
+                    Pelotes acryliques multicolores
+                </div>
+            </div>
 
-<!-- CONTAINER DES BOUTONS CLIQUABLES -->
-<div id="button-container">
+            <div class="drawer" onclick="openModal('drawer4')">
+                <div class="drawer-header">
+                    <div class="drawer-title">Tiroir Mohair</div>
+                    <div class="drawer-count" id="count-drawer4">0</div>
+                </div>
+                <div class="drawer-content">
+                    Pelotes de mohair délicates
+                </div>
+            </div>
 
-  <!-- Cadre Hobbii -->
-  <button class="clickable-btn" id="hobbii-board" style="top:9.7%; left:26.5%; width:48.3%; height:19.8%" onclick="window.open('https://hobbii.fr', '_blank')"></button>
+            <div class="drawer" onclick="openModal('drawer5')">
+                <div class="drawer-header">
+                    <div class="drawer-title">Tiroir Mérinos</div>
+                    <div class="drawer-count" id="count-drawer5">0</div>
+                </div>
+                <div class="drawer-content">
+                    Laine mérinos premium
+                </div>
+            </div>
 
-  <!-- Tiroir 1: Blanc -->
-  <button class="clickable-btn drawer-btn" style="top:45.6%; left:4.9%; width:20.6%; height:5.3%" onclick="openDrawer(1, 'Blanc')"></button>
-
-  <!-- Tiroir 2: Écru/Ivoire -->
-  <button class="clickable-btn drawer-btn" style="top:45.8%; left:27.8%; width:20.8%; height:5.2%" onclick="openDrawer(2, 'Écru/Ivoire')"></button>
-
-  <!-- Tiroir 3: Beige -->
-  <button class="clickable-btn drawer-btn" style="top:45.7%; left:51.0%; width:21.2%; height:5.3%" onclick="openDrawer(3, 'Beige')"></button>
-
-  <!-- Tiroir 4: Marron -->
-  <button class="clickable-btn drawer-btn" style="top:45.7%; left:74.0%; width:21.7%; height:5.4%" onclick="openDrawer(4, 'Marron')"></button>
-
-  <!-- Tiroir 5: Gris -->
-  <button class="clickable-btn drawer-btn" style="top:52.0%; left:4.7%; width:20.9%; height:5.6%" onclick="openDrawer(5, 'Gris')"></button>
-
-  <!-- Tiroir 6: Noir -->
-  <button class="clickable-btn drawer-btn" style="top:52.2%; left:27.4%; width:21.5%; height:5.3%" onclick="openDrawer(6, 'Noir')"></button>
-
-  <!-- Tiroir 7: Jaune -->
-  <button class="clickable-btn drawer-btn" style="top:52.2%; left:51.0%; width:21.0%; height:5.1%" onclick="openDrawer(7, 'Jaune')"></button>
-
-  <!-- Tiroir 8: Orange -->
-  <button class="clickable-btn drawer-btn" style="top:52.2%; left:74.1%; width:21.7%; height:5.5%" onclick="openDrawer(8, 'Orange')"></button>
-
-  <!-- Tiroir 9: Rouge -->
-  <button class="clickable-btn drawer-btn" style="top:58.7%; left:5.3%; width:20.0%; height:5.5%" onclick="openDrawer(9, 'Rouge')"></button>
-
-  <!-- Tiroir 10: Rose -->
-  <button class="clickable-btn drawer-btn" style="top:58.7%; left:27.6%; width:21.7%; height:5.8%" onclick="openDrawer(10, 'Rose')"></button>
-
-  <!-- Tiroir 11: Violet -->
-  <button class="clickable-btn drawer-btn" style="top:58.8%; left:51.0%; width:20.9%; height:5.6%" onclick="openDrawer(11, 'Violet')"></button>
-
-  <!-- Tiroir 12: Bleu -->
-  <button class="clickable-btn drawer-btn" style="top:58.9%; left:74.1%; width:21.7%; height:5.5%" onclick="openDrawer(12, 'Bleu')"></button>
-
-  <!-- Tiroir 13: Vert -->
-  <button class="clickable-btn drawer-btn" style="top:65.5%; left:5.3%; width:20.1%; height:5.5%" onclick="openDrawer(13, 'Vert')"></button>
-
-  <!-- Tiroir 14: Turquoise -->
-  <button class="clickable-btn drawer-btn" style="top:65.5%; left:27.5%; width:21.7%; height:5.6%" onclick="openDrawer(14, 'Turquoise')"></button>
-
-  <!-- Tiroir 15: Multicolore -->
-  <button class="clickable-btn drawer-btn" style="top:65.7%; left:50.7%; width:21.7%; height:5.4%" onclick="openDrawer(15, 'Multicolore')"></button>
-
-  <!-- Tiroir 16: Metal/Argent -->
-  <button class="clickable-btn drawer-btn" style="top:65.7%; left:73.8%; width:21.7%; height:5.5%" onclick="openDrawer(16, 'Metal/Argent')"></button>
-
-</div>
-
-<script>
-/* ===== DONNÉES DES TIROIRS ===== */
-const drawersData = {
-  1: { name: 'Blanc', photo: null, notes: '' },
-  2: { name: 'Écru/Ivoire', photo: null, notes: '' },
-  3: { name: 'Beige', photo: null, notes: '' },
-  4: { name: 'Marron', photo: null, notes: '' },
-  5: { name: 'Gris', photo: null, notes: '' },
-  6: { name: 'Noir', photo: null, notes: '' },
-  7: { name: 'Jaune', photo: null, notes: '' },
-  8: { name: 'Orange', photo: null, notes: '' },
-  9: { name: 'Rouge', photo: null, notes: '' },
-  10: { name: 'Rose', photo: null, notes: '' },
-  11: { name: 'Violet', photo: null, notes: '' },
-  12: { name: 'Bleu', photo: null, notes: '' },
-  13: { name: 'Vert', photo: null, notes: '' },
-  14: { name: 'Turquoise', photo: null, notes: '' },
-  15: { name: 'Multicolore', photo: null, notes: '' },
-  16: { name: 'Metal/Argent', photo: null, notes: '' }
-};
-
-// Charger depuis localStorage
-function loadDrawersData() {
-  const saved = localStorage.getItem('drawersData');
-  if (saved) {
-    Object.assign(drawersData, JSON.parse(saved));
-  }
-}
-
-// Sauvegarder dans localStorage
-function saveDrawersData() {
-  localStorage.setItem('drawersData', JSON.stringify(drawersData));
-}
-
-loadDrawersData();
-
-/* ===== SIDEBAR ===== */
-const sidebar = document.getElementById('sidebar');
-const toggleSidebar = document.getElementById('toggleSidebar');
-
-toggleSidebar.onclick = () => sidebar.classList.toggle('sidebar-open');
-
-// BOUTON RETOUR
-document.getElementById('backBtn').onclick = () => {
-  document.body.style.transition = 'opacity 0.5s';
-  document.body.style.opacity = '0';
-  setTimeout(() => {
-    window.location.href = 'owner.html';
-  }, 500);
-};
-
-// BOUTON VOIR TOUS LES TIROIRS
-document.getElementById('viewAllBtn').onclick = showAllDrawers;
-
-/* ===== FONCTION OUVRIR UN TIROIR ===== */
-function openDrawer(num, name) {
-  const data = drawersData[num];
-  
-  // Créer overlay
-  const overlay = document.createElement('div');
-  overlay.className = 'overlay';
-  
-  // Créer modale
-  const modal = document.createElement('div');
-  modal.className = 'drawer-modal';
-  
-  modal.innerHTML = `
-    <h2>Tiroir ${num} - ${name}</h2>
-    <div class="modal-content">
-      
-      <!-- Section Photo -->
-      <div class="photo-section">
-        <div class="photo-preview" id="photoPreview-${num}">
-          ${data.photo 
-            ? `<img src="${data.photo}" alt="Photo">` 
-            : '<div class="photo-preview-empty">Aucune photo</div>'}
+            <div class="drawer" onclick="openModal('drawer6')">
+                <div class="drawer-header">
+                    <div class="drawer-title">Tiroir Alpaga</div>
+                    <div class="drawer-count" id="count-drawer6">0</div>
+                </div>
+                <div class="drawer-content">
+                    Pelotes d'alpaga luxueuses
+                </div>
+            </div>
         </div>
-        <input type="file" id="photoInput-${num}" accept="image/*">
-        <button class="photo-btn" onclick="document.getElementById('photoInput-${num}').click()">
-          📷 ${data.photo ? 'Changer' : 'Ajouter'} une photo
-        </button>
-      </div>
-      
-      <!-- Section Notes -->
-      <div class="notes-section">
-        <label>Notes / Références :</label>
-        <textarea id="notesInput-${num}" placeholder="Marque, numéro de lot, quantité, notes...">${data.notes || ''}</textarea>
-      </div>
-      
-      <!-- Boutons -->
-      <div class="modal-buttons">
-        <button class="save-btn" id="saveBtn-${num}">💾 Enregistrer</button>
-        <button class="close-btn" id="closeBtn-${num}">Fermer</button>
-      </div>
-      
     </div>
-  `;
-  
-  document.body.appendChild(overlay);
-  document.body.appendChild(modal);
-  
-  // Gestion upload photo
-  const photoInput = document.getElementById(`photoInput-${num}`);
-  photoInput.onchange = (e) => {
-    const file = e.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = (event) => {
-        const photoPreview = document.getElementById(`photoPreview-${num}`);
-        photoPreview.innerHTML = `<img src="${event.target.result}" alt="Photo">`;
-        data.photo = event.target.result;
-      };
-      reader.readAsDataURL(file);
-    }
-  };
-  
-  // Bouton sauvegarder
-  document.getElementById(`saveBtn-${num}`).onclick = () => {
-    data.notes = document.getElementById(`notesInput-${num}`).value;
-    saveDrawersData();
-    alert('✅ Tiroir sauvegardé !');
-  };
-  
-  // Bouton fermer
-  document.getElementById(`closeBtn-${num}`).onclick = () => {
-    modal.remove();
-    overlay.remove();
-  };
-  
-  overlay.onclick = () => {
-    modal.remove();
-    overlay.remove();
-  };
-}
 
-/* ===== VUE ENSEMBLE DES TIROIRS ===== */
-function showAllDrawers() {
-  // Créer overlay
-  const overlay = document.createElement('div');
-  overlay.className = 'overlay';
-  
-  // Créer modale grille
-  const modal = document.createElement('div');
-  modal.className = 'drawers-grid-modal';
-  
-  let gridHTML = '<h2>📦 Tous les tiroirs</h2><div class="drawers-grid">';
-  
-  for (let i = 1; i <= 16; i++) {
-    const data = drawersData[i];
-    gridHTML += `
-      <div class="drawer-card" onclick="closeAllDrawersView(); openDrawer(${i}, '${data.name}')">
-        <div class="drawer-card-num">Tiroir ${i}</div>
-        <div class="drawer-card-name">${data.name}</div>
-        <div class="drawer-card-preview">
-          ${data.photo 
-            ? `<img src="${data.photo}" alt="${data.name}">` 
-            : '📷'}
+    <!-- Modal -->
+    <div class="modal" id="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <div class="modal-title" id="modal-title">Tiroir</div>
+                <button class="close-btn" onclick="closeModal()">&times;</button>
+            </div>
+            
+            <div class="counter-section">
+                <div class="counter-label">Nombre de pelotes</div>
+                <div class="counter-controls">
+                    <button class="counter-btn" onclick="decrementCounter()">−</button>
+                    <div class="counter-value" id="modal-counter">0</div>
+                    <button class="counter-btn" onclick="incrementCounter()">+</button>
+                </div>
+            </div>
+
+            <div class="modal-body" id="modal-body">
+                <div class="info-item">
+                    <div class="info-label">Type de fil :</div>
+                    <div class="info-value" id="info-type">-</div>
+                </div>
+                <div class="info-item">
+                    <div class="info-label">Description :</div>
+                    <div class="info-value" id="info-description">-</div>
+                </div>
+            </div>
         </div>
-      </div>
-    `;
-  }
-  
-  gridHTML += `</div>
-    <div class="modal-buttons">
-      <button class="close-btn" onclick="closeAllDrawersView()">Fermer</button>
     </div>
-  `;
-  
-  modal.innerHTML = gridHTML;
-  modal.id = 'allDrawersModal';
-  
-  document.body.appendChild(overlay);
-  overlay.id = 'allDrawersOverlay';
-  document.body.appendChild(modal);
-  
-  overlay.onclick = closeAllDrawersView;
-}
 
-function closeAllDrawersView() {
-  const modal = document.getElementById('allDrawersModal');
-  const overlay = document.getElementById('allDrawersOverlay');
-  if (modal) modal.remove();
-  if (overlay) overlay.remove();
-}
-</script>
+    <script>
+        let currentDrawer = null;
+        const drawerData = {
+            drawer1: { title: 'Tiroir Laine', type: 'Laine naturelle', description: 'Pelotes de laine pour tricot et projets d\'hiver', count: 0 },
+            drawer2: { title: 'Tiroir Coton', type: 'Coton', description: 'Pelotes de coton pour crochet et projets d\'été', count: 0 },
+            drawer3: { title: 'Tiroir Acrylique', type: 'Acrylique', description: 'Pelotes acryliques multicolores pour tous projets', count: 0 },
+            drawer4: { title: 'Tiroir Mohair', type: 'Mohair', description: 'Pelotes de mohair délicates et douces', count: 0 },
+            drawer5: { title: 'Tiroir Mérinos', type: 'Laine Mérinos', description: 'Laine mérinos premium de haute qualité', count: 0 },
+            drawer6: { title: 'Tiroir Alpaga', type: 'Alpaga', description: 'Pelotes d\'alpaga luxueuses et chaudes', count: 0 }
+        };
 
+        function openModal(drawerId) {
+            currentDrawer = drawerId;
+            const data = drawerData[drawerId];
+            
+            document.getElementById('modal-title').textContent = data.title;
+            document.getElementById('modal-counter').textContent = data.count;
+            document.getElementById('info-type').textContent = data.type;
+            document.getElementById('info-description').textContent = data.description;
+            
+            document.getElementById('modal').classList.add('active');
+        }
+
+        function closeModal() {
+            document.getElementById('modal').classList.remove('active');
+            currentDrawer = null;
+        }
+
+        function incrementCounter() {
+            if (currentDrawer) {
+                drawerData[currentDrawer].count++;
+                updateCounter();
+            }
+        }
+
+        function decrementCounter() {
+            if (currentDrawer && drawerData[currentDrawer].count > 0) {
+                drawerData[currentDrawer].count--;
+                updateCounter();
+            }
+        }
+
+        function updateCounter() {
+            const count = drawerData[currentDrawer].count;
+            document.getElementById('modal-counter').textContent = count;
+            document.getElementById(`count-${currentDrawer}`).textContent = count;
+        }
+
+        // Fermer le modal en cliquant en dehors
+        document.getElementById('modal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                closeModal();
+            }
+        });
+    </script>
 </body>
 </html>
