@@ -515,7 +515,13 @@ const drawersData = {
 function loadDrawersData() {
   const saved = localStorage.getItem('drawersData');
   if (saved) {
-    Object.assign(drawersData, JSON.parse(saved));
+    const savedData = JSON.parse(saved);
+    // Fusionner les données sauvegardées avec les données par défaut
+    for (let key in savedData) {
+      if (drawersData[key]) {
+        drawersData[key] = { ...drawersData[key], ...savedData[key] };
+      }
+    }
   }
 }
 
@@ -605,12 +611,14 @@ function openDrawer(num, name) {
   document.getElementById(`incrementBtn-${num}`).onclick = () => {
     data.count = (data.count || 0) + 1;
     document.getElementById(`counterValue-${num}`).textContent = data.count;
+    saveDrawersData(); // Sauvegarde automatique
   };
   
   document.getElementById(`decrementBtn-${num}`).onclick = () => {
     if (data.count > 0) {
       data.count--;
       document.getElementById(`counterValue-${num}`).textContent = data.count;
+      saveDrawersData(); // Sauvegarde automatique
     }
   };
   
@@ -624,6 +632,7 @@ function openDrawer(num, name) {
         const photoPreview = document.getElementById(`photoPreview-${num}`);
         photoPreview.innerHTML = `<img src="${event.target.result}" alt="Photo">`;
         data.photo = event.target.result;
+        saveDrawersData(); // Sauvegarde automatique
       };
       reader.readAsDataURL(file);
     }
