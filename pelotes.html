@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Éditeur Simple - Tiroirs</title>
+<title>Tiroirs Hobbii</title>
 
 <style>
 * {
@@ -29,357 +29,50 @@ body {
   z-index: 1;
 }
 
-/* Zone de travail */
-#workspace{
+/* Container pour les boutons */
+#button-container {
   position: fixed;
   inset: 0;
   z-index: 2;
-  pointer-events: none;
 }
 
-/* Éléments draggables */
-.draggable{
-  position: absolute;
-  border: 3px solid;
-  cursor: move;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: bold;
-  color: white;
-  text-shadow: 1px 1px 3px black;
-  font-size: 11px;
-  user-select: none;
-  touch-action: none;
-  pointer-events: auto;
-  z-index: 100;
-}
-
-.draggable.active{
-  opacity: 0.8;
-  z-index: 9999 !important;
-  box-shadow: 0 0 20px rgba(255,255,255,0.8);
-}
-
-/* Poignées de redimensionnement */
-.resize-handle {
-  position: absolute;
-  background: rgba(255, 255, 255, 0.8);
-  border: 2px solid #333;
-  z-index: 10;
-  pointer-events: auto;
-}
-
-/* Poignée coin bas-droit (les deux dimensions) */
-.resize-se {
-  bottom: -6px;
-  right: -6px;
-  width: 12px;
-  height: 12px;
-  cursor: nwse-resize;
-  border-radius: 50%;
-  background: rgba(0, 255, 0, 0.9);
-}
-
-/* Poignée droite (largeur) */
-.resize-e {
-  top: 50%;
-  right: -6px;
-  width: 12px;
-  height: 12px;
-  transform: translateY(-50%);
-  cursor: ew-resize;
-  border-radius: 50%;
-  background: rgba(255, 200, 0, 0.9);
-}
-
-/* Poignée bas (hauteur) */
-.resize-s {
-  bottom: -6px;
-  left: 50%;
-  width: 12px;
-  height: 12px;
-  transform: translateX(-50%);
-  cursor: ns-resize;
-  border-radius: 50%;
-  background: rgba(0, 200, 255, 0.9);
-}
-
-.resize-handle:hover {
-  transform: scale(1.3);
-  box-shadow: 0 0 10px rgba(255,255,255,0.8);
-}
-
-.resize-e:hover {
-  transform: translateY(-50%) scale(1.3);
-}
-
-.resize-s:hover {
-  transform: translateX(-50%) scale(1.3);
-}
-
-/* Cadre Hobbii */
-#hobbii{
-  background: rgba(0, 255, 0, 0.6);
-  border-color: lime;
-  width: 200px;
-  height: 60px;
-  top: 30px;
-  left: 50px;
-  font-size: 14px;
-  border-radius: 8px;
-}
-
-/* Tiroirs - Taille réduite */
-.drawer{
-  background: rgba(255, 0, 0, 0.6);
-  border-color: red;
-  width: 90px;
-  height: 35px;
-  border-radius: 5px;
-  font-size: 9px;
-}
-
-.drawer:hover{
-  background: rgba(255, 255, 0, 0.7);
-  border-color: yellow;
-}
-
-/* Panel - compact et semi-transparent */
-#panel{
-  position: fixed;
-  bottom: 10px;
-  right: 10px;
-  background: rgba(255, 255, 255, 0.92);
-  border: 3px solid #ffb6c1;
-  border-radius: 12px;
-  padding: 10px;
-  z-index: 10000;
-  max-width: 260px;
-  box-shadow: 0 5px 20px rgba(0,0,0,0.4);
-}
-
-#panel h3{
-  color: #ffb6c1;
-  margin-bottom: 8px;
-  font-size: 13px;
-}
-
-.btn{
-  width: 100%;
-  padding: 8px;
-  margin: 4px 0;
-  background: #ffb6c1;
-  border: none;
-  border-radius: 8px;
-  color: white;
-  font-weight: bold;
-  cursor: pointer;
-  font-size: 11px;
-  pointer-events: auto;
-}
-
-.btn:hover{
-  background: #ff69b4;
-}
-
-#output{
-  background: #f5f5f5;
-  border: 2px solid #ddd;
-  border-radius: 8px;
-  padding: 8px;
-  font-family: monospace;
-  font-size: 9px;
-  max-height: 250px;
-  overflow-y: auto;
-  white-space: pre;
-  margin-top: 8px;
-  display: none;
-}
-
-.info{
-  background: #fffacd;
-  padding: 6px;
-  border-radius: 5px;
-  margin-bottom: 8px;
-  font-size: 10px;
-  border-left: 3px solid #ffb6c1;
-}
-
-/* Toggle button */
-#togglePanel {
-  position: fixed;
-  bottom: 10px;
-  right: 280px;
-  background: #ffb6c1;
-  border: none;
-  border-radius: 50%;
-  width: 40px;
-  height: 40px;
-  font-size: 18px;
-  cursor: pointer;
-  z-index: 10001;
-  box-shadow: 0 3px 10px rgba(0,0,0,0.3);
-}
-
-#togglePanel:hover {
-  background: #ff69b4;
-}
-
-#panel.hidden {
-  display: none;
-}
-
-/* === NOUVEAUX STYLES POUR LES BOUTONS CLIQUABLES === */
-#clickable-layer {
-  position: fixed;
-  inset: 0;
-  z-index: 3;
-  pointer-events: none;
-  display: none; /* Caché par défaut en mode édition */
-}
-
-#clickable-layer.active {
-  display: block;
-}
-
+/* Style des boutons invisibles */
 .clickable-btn {
   position: absolute;
   background: transparent;
   border: none;
   cursor: pointer;
-  pointer-events: auto;
-  transition: background 0.2s;
+  transition: all 0.2s;
 }
 
+/* Effet hover pour visualiser les zones (optionnel) */
 .clickable-btn:hover {
   background: rgba(255, 255, 0, 0.3);
 }
+
+/* Mode debug - décommenter pour voir les zones en permanence */
+/*
+#hobbii-board {
+  background: rgba(0, 255, 0, 0.3);
+  border: 2px solid lime;
+}
+.drawer-btn {
+  background: rgba(255, 0, 0, 0.3);
+  border: 2px solid red;
+}
+*/
 </style>
 
 </head>
 
 <body>
 
+<!-- FOND IMAGE -->
 <div id="background"></div>
 
-<div id="workspace">
-  <!-- Cadre Hobbii -->
-  <div id="hobbii" class="draggable">
-    🛒 HOBBII
-    <div class="resize-handle resize-se"></div>
-    <div class="resize-handle resize-e"></div>
-    <div class="resize-handle resize-s"></div>
-  </div>
+<!-- CONTAINER DES BOUTONS CLIQUABLES -->
+<div id="button-container">
 
-  <!-- 16 Tiroirs - Disposition en grille 4x4 COMPACTE -->
-  <!-- Ligne 1 -->
-  <div class="drawer draggable" data-num="1" data-name="Blanc" style="top:120px; left:20px">
-    1-Blanc
-    <div class="resize-handle resize-se"></div>
-    <div class="resize-handle resize-e"></div>
-    <div class="resize-handle resize-s"></div>
-  </div>
-  <div class="drawer draggable" data-num="2" data-name="Écru/Ivoire" style="top:120px; left:120px">
-    2-Écru
-    <div class="resize-handle resize-se"></div>
-    <div class="resize-handle resize-e"></div>
-    <div class="resize-handle resize-s"></div>
-  </div>
-  <div class="drawer draggable" data-num="3" data-name="Beige" style="top:120px; left:220px">
-    3-Beige
-    <div class="resize-handle resize-se"></div>
-    <div class="resize-handle resize-e"></div>
-    <div class="resize-handle resize-s"></div>
-  </div>
-  <div class="drawer draggable" data-num="4" data-name="Marron" style="top:120px; left:320px">
-    4-Marron
-    <div class="resize-handle resize-se"></div>
-    <div class="resize-handle resize-e"></div>
-    <div class="resize-handle resize-s"></div>
-  </div>
-
-  <!-- Ligne 2 -->
-  <div class="drawer draggable" data-num="5" data-name="Gris" style="top:170px; left:20px">
-    5-Gris
-    <div class="resize-handle resize-se"></div>
-    <div class="resize-handle resize-e"></div>
-    <div class="resize-handle resize-s"></div>
-  </div>
-  <div class="drawer draggable" data-num="6" data-name="Noir" style="top:170px; left:120px">
-    6-Noir
-    <div class="resize-handle resize-se"></div>
-    <div class="resize-handle resize-e"></div>
-    <div class="resize-handle resize-s"></div>
-  </div>
-  <div class="drawer draggable" data-num="7" data-name="Jaune" style="top:170px; left:220px">
-    7-Jaune
-    <div class="resize-handle resize-se"></div>
-    <div class="resize-handle resize-e"></div>
-    <div class="resize-handle resize-s"></div>
-  </div>
-  <div class="drawer draggable" data-num="8" data-name="Orange" style="top:170px; left:320px">
-    8-Orange
-    <div class="resize-handle resize-se"></div>
-    <div class="resize-handle resize-e"></div>
-    <div class="resize-handle resize-s"></div>
-  </div>
-
-  <!-- Ligne 3 -->
-  <div class="drawer draggable" data-num="9" data-name="Rouge" style="top:220px; left:20px">
-    9-Rouge
-    <div class="resize-handle resize-se"></div>
-    <div class="resize-handle resize-e"></div>
-    <div class="resize-handle resize-s"></div>
-  </div>
-  <div class="drawer draggable" data-num="10" data-name="Rose" style="top:220px; left:120px">
-    10-Rose
-    <div class="resize-handle resize-se"></div>
-    <div class="resize-handle resize-e"></div>
-    <div class="resize-handle resize-s"></div>
-  </div>
-  <div class="drawer draggable" data-num="11" data-name="Violet" style="top:220px; left:220px">
-    11-Violet
-    <div class="resize-handle resize-se"></div>
-    <div class="resize-handle resize-e"></div>
-    <div class="resize-handle resize-s"></div>
-  </div>
-  <div class="drawer draggable" data-num="12" data-name="Bleu" style="top:220px; left:320px">
-    12-Bleu
-    <div class="resize-handle resize-se"></div>
-    <div class="resize-handle resize-e"></div>
-    <div class="resize-handle resize-s"></div>
-  </div>
-
-  <!-- Ligne 4 -->
-  <div class="drawer draggable" data-num="13" data-name="Vert" style="top:270px; left:20px">
-    13-Vert
-    <div class="resize-handle resize-se"></div>
-    <div class="resize-handle resize-e"></div>
-    <div class="resize-handle resize-s"></div>
-  </div>
-  <div class="drawer draggable" data-num="14" data-name="Turquoise" style="top:270px; left:120px">
-    14-Turquoise
-    <div class="resize-handle resize-se"></div>
-    <div class="resize-handle resize-e"></div>
-    <div class="resize-handle resize-s"></div>
-  </div>
-  <div class="drawer draggable" data-num="15" data-name="Multicolore" style="top:270px; left:220px">
-    15-Multi
-    <div class="resize-handle resize-se"></div>
-    <div class="resize-handle resize-e"></div>
-    <div class="resize-handle resize-s"></div>
-  </div>
-  <div class="drawer draggable" data-num="16" data-name="Metal/Argent" style="top:270px; left:320px">
-    16-Metal
-    <div class="resize-handle resize-se"></div>
-    <div class="resize-handle resize-e"></div>
-    <div class="resize-handle resize-s"></div>
-  </div>
-</div>
-
-<!-- COUCHE DES BOUTONS CLIQUABLES (vos positions générées) -->
-<div id="clickable-layer">
   <!-- Cadre Hobbii -->
   <button class="clickable-btn" id="hobbii-board" style="top:9.7%; left:26.5%; width:48.3%; height:19.8%" onclick="window.open('https://hobbii.fr', '_blank')"></button>
 
@@ -430,297 +123,27 @@ body {
 
   <!-- Tiroir 16: Metal/Argent -->
   <button class="clickable-btn drawer-btn" style="top:65.7%; left:73.8%; width:21.7%; height:5.5%" onclick="openDrawer(16, 'Metal/Argent')"></button>
-</div>
 
-<!-- Bouton pour cacher/afficher le panel -->
-<button id="togglePanel" onclick="togglePanel()">⚙️</button>
-
-<div id="panel">
-  <h3>🎯 Éditeur de Position</h3>
-
-  <div class="info">
-    <strong>Instructions :</strong><br>
-    • Glissez les rectangles sur l'image<br>
-    • <span style="color:lime">●</span> Vert = coin (L+H)<br>
-    • <span style="color:orange">●</span> Orange = largeur<br>
-    • <span style="color:cyan">●</span> Cyan = hauteur<br>
-    • 16 tiroirs au total
-  </div>
-
-  <button class="btn" onclick="generate()">🔧 Générer le Code</button>
-  <button class="btn" onclick="copy()">📋 Copier</button>
-  <button class="btn" onclick="toggleMode()">🎮 Mode Aperçu</button>
-  <button class="btn" onclick="location.reload()">🔄 Reset</button>
-  <button class="btn" onclick="showAll()">👁️ Voir tous les tiroirs</button>
-
-  <div id="output"></div>
 </div>
 
 <script>
-let activeElement = null;
-let resizeElement = null;
-let resizeType = null;
-let startX = 0;
-let startY = 0;
-let startLeft = 0;
-let startTop = 0;
-let startWidth = 0;
-let startHeight = 0;
-let previewMode = false;
-
-// Initialiser tous les draggables
-document.querySelectorAll('.draggable').forEach(elem => {
-  elem.addEventListener('mousedown', startDrag);
-  elem.addEventListener('touchstart', startDrag);
-});
-
-// Initialiser toutes les poignées de redimensionnement
-document.querySelectorAll('.resize-handle').forEach(handle => {
-  handle.addEventListener('mousedown', startResize);
-  handle.addEventListener('touchstart', startResize);
-});
-
-function startDrag(e) {
-  // Ignorer si on clique sur le panel ou une poignée
-  if (e.target.closest('#panel') || e.target.closest('.resize-handle')) return;
-  
-  activeElement = e.target.closest('.draggable');
-  if (!activeElement) return;
-  
-  activeElement.classList.add('active');
-  
-  const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-  const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-  
-  startX = clientX;
-  startY = clientY;
-  
-  const style = window.getComputedStyle(activeElement);
-  startLeft = parseInt(style.left);
-  startTop = parseInt(style.top);
-  
-  document.addEventListener('mousemove', doDrag);
-  document.addEventListener('mouseup', stopDrag);
-  document.addEventListener('touchmove', doDrag);
-  document.addEventListener('touchend', stopDrag);
-  
-  e.preventDefault();
-}
-
-function doDrag(e) {
-  if (!activeElement) return;
-  
-  const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-  const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-  
-  const dx = clientX - startX;
-  const dy = clientY - startY;
-  
-  activeElement.style.left = (startLeft + dx) + 'px';
-  activeElement.style.top = (startTop + dy) + 'px';
-}
-
-function stopDrag() {
-  if (activeElement) {
-    activeElement.classList.remove('active');
-    activeElement = null;
-  }
-  
-  document.removeEventListener('mousemove', doDrag);
-  document.removeEventListener('mouseup', stopDrag);
-  document.removeEventListener('touchmove', doDrag);
-  document.removeEventListener('touchend', stopDrag);
-}
-
-// REDIMENSIONNEMENT
-function startResize(e) {
-  e.stopPropagation();
-  
-  resizeElement = e.target.closest('.draggable');
-  if (!resizeElement) return;
-  
-  resizeElement.classList.add('active');
-  
-  // Déterminer le type de redimensionnement
-  if (e.target.classList.contains('resize-se')) {
-    resizeType = 'se'; // Les deux dimensions
-  } else if (e.target.classList.contains('resize-e')) {
-    resizeType = 'e'; // Largeur seulement
-  } else if (e.target.classList.contains('resize-s')) {
-    resizeType = 's'; // Hauteur seulement
-  }
-  
-  const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-  const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-  
-  startX = clientX;
-  startY = clientY;
-  
-  const style = window.getComputedStyle(resizeElement);
-  startWidth = parseInt(style.width);
-  startHeight = parseInt(style.height);
-  
-  document.addEventListener('mousemove', doResize);
-  document.addEventListener('mouseup', stopResize);
-  document.addEventListener('touchmove', doResize);
-  document.addEventListener('touchend', stopResize);
-  
-  e.preventDefault();
-}
-
-function doResize(e) {
-  if (!resizeElement) return;
-  
-  const clientX = e.touches ? e.touches[0].clientX : e.clientX;
-  const clientY = e.touches ? e.touches[0].clientY : e.clientY;
-  
-  const dx = clientX - startX;
-  const dy = clientY - startY;
-  
-  if (resizeType === 'se') {
-    // Redimensionner largeur et hauteur
-    const newWidth = Math.max(50, startWidth + dx);
-    const newHeight = Math.max(30, startHeight + dy);
-    resizeElement.style.width = newWidth + 'px';
-    resizeElement.style.height = newHeight + 'px';
-  } else if (resizeType === 'e') {
-    // Redimensionner largeur seulement
-    const newWidth = Math.max(50, startWidth + dx);
-    resizeElement.style.width = newWidth + 'px';
-  } else if (resizeType === 's') {
-    // Redimensionner hauteur seulement
-    const newHeight = Math.max(30, startHeight + dy);
-    resizeElement.style.height = newHeight + 'px';
-  }
-}
-
-function stopResize() {
-  if (resizeElement) {
-    resizeElement.classList.remove('active');
-    resizeElement = null;
-    resizeType = null;
-  }
-  
-  document.removeEventListener('mousemove', doResize);
-  document.removeEventListener('mouseup', stopResize);
-  document.removeEventListener('touchmove', doResize);
-  document.removeEventListener('touchend', stopResize);
-}
-
-// Toggle panel
-function togglePanel() {
-  const panel = document.getElementById('panel');
-  panel.classList.toggle('hidden');
-}
-
-// Toggle entre mode édition et mode aperçu
-function toggleMode() {
-  previewMode = !previewMode;
-  const workspace = document.getElementById('workspace');
-  const clickableLayer = document.getElementById('clickable-layer');
-  
-  if (previewMode) {
-    workspace.style.display = 'none';
-    clickableLayer.classList.add('active');
-    alert('✅ Mode Aperçu activé - Les boutons sont maintenant cliquables !');
-  } else {
-    workspace.style.display = 'block';
-    clickableLayer.classList.remove('active');
-    alert('✅ Mode Édition activé - Vous pouvez déplacer les rectangles');
-  }
-}
-
-// Afficher tous les tiroirs (pour debug)
-function showAll() {
-  const drawers = document.querySelectorAll('.drawer');
-  let message = `Tiroirs trouvés : ${drawers.length}\n\n`;
-  
-  drawers.forEach((drawer, index) => {
-    const num = drawer.getAttribute('data-num');
-    const name = drawer.getAttribute('data-name');
-    const rect = drawer.getBoundingClientRect();
-    message += `${num}. ${name} - Position: (${Math.round(rect.left)}, ${Math.round(rect.top)})\n`;
-  });
-  
-  alert(message);
-}
-
-// Générer le code
-function generate() {
-  const W = window.innerWidth;
-  const H = window.innerHeight;
-  
-  let code = '<!-- ZONES CLIQUABLES -->\n\n';
-  
-  // Hobbii
-  const hobbii = document.getElementById('hobbii');
-  const hRect = hobbii.getBoundingClientRect();
-  const hTop = (hRect.top / H * 100).toFixed(1);
-  const hLeft = (hRect.left / W * 100).toFixed(1);
-  const hWidth = (hRect.width / W * 100).toFixed(1);
-  const hHeight = (hRect.height / H * 100).toFixed(1);
-  
-  code += `<!-- Cadre Hobbii -->\n`;
-  code += `<button id="hobbii-board" style="top:${hTop}%; left:${hLeft}%; width:${hWidth}%; height:${hHeight}%" onclick="window.open('https://hobbii.fr', '_blank')"></button>\n\n`;
-  
-  // Tiroirs
-  const drawers = document.querySelectorAll('.drawer');
-  const drawerData = [];
-  
-  drawers.forEach(drawer => {
-    const rect = drawer.getBoundingClientRect();
-    const num = drawer.getAttribute('data-num');
-    const name = drawer.getAttribute('data-name');
-    const top = (rect.top / H * 100).toFixed(1);
-    const left = (rect.left / W * 100).toFixed(1);
-    const width = (rect.width / W * 100).toFixed(1);
-    const height = (rect.height / H * 100).toFixed(1);
-    
-    drawerData.push({ num, name, top, left, width, height });
-  });
-  
-  // Trier par numéro
-  drawerData.sort((a, b) => parseInt(a.num) - parseInt(b.num));
-  
-  // Générer le code
-  drawerData.forEach(d => {
-    code += `<!-- Tiroir ${d.num}: ${d.name} -->\n`;
-    code += `<button class="drawer" style="top:${d.top}%; left:${d.left}%; width:${d.width}%; height:${d.height}%" onclick="openDrawer(${d.num}, '${d.name}')"></button>\n\n`;
-  });
-  
-  // Afficher
-  const output = document.getElementById('output');
-  output.textContent = code;
-  output.style.display = 'block';
-}
-
-// Copier
-function copy() {
-  const output = document.getElementById('output');
-  if (output.style.display === 'none') {
-    alert('⚠️ Générez le code d\'abord !');
-    return;
-  }
-  
-  navigator.clipboard.writeText(output.textContent).then(() => {
-    alert('✅ Code copié !');
-  }).catch(() => {
-    // Fallback
-    const textarea = document.createElement('textarea');
-    textarea.value = output.textContent;
-    document.body.appendChild(textarea);
-    textarea.select();
-    document.execCommand('copy');
-    document.body.removeChild(textarea);
-    alert('✅ Code copié !');
-  });
-}
-
 // Fonction appelée quand on clique sur un tiroir
 function openDrawer(num, name) {
   console.log(`Tiroir ${num} cliqué : ${name}`);
   
-  // Créer une modale simple
+  // OPTION 1 : Afficher une modale
+  showModal(num, name);
+  
+  // OPTION 2 : Ouvrir une URL (décommenter si besoin)
+  // window.open(`https://hobbii.fr/tiroir-${num}`, '_blank');
+  
+  // OPTION 3 : Rediriger vers une page (décommenter si besoin)
+  // window.location.href = `page-tiroir.html?num=${num}&name=${name}`;
+}
+
+// Fonction pour afficher une modale
+function showModal(num, name) {
+  // Créer la modale
   const modal = document.createElement('div');
   modal.style.cssText = `
     position: fixed;
@@ -738,9 +161,12 @@ function openDrawer(num, name) {
   
   modal.innerHTML = `
     <h2 style="color: #ff69b4; margin-bottom: 15px;">Tiroir ${num}</h2>
-    <p style="font-size: 18px; margin-bottom: 20px;">${name}</p>
+    <p style="font-size: 18px; margin-bottom: 20px; color: #333;">${name}</p>
+    <p style="font-size: 14px; margin-bottom: 20px; color: #666;">
+      Contenu du tiroir ${name} à personnaliser ici...
+    </p>
     <button onclick="this.parentElement.remove(); document.getElementById('overlay').remove();" 
-            style="background: #ffb6c1; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-size: 16px;">
+            style="background: #ffb6c1; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-size: 16px; font-weight: bold;">
       Fermer
     </button>
   `;
@@ -762,11 +188,6 @@ function openDrawer(num, name) {
   document.body.appendChild(overlay);
   document.body.appendChild(modal);
 }
-
-// Empêcher la sélection de texte pendant le drag
-document.addEventListener('selectstart', (e) => {
-  if (activeElement || resizeElement) e.preventDefault();
-});
 </script>
 
 </body>
