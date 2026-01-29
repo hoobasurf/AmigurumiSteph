@@ -229,6 +229,32 @@ body {
 #panel.hidden {
   display: none;
 }
+
+/* === NOUVEAUX STYLES POUR LES BOUTONS CLIQUABLES === */
+#clickable-layer {
+  position: fixed;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  display: none; /* Caché par défaut en mode édition */
+}
+
+#clickable-layer.active {
+  display: block;
+}
+
+.clickable-btn {
+  position: absolute;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  pointer-events: auto;
+  transition: background 0.2s;
+}
+
+.clickable-btn:hover {
+  background: rgba(255, 255, 0, 0.3);
+}
 </style>
 
 </head>
@@ -352,6 +378,60 @@ body {
   </div>
 </div>
 
+<!-- COUCHE DES BOUTONS CLIQUABLES (vos positions générées) -->
+<div id="clickable-layer">
+  <!-- Cadre Hobbii -->
+  <button class="clickable-btn" id="hobbii-board" style="top:9.7%; left:26.5%; width:48.3%; height:19.8%" onclick="window.open('https://hobbii.fr', '_blank')"></button>
+
+  <!-- Tiroir 1: Blanc -->
+  <button class="clickable-btn drawer-btn" style="top:45.6%; left:4.9%; width:20.6%; height:5.3%" onclick="openDrawer(1, 'Blanc')"></button>
+
+  <!-- Tiroir 2: Écru/Ivoire -->
+  <button class="clickable-btn drawer-btn" style="top:45.8%; left:27.8%; width:20.8%; height:5.2%" onclick="openDrawer(2, 'Écru/Ivoire')"></button>
+
+  <!-- Tiroir 3: Beige -->
+  <button class="clickable-btn drawer-btn" style="top:45.7%; left:51.0%; width:21.2%; height:5.3%" onclick="openDrawer(3, 'Beige')"></button>
+
+  <!-- Tiroir 4: Marron -->
+  <button class="clickable-btn drawer-btn" style="top:45.7%; left:74.0%; width:21.7%; height:5.4%" onclick="openDrawer(4, 'Marron')"></button>
+
+  <!-- Tiroir 5: Gris -->
+  <button class="clickable-btn drawer-btn" style="top:52.0%; left:4.7%; width:20.9%; height:5.6%" onclick="openDrawer(5, 'Gris')"></button>
+
+  <!-- Tiroir 6: Noir -->
+  <button class="clickable-btn drawer-btn" style="top:52.2%; left:27.4%; width:21.5%; height:5.3%" onclick="openDrawer(6, 'Noir')"></button>
+
+  <!-- Tiroir 7: Jaune -->
+  <button class="clickable-btn drawer-btn" style="top:52.2%; left:51.0%; width:21.0%; height:5.1%" onclick="openDrawer(7, 'Jaune')"></button>
+
+  <!-- Tiroir 8: Orange -->
+  <button class="clickable-btn drawer-btn" style="top:52.2%; left:74.1%; width:21.7%; height:5.5%" onclick="openDrawer(8, 'Orange')"></button>
+
+  <!-- Tiroir 9: Rouge -->
+  <button class="clickable-btn drawer-btn" style="top:58.7%; left:5.3%; width:20.0%; height:5.5%" onclick="openDrawer(9, 'Rouge')"></button>
+
+  <!-- Tiroir 10: Rose -->
+  <button class="clickable-btn drawer-btn" style="top:58.7%; left:27.6%; width:21.7%; height:5.8%" onclick="openDrawer(10, 'Rose')"></button>
+
+  <!-- Tiroir 11: Violet -->
+  <button class="clickable-btn drawer-btn" style="top:58.8%; left:51.0%; width:20.9%; height:5.6%" onclick="openDrawer(11, 'Violet')"></button>
+
+  <!-- Tiroir 12: Bleu -->
+  <button class="clickable-btn drawer-btn" style="top:58.9%; left:74.1%; width:21.7%; height:5.5%" onclick="openDrawer(12, 'Bleu')"></button>
+
+  <!-- Tiroir 13: Vert -->
+  <button class="clickable-btn drawer-btn" style="top:65.5%; left:5.3%; width:20.1%; height:5.5%" onclick="openDrawer(13, 'Vert')"></button>
+
+  <!-- Tiroir 14: Turquoise -->
+  <button class="clickable-btn drawer-btn" style="top:65.5%; left:27.5%; width:21.7%; height:5.6%" onclick="openDrawer(14, 'Turquoise')"></button>
+
+  <!-- Tiroir 15: Multicolore -->
+  <button class="clickable-btn drawer-btn" style="top:65.7%; left:50.7%; width:21.7%; height:5.4%" onclick="openDrawer(15, 'Multicolore')"></button>
+
+  <!-- Tiroir 16: Metal/Argent -->
+  <button class="clickable-btn drawer-btn" style="top:65.7%; left:73.8%; width:21.7%; height:5.5%" onclick="openDrawer(16, 'Metal/Argent')"></button>
+</div>
+
 <!-- Bouton pour cacher/afficher le panel -->
 <button id="togglePanel" onclick="togglePanel()">⚙️</button>
 
@@ -369,6 +449,7 @@ body {
 
   <button class="btn" onclick="generate()">🔧 Générer le Code</button>
   <button class="btn" onclick="copy()">📋 Copier</button>
+  <button class="btn" onclick="toggleMode()">🎮 Mode Aperçu</button>
   <button class="btn" onclick="location.reload()">🔄 Reset</button>
   <button class="btn" onclick="showAll()">👁️ Voir tous les tiroirs</button>
 
@@ -385,6 +466,7 @@ let startLeft = 0;
 let startTop = 0;
 let startWidth = 0;
 let startHeight = 0;
+let previewMode = false;
 
 // Initialiser tous les draggables
 document.querySelectorAll('.draggable').forEach(elem => {
@@ -531,6 +613,23 @@ function togglePanel() {
   panel.classList.toggle('hidden');
 }
 
+// Toggle entre mode édition et mode aperçu
+function toggleMode() {
+  previewMode = !previewMode;
+  const workspace = document.getElementById('workspace');
+  const clickableLayer = document.getElementById('clickable-layer');
+  
+  if (previewMode) {
+    workspace.style.display = 'none';
+    clickableLayer.classList.add('active');
+    alert('✅ Mode Aperçu activé - Les boutons sont maintenant cliquables !');
+  } else {
+    workspace.style.display = 'block';
+    clickableLayer.classList.remove('active');
+    alert('✅ Mode Édition activé - Vous pouvez déplacer les rectangles');
+  }
+}
+
 // Afficher tous les tiroirs (pour debug)
 function showAll() {
   const drawers = document.querySelectorAll('.drawer');
@@ -615,6 +714,53 @@ function copy() {
     document.body.removeChild(textarea);
     alert('✅ Code copié !');
   });
+}
+
+// Fonction appelée quand on clique sur un tiroir
+function openDrawer(num, name) {
+  console.log(`Tiroir ${num} cliqué : ${name}`);
+  
+  // Créer une modale simple
+  const modal = document.createElement('div');
+  modal.style.cssText = `
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: white;
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+    z-index: 10000;
+    text-align: center;
+    min-width: 300px;
+  `;
+  
+  modal.innerHTML = `
+    <h2 style="color: #ff69b4; margin-bottom: 15px;">Tiroir ${num}</h2>
+    <p style="font-size: 18px; margin-bottom: 20px;">${name}</p>
+    <button onclick="this.parentElement.remove(); document.getElementById('overlay').remove();" 
+            style="background: #ffb6c1; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-size: 16px;">
+      Fermer
+    </button>
+  `;
+  
+  // Overlay pour assombrir le fond
+  const overlay = document.createElement('div');
+  overlay.id = 'overlay';
+  overlay.style.cssText = `
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.7);
+    z-index: 9999;
+  `;
+  overlay.onclick = () => {
+    modal.remove();
+    overlay.remove();
+  };
+  
+  document.body.appendChild(overlay);
+  document.body.appendChild(modal);
 }
 
 // Empêcher la sélection de texte pendant le drag
