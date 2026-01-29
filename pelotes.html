@@ -50,61 +50,305 @@ body {
   background: rgba(255, 255, 0, 0.3);
 }
 
-/* SIDEBAR TRANSPARENTE */
-.sidebar {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 80px;
-  height: 100vh;
-  background: rgba(255, 255, 255, 0.15);
-  backdrop-filter: blur(10px);
-  -webkit-backdrop-filter: blur(10px);
-  border-right: 1px solid rgba(255, 255, 255, 0.2);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 20px 0;
-  z-index: 5000;
-  box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+/* ===== SIDEBAR ===== */
+#sidebar{
+  position:fixed;
+  top:0;
+  left:-220px;
+  width:220px;
+  height:100vh;
+  background:rgba(255,230,240,0.2);
+  border-right:2px solid #b67385;
+  padding:20px;
+  transition:left .3s;
+  z-index:5000;
+}
+#sidebar.sidebar-open{left:0}
+
+#toggleSidebar{
+  position:absolute;
+  top:50%;
+  right:-30px;
+  width:30px;
+  height:60px;
+  background:#ffb6c1;
+  border-radius:0 12px 12px 0;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  cursor:pointer;
+  font-weight:bold;
 }
 
-/* Bouton retour rose pastel */
-.back-btn {
-  width: 50px;
-  height: 50px;
-  background: rgba(255, 182, 193, 0.8);
-  border: 2px solid rgba(255, 182, 193, 1);
-  border-radius: 50%;
+#sidebar button{
+  padding:8px 16px;
+  border-radius:16px;
+  border:none;
+  background:#ffb6c1;
+  color:#fff;
+  cursor:pointer;
+  font-weight:bold;
+  margin-top:10px;
+  width:100%;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+}
+
+#sidebar button:hover{
+  background:#ff69b4;
+}
+
+/* ===== MODALE TIROIR ===== */
+.drawer-modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: linear-gradient(145deg, #ffe6f0, #ffd6e8);
+  padding: 30px;
+  border-radius: 20px;
+  box-shadow: 
+    0 10px 40px rgba(0,0,0,0.3),
+    inset 0 2px 10px rgba(255,255,255,0.8),
+    inset 0 -2px 10px rgba(0,0,0,0.1);
+  z-index: 10000;
+  min-width: 350px;
+  max-width: 500px;
+  border: 3px solid #ffb6c1;
+}
+
+.drawer-modal h2 {
+  color: #ff69b4;
+  margin-bottom: 20px;
+  text-align: center;
+  font-size: 24px;
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+}
+
+.modal-content {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+/* Zone photo */
+.photo-section {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.photo-preview {
+  width: 100%;
+  height: 200px;
+  background: #fff0f5;
+  border: 2px dashed #ffb6c1;
+  border-radius: 12px;
   display: flex;
   align-items: center;
   justify-content: center;
-  cursor: pointer;
-  transition: all 0.3s;
-  font-size: 24px;
+  overflow: hidden;
+  position: relative;
+}
+
+.photo-preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.photo-preview-empty {
+  color: #ffb6c1;
+  font-size: 14px;
+  text-align: center;
+}
+
+.photo-btn {
+  padding: 8px 16px;
+  background: #ffb6c1;
+  border: none;
+  border-radius: 8px;
   color: white;
-  text-decoration: none;
-  box-shadow: 0 4px 10px rgba(255, 182, 193, 0.3);
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: bold;
+  transition: all 0.2s;
 }
 
-.back-btn:hover {
-  background: rgba(255, 105, 180, 0.9);
-  border-color: rgba(255, 105, 180, 1);
-  transform: scale(1.1);
-  box-shadow: 0 6px 15px rgba(255, 105, 180, 0.5);
+.photo-btn:hover {
+  background: #ff69b4;
+  transform: scale(1.05);
 }
 
-/* Mode debug - décommenter pour voir les zones en permanence */
-/*
-#hobbii-board {
-  background: rgba(0, 255, 0, 0.3);
-  border: 2px solid lime;
+/* Zone texte */
+.notes-section {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
-.drawer-btn {
-  background: rgba(255, 0, 0, 0.3);
-  border: 2px solid red;
+
+.notes-section label {
+  color: #b67385;
+  font-weight: bold;
+  font-size: 14px;
 }
-*/
+
+.notes-section textarea {
+  width: 100%;
+  min-height: 120px;
+  padding: 12px;
+  border: 2px solid #ffb6c1;
+  border-radius: 12px;
+  background: #fff0f5;
+  color: #b84c6f;
+  font-family: 'Comic Sans MS', cursive;
+  font-size: 14px;
+  resize: vertical;
+  box-shadow: inset 0 2px 5px rgba(0,0,0,0.1);
+}
+
+.notes-section textarea:focus {
+  outline: none;
+  border-color: #ff69b4;
+  box-shadow: inset 0 2px 5px rgba(0,0,0,0.1), 0 0 10px rgba(255,105,180,0.3);
+}
+
+/* Boutons de la modale */
+.modal-buttons {
+  display: flex;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.modal-buttons button {
+  flex: 1;
+  padding: 12px;
+  border: none;
+  border-radius: 10px;
+  font-weight: bold;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.2s;
+}
+
+.save-btn {
+  background: #ffb6c1;
+  color: white;
+}
+
+.save-btn:hover {
+  background: #ff69b4;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(255,105,180,0.4);
+}
+
+.close-btn {
+  background: #ddd;
+  color: #666;
+}
+
+.close-btn:hover {
+  background: #ccc;
+}
+
+/* Overlay */
+.overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.7);
+  z-index: 9999;
+  backdrop-filter: blur(3px);
+}
+
+/* ===== VUE ENSEMBLE DES TIROIRS ===== */
+.drawers-grid-modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: linear-gradient(145deg, #ffe6f0, #ffd6e8);
+  padding: 30px;
+  border-radius: 20px;
+  box-shadow: 
+    0 10px 40px rgba(0,0,0,0.3),
+    inset 0 2px 10px rgba(255,255,255,0.8),
+    inset 0 -2px 10px rgba(0,0,0,0.1);
+  z-index: 10000;
+  width: 90%;
+  max-width: 800px;
+  max-height: 85vh;
+  overflow-y: auto;
+  border: 3px solid #ffb6c1;
+}
+
+.drawers-grid-modal h2 {
+  color: #ff69b4;
+  margin-bottom: 20px;
+  text-align: center;
+  font-size: 24px;
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+}
+
+.drawers-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 15px;
+  margin-bottom: 20px;
+}
+
+.drawer-card {
+  background: white;
+  border: 2px solid #ffb6c1;
+  border-radius: 12px;
+  padding: 15px;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.drawer-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 6px 16px rgba(255,105,180,0.3);
+  border-color: #ff69b4;
+}
+
+.drawer-card-num {
+  font-size: 18px;
+  font-weight: bold;
+  color: #ff69b4;
+  margin-bottom: 5px;
+}
+
+.drawer-card-name {
+  font-size: 14px;
+  color: #b67385;
+}
+
+.drawer-card-preview {
+  margin-top: 10px;
+  width: 100%;
+  height: 80px;
+  background: #fff0f5;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  color: #ffb6c1;
+  overflow: hidden;
+}
+
+.drawer-card-preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+input[type="file"] {
+  display: none;
+}
 </style>
 
 </head>
@@ -114,11 +358,19 @@ body {
 <!-- FOND IMAGE -->
 <div id="background"></div>
 
-<!-- SIDEBAR TRANSPARENTE -->
-<div class="sidebar">
-  <a href="index.html" class="back-btn" title="Retour">
-    ←
-  </a>
+<!-- ===== SIDEBAR ===== -->
+<div id="sidebar">
+  <div id="toggleSidebar">☰</div>
+  <button id="backBtn">← Retour</button>
+  <button id="viewAllBtn">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <rect x="3" y="3" width="7" height="7" rx="1"/>
+      <rect x="14" y="3" width="7" height="7" rx="1"/>
+      <rect x="3" y="14" width="7" height="7" rx="1"/>
+      <rect x="14" y="14" width="7" height="7" rx="1"/>
+    </svg>
+    Tous les tiroirs
+  </button>
 </div>
 
 <!-- CONTAINER DES BOUTONS CLIQUABLES -->
@@ -178,66 +430,188 @@ body {
 </div>
 
 <script>
-// Fonction appelée quand on clique sur un tiroir
-function openDrawer(num, name) {
-  console.log(`Tiroir ${num} cliqué : ${name}`);
-  
-  // Afficher une modale
-  showModal(num, name);
-  
-  // OPTION : Ouvrir une URL (décommenter si besoin)
-  // window.open(`https://hobbii.fr/tiroir-${num}`, '_blank');
-  
-  // OPTION : Rediriger vers une page (décommenter si besoin)
-  // window.location.href = `page-tiroir.html?num=${num}&name=${name}`;
+/* ===== DONNÉES DES TIROIRS ===== */
+const drawersData = {
+  1: { name: 'Blanc', photo: null, notes: '' },
+  2: { name: 'Écru/Ivoire', photo: null, notes: '' },
+  3: { name: 'Beige', photo: null, notes: '' },
+  4: { name: 'Marron', photo: null, notes: '' },
+  5: { name: 'Gris', photo: null, notes: '' },
+  6: { name: 'Noir', photo: null, notes: '' },
+  7: { name: 'Jaune', photo: null, notes: '' },
+  8: { name: 'Orange', photo: null, notes: '' },
+  9: { name: 'Rouge', photo: null, notes: '' },
+  10: { name: 'Rose', photo: null, notes: '' },
+  11: { name: 'Violet', photo: null, notes: '' },
+  12: { name: 'Bleu', photo: null, notes: '' },
+  13: { name: 'Vert', photo: null, notes: '' },
+  14: { name: 'Turquoise', photo: null, notes: '' },
+  15: { name: 'Multicolore', photo: null, notes: '' },
+  16: { name: 'Metal/Argent', photo: null, notes: '' }
+};
+
+// Charger depuis localStorage
+function loadDrawersData() {
+  const saved = localStorage.getItem('drawersData');
+  if (saved) {
+    Object.assign(drawersData, JSON.parse(saved));
+  }
 }
 
-// Fonction pour afficher une modale
-function showModal(num, name) {
-  // Créer la modale
+// Sauvegarder dans localStorage
+function saveDrawersData() {
+  localStorage.setItem('drawersData', JSON.stringify(drawersData));
+}
+
+loadDrawersData();
+
+/* ===== SIDEBAR ===== */
+const sidebar = document.getElementById('sidebar');
+const toggleSidebar = document.getElementById('toggleSidebar');
+
+toggleSidebar.onclick = () => sidebar.classList.toggle('sidebar-open');
+
+// BOUTON RETOUR
+document.getElementById('backBtn').onclick = () => {
+  document.body.style.transition = 'opacity 0.5s';
+  document.body.style.opacity = '0';
+  setTimeout(() => {
+    window.location.href = 'owner.html';
+  }, 500);
+};
+
+// BOUTON VOIR TOUS LES TIROIRS
+document.getElementById('viewAllBtn').onclick = showAllDrawers;
+
+/* ===== FONCTION OUVRIR UN TIROIR ===== */
+function openDrawer(num, name) {
+  const data = drawersData[num];
+  
+  // Créer overlay
+  const overlay = document.createElement('div');
+  overlay.className = 'overlay';
+  
+  // Créer modale
   const modal = document.createElement('div');
-  modal.style.cssText = `
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    background: white;
-    padding: 30px;
-    border-radius: 15px;
-    box-shadow: 0 10px 40px rgba(0,0,0,0.5);
-    z-index: 10000;
-    text-align: center;
-    min-width: 300px;
-  `;
+  modal.className = 'drawer-modal';
   
   modal.innerHTML = `
-    <h2 style="color: #ff69b4; margin-bottom: 15px;">Tiroir ${num}</h2>
-    <p style="font-size: 18px; margin-bottom: 20px; color: #333;">${name}</p>
-    <p style="font-size: 14px; margin-bottom: 20px; color: #666;">
-      Contenu du tiroir ${name} à personnaliser ici...
-    </p>
-    <button onclick="this.parentElement.remove(); document.getElementById('overlay').remove();" 
-            style="background: #ffb6c1; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-size: 16px; font-weight: bold;">
-      Fermer
-    </button>
+    <h2>Tiroir ${num} - ${name}</h2>
+    <div class="modal-content">
+      
+      <!-- Section Photo -->
+      <div class="photo-section">
+        <div class="photo-preview" id="photoPreview-${num}">
+          ${data.photo 
+            ? `<img src="${data.photo}" alt="Photo">` 
+            : '<div class="photo-preview-empty">Aucune photo</div>'}
+        </div>
+        <input type="file" id="photoInput-${num}" accept="image/*">
+        <button class="photo-btn" onclick="document.getElementById('photoInput-${num}').click()">
+          📷 ${data.photo ? 'Changer' : 'Ajouter'} une photo
+        </button>
+      </div>
+      
+      <!-- Section Notes -->
+      <div class="notes-section">
+        <label>Notes / Références :</label>
+        <textarea id="notesInput-${num}" placeholder="Marque, numéro de lot, quantité, notes...">${data.notes || ''}</textarea>
+      </div>
+      
+      <!-- Boutons -->
+      <div class="modal-buttons">
+        <button class="save-btn" id="saveBtn-${num}">💾 Enregistrer</button>
+        <button class="close-btn" id="closeBtn-${num}">Fermer</button>
+      </div>
+      
+    </div>
   `;
   
-  // Overlay pour assombrir le fond
-  const overlay = document.createElement('div');
-  overlay.id = 'overlay';
-  overlay.style.cssText = `
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.7);
-    z-index: 9999;
-  `;
-  overlay.onclick = () => {
+  document.body.appendChild(overlay);
+  document.body.appendChild(modal);
+  
+  // Gestion upload photo
+  const photoInput = document.getElementById(`photoInput-${num}`);
+  photoInput.onchange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const photoPreview = document.getElementById(`photoPreview-${num}`);
+        photoPreview.innerHTML = `<img src="${event.target.result}" alt="Photo">`;
+        data.photo = event.target.result;
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+  
+  // Bouton sauvegarder
+  document.getElementById(`saveBtn-${num}`).onclick = () => {
+    data.notes = document.getElementById(`notesInput-${num}`).value;
+    saveDrawersData();
+    alert('✅ Tiroir sauvegardé !');
+  };
+  
+  // Bouton fermer
+  document.getElementById(`closeBtn-${num}`).onclick = () => {
     modal.remove();
     overlay.remove();
   };
   
+  overlay.onclick = () => {
+    modal.remove();
+    overlay.remove();
+  };
+}
+
+/* ===== VUE ENSEMBLE DES TIROIRS ===== */
+function showAllDrawers() {
+  // Créer overlay
+  const overlay = document.createElement('div');
+  overlay.className = 'overlay';
+  
+  // Créer modale grille
+  const modal = document.createElement('div');
+  modal.className = 'drawers-grid-modal';
+  
+  let gridHTML = '<h2>📦 Tous les tiroirs</h2><div class="drawers-grid">';
+  
+  for (let i = 1; i <= 16; i++) {
+    const data = drawersData[i];
+    gridHTML += `
+      <div class="drawer-card" onclick="closeAllDrawersView(); openDrawer(${i}, '${data.name}')">
+        <div class="drawer-card-num">Tiroir ${i}</div>
+        <div class="drawer-card-name">${data.name}</div>
+        <div class="drawer-card-preview">
+          ${data.photo 
+            ? `<img src="${data.photo}" alt="${data.name}">` 
+            : '📷'}
+        </div>
+      </div>
+    `;
+  }
+  
+  gridHTML += `</div>
+    <div class="modal-buttons">
+      <button class="close-btn" onclick="closeAllDrawersView()">Fermer</button>
+    </div>
+  `;
+  
+  modal.innerHTML = gridHTML;
+  modal.id = 'allDrawersModal';
+  
   document.body.appendChild(overlay);
+  overlay.id = 'allDrawersOverlay';
   document.body.appendChild(modal);
+  
+  overlay.onclick = closeAllDrawersView;
+}
+
+function closeAllDrawersView() {
+  const modal = document.getElementById('allDrawersModal');
+  const overlay = document.getElementById('allDrawersOverlay');
+  if (modal) modal.remove();
+  if (overlay) overlay.remove();
 }
 </script>
 
