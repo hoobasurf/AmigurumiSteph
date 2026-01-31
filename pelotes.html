@@ -518,6 +518,9 @@ input[type="file"] {
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <script>
+// ATTENDRE QUE LE DOM SOIT CHARGÉ
+document.addEventListener('DOMContentLoaded', function() {
+
 // ===== CONFIGURATION SUPABASE =====
 const SUPABASE_URL = 'https://jyhbamdcxmpveujjqjla.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp5aGJhbWRjeG1wdmV1ampxamxhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjcwMjYzOTMsImV4cCI6MjA4MjYwMjM5M30.PIOMZxprCdkFwFj_sUC0ZDNSIP5OcGmxkvYN7D3JmGY';
@@ -639,36 +642,46 @@ async function saveDrawerData(drawerNumber) {
 const sidebar = document.getElementById('sidebar');
 const toggleSidebar = document.getElementById('toggleSidebar');
 
-toggleSidebar.onclick = () => sidebar.classList.toggle('sidebar-open');
+console.log('Sidebar:', sidebar);
+console.log('ToggleSidebar:', toggleSidebar);
+
+toggleSidebar.addEventListener('click', function() {
+  console.log('Toggle clicked!');
+  sidebar.classList.toggle('sidebar-open');
+});
 
 // BOUTON RETOUR
-document.getElementById('backBtn').onclick = () => {
+document.getElementById('backBtn').addEventListener('click', function() {
   document.body.style.transition = 'opacity 0.5s';
   document.body.style.opacity = '0';
   setTimeout(() => {
     window.location.href = 'owner.html';
   }, 500);
-};
+});
 
 // BOUTON VOIR TOUS LES TIROIRS
-document.getElementById('viewAllBtn').onclick = showAllDrawers;
+document.getElementById('viewAllBtn').addEventListener('click', showAllDrawers);
 
 // BOUTON HOBBII
-document.getElementById('hobbii-board').onclick = () => {
+document.getElementById('hobbii-board').addEventListener('click', function() {
   window.open('https://hobbii.fr', '_blank');
-};
+});
 
 // EVENT LISTENERS POUR LES TIROIRS
 document.querySelectorAll('.drawer-btn').forEach(btn => {
-  btn.addEventListener('click', function() {
+  btn.addEventListener('click', function(e) {
+    e.preventDefault();
+    e.stopPropagation();
     const num = parseInt(this.getAttribute('data-drawer'));
     const name = this.getAttribute('data-name');
+    console.log('Opening drawer:', num, name);
     openDrawer(num, name);
   });
 });
 
 /* ===== FONCTION OUVRIR UN TIROIR ===== */
 function openDrawer(num, name) {
+  console.log('openDrawer called:', num, name);
   const data = drawersData[num];
   
   // Créer overlay
@@ -846,6 +859,8 @@ function closeAllDrawersView() {
   if (modal) modal.remove();
   if (overlay) overlay.remove();
 }
+
+}); // FIN DU DOMContentLoaded
 </script>
 
 </body>
