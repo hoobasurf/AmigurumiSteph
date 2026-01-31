@@ -108,12 +108,12 @@ body::before {
 }
 
 #toggleTranscript {
-  background: #ff69b4;
+  background: #ff69b4 !important;
   margin-top: 10px;
 }
 
 #toggleTranscript:hover {
-  background: #ff1493;
+  background: #ff1493 !important;
 }
 
 /* Label pour transcription */
@@ -197,6 +197,7 @@ const returnBtn = document.getElementById('returnBtn');
 let currentPlayer = null;
 let transcriptionInterval = null;
 let transcriptionData = [];
+let youtubeAPIReady = false;
 
 // SIDEBAR
 toggleSidebar.onclick = () => sidebar.classList.toggle('sidebar-open');
@@ -216,6 +217,20 @@ cancelAddVideo.onclick = ()=> {
 };
 videoModalAdd.onclick = e => { if(e.target===videoModalAdd) videoModalAdd.style.display='none'; };
 
+// Vérifier si la colonne transcription existe, sinon la créer
+async function checkAndCreateTranscriptionColumn() {
+  try {
+    const { data, error } = await supabase.from('videos').select('transcription').limit(1);
+    if (error && error.message.includes('column')) {
+      console.log('Colonne transcription manquante, tentative de création...');
+      // La colonne n'existe pas, informer l'utilisateur
+      alert('Note : Pour utiliser la transcription, ajoutez une colonne "transcription" (type text) à votre table "videos" dans Supabase.');
+    }
+  } catch (e) {
+    console.error('Erreur lors de la vérification de la colonne:', e);
+  }
+}
+
 // AJOUT VIDEO
 confirmAddVideo.onclick = async ()=>{
   const yt = youtubeLink.value.trim();
@@ -223,20 +238,35 @@ confirmAddVideo.onclick = async ()=>{
 
   const transcription = transcriptionInput.value.trim();
 
-  const { data, error } = await supabase.from('videos')
-    .insert([{ 
+  try {
+    const insertData = { 
       name:"Vidéo YouTube", 
-      youtubelink: yt,
-      transcription: transcription || null
-    }])
-    .select();
+      youtubelink: yt
+    };
+    
+    // Essayer d'ajouter la transcription si le champ est rempli
+    if (transcription) {
+      insertData.transcription = transcription;
+    }
 
-  if(error){ alert(error.message); console.error(error); return; }
+    const { data, error } = await supabase.from('videos')
+      .insert([insertData])
+      .select();
 
-  youtubeLink.value=''; 
-  transcriptionInput.value='';
-  videoModalAdd.style.display='none'; 
-  loadVideos();
+    if(error){ 
+      console.error('Erreur Supabase:', error);
+      alert(error.message); 
+      return; 
+    }
+
+    youtubeLink.value=''; 
+    transcriptionInput.value='';
+    videoModalAdd.style.display='none'; 
+    loadVideos();
+  } catch (e) {
+    console.error('Erreur lors de l\'ajout:', e);
+    alert('Erreur lors de l\'ajout de la vidéo');
+  }
 };
 
 // CHARGER VIDEOS
@@ -318,7 +348,10 @@ function updateTranscription(currentTime) {
     if (currentTime >= item.time && currentTime < nextTime) {
       line.className = 'transcript-line active';
       // Auto-scroll vers la ligne active
-      line.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      const container = document.getElementById('transcriptionContainer');
+      if (container) {
+        line.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
     } else if (currentTime >= nextTime) {
       line.className = 'transcript-line passed';
     } else {
@@ -329,6 +362,9 @@ function updateTranscription(currentTime) {
 
 // LECTEUR
 function openVideo(v){
+  console.log('Ouverture de la vidéo:', v);
+  console.log('Transcription disponible:', v.transcription);
+  
   modalPlayContent.innerHTML='';
   
   // Bouton fermer
@@ -378,22 +414,29 @@ function openVideo(v){
       }
       
       // Ajouter la transcription si disponible
-      if (v.transcription) {
+      if (v.transcription && v.transcription.trim() !== '') {
+        console.log('Ajout de la transcription...');
         transcriptionData = parseTranscription(v.transcription);
+        console.log('Données de transcription:', transcriptionData);
         
         if (transcriptionData.length > 0) {
           // Bouton pour afficher/masquer la transcription
           const toggleBtn = document.createElement('button');
           toggleBtn.id = 'toggleTranscript';
           toggleBtn.textContent = '📝 Afficher la transcription';
+          toggleBtn.style.background = '#ff69b4';
+          toggleBtn.style.marginTop = '10px';
           toggleBtn.onclick = () => {
             const container = document.getElementById('transcriptionContainer');
-            container.classList.toggle('visible');
-            toggleBtn.textContent = container.classList.contains('visible') 
-              ? '🙈 Masquer la transcription' 
-              : '📝 Afficher la transcription';
+            if (container) {
+              container.classList.toggle('visible');
+              toggleBtn.textContent = container.classList.contains('visible') 
+                ? '🙈 Masquer la transcription' 
+                : '📝 Afficher la transcription';
+            }
           };
           modalPlayContent.appendChild(toggleBtn);
+          console.log('Bouton de transcription ajouté');
           
           // Container de transcription
           const transcriptionContainer = document.createElement('div');
@@ -415,7 +458,12 @@ function openVideo(v){
           
           transcriptionContainer.appendChild(transcriptionText);
           modalPlayContent.appendChild(transcriptionContainer);
+          console.log('Container de transcription ajouté');
+        } else {
+          console.log('Aucune donnée de transcription valide');
         }
+      } else {
+        console.log('Pas de transcription disponible pour cette vidéo');
       }
     } else {
       const p=document.createElement('p'); 
@@ -428,8 +476,10 @@ function openVideo(v){
 
 // Callback quand le player est prêt
 function onPlayerReady(event) {
+  console.log('Player YouTube prêt');
   // Démarrer l'intervalle pour mettre à jour la transcription
   if (transcriptionData.length > 0) {
+    console.log('Démarrage de l\'intervalle de transcription');
     transcriptionInterval = setInterval(() => {
       if (currentPlayer && currentPlayer.getCurrentTime) {
         const currentTime = currentPlayer.getCurrentTime();
@@ -494,8 +544,11 @@ videoModalPlay.onclick=e=>{
 // S'assurer que l'API YouTube est chargée
 window.onYouTubeIframeAPIReady = function() {
   console.log('YouTube API prête');
+  youtubeAPIReady = true;
 };
 
+// Vérifier la colonne transcription au chargement
+checkAndCreateTranscriptionColumn();
 loadVideos();
 </script>
 </body>
