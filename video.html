@@ -61,8 +61,7 @@ body::before {
 /* MODAL */
 .modal { position:fixed; inset:0; display:none; justify-content:center; align-items:center; background:rgba(0,0,0,0.5); z-index:1000; }
 .modal-content{ background:#fff0f6; padding:20px; border-radius:12px; max-width:90%; width:500px; text-align:center; display:flex; flex-direction:column; gap:10px; max-height:90vh; overflow-y:auto; }
-.modal-content input, .modal-content textarea{ padding:6px 12px; border-radius:10px; border:2px solid #b67385; width:100%; font-family: inherit; box-sizing:border-box; }
-.modal-content textarea{ min-height:100px; resize:vertical; }
+.modal-content input{ padding:6px 12px; border-radius:10px; border:2px solid #b67385; width:100%; font-family: inherit; box-sizing:border-box; }
 .modal-content button{ padding:6px 12px; border:none; background:#ffb6c1; color:#fff; border-radius:12px; cursor:pointer; font-weight:bold; }
 
 /* TRANSCRIPTION KARAOKÉ */
@@ -116,12 +115,15 @@ body::before {
   background: #ff1493 !important;
 }
 
-/* Label pour transcription */
-.transcript-label {
-  font-size: 12px;
+#toggleTranscript:disabled {
+  background: #ccc !important;
+  cursor: not-allowed;
+}
+
+.loading {
   color: #b84c6f;
-  margin-top: 5px;
-  text-align: left;
+  font-style: italic;
+  margin-top: 10px;
 }
 
 /* Player container */
@@ -149,12 +151,6 @@ body::before {
   <div class="modal-content">
     <h3>Ajouter une vidéo</h3>
     <input type="text" id="youtubeLink" placeholder="Lien YouTube">
-    <label class="transcript-label">Transcription (optionnel - format: temps|texte)</label>
-    <textarea id="transcriptionInput" placeholder="Exemple:
-0:00|Bienvenue dans cette vidéo
-0:05|Aujourd'hui nous allons parler de...
-0:12|C'est très intéressant
-1:30|Et voici la conclusion"></textarea>
     <button id="confirmAddVideo">Ajouter</button>
     <button id="cancelAddVideo">Annuler</button>
   </div>
@@ -182,7 +178,6 @@ const videoList = document.getElementById('video-list');
 const addVideoBtn = document.getElementById('addVideoBtn');
 const videoModalAdd = document.getElementById('videoModalAdd');
 const youtubeLink = document.getElementById('youtubeLink');
-const transcriptionInput = document.getElementById('transcriptionInput');
 const confirmAddVideo = document.getElementById('confirmAddVideo');
 const cancelAddVideo = document.getElementById('cancelAddVideo');
 
@@ -197,7 +192,6 @@ const returnBtn = document.getElementById('returnBtn');
 let currentPlayer = null;
 let transcriptionInterval = null;
 let transcriptionData = [];
-let youtubeAPIReady = false;
 
 // SIDEBAR
 toggleSidebar.onclick = () => sidebar.classList.toggle('sidebar-open');
@@ -213,60 +207,23 @@ addVideoBtn.onclick = ()=> videoModalAdd.style.display='flex';
 cancelAddVideo.onclick = ()=> {
   videoModalAdd.style.display='none';
   youtubeLink.value='';
-  transcriptionInput.value='';
 };
 videoModalAdd.onclick = e => { if(e.target===videoModalAdd) videoModalAdd.style.display='none'; };
-
-// Vérifier si la colonne transcription existe, sinon la créer
-async function checkAndCreateTranscriptionColumn() {
-  try {
-    const { data, error } = await supabase.from('videos').select('transcription').limit(1);
-    if (error && error.message.includes('column')) {
-      console.log('Colonne transcription manquante, tentative de création...');
-      // La colonne n'existe pas, informer l'utilisateur
-      alert('Note : Pour utiliser la transcription, ajoutez une colonne "transcription" (type text) à votre table "videos" dans Supabase.');
-    }
-  } catch (e) {
-    console.error('Erreur lors de la vérification de la colonne:', e);
-  }
-}
 
 // AJOUT VIDEO
 confirmAddVideo.onclick = async ()=>{
   const yt = youtubeLink.value.trim();
   if(!yt){ alert("Colle un lien YouTube"); return; }
 
-  const transcription = transcriptionInput.value.trim();
+  const { data, error } = await supabase.from('videos')
+    .insert([{ name:"Vidéo YouTube", youtubelink: yt }])
+    .select();
 
-  try {
-    const insertData = { 
-      name:"Vidéo YouTube", 
-      youtubelink: yt
-    };
-    
-    // Essayer d'ajouter la transcription si le champ est rempli
-    if (transcription) {
-      insertData.transcription = transcription;
-    }
+  if(error){ alert(error.message); console.error(error); return; }
 
-    const { data, error } = await supabase.from('videos')
-      .insert([insertData])
-      .select();
-
-    if(error){ 
-      console.error('Erreur Supabase:', error);
-      alert(error.message); 
-      return; 
-    }
-
-    youtubeLink.value=''; 
-    transcriptionInput.value='';
-    videoModalAdd.style.display='none'; 
-    loadVideos();
-  } catch (e) {
-    console.error('Erreur lors de l\'ajout:', e);
-    alert('Erreur lors de l\'ajout de la vidéo');
-  }
+  youtubeLink.value=''; 
+  videoModalAdd.style.display='none'; 
+  loadVideos();
 };
 
 // CHARGER VIDEOS
@@ -310,29 +267,57 @@ async function loadVideos(){
   });
 }
 
-// PARSER LA TRANSCRIPTION
-function parseTranscription(transcriptionText) {
-  if (!transcriptionText) return [];
-  
-  const lines = transcriptionText.split('\n').filter(line => line.trim());
-  return lines.map(line => {
-    const parts = line.split('|');
-    if (parts.length < 2) return null;
+// RÉCUPÉRER LA TRANSCRIPTION AUTOMATIQUE
+async function fetchYouTubeTranscript(videoId) {
+  try {
+    // Utiliser l'API de transcription YouTube via un service tiers
+    const response = await fetch(`https://www.youtube.com/api/timedtext?v=${videoId}&lang=fr`);
     
-    const time = parts[0].trim();
-    const text = parts.slice(1).join('|').trim();
-    
-    // Convertir le temps en secondes (format: 0:00 ou 0:00:00 ou 1:30)
-    const timeParts = time.split(':').map(Number);
-    let seconds = 0;
-    if (timeParts.length === 2) {
-      seconds = timeParts[0] * 60 + timeParts[1];
-    } else if (timeParts.length === 3) {
-      seconds = timeParts[0] * 3600 + timeParts[1] * 60 + timeParts[2];
+    if (!response.ok) {
+      // Essayer avec l'anglais si français pas disponible
+      const responseEN = await fetch(`https://www.youtube.com/api/timedtext?v=${videoId}&lang=en`);
+      if (!responseEN.ok) {
+        throw new Error('Transcription non disponible');
+      }
+      const xmlText = await responseEN.text();
+      return parseYouTubeXML(xmlText);
     }
     
-    return { time: seconds, text: text };
-  }).filter(item => item !== null);
+    const xmlText = await response.text();
+    return parseYouTubeXML(xmlText);
+  } catch (error) {
+    console.error('Erreur lors de la récupération de la transcription:', error);
+    return null;
+  }
+}
+
+// PARSER LE XML DE YOUTUBE
+function parseYouTubeXML(xmlText) {
+  const parser = new DOMParser();
+  const xmlDoc = parser.parseFromString(xmlText, 'text/xml');
+  const texts = xmlDoc.getElementsByTagName('text');
+  
+  const transcription = [];
+  for (let i = 0; i < texts.length; i++) {
+    const text = texts[i];
+    const start = parseFloat(text.getAttribute('start') || 0);
+    const content = text.textContent
+      .replace(/&amp;/g, '&')
+      .replace(/&lt;/g, '<')
+      .replace(/&gt;/g, '>')
+      .replace(/&quot;/g, '"')
+      .replace(/&#39;/g, "'")
+      .trim();
+    
+    if (content) {
+      transcription.push({
+        time: start,
+        text: content
+      });
+    }
+  }
+  
+  return transcription;
 }
 
 // METTRE À JOUR LA TRANSCRIPTION KARAOKÉ
@@ -349,7 +334,7 @@ function updateTranscription(currentTime) {
       line.className = 'transcript-line active';
       // Auto-scroll vers la ligne active
       const container = document.getElementById('transcriptionContainer');
-      if (container) {
+      if (container && container.classList.contains('visible')) {
         line.scrollIntoView({ behavior: 'smooth', block: 'center' });
       }
     } else if (currentTime >= nextTime) {
@@ -362,9 +347,6 @@ function updateTranscription(currentTime) {
 
 // LECTEUR
 function openVideo(v){
-  console.log('Ouverture de la vidéo:', v);
-  console.log('Transcription disponible:', v.transcription);
-  
   modalPlayContent.innerHTML='';
   
   // Bouton fermer
@@ -380,6 +362,7 @@ function openVideo(v){
       currentPlayer.destroy();
       currentPlayer = null;
     }
+    transcriptionData = [];
     videoModalPlay.style.display='none';
   };
   modalPlayContent.appendChild(closeBtn);
@@ -397,6 +380,75 @@ function openVideo(v){
       playerContainer.id = 'playerContainer';
       modalPlayContent.appendChild(playerContainer);
       
+      // Bouton pour charger la transcription
+      const toggleBtn = document.createElement('button');
+      toggleBtn.id = 'toggleTranscript';
+      toggleBtn.textContent = '📝 Charger la transcription';
+      toggleBtn.onclick = async () => {
+        toggleBtn.disabled = true;
+        toggleBtn.textContent = '⏳ Chargement...';
+        
+        // Récupérer la transcription
+        const transcript = await fetchYouTubeTranscript(ytId);
+        
+        if (transcript && transcript.length > 0) {
+          transcriptionData = transcript;
+          
+          // Créer le container de transcription
+          let transcriptionContainer = document.getElementById('transcriptionContainer');
+          if (!transcriptionContainer) {
+            transcriptionContainer = document.createElement('div');
+            transcriptionContainer.id = 'transcriptionContainer';
+            
+            const transcriptionText = document.createElement('div');
+            transcriptionText.id = 'transcriptionText';
+            
+            transcriptionData.forEach((item, index) => {
+              const span = document.createElement('span');
+              span.className = 'transcript-line';
+              span.textContent = item.text;
+              transcriptionText.appendChild(span);
+              
+              if (index < transcriptionData.length - 1) {
+                transcriptionText.appendChild(document.createTextNode(' '));
+              }
+            });
+            
+            transcriptionContainer.appendChild(transcriptionText);
+            modalPlayContent.appendChild(transcriptionContainer);
+          }
+          
+          transcriptionContainer.classList.add('visible');
+          toggleBtn.textContent = '🙈 Masquer la transcription';
+          toggleBtn.disabled = false;
+          
+          // Modifier le comportement du bouton
+          toggleBtn.onclick = () => {
+            transcriptionContainer.classList.toggle('visible');
+            toggleBtn.textContent = transcriptionContainer.classList.contains('visible') 
+              ? '🙈 Masquer la transcription' 
+              : '📝 Afficher la transcription';
+          };
+          
+          // Démarrer la synchronisation
+          if (!transcriptionInterval) {
+            transcriptionInterval = setInterval(() => {
+              if (currentPlayer && currentPlayer.getCurrentTime) {
+                const currentTime = currentPlayer.getCurrentTime();
+                updateTranscription(currentTime);
+              }
+            }, 100);
+          }
+        } else {
+          toggleBtn.textContent = '❌ Transcription non disponible';
+          setTimeout(() => {
+            toggleBtn.textContent = '📝 Charger la transcription';
+            toggleBtn.disabled = false;
+          }, 2000);
+        }
+      };
+      modalPlayContent.appendChild(toggleBtn);
+      
       // Initialiser le player YouTube
       if (typeof YT !== 'undefined' && YT.Player) {
         currentPlayer = new YT.Player('playerContainer', {
@@ -412,59 +464,6 @@ function openVideo(v){
           }
         });
       }
-      
-      // Ajouter la transcription si disponible
-      if (v.transcription && v.transcription.trim() !== '') {
-        console.log('Ajout de la transcription...');
-        transcriptionData = parseTranscription(v.transcription);
-        console.log('Données de transcription:', transcriptionData);
-        
-        if (transcriptionData.length > 0) {
-          // Bouton pour afficher/masquer la transcription
-          const toggleBtn = document.createElement('button');
-          toggleBtn.id = 'toggleTranscript';
-          toggleBtn.textContent = '📝 Afficher la transcription';
-          toggleBtn.style.background = '#ff69b4';
-          toggleBtn.style.marginTop = '10px';
-          toggleBtn.onclick = () => {
-            const container = document.getElementById('transcriptionContainer');
-            if (container) {
-              container.classList.toggle('visible');
-              toggleBtn.textContent = container.classList.contains('visible') 
-                ? '🙈 Masquer la transcription' 
-                : '📝 Afficher la transcription';
-            }
-          };
-          modalPlayContent.appendChild(toggleBtn);
-          console.log('Bouton de transcription ajouté');
-          
-          // Container de transcription
-          const transcriptionContainer = document.createElement('div');
-          transcriptionContainer.id = 'transcriptionContainer';
-          
-          const transcriptionText = document.createElement('div');
-          transcriptionText.id = 'transcriptionText';
-          
-          transcriptionData.forEach((item, index) => {
-            const span = document.createElement('span');
-            span.className = 'transcript-line';
-            span.textContent = item.text;
-            transcriptionText.appendChild(span);
-            
-            if (index < transcriptionData.length - 1) {
-              transcriptionText.appendChild(document.createTextNode(' '));
-            }
-          });
-          
-          transcriptionContainer.appendChild(transcriptionText);
-          modalPlayContent.appendChild(transcriptionContainer);
-          console.log('Container de transcription ajouté');
-        } else {
-          console.log('Aucune donnée de transcription valide');
-        }
-      } else {
-        console.log('Pas de transcription disponible pour cette vidéo');
-      }
     } else {
       const p=document.createElement('p'); 
       p.textContent="Lien YouTube invalide";
@@ -477,24 +476,10 @@ function openVideo(v){
 // Callback quand le player est prêt
 function onPlayerReady(event) {
   console.log('Player YouTube prêt');
-  // Démarrer l'intervalle pour mettre à jour la transcription
-  if (transcriptionData.length > 0) {
-    console.log('Démarrage de l\'intervalle de transcription');
-    transcriptionInterval = setInterval(() => {
-      if (currentPlayer && currentPlayer.getCurrentTime) {
-        const currentTime = currentPlayer.getCurrentTime();
-        updateTranscription(currentTime);
-      }
-    }, 100); // Mise à jour toutes les 100ms pour une synchronisation fluide
-  }
 }
 
 // Callback quand l'état du player change
 function onPlayerStateChange(event) {
-  // YT.PlayerState.ENDED = 0
-  // YT.PlayerState.PLAYING = 1
-  // YT.PlayerState.PAUSED = 2
-  
   if (event.data === 0 || event.data === 2) {
     // Vidéo terminée ou en pause
     if (transcriptionInterval) {
@@ -524,6 +509,7 @@ closePlayModal.onclick=()=> {
     currentPlayer.destroy();
     currentPlayer = null;
   }
+  transcriptionData = [];
   videoModalPlay.style.display='none';
 };
 
@@ -537,6 +523,7 @@ videoModalPlay.onclick=e=>{
       currentPlayer.destroy();
       currentPlayer = null;
     }
+    transcriptionData = [];
     videoModalPlay.style.display='none';
   }
 };
@@ -544,11 +531,8 @@ videoModalPlay.onclick=e=>{
 // S'assurer que l'API YouTube est chargée
 window.onYouTubeIframeAPIReady = function() {
   console.log('YouTube API prête');
-  youtubeAPIReady = true;
 };
 
-// Vérifier la colonne transcription au chargement
-checkAndCreateTranscriptionColumn();
 loadVideos();
 </script>
 </body>
