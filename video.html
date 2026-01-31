@@ -60,10 +60,77 @@ body::before {
 
 /* MODAL */
 .modal { position:fixed; inset:0; display:none; justify-content:center; align-items:center; background:rgba(0,0,0,0.5); z-index:1000; }
-.modal-content{ background:#fff0f6; padding:20px; border-radius:12px; max-width:90%; width:400px; text-align:center; display:flex; flex-direction:column; gap:10px; }
-.modal-content input{ padding:6px 12px; border-radius:10px; border:2px solid #b67385; width:100%; }
+.modal-content{ background:#fff0f6; padding:20px; border-radius:12px; max-width:90%; width:500px; text-align:center; display:flex; flex-direction:column; gap:10px; max-height:90vh; overflow-y:auto; }
+.modal-content input, .modal-content textarea{ padding:6px 12px; border-radius:10px; border:2px solid #b67385; width:100%; font-family: inherit; box-sizing:border-box; }
+.modal-content textarea{ min-height:100px; resize:vertical; }
 .modal-content button{ padding:6px 12px; border:none; background:#ffb6c1; color:#fff; border-radius:12px; cursor:pointer; font-weight:bold; }
-.modal-content iframe, .modal-content video{ width:100%; height:220px; border-radius:8px; }
+
+/* TRANSCRIPTION KARAOKÉ */
+#transcriptionContainer {
+  background: rgba(255,255,255,0.95);
+  border-radius: 12px;
+  padding: 15px;
+  margin-top: 10px;
+  max-height: 150px;
+  overflow-y: auto;
+  text-align: left;
+  display: none;
+  box-shadow: 0 2px 10px rgba(182,115,133,0.3);
+}
+
+#transcriptionContainer.visible {
+  display: block;
+}
+
+#transcriptionText {
+  font-size: 16px;
+  line-height: 1.8;
+  color: #333;
+}
+
+.transcript-line {
+  display: inline;
+  transition: all 0.3s ease;
+}
+
+.transcript-line.active {
+  color: #ff1493;
+  font-weight: bold;
+  font-size: 18px;
+  text-shadow: 0 0 10px rgba(255,20,147,0.5);
+  background: rgba(255,20,147,0.1);
+  padding: 2px 4px;
+  border-radius: 4px;
+}
+
+.transcript-line.passed {
+  color: #999;
+}
+
+#toggleTranscript {
+  background: #ff69b4;
+  margin-top: 10px;
+}
+
+#toggleTranscript:hover {
+  background: #ff1493;
+}
+
+/* Label pour transcription */
+.transcript-label {
+  font-size: 12px;
+  color: #b84c6f;
+  margin-top: 5px;
+  text-align: left;
+}
+
+/* Player container */
+#playerContainer {
+  width: 100%;
+  height: 280px;
+  border-radius: 8px;
+  overflow: hidden;
+}
 </style>
 </head>
 <body>
@@ -82,6 +149,12 @@ body::before {
   <div class="modal-content">
     <h3>Ajouter une vidéo</h3>
     <input type="text" id="youtubeLink" placeholder="Lien YouTube">
+    <label class="transcript-label">Transcription (optionnel - format: temps|texte)</label>
+    <textarea id="transcriptionInput" placeholder="Exemple:
+0:00|Bienvenue dans cette vidéo
+0:05|Aujourd'hui nous allons parler de...
+0:12|C'est très intéressant
+1:30|Et voici la conclusion"></textarea>
     <button id="confirmAddVideo">Ajouter</button>
     <button id="cancelAddVideo">Annuler</button>
   </div>
@@ -93,6 +166,9 @@ body::before {
     <button id="closePlayModal">Fermer</button>
   </div>
 </div>
+
+<!-- Charger l'API YouTube -->
+<script src="https://www.youtube.com/iframe_api"></script>
 
 <script type="module">
 import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
@@ -106,6 +182,7 @@ const videoList = document.getElementById('video-list');
 const addVideoBtn = document.getElementById('addVideoBtn');
 const videoModalAdd = document.getElementById('videoModalAdd');
 const youtubeLink = document.getElementById('youtubeLink');
+const transcriptionInput = document.getElementById('transcriptionInput');
 const confirmAddVideo = document.getElementById('confirmAddVideo');
 const cancelAddVideo = document.getElementById('cancelAddVideo');
 
@@ -116,6 +193,10 @@ const closePlayModal = document.getElementById('closePlayModal');
 const sidebar = document.getElementById('sidebar');
 const toggleSidebar = document.getElementById('toggleSidebar');
 const returnBtn = document.getElementById('returnBtn');
+
+let currentPlayer = null;
+let transcriptionInterval = null;
+let transcriptionData = [];
 
 // SIDEBAR
 toggleSidebar.onclick = () => sidebar.classList.toggle('sidebar-open');
@@ -128,7 +209,11 @@ returnBtn.onclick = () => {
 
 // MODAL AJOUT
 addVideoBtn.onclick = ()=> videoModalAdd.style.display='flex';
-cancelAddVideo.onclick = ()=> videoModalAdd.style.display='none';
+cancelAddVideo.onclick = ()=> {
+  videoModalAdd.style.display='none';
+  youtubeLink.value='';
+  transcriptionInput.value='';
+};
 videoModalAdd.onclick = e => { if(e.target===videoModalAdd) videoModalAdd.style.display='none'; };
 
 // AJOUT VIDEO
@@ -136,13 +221,22 @@ confirmAddVideo.onclick = async ()=>{
   const yt = youtubeLink.value.trim();
   if(!yt){ alert("Colle un lien YouTube"); return; }
 
+  const transcription = transcriptionInput.value.trim();
+
   const { data, error } = await supabase.from('videos')
-    .insert([{ name:"Vidéo YouTube", youtubelink: yt }])
+    .insert([{ 
+      name:"Vidéo YouTube", 
+      youtubelink: yt,
+      transcription: transcription || null
+    }])
     .select();
 
   if(error){ alert(error.message); console.error(error); return; }
 
-  youtubeLink.value=''; videoModalAdd.style.display='none'; loadVideos();
+  youtubeLink.value=''; 
+  transcriptionInput.value='';
+  videoModalAdd.style.display='none'; 
+  loadVideos();
 };
 
 // CHARGER VIDEOS
@@ -186,13 +280,72 @@ async function loadVideos(){
   });
 }
 
+// PARSER LA TRANSCRIPTION
+function parseTranscription(transcriptionText) {
+  if (!transcriptionText) return [];
+  
+  const lines = transcriptionText.split('\n').filter(line => line.trim());
+  return lines.map(line => {
+    const parts = line.split('|');
+    if (parts.length < 2) return null;
+    
+    const time = parts[0].trim();
+    const text = parts.slice(1).join('|').trim();
+    
+    // Convertir le temps en secondes (format: 0:00 ou 0:00:00 ou 1:30)
+    const timeParts = time.split(':').map(Number);
+    let seconds = 0;
+    if (timeParts.length === 2) {
+      seconds = timeParts[0] * 60 + timeParts[1];
+    } else if (timeParts.length === 3) {
+      seconds = timeParts[0] * 3600 + timeParts[1] * 60 + timeParts[2];
+    }
+    
+    return { time: seconds, text: text };
+  }).filter(item => item !== null);
+}
+
+// METTRE À JOUR LA TRANSCRIPTION KARAOKÉ
+function updateTranscription(currentTime) {
+  const lines = document.querySelectorAll('.transcript-line');
+  
+  transcriptionData.forEach((item, index) => {
+    const line = lines[index];
+    if (!line) return;
+    
+    const nextTime = transcriptionData[index + 1]?.time || Infinity;
+    
+    if (currentTime >= item.time && currentTime < nextTime) {
+      line.className = 'transcript-line active';
+      // Auto-scroll vers la ligne active
+      line.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    } else if (currentTime >= nextTime) {
+      line.className = 'transcript-line passed';
+    } else {
+      line.className = 'transcript-line';
+    }
+  });
+}
+
 // LECTEUR
 function openVideo(v){
   modalPlayContent.innerHTML='';
+  
+  // Bouton fermer
   const closeBtn=document.createElement('button');
   closeBtn.textContent='Fermer';
   closeBtn.style.marginBottom='10px';
-  closeBtn.onclick=()=> videoModalPlay.style.display='none';
+  closeBtn.onclick=()=> {
+    if (transcriptionInterval) {
+      clearInterval(transcriptionInterval);
+      transcriptionInterval = null;
+    }
+    if (currentPlayer) {
+      currentPlayer.destroy();
+      currentPlayer = null;
+    }
+    videoModalPlay.style.display='none';
+  };
   modalPlayContent.appendChild(closeBtn);
 
   if(v.youtubelink){
@@ -201,25 +354,147 @@ function openVideo(v){
     if(matchWatch) ytId=matchWatch[1];
     const matchShort=v.youtubelink.match(/youtu\.be\/([^?&]+)/);
     if(matchShort) ytId=matchShort[1];
+    
     if(ytId){
-      const iframe=document.createElement('iframe');
-      iframe.src=`https://www.youtube.com/embed/${ytId}`;
-      iframe.frameBorder="0";
-      iframe.allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture";
-      iframe.allowFullscreen=true;
-      iframe.style.width='100%'; iframe.style.height='220px'; iframe.style.borderRadius='8px';
-      modalPlayContent.appendChild(iframe);
+      // Créer le container pour le player
+      const playerContainer = document.createElement('div');
+      playerContainer.id = 'playerContainer';
+      modalPlayContent.appendChild(playerContainer);
+      
+      // Initialiser le player YouTube
+      if (typeof YT !== 'undefined' && YT.Player) {
+        currentPlayer = new YT.Player('playerContainer', {
+          height: '280',
+          width: '100%',
+          videoId: ytId,
+          playerVars: {
+            'playsinline': 1
+          },
+          events: {
+            'onReady': onPlayerReady,
+            'onStateChange': onPlayerStateChange
+          }
+        });
+      }
+      
+      // Ajouter la transcription si disponible
+      if (v.transcription) {
+        transcriptionData = parseTranscription(v.transcription);
+        
+        if (transcriptionData.length > 0) {
+          // Bouton pour afficher/masquer la transcription
+          const toggleBtn = document.createElement('button');
+          toggleBtn.id = 'toggleTranscript';
+          toggleBtn.textContent = '📝 Afficher la transcription';
+          toggleBtn.onclick = () => {
+            const container = document.getElementById('transcriptionContainer');
+            container.classList.toggle('visible');
+            toggleBtn.textContent = container.classList.contains('visible') 
+              ? '🙈 Masquer la transcription' 
+              : '📝 Afficher la transcription';
+          };
+          modalPlayContent.appendChild(toggleBtn);
+          
+          // Container de transcription
+          const transcriptionContainer = document.createElement('div');
+          transcriptionContainer.id = 'transcriptionContainer';
+          
+          const transcriptionText = document.createElement('div');
+          transcriptionText.id = 'transcriptionText';
+          
+          transcriptionData.forEach((item, index) => {
+            const span = document.createElement('span');
+            span.className = 'transcript-line';
+            span.textContent = item.text;
+            transcriptionText.appendChild(span);
+            
+            if (index < transcriptionData.length - 1) {
+              transcriptionText.appendChild(document.createTextNode(' '));
+            }
+          });
+          
+          transcriptionContainer.appendChild(transcriptionText);
+          modalPlayContent.appendChild(transcriptionContainer);
+        }
+      }
     } else {
-      const p=document.createElement('p'); p.textContent="Lien YouTube invalide";
+      const p=document.createElement('p'); 
+      p.textContent="Lien YouTube invalide";
       modalPlayContent.appendChild(p);
     }
   }
   videoModalPlay.style.display='flex';
 }
 
+// Callback quand le player est prêt
+function onPlayerReady(event) {
+  // Démarrer l'intervalle pour mettre à jour la transcription
+  if (transcriptionData.length > 0) {
+    transcriptionInterval = setInterval(() => {
+      if (currentPlayer && currentPlayer.getCurrentTime) {
+        const currentTime = currentPlayer.getCurrentTime();
+        updateTranscription(currentTime);
+      }
+    }, 100); // Mise à jour toutes les 100ms pour une synchronisation fluide
+  }
+}
+
+// Callback quand l'état du player change
+function onPlayerStateChange(event) {
+  // YT.PlayerState.ENDED = 0
+  // YT.PlayerState.PLAYING = 1
+  // YT.PlayerState.PAUSED = 2
+  
+  if (event.data === 0 || event.data === 2) {
+    // Vidéo terminée ou en pause
+    if (transcriptionInterval) {
+      clearInterval(transcriptionInterval);
+      transcriptionInterval = null;
+    }
+  } else if (event.data === 1) {
+    // Vidéo en lecture
+    if (transcriptionData.length > 0 && !transcriptionInterval) {
+      transcriptionInterval = setInterval(() => {
+        if (currentPlayer && currentPlayer.getCurrentTime) {
+          const currentTime = currentPlayer.getCurrentTime();
+          updateTranscription(currentTime);
+        }
+      }, 100);
+    }
+  }
+}
+
 // FERMER MODAL
-closePlayModal.onclick=()=> videoModalPlay.style.display='none';
-videoModalPlay.onclick=e=>{ if(e.target===videoModalPlay) videoModalPlay.style.display='none'; };
+closePlayModal.onclick=()=> {
+  if (transcriptionInterval) {
+    clearInterval(transcriptionInterval);
+    transcriptionInterval = null;
+  }
+  if (currentPlayer) {
+    currentPlayer.destroy();
+    currentPlayer = null;
+  }
+  videoModalPlay.style.display='none';
+};
+
+videoModalPlay.onclick=e=>{ 
+  if(e.target===videoModalPlay) {
+    if (transcriptionInterval) {
+      clearInterval(transcriptionInterval);
+      transcriptionInterval = null;
+    }
+    if (currentPlayer) {
+      currentPlayer.destroy();
+      currentPlayer = null;
+    }
+    videoModalPlay.style.display='none';
+  }
+};
+
+// S'assurer que l'API YouTube est chargée
+window.onYouTubeIframeAPIReady = function() {
+  console.log('YouTube API prête');
+};
 
 loadVideos();
 </script>
