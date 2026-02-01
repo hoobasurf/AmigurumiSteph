@@ -82,7 +82,7 @@ overflow:hidden;
 }
 
 #newPostBox::before {
-content: ‘’;
+content: '';
 position: absolute;
 top: 0;
 left: 0;
@@ -91,6 +91,11 @@ height: 3px;
 background: linear-gradient(90deg, #ff69b4, #ffb6c1, #ffd6e6, #ffb6c1, #ff69b4);
 background-size: 200% 100%;
 animation: shimmer 3s linear infinite;
+}
+
+@keyframes shimmer {
+0% { background-position: 200% 0; }
+100% { background-position: -200% 0; }
 }
 
 .new-post-header {
@@ -122,7 +127,7 @@ font-size:15px;
 resize:none;
 min-height:80px;
 background:#fff;
-font-family:‘Comic Sans MS’,cursive;
+font-family:'Comic Sans MS',cursive;
 }
 
 #newPostBox textarea:focus {
@@ -212,6 +217,11 @@ transform: scale(1.05);
 box-shadow: 0 4px 12px rgba(255,105,180,0.4);
 }
 
+#postBtn:disabled {
+opacity:0.6;
+cursor:not-allowed;
+}
+
 /* ====== FEED ====== */
 #feed {
 margin:20px auto;
@@ -241,7 +251,7 @@ overflow:hidden;
 }
 
 .post::before {
-content: ‘’;
+content: '';
 position: absolute;
 top: 0;
 left: 0;
@@ -250,11 +260,6 @@ height: 3px;
 background: linear-gradient(90deg, #ff69b4, #ffb6c1, #ffd6e6, #ffb6c1, #ff69b4);
 background-size: 200% 100%;
 animation: shimmer 3s linear infinite;
-}
-
-@keyframes shimmer {
-0% { background-position: 200% 0; }
-100% { background-position: -200% 0; }
 }
 
 .post:hover {
@@ -371,17 +376,16 @@ max-height:250px;
 .post-photos img {
 width:100%;
 height:auto;
-max-height:400px;
-object-fit:contain;
+object-fit:cover;
 cursor:pointer;
 transition:all 0.3s;
-background:#000;
 border-radius:8px;
+border:2px solid rgba(182,115,133,0.3);
 }
 
 .post-photos img:hover {
 transform:scale(1.02);
-box-shadow:0 8px 16px rgba(0,0,0,0.3);
+box-shadow:0 8px 16px rgba(184,76,111,0.3);
 }
 
 /* ====== STATS BAR ====== */
@@ -433,7 +437,7 @@ overflow:hidden;
 }
 
 .post-actions button::before {
-content: ‘’;
+content: '';
 position: absolute;
 top: 50%;
 left: 50%;
@@ -491,7 +495,7 @@ border:1px solid #ddd;
 padding:8px 16px;
 font-size:14px;
 background:#f0f2f5;
-font-family:‘Comic Sans MS’,cursive;
+font-family:'Comic Sans MS',cursive;
 }
 
 .comment-input-area input:focus {
@@ -518,6 +522,7 @@ transform:scale(1.2);
 display:flex;
 flex-direction:column;
 gap:8px;
+margin-bottom:12px;
 }
 
 .comment {
@@ -699,13 +704,6 @@ max-width:95%;
 max-height:95%;
 border-radius:16px;
 box-shadow:0 20px 60px rgba(0,0,0,0.5);
-cursor:zoom-in;
-transition:transform 0.3s;
-}
-
-#photoViewer img:active {
-cursor:zoom-out;
-transform:scale(1.5);
 }
 
 #photoViewer .closeModal {
@@ -810,7 +808,7 @@ import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js
 
 const supabase = createClient(
   "https://jyhbamdcxmpveujjqjla.supabase.co",
-  "sb_publishable_sqsxb-3Kl5o3-JQYv9kGFw_-g0EgwMa"
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp5aGJhbWRjeG1wdmV1ampxamxhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mzc4MTk0ODgsImV4cCI6MjA1MzM5NTQ4OH0.YFsLnEy82_g0Y1w0XA0xjPD5K-9u_jdpUqC_Rfs-3Kw"
 );
 
 const myPrenom = localStorage.getItem('prenom') || 'Utilisateur';
@@ -840,8 +838,7 @@ headerName.textContent = `${myPrenom}, quoi de neuf ?`;
 
 // Retour
 backBtn.onclick = () => {
-  document.body.style.opacity = '0';
-  setTimeout(() => window.location.href = 'owner.html', 500);
+  window.location.href = 'owner.html';
 };
 
 // Charger les photos des utilisateurs
@@ -905,7 +902,7 @@ async function loadPosts() {
     .order('created_at', { ascending: false });
   
   if (error) {
-    console.error(error);
+    console.error('Erreur chargement:', error);
     return;
   }
 
@@ -989,8 +986,8 @@ async function loadPosts() {
     if (deleteBtn) {
       deleteBtn.onclick = async () => {
         if (confirm('Voulez-vous vraiment supprimer cette publication ?')) {
-          await supabase.from('posts').delete().eq('id', post.id);
-          loadPosts();
+          const { error } = await supabase.from('posts').delete().eq('id', post.id);
+          if (!error) loadPosts();
         }
       };
     }
@@ -1015,8 +1012,8 @@ async function loadPosts() {
         newLikes.push({ name: myPrenom, photo: ownerPhotoUrl });
       }
       
-      await supabase.from('posts').update({ likes: newLikes }).eq('id', post.id);
-      loadPosts();
+      const { error } = await supabase.from('posts').update({ likes: newLikes }).eq('id', post.id);
+      if (!error) loadPosts();
     };
 
     // SHOW LIKES
@@ -1066,9 +1063,11 @@ async function loadPosts() {
         timestamp: new Date().toISOString()
       }];
       
-      await supabase.from('posts').update({ comments: newComments }).eq('id', post.id);
-      commentInput.value = '';
-      loadPosts();
+      const { error } = await supabase.from('posts').update({ comments: newComments }).eq('id', post.id);
+      if (!error) {
+        commentInput.value = '';
+        loadPosts();
+      }
     };
     
     sendCommentBtn.onclick = addComment;
@@ -1096,8 +1095,8 @@ async function loadPosts() {
       if (deleteCommentBtn) {
         deleteCommentBtn.onclick = async () => {
           const newComments = comments.filter((_, i) => i !== index);
-          await supabase.from('posts').update({ comments: newComments }).eq('id', post.id);
-          loadPosts();
+          const { error } = await supabase.from('posts').update({ comments: newComments }).eq('id', post.id);
+          if (!error) loadPosts();
         };
       }
       
@@ -1123,33 +1122,42 @@ postBtn.onclick = async () => {
     // Upload des photos
     const photoUrls = [];
     for (const file of selectedFiles) {
-      const path = `posts/${Date.now()}_${Math.random().toString(36).substr(2, 9)}_${file.name}`;
+      const fileName = `${Date.now()}_${Math.random().toString(36).substr(2, 9)}_${file.name}`;
+      const path = `posts/${fileName}`;
+      
       const { error: uploadError } = await supabase.storage.from('images').upload(path, file);
       
       if (!uploadError) {
         const { data } = supabase.storage.from('images').getPublicUrl(path);
         photoUrls.push(data.publicUrl);
+      } else {
+        console.error('Erreur upload:', uploadError);
       }
     }
     
     // Créer le post
-    await supabase.from('posts').insert([{
+    const { data, error } = await supabase.from('posts').insert([{
       name: myPrenom,
       content: content,
       photo: ownerPhotoUrl,
       photos: photoUrls,
       likes: [],
-      comments: [],
-      created_at: new Date().toISOString()
-    }]);
+      comments: []
+    }]).select();
     
-    postInput.value = '';
-    selectedFiles = [];
-    photoPreview.innerHTML = '';
-    photoInput.value = '';
-    loadPosts();
+    if (error) {
+      console.error('Erreur création:', error);
+      alert('Erreur: ' + error.message);
+    } else {
+      console.log('Post créé:', data);
+      postInput.value = '';
+      selectedFiles = [];
+      photoPreview.innerHTML = '';
+      photoInput.value = '';
+      await loadPosts();
+    }
   } catch (error) {
-    console.error(error);
+    console.error('Erreur:', error);
     alert('Erreur lors de la publication');
   }
   
@@ -1182,7 +1190,11 @@ photoViewer.onclick = (e) => {
 };
 
 // ====== INIT ======
-loadUserPhotos().then(() => loadPosts());
+console.log('Démarrage...');
+loadUserPhotos().then(() => {
+  console.log('Photos chargées');
+  loadPosts();
+});
 
 // ====== RAFRAICHISSEMENT AUTO ======
 setInterval(loadPosts, 30000);
