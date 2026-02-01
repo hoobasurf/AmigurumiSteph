@@ -9,30 +9,24 @@
 <style>
 /* ====== RESET ====== */
 * { box-sizing:border-box; margin:0; padding:0; font-family:'Comic Sans MS',cursive; }
-html, body { 
-min-height:100%; 
-background: url('2A108385-A26A-4390-A0F8-635DD2C93625.png') center top;
-background-size: cover;
-background-attachment: fixed;
-overflow-y:auto; 
-}
+html, body { min-height:100%; background:#ffe6f0; overflow-y:auto; }
 
 /* ====== HEADER ====== */
 header {
 position: sticky;
 top:0;
-background: #ffffff;
+background: linear-gradient(135deg, #ffd6e6,#ffb6c1);
 height:60px;
 display:flex;
 align-items:center;
 justify-content:space-between;
 padding:0 20px;
 font-weight:bold;
-color:#FFB6C1;
+color:#b84c6f;
 font-size:22px;
-border-bottom:3px solid #FFB6C1;
+border-bottom:3px solid #b67385;
 z-index:100;
-box-shadow: 0 0 20px rgba(255,182,193,0.6);
+box-shadow: 0 2px 8px rgba(184,76,111,0.2);
 }
 
 .header-left {
@@ -43,7 +37,7 @@ gap:12px;
 
 .back-btn {
 background:#fff;
-border:3px solid #FFB6C1;
+border:2px solid #b67385;
 border-radius:50%;
 width:40px;
 height:40px;
@@ -52,36 +46,51 @@ align-items:center;
 justify-content:center;
 cursor:pointer;
 font-size:20px;
-transition:all 0.3s;
-color:#FFB6C1;
-box-shadow: 0 0 15px rgba(255,182,193,0.8);
+transition:all 0.2s;
 }
 
 .back-btn:hover {
-transform:scale(1.15);
-box-shadow: 0 0 25px rgba(255,182,193,1);
+transform:scale(1.1);
+background:#ffe6f0;
 }
 
 #ownerPhoto {
 width:40px;
 height:40px;
 border-radius:50%;
-border:3px solid #FFB6C1;
+border:2px solid #fff;
 object-fit:cover;
-box-shadow: 0 0 15px rgba(255,182,193,0.8);
 }
 
 /* ====== NEW POST BOX ====== */
 #newPostBox {
 margin:20px auto;
 width:90%;
-max-width:600px;
-background:rgba(255,255,255,0.95);
-backdrop-filter: blur(10px);
-border:3px solid #FFB6C1;
+max-width:680px;
+background:linear-gradient(135deg, rgba(255,255,255,0.98), rgba(255,245,250,0.95));
+backdrop-filter: blur(20px);
+border:3px solid transparent;
+background-clip: padding-box;
+position:relative;
 border-radius:20px;
 padding:20px;
-box-shadow: 0 0 20px rgba(255,182,193,0.5);
+box-shadow:
+0 8px 32px rgba(184,76,111,0.2),
+inset 0 1px 0 rgba(255,255,255,0.8),
+0 0 0 1px rgba(182,115,133,0.3);
+overflow:hidden;
+}
+
+#newPostBox::before {
+content: ‘’;
+position: absolute;
+top: 0;
+left: 0;
+right: 0;
+height: 3px;
+background: linear-gradient(90deg, #ff69b4, #ffb6c1, #ffd6e6, #ffb6c1, #ff69b4);
+background-size: 200% 100%;
+animation: shimmer 3s linear infinite;
 }
 
 .new-post-header {
@@ -95,34 +104,30 @@ margin-bottom:12px;
 width:40px;
 height:40px;
 border-radius:50%;
-border:3px solid #FFB6C1;
+border:2px solid #ffb6c1;
 object-fit:cover;
-box-shadow: 0 0 12px rgba(255,182,193,0.7);
 }
 
 .new-post-header span {
 font-weight:bold;
-color:#FFB6C1;
+color:#b84c6f;
 }
 
 #newPostBox textarea {
 width:100%;
 border-radius:12px;
-border:3px solid #FFB6C1;
+border:2px solid #b67385;
 padding:12px;
 font-size:15px;
 resize:none;
 min-height:80px;
-background:rgba(255,255,255,0.9);
-font-family:'Comic Sans MS',cursive;
-transition:all 0.3s;
-box-shadow: 0 0 10px rgba(255,182,193,0.4);
+background:#fff;
+font-family:‘Comic Sans MS’,cursive;
 }
 
 #newPostBox textarea:focus {
 outline:none;
-border-color:#FFB6C1;
-box-shadow: 0 0 20px rgba(255,182,193,0.8);
+border-color:#ff69b4;
 }
 
 .post-actions-new {
@@ -137,19 +142,18 @@ display:flex;
 align-items:center;
 gap:8px;
 background:#fff;
-border:3px solid #FFB6C1;
+border:2px solid #b67385;
 border-radius:12px;
 padding:8px 16px;
 cursor:pointer;
-transition:all 0.3s;
-color:#FFB6C1;
+transition:all 0.2s;
+color:#b84c6f;
 font-weight:bold;
-box-shadow: 0 0 15px rgba(255,182,193,0.5);
 }
 
 .photo-upload-btn:hover {
+background:#ffe6f0;
 transform:scale(1.05);
-box-shadow: 0 0 25px rgba(255,182,193,0.9);
 }
 
 #photoPreview {
@@ -163,10 +167,9 @@ flex-wrap:wrap;
 position:relative;
 width:80px;
 height:80px;
-border-radius:12px;
+border-radius:8px;
 overflow:hidden;
-border:3px solid #FFB6C1;
-box-shadow: 0 0 15px rgba(255,182,193,0.6);
+border:2px solid #b67385;
 }
 
 .preview-item img {
@@ -179,70 +182,88 @@ object-fit:cover;
 position:absolute;
 top:2px;
 right:2px;
-background:#FFB6C1;
+background:#ffb6c1;
 color:#fff;
 border-radius:50%;
-width:22px;
-height:22px;
+width:20px;
+height:20px;
 display:flex;
 align-items:center;
 justify-content:center;
 cursor:pointer;
 font-size:14px;
 font-weight:bold;
-box-shadow: 0 0 10px rgba(255,182,193,0.9);
 }
 
 #postBtn {
-background:#FFB6C1;
-border:3px solid #FFB6C1;
+background:linear-gradient(135deg, #ffb6c1, #ff69b4);
+border:none;
 color:#fff;
 font-weight:bold;
 border-radius:12px;
 padding:10px 24px;
 cursor:pointer;
-transition:all 0.3s;
+transition:all 0.2s;
 font-size:15px;
-box-shadow: 0 0 20px rgba(255,182,193,0.7);
 }
 
 #postBtn:hover {
-transform: scale(1.08);
-box-shadow: 0 0 30px rgba(255,182,193,1);
-background:#ff69b4;
-border-color:#ff69b4;
-}
-
-#postBtn:disabled {
-opacity: 0.6;
-cursor: not-allowed;
+transform: scale(1.05);
+box-shadow: 0 4px 12px rgba(255,105,180,0.4);
 }
 
 /* ====== FEED ====== */
 #feed {
 margin:20px auto;
 width:90%;
-max-width:600px;
+max-width:680px;
 display:flex;
 flex-direction:column;
-gap:20px;
+gap:24px;
 padding-bottom:40px;
 }
 
 /* ====== POST ====== */
 .post {
-background:rgba(255,255,255,0.95);
-backdrop-filter: blur(10px);
-border:3px solid #FFB6C1;
+background:linear-gradient(135deg, rgba(255,255,255,0.98), rgba(255,240,250,0.95));
+backdrop-filter: blur(20px);
+border:3px solid transparent;
+background-clip: padding-box;
+position:relative;
 border-radius:20px;
 padding:20px;
-box-shadow: 0 0 20px rgba(255,182,193,0.5);
-transition: all 0.3s;
+box-shadow:
+0 8px 32px rgba(184,76,111,0.2),
+inset 0 1px 0 rgba(255,255,255,0.8),
+0 0 0 1px rgba(182,115,133,0.3);
+transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+overflow:hidden;
+}
+
+.post::before {
+content: ‘’;
+position: absolute;
+top: 0;
+left: 0;
+right: 0;
+height: 3px;
+background: linear-gradient(90deg, #ff69b4, #ffb6c1, #ffd6e6, #ffb6c1, #ff69b4);
+background-size: 200% 100%;
+animation: shimmer 3s linear infinite;
+}
+
+@keyframes shimmer {
+0% { background-position: 200% 0; }
+100% { background-position: -200% 0; }
 }
 
 .post:hover {
-transform: translateY(-5px);
-box-shadow: 0 0 35px rgba(255,182,193,0.9);
+transform: translateY(-4px) scale(1.01);
+box-shadow:
+0 12px 40px rgba(184,76,111,0.3),
+inset 0 1px 0 rgba(255,255,255,0.9),
+0 0 0 1px rgba(182,115,133,0.5),
+0 0 20px rgba(255,105,180,0.2);
 }
 
 .post-header {
@@ -262,9 +283,8 @@ gap:12px;
 width:40px;
 height:40px;
 border-radius:50%;
-border:3px solid #FFB6C1;
+border:2px solid #ffb6c1;
 object-fit:cover;
-box-shadow: 0 0 12px rgba(255,182,193,0.7);
 }
 
 .post-author-info {
@@ -274,7 +294,7 @@ flex-direction:column;
 
 .post-author-name {
 font-weight:bold;
-color:#FFB6C1;
+color:#b84c6f;
 font-size:15px;
 }
 
@@ -285,36 +305,33 @@ color:#999;
 
 .post-delete {
 background:transparent;
-border:2px solid transparent;
+border:none;
 color:#999;
 cursor:pointer;
 font-size:20px;
-padding:6px 10px;
+padding:4px 8px;
 border-radius:8px;
-transition:all 0.3s;
+transition:all 0.2s;
 }
 
 .post-delete:hover {
-background:rgba(255,182,193,0.3);
-color:#FFB6C1;
-transform:scale(1.15);
-border-color:#FFB6C1;
-box-shadow: 0 0 10px rgba(255,182,193,0.6);
+background:#ffe6f0;
+color:#b84c6f;
 }
 
 .post-content {
 font-size:15px;
 color:#333;
-line-height:1.6;
+line-height:1.5;
 margin-bottom:12px;
 word-wrap:break-word;
 }
 
 .post-photos {
 display:grid;
-gap:10px;
-margin-bottom:12px;
-border-radius:12px;
+gap:12px;
+margin-bottom:16px;
+border-radius:16px;
 overflow:hidden;
 }
 
@@ -326,32 +343,45 @@ grid-template-columns: 1fr;
 grid-template-columns: 1fr 1fr;
 }
 
+.post-photos.double img {
+max-height:350px;
+}
+
 .post-photos.triple {
 grid-template-columns: 1fr 1fr;
 }
 
 .post-photos.triple img:first-child {
 grid-column: 1 / -1;
+max-height:400px;
+}
+
+.post-photos.triple img:not(:first-child) {
+max-height:250px;
 }
 
 .post-photos.multiple {
 grid-template-columns: 1fr 1fr;
 }
 
+.post-photos.multiple img {
+max-height:250px;
+}
+
 .post-photos img {
 width:100%;
-height:200px;
-object-fit:cover;
+height:auto;
+max-height:400px;
+object-fit:contain;
 cursor:pointer;
 transition:all 0.3s;
-border:3px solid #FFB6C1;
-border-radius:10px;
-box-shadow: 0 0 15px rgba(255,182,193,0.5);
+background:#000;
+border-radius:8px;
 }
 
 .post-photos img:hover {
-transform:scale(1.03);
-box-shadow: 0 0 25px rgba(255,182,193,0.9);
+transform:scale(1.02);
+box-shadow:0 8px 16px rgba(0,0,0,0.3);
 }
 
 /* ====== STATS BAR ====== */
@@ -359,7 +389,7 @@ box-shadow: 0 0 25px rgba(255,182,193,0.9);
 display:flex;
 justify-content:space-between;
 padding:8px 0;
-border-bottom:2px solid rgba(255,182,193,0.4);
+border-bottom:1px solid #ffe6f0;
 margin-bottom:8px;
 font-size:13px;
 color:#666;
@@ -367,54 +397,71 @@ color:#666;
 
 .likes-count, .comments-count {
 cursor:pointer;
-transition:all 0.3s;
-padding:4px 8px;
-border-radius:6px;
+transition:color 0.2s;
 }
 
 .likes-count:hover, .comments-count:hover {
-color:#FFB6C1;
-background:rgba(255,182,193,0.2);
-transform:scale(1.08);
+color:#b84c6f;
+text-decoration:underline;
 }
 
 /* ====== POST ACTIONS ====== */
 .post-actions {
 display:flex;
-gap:8px;
-padding:8px 0;
-border-bottom:2px solid rgba(255,182,193,0.4);
+gap:12px;
+padding:12px 0;
+border-bottom:1px solid rgba(255,182,193,0.3);
 }
 
 .post-actions button {
 flex:1;
-background:#fff;
-border:3px solid #FFB6C1;
+background:linear-gradient(135deg, rgba(255,255,255,0.8), rgba(255,240,250,0.6));
+border:2px solid rgba(182,115,133,0.2);
 cursor:pointer;
-color:#FFB6C1;
+color:#666;
 font-weight:bold;
 display:flex;
 align-items:center;
 justify-content:center;
-gap:6px;
+gap:8px;
 font-size:14px;
 padding:10px;
 border-radius:12px;
-transition:all 0.3s;
-box-shadow: 0 0 12px rgba(255,182,193,0.4);
+transition:all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+position:relative;
+overflow:hidden;
+}
+
+.post-actions button::before {
+content: ‘’;
+position: absolute;
+top: 50%;
+left: 50%;
+width: 0;
+height: 0;
+border-radius: 50%;
+background: rgba(255,105,180,0.2);
+transform: translate(-50%, -50%);
+transition: width 0.4s, height 0.4s;
+}
+
+.post-actions button:hover::before {
+width: 300px;
+height: 300px;
 }
 
 .post-actions button:hover {
-background:rgba(255,182,193,0.3);
-box-shadow: 0 0 20px rgba(255,182,193,0.8);
-transform:scale(1.05);
+background:linear-gradient(135deg, rgba(255,230,240,1), rgba(255,182,193,0.8));
+border-color:#ff69b4;
+color:#b84c6f;
+transform:translateY(-2px);
+box-shadow:0 4px 12px rgba(255,105,180,0.3);
 }
 
 .post-actions button.liked {
-color:#fff;
-background:#ff1493;
-border-color:#ff1493;
-box-shadow: 0 0 20px rgba(255,20,147,0.7);
+background:linear-gradient(135deg, rgba(255,105,180,0.2), rgba(255,182,193,0.3));
+color:#ff1493;
+border-color:#ff69b4;
 }
 
 /* ====== COMMENT SECTION ====== */
@@ -433,49 +480,44 @@ margin-bottom:12px;
 width:32px;
 height:32px;
 border-radius:50%;
-border:3px solid #FFB6C1;
+border:2px solid #ffb6c1;
 object-fit:cover;
-box-shadow: 0 0 10px rgba(255,182,193,0.6);
 }
 
 .comment-input-area input {
 flex:1;
 border-radius:20px;
-border:3px solid #FFB6C1;
+border:1px solid #ddd;
 padding:8px 16px;
 font-size:14px;
-background:rgba(255,255,255,0.9);
-font-family:'Comic Sans MS',cursive;
-transition:all 0.3s;
-box-shadow: 0 0 10px rgba(255,182,193,0.3);
+background:#f0f2f5;
+font-family:‘Comic Sans MS’,cursive;
 }
 
 .comment-input-area input:focus {
 outline:none;
-border-color:#FFB6C1;
-box-shadow: 0 0 20px rgba(255,182,193,0.8);
+border-color:#ff69b4;
+background:#fff;
 }
 
 .comment-input-area button {
 background:transparent;
 border:none;
-color:#FFB6C1;
+color:#ff69b4;
 cursor:pointer;
-font-size:22px;
-padding:6px 10px;
-transition:all 0.3s;
+font-size:20px;
+padding:4px 8px;
+transition:transform 0.2s;
 }
 
 .comment-input-area button:hover {
-transform:scale(1.4);
-filter: drop-shadow(0 0 10px rgba(255,182,193,0.9));
+transform:scale(1.2);
 }
 
 .comments-list {
 display:flex;
 flex-direction:column;
-gap:10px;
-margin-bottom: 12px;
+gap:8px;
 }
 
 .comment {
@@ -487,25 +529,31 @@ gap:8px;
 width:32px;
 height:32px;
 border-radius:50%;
-border:3px solid #FFB6C1;
+border:2px solid #ffb6c1;
 flex-shrink:0;
 object-fit:cover;
-box-shadow: 0 0 10px rgba(255,182,193,0.6);
 }
 
 .comment-content {
 flex:1;
-background:rgba(255,182,193,0.25);
-border-radius:16px;
+background:linear-gradient(135deg, rgba(240,242,245,0.95), rgba(255,240,250,0.8));
+border-radius:18px;
 padding:10px 14px;
 position:relative;
-border:2px solid rgba(255,182,193,0.5);
-box-shadow: 0 0 10px rgba(255,182,193,0.3);
+border:1px solid rgba(182,115,133,0.1);
+box-shadow:0 2px 8px rgba(184,76,111,0.08);
+transition:all 0.2s;
+}
+
+.comment-content:hover {
+background:linear-gradient(135deg, rgba(255,240,250,1), rgba(255,230,240,0.9));
+box-shadow:0 4px 12px rgba(184,76,111,0.15);
+transform:translateX(4px);
 }
 
 .comment-author {
 font-weight:bold;
-color:#FFB6C1;
+color:#b84c6f;
 font-size:13px;
 margin-bottom:2px;
 }
@@ -524,11 +572,11 @@ background:transparent;
 border:none;
 color:#999;
 cursor:pointer;
-font-size:18px;
-padding:4px 8px;
+font-size:16px;
+padding:2px 6px;
 border-radius:50%;
 opacity:0;
-transition:all 0.3s;
+transition:all 0.2s;
 }
 
 .comment:hover .comment-delete {
@@ -537,36 +585,33 @@ opacity:1;
 
 .comment-delete:hover {
 background:#fff;
-color:#FFB6C1;
-transform:scale(1.3);
-box-shadow: 0 0 10px rgba(255,182,193,0.6);
+color:#b84c6f;
 }
 
 /* ====== MODALS ====== */
 .modal {
 position:fixed;
 inset:0;
-background:rgba(0,0,0,0.5);
+background:rgba(0,0,0,0.7);
 display:none;
 justify-content:center;
 align-items:center;
 z-index:1000;
 padding:20px;
-backdrop-filter: blur(8px);
 }
 
 .modal-box {
-background:rgba(255,255,255,0.95);
-backdrop-filter: blur(15px);
-border:3px solid #FFB6C1;
-border-radius:20px;
+background:rgba(255,255,255,0.98);
+backdrop-filter: blur(10px);
+border:2px solid #b67385;
+border-radius:16px;
 padding:24px;
 width:100%;
 max-width:400px;
 max-height:80vh;
 overflow-y:auto;
 position:relative;
-box-shadow: 0 0 40px rgba(255,182,193,0.8);
+box-shadow: 0 8px 32px rgba(0,0,0,0.3);
 }
 
 .modal-header {
@@ -575,35 +620,33 @@ justify-content:space-between;
 align-items:center;
 margin-bottom:16px;
 padding-bottom:12px;
-border-bottom:3px solid rgba(255,182,193,0.5);
+border-bottom:2px solid #ffe6f0;
 }
 
 .modal-header h3 {
-color:#FFB6C1;
+color:#b84c6f;
 font-size:18px;
 }
 
 .closeModal {
-background:#FFB6C1;
+background:#ffb6c1;
 color:#fff;
-width:34px;
-height:34px;
+width:32px;
+height:32px;
 border-radius:50%;
 display:flex;
 align-items:center;
 justify-content:center;
 cursor:pointer;
 font-weight:bold;
-font-size:22px;
+font-size:20px;
 border:none;
-transition:all 0.3s;
-box-shadow: 0 0 15px rgba(255,182,193,0.7);
+transition:all 0.2s;
 }
 
 .closeModal:hover {
-transform:scale(1.2);
-box-shadow: 0 0 25px rgba(255,182,193,1);
 background:#ff69b4;
+transform:scale(1.1);
 }
 
 .likes-list {
@@ -616,31 +659,26 @@ gap:12px;
 display:flex;
 align-items:center;
 gap:12px;
-padding:10px;
-border-radius:12px;
-transition:all 0.3s;
-border:2px solid transparent;
+padding:8px;
+border-radius:8px;
+transition:background 0.2s;
 }
 
 .like-item:hover {
-background:rgba(255,182,193,0.25);
-border-color:#FFB6C1;
-transform:scale(1.03);
-box-shadow: 0 0 12px rgba(255,182,193,0.5);
+background:#ffe6f0;
 }
 
 .like-item img {
 width:40px;
 height:40px;
 border-radius:50%;
-border:3px solid #FFB6C1;
+border:2px solid #ffb6c1;
 object-fit:cover;
-box-shadow: 0 0 10px rgba(255,182,193,0.6);
 }
 
 .like-item .name {
 font-weight:bold;
-color:#FFB6C1;
+color:#b84c6f;
 font-size:15px;
 }
 
@@ -648,50 +686,49 @@ font-size:15px;
 #photoViewer {
 position:fixed;
 inset:0;
-background:rgba(0,0,0,0.85);
+background:rgba(0,0,0,0.95);
 display:none;
 justify-content:center;
 align-items:center;
 z-index:2000;
-backdrop-filter: blur(8px);
+backdrop-filter:blur(10px);
 }
 
 #photoViewer img {
-max-width:90%;
-max-height:90%;
+max-width:95%;
+max-height:95%;
 border-radius:16px;
-box-shadow: 0 0 50px rgba(255,182,193,0.9);
-border:4px solid #FFB6C1;
+box-shadow:0 20px 60px rgba(0,0,0,0.5);
+cursor:zoom-in;
+transition:transform 0.3s;
+}
+
+#photoViewer img:active {
+cursor:zoom-out;
+transform:scale(1.5);
 }
 
 #photoViewer .closeModal {
 position:absolute;
 top:20px;
 right:20px;
+z-index:2001;
 }
 
 /* ====== EMPTY STATE ====== */
 .empty-state {
 text-align:center;
 padding:40px 20px;
+color:#999;
 }
 
 .empty-state .emoji {
-font-size:60px;
-margin-bottom:16px;
-filter: drop-shadow(0 0 15px rgba(255,182,193,0.8));
-animation: float 3s ease-in-out infinite;
-}
-
-@keyframes float {
-0%, 100% { transform: translateY(0); }
-50% { transform: translateY(-10px); }
+font-size:48px;
+margin-bottom:12px;
 }
 
 .empty-state p {
 font-size:16px;
-color:#FFB6C1;
-font-weight:bold;
 }
 
 /* ====== RESPONSIVE ====== */
@@ -716,7 +753,7 @@ height:150px;
 <header>
   <div class="header-left">
     <div class="back-btn" id="backBtn">←</div>
-    <span>Actualité</span>
+    <span>📰 Actualité</span>
   </div>
   <img id="ownerPhoto" src="icon-152.png" alt="Photo">
 </header>
@@ -745,7 +782,7 @@ height:150px;
   <div class="empty-state">
     <div class="emoji">🌸</div>
     <p>Aucune publication pour le moment</p>
-    <p style="font-size:13px;margin-top:8px;color:#999;">Soyez le premier à partager quelque chose !</p>
+    <p style="font-size:13px;margin-top:8px;">Soyez le premier à partager quelque chose !</p>
   </div>
 </div>
 
@@ -773,7 +810,7 @@ import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js
 
 const supabase = createClient(
   "https://jyhbamdcxmpveujjqjla.supabase.co",
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp5aGJhbWRjeG1wdmV1ampxamxhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mzc4MTk0ODgsImV4cCI6MjA1MzM5NTQ4OH0.YFsLnEy82_g0Y1w0XA0xjPD5K-9u_jdpUqC_Rfs-3Kw"
+  "sb_publishable_sqsxb-3Kl5o3-JQYv9kGFw_-g0EgwMa"
 );
 
 const myPrenom = localStorage.getItem('prenom') || 'Utilisateur';
@@ -803,7 +840,8 @@ headerName.textContent = `${myPrenom}, quoi de neuf ?`;
 
 // Retour
 backBtn.onclick = () => {
-  window.location.href = 'owner.html';
+  document.body.style.opacity = '0';
+  setTimeout(() => window.location.href = 'owner.html', 500);
 };
 
 // Charger les photos des utilisateurs
@@ -867,7 +905,7 @@ async function loadPosts() {
     .order('created_at', { ascending: false });
   
   if (error) {
-    console.error('Erreur chargement posts:', error);
+    console.error(error);
     return;
   }
 
@@ -878,7 +916,7 @@ async function loadPosts() {
       <div class="empty-state">
         <div class="emoji">🌸</div>
         <p>Aucune publication pour le moment</p>
-        <p style="font-size:13px;margin-top:8px;color:#999;">Soyez le premier à partager quelque chose !</p>
+        <p style="font-size:13px;margin-top:8px;">Soyez le premier à partager quelque chose !</p>
       </div>
     `;
     return;
@@ -951,10 +989,8 @@ async function loadPosts() {
     if (deleteBtn) {
       deleteBtn.onclick = async () => {
         if (confirm('Voulez-vous vraiment supprimer cette publication ?')) {
-          const { error } = await supabase.from('posts').delete().eq('id', post.id);
-          if (!error) {
-            loadPosts();
-          }
+          await supabase.from('posts').delete().eq('id', post.id);
+          loadPosts();
         }
       };
     }
@@ -979,10 +1015,8 @@ async function loadPosts() {
         newLikes.push({ name: myPrenom, photo: ownerPhotoUrl });
       }
       
-      const { error } = await supabase.from('posts').update({ likes: newLikes }).eq('id', post.id);
-      if (!error) {
-        loadPosts();
-      }
+      await supabase.from('posts').update({ likes: newLikes }).eq('id', post.id);
+      loadPosts();
     };
 
     // SHOW LIKES
@@ -1032,11 +1066,9 @@ async function loadPosts() {
         timestamp: new Date().toISOString()
       }];
       
-      const { error } = await supabase.from('posts').update({ comments: newComments }).eq('id', post.id);
-      if (!error) {
-        commentInput.value = '';
-        loadPosts();
-      }
+      await supabase.from('posts').update({ comments: newComments }).eq('id', post.id);
+      commentInput.value = '';
+      loadPosts();
     };
     
     sendCommentBtn.onclick = addComment;
@@ -1064,10 +1096,8 @@ async function loadPosts() {
       if (deleteCommentBtn) {
         deleteCommentBtn.onclick = async () => {
           const newComments = comments.filter((_, i) => i !== index);
-          const { error } = await supabase.from('posts').update({ comments: newComments }).eq('id', post.id);
-          if (!error) {
-            loadPosts();
-          }
+          await supabase.from('posts').update({ comments: newComments }).eq('id', post.id);
+          loadPosts();
         };
       }
       
@@ -1093,42 +1123,33 @@ postBtn.onclick = async () => {
     // Upload des photos
     const photoUrls = [];
     for (const file of selectedFiles) {
-      const fileName = `${Date.now()}_${Math.random().toString(36).substr(2, 9)}_${file.name}`;
-      const path = `posts/${fileName}`;
-      
+      const path = `posts/${Date.now()}_${Math.random().toString(36).substr(2, 9)}_${file.name}`;
       const { error: uploadError } = await supabase.storage.from('images').upload(path, file);
       
-      if (uploadError) {
-        console.error('Erreur upload:', uploadError);
-      } else {
+      if (!uploadError) {
         const { data } = supabase.storage.from('images').getPublicUrl(path);
         photoUrls.push(data.publicUrl);
       }
     }
     
     // Créer le post
-    const { data, error } = await supabase.from('posts').insert([{
+    await supabase.from('posts').insert([{
       name: myPrenom,
       content: content,
       photo: ownerPhotoUrl,
       photos: photoUrls,
       likes: [],
-      comments: []
-    }]).select();
+      comments: [],
+      created_at: new Date().toISOString()
+    }]);
     
-    if (error) {
-      console.error('Erreur création post:', error);
-      alert('Erreur lors de la publication: ' + error.message);
-    } else {
-      console.log('Post créé avec succès:', data);
-      postInput.value = '';
-      selectedFiles = [];
-      photoPreview.innerHTML = '';
-      photoInput.value = '';
-      await loadPosts();
-    }
+    postInput.value = '';
+    selectedFiles = [];
+    photoPreview.innerHTML = '';
+    photoInput.value = '';
+    loadPosts();
   } catch (error) {
-    console.error('Erreur:', error);
+    console.error(error);
     alert('Erreur lors de la publication');
   }
   
@@ -1161,11 +1182,7 @@ photoViewer.onclick = (e) => {
 };
 
 // ====== INIT ======
-console.log('Initialisation...');
-loadUserPhotos().then(() => {
-  console.log('Photos utilisateurs chargées');
-  loadPosts();
-});
+loadUserPhotos().then(() => loadPosts());
 
 // ====== RAFRAICHISSEMENT AUTO ======
 setInterval(loadPosts, 30000);
