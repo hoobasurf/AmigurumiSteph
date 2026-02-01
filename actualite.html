@@ -9,7 +9,13 @@
 <style>
 /* ====== RESET ====== */
 * { box-sizing:border-box; margin:0; padding:0; font-family:'Comic Sans MS',cursive; }
-html, body { min-height:100%; background:#ffe6f0; overflow-y:auto; }
+html, body { 
+  min-height:100%; 
+  background: url('2A108385-A26A-4390-A0F8-635DD2C93625.png') center top;
+  background-size: cover;
+  background-attachment: fixed;
+  overflow-y:auto; 
+}
 
 /* ====== HEADER ====== */
 header {
@@ -751,7 +757,7 @@ height:150px;
 <header>
   <div class="header-left">
     <div class="back-btn" id="backBtn">←</div>
-    <span>📰 Actualité</span>
+    <span>Actualité</span>
   </div>
   <img id="ownerPhoto" src="icon-152.png" alt="Photo">
 </header>
@@ -812,7 +818,26 @@ const supabase = createClient(
 );
 
 const myPrenom = localStorage.getItem('prenom') || 'Utilisateur';
-const ownerPhotoUrl = localStorage.getItem('ownerPhoto') || 'icon-152.png';
+let ownerPhotoUrl = localStorage.getItem('ownerPhoto') || 'icon-152.png';
+
+// IMPORTANT: Charger la photo de profil depuis Supabase
+async function loadMyProfile() {
+  const { data, error } = await supabase
+    .from('profiles')
+    .select('photo_url')
+    .eq('prenom', myPrenom)
+    .single();
+  
+  if (!error && data && data.photo_url) {
+    ownerPhotoUrl = data.photo_url;
+    // Mettre à jour aussi dans localStorage pour la prochaine fois
+    localStorage.setItem('ownerPhoto', ownerPhotoUrl);
+  }
+  
+  // Mettre à jour toutes les photos de profil dans l'interface
+  headerPhoto.src = ownerPhotoUrl;
+  ownerPhoto.src = ownerPhotoUrl;
+}
 
 const feed = document.getElementById('feed');
 const postBtn = document.getElementById('postBtn');
@@ -841,14 +866,17 @@ backBtn.onclick = () => {
   window.location.href = 'owner.html';
 };
 
-// Charger les photos des utilisateurs
+// Charger les photos des utilisateurs depuis Supabase
 async function loadUserPhotos() {
   const { data, error } = await supabase.from('profiles').select('prenom, photo_url');
   if (!error && data) {
     data.forEach(u => {
-      userPhotos[u.prenom] = u.photo_url || 'icon-152.png';
+      if (u.photo_url) {
+        userPhotos[u.prenom] = u.photo_url;
+      }
     });
   }
+  console.log('Photos utilisateurs chargées:', userPhotos);
 }
 
 // Sélection de photos
@@ -928,6 +956,7 @@ async function loadPosts() {
     const photos = post.photos || [];
     const isLiked = likes.some(l => l.name === myPrenom);
     
+    // IMPORTANT: Utiliser la photo depuis userPhotos (base de données) d'abord
     const authorPhoto = userPhotos[post.name] || post.photo || 'icon-152.png';
     
     // Déterminer la classe grid pour les photos
@@ -940,7 +969,7 @@ async function loadPosts() {
     div.innerHTML = `
       <div class="post-header">
         <div class="post-author">
-          <img src="${authorPhoto}" alt="${post.name}">
+          <img src="${authorPhoto}" alt="${post.name}" onerror="this.src='icon-152.png'">
           <div class="post-author-info">
             <div class="post-author-name">${post.name}</div>
             <div class="post-timestamp">${formatTime(post.created_at)}</div>
@@ -974,7 +1003,7 @@ async function loadPosts() {
       <div class="comment-section" style="display:${comments.length > 0 ? 'block' : 'none'}">
         <div class="comments-list"></div>
         <div class="comment-input-area">
-          <img src="${ownerPhotoUrl}" alt="${myPrenom}">
+          <img src="${ownerPhotoUrl}" alt="${myPrenom}" onerror="this.src='icon-152.png'">
           <input type="text" placeholder="Écrivez un commentaire..." class="commentInput">
           <button class="sendCommentBtn">➤</button>
         </div>
@@ -1028,7 +1057,7 @@ async function loadPosts() {
           item.className = 'like-item';
           const likePhoto = userPhotos[like.name] || like.photo || 'icon-152.png';
           item.innerHTML = `
-            <img src="${likePhoto}" alt="${like.name}">
+            <img src="${likePhoto}" alt="${like.name}" onerror="this.src='icon-152.png'">
             <span class="name">${like.name}</span>
           `;
           likesContent.appendChild(item);
@@ -1082,7 +1111,7 @@ async function loadPosts() {
       cm.className = 'comment';
       const commentPhoto = userPhotos[comment.name] || comment.photo || 'icon-152.png';
       cm.innerHTML = `
-        <img src="${commentPhoto}" alt="${comment.name}">
+        <img src="${commentPhoto}" alt="${comment.name}" onerror="this.src='icon-152.png'">
         <div class="comment-content">
           <div class="comment-author">${comment.name}</div>
           <div class="comment-text">${comment.text}</div>
@@ -1135,11 +1164,11 @@ postBtn.onclick = async () => {
       }
     }
     
-    // Créer le post
+    // Créer le post avec la vraie photo de profil
     const { data, error } = await supabase.from('posts').insert([{
       name: myPrenom,
       content: content,
-      photo: ownerPhotoUrl,
+      photo: ownerPhotoUrl,  // Utilise la photo chargée depuis Supabase
       photos: photoUrls,
       likes: [],
       comments: []
@@ -1191,8 +1220,14 @@ photoViewer.onclick = (e) => {
 
 // ====== INIT ======
 console.log('Démarrage...');
-loadUserPhotos().then(() => {
-  console.log('Photos chargées');
+// D'abord charger ma propre photo de profil
+loadMyProfile().then(() => {
+  console.log('Ma photo chargée:', ownerPhotoUrl);
+  // Ensuite charger les photos de tous les utilisateurs
+  return loadUserPhotos();
+}).then(() => {
+  console.log('Toutes les photos chargées');
+  // Enfin charger les posts
   loadPosts();
 });
 
