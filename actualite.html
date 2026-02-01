@@ -142,7 +142,7 @@ font-size:15px;
 resize:none;
 min-height:80px;
 background:rgba(255,255,255,0.9);
-font-family:'Comic Sans MS',cursive;
+font-family:‘Comic Sans MS’,cursive;
 transition:all 0.3s;
 box-shadow: 0 0 10px rgba(255,182,193,0.4);
 }
@@ -470,7 +470,7 @@ border:3px solid #FFB6C1;
 padding:8px 16px;
 font-size:14px;
 background:rgba(255,255,255,0.9);
-font-family:'Comic Sans MS',cursive;
+font-family:‘Comic Sans MS’,cursive;
 transition:all 0.3s;
 box-shadow: 0 0 10px rgba(255,182,193,0.3);
 }
@@ -797,7 +797,7 @@ import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js
 
 const supabase = createClient(
   "https://jyhbamdcxmpveujjqjla.supabase.co",
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imp5aGJhbWRjeG1wdmV1ampxamxhIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Mzc4MTk0ODgsImV4cCI6MjA1MzM5NTQ4OH0.YFsLnEy82_g0Y1w0XA0xjPD5K-9u_jdpUqC_Rfs-3Kw"
+  "sb_publishable_sqsxb-3Kl5o3-JQYv9kGFw_-g0EgwMa"
 );
 
 const myPrenom = localStorage.getItem('prenom') || 'Utilisateur';
@@ -1119,7 +1119,7 @@ postBtn.onclick = async () => {
     }
     
     // Créer le post
-    const { error } = await supabase.from('posts').insert([{
+    await supabase.from('posts').insert([{
       name: myPrenom,
       content: content,
       photo: ownerPhotoUrl,
@@ -1129,18 +1129,13 @@ postBtn.onclick = async () => {
       created_at: new Date().toISOString()
     }]);
     
-    if (error) {
-      console.error('Erreur insertion:', error);
-      alert('Erreur lors de la publication: ' + error.message);
-    } else {
-      postInput.value = '';
-      selectedFiles = [];
-      photoPreview.innerHTML = '';
-      photoInput.value = '';
-      await loadPosts();
-    }
+    postInput.value = '';
+    selectedFiles = [];
+    photoPreview.innerHTML = '';
+    photoInput.value = '';
+    loadPosts();
   } catch (error) {
-    console.error('Erreur:', error);
+    console.error(error);
     alert('Erreur lors de la publication');
   }
   
