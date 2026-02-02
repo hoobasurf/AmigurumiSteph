@@ -809,6 +809,10 @@ height:150px;
   <img id="viewerImage" src="" alt="">
 </div>
 
+<!-- Juste AVANT <script type="module"> -->
+<script src="image-handler.js"></script>
+
+  
 <script type="module">
 import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
 
@@ -1147,21 +1151,11 @@ postBtn.onclick = async () => {
   postBtn.textContent = 'Publication...';
   
   try {
-    // Upload des photos
-    const photoUrls = [];
-    for (const file of selectedFiles) {
-      const fileName = `${Date.now()}_${Math.random().toString(36).substr(2, 9)}_${file.name}`;
-      const path = `posts/${fileName}`;
-      
-      const { error: uploadError } = await supabase.storage.from('images').upload(path, file);
-      
-      if (!uploadError) {
-        const { data } = supabase.storage.from('images').getPublicUrl(path);
-        photoUrls.push(data.publicUrl);
-      } else {
-        console.error('Erreur upload:', uploadError);
-      }
-    }
+    // Upload des photos vers ImgBB avec compression automatique
+const photoUrls = await uploadMultipleImages(selectedFiles, (current, total) => {
+  postBtn.textContent = `Upload ${current}/${total}...`;
+});
+
     
     // Créer le post
     const newPost = {
