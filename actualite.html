@@ -820,25 +820,6 @@ const supabase = createClient(
 const myPrenom = localStorage.getItem('prenom') || 'Utilisateur';
 let ownerPhotoUrl = localStorage.getItem('ownerPhoto') || 'icon-152.png';
 
-// IMPORTANT: Charger la photo de profil depuis Supabase
-async function loadMyProfile() {
-  const { data, error } = await supabase
-    .from('profiles')
-    .select('photo_url')
-    .eq('prenom', myPrenom)
-    .single();
-  
-  if (!error && data && data.photo_url) {
-    ownerPhotoUrl = data.photo_url;
-    // Mettre à jour aussi dans localStorage pour la prochaine fois
-    localStorage.setItem('ownerPhoto', ownerPhotoUrl);
-  }
-  
-  // Mettre à jour toutes les photos de profil dans l'interface
-  headerPhoto.src = ownerPhotoUrl;
-  ownerPhoto.src = ownerPhotoUrl;
-}
-
 const feed = document.getElementById('feed');
 const postBtn = document.getElementById('postBtn');
 const postInput = document.getElementById('postInput');
@@ -856,17 +837,33 @@ const viewerImage = document.getElementById('viewerImage');
 let selectedFiles = [];
 let userPhotos = {};
 
-// Initialiser le header
-headerPhoto.src = ownerPhotoUrl;
-ownerPhoto.src = ownerPhotoUrl;
-headerName.textContent = `${myPrenom}, quoi de neuf ?`;
-
 // Retour
 backBtn.onclick = () => {
   window.location.href = 'owner.html';
 };
 
-// Charger les photos des utilisateurs depuis Supabase
+// Charger ma photo de profil depuis Supabase
+async function loadMyProfile() {
+  const { data, error } = await supabase
+    .from('profiles')
+    .select('photo_url')
+    .eq('prenom', myPrenom)
+    .single();
+  
+  if (!error && data && data.photo_url) {
+    ownerPhotoUrl = data.photo_url;
+    localStorage.setItem('ownerPhoto', ownerPhotoUrl);
+  }
+  
+  // Mettre à jour l'interface
+  headerPhoto.src = ownerPhotoUrl;
+  ownerPhoto.src = ownerPhotoUrl;
+  headerName.textContent = `Quoi de neuf, ${myPrenom} ?`;
+  
+  console.log('Ma photo chargée:', ownerPhotoUrl);
+}
+
+// Charger les photos des utilisateurs
 async function loadUserPhotos() {
   const { data, error } = await supabase.from('profiles').select('prenom, photo_url');
   if (!error && data) {
@@ -876,7 +873,7 @@ async function loadUserPhotos() {
       }
     });
   }
-  console.log('Photos utilisateurs chargées:', userPhotos);
+  console.log('Photos utilisateurs:', userPhotos);
 }
 
 // Sélection de photos
@@ -947,6 +944,8 @@ async function loadPosts() {
     return;
   }
 
+  console.log('Posts chargés:', data);
+
   data.forEach(post => {
     const div = document.createElement('div');
     div.className = 'post';
@@ -956,7 +955,7 @@ async function loadPosts() {
     const photos = post.photos || [];
     const isLiked = likes.some(l => l.name === myPrenom);
     
-    // IMPORTANT: Utiliser la photo depuis userPhotos (base de données) d'abord
+    // Utiliser la photo depuis userPhotos d'abord
     const authorPhoto = userPhotos[post.name] || post.photo || 'icon-152.png';
     
     // Déterminer la classe grid pour les photos
@@ -1164,21 +1163,25 @@ postBtn.onclick = async () => {
       }
     }
     
-    // Créer le post avec la vraie photo de profil
-    const { data, error } = await supabase.from('posts').insert([{
+    // Créer le post
+    const newPost = {
       name: myPrenom,
       content: content,
-      photo: ownerPhotoUrl,  // Utilise la photo chargée depuis Supabase
+      photo: ownerPhotoUrl,
       photos: photoUrls,
       likes: [],
       comments: []
-    }]).select();
+    };
+    
+    console.log('Création du post:', newPost);
+    
+    const { data, error } = await supabase.from('posts').insert([newPost]).select();
     
     if (error) {
       console.error('Erreur création:', error);
       alert('Erreur: ' + error.message);
     } else {
-      console.log('Post créé:', data);
+      console.log('Post créé avec succès:', data);
       postInput.value = '';
       selectedFiles = [];
       photoPreview.innerHTML = '';
@@ -1219,15 +1222,12 @@ photoViewer.onclick = (e) => {
 };
 
 // ====== INIT ======
-console.log('Démarrage...');
-// D'abord charger ma propre photo de profil
+console.log('Démarrage - Prénom:', myPrenom);
+
+// Charger d'abord ma photo, puis les autres, puis les posts
 loadMyProfile().then(() => {
-  console.log('Ma photo chargée:', ownerPhotoUrl);
-  // Ensuite charger les photos de tous les utilisateurs
   return loadUserPhotos();
 }).then(() => {
-  console.log('Toutes les photos chargées');
-  // Enfin charger les posts
   loadPosts();
 });
 
