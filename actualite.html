@@ -1151,11 +1151,21 @@ postBtn.onclick = async () => {
   postBtn.textContent = 'Publication...';
   
   try {
+    console.log('🚀 Début publication');
+    console.log('📝 Contenu:', content);
+    console.log('📷 Fichiers sélectionnés:', selectedFiles.length);
+    
     // Upload des photos vers ImgBB avec compression automatique
-const photoUrls = await uploadMultipleImages(selectedFiles, (current, total) => {
-  postBtn.textContent = `Upload ${current}/${total}...`;
-});
-
+    let photoUrls = [];
+    
+    if (selectedFiles.length > 0) {
+      console.log('⏳ Upload des images...');
+      photoUrls = await uploadMultipleImages(selectedFiles, (current, total) => {
+        postBtn.textContent = `Upload ${current}/${total}...`;
+        console.log(`📤 Progression: ${current}/${total}`);
+      });
+      console.log('✅ Images uploadées:', photoUrls);
+    }
     
     // Créer le post
     const newPost = {
@@ -1164,31 +1174,41 @@ const photoUrls = await uploadMultipleImages(selectedFiles, (current, total) => 
       photo: ownerPhotoUrl,
       photos: photoUrls,
       likes: [],
-      comments: []
+      comments: [],
+      created_at: new Date().toISOString() // ⚠️ IMPORTANT : Ajouter timestamp
     };
     
-    console.log('Création du post:', newPost);
+    console.log('📤 Envoi du post à Supabase:', newPost);
     
-    const { data, error } = await supabase.from('posts').insert([newPost]).select();
+    const { data, error } = await supabase
+      .from('posts')
+      .insert([newPost])
+      .select();
     
     if (error) {
-      console.error('Erreur création:', error);
+      console.error('❌ Erreur Supabase:', error);
       alert('Erreur: ' + error.message);
     } else {
-      console.log('Post créé avec succès:', data);
+      console.log('✅ Post créé avec succès:', data);
+      
+      // Réinitialiser le formulaire
       postInput.value = '';
       selectedFiles = [];
       photoPreview.innerHTML = '';
       photoInput.value = '';
+      
+      // Recharger immédiatement
+      console.log('🔄 Rechargement des posts...');
       await loadPosts();
+      console.log('✅ Posts rechargés');
     }
   } catch (error) {
-    console.error('Erreur:', error);
-    alert('Erreur lors de la publication');
+    console.error('❌ Erreur générale:', error);
+    alert('Erreur lors de la publication: ' + error.message);
+  } finally {
+    postBtn.disabled = false;
+    postBtn.textContent = 'Publier';
   }
-  
-  postBtn.disabled = false;
-  postBtn.textContent = 'Publier';
 };
 
 // ENTER pour publier
@@ -1216,17 +1236,33 @@ photoViewer.onclick = (e) => {
 };
 
 // ====== INIT ======
-console.log('Démarrage - Prénom:', myPrenom);
+console.log('🎬 Démarrage - Prénom:', myPrenom);
 
 // Charger d'abord ma photo, puis les autres, puis les posts
-loadMyProfile().then(() => {
-  return loadUserPhotos();
-}).then(() => {
-  loadPosts();
-});
+(async () => {
+  try {
+    console.log('⏳ Chargement du profil...');
+    await loadMyProfile();
+    console.log('✅ Profil chargé');
+    
+    console.log('⏳ Chargement des photos utilisateurs...');
+    await loadUserPhotos();
+    console.log('✅ Photos utilisateurs chargées');
+    
+    console.log('⏳ Chargement des posts...');
+    await loadPosts();
+    console.log('✅ Posts chargés');
+  } catch (error) {
+    console.error('❌ Erreur lors du chargement initial:', error);
+  }
+})();
 
 // ====== RAFRAICHISSEMENT AUTO ======
-setInterval(loadPosts, 30000);
+setInterval(() => {
+  console.log('🔄 Rafraîchissement automatique...');
+  loadPosts();
+}, 30000);
+
 </script>
 
 </body>
