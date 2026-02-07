@@ -562,11 +562,12 @@ async function refreshCreations() {
     if (error) { console.error(error); return; }
 
     creations = data.map(c => {
+      // ✅ Les images sont déjà des URLs ImgBB, pas besoin de Supabase Storage
       let zoomGroup = [];
       if (Array.isArray(c.images) && c.images.length) {
-        zoomGroup = c.images.map(p => supabase.storage.from('images').getPublicUrl(p).data.publicUrl);
+        zoomGroup = c.images; // Directement les URLs ImgBB
       } else if (c.image_path) {
-        zoomGroup = [supabase.storage.from('images').getPublicUrl(c.image_path).data.publicUrl];
+        zoomGroup = [c.image_path]; // URL ImgBB
       }
 
       return {
@@ -820,23 +821,40 @@ document.getElementById('confirmAdd').onclick = async () => {
   if (!name || !files.length) { alert("Mettre un nom et choisir au moins une photo"); return; }
 
   try {
-    const paths = [];
+    // ✅ UPLOAD VERS IMGBB au lieu de Supabase
+    const imageUrls = [];
+    
     for (let i = 0; i < files.length; i++) {
-      const file = files[i];
-      const path = `${Date.now()}_${Math.random().toString(36).substr(2, 9)}_${file.name}`;
-      const { error: uploadError } = await supabase.storage.from('images').upload(path, file);
-      if (uploadError) { console.error('Upload error:', uploadError); continue; }
-      paths.push(path);
+      try {
+        const url = await window.uploadImage(files[i]); // Utilise image-handler.js
+        imageUrls.push(url);
+      } catch (err) {
+        console.error('Erreur upload ImgBB:', err);
+      }
     }
 
-    if (!paths.length) { alert('Aucune image uploadée avec succès'); return; }
+    if (!imageUrls.length) { 
+      alert('Aucune image uploadée avec succès'); 
+      return; 
+    }
 
+    // ✅ Sauvegarde juste les URLS dans Supabase (pas les fichiers)
     const { error: insertError } = await supabase.from('creations').insert([{
-      name, legend: legend || '', image_path: paths[0], images: paths, likes: [], comments: [],
-      x: 0, y: 0, scale: 1, x_legend: 0, y_legend: 0, scale_legend: 1
+      name, 
+      legend: legend || '', 
+      image_path: imageUrls[0],  // Premier URL
+      images: imageUrls,         // Tous les URLs
+      likes: [], 
+      comments: [],
+      x: 0, y: 0, scale: 1, 
+      x_legend: 0, y_legend: 0, scale_legend: 1
     }]);
 
-    if (insertError) { console.error('Insert error:', insertError); alert('Erreur insertion: ' + insertError.message); return; }
+    if (insertError) { 
+      console.error('Insert error:', insertError); 
+      alert('Erreur insertion: ' + insertError.message); 
+      return; 
+    }
 
     addModal.style.display = 'none';
     document.getElementById('photoName').value = '';
@@ -844,7 +862,11 @@ document.getElementById('confirmAdd').onclick = async () => {
     document.getElementById('multiPhoto').value = '';
     fileInfo.textContent = '';
     await refreshCreations();
-  } catch (error) { console.error('Error:', error); alert('Erreur: ' + error.message); }
+    
+  } catch (error) { 
+    console.error('Error:', error); 
+    alert('Erreur: ' + error.message); 
+  }
 };
 
 // Delete creation
