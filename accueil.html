@@ -58,7 +58,7 @@ h2 {
   top:10px;
   right:10px;
   z-index:10000;
-  background:#ffe6f0; /* couleur si pas de photo */
+  background:#ffe6f0;
   border:2px solid #b84c6f;
   display:block;
 }
@@ -137,9 +137,24 @@ button:hover { background: #e94f9a; }
   flex-direction: column;
   gap: 12px;
 }
+
+.loading {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(0,0,0,0.8);
+  color: white;
+  padding: 20px 40px;
+  border-radius: 12px;
+  z-index: 10001;
+  display: none;
+}
 </style>
 </head>
 <body>
+
+<div class="loading" id="loading">Chargement...</div>
 
 <h2>Bienvenue</h2>
 
@@ -179,10 +194,10 @@ button:hover { background: #e94f9a; }
 <script type="module">
 import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
 
-// ====== Supabase config ======
+// ====== Supabase config - NOUVELLES CLÉS ======
 const supabase = createClient(
-  "https://jyhbamdcxmpveujjqjla.supabase.co",
-  "sb_publishable_sqsxb-3Kl5o3-JQYv9kGFw_-g0EgwMa"
+  "https://lgduavepbznnzjfxlsnx.supabase.co",
+  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImxnZHVhdmVwYnpubnpqZnhsc254Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzA0NzgyODcsImV4cCI6MjA4NjA1NDI4N30.6yAmtLvG0t7ne3sV2DXMbsCfcK8JVAi5NujZsQUJ_Tk"
 );
 
 const photoBtn = document.getElementById('photoBtn');
@@ -190,32 +205,62 @@ const photoInput = document.getElementById('photoInput');
 const profilePreview = document.getElementById('profilePreview');
 const prenomInput = document.getElementById('prenom');
 const ownerPhoto = document.getElementById('ownerPhoto');
+const loading = document.getElementById('loading');
 
-// ====== Choisir photo ======
+// ====== Charger photo de profil existante ======
+prenomInput.addEventListener('blur', async () => {
+  const prenom = prenomInput.value.trim();
+  if (!prenom) return;
+
+  try {
+    const { data, error } = await supabase
+      .from('profiles')
+      .select('photo_url')
+      .eq('prenom', prenom)
+      .single();
+    
+    if (!error && data?.photo_url) {
+      profilePreview.src = data.photo_url;
+      profilePreview.style.display = 'block';
+      ownerPhoto.src = data.photo_url;
+    }
+  } catch (err) {
+    console.log('Pas de profil existant');
+  }
+});
+
+// ====== Choisir photo - UPLOAD VERS IMGBB ======
 photoBtn.onclick = () => photoInput.click();
+
 photoInput.onchange = async (e) => {
   const file = e.target.files[0];
   if (!file) return;
 
-  const filePath = `profile_${Date.now()}_${file.name}`;
-  const { error: uploadError } = await supabase.storage.from('images').upload(filePath, file);
-  if(uploadError) return alert("Erreur upload: " + uploadError.message);
-
-  const { data } = supabase.storage.from('images').getPublicUrl(filePath);
-  if(!data?.publicUrl) return alert("Impossible de récupérer l'URL de l'image");
-
   const prenom = prenomInput.value.trim();
-  if(!prenom) return alert("Veuillez saisir votre prénom avant de choisir une photo");
+  if (!prenom) return alert("Veuillez saisir votre prénom avant de choisir une photo");
 
-  await supabase.from('profiles')
-    .upsert({ prenom, photo_url: data.publicUrl }, { onConflict: ['prenom'] });
+  try {
+    loading.style.display = 'block';
 
-  profilePreview.src = data.publicUrl;
-  profilePreview.style.display = 'block';
+    // ✅ Upload vers ImgBB au lieu de Supabase Storage
+    const imgbbUrl = await window.uploadImage(file);
 
-  // Affichage mini cercle haut droite
-  ownerPhoto.src = data.publicUrl;
-  localStorage.setItem('prenom', prenom); // garder le prénom pour owner.html
+    // ✅ Sauvegarder l'URL ImgBB dans Supabase
+    await supabase.from('profiles')
+      .upsert({ prenom, photo_url: imgbbUrl }, { onConflict: 'prenom' });
+
+    profilePreview.src = imgbbUrl;
+    profilePreview.style.display = 'block';
+    ownerPhoto.src = imgbbUrl;
+
+    localStorage.setItem('prenom', prenom);
+    loading.style.display = 'none';
+    
+  } catch (error) {
+    console.error('Erreur upload:', error);
+    loading.style.display = 'none';
+    alert('❌ Erreur lors de l\'upload: ' + error.message);
+  }
 };
 
 // ====== Connexion ======
@@ -223,11 +268,12 @@ document.getElementById('connexionBtn').onclick = () => {
   const prenom = prenomInput.value.trim();
   const password = document.getElementById('password').value;
 
-  if(!prenom) return alert("Veuillez saisir votre prénom");
+  if (!prenom) return alert("Veuillez saisir votre prénom");
 
-  if(prenom === "Steph" && password === "Steph1511") {
+  if (prenom === "Steph" && password === "Steph1511") {
     document.getElementById('choiceModal').style.display = 'flex';
   } else {
+    localStorage.setItem('prenom', prenom);
     window.location.href = 'visitor.html';
   }
 };
@@ -237,11 +283,16 @@ document.getElementById('creationBtn').onclick = () => {
   localStorage.setItem('prenom', prenomInput.value.trim());
   window.location.href = 'owner.html';
 };
-document.getElementById('visiteBtn').onclick = () => window.location.href = 'visitor.html';
+document.getElementById('visiteBtn').onclick = () => {
+  localStorage.setItem('prenom', prenomInput.value.trim());
+  window.location.href = 'visitor.html';
+};
 
 // Fermer modal si clic en dehors
 document.getElementById('choiceModal').onclick = e => {
-  if(e.target === document.getElementById('choiceModal')) document.getElementById('choiceModal').style.display='none';
+  if (e.target === document.getElementById('choiceModal')) {
+    document.getElementById('choiceModal').style.display = 'none';
+  }
 };
 </script>
 
