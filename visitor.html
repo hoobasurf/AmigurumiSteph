@@ -685,11 +685,33 @@ let userPhotos = {};
 
 // ====== OWNER PHOTO ======
 
+// ===== PHOTO OWNER (toujours Steph) =====
+const OWNER_PRENOM = ‘Steph’;
+
+async function loadOwnerPhoto() {
+// Toujours charger la photo de Steph (owner), pas du visiteur
+try {
+const { data, error } = await supabase.from(‘profiles’).select(‘photo_url’).eq(‘prenom’, OWNER_PRENOM).single();
+if (!error && data?.photo_url) {
+ownerPhoto.src = data.photo_url;
+ownerPhoto.style.opacity = ‘1’;
+localStorage.setItem(‘photo_url_Steph’, data.photo_url);
+} else {
+// Fallback localStorage
+const cached = localStorage.getItem(‘photo_url_Steph’);
+if (cached) { ownerPhoto.src = cached; ownerPhoto.style.opacity = ‘1’; }
+else ownerPhoto.style.opacity = ‘0.3’;
+}
+} catch(e) {
+const cached = localStorage.getItem(‘photo_url_Steph’);
+if (cached) { ownerPhoto.src = cached; ownerPhoto.style.opacity = ‘1’; }
+}
+}
+
 // ===== CLIC PHOTO PROFIL =====
 ownerPhoto.addEventListener(‘click’, () => {
-const p = prenom || localStorage.getItem(‘prenom’) || ‘’;
 document.getElementById(‘overlayImg’).src = ownerPhoto.src || ‘icon-152.png’;
-document.getElementById(‘overlayPrenom’).textContent = p;
+document.getElementById(‘overlayPrenom’).textContent = OWNER_PRENOM;
 document.getElementById(‘photoOverlay’).classList.add(‘visible’);
 });
 document.getElementById(‘overlayClose’).addEventListener(‘click’, () => {
@@ -699,22 +721,6 @@ document.getElementById(‘photoOverlay’).addEventListener(‘click’, (e) =>
 if (e.target === document.getElementById(‘photoOverlay’))
 document.getElementById(‘photoOverlay’).classList.remove(‘visible’);
 });
-
-async function loadOwnerPhoto() {
-const p = prenom || localStorage.getItem(‘prenom’);
-const cached = localStorage.getItem(‘photo_url’) || (p ? localStorage.getItem(‘photo_url_’ + p) : null);
-if (cached) { ownerPhoto.src = cached; ownerPhoto.style.opacity = ‘1’; }
-if (!p) { if (!cached) ownerPhoto.style.opacity = ‘0.3’; return; }
-try {
-const { data, error } = await supabase.from(‘profiles’).select(‘photo_url’).eq(‘prenom’, p).single();
-if (!error && data?.photo_url) {
-ownerPhoto.src = data.photo_url;
-ownerPhoto.style.opacity = ‘1’;
-localStorage.setItem(‘photo_url’, data.photo_url);
-localStorage.setItem(‘photo_url_’ + p, data.photo_url);
-} else if (!cached) { ownerPhoto.style.opacity = ‘0.3’; }
-} catch(e) {}
-}
 
 document.addEventListener(‘DOMContentLoaded’, loadOwnerPhoto);
 window.addEventListener(‘pageshow’, loadOwnerPhoto);
