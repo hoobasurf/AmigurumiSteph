@@ -259,6 +259,7 @@ photoInput.onchange = async (e) => {
     profilePreview.src = imgbbUrl;
     ownerPhoto.src = imgbbUrl;
     localStorage.setItem('prenom', prenom);
+    localStorage.setItem('photo_url', imgbbUrl);
   } catch (error) {
     console.error('Erreur upload:', error);
     alert('❌ Erreur lors de l\'upload: ' + error.message);
