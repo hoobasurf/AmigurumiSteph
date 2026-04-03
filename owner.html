@@ -291,85 +291,87 @@ body.modal-open {
   position: fixed;
   inset: 0;
   z-index: 99999;
-  background: linear-gradient(135deg, #ffe6f0, #ffb6c1, #ffc0cb);
+  background: linear-gradient(135deg, #1a0a10, #3d1525, #1a0a10);
   background-size: 400% 400%;
-  animation: gradBG 6s ease infinite;
+  animation: gradBG 8s ease infinite;
   justify-content: center;
   align-items: center;
   flex-direction: column;
-  gap: 24px;
+  gap: 32px;
   cursor: pointer;
+  perspective: 800px;
 }
 @keyframes gradBG {
   0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%}
 }
 #photoOverlay.visible { display: flex; }
 
-/* Cercle avec anneaux animés */
 .overlay-ring-wrap {
   position: relative;
   width: 220px; height: 220px;
   display: flex; align-items: center; justify-content: center;
-  animation: popIn 0.45s cubic-bezier(0.34,1.56,0.64,1);
+  animation: popIn 0.5s cubic-bezier(0.34,1.56,0.64,1) both;
 }
 .overlay-ring {
   position: absolute;
   border-radius: 50%;
-  border: 3px solid rgba(184,76,111,0.4);
-  animation: ringPulse 2s ease-out infinite;
+  border: 2px solid rgba(255,182,193,0.35);
+  animation: ringPulse 2.4s ease-out infinite;
 }
 .overlay-ring:nth-child(1){ width:220px; height:220px; animation-delay:0s; }
-.overlay-ring:nth-child(2){ width:260px; height:260px; animation-delay:0.4s; }
-.overlay-ring:nth-child(3){ width:300px; height:300px; animation-delay:0.8s; }
+.overlay-ring:nth-child(2){ width:270px; height:270px; animation-delay:0.6s; }
+.overlay-ring:nth-child(3){ width:320px; height:320px; animation-delay:1.2s; }
 @keyframes ringPulse {
-  0%  { transform: scale(0.85); opacity: 0.7; }
-  100%{ transform: scale(1.1);  opacity: 0; }
+  0%  { opacity: 0.6; transform: scale(0.9); }
+  100%{ opacity: 0;   transform: scale(1.15); }
 }
 #overlayImg {
   width: 200px; height: 200px;
   border-radius: 50%;
   object-fit: cover;
-  border: 5px solid #b67385;
-  box-shadow: 0 0 40px rgba(184,76,111,0.5);
+  border: 4px solid #ffb6c1;
+  box-shadow: 0 0 50px rgba(255,100,150,0.6), 0 0 100px rgba(255,100,150,0.2);
   position: relative; z-index: 2;
 }
 @keyframes popIn {
-  from { transform: scale(0.2); opacity: 0; }
-  to   { transform: scale(1);   opacity: 1; }
+  from { transform: scale(0.1) rotateY(90deg); opacity: 0; }
+  to   { transform: scale(1)   rotateY(0deg);  opacity: 1; }
 }
+
+/* Prénom 3D */
 #overlayPrenom {
-  font-size: 36px;
-  color: #fff;
   font-family: 'Comic Sans MS', cursive;
-  text-shadow: 0 2px 12px rgba(184,76,111,0.6);
-  animation: slideUp 0.5s 0.2s ease both;
+  font-size: 52px;
+  font-weight: bold;
+  letter-spacing: 6px;
+  text-transform: uppercase;
+  background: linear-gradient(180deg, #fff0f5 0%, #ffb6c1 40%, #e94f9a 70%, #b84c6f 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  -webkit-text-stroke: 1px rgba(0,0,0,0.6);
+  filter: drop-shadow(0 4px 0px #1a0a10) drop-shadow(0 8px 16px rgba(0,0,0,0.8));
+  animation: prenom3D 0.6s 0.25s cubic-bezier(0.34,1.56,0.64,1) both,
+             float3D 4s 1s ease-in-out infinite;
+  transform-style: preserve-3d;
+}
+@keyframes prenom3D {
+  from { transform: translateY(40px) rotateX(-60deg) scale(0.5); opacity: 0; }
+  to   { transform: translateY(0)    rotateX(0deg)   scale(1);   opacity: 1; }
+}
+@keyframes float3D {
+  0%,100% { transform: translateY(0)    rotateX(0deg)   rotateY(-3deg); }
+  50%      { transform: translateY(-8px) rotateX(5deg)   rotateY(3deg); }
+}
+
+#overlayHint {
+  font-size: 12px;
+  color: rgba(255,182,193,0.4);
+  font-family: 'Comic Sans MS', cursive;
   letter-spacing: 2px;
-}
-@keyframes slideUp {
-  from { transform: translateY(24px); opacity: 0; }
-  to   { transform: translateY(0);    opacity: 1; }
-}
-.pelote-anim {
-  font-size: 38px;
-  animation: bounce 1s ease infinite alternate;
-  display: inline-block;
-  filter: drop-shadow(0 2px 6px rgba(184,76,111,0.3));
-}
-@keyframes bounce {
-  from { transform: translateY(0) rotate(-12deg); }
-  to   { transform: translateY(-12px) rotate(12deg); }
-}
-.pelote-row {
-  display: flex; gap: 16px;
-  animation: fadeIn 0.6s 0.3s ease both;
+  animation: fadeIn 1.2s 1s ease both;
 }
 @keyframes fadeIn { from{opacity:0} to{opacity:1} }
-#overlayHint {
-  font-size: 13px;
-  color: rgba(255,255,255,0.7);
-  font-family: 'Comic Sans MS', cursive;
-  animation: fadeIn 1s 0.8s ease both;
-}
 </style>
 
 </head>
@@ -378,11 +380,6 @@ body.modal-open {
 <img id="ownerPhoto" alt="Owner">
 
 <div id="photoOverlay">
-  <div class="pelote-row">
-    <span class="pelote-anim">🧶</span>
-    <span class="pelote-anim" style="animation-delay:0.2s">🧶</span>
-    <span class="pelote-anim" style="animation-delay:0.4s">🧶</span>
-  </div>
   <div class="overlay-ring-wrap">
     <div class="overlay-ring"></div>
     <div class="overlay-ring"></div>
@@ -390,12 +387,7 @@ body.modal-open {
     <img id="overlayImg" src="" alt="photo">
   </div>
   <div id="overlayPrenom"></div>
-  <div class="pelote-row">
-    <span class="pelote-anim" style="animation-delay:0.1s">🪡</span>
-    <span class="pelote-anim" style="animation-delay:0.3s">🧶</span>
-    <span class="pelote-anim" style="animation-delay:0.5s">🪡</span>
-  </div>
-  <div id="overlayHint">Toucher pour fermer</div>
+  <div id="overlayHint">toucher pour fermer</div>
 </div>
 
 <div class="center-zone">
