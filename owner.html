@@ -397,8 +397,6 @@ body.modal-open {
   </div>
 </div>
 
-<!-- ✅ FIX : image-handler.js chargé en script classique AVANT le module -->
-
 <script src="image-handler.js"></script>
 
 <script type="module">
@@ -408,6 +406,8 @@ const supabase = createClient(
   "https://kdgxbmqwhpuctjtlygrt.supabase.co",
   "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtkZ3hibXF3aHB1Y3RqdGx5Z3J0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUyMjY0NzQsImV4cCI6MjA5MDgwMjQ3NH0.9RsIj_bQgJskg9raRGN6uQJwUUlByTvWAFF2Eq9f6KM"
 );
+
+
 
 // Variables globales
 let creations = [];
@@ -459,15 +459,23 @@ fileInput.onchange = () => {
   fileInfo.textContent = fileInput.files.length ? `${fileInput.files.length} photo(s) sélectionnée(s)` : '';
 };
 
-// ✅ FIX : Owner photo — localStorage uniquement (index.html sauvegarde là)
-function loadOwnerPhoto() {
-  const cachedPhoto = localStorage.getItem('photo_url');
-  if (cachedPhoto) {
-    ownerPhoto.src = cachedPhoto;
-    ownerPhoto.style.opacity = '1';
-  } else {
-    ownerPhoto.style.opacity = '0.3';
-  }
+// Owner photo
+async function loadOwnerPhoto() {
+  if (!prenom) return;
+  // 1. localStorage d'abord (instantané)
+  const cached = localStorage.getItem('photo_url');
+  if (cached) { ownerPhoto.src = cached; ownerPhoto.style.opacity = '1'; }
+  // 2. Supabase en fallback/sync
+  try {
+    const { data, error } = await supabase.from('profiles').select('photo_url').eq('prenom', prenom).single();
+    if (!error && data?.photo_url) {
+      ownerPhoto.src = data.photo_url;
+      ownerPhoto.style.opacity = '1';
+      localStorage.setItem('photo_url', data.photo_url);
+    } else if (!cached) {
+      ownerPhoto.style.opacity = '0.3';
+    }
+  } catch(e) { console.warn('Photo load error:', e); }
 }
 
 // Messagerie
@@ -569,11 +577,12 @@ async function refreshCreations() {
     if (error) { console.error(error); return; }
 
     creations = data.map(c => {
+      // ✅ Les images sont déjà des URLs ImgBB, pas besoin de Supabase Storage
       let zoomGroup = [];
       if (Array.isArray(c.images) && c.images.length) {
-        zoomGroup = c.images;
+        zoomGroup = c.images; // Directement les URLs ImgBB
       } else if (c.image_path) {
-        zoomGroup = [c.image_path];
+        zoomGroup = [c.image_path]; // URL ImgBB
       }
 
       return {
@@ -699,7 +708,7 @@ function renderCreations(list) {
 
     const d = document.createElement('div');
     d.className = 'visitor-item';
-
+    
     const delBtn = document.createElement('div');
     delBtn.className = 'delete-btn';
     delBtn.textContent = '×';
@@ -827,40 +836,39 @@ document.getElementById('confirmAdd').onclick = async () => {
   if (!name || !files.length) { alert("Mettre un nom et choisir au moins une photo"); return; }
 
   try {
+    // ✅ UPLOAD VERS IMGBB au lieu de Supabase
     const imageUrls = [];
-
+    
     for (let i = 0; i < files.length; i++) {
       try {
-        // ✅ window.uploadImage garanti disponible car image-handler.js chargé avant
-        const url = await window.uploadImage(files[i]);
+        const url = await window.uploadImage(files[i]); // Utilise image-handler.js
         imageUrls.push(url);
       } catch (err) {
         console.error('Erreur upload ImgBB:', err);
-        alert('Erreur upload: ' + err.message);
-        return;
       }
     }
 
-    if (!imageUrls.length) {
-      alert('Aucune image uploadée avec succès');
-      return;
+    if (!imageUrls.length) { 
+      alert('Aucune image uploadée avec succès'); 
+      return; 
     }
 
+    // ✅ Sauvegarde juste les URLS dans Supabase (pas les fichiers)
     const { error: insertError } = await supabase.from('creations').insert([{
-      name,
-      legend: legend || '',
-      image_path: imageUrls[0],
-      images: imageUrls,
-      likes: [],
+      name, 
+      legend: legend || '', 
+      image_path: imageUrls[0],  // Premier URL
+      images: imageUrls,         // Tous les URLs
+      likes: [], 
       comments: [],
-      x: 0, y: 0, scale: 1,
+      x: 0, y: 0, scale: 1, 
       x_legend: 0, y_legend: 0, scale_legend: 1
     }]);
 
-    if (insertError) {
-      console.error('Insert error:', insertError);
-      alert('Erreur insertion: ' + insertError.message);
-      return;
+    if (insertError) { 
+      console.error('Insert error:', insertError); 
+      alert('Erreur insertion: ' + insertError.message); 
+      return; 
     }
 
     addModal.style.display = 'none';
@@ -869,10 +877,10 @@ document.getElementById('confirmAdd').onclick = async () => {
     document.getElementById('multiPhoto').value = '';
     fileInfo.textContent = '';
     await refreshCreations();
-
-  } catch (error) {
-    console.error('Error:', error);
-    alert('Erreur: ' + error.message);
+    
+  } catch (error) { 
+    console.error('Error:', error); 
+    alert('Erreur: ' + error.message); 
   }
 };
 
@@ -923,8 +931,10 @@ chatModal.addEventListener('touchmove', e => {
 chatModal.addEventListener('touchend', () => { initialDistance = null; });
 
 // Initial load
-loadOwnerPhoto();
+document.addEventListener('DOMContentLoaded', loadOwnerPhoto);
+window.addEventListener('pageshow', loadOwnerPhoto);
 refreshCreations();
+loadOwnerPhoto();
 loadChatUsers();
 </script>
 
