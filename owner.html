@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
@@ -396,10 +397,7 @@ body.modal-open {
   </div>
 </div>
 
-
-  
 <script src="image-handler.js"></script>
-
 
 <script type="module">
 import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
@@ -464,9 +462,18 @@ fileInput.onchange = () => {
 // Owner photo
 async function loadOwnerPhoto() {
   if (!prenom) return;
+  // Affichage immédiat depuis localStorage
+  const cachedPhoto = localStorage.getItem('photo_url');
+  if (cachedPhoto) { ownerPhoto.src = cachedPhoto; ownerPhoto.style.opacity = '1'; }
+  // Mise à jour depuis Supabase en arrière-plan
   const { data, error } = await supabase.from('profiles').select('photo_url').eq('prenom', prenom).single();
-  if (!error && data?.photo_url) ownerPhoto.src = data.photo_url;
-  ownerPhoto.style.opacity = data?.photo_url ? '1' : '0.3';
+  if (!error && data?.photo_url) {
+    ownerPhoto.src = data.photo_url;
+    ownerPhoto.style.opacity = '1';
+    localStorage.setItem('photo_url', data.photo_url);
+  } else if (!cachedPhoto) {
+    ownerPhoto.style.opacity = '0.3';
+  }
 }
 
 // Messagerie
