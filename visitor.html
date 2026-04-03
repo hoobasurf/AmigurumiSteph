@@ -602,24 +602,9 @@ let userPhotos = {};
 // ====== OWNER PHOTO ======
 async function loadOwnerPhoto() {
 if (!prenom) return;
-
-// 1. localStorage immédiat (pas d’attente réseau)
-const cached = localStorage.getItem(‘photo_url_’ + prenom) || localStorage.getItem(‘photo_url’);
-if (cached) {
-ownerPhoto.src = cached;
-ownerPhoto.style.opacity = ‘1’;
-}
-
-// 2. Supabase en arrière-plan pour mise à jour
-try {
-const { data, error } = await supabase
-.from(‘profiles’).select(‘photo_url’).eq(‘prenom’, prenom).single();
-if (!error && data?.photo_url) {
-ownerPhoto.src = data.photo_url;
-ownerPhoto.style.opacity = ‘1’;
-localStorage.setItem(‘photo_url_’ + prenom, data.photo_url);
-}
-} catch(e) {}
+const { data, error } = await supabase.from(‘profiles’).select(‘photo_url’).eq(‘prenom’, prenom).single();
+if (!error && data?.photo_url) ownerPhoto.src = data.photo_url;
+ownerPhoto.style.opacity = data?.photo_url ? ‘1’ : ‘0.3’;
 }
 
 document.addEventListener(‘DOMContentLoaded’, loadOwnerPhoto);
@@ -637,7 +622,7 @@ const { data, error } = await supabase
 )
 .order(‘created_at’, { ascending: true });
 
-if (error) return console.error(error);
+if (error) return console.error(‘Supabase error:’, JSON.stringify(error));
 
 chatMessages.innerHTML = ‘’;
 
@@ -759,7 +744,7 @@ if (‘Notification’ in window && Notification.permission !== ‘granted’) N
 async function refreshCreations() {
 try {
 const { data, error } = await supabase.from(‘creations’).select(’*’).order(‘created_at’, { ascending: false });
-if (error) return console.error(error);
+if (error) return console.error(‘Supabase error:’, JSON.stringify(error));
 
 ```
 creations = data.map(c => {
@@ -780,7 +765,7 @@ creations = data.map(c => {
 ```
 
 id: c.id,
-name: c.name,
+name: c.titre || c.name || ‘’,
 legend: c.legend || ‘’,
 imgUrl: zoomGroup[0] || ‘’,
 zoomGroup,
@@ -911,52 +896,29 @@ document.getElementById(‘addBtn’).onclick = () => addModal.style.display = �
 addModal.addEventListener(‘click’, e => { if (e.target === addModal) addModal.style.display = ‘none’; });
 document.getElementById(‘confirmAdd’).onclick = async e => {
 e.stopPropagation();
-const name   = document.getElementById(‘photoName’).value.trim();
+const name = document.getElementById(‘photoName’).value.trim();
 const legend = document.getElementById(‘photoLegend’).value.trim();
-const files  = document.getElementById(‘multiPhoto’).files;
+const files = document.getElementById(‘multiPhoto’).files;
 if (!name || !files.length) { alert(“Mettre un nom et choisir au moins une photo”); return; }
-
-const confirmBtn = document.getElementById(‘confirmAdd’);
-confirmBtn.disabled = true;
-
-try {
-// Upload vers ImgBB
+// ✅ Upload vers ImgBB (gratuit, sans limite)
 const urls = await window.uploadMultipleImages(Array.from(files), (current, total) => {
-confirmBtn.textContent = `⏳ Upload ${current}/${total}...`;
+document.getElementById(‘confirmAdd’).textContent = `Upload ${current}/${total}...`;
 });
-
-```
-if (!urls.length) throw new Error("Aucune image uploadée");
-
-confirmBtn.textContent = '💾 Sauvegarde...';
-
-// Insertion Supabase
-const { error } = await supabase.from('creations').insert([{
-  name,
-  legend,
-  image_path: urls[0],
-  images: urls,
-  likes: [],
-  comments: []
+document.getElementById(‘confirmAdd’).textContent = ‘Ajouter’;
+if (!urls.length) return;
+await supabase.from(‘creations’).insert([{
+name,
+legend,
+image_path: urls[0],
+images: urls,
+likes: [],
+comments: []
 }]);
-
-if (error) throw new Error(error.message);
-
-addModal.style.display = 'none';
-document.getElementById('photoName').value = '';
-document.getElementById('multiPhoto').value = '';
-document.getElementById('photoLegend').value = '';
-document.getElementById('fileInfo').textContent = '';
+addModal.style.display = ‘none’;
+document.getElementById(‘photoName’).value = ‘’;
+document.getElementById(‘multiPhoto’).value = ‘’;
+document.getElementById(‘photoLegend’).value = ‘’;
 await refreshCreations();
-```
-
-} catch(err) {
-console.error(‘Erreur ajout création:’, err);
-alert(’❌ Erreur: ’ + err.message);
-} finally {
-confirmBtn.disabled = false;
-confirmBtn.textContent = ‘Valider’;
-}
 };
 
 // ====== DELETE CREATION ======
