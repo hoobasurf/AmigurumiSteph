@@ -244,24 +244,23 @@ photoInput.onchange = async (e) => {
   if (!file) return;
   const prenom = prenomInput.value.trim();
   if (!prenom) return alert("Veuillez saisir votre prénom avant de choisir une photo");
+
+  // Affichage instantané depuis le fichier local
+  const localUrl = URL.createObjectURL(file);
+  profilePreview.src = localUrl;
+  profilePreview.style.display = 'block';
+  ownerPhoto.src = localUrl;
+  loading.style.display = 'none';
+
+  // Upload ImgBB en arrière-plan (sans bloquer l'interface)
   try {
-    loading.style.display = 'block';
     const imgbbUrl = await window.uploadImage(file);
-    // Sauvegarde dans Firestore (doc id = prenom)
     await setDoc(doc(db, 'profiles', prenom), { prenom, photo_url: imgbbUrl }, { merge: true });
-    profilePreview.onload = () => {
-      loading.style.display = 'none';
-    };
-    profilePreview.onerror = () => {
-      loading.style.display = 'none';
-    };
     profilePreview.src = imgbbUrl;
-    profilePreview.style.display = 'block';
     ownerPhoto.src = imgbbUrl;
     localStorage.setItem('prenom', prenom);
   } catch (error) {
     console.error('Erreur upload:', error);
-    loading.style.display = 'none';
     alert('❌ Erreur lors de l\'upload: ' + error.message);
   }
 };
