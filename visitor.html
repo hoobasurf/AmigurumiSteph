@@ -689,23 +689,28 @@ let userPhotos = {};
 const OWNER_PRENOM = ‘Steph’;
 
 async function loadOwnerPhoto() {
-// Toujours charger la photo de Steph (owner), pas du visiteur
+// 1. localStorage immédiat (toutes les clés possibles)
+const p = ‘Steph’;
+const cached = localStorage.getItem(‘photo_url’)
+|| localStorage.getItem(‘photo_url_Steph’);
+if (cached) {
+ownerPhoto.src = cached;
+ownerPhoto.style.opacity = ‘1’;
+console.log(‘Photo depuis localStorage OK’);
+}
+// 2. Supabase sync
 try {
-const { data, error } = await supabase.from(‘profiles’).select(‘photo_url’).eq(‘prenom’, OWNER_PRENOM).single();
+const { data, error } = await supabase.from(‘profiles’).select(‘photo_url’).eq(‘prenom’, p).single();
 if (!error && data?.photo_url) {
 ownerPhoto.src = data.photo_url;
 ownerPhoto.style.opacity = ‘1’;
+localStorage.setItem(‘photo_url’, data.photo_url);
 localStorage.setItem(‘photo_url_Steph’, data.photo_url);
-} else {
-// Fallback localStorage
-const cached = localStorage.getItem(‘photo_url_Steph’);
-if (cached) { ownerPhoto.src = cached; ownerPhoto.style.opacity = ‘1’; }
-else ownerPhoto.style.opacity = ‘0.3’;
+console.log(‘Photo depuis Supabase OK’);
+} else if (!cached) {
+ownerPhoto.style.opacity = ‘0.3’;
 }
-} catch(e) {
-const cached = localStorage.getItem(‘photo_url_Steph’);
-if (cached) { ownerPhoto.src = cached; ownerPhoto.style.opacity = ‘1’; }
-}
+} catch(e) { console.warn(‘Photo load error:’, e); }
 }
 
 // ===== CLIC PHOTO PROFIL =====
