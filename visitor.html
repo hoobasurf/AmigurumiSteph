@@ -629,12 +629,84 @@ body::before{
 <script type="module">
 ```
 
-import { createClient } from “https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm”;
+// ====== SUPABASE REST (fetch direct — compatible Safari iOS) ======
+const SB_URL = “https://kdgxbmqwhpuctjtlygrt.supabase.co”;
+const SB_KEY = “eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtkZ3hibXF3aHB1Y3RqdGx5Z3J0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUyMjY0NzQsImV4cCI6MjA5MDgwMjQ3NH0.9RsIj_bQgJskg9raRGN6uQJwUUlByTvWAFF2Eq9f6KM”;
+const SB_HEADERS = { “apikey”: SB_KEY, “Authorization”: “Bearer “ + SB_KEY, “Content-Type”: “application/json”, “Prefer”: “return=representation” };
 
-const supabase = createClient(
-“https://kdgxbmqwhpuctjtlygrt.supabase.co”,
-“eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtkZ3hibXF3aHB1Y3RqdGx5Z3J0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUyMjY0NzQsImV4cCI6MjA5MDgwMjQ3NH0.9RsIj_bQgJskg9raRGN6uQJwUUlByTvWAFF2Eq9f6KM”
-);
+const supabase = {
+from: (table) => ({
+select: (cols = “*”) => ({
+eq: (col, val) => ({
+single: async () => {
+const r = await fetch(`${SB_URL}/rest/v1/${table}?select=${cols}&${col}=eq.${encodeURIComponent(val)}&limit=1`, { headers: SB_HEADERS });
+const d = await r.json();
+if (!r.ok) return { data: null, error: d };
+return { data: d[0] || null, error: d[0] ? null : { message: ‘Not found’ } };
+},
+order: (col2, { ascending } = {}) => ({
+limit: async (n) => {
+const dir = ascending ? ‘asc’ : ‘desc’;
+const r = await fetch(`${SB_URL}/rest/v1/${table}?select=${cols}&${col}=eq.${encodeURIComponent(val)}&order=${col2}.${dir}&limit=${n}`, { headers: SB_HEADERS });
+const d = await r.json();
+return { data: r.ok ? d : null, error: r.ok ? null : d };
+}
+}),
+neq: (col2, val2) => ({
+async then(resolve) { resolve(await supabase.from(table).select(cols).neq(col2, val2)); }
+})
+}),
+neq: async (col, val) => {
+const r = await fetch(`${SB_URL}/rest/v1/${table}?select=${cols}&${col}=neq.${encodeURIComponent(val)}`, { headers: SB_HEADERS });
+const d = await r.json();
+return { data: r.ok ? d : null, error: r.ok ? null : d };
+},
+or: (filter) => ({
+order: (col2, { ascending } = {}) => ({
+async then(resolve) {
+const dir = ascending ? ‘asc’ : ‘desc’;
+const r = await fetch(`${SB_URL}/rest/v1/${table}?select=${cols}&or=(${encodeURIComponent(filter)})&order=${col2}.${dir}`, { headers: SB_HEADERS });
+const d = await r.json();
+resolve({ data: r.ok ? d : null, error: r.ok ? null : d });
+}
+})
+}),
+order: (col2, { ascending } = {}) => ({
+async then(resolve) {
+const dir = ascending ? ‘asc’ : ‘desc’;
+const r = await fetch(`${SB_URL}/rest/v1/${table}?select=${cols}&order=${col2}.${dir}`, { headers: SB_HEADERS });
+const d = await r.json();
+resolve({ data: r.ok ? d : null, error: r.ok ? null : d });
+}
+})
+}),
+insert: async (rows) => {
+const r = await fetch(`${SB_URL}/rest/v1/${table}`, { method: ‘POST’, headers: SB_HEADERS, body: JSON.stringify(Array.isArray(rows) ? rows : [rows]) });
+const d = await r.json();
+return { data: r.ok ? d : null, error: r.ok ? null : d };
+},
+upsert: async (row, opts = {}) => {
+const h = { …SB_HEADERS, “Prefer”: “resolution=merge-duplicates,return=representation” };
+if (opts.onConflict) h[“Prefer”] += `,on_conflict=${opts.onConflict}`;
+const r = await fetch(`${SB_URL}/rest/v1/${table}`, { method: ‘POST’, headers: h, body: JSON.stringify(row) });
+const d = await r.json();
+return { data: r.ok ? d : null, error: r.ok ? null : d };
+},
+update: (updates) => ({
+eq: async (col, val) => {
+const r = await fetch(`${SB_URL}/rest/v1/${table}?${col}=eq.${encodeURIComponent(val)}`, { method: ‘PATCH’, headers: SB_HEADERS, body: JSON.stringify(updates) });
+const d = await r.json();
+return { data: r.ok ? d : null, error: r.ok ? null : d };
+}
+}),
+delete: () => ({
+eq: async (col, val) => {
+const r = await fetch(`${SB_URL}/rest/v1/${table}?${col}=eq.${encodeURIComponent(val)}`, { method: ‘DELETE’, headers: SB_HEADERS });
+return { error: r.ok ? null : await r.json() };
+}
+})
+})
+};
 
 // ====== VARIABLES GLOBALES ======
 const ownerPhoto = document.getElementById(‘ownerPhoto’);
@@ -688,29 +760,17 @@ let userPhotos = {};
 // ===== PHOTO OWNER (toujours Steph) =====
 const OWNER_PRENOM = ‘Steph’;
 
-async function loadOwnerPhoto() {
-// 1. localStorage immédiat (toutes les clés possibles)
-const p = ‘Steph’;
-const cached = localStorage.getItem(‘photo_url’)
-|| localStorage.getItem(‘photo_url_Steph’);
+function loadOwnerPhoto() {
+// localStorage uniquement — Safari iOS bloque les fetch dans certains contextes
+const cached = localStorage.getItem(‘photo_url_Steph’)
+|| localStorage.getItem(‘photo_url’);
 if (cached) {
 ownerPhoto.src = cached;
 ownerPhoto.style.opacity = ‘1’;
-console.log(‘Photo depuis localStorage OK’);
+} else {
+ownerPhoto.src = ‘icon-152.png’;
+ownerPhoto.style.opacity = ‘0.8’;
 }
-// 2. Supabase sync
-try {
-const { data, error } = await supabase.from(‘profiles’).select(‘photo_url’).eq(‘prenom’, p).single();
-if (!error && data?.photo_url) {
-ownerPhoto.src = data.photo_url;
-ownerPhoto.style.opacity = ‘1’;
-localStorage.setItem(‘photo_url’, data.photo_url);
-localStorage.setItem(‘photo_url_Steph’, data.photo_url);
-console.log(‘Photo depuis Supabase OK’);
-} else if (!cached) {
-ownerPhoto.style.opacity = ‘0.3’;
-}
-} catch(e) { console.warn(‘Photo load error:’, e); }
 }
 
 // ===== CLIC PHOTO PROFIL =====
@@ -727,7 +787,6 @@ if (e.target === document.getElementById(‘photoOverlay’))
 document.getElementById(‘photoOverlay’).classList.remove(‘visible’);
 });
 
-document.addEventListener(‘DOMContentLoaded’, loadOwnerPhoto);
 window.addEventListener(‘pageshow’, loadOwnerPhoto);
 
 // ====== MESSAGERIE ======
@@ -784,23 +843,22 @@ chatInput.value = ‘’;
 loadMessages();
 };
 
-// Temps réel messagerie
-supabase.channel(‘public:messages’).on(
-‘postgres_changes’,
-{ event: ‘*’, schema: ‘public’, table: ‘messages’ },
-payload => {
-const msg = payload.new;
-if (!msg) return;
-
-```
-if (msg.receiver === prenom) {
-  if (msg.sender !== currentChatUser) showInAppNotification(msg.sender, msg.content);
-  if (msg.sender === currentChatUser) loadMessages();
+// Polling messages toutes les 5s (remplace WebSocket non supporté sur Safari iOS)
+let lastMsgId = null;
+setInterval(async () => {
+if (!currentChatUser || !prenom) return;
+try {
+const { data } = await supabase.from(‘messages’)
+.select(’*’).eq(‘receiver’, prenom)
+.order(‘created_at’, { ascending: false }).limit(1);
+if (data && data[0] && data[0].id !== lastMsgId) {
+lastMsgId = data[0].id;
+const msg = data[0];
+if (msg.sender !== currentChatUser) showInAppNotification(msg.sender, msg.content);
+else loadMessages();
 }
-```
-
-}
-).subscribe();
+} catch(e) {}
+}, 5000);
 
 // ====== LOAD USERS ======
 async function loadChatUsers() {
