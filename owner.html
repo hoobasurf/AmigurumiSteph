@@ -461,17 +461,25 @@ fileInput.onchange = () => {
 
 // Owner photo
 async function loadOwnerPhoto() {
-  if (!prenom) return;
-  // 1. localStorage d'abord (instantané)
-  const cached = localStorage.getItem('photo_url');
-  if (cached) { ownerPhoto.src = cached; ownerPhoto.style.opacity = '1'; }
-  // 2. Supabase en fallback/sync
+  // 1. localStorage immédiat (toutes les clés possibles)
+  const p = prenom || localStorage.getItem('prenom');
+  const cached = localStorage.getItem('photo_url')
+               || (p ? localStorage.getItem('photo_url_' + p) : null);
+  if (cached) {
+    ownerPhoto.src = cached;
+    ownerPhoto.style.opacity = '1';
+    console.log('Photo depuis localStorage OK');
+  }
+  // 2. Supabase sync
+  if (!p) { if (!cached) ownerPhoto.style.opacity = '0.3'; return; }
   try {
-    const { data, error } = await supabase.from('profiles').select('photo_url').eq('prenom', prenom).single();
+    const { data, error } = await supabase.from('profiles').select('photo_url').eq('prenom', p).single();
     if (!error && data?.photo_url) {
       ownerPhoto.src = data.photo_url;
       ownerPhoto.style.opacity = '1';
       localStorage.setItem('photo_url', data.photo_url);
+      localStorage.setItem('photo_url_' + p, data.photo_url);
+      console.log('Photo depuis Supabase OK');
     } else if (!cached) {
       ownerPhoto.style.opacity = '0.3';
     }
@@ -484,7 +492,7 @@ async function loadMessages() {
   const { data, error } = await supabase.from('messages').select('*')
     .or(`and(sender.eq.${myPrenom},receiver.eq.${currentChatUser}),and(sender.eq.${currentChatUser},receiver.eq.${myPrenom})`)
     .order('created_at', { ascending: true });
-  if (error) return console.error(error);
+  if (error) return console.error('Supabase error:', JSON.stringify(error));
 
   chatMessages.innerHTML = '';
   data.forEach(msg => {
@@ -511,12 +519,14 @@ sendMsgBtn.onclick = async () => {
   loadMessages();
 };
 
-supabase.channel('public:messages').on('postgres_changes', { event: '*', schema: 'public', table: 'messages' }, payload => {
-  const msg = payload.new;
-  if (!msg || msg.receiver !== prenom) return;
-  if (msg.sender !== currentChatUser) showInAppNotification(msg.sender, msg.content);
-  if (msg.sender === currentChatUser) loadMessages();
-}).subscribe();
+try {
+  supabase.channel('public:messages').on('postgres_changes', { event: '*', schema: 'public', table: 'messages' }, payload => {
+    const msg = payload.new;
+    if (!msg || msg.receiver !== prenom) return;
+    if (msg.sender !== currentChatUser) showInAppNotification(msg.sender, msg.content);
+    if (msg.sender === currentChatUser) loadMessages();
+  }).subscribe();
+} catch(e) { console.warn('Realtime non disponible (Safari iOS):', e.message); }
 
 async function loadChatUsers() {
   try {
@@ -574,7 +584,7 @@ if ('Notification' in window && Notification.permission !== 'granted') Notificat
 async function refreshCreations() {
   try {
     const { data, error } = await supabase.from('creations').select('*').order('created_at', { ascending: false });
-    if (error) { console.error(error); return; }
+    if (error) { console.error('Supabase error:', JSON.stringify(error)); return; }
 
     creations = data.map(c => {
       // ✅ Les images sont déjà des URLs ImgBB, pas besoin de Supabase Storage
@@ -587,7 +597,7 @@ async function refreshCreations() {
 
       return {
         id: c.id,
-        name: c.name || '',
+        name: c.titre || c.name || '',
         legend: c.legend || '',
         imgUrl: zoomGroup[0] || '',
         zoomGroup,
@@ -599,7 +609,7 @@ async function refreshCreations() {
     });
 
     renderCreations(creations);
-  } catch (e) { console.error('refreshCreations crash', e); }
+  } catch (e) { console.error('refreshCreations crash:', e?.message || JSON.stringify(e)); }
 }
 
 // Drag & Zoom
@@ -879,7 +889,7 @@ document.getElementById('confirmAdd').onclick = async () => {
     await refreshCreations();
     
   } catch (error) { 
-    console.error('Error:', error); 
+    console.error('Error:', error?.message || JSON.stringify(error)); 
     alert('Erreur: ' + error.message); 
   }
 };
