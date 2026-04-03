@@ -70,7 +70,7 @@ body::before{
 #zoomModal .thumbs img{width:50px;height:50px;object-fit:cover;border-radius:12px;border:2px solid #b67385;cursor:pointer;}
 .closeZoom{position:absolute;top:12px;right:12px;width:28px;height:28px;background:#ffb6c1;color:#fff;border-radius:50%;display:flex;justify-content:center;align-items:center;cursor:pointer;}
 
-#ownerPhoto{width:32px;height:32px;border-radius:50%;position:fixed;top:10px;right:10px;z-index:10000;background:#ffe6f0;border:2px solid #b84c6f;}
+#ownerPhoto{width:76px;height:76px;border-radius:50%;position:fixed;top:10px;right:10px;z-index:10000;background:#ffe6f0;border:3px solid #b84c6f;cursor:pointer;box-shadow:0 2px 12px rgba(184,76,111,0.3);transition:transform 0.2s;object-fit:cover;} #ownerPhoto:hover{transform:scale(1.08);}
 @media(max-width:480px){.page{grid-template-columns:repeat(2,120px);grid-template-rows:repeat(3,120px);}.visitor-item{width:120px;height:120px;}.modal .modal-box{min-width:180px;}}
 
 .icon-btn svg {
@@ -306,12 +306,96 @@ body::before{
   display:none !important;
 }
   
+
+/* ===== OVERLAY PHOTO PROFIL ===== */
+#photoOverlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  background: rgba(255, 230, 240, 0.92);
+  backdrop-filter: blur(8px);
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  gap: 20px;
+}
+#photoOverlay.visible { display: flex; }
+#overlayImg {
+  width: 180px; height: 180px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 4px solid #b67385;
+  box-shadow: 0 0 30px rgba(184,76,111,0.4);
+  animation: popIn 0.4s cubic-bezier(0.34,1.56,0.64,1);
+}
+@keyframes popIn {
+  from { transform: scale(0.3); opacity: 0; }
+  to   { transform: scale(1);   opacity: 1; }
+}
+#overlayPrenom {
+  font-size: 32px;
+  color: #b84c6f;
+  font-family: 'Comic Sans MS', cursive;
+  animation: slideUp 0.5s ease forwards;
+  opacity: 0;
+  position: relative;
+}
+@keyframes slideUp {
+  from { transform: translateY(20px); opacity: 0; }
+  to   { transform: translateY(0);    opacity: 1; }
+}
+.pelote-anim {
+  font-size: 36px;
+  animation: bounce 1s ease infinite alternate;
+  display: inline-block;
+}
+@keyframes bounce {
+  from { transform: translateY(0) rotate(-10deg); }
+  to   { transform: translateY(-10px) rotate(10deg); }
+}
+.pelote-row {
+  display: flex; gap: 12px;
+  animation: fadeIn 0.6s 0.3s ease forwards;
+  opacity: 0;
+}
+@keyframes fadeIn {
+  to { opacity: 1; }
+}
+#overlayClose {
+  margin-top: 10px;
+  background: #ffb6c1;
+  border: none;
+  border-radius: 20px;
+  padding: 8px 24px;
+  color: white;
+  font-weight: bold;
+  font-size: 16px;
+  cursor: pointer;
+  font-family: 'Comic Sans MS', cursive;
+}
 </style>
 
 </head>
 <body>
 
 <img id="ownerPhoto" alt="Owner">
+
+<div id="photoOverlay">
+  <div class="pelote-row">
+    <span class="pelote-anim">🧶</span>
+    <span class="pelote-anim" style="animation-delay:0.2s">🧶</span>
+    <span class="pelote-anim" style="animation-delay:0.4s">🧶</span>
+  </div>
+  <img id="overlayImg" src="" alt="photo">
+  <div id="overlayPrenom"></div>
+  <div class="pelote-row">
+    <span class="pelote-anim" style="animation-delay:0.1s">🪡</span>
+    <span class="pelote-anim" style="animation-delay:0.3s">🧶</span>
+    <span class="pelote-anim" style="animation-delay:0.5s">🪡</span>
+  </div>
+  <button id="overlayClose">Fermer</button>
+</div>
 
 <div class="center-zone">
   <div id="visitor-list-container"></div>
@@ -600,11 +684,36 @@ let currentChatUser = localStorage.getItem(‘currentChatUser’) || null;
 let userPhotos = {};
 
 // ====== OWNER PHOTO ======
+
+// ===== CLIC PHOTO PROFIL =====
+ownerPhoto.addEventListener(‘click’, () => {
+const p = prenom || localStorage.getItem(‘prenom’) || ‘’;
+document.getElementById(‘overlayImg’).src = ownerPhoto.src || ‘icon-152.png’;
+document.getElementById(‘overlayPrenom’).textContent = p;
+document.getElementById(‘photoOverlay’).classList.add(‘visible’);
+});
+document.getElementById(‘overlayClose’).addEventListener(‘click’, () => {
+document.getElementById(‘photoOverlay’).classList.remove(‘visible’);
+});
+document.getElementById(‘photoOverlay’).addEventListener(‘click’, (e) => {
+if (e.target === document.getElementById(‘photoOverlay’))
+document.getElementById(‘photoOverlay’).classList.remove(‘visible’);
+});
+
 async function loadOwnerPhoto() {
-if (!prenom) return;
-const { data, error } = await supabase.from(‘profiles’).select(‘photo_url’).eq(‘prenom’, prenom).single();
-if (!error && data?.photo_url) ownerPhoto.src = data.photo_url;
-ownerPhoto.style.opacity = data?.photo_url ? ‘1’ : ‘0.3’;
+const p = prenom || localStorage.getItem(‘prenom’);
+const cached = localStorage.getItem(‘photo_url’) || (p ? localStorage.getItem(‘photo_url_’ + p) : null);
+if (cached) { ownerPhoto.src = cached; ownerPhoto.style.opacity = ‘1’; }
+if (!p) { if (!cached) ownerPhoto.style.opacity = ‘0.3’; return; }
+try {
+const { data, error } = await supabase.from(‘profiles’).select(‘photo_url’).eq(‘prenom’, p).single();
+if (!error && data?.photo_url) {
+ownerPhoto.src = data.photo_url;
+ownerPhoto.style.opacity = ‘1’;
+localStorage.setItem(‘photo_url’, data.photo_url);
+localStorage.setItem(‘photo_url_’ + p, data.photo_url);
+} else if (!cached) { ownerPhoto.style.opacity = ‘0.3’; }
+} catch(e) {}
 }
 
 document.addEventListener(‘DOMContentLoaded’, loadOwnerPhoto);
