@@ -127,7 +127,7 @@ body::before{
   min-width: 18px;
 }
 
-#ownerPhoto{width:32px;height:32px;border-radius:50%;position:fixed;top:10px;right:10px;z-index:10000;background:#ffe6f0;border:2px solid #b84c6f;}
+#ownerPhoto{width:76px;height:76px;border-radius:50%;position:fixed;top:10px;right:10px;z-index:10000;background:#ffe6f0;border:3px solid #b84c6f;cursor:pointer;box-shadow:0 2px 12px rgba(184,76,111,0.3);transition:transform 0.2s;object-fit:cover;} #ownerPhoto:hover{transform:scale(1.08);}
 
 .pink-file-btn{
   background: linear-gradient(#ffd6e6, #ffb6c1);
@@ -284,12 +284,119 @@ body.modal-open {
   .visitor-item{width:120px;height:120px;}
   .modal .modal-box{min-width:180px;}
 }
+
+/* ===== OVERLAY PHOTO PROFIL ===== */
+#photoOverlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  background: linear-gradient(135deg, #ffe6f0, #ffb6c1, #ffc0cb);
+  background-size: 400% 400%;
+  animation: gradBG 6s ease infinite;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  gap: 24px;
+  cursor: pointer;
+}
+@keyframes gradBG {
+  0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%}
+}
+#photoOverlay.visible { display: flex; }
+
+/* Cercle avec anneaux animés */
+.overlay-ring-wrap {
+  position: relative;
+  width: 220px; height: 220px;
+  display: flex; align-items: center; justify-content: center;
+  animation: popIn 0.45s cubic-bezier(0.34,1.56,0.64,1);
+}
+.overlay-ring {
+  position: absolute;
+  border-radius: 50%;
+  border: 3px solid rgba(184,76,111,0.4);
+  animation: ringPulse 2s ease-out infinite;
+}
+.overlay-ring:nth-child(1){ width:220px; height:220px; animation-delay:0s; }
+.overlay-ring:nth-child(2){ width:260px; height:260px; animation-delay:0.4s; }
+.overlay-ring:nth-child(3){ width:300px; height:300px; animation-delay:0.8s; }
+@keyframes ringPulse {
+  0%  { transform: scale(0.85); opacity: 0.7; }
+  100%{ transform: scale(1.1);  opacity: 0; }
+}
+#overlayImg {
+  width: 200px; height: 200px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 5px solid #b67385;
+  box-shadow: 0 0 40px rgba(184,76,111,0.5);
+  position: relative; z-index: 2;
+}
+@keyframes popIn {
+  from { transform: scale(0.2); opacity: 0; }
+  to   { transform: scale(1);   opacity: 1; }
+}
+#overlayPrenom {
+  font-size: 36px;
+  color: #fff;
+  font-family: 'Comic Sans MS', cursive;
+  text-shadow: 0 2px 12px rgba(184,76,111,0.6);
+  animation: slideUp 0.5s 0.2s ease both;
+  letter-spacing: 2px;
+}
+@keyframes slideUp {
+  from { transform: translateY(24px); opacity: 0; }
+  to   { transform: translateY(0);    opacity: 1; }
+}
+.pelote-anim {
+  font-size: 38px;
+  animation: bounce 1s ease infinite alternate;
+  display: inline-block;
+  filter: drop-shadow(0 2px 6px rgba(184,76,111,0.3));
+}
+@keyframes bounce {
+  from { transform: translateY(0) rotate(-12deg); }
+  to   { transform: translateY(-12px) rotate(12deg); }
+}
+.pelote-row {
+  display: flex; gap: 16px;
+  animation: fadeIn 0.6s 0.3s ease both;
+}
+@keyframes fadeIn { from{opacity:0} to{opacity:1} }
+#overlayHint {
+  font-size: 13px;
+  color: rgba(255,255,255,0.7);
+  font-family: 'Comic Sans MS', cursive;
+  animation: fadeIn 1s 0.8s ease both;
+}
 </style>
 
 </head>
 <body>
 
 <img id="ownerPhoto" alt="Owner">
+
+<div id="photoOverlay">
+  <div class="pelote-row">
+    <span class="pelote-anim">🧶</span>
+    <span class="pelote-anim" style="animation-delay:0.2s">🧶</span>
+    <span class="pelote-anim" style="animation-delay:0.4s">🧶</span>
+  </div>
+  <div class="overlay-ring-wrap">
+    <div class="overlay-ring"></div>
+    <div class="overlay-ring"></div>
+    <div class="overlay-ring"></div>
+    <img id="overlayImg" src="" alt="photo">
+  </div>
+  <div id="overlayPrenom"></div>
+  <div class="pelote-row">
+    <span class="pelote-anim" style="animation-delay:0.1s">🪡</span>
+    <span class="pelote-anim" style="animation-delay:0.3s">🧶</span>
+    <span class="pelote-anim" style="animation-delay:0.5s">🪡</span>
+  </div>
+  <div id="overlayHint">Toucher pour fermer</div>
+</div>
 
 <div class="center-zone">
   <div id="visitor-list-container"></div>
@@ -400,12 +507,81 @@ body.modal-open {
 <script src="image-handler.js"></script>
 
 <script type="module">
-import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
+// ====== SUPABASE REST (fetch direct — compatible Safari iOS) ======
+const SB_URL = "https://kdgxbmqwhpuctjtlygrt.supabase.co";
+const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtkZ3hibXF3aHB1Y3RqdGx5Z3J0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUyMjY0NzQsImV4cCI6MjA5MDgwMjQ3NH0.9RsIj_bQgJskg9raRGN6uQJwUUlByTvWAFF2Eq9f6KM";
+const SB_HEADERS = { "apikey": SB_KEY, "Authorization": "Bearer " + SB_KEY, "Content-Type": "application/json", "Prefer": "return=representation" };
 
-const supabase = createClient(
-  "https://kdgxbmqwhpuctjtlygrt.supabase.co",
-  "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtkZ3hibXF3aHB1Y3RqdGx5Z3J0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUyMjY0NzQsImV4cCI6MjA5MDgwMjQ3NH0.9RsIj_bQgJskg9raRGN6uQJwUUlByTvWAFF2Eq9f6KM"
-);
+const supabase = {
+  from: (table) => ({
+    select: (cols = "*") => ({
+      eq: (col, val) => ({
+        single: async () => {
+          const r = await fetch(`${SB_URL}/rest/v1/${table}?select=${cols}&${col}=eq.${encodeURIComponent(val)}&limit=1`, { headers: SB_HEADERS });
+          const d = await r.json();
+          if (!r.ok) return { data: null, error: d };
+          return { data: d[0] || null, error: d[0] ? null : { message: 'Not found' } };
+        },
+        order: (col2, { ascending } = {}) => ({
+          limit: async (n) => {
+            const dir = ascending ? 'asc' : 'desc';
+            const r = await fetch(`${SB_URL}/rest/v1/${table}?select=${cols}&${col}=eq.${encodeURIComponent(val)}&order=${col2}.${dir}&limit=${n}`, { headers: SB_HEADERS });
+            const d = await r.json();
+            return { data: r.ok ? d : null, error: r.ok ? null : d };
+          }
+        })
+      }),
+      neq: async (col, val) => {
+        const r = await fetch(`${SB_URL}/rest/v1/${table}?select=${cols}&${col}=neq.${encodeURIComponent(val)}`, { headers: SB_HEADERS });
+        const d = await r.json();
+        return { data: r.ok ? d : null, error: r.ok ? null : d };
+      },
+      or: (filter) => ({
+        order: (col2, { ascending } = {}) => ({
+          async then(resolve) {
+            const dir = ascending ? 'asc' : 'desc';
+            const r = await fetch(`${SB_URL}/rest/v1/${table}?select=${cols}&or=(${encodeURIComponent(filter)})&order=${col2}.${dir}`, { headers: SB_HEADERS });
+            const d = await r.json();
+            resolve({ data: r.ok ? d : null, error: r.ok ? null : d });
+          }
+        })
+      }),
+      order: (col2, { ascending } = {}) => ({
+        async then(resolve) {
+          const dir = ascending ? 'asc' : 'desc';
+          const r = await fetch(`${SB_URL}/rest/v1/${table}?select=${cols}&order=${col2}.${dir}`, { headers: SB_HEADERS });
+          const d = await r.json();
+          resolve({ data: r.ok ? d : null, error: r.ok ? null : d });
+        }
+      })
+    }),
+    insert: async (rows) => {
+      const r = await fetch(`${SB_URL}/rest/v1/${table}`, { method: 'POST', headers: SB_HEADERS, body: JSON.stringify(Array.isArray(rows) ? rows : [rows]) });
+      const d = await r.json();
+      return { data: r.ok ? d : null, error: r.ok ? null : d };
+    },
+    upsert: async (row, opts = {}) => {
+      const h = { ...SB_HEADERS, "Prefer": "resolution=merge-duplicates,return=representation" };
+      if (opts.onConflict) h["Prefer"] += `,on_conflict=${opts.onConflict}`;
+      const r = await fetch(`${SB_URL}/rest/v1/${table}`, { method: 'POST', headers: h, body: JSON.stringify(row) });
+      const d = await r.json();
+      return { data: r.ok ? d : null, error: r.ok ? null : d };
+    },
+    update: (updates) => ({
+      eq: async (col, val) => {
+        const r = await fetch(`${SB_URL}/rest/v1/${table}?${col}=eq.${encodeURIComponent(val)}`, { method: 'PATCH', headers: SB_HEADERS, body: JSON.stringify(updates) });
+        const d = await r.json();
+        return { data: r.ok ? d : null, error: r.ok ? null : d };
+      }
+    }),
+    delete: () => ({
+      eq: async (col, val) => {
+        const r = await fetch(`${SB_URL}/rest/v1/${table}?${col}=eq.${encodeURIComponent(val)}`, { method: 'DELETE', headers: SB_HEADERS });
+        return { error: r.ok ? null : await r.json() };
+      }
+    })
+  })
+};
 
 
 
@@ -460,30 +636,30 @@ fileInput.onchange = () => {
 };
 
 // Owner photo
-async function loadOwnerPhoto() {
-  // 1. localStorage immédiat (toutes les clés possibles)
+
+// ===== CLIC PHOTO PROFIL =====
+ownerPhoto.addEventListener('click', () => {
+  const p = prenom || localStorage.getItem('prenom') || '';
+  document.getElementById('overlayImg').src = ownerPhoto.src || 'icon-152.png';
+  document.getElementById('overlayPrenom').textContent = p;
+  document.getElementById('photoOverlay').classList.add('visible');
+});
+// Clic n'importe où pour fermer
+document.getElementById('photoOverlay').addEventListener('click', () => {
+  document.getElementById('photoOverlay').classList.remove('visible');
+});
+
+function loadOwnerPhoto() {
   const p = prenom || localStorage.getItem('prenom');
   const cached = localStorage.getItem('photo_url')
                || (p ? localStorage.getItem('photo_url_' + p) : null);
   if (cached) {
     ownerPhoto.src = cached;
     ownerPhoto.style.opacity = '1';
-    console.log('Photo depuis localStorage OK');
+  } else {
+    ownerPhoto.src = 'icon-152.png';
+    ownerPhoto.style.opacity = '0.8';
   }
-  // 2. Supabase sync
-  if (!p) { if (!cached) ownerPhoto.style.opacity = '0.3'; return; }
-  try {
-    const { data, error } = await supabase.from('profiles').select('photo_url').eq('prenom', p).single();
-    if (!error && data?.photo_url) {
-      ownerPhoto.src = data.photo_url;
-      ownerPhoto.style.opacity = '1';
-      localStorage.setItem('photo_url', data.photo_url);
-      localStorage.setItem('photo_url_' + p, data.photo_url);
-      console.log('Photo depuis Supabase OK');
-    } else if (!cached) {
-      ownerPhoto.style.opacity = '0.3';
-    }
-  } catch(e) { console.warn('Photo load error:', e); }
 }
 
 // Messagerie
@@ -519,14 +695,22 @@ sendMsgBtn.onclick = async () => {
   loadMessages();
 };
 
-try {
-  supabase.channel('public:messages').on('postgres_changes', { event: '*', schema: 'public', table: 'messages' }, payload => {
-    const msg = payload.new;
-    if (!msg || msg.receiver !== prenom) return;
-    if (msg.sender !== currentChatUser) showInAppNotification(msg.sender, msg.content);
-    if (msg.sender === currentChatUser) loadMessages();
-  }).subscribe();
-} catch(e) { console.warn('Realtime non disponible (Safari iOS):', e.message); }
+// Polling messages toutes les 5s (remplace WebSocket non supporté sur Safari iOS)
+let lastMsgId = null;
+setInterval(async () => {
+  if (!currentChatUser || !prenom) return;
+  try {
+    const { data } = await supabase.from('messages')
+      .select('*').eq('receiver', prenom)
+      .order('created_at', { ascending: false }).limit(1);
+    if (data && data[0] && data[0].id !== lastMsgId) {
+      lastMsgId = data[0].id;
+      const msg = data[0];
+      if (msg.sender !== currentChatUser) showInAppNotification(msg.sender, msg.content);
+      else loadMessages();
+    }
+  } catch(e) {}
+}, 5000);
 
 async function loadChatUsers() {
   try {
