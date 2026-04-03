@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
@@ -9,53 +10,53 @@ html, body { margin:0; padding:0; height:100%; font-family:'Comic Sans MS', curs
 
 /* FOND IMAGE */
 body::before {
-  content:"";
-  position:fixed;
-  inset:0;
-  background-image:url('Photoroom_20260106_224222.png');
-  background-size:cover;
-  background-position:center;
-  background-repeat:no-repeat;
-  z-index:-1;
+content:””;
+position:fixed;
+inset:0;
+background-image:url(‘Photoroom_20260106_224222.png’);
+background-size:cover;
+background-position:center;
+background-repeat:no-repeat;
+z-index:-1;
 }
 
 /* SIDEBAR */
 #sidebar{
-  position:fixed; top:0; left:-220px; width:220px; height:100vh;
-  background:rgba(255,230,240,0.2); border-right:2px solid #b67385; padding:20px;
-  transition:left .3s; z-index:100;
+position:fixed; top:0; left:-220px; width:220px; height:100vh;
+background:rgba(255,230,240,0.2); border-right:2px solid #b67385; padding:20px;
+transition:left .3s; z-index:100;
 }
 #sidebar.sidebar-open{ left:0; }
 #toggleSidebar{
-  position:absolute; top:50%; right:-30px; width:30px; height:60px;
-  background:#ffb6c1; border-radius:0 12px 12px 0; display:flex;
-  align-items:center; justify-content:center; cursor:pointer; font-weight:bold; color:white;
+position:absolute; top:50%; right:-30px; width:30px; height:60px;
+background:#ffb6c1; border-radius:0 12px 12px 0; display:flex;
+align-items:center; justify-content:center; cursor:pointer; font-weight:bold; color:white;
 }
 #sidebar button{
-  width:auto; padding:8px 16px; border-radius:16px; border:none;
-  background:#ffb6c1; color:#fff; cursor:pointer; font-weight:bold; margin-top:10px;
+width:auto; padding:8px 16px; border-radius:16px; border:none;
+background:#ffb6c1; color:#fff; cursor:pointer; font-weight:bold; margin-top:10px;
 }
 
 /* LISTE VIDEOS */
 #video-list { display:flex; flex-direction:column; gap:10px; max-width:360px; margin:auto; margin-top:60px; }
 .video-item {
-  background: rgba(255,182,193,0.4);
-  padding:10px 16px; border-radius:12px;
-  display:flex; justify-content:space-between; align-items:center;
-  cursor:pointer; border:2px solid #b67385; color:#b84c6f; font-weight:bold;
+background: rgba(255,182,193,0.4);
+padding:10px 16px; border-radius:12px;
+display:flex; justify-content:space-between; align-items:center;
+cursor:pointer; border:2px solid #b67385; color:#b84c6f; font-weight:bold;
 }
 .video-item span { flex:1; }
 .video-item div { display:flex; gap:5px; }
 
 /* BOUTONS OUVRIR & RENOMMER */
 .video-item button {
-  background:#ffb6c1;
-  color:white;
-  border:none;
-  border-radius:12px;
-  padding:4px 8px;
-  cursor:pointer;
-  font-weight:bold;
+background:#ffb6c1;
+color:white;
+border:none;
+border-radius:12px;
+padding:4px 8px;
+cursor:pointer;
+font-weight:bold;
 }
 
 /* MODAL */
@@ -66,75 +67,76 @@ body::before {
 
 /* TRANSCRIPTION KARAOKÉ */
 #transcriptionContainer {
-  background: rgba(255,255,255,0.95);
-  border-radius: 12px;
-  padding: 15px;
-  margin-top: 10px;
-  max-height: 150px;
-  overflow-y: auto;
-  text-align: left;
-  display: none;
-  box-shadow: 0 2px 10px rgba(182,115,133,0.3);
+background: rgba(255,255,255,0.95);
+border-radius: 12px;
+padding: 15px;
+margin-top: 10px;
+max-height: 150px;
+overflow-y: auto;
+text-align: left;
+display: none;
+box-shadow: 0 2px 10px rgba(182,115,133,0.3);
 }
 
 #transcriptionContainer.visible {
-  display: block;
+display: block;
 }
 
 #transcriptionText {
-  font-size: 16px;
-  line-height: 1.8;
-  color: #333;
+font-size: 16px;
+line-height: 1.8;
+color: #333;
 }
 
 .transcript-line {
-  display: inline;
-  transition: all 0.3s ease;
+display: inline;
+transition: all 0.3s ease;
 }
 
 .transcript-line.active {
-  color: #ff1493;
-  font-weight: bold;
-  font-size: 18px;
-  text-shadow: 0 0 10px rgba(255,20,147,0.5);
-  background: rgba(255,20,147,0.1);
-  padding: 2px 4px;
-  border-radius: 4px;
+color: #ff1493;
+font-weight: bold;
+font-size: 18px;
+text-shadow: 0 0 10px rgba(255,20,147,0.5);
+background: rgba(255,20,147,0.1);
+padding: 2px 4px;
+border-radius: 4px;
 }
 
 .transcript-line.passed {
-  color: #999;
+color: #999;
 }
 
 #toggleTranscript {
-  background: #ff69b4 !important;
-  margin-top: 10px;
+background: #ff69b4 !important;
+margin-top: 10px;
 }
 
 #toggleTranscript:hover {
-  background: #ff1493 !important;
+background: #ff1493 !important;
 }
 
 #toggleTranscript:disabled {
-  background: #ccc !important;
-  cursor: not-allowed;
+background: #ccc !important;
+cursor: not-allowed;
 }
 
 .transcript-info {
-  font-size: 12px;
-  color: #b84c6f;
-  margin-top: 5px;
-  font-style: italic;
+font-size: 12px;
+color: #b84c6f;
+margin-top: 5px;
+font-style: italic;
 }
 
 /* Player container */
 #playerContainer {
-  width: 100%;
-  height: 280px;
-  border-radius: 8px;
-  overflow: hidden;
+width: 100%;
+height: 280px;
+border-radius: 8px;
+overflow: hidden;
 }
 </style>
+
 </head>
 <body>
 
@@ -148,6 +150,7 @@ body::before {
 <div id="video-list"></div>
 
 <!-- MODAL AJOUT -->
+
 <div class="modal" id="videoModalAdd">
   <div class="modal-content">
     <h3>Ajouter une vidéo</h3>
@@ -158,6 +161,7 @@ body::before {
 </div>
 
 <!-- MODAL LECTEUR -->
+
 <div class="modal" id="videoModalPlay">
   <div class="modal-content" id="modalPlayContent">
     <button id="closePlayModal">Fermer</button>
@@ -165,6 +169,7 @@ body::before {
 </div>
 
 <!-- Charger l'API YouTube -->
+
 <script src="https://www.youtube.com/iframe_api"></script>
 
 <script type="module">
@@ -625,5 +630,6 @@ window.onYouTubeIframeAPIReady = function() {
 
 loadVideos();
 </script>
+
 </body>
 </html>
