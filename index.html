@@ -68,7 +68,7 @@ button:hover { background: #e94f9a; }
 </head>
 <body>
 
-<div class="loading" id="loading">Chargement...</div>
+<div id="loading">Chargement...</div>
 <h2>Bienvenue</h2>
 <img id="appLogo" src="Photoroom_20260107_185314.png" alt="Logo chat">
 <img id="ownerPhoto" src="" alt="Owner">
@@ -110,12 +110,25 @@ const prenomInput    = document.getElementById('prenom');
 const ownerPhoto     = document.getElementById('ownerPhoto');
 const loading        = document.getElementById('loading');
 
+// ====== Pré-remplir le prénom si déjà connu ======
+const savedPrenom = localStorage.getItem('prenom');
+if (savedPrenom) {
+  prenomInput.value = savedPrenom;
+  // Charger la photo immédiatement
+  const cached = localStorage.getItem('photo_url');
+  if (cached) {
+    profilePreview.src = cached;
+    profilePreview.style.display = 'block';
+    ownerPhoto.src = cached;
+  }
+}
+
 // ====== Charger photo existante au blur ======
 prenomInput.addEventListener('blur', async () => {
   const prenom = prenomInput.value.trim();
   if (!prenom) return;
 
-  // 1. Essayer localStorage d'abord (instantané)
+  // 1. localStorage d'abord (instantané)
   const cached = localStorage.getItem('photo_url_' + prenom);
   if (cached) {
     profilePreview.src = cached;
@@ -123,7 +136,7 @@ prenomInput.addEventListener('blur', async () => {
     ownerPhoto.src = cached;
   }
 
-  // 2. Vérifier Supabase
+  // 2. Supabase pour sync
   try {
     const { data, error } = await supabase
       .from('profiles').select('photo_url').eq('prenom', prenom).single();
@@ -131,6 +144,8 @@ prenomInput.addEventListener('blur', async () => {
       profilePreview.src = data.photo_url;
       profilePreview.style.display = 'block';
       ownerPhoto.src = data.photo_url;
+      // Sauvegarder les deux clés
+      localStorage.setItem('photo_url', data.photo_url);
       localStorage.setItem('photo_url_' + prenom, data.photo_url);
     }
   } catch(e) {}
@@ -164,14 +179,14 @@ photoInput.onchange = async (e) => {
     profilePreview.style.display = 'block';
     ownerPhoto.src = imgbbUrl;
 
-    // Sauvegarder dans localStorage
+    // Sauvegarder dans localStorage — les DEUX clés
     localStorage.setItem('prenom', prenom);
     localStorage.setItem('photo_url', imgbbUrl);
     localStorage.setItem('photo_url_' + prenom, imgbbUrl);
 
   } catch (error) {
     console.error('Erreur upload:', error);
-    alert('❌ Erreur upload: ' + error.message);
+    alert('Erreur upload: ' + error.message);
   }
   loading.style.display = 'none';
 };
