@@ -238,7 +238,12 @@ const supabase={
     }),
     insert:async(rows)=>{const r=await fetch(`${SB_URL}/rest/v1/${table}`,{method:'POST',headers:SB_HEADERS,body:JSON.stringify(Array.isArray(rows)?rows:[rows])});const d=await r.json();return{data:r.ok?d:null,error:r.ok?null:d};},
     upsert:async(row,opts={})=>{const h={...SB_HEADERS,"Prefer":"resolution=merge-duplicates,return=representation"};if(opts.onConflict)h["Prefer"]+=`,on_conflict=${opts.onConflict}`;const r=await fetch(`${SB_URL}/rest/v1/${table}`,{method:'POST',headers:h,body:JSON.stringify(row)});const d=await r.json();return{data:r.ok?d:null,error:r.ok?null:d};},
-    update:(updates)=>({eq:async(col,val)=>{const r=await fetch(`${SB_URL}/rest/v1/${table}?${col}=eq.${encodeURIComponent(val)}`,{method:'PATCH',headers:SB_HEADERS,body:JSON.stringify(updates)});const d=await r.json();return{data:r.ok?d:null,error:r.ok?null:d};}}),
+    update:(updates)=>({eq:async(col,val)=>{
+      const r=await fetch(`${SB_URL}/rest/v1/${table}?${col}=eq.${encodeURIComponent(val)}`,{method:'PATCH',headers:SB_HEADERS,body:JSON.stringify(updates)});
+      const d=await r.json();
+      console.log(`[PATCH ${table}] status:${r.status}`,JSON.stringify(d));
+      return{data:r.ok?d:null,error:r.ok?null:d};
+    }}),
     delete:()=>({eq:async(col,val)=>{const r=await fetch(`${SB_URL}/rest/v1/${table}?${col}=eq.${encodeURIComponent(val)}`,{method:'DELETE',headers:SB_HEADERS});return{error:r.ok?null:await r.json()};}})
   })
 };
@@ -390,7 +395,6 @@ async function refreshCreations(){
       let zoomGroup=[];
       if(Array.isArray(c.images)&&c.images.length)zoomGroup=c.images;
       else if(c.image_path)zoomGroup=[c.image_path];
-      // FIX: jsonb arrive déjà parsé, pas besoin de JSON.parse
       const likes=Array.isArray(c.likes)?c.likes:[];
       const comments=Array.isArray(c.comments)?c.comments:[];
       return{
@@ -508,7 +512,6 @@ document.getElementById('likeBtn').onclick=()=>{
   renderLikeList();likeModal.style.display='flex';
 };
 
-// FIX: envoie le tableau directement (jsonb), sans JSON.stringify
 confirmLike.onclick=async()=>{
   if(!currentZoom)return;
   const name=likeNameInput.value.trim();if(!name)return;
@@ -516,8 +519,9 @@ confirmLike.onclick=async()=>{
   if(!currentZoom.likes.some(l=>l.name===name)){
     currentZoom.likes.push({name,photo:ownerPhoto.src||''});
   }
-  const{error}=await supabase.from('creations').update({likes:currentZoom.likes}).eq('id',currentZoom.id);
-  if(error)console.error('Like error:',JSON.stringify(error));
+  console.log('[LIKE] envoi id:',currentZoom.id,'data:',JSON.stringify(currentZoom.likes));
+  const{data,error}=await supabase.from('creations').update({likes:currentZoom.likes}).eq('id',currentZoom.id);
+  console.log('[LIKE] UPDATE result:', JSON.stringify(data), JSON.stringify(error));
   renderLikeList();likeModal.style.display='none';
 };
 
@@ -527,7 +531,6 @@ document.getElementById('commentBtn').onclick=()=>{
   renderCommentList();commentModal.style.display='flex';
 };
 
-// FIX: envoie le tableau directement (jsonb), sans JSON.stringify
 confirmComment.onclick=async()=>{
   if(!currentZoom)return;
   const name=commentNameInput.value.trim();
@@ -535,8 +538,9 @@ confirmComment.onclick=async()=>{
   if(!name||!text)return;
   currentZoom.comments=currentZoom.comments||[];
   currentZoom.comments.push({name,text,photo:ownerPhoto.src||''});
-  const{error}=await supabase.from('creations').update({comments:currentZoom.comments}).eq('id',currentZoom.id);
-  if(error)console.error('Comment error:',JSON.stringify(error));
+  console.log('[COMMENT] envoi id:',currentZoom.id,'data:',JSON.stringify(currentZoom.comments));
+  const{data,error}=await supabase.from('creations').update({comments:currentZoom.comments}).eq('id',currentZoom.id);
+  console.log('[COMMENT] UPDATE result:', JSON.stringify(data), JSON.stringify(error));
   renderCommentList();commentTextInput.value='';
   commentCount.textContent=currentZoom.comments.length;
 };
