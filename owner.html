@@ -527,12 +527,32 @@ document.getElementById('confirmAdd').onclick=async()=>{
     const imageUrls=[];
     for(let i=0;i<files.length;i++){
       try{
-        alert('Upload photo '+(i+1)+'/'+files.length+'...');
-        const url=await window.uploadImage(files[i]);
-        imageUrls.push(url);
-        alert('✅ Photo '+(i+1)+' OK: '+url.substring(0,40));
+        // Compression
+        const compressed = await new Promise(resolve=>{
+          const reader=new FileReader();
+          reader.onload=e2=>{
+            const img=new Image();
+            img.onload=()=>{
+              const canvas=document.createElement('canvas');
+              let w=img.width,h=img.height,max=1200;
+              if(w>h&&w>max){h=h*max/w;w=max;}else if(h>max){w=w*max/h;h=max;}
+              canvas.width=w;canvas.height=h;
+              canvas.getContext('2d').drawImage(img,0,0,w,h);
+              canvas.toBlob(blob=>resolve(new File([blob],'photo.jpg',{type:'image/jpeg'})),'image/jpeg',0.75);
+            };
+            img.src=e2.target.result;
+          };
+          reader.readAsDataURL(files[i]);
+        });
+        // Upload ImgBB
+        const formData=new FormData();
+        formData.append('image',compressed);
+        const res=await fetch('https://api.imgbb.com/1/upload?key=1612fdd94e39f24c3d14f1864f41d591',{method:'POST',body:formData});
+        const json=await res.json();
+        if(!json.success)throw new Error('ImgBB erreur: '+JSON.stringify(json));
+        imageUrls.push(json.data.url);
       }catch(err){
-        alert('❌ Erreur photo '+(i+1)+': '+(err?.message||JSON.stringify(err)));
+        alert('❌ Erreur photo '+(i+1)+': '+(err?.message||String(err)));
       }
     }
     if(!imageUrls.length){alert('Aucune image uploadée avec succès');return;}
