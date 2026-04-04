@@ -14,18 +14,14 @@
 <style>
 * { box-sizing:border-box;margin:0;padding:0;font-family:'Comic Sans MS',cursive; }
 html,body{height:100%;overflow-x:hidden;}
-
-/* ✅ FIX ZOOM iOS/Safari : font-size 16px sur tous les inputs */
 input, textarea, select { font-size: 16px !important; }
-
-/* ✅ fond géré par un div#bg, plus de body::before */
 .center-zone{display:flex;justify-content:center;align-items:flex-start;padding-top:4.5cm;overflow:hidden;height:auto;}
 #visitor-list-container{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;justify-content:center;padding-left:1cm;}
 .page{display:grid;grid-template-columns:repeat(2,1fr);grid-template-rows:repeat(3,1fr);column-gap:3mm;row-gap:4mm;flex:0 0 auto;width:calc(2*200px+3mm);height:calc(3*200px+8mm);scroll-snap-align:center;padding:4mm;justify-content:center;margin-top:0;}
 .visitor-item{position:relative;width:200px;height:200px;border-radius:12px;overflow:hidden;border:3px solid #fff;box-shadow:0 0 0 3px #f6c2d1,0 6px 14px rgba(0,0,0,0.25),inset 0 0 0 1px rgba(255,255,255,0.4);background:#ffe6f0;}
 .visitor-item img{width:100%;height:100%;object-fit:cover;border-radius:12px;cursor:pointer;display:block;filter:brightness(1.05) contrast(1.05) saturate(0.95);transition:filter 0.3s,transform 0.3s;position:relative;z-index:2;}
 .visitor-item img:hover{transform:scale(1.03);}
-.visitor-item::after{content:””;position:absolute;inset:0;background:rgba(255,230,240,0.12);pointer-events:none;z-index:1;}
+.visitor-item::after{content:"";position:absolute;inset:0;background:rgba(255,230,240,0.12);pointer-events:none;z-index:1;}
 .visitor-item p{position:absolute;bottom:2px;width:100%;font-size:14px;color:#b84c6f;font-weight:bold;text-align:center;text-shadow:1px 1px 2px rgba(255,255,255,0.8);z-index:3;}
 .delete-btn{position:absolute;top:6px;right:6px;width:24px;height:24px;background:#ffb6c1;color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:bold;cursor:pointer;z-index:5;font-size:16px;transition:transform 0.2s,box-shadow 0.2s;}
 .delete-btn:hover{transform:scale(1.2);box-shadow:0 2px 6px rgba(0,0,0,0.25);}
@@ -35,7 +31,7 @@ input, textarea, select { font-size: 16px !important; }
 #sidebar button{width:auto;padding:8px 16px;border-radius:16px;border:none;background:#ffb6c1;color:#fff;cursor:pointer;font-weight:bold;display:block;margin-top:10px;}
 #sidebar button:hover{transform:scale(1.03);}
 .modal{position:fixed;inset:0;background:rgba(0,0,0,0.6);display:none;justify-content:center;align-items:center;z-index:10001;}
-.modal .modal-box{background:#ffe6f0;padding:16px 24px;border-radius:20px;border:3px solid #b67385;display:flex;flex-direction:column;gap:10px;align-items:center;min-width:200px;font-family:‘Comic Sans MS’,cursive;}
+.modal .modal-box{background:#ffe6f0;padding:16px 24px;border-radius:20px;border:3px solid #b67385;display:flex;flex-direction:column;gap:10px;align-items:center;min-width:200px;font-family:'Comic Sans MS',cursive;}
 .modal input{padding:6px 12px;border-radius:10px;border:2px solid #b67385;width:100%;}
 .modal button{padding:6px 14px;border:none;background:#ffb6c1;color:#fff;border-radius:12px;cursor:pointer;font-weight:bold;width:100%;}
 #zoomModal{position:fixed;inset:0;background:rgba(0,0,0,0.7);display:none;justify-content:center;align-items:center;flex-direction:column;z-index:10000;overflow:hidden;}
@@ -50,30 +46,49 @@ input, textarea, select { font-size: 16px !important; }
 .icon-btn{background:none!important;border:none;padding:4px;display:flex;align-items:center;justify-content:center;cursor:pointer;}
 .icon-btn svg{background:none!important;fill:none;stroke:#b84c6f;width:22px;height:22px;transition:transform 0.2s;}
 .icon-btn:hover svg{transform:scale(1.2);}
-#likeCount,#commentCount{font-family:‘Courier New’,monospace;font-weight:bold;color:#b84c6f;font-size:14px;min-width:18px;}
-#ownerPhoto{width:76px;height:76px;border-radius:50%;position:fixed;top:10px;right:10px;z-index:10000;background:#ffe6f0;border:3px solid #b84c6f;cursor:pointer;box-shadow:0 2px 12px rgba(184,76,111,0.3);transition:transform 0.2s,box-shadow 0.3s;object-fit:cover;}
+#likeCount,#commentCount{font-family:'Courier New',monospace;font-weight:bold;color:#b84c6f;font-size:14px;min-width:18px;}
+
+/* ✅ ownerPhoto — bloque menu contextuel iOS */
+#ownerPhoto{
+width:76px;height:76px;border-radius:50%;
+position:fixed;top:10px;right:10px;
+z-index:10000;background:#ffe6f0;
+border:3px solid #b84c6f;cursor:pointer;
+box-shadow:0 2px 12px rgba(184,76,111,0.3);
+transition:transform 0.2s,box-shadow 0.3s;
+object-fit:cover;
+-webkit-touch-callout:none;
+-webkit-user-select:none;
+user-select:none;
+}
 #ownerPhoto:hover{transform:scale(1.08);}
 
-/* Anneau de progression pour le long press */
-#ownerProgressRing{
-position:fixed;top:6px;right:6px;
-width:84px;height:84px;
-border-radius:50%;
+/* Anneaux pulsants pendant le long press */
+#ownerRings{
+position:fixed;
+top:10px;right:10px;
+width:76px;height:76px;
 pointer-events:none;
-z-index:10001;
+z-index:9999;
 opacity:0;
-transition:opacity 0.2s;
+transition:opacity 0.3s;
 }
-#ownerProgressRing circle{
-fill:none;
-stroke:#b84c6f;
-stroke-width:3;
-stroke-linecap:round;
-stroke-dasharray:251;
-stroke-dashoffset:251;
-transform:rotate(-90deg);
-transform-origin:50% 50%;
-transition:stroke-dashoffset 0.05s linear;
+.owner-ring{
+position:absolute;
+border-radius:50%;
+border:2px solid rgba(255,182,193,0.7);
+opacity:0;
+}
+.owner-ring:nth-child(1){width:76px;height:76px;top:0;left:0;}
+.owner-ring:nth-child(2){width:96px;height:96px;top:-10px;left:-10px;}
+.owner-ring:nth-child(3){width:116px;height:116px;top:-20px;left:-20px;}
+
+#ownerRings.pulsing .owner-ring:nth-child(1){animation:ownerRing 1.2s ease-out infinite;}
+#ownerRings.pulsing .owner-ring:nth-child(2){animation:ownerRing 1.2s ease-out 0.3s infinite;}
+#ownerRings.pulsing .owner-ring:nth-child(3){animation:ownerRing 1.2s ease-out 0.6s infinite;}
+@keyframes ownerRing{
+0%{opacity:0.8;transform:scale(0.85);}
+100%{opacity:0;transform:scale(1.2);}
 }
 
 .pink-file-btn{background:linear-gradient(#ffd6e6,#ffb6c1);border:2px solid #b67385;border-radius:16px;padding:8px 14px;color:#b84c6f;font-weight:bold;cursor:pointer;width:100%;transition:transform 0.15s,box-shadow 0.15s;}
@@ -123,17 +138,17 @@ body.modal-open{overflow:hidden;touch-action:none;}
 </head>
 <body>
 
-<!-- ✅ Fond d'écran en vrai div — stable sur Safari iOS, résiste au resetViewport -->
-
 <div id="bg" style="position:fixed;top:0;left:0;width:100vw;height:100vh;background-image:url('Photoroom_20251223_114401.jpeg');background-size:cover;background-position:center center;background-repeat:no-repeat;z-index:-1;pointer-events:none;"></div>
 
 <img id="ownerPhoto" alt="Owner">
 
-<!-- Anneau de progression long press -->
+<!-- Anneaux pulsants pendant le long press -->
 
-<svg id="ownerProgressRing" viewBox="0 0 84 84">
-  <circle cx="42" cy="42" r="40"/>
-</svg>
+<div id="ownerRings">
+  <div class="owner-ring"></div>
+  <div class="owner-ring"></div>
+  <div class="owner-ring"></div>
+</div>
 
 <div id="photoOverlay">
   <div class="overlay-ring-wrap">
@@ -248,7 +263,6 @@ const SB_URL="https://kdgxbmqwhpuctjtlygrt.supabase.co";
 const SB_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtkZ3hibXF3aHB1Y3RqdGx5Z3J0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUyMjY0NzQsImV4cCI6MjA5MDgwMjQ3NH0.9RsIj_bQgJskg9raRGN6uQJwUUlByTvWAFF2Eq9f6KM";
 const SB_HEADERS={"apikey":SB_KEY,"Authorization":"Bearer "+SB_KEY,"Content-Type":"application/json"};
 
-// ✅ FIX ZOOM iOS/Safari — reset viewport après fermeture du clavier
 function resetViewport() {
   setTimeout(() => {
     const meta = document.querySelector('meta[name="viewport"]');
@@ -295,6 +309,7 @@ const supabase={
 let creations=[],currentZoom=null,currentDelete=null,
     currentChatUser=localStorage.getItem('currentChatUser')||null,userPhotos={};
 const ownerPhoto=document.getElementById('ownerPhoto');
+const ownerRings=document.getElementById('ownerRings');
 const prenom=localStorage.getItem('prenom');
 const myPrenom=prenom;
 const chatUserList=document.getElementById('chatUserList');
@@ -325,8 +340,6 @@ const fileBtn=document.getElementById('fileBtn');
 const fileInput=document.getElementById('multiPhoto');
 const fileInfo=document.getElementById('fileInfo');
 const zoomLegend=document.getElementById('zoomLegend');
-const progressRing=document.getElementById('ownerProgressRing');
-const progressCircle=progressRing.querySelector('circle');
 
 mainZoom.addEventListener('mousedown',e=>e.stopPropagation());
 mainZoom.addEventListener('touchstart',e=>e.stopPropagation());
@@ -346,7 +359,6 @@ window.addEventListener('resize',()=>{
 // OWNER PHOTO — click = overlay, long press 2s = changer photo
 // =============================================
 
-// Input fichier caché pour changer la photo owner
 const ownerFileInput = document.createElement('input');
 ownerFileInput.type = 'file';
 ownerFileInput.accept = 'image/*';
@@ -374,19 +386,15 @@ ownerFileInput.onchange = async () => {
       };
       reader.readAsDataURL(file);
     });
-
     const formData = new FormData();
     formData.append('image', compressed);
     const res = await fetch('https://api.imgbb.com/1/upload?key=1612fdd94e39f24c3d14f1864f41d591', { method: 'POST', body: formData });
     const json = await res.json();
     if (!json.success) throw new Error('ImgBB error');
-
     const url = json.data.url;
     ownerPhoto.src = url;
     localStorage.setItem('photo_url', url);
     if (prenom) localStorage.setItem('photo_url_' + prenom, url);
-
-    // Sauvegarde dans Supabase
     if (prenom) {
       await supabase.from('profiles').upsert({ prenom, photo_url: url }, { onConflict: 'prenom' });
     }
@@ -395,61 +403,40 @@ ownerFileInput.onchange = async () => {
   }
 };
 
-// --- Long press logic ---
+// Long press
 let ownerLongPressTimer = null;
 let ownerLongPressed = false;
-let ownerProgressInterval = null;
-const LONG_PRESS_DURATION = 2000; // 2 secondes
-const CIRCUMFERENCE = 251; // 2 * PI * 40
 
 function startOwnerLongPress() {
   ownerLongPressed = false;
-  let elapsed = 0;
-  const step = 30;
-
-  // Affiche l'anneau
-  progressRing.style.opacity = '1';
-  progressCircle.style.strokeDashoffset = CIRCUMFERENCE;
-
-  ownerProgressInterval = setInterval(() => {
-    elapsed += step;
-    const progress = Math.min(elapsed / LONG_PRESS_DURATION, 1);
-    progressCircle.style.strokeDashoffset = CIRCUMFERENCE * (1 - progress);
-  }, step);
+  ownerRings.style.opacity = '1';
+  ownerRings.classList.add('pulsing');
 
   ownerLongPressTimer = setTimeout(() => {
     ownerLongPressed = true;
-    clearInterval(ownerProgressInterval);
-    ownerProgressInterval = null;
-
-    // Feedback visuel flash
+    ownerRings.classList.remove('pulsing');
+    ownerRings.style.opacity = '0';
     ownerPhoto.style.transform = 'scale(1.15)';
     ownerPhoto.style.boxShadow = '0 0 0 4px #b84c6f, 0 0 20px rgba(184,76,111,0.5)';
     setTimeout(() => {
       ownerPhoto.style.transform = '';
       ownerPhoto.style.boxShadow = '';
-      progressRing.style.opacity = '0';
-      progressCircle.style.strokeDashoffset = CIRCUMFERENCE;
     }, 300);
-
     ownerFileInput.click();
-  }, LONG_PRESS_DURATION);
+  }, 2000);
 }
 
 function cancelOwnerLongPress() {
   clearTimeout(ownerLongPressTimer);
-  clearInterval(ownerProgressInterval);
-  ownerProgressInterval = null;
-  progressRing.style.opacity = '0';
-  progressCircle.style.strokeDashoffset = CIRCUMFERENCE;
+  ownerRings.classList.remove('pulsing');
+  ownerRings.style.opacity = '0';
 }
 
-// Mouse events
 ownerPhoto.addEventListener('mousedown', startOwnerLongPress);
 ownerPhoto.addEventListener('mouseup', cancelOwnerLongPress);
 ownerPhoto.addEventListener('mouseleave', cancelOwnerLongPress);
 
-// Touch events (preventDefault pour bloquer le menu contextuel iOS)
+// ✅ preventDefault bloque le menu contextuel iOS Safari
 ownerPhoto.addEventListener('touchstart', e => {
   e.preventDefault();
   startOwnerLongPress();
@@ -457,7 +444,6 @@ ownerPhoto.addEventListener('touchstart', e => {
 ownerPhoto.addEventListener('touchend', cancelOwnerLongPress);
 ownerPhoto.addEventListener('touchcancel', cancelOwnerLongPress);
 
-// Click — ouvre l'overlay si ce n'est pas un long press
 ownerPhoto.addEventListener('click', () => {
   if (ownerLongPressed) { ownerLongPressed = false; return; }
   document.getElementById('overlayImg').src = ownerPhoto.src || 'icon-152.png';
@@ -558,14 +544,10 @@ async function savePosition(x,y,isLegend){
   clearTimeout(saveTimeout);
   saveTimeout=setTimeout(async()=>{
     if(isLegend){
-      currentZoom.x_legend=parseFloat(x);
-      currentZoom.y_legend=parseFloat(y);
-      currentZoom.scale_legend=parseFloat(zoomLegend.dataset.scale)||1;
+      currentZoom.x_legend=parseFloat(x);currentZoom.y_legend=parseFloat(y);currentZoom.scale_legend=parseFloat(zoomLegend.dataset.scale)||1;
       await supabase.from('creations').update({x_legend:currentZoom.x_legend,y_legend:currentZoom.y_legend,scale_legend:currentZoom.scale_legend}).eq('id',currentZoom.id);
     }else{
-      currentZoom.x=parseFloat(x);
-      currentZoom.y=parseFloat(y);
-      currentZoom.scale=parseFloat(mainZoom.dataset.scale)||1;
+      currentZoom.x=parseFloat(x);currentZoom.y=parseFloat(y);currentZoom.scale=parseFloat(mainZoom.dataset.scale)||1;
       await supabase.from('creations').update({x:currentZoom.x,y:currentZoom.y,scale:currentZoom.scale}).eq('id',currentZoom.id);
     }
     const idx=creations.findIndex(c=>c.id===currentZoom.id);
