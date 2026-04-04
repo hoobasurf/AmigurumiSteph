@@ -208,7 +208,7 @@ body.modal-open{overflow:hidden;touch-action:none;}
 <script type="module">
 const SB_URL="https://kdgxbmqwhpuctjtlygrt.supabase.co";
 const SB_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtkZ3hibXF3aHB1Y3RqdGx5Z3J0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUyMjY0NzQsImV4cCI6MjA5MDgwMjQ3NH0.9RsIj_bQgJskg9raRGN6uQJwUUlByTvWAFF2Eq9f6KM";
-const SB_HEADERS={"apikey":SB_KEY,"Authorization":"Bearer "+SB_KEY,"Content-Type":"application/json","Prefer":"return=representation"};
+const SB_HEADERS={"apikey":SB_KEY,"Authorization":"Bearer "+SB_KEY,"Content-Type":"application/json"};
 
 const supabase={
   from:(table)=>({
@@ -221,9 +221,14 @@ const supabase={
       or:(filter)=>({order:(col2,{ascending}={})=>({async then(resolve){const dir=ascending?'asc':'desc';const r=await fetch(`${SB_URL}/rest/v1/${table}?select=${cols}&or=(${encodeURIComponent(filter)})&order=${col2}.${dir}`,{headers:SB_HEADERS});const d=await r.json();resolve({data:r.ok?d:null,error:r.ok?null:d});}})}),
       order:(col2,{ascending}={})=>({async then(resolve){const dir=ascending?'asc':'desc';const r=await fetch(`${SB_URL}/rest/v1/${table}?select=${cols}&order=${col2}.${dir}`,{headers:SB_HEADERS});const d=await r.json();resolve({data:r.ok?d:null,error:r.ok?null:d});}})
     }),
-    insert:async(rows)=>{const r=await fetch(`${SB_URL}/rest/v1/${table}`,{method:'POST',headers:SB_HEADERS,body:JSON.stringify(Array.isArray(rows)?rows:[rows])});const d=await r.json();return{data:r.ok?d:null,error:r.ok?null:d};},
-    upsert:async(row,opts={})=>{const h={...SB_HEADERS,"Prefer":"resolution=merge-duplicates,return=representation"};if(opts.onConflict)h["Prefer"]+=`,on_conflict=${opts.onConflict}`;const r=await fetch(`${SB_URL}/rest/v1/${table}`,{method:'POST',headers:h,body:JSON.stringify(row)});const d=await r.json();return{data:r.ok?d:null,error:r.ok?null:d};},
-    update:(updates)=>({eq:async(col,val)=>{const r=await fetch(`${SB_URL}/rest/v1/${table}?${col}=eq.${encodeURIComponent(val)}`,{method:'PATCH',headers:{...SB_HEADERS,"Prefer":"return=minimal"},body:JSON.stringify(updates)});if(!r.ok){const d=await r.json();return{error:d};}return{error:null};}}),
+    insert:async(rows)=>{const r=await fetch(`${SB_URL}/rest/v1/${table}`,{method:'POST',headers:{...SB_HEADERS,"Prefer":"return=minimal"},body:JSON.stringify(Array.isArray(rows)?rows:[rows])});if(!r.ok){const d=await r.json();return{data:null,error:d};}return{data:true,error:null};},
+    upsert:async(row,opts={})=>{const h={...SB_HEADERS,"Prefer":"resolution=merge-duplicates,return=minimal"};if(opts.onConflict)h["Prefer"]+=`,on_conflict=${opts.onConflict}`;const r=await fetch(`${SB_URL}/rest/v1/${table}`,{method:'POST',headers:h,body:JSON.stringify(row)});if(!r.ok){const d=await r.json();return{data:null,error:d};}return{data:true,error:null};},
+    update:(updates)=>({eq:async(col,val)=>{
+      const url=`${SB_URL}/rest/v1/${table}?${col}=eq.${encodeURIComponent(String(val))}`;
+      const r=await fetch(url,{method:'PATCH',headers:{...SB_HEADERS,"Prefer":"return=minimal"},body:JSON.stringify(updates)});
+      if(!r.ok){let d={};try{d=await r.json();}catch(e){}return{error:d};}
+      return{error:null};
+    }}),
     delete:()=>({eq:async(col,val)=>{const r=await fetch(`${SB_URL}/rest/v1/${table}?${col}=eq.${encodeURIComponent(val)}`,{method:'DELETE',headers:SB_HEADERS});return{error:r.ok?null:await r.json()};}})
   })
 };
@@ -353,13 +358,8 @@ async function refreshCreations(){
       let zoomGroup=[];
       if(Array.isArray(c.images)&&c.images.length)zoomGroup=c.images;
       else if(c.image_path)zoomGroup=[c.image_path];
-      // likes/comments : jsonb => déjà un tableau, pas besoin de JSON.parse
-      let likes=[];
-      if(Array.isArray(c.likes))likes=c.likes;
-      else if(typeof c.likes==='string'&&c.likes){try{likes=JSON.parse(c.likes);}catch(e){likes=[];}}
-      let comments=[];
-      if(Array.isArray(c.comments))comments=c.comments;
-      else if(typeof c.comments==='string'&&c.comments){try{comments=JSON.parse(c.comments);}catch(e){comments=[];}}
+      let likes=Array.isArray(c.likes)?c.likes:[];
+      let comments=Array.isArray(c.comments)?c.comments:[];
       return{id:c.id,name:c.titre||c.name||'',legend:c.legend||'',imgUrl:zoomGroup[0]||'',zoomGroup,
         likes,comments,
         x:c.x||0,y:c.y||0,scale:c.scale||1,x_legend:c.x_legend||0,y_legend:c.y_legend||0,scale_legend:c.scale_legend||1};
@@ -420,22 +420,34 @@ function openZoom(c){
   renderLikeList();renderCommentList();zoomModal.style.display='flex';document.body.classList.add('modal-open');document.body.style.overflow='hidden';
 }
 
-document.getElementById('likeBtn').onclick=()=>{if(!currentZoom){alert("Sélectionnez d'abord une image!");return;}likeNameInput.value=myPrenom||'';renderLikeList();likeModal.style.display='flex';};
+document.getElementById('likeBtn').onclick=()=>{
+  if(!currentZoom){alert("Sélectionnez d'abord une image!");return;}
+  likeNameInput.value=myPrenom||'';
+  renderLikeList();
+  likeModal.style.display='flex';
+};
 
-// ===== LIKE : envoi en jsonb (tableau natif, pas JSON.stringify) =====
+// ===== LIKE avec alert debug =====
 confirmLike.onclick=async()=>{
   if(!currentZoom)return;
   const name=likeNameInput.value.trim();if(!name)return;
   currentZoom.likes=currentZoom.likes||[];
   if(!currentZoom.likes.some(l=>l.name===name))currentZoom.likes.push({name,photo:ownerPhoto.src||''});
-  const{error}=await supabase.from('creations').update({likes:currentZoom.likes}).eq('id',currentZoom.id);
-  if(error){console.error('Like error:',JSON.stringify(error));return;}
-  renderLikeList();likeModal.style.display='none';
+  const url=`${SB_URL}/rest/v1/creations?id=eq.${encodeURIComponent(String(currentZoom.id))}`;
+  const body=JSON.stringify({likes:currentZoom.likes});
+  const r=await fetch(url,{method:'PATCH',headers:{...SB_HEADERS,"Prefer":"return=minimal"},body});
+  if(!r.ok){
+    let d={};try{d=await r.json();}catch(e){}
+    alert('❌ ERREUR LIKE '+r.status+':\n'+JSON.stringify(d));
+    return;
+  }
+  alert('✅ Like sauvegardé !');
+  renderLikeList();
+  likeModal.style.display='none';
 };
 
 document.getElementById('commentBtn').onclick=()=>{if(!currentZoom)return;commentNameInput.value=myPrenom||'';commentTextInput.value='';renderCommentList();commentModal.style.display='flex';};
 
-// ===== COMMENT : envoi en jsonb (tableau natif, pas JSON.stringify) =====
 confirmComment.onclick=async()=>{
   if(!currentZoom)return;
   const name=commentNameInput.value.trim();const text=commentTextInput.value.trim();if(!name||!text)return;
@@ -474,7 +486,6 @@ document.getElementById('confirmAdd').onclick=async()=>{
       }catch(err){alert('❌ Erreur photo '+(i+1)+': '+(err?.message||String(err)));}
     }
     if(!imageUrls.length){alert('Aucune image uploadée avec succès');return;}
-    // Insertion avec likes/comments en tableaux natifs (jsonb)
     const{error:insertError}=await supabase.from('creations').insert([{name,legend:legend||'',image_path:imageUrls[0],images:imageUrls,likes:[],comments:[],x:0,y:0,scale:1,x_legend:0,y_legend:0,scale_legend:1}]);
     if(insertError){alert('Erreur insertion: '+insertError.message);return;}
     addModal.style.display='none';document.getElementById('photoName').value='';document.getElementById('photoLegend').value='';document.getElementById('multiPhoto').value='';fileInfo.textContent='';
