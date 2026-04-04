@@ -16,7 +16,6 @@
 html,body{height:100%;overflow-x:hidden;}
 body::before{content:"";position:fixed;top:0;left:0;width:100vw;height:100vh;background-image:url('Photoroom_20251223_114401.jpeg');background-size:cover;background-position:center center;background-repeat:no-repeat;z-index:-1;}
 
-/* Fix Safari iOS : descendre les projets sous le titre */
 .center-zone{display:flex;justify-content:center;align-items:flex-start;padding-top:4.5cm;overflow:hidden;height:auto;}
 
 #visitor-list-container{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;justify-content:center;padding-left:1cm;}
@@ -284,7 +283,6 @@ zoomLegend.addEventListener('touchstart',e=>e.stopPropagation());
 fileBtn.onclick=()=>fileInput.click();
 fileInput.onchange=()=>{fileInfo.textContent=fileInput.files.length?`${fileInput.files.length} photo(s) sélectionnée(s)`:''};
 
-// ===== DEZOOM auto quand clavier se ferme (visibilityChange + resize) =====
 window.addEventListener('resize', () => {
   if (mainZoom.dataset.scale && parseFloat(mainZoom.dataset.scale) !== 1) {
     mainZoom.dataset.scale = 1;
@@ -376,8 +374,7 @@ async function refreshCreations(){
       else if(c.image_path)zoomGroup=[c.image_path];
       return{id:c.id,name:c.titre||c.name||'',legend:c.legend||'',imgUrl:zoomGroup[0]||'',zoomGroup,
         likes:Array.isArray(c.likes)?c.likes:(c.likes?JSON.parse(c.likes):[]),
-        comments:Array.isArray(c.comments)?c.comments:(c.comments?JSON.parse(c.comments):[]),
-        x:c.x||0,y:c.y||0,scale:c.scale||1,x_legend:c.x_legend||0,y_legend:c.y_legend||0,scale_legend:c.scale_legend||1};
+        comments:Array.isArray(c.comments)?c.comments:(c.comments?JSON.parse(c.comments):[])};
     });
     renderCreations(creations);
   }catch(e){console.error('refreshCreations:',e?.message);}
@@ -387,24 +384,18 @@ function makeDraggable(el,isLegend=false){
   let isDragging=false,startX,startY;
   el.dataset.x=el.dataset.x||0;el.dataset.y=el.dataset.y||0;el.dataset.scale=el.dataset.scale||1;
   el.addEventListener('mousedown',e=>{isDragging=true;startX=e.clientX;startY=e.clientY;});
-  document.addEventListener('mousemove',e=>{if(!isDragging)return;let newX=parseFloat(el.dataset.x)+(e.clientX-startX);let newY=parseFloat(el.dataset.y)+(e.clientY-startY);el.dataset.x=newX;el.dataset.y=newY;el.style.transform=`translate(${newX}px,${newY}px) scale(${el.dataset.scale})`;startX=e.clientX;startY=e.clientY;savePosition(newX,newY,isLegend);});
+  document.addEventListener('mousemove',e=>{if(!isDragging)return;let newX=parseFloat(el.dataset.x)+(e.clientX-startX);let newY=parseFloat(el.dataset.y)+(e.clientY-startY);el.dataset.x=newX;el.dataset.y=newY;el.style.transform=`translate(${newX}px,${newY}px) scale(${el.dataset.scale})`;startX=e.clientX;startY=e.clientY;});
   document.addEventListener('mouseup',()=>{isDragging=false;});
   el.addEventListener('touchstart',e=>{isDragging=true;startX=e.touches[0].clientX;startY=e.touches[0].clientY;});
-  el.addEventListener('touchmove',e=>{if(!isDragging)return;e.preventDefault();let newX=parseFloat(el.dataset.x)+(e.touches[0].clientX-startX);let newY=parseFloat(el.dataset.y)+(e.touches[0].clientY-startY);el.dataset.x=newX;el.dataset.y=newY;el.style.transform=`translate(${newX}px,${newY}px) scale(${el.dataset.scale})`;startX=e.touches[0].clientX;startY=e.touches[0].clientY;savePosition(newX,newY,isLegend);},{passive:false});
+  el.addEventListener('touchmove',e=>{if(!isDragging)return;e.preventDefault();let newX=parseFloat(el.dataset.x)+(e.touches[0].clientX-startX);let newY=parseFloat(el.dataset.y)+(e.touches[0].clientY-startY);el.dataset.x=newX;el.dataset.y=newY;el.style.transform=`translate(${newX}px,${newY}px) scale(${el.dataset.scale})`;startX=e.touches[0].clientX;startY=e.touches[0].clientY;},{passive:false});
   el.addEventListener('touchend',()=>{isDragging=false;});
-}
-
-async function savePosition(x,y,isLegend){
-  if(!currentZoom||!currentZoom.id)return;
-  if(isLegend){currentZoom.x_legend=x;currentZoom.y_legend=y;currentZoom.scale_legend=zoomLegend.dataset.scale||1;await supabase.from('creations').update({x_legend:x,y_legend:y,scale_legend:zoomLegend.dataset.scale||1}).eq('id',currentZoom.id);}
-  else{currentZoom.x=x;currentZoom.y=y;currentZoom.scale=mainZoom.dataset.scale||1;await supabase.from('creations').update({x:x,y:y,scale:mainZoom.dataset.scale||1}).eq('id',currentZoom.id);}
 }
 
 function makePinchZoom(el,isLegend=false){
   el.dataset.scale=el.dataset.scale||1;let initialDistance=null,initialScale=1;
-  el.addEventListener('wheel',e=>{e.preventDefault();let scale=parseFloat(el.dataset.scale);scale+=e.deltaY*-0.001;scale=Math.min(Math.max(0.5,scale),3);el.dataset.scale=scale;el.style.transform=`translate(${el.dataset.x||0}px,${el.dataset.y||0}px) scale(${scale})`;savePosition(el.dataset.x,el.dataset.y,isLegend);},{passive:false});
+  el.addEventListener('wheel',e=>{e.preventDefault();let scale=parseFloat(el.dataset.scale);scale+=e.deltaY*-0.001;scale=Math.min(Math.max(0.5,scale),3);el.dataset.scale=scale;el.style.transform=`translate(${el.dataset.x||0}px,${el.dataset.y||0}px) scale(${scale})`;},{passive:false});
   el.addEventListener('touchstart',e=>{if(e.touches.length===2){initialDistance=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);initialScale=parseFloat(el.dataset.scale);}});
-  el.addEventListener('touchmove',e=>{if(e.touches.length===2&&initialDistance){e.preventDefault();let currentDistance=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);let scale=initialScale*(currentDistance/initialDistance);scale=Math.min(Math.max(0.5,scale),3);el.dataset.scale=scale;el.style.transform=`translate(${el.dataset.x||0}px,${el.dataset.y||0}px) scale(${scale})`;savePosition(el.dataset.x,el.dataset.y,isLegend);}},{passive:false});
+  el.addEventListener('touchmove',e=>{if(e.touches.length===2&&initialDistance){e.preventDefault();let currentDistance=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);let scale=initialScale*(currentDistance/initialDistance);scale=Math.min(Math.max(0.5,scale),3);el.dataset.scale=scale;el.style.transform=`translate(${el.dataset.x||0}px,${el.dataset.y||0}px) scale(${scale})`;}},{passive:false});
   el.addEventListener('touchend',()=>{initialDistance=null;});
 }
 
@@ -423,33 +414,40 @@ function renderCreations(list){
   if(pageDiv.children.length>0)container.appendChild(pageDiv);
 }
 
+// ===== FIX ZOOM : toujours ouvrir à scale=1, position neutre =====
 function openZoom(c){
   currentZoom=creations.find(x=>x.id===c.id);if(!currentZoom)return;
-  mainZoom.src=currentZoom.imgUrl||'';zoomLegend.textContent=currentZoom.legend||'Aucune légende';
-  mainZoom.dataset.x=currentZoom.x??0;mainZoom.dataset.y=currentZoom.y??0;mainZoom.dataset.scale=currentZoom.scale??1;
-  mainZoom.style.transform=`translate(${mainZoom.dataset.x}px,${mainZoom.dataset.y}px) scale(${mainZoom.dataset.scale})`;
-  zoomLegend.dataset.x=currentZoom.x_legend??0;zoomLegend.dataset.y=currentZoom.y_legend??0;zoomLegend.dataset.scale=currentZoom.scale_legend??1;
-  zoomLegend.style.transform=`translate(${zoomLegend.dataset.x}px,${zoomLegend.dataset.y}px) scale(${zoomLegend.dataset.scale})`;
+  mainZoom.src=currentZoom.imgUrl||'';
+  zoomLegend.textContent=currentZoom.legend||'Aucune légende';
+  // Reset position et scale à chaque ouverture
+  mainZoom.dataset.x=0;mainZoom.dataset.y=0;mainZoom.dataset.scale=1;
+  mainZoom.style.transform='translate(0px,0px) scale(1)';
+  zoomLegend.dataset.x=0;zoomLegend.dataset.y=0;zoomLegend.dataset.scale=1;
+  zoomLegend.style.transform='translate(0px,0px) scale(1)';
   thumbs.innerHTML='';(currentZoom.zoomGroup||[]).forEach(u=>{const t=document.createElement('img');t.src=u;t.onclick=()=>mainZoom.src=u;thumbs.appendChild(t);});
   renderLikeList();renderCommentList();zoomModal.style.display='flex';document.body.classList.add('modal-open');document.body.style.overflow='hidden';
 }
 
 document.getElementById('likeBtn').onclick=()=>{if(!currentZoom){alert("Sélectionnez d'abord une image!");return;}likeNameInput.value=myPrenom||'';renderLikeList();likeModal.style.display='flex';};
 
-// ===== LIKE : sauvegarde en JSON string pour Supabase =====
+// ===== FIX LIKE : recharger depuis Supabase après sauvegarde =====
 confirmLike.onclick=async()=>{
   if(!currentZoom)return;
   const name=likeNameInput.value.trim();if(!name)return;
   currentZoom.likes=currentZoom.likes||[];
   if(!currentZoom.likes.some(l=>l.name===name))currentZoom.likes.push({name,photo:ownerPhoto.src||''});
   const{error}=await supabase.from('creations').update({likes:JSON.stringify(currentZoom.likes)}).eq('id',currentZoom.id);
-  if(error)console.error('Like error:',JSON.stringify(error));
+  if(error){console.error('Like error:',JSON.stringify(error));return;}
+  // Recharger depuis Supabase pour confirmer la sauvegarde
+  const{data}=await supabase.from('creations').select('likes').eq('id',currentZoom.id).single();
+  if(data?.likes){
+    currentZoom.likes=Array.isArray(data.likes)?data.likes:JSON.parse(data.likes);
+  }
   renderLikeList();likeModal.style.display='none';
 };
 
 document.getElementById('commentBtn').onclick=()=>{if(!currentZoom)return;commentNameInput.value=myPrenom||'';commentTextInput.value='';renderCommentList();commentModal.style.display='flex';};
 
-// ===== COMMENT : sauvegarde en JSON string =====
 confirmComment.onclick=async()=>{
   if(!currentZoom)return;
   const name=commentNameInput.value.trim();const text=commentTextInput.value.trim();if(!name||!text)return;
