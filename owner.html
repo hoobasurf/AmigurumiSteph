@@ -101,12 +101,29 @@ body.modal-open{overflow:hidden;touch-action:none;}
 @keyframes prenomFloat{0%,100%{transform:translateY(0) rotate(-1deg);}50%{transform:translateY(-9px) rotate(1deg);}}
 #overlayHint{font-size:11px;color:rgba(255,230,240,0.5);letter-spacing:3px;font-family:‘Georgia’,serif;font-style:italic;animation:fadeIn 1.5s 1s ease both;}
 @keyframes fadeIn{from{opacity:0}to{opacity:1}}
+
+/* Debug overlay iPhone */
+#debugOverlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.9);z-index:999999;padding:16px;overflow-y:auto;}
+#debugBox{background:#ffe6f0;border-radius:16px;padding:16px;word-break:break-all;font-size:11px;color:#333;}
+#debugBox strong{color:#b84c6f;font-size:13px;}
+#debugBox pre{margin-top:10px;white-space:pre-wrap;font-size:10px;line-height:1.4;}
+#debugClose{margin-top:12px;background:#ffb6c1;border:none;border-radius:10px;padding:10px;font-weight:bold;color:#fff;width:100%;font-size:14px;}
 </style>
 
 </head>
 <body>
 
 <img id="ownerPhoto" alt="Owner">
+
+<!-- Debug overlay iPhone-friendly -->
+
+<div id="debugOverlay">
+  <div id="debugBox">
+    <strong>🔍 Debug PATCH Supabase</strong>
+    <pre id="debugContent"></pre>
+    <button id="debugClose">Fermer</button>
+  </div>
+</div>
 
 <div id="photoOverlay">
   <div class="overlay-ring-wrap">
@@ -225,33 +242,50 @@ const SB_URL = "https://kdgxbmqwhpuctjtlygrt.supabase.co";
 const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtkZ3hibXF3aHB1Y3RqdGx5Z3J0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUyMjY0NzQsImV4cCI6MjA5MDgwMjQ3NH0.9RsIj_bQgJskg9raRGN6uQJwUUlByTvWAFF2Eq9f6KM";
 const SB_HEADERS = { "apikey": SB_KEY, "Authorization": "Bearer " + SB_KEY, "Content-Type": "application/json" };
 
-// ── PATCH corrigé — force jsonb explicitement via l'en-tête Accept-Profile ──
+// ── Debug overlay iPhone ─────────────────────────────────────────────────────
+const debugOverlay = document.getElementById('debugOverlay');
+const debugContent = document.getElementById('debugContent');
+document.getElementById('debugClose').onclick = () => { debugOverlay.style.display = 'none'; };
+function showDebug(text) {
+  debugContent.textContent = text;
+  debugOverlay.style.display = 'block';
+}
+
+// ── PATCH avec debug complet ─────────────────────────────────────────────────
 async function sbPatch(table, updates, col, val) {
-  const h = {
-    ...SB_HEADERS,
-    "Prefer": "return=minimal",
-    // Force PostgREST à traiter les valeurs comme jsonb et non integer
-    "Content-Profile": "public"
-  };
-
-  // Sérialise les tableaux/objets en JSON string puis re-parse
-  // pour s'assurer que le body est un objet JS pur (pas de proxy/ref)
+  const h = { ...SB_HEADERS, "Prefer": "return=minimal" };
   const safeUpdates = JSON.parse(JSON.stringify(updates));
-
   const url = `${SB_URL}/rest/v1/${table}?${col}=eq.${encodeURIComponent(String(val))}`;
+  const bodyStr = JSON.stringify(safeUpdates);
 
-  const r = await fetch(url, {
-    method: 'PATCH',
-    headers: h,
-    body: JSON.stringify(safeUpdates)
-  });
+  // Affiche sur iPhone avant l'envoi
+  showDebug(
+    'TABLE: ' + table +
+    '\nCOL filtre: ' + col +
+    '\nVAL filtre: ' + String(val) +
+    '\nURL: ' + url +
+    '\nBODY: ' + bodyStr +
+    '\n\n⏳ Envoi en cours...'
+  );
+
+  const r = await fetch(url, { method: 'PATCH', headers: h, body: bodyStr });
 
   if (!r.ok) {
     let d = {};
     try { d = await r.json(); } catch(e) {}
-    console.error(`[PATCH ${table}] ${r.status}`, JSON.stringify(d));
+    showDebug(
+      'TABLE: ' + table +
+      '\nCOL filtre: ' + col +
+      '\nVAL filtre: ' + String(val) +
+      '\nURL: ' + url +
+      '\nBODY: ' + bodyStr +
+      '\n\n❌ ERREUR HTTP ' + r.status + ':\n' + JSON.stringify(d, null, 2)
+    );
     return { error: d };
   }
+
+  // Succès — ferme le debug
+  debugOverlay.style.display = 'none';
   return { error: null };
 }
 
@@ -301,9 +335,7 @@ const supabase = {
     }),
     insert: async (rows) => {
       const h = { ...SB_HEADERS, "Prefer": "return=minimal" };
-      const body = Array.isArray(rows) ? rows : [rows];
-      // Deep clone pour éviter les références corrompues
-      const safeBody = JSON.parse(JSON.stringify(body));
+      const safeBody = JSON.parse(JSON.stringify(Array.isArray(rows) ? rows : [rows]));
       const r = await fetch(`${SB_URL}/rest/v1/${table}`, { method: 'POST', headers: h, body: JSON.stringify(safeBody) });
       if (!r.ok) { const d = await r.json(); return { data: null, error: d }; }
       return { data: true, error: null };
@@ -610,14 +642,9 @@ confirmLike.onclick = async () => {
   if (!currentZoom.likes.some(l => l.name === name)) {
     currentZoom.likes.push({ name, photo: ownerPhoto.src || '' });
   }
-  // Deep clone avant envoi pour éviter tout problème de référence
   const likesPayload = JSON.parse(JSON.stringify(currentZoom.likes));
   const { error } = await supabase.from('creations').update({ likes: likesPayload }).eq('id', currentZoom.id);
-  if (error) {
-    console.error('[LIKE] Erreur:', JSON.stringify(error));
-    alert('Erreur like: ' + (error.message || JSON.stringify(error)));
-    return;
-  }
+  if (error) return;
   const idx = creations.findIndex(x => x.id === currentZoom.id);
   if (idx !== -1) creations[idx].likes = likesPayload;
   renderLikeList();
@@ -638,14 +665,9 @@ confirmComment.onclick = async () => {
   if (!name || !text) return;
   currentZoom.comments = currentZoom.comments || [];
   currentZoom.comments.push({ name, text, photo: ownerPhoto.src || '' });
-  // Deep clone avant envoi
   const commentsPayload = JSON.parse(JSON.stringify(currentZoom.comments));
   const { error } = await supabase.from('creations').update({ comments: commentsPayload }).eq('id', currentZoom.id);
-  if (error) {
-    console.error('[COMMENT] Erreur:', JSON.stringify(error));
-    alert('Erreur commentaire: ' + (error.message || JSON.stringify(error)));
-    return;
-  }
+  if (error) return;
   const idx = creations.findIndex(x => x.id === currentZoom.id);
   if (idx !== -1) creations[idx].comments = commentsPayload;
   renderCommentList();
@@ -721,13 +743,11 @@ document.getElementById('confirmAdd').onclick = async () => {
       } catch(err) { alert('❌ Erreur photo ' + (i + 1) + ': ' + (err?.message || String(err))); }
     }
     if (!imageUrls.length) { alert('Aucune image uploadée avec succès'); return; }
-    const newRow = {
+    const newRow = JSON.parse(JSON.stringify({
       name, legend: legend || '', image_path: imageUrls[0],
-      images: imageUrls,   // jsonb array — Supabase accepte le tableau JS directement
-      likes: [],
-      comments: [],
+      images: imageUrls, likes: [], comments: [],
       x: 0, y: 0, scale: 1, x_legend: 0, y_legend: 0, scale_legend: 1
-    };
+    }));
     const { error: insertError } = await supabase.from('creations').insert([newRow]);
     if (insertError) { alert('Erreur insertion: ' + insertError.message); return; }
     addModal.style.display = 'none';
