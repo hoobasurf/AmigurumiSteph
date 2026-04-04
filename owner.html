@@ -225,22 +225,27 @@ const SB_URL = "https://kdgxbmqwhpuctjtlygrt.supabase.co";
 const SB_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtkZ3hibXF3aHB1Y3RqdGx5Z3J0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUyMjY0NzQsImV4cCI6MjA5MDgwMjQ3NH0.9RsIj_bQgJskg9raRGN6uQJwUUlByTvWAFF2Eq9f6KM";
 const SB_HEADERS = { "apikey": SB_KEY, "Authorization": "Bearer " + SB_KEY, "Content-Type": "application/json" };
 
-// ── PATCH avec cast jsonb explicite via l'URL PostgREST ──────────────────────
-// PostgREST supporte le cast de type dans l'URL : colonne=cast(val as jsonb)
-// La méthode la plus fiable pour forcer jsonb est d'utiliser le suffixe ::jsonb
-// dans le nom de colonne du body — mais ça ne marche pas directement.
-// Solution : on passe par une RPC ou on sérialise en string + cast via query.
-// En pratique le plus simple : envoyer le body avec les tableaux sérialisés
-// en string JSON et ajouter le Content-Type application/json suffit SI la
-// colonne est jsonb. Si elle est text/integer, ça échoue.
-// → Le vrai fix définitif : ALTER TABLE côté Supabase (déjà fait).
-// Ce code envoie correctement le JSON natif, Supabase doit l'accepter.
+// ── PATCH corrigé — force jsonb explicitement via l'en-tête Accept-Profile ──
 async function sbPatch(table, updates, col, val) {
-  const h = { ...SB_HEADERS, "Prefer": "return=minimal" };
-  const r = await fetch(
-    `${SB_URL}/rest/v1/${table}?${col}=eq.${encodeURIComponent(val)}`,
-    { method: 'PATCH', headers: h, body: JSON.stringify(updates) }
-  );
+  const h = {
+    ...SB_HEADERS,
+    "Prefer": "return=minimal",
+    // Force PostgREST à traiter les valeurs comme jsonb et non integer
+    "Content-Profile": "public"
+  };
+
+  // Sérialise les tableaux/objets en JSON string puis re-parse
+  // pour s'assurer que le body est un objet JS pur (pas de proxy/ref)
+  const safeUpdates = JSON.parse(JSON.stringify(updates));
+
+  const url = `${SB_URL}/rest/v1/${table}?${col}=eq.${encodeURIComponent(String(val))}`;
+
+  const r = await fetch(url, {
+    method: 'PATCH',
+    headers: h,
+    body: JSON.stringify(safeUpdates)
+  });
+
   if (!r.ok) {
     let d = {};
     try { d = await r.json(); } catch(e) {}
@@ -296,7 +301,10 @@ const supabase = {
     }),
     insert: async (rows) => {
       const h = { ...SB_HEADERS, "Prefer": "return=minimal" };
-      const r = await fetch(`${SB_URL}/rest/v1/${table}`, { method: 'POST', headers: h, body: JSON.stringify(Array.isArray(rows) ? rows : [rows]) });
+      const body = Array.isArray(rows) ? rows : [rows];
+      // Deep clone pour éviter les références corrompues
+      const safeBody = JSON.parse(JSON.stringify(body));
+      const r = await fetch(`${SB_URL}/rest/v1/${table}`, { method: 'POST', headers: h, body: JSON.stringify(safeBody) });
       if (!r.ok) { const d = await r.json(); return { data: null, error: d }; }
       return { data: true, error: null };
     },
@@ -602,15 +610,16 @@ confirmLike.onclick = async () => {
   if (!currentZoom.likes.some(l => l.name === name)) {
     currentZoom.likes.push({ name, photo: ownerPhoto.src || '' });
   }
-  const { error } = await supabase.from('creations').update({ likes: currentZoom.likes }).eq('id', currentZoom.id);
+  // Deep clone avant envoi pour éviter tout problème de référence
+  const likesPayload = JSON.parse(JSON.stringify(currentZoom.likes));
+  const { error } = await supabase.from('creations').update({ likes: likesPayload }).eq('id', currentZoom.id);
   if (error) {
     console.error('[LIKE] Erreur:', JSON.stringify(error));
     alert('Erreur like: ' + (error.message || JSON.stringify(error)));
     return;
   }
-  // ✅ Sync tableau local — évite la perte au prochain refreshCreations
   const idx = creations.findIndex(x => x.id === currentZoom.id);
-  if (idx !== -1) creations[idx].likes = [...currentZoom.likes];
+  if (idx !== -1) creations[idx].likes = likesPayload;
   renderLikeList();
   likeModal.style.display = 'none';
 };
@@ -629,15 +638,16 @@ confirmComment.onclick = async () => {
   if (!name || !text) return;
   currentZoom.comments = currentZoom.comments || [];
   currentZoom.comments.push({ name, text, photo: ownerPhoto.src || '' });
-  const { error } = await supabase.from('creations').update({ comments: currentZoom.comments }).eq('id', currentZoom.id);
+  // Deep clone avant envoi
+  const commentsPayload = JSON.parse(JSON.stringify(currentZoom.comments));
+  const { error } = await supabase.from('creations').update({ comments: commentsPayload }).eq('id', currentZoom.id);
   if (error) {
     console.error('[COMMENT] Erreur:', JSON.stringify(error));
     alert('Erreur commentaire: ' + (error.message || JSON.stringify(error)));
     return;
   }
-  // ✅ Sync tableau local
   const idx = creations.findIndex(x => x.id === currentZoom.id);
-  if (idx !== -1) creations[idx].comments = [...currentZoom.comments];
+  if (idx !== -1) creations[idx].comments = commentsPayload;
   renderCommentList();
   commentTextInput.value = '';
   commentCount.textContent = currentZoom.comments.length;
@@ -711,11 +721,14 @@ document.getElementById('confirmAdd').onclick = async () => {
       } catch(err) { alert('❌ Erreur photo ' + (i + 1) + ': ' + (err?.message || String(err))); }
     }
     if (!imageUrls.length) { alert('Aucune image uploadée avec succès'); return; }
-    const { error: insertError } = await supabase.from('creations').insert([{
-      name, legend: legend || '', image_path: imageUrls[0], images: imageUrls,
-      likes: [], comments: [],
+    const newRow = {
+      name, legend: legend || '', image_path: imageUrls[0],
+      images: imageUrls,   // jsonb array — Supabase accepte le tableau JS directement
+      likes: [],
+      comments: [],
       x: 0, y: 0, scale: 1, x_legend: 0, y_legend: 0, scale_legend: 1
-    }]);
+    };
+    const { error: insertError } = await supabase.from('creations').insert([newRow]);
     if (insertError) { alert('Erreur insertion: ' + insertError.message); return; }
     addModal.style.display = 'none';
     document.getElementById('photoName').value = ''; document.getElementById('photoLegend').value = '';
