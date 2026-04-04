@@ -223,32 +223,93 @@ body.modal-open{overflow:hidden;touch-action:none;}
 <script type="module">
 const SB_URL="https://kdgxbmqwhpuctjtlygrt.supabase.co";
 const SB_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtkZ3hibXF3aHB1Y3RqdGx5Z3J0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUyMjY0NzQsImV4cCI6MjA5MDgwMjQ3NH0.9RsIj_bQgJskg9raRGN6uQJwUUlByTvWAFF2Eq9f6KM";
-const SB_HEADERS={"apikey":SB_KEY,"Authorization":"Bearer "+SB_KEY,"Content-Type":"application/json","Prefer":"return=representation"};
+const SB_HEADERS={"apikey":SB_KEY,"Authorization":"Bearer "+SB_KEY,"Content-Type":"application/json"};
 
+// ─── Client Supabase ────────────────────────────────────────────────────────
 const supabase={
   from:(table)=>({
     select:(cols="*")=>({
       eq:(col,val)=>({
-        single:async()=>{const r=await fetch(`${SB_URL}/rest/v1/${table}?select=${cols}&${col}=eq.${encodeURIComponent(val)}&limit=1`,{headers:SB_HEADERS});const d=await r.json();if(!r.ok)return{data:null,error:d};return{data:d[0]||null,error:d[0]?null:{message:'Not found'}};},
-        order:(col2,{ascending}={})=>({limit:async(n)=>{const dir=ascending?'asc':'desc';const r=await fetch(`${SB_URL}/rest/v1/${table}?select=${cols}&${col}=eq.${encodeURIComponent(val)}&order=${col2}.${dir}&limit=${n}`,{headers:SB_HEADERS});const d=await r.json();return{data:r.ok?d:null,error:r.ok?null:d};}})
+        single:async()=>{
+          const r=await fetch(`${SB_URL}/rest/v1/${table}?select=${cols}&${col}=eq.${encodeURIComponent(val)}&limit=1`,{headers:SB_HEADERS});
+          const d=await r.json();
+          if(!r.ok)return{data:null,error:d};
+          return{data:d[0]||null,error:d[0]?null:{message:'Not found'}};
+        },
+        order:(col2,{ascending}={})=>({
+          limit:async(n)=>{
+            const dir=ascending?'asc':'desc';
+            const r=await fetch(`${SB_URL}/rest/v1/${table}?select=${cols}&${col}=eq.${encodeURIComponent(val)}&order=${col2}.${dir}&limit=${n}`,{headers:SB_HEADERS});
+            const d=await r.json();
+            return{data:r.ok?d:null,error:r.ok?null:d};
+          }
+        })
       }),
-      neq:async(col,val)=>{const r=await fetch(`${SB_URL}/rest/v1/${table}?select=${cols}&${col}=neq.${encodeURIComponent(val)}`,{headers:SB_HEADERS});const d=await r.json();return{data:r.ok?d:null,error:r.ok?null:d};},
-      or:(filter)=>({order:(col2,{ascending}={})=>({async then(resolve){const dir=ascending?'asc':'desc';const r=await fetch(`${SB_URL}/rest/v1/${table}?select=${cols}&or=(${encodeURIComponent(filter)})&order=${col2}.${dir}`,{headers:SB_HEADERS});const d=await r.json();resolve({data:r.ok?d:null,error:r.ok?null:d});}})}),
-      order:(col2,{ascending}={})=>({async then(resolve){const dir=ascending?'asc':'desc';const r=await fetch(`${SB_URL}/rest/v1/${table}?select=${cols}&order=${col2}.${dir}`,{headers:SB_HEADERS});const d=await r.json();resolve({data:r.ok?d:null,error:r.ok?null:d});}})
+      neq:async(col,val)=>{
+        const r=await fetch(`${SB_URL}/rest/v1/${table}?select=${cols}&${col}=neq.${encodeURIComponent(val)}`,{headers:SB_HEADERS});
+        const d=await r.json();
+        return{data:r.ok?d:null,error:r.ok?null:d};
+      },
+      or:(filter)=>({
+        order:(col2,{ascending}={})=>({
+          async then(resolve){
+            const dir=ascending?'asc':'desc';
+            const r=await fetch(`${SB_URL}/rest/v1/${table}?select=${cols}&or=(${encodeURIComponent(filter)})&order=${col2}.${dir}`,{headers:SB_HEADERS});
+            const d=await r.json();
+            resolve({data:r.ok?d:null,error:r.ok?null:d});
+          }
+        })
+      }),
+      order:(col2,{ascending}={})=>({
+        async then(resolve){
+          const dir=ascending?'asc':'desc';
+          const r=await fetch(`${SB_URL}/rest/v1/${table}?select=${cols}&order=${col2}.${dir}`,{headers:SB_HEADERS});
+          const d=await r.json();
+          resolve({data:r.ok?d:null,error:r.ok?null:d});
+        }
+      })
     }),
-    insert:async(rows)=>{const r=await fetch(`${SB_URL}/rest/v1/${table}`,{method:'POST',headers:SB_HEADERS,body:JSON.stringify(Array.isArray(rows)?rows:[rows])});const d=await r.json();return{data:r.ok?d:null,error:r.ok?null:d};},
-    upsert:async(row,opts={})=>{const h={...SB_HEADERS,"Prefer":"resolution=merge-duplicates,return=representation"};if(opts.onConflict)h["Prefer"]+=`,on_conflict=${opts.onConflict}`;const r=await fetch(`${SB_URL}/rest/v1/${table}`,{method:'POST',headers:h,body:JSON.stringify(row)});const d=await r.json();return{data:r.ok?d:null,error:r.ok?null:d};},
-    update:(updates)=>({eq:async(col,val)=>{
-      const r=await fetch(`${SB_URL}/rest/v1/${table}?${col}=eq.${encodeURIComponent(val)}`,{method:'PATCH',headers:SB_HEADERS,body:JSON.stringify(updates)});
-      const d=await r.json();
-      console.log(`[PATCH ${table}] status:${r.status}`,JSON.stringify(d));
-      return{data:r.ok?d:null,error:r.ok?null:d};
-    }}),
-    delete:()=>({eq:async(col,val)=>{const r=await fetch(`${SB_URL}/rest/v1/${table}?${col}=eq.${encodeURIComponent(val)}`,{method:'DELETE',headers:SB_HEADERS});return{error:r.ok?null:await r.json()};}})
+    insert:async(rows)=>{
+      const h={...SB_HEADERS,"Prefer":"return=minimal"};
+      const r=await fetch(`${SB_URL}/rest/v1/${table}`,{method:'POST',headers:h,body:JSON.stringify(Array.isArray(rows)?rows:[rows])});
+      if(!r.ok){const d=await r.json();return{data:null,error:d};}
+      return{data:true,error:null};
+    },
+    upsert:async(row,opts={})=>{
+      const h={...SB_HEADERS,"Prefer":"resolution=merge-duplicates,return=minimal"};
+      if(opts.onConflict)h["Prefer"]+=`,on_conflict=${opts.onConflict}`;
+      const r=await fetch(`${SB_URL}/rest/v1/${table}`,{method:'POST',headers:h,body:JSON.stringify(row)});
+      if(!r.ok){const d=await r.json();return{data:null,error:d};}
+      return{data:true,error:null};
+    },
+    // ✅ FIX : Prefer return=minimal pour éviter les rejets RLS sur le retour
+    update:(updates)=>({
+      eq:async(col,val)=>{
+        const h={...SB_HEADERS,"Prefer":"return=minimal"};
+        const r=await fetch(`${SB_URL}/rest/v1/${table}?${col}=eq.${encodeURIComponent(val)}`,{method:'PATCH',headers:h,body:JSON.stringify(updates)});
+        if(!r.ok){
+          let d={};
+          try{d=await r.json();}catch(e){}
+          console.error(`[PATCH ${table}] status:${r.status}`,JSON.stringify(d));
+          return{data:null,error:d};
+        }
+        return{data:true,error:null};
+      }
+    }),
+    delete:()=>({
+      eq:async(col,val)=>{
+        const r=await fetch(`${SB_URL}/rest/v1/${table}?${col}=eq.${encodeURIComponent(val)}`,{method:'DELETE',headers:SB_HEADERS});
+        return{error:r.ok?null:await r.json()};
+      }
+    })
   })
 };
 
-let creations=[],currentZoom=null,currentDelete=null,currentChatUser=localStorage.getItem('currentChatUser')||null,userPhotos={};
+// ─── State ──────────────────────────────────────────────────────────────────
+let creations=[],currentZoom=null,currentDelete=null,
+    currentChatUser=localStorage.getItem('currentChatUser')||null,
+    userPhotos={};
+
 const ownerPhoto=document.getElementById('ownerPhoto');
 const prenom=localStorage.getItem('prenom');
 const myPrenom=prenom;
@@ -281,6 +342,7 @@ const fileInput=document.getElementById('multiPhoto');
 const fileInfo=document.getElementById('fileInfo');
 const zoomLegend=document.getElementById('zoomLegend');
 
+// ─── Drag/Zoom setup ────────────────────────────────────────────────────────
 mainZoom.addEventListener('mousedown',e=>e.stopPropagation());
 mainZoom.addEventListener('touchstart',e=>e.stopPropagation());
 zoomLegend.addEventListener('mousedown',e=>e.stopPropagation());
@@ -295,6 +357,7 @@ window.addEventListener('resize',()=>{
   }
 });
 
+// ─── Photo overlay ──────────────────────────────────────────────────────────
 ownerPhoto.addEventListener('click',()=>{
   const p=prenom||localStorage.getItem('prenom')||'';
   document.getElementById('overlayImg').src=ownerPhoto.src||'icon-152.png';
@@ -312,6 +375,7 @@ function loadOwnerPhoto(){
   else{ownerPhoto.src='icon-152.png';ownerPhoto.style.opacity='0.8';}
 }
 
+// ─── Messagerie ─────────────────────────────────────────────────────────────
 async function loadMessages(){
   if(!currentChatUser)return;
   const{data,error}=await supabase.from('messages').select('*').or(`and(sender.eq.${myPrenom},receiver.eq.${currentChatUser}),and(sender.eq.${currentChatUser},receiver.eq.${myPrenom})`).order('created_at',{ascending:true});
@@ -387,6 +451,7 @@ function showInAppNotification(sender,message){
 }
 if('Notification'in window&&Notification.permission!=='granted')Notification.requestPermission();
 
+// ─── Créations ──────────────────────────────────────────────────────────────
 async function refreshCreations(){
   try{
     const{data,error}=await supabase.from('creations').select('*').order('created_at',{ascending:false});
@@ -409,6 +474,7 @@ async function refreshCreations(){
   }catch(e){console.error('refreshCreations:',e?.message);}
 }
 
+// ─── Drag & pinch ────────────────────────────────────────────────────────────
 function makeDraggable(el,isLegend=false){
   let isDragging=false,startX,startY;
   el.dataset.x=el.dataset.x||0;el.dataset.y=el.dataset.y||0;el.dataset.scale=el.dataset.scale||1;
@@ -475,6 +541,7 @@ makeDraggable(mainZoom,false);makeDraggable(zoomLegend,true);
 makePinchZoom(mainZoom,false);makePinchZoom(zoomLegend,true);
 mainZoom.dataset.scale=1;
 
+// ─── Render ──────────────────────────────────────────────────────────────────
 function renderCreations(list){
   const container=document.getElementById('visitor-list-container');container.innerHTML='';
   let pageDiv=document.createElement('div');pageDiv.className='page';
@@ -506,12 +573,14 @@ function openZoom(c){
   document.body.classList.add('modal-open');document.body.style.overflow='hidden';
 }
 
+// ─── Likes ───────────────────────────────────────────────────────────────────
 document.getElementById('likeBtn').onclick=()=>{
   if(!currentZoom){alert("Sélectionnez d'abord une image!");return;}
   likeNameInput.value=myPrenom||'';
   renderLikeList();likeModal.style.display='flex';
 };
 
+// ✅ FIX likes : return=minimal + sync tableau local
 confirmLike.onclick=async()=>{
   if(!currentZoom)return;
   const name=likeNameInput.value.trim();if(!name)return;
@@ -519,18 +588,27 @@ confirmLike.onclick=async()=>{
   if(!currentZoom.likes.some(l=>l.name===name)){
     currentZoom.likes.push({name,photo:ownerPhoto.src||''});
   }
-  console.log('[LIKE] envoi id:',currentZoom.id,'data:',JSON.stringify(currentZoom.likes));
-  const{data,error}=await supabase.from('creations').update({likes:currentZoom.likes}).eq('id',currentZoom.id);
-  console.log('[LIKE] UPDATE result:', JSON.stringify(data), JSON.stringify(error));
-  renderLikeList();likeModal.style.display='none';
+  const{error}=await supabase.from('creations').update({likes:currentZoom.likes}).eq('id',currentZoom.id);
+  if(error){
+    console.error('[LIKE] Erreur sauvegarde:',JSON.stringify(error));
+    alert('Erreur like: '+JSON.stringify(error));
+    return;
+  }
+  // Sync tableau local pour que le prochain refreshCreations ne perde pas les données
+  const idx=creations.findIndex(x=>x.id===currentZoom.id);
+  if(idx!==-1)creations[idx].likes=[...currentZoom.likes];
+  renderLikeList();
+  likeModal.style.display='none';
 };
 
+// ─── Commentaires ─────────────────────────────────────────────────────────────
 document.getElementById('commentBtn').onclick=()=>{
   if(!currentZoom)return;
   commentNameInput.value=myPrenom||'';commentTextInput.value='';
   renderCommentList();commentModal.style.display='flex';
 };
 
+// ✅ FIX comments : return=minimal + sync tableau local
 confirmComment.onclick=async()=>{
   if(!currentZoom)return;
   const name=commentNameInput.value.trim();
@@ -538,10 +616,17 @@ confirmComment.onclick=async()=>{
   if(!name||!text)return;
   currentZoom.comments=currentZoom.comments||[];
   currentZoom.comments.push({name,text,photo:ownerPhoto.src||''});
-  console.log('[COMMENT] envoi id:',currentZoom.id,'data:',JSON.stringify(currentZoom.comments));
-  const{data,error}=await supabase.from('creations').update({comments:currentZoom.comments}).eq('id',currentZoom.id);
-  console.log('[COMMENT] UPDATE result:', JSON.stringify(data), JSON.stringify(error));
-  renderCommentList();commentTextInput.value='';
+  const{error}=await supabase.from('creations').update({comments:currentZoom.comments}).eq('id',currentZoom.id);
+  if(error){
+    console.error('[COMMENT] Erreur sauvegarde:',JSON.stringify(error));
+    alert('Erreur commentaire: '+JSON.stringify(error));
+    return;
+  }
+  // Sync tableau local
+  const idx=creations.findIndex(x=>x.id===currentZoom.id);
+  if(idx!==-1)creations[idx].comments=[...currentZoom.comments];
+  renderCommentList();
+  commentTextInput.value='';
   commentCount.textContent=currentZoom.comments.length;
 };
 
@@ -567,6 +652,7 @@ function renderCommentList(){
   commentCount.textContent=(currentZoom.comments||[]).length;
 }
 
+// ─── Ajout ──────────────────────────────────────────────────────────────────
 document.getElementById('addBtn').onclick=()=>addModal.style.display='flex';
 document.querySelector('#addModal .modal-box').addEventListener('click',e=>e.stopPropagation());
 addModal.addEventListener('click',e=>{
@@ -625,6 +711,7 @@ document.getElementById('confirmAdd').onclick=async()=>{
   }catch(error){alert('Erreur: '+error.message);}
 };
 
+// ─── Suppression ────────────────────────────────────────────────────────────
 function openDeleteModal(c){currentDelete=c;deleteModal.style.display='flex';}
 document.getElementById('cancelDelete').onclick=()=>{currentDelete=null;deleteModal.style.display='none';};
 document.getElementById('confirmDelete').onclick=async()=>{
@@ -633,6 +720,7 @@ document.getElementById('confirmDelete').onclick=async()=>{
   currentDelete=null;deleteModal.style.display='none';await refreshCreations();
 };
 
+// ─── Navigation ──────────────────────────────────────────────────────────────
 document.getElementById('pelotesBtn').onclick=()=>{document.body.style.opacity='0';setTimeout(()=>window.location.href='pelotes.html',500);};
 document.getElementById('videoBtn').onclick=()=>{document.body.style.opacity='0';setTimeout(()=>window.location.href='video.html',500);};
 document.getElementById('notesBtn').onclick=()=>{document.body.style.opacity='0';setTimeout(()=>window.location.href='notes.html',500);};
@@ -640,13 +728,15 @@ document.getElementById('messagerieBtn').onclick=()=>{chatModal.style.display='f
 document.getElementById('actualiteBtn').onclick=()=>{document.body.style.opacity='0';setTimeout(()=>window.location.href='actualite.html',500);};
 document.getElementById('toggleSidebar').onclick=()=>sidebar.classList.toggle('sidebar-open');
 
+// ─── Fermeture modals ────────────────────────────────────────────────────────
 chatModal.addEventListener('click',(e)=>{if(e.target===chatModal)chatModal.style.display='none';});
 document.querySelector('.chat-window').addEventListener('click',(e)=>e.stopPropagation());
 [zoomModal,likeModal,commentModal,deleteModal].forEach(m=>{
-  m.onclick=e=>{if(e.target===m){m.style.display='none';if(m===zoomModal)document.body.style.overflow='';}};
+  m.onclick=e=>{if(e.target===m){m.style.display='none';if(m===zoomModal){document.body.classList.remove('modal-open');document.body.style.overflow='';}}};
 });
-document.querySelector('.closeZoom').onclick=()=>{zoomModal.style.display='none';document.body.style.overflow='';};
+document.querySelector('.closeZoom').onclick=()=>{zoomModal.style.display='none';document.body.classList.remove('modal-open');document.body.style.overflow='';};
 
+// ─── Chat resize ─────────────────────────────────────────────────────────────
 toggleChatSize.onclick=()=>{
   chatModal.classList.toggle('expanded');
   icon.innerHTML=chatModal.classList.contains('expanded')
@@ -665,6 +755,7 @@ chatModal.addEventListener('touchmove',e=>{
 });
 chatModal.addEventListener('touchend',()=>{initialDistance=null;});
 
+// ─── Init ────────────────────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded',loadOwnerPhoto);
 window.addEventListener('pageshow',loadOwnerPhoto);
 refreshCreations();
