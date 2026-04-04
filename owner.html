@@ -556,7 +556,7 @@ document.getElementById('confirmAdd').onclick=async()=>{
       }
     }
     if(!imageUrls.length){alert('Aucune image uploadée avec succès');return;}
-    const{error:insertError}=await supabase.from('creations').insert([{name,legend:legend||'',image_path:imageUrls[0],images:imageUrls,likes:[],comments:[],x:0,y:0,scale:1,x_legend:0,y_legend:0,scale_legend:1}]);
+    const{error:insertError}=await supabase.from('creations').insert([{name,legend:legend||'',image_path:imageUrls[0],images:imageUrls,x:0,y:0,scale:1,x_legend:0,y_legend:0,scale_legend:1}]);
     if(insertError){console.error('Insert error:',insertError);alert('Erreur insertion: '+insertError.message);return;}
     addModal.style.display='none';document.getElementById('photoName').value='';document.getElementById('photoLegend').value='';document.getElementById('multiPhoto').value='';fileInfo.textContent='';
     await refreshCreations();
