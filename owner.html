@@ -18,7 +18,7 @@ html,body{height:100%;overflow-x:hidden;}
 /* ✅ FIX ZOOM iOS/Safari : font-size 16px sur tous les inputs */
 input, textarea, select { font-size: 16px !important; }
 
-body::before{content:””;position:fixed;top:0;left:0;width:100vw;height:100vh;background-image:url(‘Photoroom_20251223_114401.jpeg’);background-size:cover;background-position:center center;background-repeat:no-repeat;z-index:-1;}
+/* ✅ fond géré par un div#bg, plus de body::before */
 .center-zone{display:flex;justify-content:center;align-items:flex-start;padding-top:4.5cm;overflow:hidden;height:auto;}
 #visitor-list-container{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;justify-content:center;padding-left:1cm;}
 .page{display:grid;grid-template-columns:repeat(2,1fr);grid-template-rows:repeat(3,1fr);column-gap:3mm;row-gap:4mm;flex:0 0 auto;width:calc(2*200px+3mm);height:calc(3*200px+8mm);scroll-snap-align:center;padding:4mm;justify-content:center;margin-top:0;}
@@ -69,7 +69,7 @@ body::before{content:””;position:fixed;top:0;left:0;width:100vw;height:100vh
 .msg-me{background:#ffb6c1;align-self:flex-end;}
 .msg-them{background:#ffffff;border:1px solid #f3b3c8;}
 .chat-input{display:flex;padding:4px;gap:4px;}
-.chat-input input{flex:1;border-radius:10px;border:2px solid #b67385;padding:4px 6px;font-size:12px;}
+.chat-input input{flex:1;border-radius:10px;border:2px solid #b67385;padding:4px 6px;}
 .chat-icon-btn{background:transparent;border:none;cursor:pointer;padding:2px;display:flex;align-items:center;}
 .expanded .chat-window{width:720px;height:460px;border-radius:24px;}
 body.modal-open{overflow:hidden;touch-action:none;}
@@ -99,6 +99,10 @@ body.modal-open{overflow:hidden;touch-action:none;}
 
 </head>
 <body>
+
+<!-- ✅ Fond d'écran en vrai div — stable sur Safari iOS, résiste au resetViewport -->
+
+<div id="bg" style="position:fixed;top:0;left:0;width:100vw;height:100vh;background-image:url('Photoroom_20251223_114401.jpeg');background-size:cover;background-position:center center;background-repeat:no-repeat;z-index:-1;pointer-events:none;"></div>
 
 <img id="ownerPhoto" alt="Owner">
 
@@ -215,7 +219,7 @@ const SB_URL="https://kdgxbmqwhpuctjtlygrt.supabase.co";
 const SB_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtkZ3hibXF3aHB1Y3RqdGx5Z3J0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUyMjY0NzQsImV4cCI6MjA5MDgwMjQ3NH0.9RsIj_bQgJskg9raRGN6uQJwUUlByTvWAFF2Eq9f6KM";
 const SB_HEADERS={"apikey":SB_KEY,"Authorization":"Bearer "+SB_KEY,"Content-Type":"application/json"};
 
-// ✅ FIX ZOOM iOS/Safari universel
+// ✅ FIX ZOOM iOS/Safari — reset viewport après fermeture du clavier
 function resetViewport() {
   setTimeout(() => {
     const meta = document.querySelector('meta[name="viewport"]');
@@ -223,6 +227,9 @@ function resetViewport() {
     meta.setAttribute('content', 'width=device-width, initial-scale=1.0, maximum-scale=1.0');
     setTimeout(() => {
       meta.setAttribute('content', 'width=device-width, initial-scale=1.0');
+      // ✅ Force le fond à rester visible après reset viewport Safari
+      const bg = document.getElementById('bg');
+      if (bg) { bg.style.display = 'none'; bg.offsetHeight; bg.style.display = ''; }
     }, 50);
   }, 150);
 }
@@ -457,16 +464,12 @@ function openZoom(c){
   currentZoom=creations.find(x=>x.id===c.id);if(!currentZoom)return;
   mainZoom.src=currentZoom.imgUrl||'';
   zoomLegend.textContent=currentZoom.legend||'Aucune légende';
-
   const x=currentZoom.x||0,y=currentZoom.y||0,s=currentZoom.scale||1;
   const xl=currentZoom.x_legend||0,yl=currentZoom.y_legend||0,sl=currentZoom.scale_legend||1;
-
   mainZoom.dataset.x=x;mainZoom.dataset.y=y;mainZoom.dataset.scale=s;
   mainZoom.style.transform=`translate(${x}px,${y}px) scale(${s})`;
-
   zoomLegend.dataset.x=xl;zoomLegend.dataset.y=yl;zoomLegend.dataset.scale=sl;
   zoomLegend.style.transform=`translate(${xl}px,${yl}px) scale(${sl})`;
-
   thumbs.innerHTML='';(currentZoom.zoomGroup||[]).forEach(u=>{const t=document.createElement('img');t.src=u;t.onclick=()=>mainZoom.src=u;thumbs.appendChild(t);});
   renderLikeList();renderCommentList();
   zoomModal.style.display='flex';document.body.classList.add('modal-open');document.body.style.overflow='hidden';
