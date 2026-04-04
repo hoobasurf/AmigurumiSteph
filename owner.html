@@ -14,14 +14,18 @@
 <style>
 * { box-sizing:border-box;margin:0;padding:0;font-family:'Comic Sans MS',cursive; }
 html,body{height:100%;overflow-x:hidden;}
-body::before{content:"";position:fixed;top:0;left:0;width:100vw;height:100vh;background-image:url('Photoroom_20251223_114401.jpeg');background-size:cover;background-position:center center;background-repeat:no-repeat;z-index:-1;}
+
+/* ✅ FIX ZOOM iOS/Safari : font-size 16px sur tous les inputs */
+input, textarea, select { font-size: 16px !important; }
+
+body::before{content:””;position:fixed;top:0;left:0;width:100vw;height:100vh;background-image:url(‘Photoroom_20251223_114401.jpeg’);background-size:cover;background-position:center center;background-repeat:no-repeat;z-index:-1;}
 .center-zone{display:flex;justify-content:center;align-items:flex-start;padding-top:4.5cm;overflow:hidden;height:auto;}
 #visitor-list-container{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;justify-content:center;padding-left:1cm;}
 .page{display:grid;grid-template-columns:repeat(2,1fr);grid-template-rows:repeat(3,1fr);column-gap:3mm;row-gap:4mm;flex:0 0 auto;width:calc(2*200px+3mm);height:calc(3*200px+8mm);scroll-snap-align:center;padding:4mm;justify-content:center;margin-top:0;}
 .visitor-item{position:relative;width:200px;height:200px;border-radius:12px;overflow:hidden;border:3px solid #fff;box-shadow:0 0 0 3px #f6c2d1,0 6px 14px rgba(0,0,0,0.25),inset 0 0 0 1px rgba(255,255,255,0.4);background:#ffe6f0;}
 .visitor-item img{width:100%;height:100%;object-fit:cover;border-radius:12px;cursor:pointer;display:block;filter:brightness(1.05) contrast(1.05) saturate(0.95);transition:filter 0.3s,transform 0.3s;position:relative;z-index:2;}
 .visitor-item img:hover{transform:scale(1.03);}
-.visitor-item::after{content:"";position:absolute;inset:0;background:rgba(255,230,240,0.12);pointer-events:none;z-index:1;}
+.visitor-item::after{content:””;position:absolute;inset:0;background:rgba(255,230,240,0.12);pointer-events:none;z-index:1;}
 .visitor-item p{position:absolute;bottom:2px;width:100%;font-size:14px;color:#b84c6f;font-weight:bold;text-align:center;text-shadow:1px 1px 2px rgba(255,255,255,0.8);z-index:3;}
 .delete-btn{position:absolute;top:6px;right:6px;width:24px;height:24px;background:#ffb6c1;color:#fff;border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:bold;cursor:pointer;z-index:5;font-size:16px;transition:transform 0.2s,box-shadow 0.2s;}
 .delete-btn:hover{transform:scale(1.2);box-shadow:0 2px 6px rgba(0,0,0,0.25);}
@@ -31,7 +35,7 @@ body::before{content:"";position:fixed;top:0;left:0;width:100vw;height:100vh;bac
 #sidebar button{width:auto;padding:8px 16px;border-radius:16px;border:none;background:#ffb6c1;color:#fff;cursor:pointer;font-weight:bold;display:block;margin-top:10px;}
 #sidebar button:hover{transform:scale(1.03);}
 .modal{position:fixed;inset:0;background:rgba(0,0,0,0.6);display:none;justify-content:center;align-items:center;z-index:10001;}
-.modal .modal-box{background:#ffe6f0;padding:16px 24px;border-radius:20px;border:3px solid #b67385;display:flex;flex-direction:column;gap:10px;align-items:center;min-width:200px;font-family:'Comic Sans MS',cursive;}
+.modal .modal-box{background:#ffe6f0;padding:16px 24px;border-radius:20px;border:3px solid #b67385;display:flex;flex-direction:column;gap:10px;align-items:center;min-width:200px;font-family:‘Comic Sans MS’,cursive;}
 .modal input{padding:6px 12px;border-radius:10px;border:2px solid #b67385;width:100%;}
 .modal button{padding:6px 14px;border:none;background:#ffb6c1;color:#fff;border-radius:12px;cursor:pointer;font-weight:bold;width:100%;}
 #zoomModal{position:fixed;inset:0;background:rgba(0,0,0,0.7);display:none;justify-content:center;align-items:center;flex-direction:column;z-index:10000;overflow:hidden;}
@@ -46,7 +50,7 @@ body::before{content:"";position:fixed;top:0;left:0;width:100vw;height:100vh;bac
 .icon-btn{background:none!important;border:none;padding:4px;display:flex;align-items:center;justify-content:center;cursor:pointer;}
 .icon-btn svg{background:none!important;fill:none;stroke:#b84c6f;width:22px;height:22px;transition:transform 0.2s;}
 .icon-btn:hover svg{transform:scale(1.2);}
-#likeCount,#commentCount{font-family:'Courier New',monospace;font-weight:bold;color:#b84c6f;font-size:14px;min-width:18px;}
+#likeCount,#commentCount{font-family:‘Courier New’,monospace;font-weight:bold;color:#b84c6f;font-size:14px;min-width:18px;}
 #ownerPhoto{width:76px;height:76px;border-radius:50%;position:fixed;top:10px;right:10px;z-index:10000;background:#ffe6f0;border:3px solid #b84c6f;cursor:pointer;box-shadow:0 2px 12px rgba(184,76,111,0.3);transition:transform 0.2s;object-fit:cover;}
 #ownerPhoto:hover{transform:scale(1.08);}
 .pink-file-btn{background:linear-gradient(#ffd6e6,#ffb6c1);border:2px solid #b67385;border-radius:16px;padding:8px 14px;color:#b84c6f;font-weight:bold;cursor:pointer;width:100%;transition:transform 0.15s,box-shadow 0.15s;}
@@ -74,8 +78,8 @@ body.modal-open{overflow:hidden;touch-action:none;}
 .visitor-item{width:120px;height:120px;}
 .modal .modal-box{min-width:180px;}
 }
-#photoOverlay{display:none;position:fixed;inset:0;z-index:99999;background-image:url('DF7FFC0E-2321-4B88-8667-F6079CE30D5A.png');background-size:cover;background-position:center;justify-content:center;align-items:center;flex-direction:column;gap:28px;cursor:pointer;}
-#photoOverlay::before{content:'';position:absolute;inset:0;background:rgba(0,0,0,0.35);backdrop-filter:blur(2px);}
+#photoOverlay{display:none;position:fixed;inset:0;z-index:99999;background-image:url(‘DF7FFC0E-2321-4B88-8667-F6079CE30D5A.png’);background-size:cover;background-position:center;justify-content:center;align-items:center;flex-direction:column;gap:28px;cursor:pointer;}
+#photoOverlay::before{content:’’;position:absolute;inset:0;background:rgba(0,0,0,0.35);backdrop-filter:blur(2px);}
 #photoOverlay.visible{display:flex;}
 #photoOverlay>*{position:relative;z-index:1;}
 .overlay-ring-wrap{position:relative;width:220px;height:220px;display:flex;align-items:center;justify-content:center;animation:popIn 0.5s cubic-bezier(0.34,1.56,0.64,1) both;}
@@ -86,12 +90,13 @@ body.modal-open{overflow:hidden;touch-action:none;}
 @keyframes ringPulse{0%{opacity:0.6;transform:scale(0.9);}100%{opacity:0;transform:scale(1.15);}}
 #overlayImg{width:200px;height:200px;border-radius:50%;object-fit:cover;border:4px solid #ffb6c1;box-shadow:0 0 50px rgba(255,100,150,0.7),0 0 100px rgba(255,100,150,0.3);position:relative;z-index:2;}
 @keyframes popIn{from{transform:scale(0.1) rotateY(90deg);opacity:0;}to{transform:scale(1) rotateY(0deg);opacity:1;}}
-#overlayPrenom{font-family:'Georgia','Palatino',serif;font-size:54px;font-weight:normal;font-style:italic;letter-spacing:8px;color:#ffe6f0;-webkit-text-stroke:1.5px #1a0005;text-shadow:0 1px 0 #c8637a,0 2px 0 #b84c6f,0 3px 0 #a03060,0 4px 0 #8a1a40,0 5px 8px rgba(0,0,0,0.6),0 10px 20px rgba(0,0,0,0.4);animation:prenomIn 0.7s 0.2s cubic-bezier(0.34,1.56,0.64,1) both,prenomFloat 5s 1s ease-in-out infinite;}
+#overlayPrenom{font-family:‘Georgia’,‘Palatino’,serif;font-size:54px;font-weight:normal;font-style:italic;letter-spacing:8px;color:#ffe6f0;-webkit-text-stroke:1.5px #1a0005;text-shadow:0 1px 0 #c8637a,0 2px 0 #b84c6f,0 3px 0 #a03060,0 4px 0 #8a1a40,0 5px 8px rgba(0,0,0,0.6),0 10px 20px rgba(0,0,0,0.4);animation:prenomIn 0.7s 0.2s cubic-bezier(0.34,1.56,0.64,1) both,prenomFloat 5s 1s ease-in-out infinite;}
 @keyframes prenomIn{from{transform:translateY(30px) scale(0.6);opacity:0;}to{transform:translateY(0) scale(1);opacity:1;}}
 @keyframes prenomFloat{0%,100%{transform:translateY(0) rotate(-1deg);}50%{transform:translateY(-9px) rotate(1deg);}}
-#overlayHint{font-size:11px;color:rgba(255,230,240,0.5);letter-spacing:3px;font-family:'Georgia',serif;font-style:italic;animation:fadeIn 1.5s 1s ease both;}
+#overlayHint{font-size:11px;color:rgba(255,230,240,0.5);letter-spacing:3px;font-family:‘Georgia’,serif;font-style:italic;animation:fadeIn 1.5s 1s ease both;}
 @keyframes fadeIn{from{opacity:0}to{opacity:1}}
 </style>
+
 </head>
 <body>
 
@@ -209,6 +214,19 @@ body.modal-open{overflow:hidden;touch-action:none;}
 const SB_URL="https://kdgxbmqwhpuctjtlygrt.supabase.co";
 const SB_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtkZ3hibXF3aHB1Y3RqdGx5Z3J0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUyMjY0NzQsImV4cCI6MjA5MDgwMjQ3NH0.9RsIj_bQgJskg9raRGN6uQJwUUlByTvWAFF2Eq9f6KM";
 const SB_HEADERS={"apikey":SB_KEY,"Authorization":"Bearer "+SB_KEY,"Content-Type":"application/json"};
+
+// ✅ FIX ZOOM iOS/Safari universel
+function resetViewport() {
+  setTimeout(() => {
+    const meta = document.querySelector('meta[name="viewport"]');
+    if (!meta) return;
+    meta.setAttribute('content', 'width=device-width, initial-scale=1.0, maximum-scale=1.0');
+    setTimeout(() => {
+      meta.setAttribute('content', 'width=device-width, initial-scale=1.0');
+    }, 50);
+  }, 150);
+}
+document.addEventListener('focusout', resetViewport);
 
 function parseJsonField(val){
   if(Array.isArray(val))return val;
@@ -377,7 +395,6 @@ async function refreshCreations(){
   }catch(e){console.error('refreshCreations:',e?.message);}
 }
 
-// ✅ debounce : sauvegarde 600ms après le dernier mouvement
 let saveTimeout=null;
 async function savePosition(x,y,isLegend){
   if(!currentZoom||!currentZoom.id)return;
@@ -394,7 +411,6 @@ async function savePosition(x,y,isLegend){
       currentZoom.scale=parseFloat(mainZoom.dataset.scale)||1;
       await supabase.from('creations').update({x:currentZoom.x,y:currentZoom.y,scale:currentZoom.scale}).eq('id',currentZoom.id);
     }
-    // Sync tableau local
     const idx=creations.findIndex(c=>c.id===currentZoom.id);
     if(idx!==-1){
       if(isLegend){creations[idx].x_legend=currentZoom.x_legend;creations[idx].y_legend=currentZoom.y_legend;creations[idx].scale_legend=currentZoom.scale_legend;}
@@ -437,7 +453,6 @@ function renderCreations(list){
   if(pageDiv.children.length>0)container.appendChild(pageDiv);
 }
 
-// ✅ openZoom restaure la position/zoom sauvegardée au lieu de tout remettre à 0
 function openZoom(c){
   currentZoom=creations.find(x=>x.id===c.id);if(!currentZoom)return;
   mainZoom.src=currentZoom.imgUrl||'';
