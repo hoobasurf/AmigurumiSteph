@@ -51,8 +51,31 @@ input, textarea, select { font-size: 16px !important; }
 .icon-btn svg{background:none!important;fill:none;stroke:#b84c6f;width:22px;height:22px;transition:transform 0.2s;}
 .icon-btn:hover svg{transform:scale(1.2);}
 #likeCount,#commentCount{font-family:‘Courier New’,monospace;font-weight:bold;color:#b84c6f;font-size:14px;min-width:18px;}
-#ownerPhoto{width:76px;height:76px;border-radius:50%;position:fixed;top:10px;right:10px;z-index:10000;background:#ffe6f0;border:3px solid #b84c6f;cursor:pointer;box-shadow:0 2px 12px rgba(184,76,111,0.3);transition:transform 0.2s;object-fit:cover;}
+#ownerPhoto{width:76px;height:76px;border-radius:50%;position:fixed;top:10px;right:10px;z-index:10000;background:#ffe6f0;border:3px solid #b84c6f;cursor:pointer;box-shadow:0 2px 12px rgba(184,76,111,0.3);transition:transform 0.2s,box-shadow 0.3s;object-fit:cover;}
 #ownerPhoto:hover{transform:scale(1.08);}
+
+/* Anneau de progression pour le long press */
+#ownerProgressRing{
+position:fixed;top:6px;right:6px;
+width:84px;height:84px;
+border-radius:50%;
+pointer-events:none;
+z-index:10001;
+opacity:0;
+transition:opacity 0.2s;
+}
+#ownerProgressRing circle{
+fill:none;
+stroke:#b84c6f;
+stroke-width:3;
+stroke-linecap:round;
+stroke-dasharray:251;
+stroke-dashoffset:251;
+transform:rotate(-90deg);
+transform-origin:50% 50%;
+transition:stroke-dashoffset 0.05s linear;
+}
+
 .pink-file-btn{background:linear-gradient(#ffd6e6,#ffb6c1);border:2px solid #b67385;border-radius:16px;padding:8px 14px;color:#b84c6f;font-weight:bold;cursor:pointer;width:100%;transition:transform 0.15s,box-shadow 0.15s;}
 .pink-file-btn:hover{transform:scale(1.03);box-shadow:0 4px 10px rgba(0,0,0,0.15);}
 .chat-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.4);display:none;justify-content:center;align-items:center;z-index:20000;}
@@ -105,6 +128,12 @@ body.modal-open{overflow:hidden;touch-action:none;}
 <div id="bg" style="position:fixed;top:0;left:0;width:100vw;height:100vh;background-image:url('Photoroom_20251223_114401.jpeg');background-size:cover;background-position:center center;background-repeat:no-repeat;z-index:-1;pointer-events:none;"></div>
 
 <img id="ownerPhoto" alt="Owner">
+
+<!-- Anneau de progression long press -->
+
+<svg id="ownerProgressRing" viewBox="0 0 84 84">
+  <circle cx="42" cy="42" r="40"/>
+</svg>
 
 <div id="photoOverlay">
   <div class="overlay-ring-wrap">
@@ -227,7 +256,6 @@ function resetViewport() {
     meta.setAttribute('content', 'width=device-width, initial-scale=1.0, maximum-scale=1.0');
     setTimeout(() => {
       meta.setAttribute('content', 'width=device-width, initial-scale=1.0');
-      // ✅ Force le fond à rester visible après reset viewport Safari
       const bg = document.getElementById('bg');
       if (bg) { bg.style.display = 'none'; bg.offsetHeight; bg.style.display = ''; }
     }, 50);
@@ -297,6 +325,8 @@ const fileBtn=document.getElementById('fileBtn');
 const fileInput=document.getElementById('multiPhoto');
 const fileInfo=document.getElementById('fileInfo');
 const zoomLegend=document.getElementById('zoomLegend');
+const progressRing=document.getElementById('ownerProgressRing');
+const progressCircle=progressRing.querySelector('circle');
 
 mainZoom.addEventListener('mousedown',e=>e.stopPropagation());
 mainZoom.addEventListener('touchstart',e=>e.stopPropagation());
@@ -312,14 +342,134 @@ window.addEventListener('resize',()=>{
   }
 });
 
-ownerPhoto.addEventListener('click',()=>{
-  document.getElementById('overlayImg').src=ownerPhoto.src||'icon-152.png';
-  document.getElementById('overlayPrenom').textContent=prenom||'';
+// =============================================
+// OWNER PHOTO — click = overlay, long press 2s = changer photo
+// =============================================
+
+// Input fichier caché pour changer la photo owner
+const ownerFileInput = document.createElement('input');
+ownerFileInput.type = 'file';
+ownerFileInput.accept = 'image/*';
+ownerFileInput.style.display = 'none';
+document.body.appendChild(ownerFileInput);
+
+ownerFileInput.onchange = async () => {
+  const file = ownerFileInput.files[0];
+  if (!file) return;
+  try {
+    const compressed = await new Promise(resolve => {
+      const reader = new FileReader();
+      reader.onload = e2 => {
+        const img = new Image();
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          let w = img.width, h = img.height, max = 400;
+          if (w > h && w > max) { h = h * max / w; w = max; }
+          else if (h > max) { w = w * max / h; h = max; }
+          canvas.width = w; canvas.height = h;
+          canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+          canvas.toBlob(blob => resolve(new File([blob], 'photo.jpg', { type: 'image/jpeg' })), 'image/jpeg', 0.8);
+        };
+        img.src = e2.target.result;
+      };
+      reader.readAsDataURL(file);
+    });
+
+    const formData = new FormData();
+    formData.append('image', compressed);
+    const res = await fetch('https://api.imgbb.com/1/upload?key=1612fdd94e39f24c3d14f1864f41d591', { method: 'POST', body: formData });
+    const json = await res.json();
+    if (!json.success) throw new Error('ImgBB error');
+
+    const url = json.data.url;
+    ownerPhoto.src = url;
+    localStorage.setItem('photo_url', url);
+    if (prenom) localStorage.setItem('photo_url_' + prenom, url);
+
+    // Sauvegarde dans Supabase
+    if (prenom) {
+      await supabase.from('profiles').upsert({ prenom, photo_url: url }, { onConflict: 'prenom' });
+    }
+  } catch (err) {
+    alert('Erreur upload photo : ' + (err?.message || err));
+  }
+};
+
+// --- Long press logic ---
+let ownerLongPressTimer = null;
+let ownerLongPressed = false;
+let ownerProgressInterval = null;
+const LONG_PRESS_DURATION = 2000; // 2 secondes
+const CIRCUMFERENCE = 251; // 2 * PI * 40
+
+function startOwnerLongPress() {
+  ownerLongPressed = false;
+  let elapsed = 0;
+  const step = 30;
+
+  // Affiche l'anneau
+  progressRing.style.opacity = '1';
+  progressCircle.style.strokeDashoffset = CIRCUMFERENCE;
+
+  ownerProgressInterval = setInterval(() => {
+    elapsed += step;
+    const progress = Math.min(elapsed / LONG_PRESS_DURATION, 1);
+    progressCircle.style.strokeDashoffset = CIRCUMFERENCE * (1 - progress);
+  }, step);
+
+  ownerLongPressTimer = setTimeout(() => {
+    ownerLongPressed = true;
+    clearInterval(ownerProgressInterval);
+    ownerProgressInterval = null;
+
+    // Feedback visuel flash
+    ownerPhoto.style.transform = 'scale(1.15)';
+    ownerPhoto.style.boxShadow = '0 0 0 4px #b84c6f, 0 0 20px rgba(184,76,111,0.5)';
+    setTimeout(() => {
+      ownerPhoto.style.transform = '';
+      ownerPhoto.style.boxShadow = '';
+      progressRing.style.opacity = '0';
+      progressCircle.style.strokeDashoffset = CIRCUMFERENCE;
+    }, 300);
+
+    ownerFileInput.click();
+  }, LONG_PRESS_DURATION);
+}
+
+function cancelOwnerLongPress() {
+  clearTimeout(ownerLongPressTimer);
+  clearInterval(ownerProgressInterval);
+  ownerProgressInterval = null;
+  progressRing.style.opacity = '0';
+  progressCircle.style.strokeDashoffset = CIRCUMFERENCE;
+}
+
+// Mouse events
+ownerPhoto.addEventListener('mousedown', startOwnerLongPress);
+ownerPhoto.addEventListener('mouseup', cancelOwnerLongPress);
+ownerPhoto.addEventListener('mouseleave', cancelOwnerLongPress);
+
+// Touch events (preventDefault pour bloquer le menu contextuel iOS)
+ownerPhoto.addEventListener('touchstart', e => {
+  e.preventDefault();
+  startOwnerLongPress();
+}, { passive: false });
+ownerPhoto.addEventListener('touchend', cancelOwnerLongPress);
+ownerPhoto.addEventListener('touchcancel', cancelOwnerLongPress);
+
+// Click — ouvre l'overlay si ce n'est pas un long press
+ownerPhoto.addEventListener('click', () => {
+  if (ownerLongPressed) { ownerLongPressed = false; return; }
+  document.getElementById('overlayImg').src = ownerPhoto.src || 'icon-152.png';
+  document.getElementById('overlayPrenom').textContent = prenom || '';
   document.getElementById('photoOverlay').classList.add('visible');
 });
-document.getElementById('photoOverlay').addEventListener('click',()=>{
+
+document.getElementById('photoOverlay').addEventListener('click', () => {
   document.getElementById('photoOverlay').classList.remove('visible');
 });
+
+// =============================================
 
 function loadOwnerPhoto(){
   const p=prenom||localStorage.getItem('prenom');
