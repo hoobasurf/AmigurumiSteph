@@ -194,6 +194,20 @@ pointer-events:none;z-index:2;
 #closeTiktok{position:fixed;top:14px;left:14px;width:38px;height:38px;background:rgba(13,0,8,0.6);backdrop-filter:blur(8px);border:2px solid rgba(255,182,193,0.5);border-radius:50%;display:none;align-items:center;justify-content:center;color:#ffe6f0;font-size:20px;font-weight:bold;cursor:pointer;z-index:50001;transition:transform 0.2s,background 0.2s;}
 #closeTiktok.visible{display:flex;}
 #closeTiktok:hover{transform:scale(1.12);background:rgba(255,45,120,0.45);}
+
+/* ===== MODAL NOTIFICATIONS ===== */
+#notifModal{position:fixed;inset:0;background:rgba(0,0,0,0.6);display:none;justify-content:center;align-items:center;z-index:199999;}
+#notifModal.visible{display:flex;}
+#notifBox{background:#ffe6f0;border:3px solid #b67385;border-radius:24px;padding:24px;max-width:300px;width:90%;display:flex;flex-direction:column;align-items:center;gap:14px;font-family:‘Comic Sans MS’,cursive;text-align:center;}
+#notifBox h3{color:#b84c6f;font-size:18px;}
+#notifBox p{color:#b84c6f;font-size:13px;line-height:1.5;}
+#notifStatusIcon{font-size:44px;}
+.notif-btn-yes{background:linear-gradient(#ffd6e6,#ffb6c1);border:2px solid #b67385;border-radius:14px;padding:10px 24px;color:#b84c6f;font-weight:bold;font-size:15px;cursor:pointer;width:100%;font-family:‘Comic Sans MS’,cursive;}
+.notif-btn-no{background:none;border:none;color:rgba(184,76,111,0.5);font-size:12px;cursor:pointer;font-family:‘Comic Sans MS’,cursive;margin-top:-6px;}
+#notifBellBtn{position:fixed;bottom:24px;right:20px;width:50px;height:50px;border-radius:50%;background:linear-gradient(135deg,#ffd6e6,#ffb6c1);border:2px solid #b67385;box-shadow:0 2px 12px rgba(184,76,111,0.4);display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:10000;font-size:22px;transition:transform 0.2s;position:fixed;}
+#notifBellBtn:hover{transform:scale(1.1);}
+.notif-dot{position:absolute;top:4px;right:4px;width:11px;height:11px;border-radius:50%;background:#ff2d78;border:2px solid #fff;display:none;}
+.notif-dot.show{display:block;}
 </style>
 
 </head>
@@ -553,7 +567,7 @@ async function loadMessages(){
   data.forEach(msg=>{const div=document.createElement('div');div.className='msg '+(msg.sender===myPrenom?'msg-me':'msg-them');const circle=document.createElement('img');circle.style.cssText='width:24px;height:24px;border-radius:50%;margin-right:6px;vertical-align:middle;';circle.src=msg.sender===myPrenom?ownerPhoto.src||'icon-152.png':userPhotos[msg.sender]||'icon-152.png';const p=document.createElement('p');p.style.cssText='display:inline-block;margin:0;';p.textContent=msg.content;div.appendChild(circle);div.appendChild(p);chatMessages.appendChild(div);});
   chatMessages.scrollTop=chatMessages.scrollHeight;
 }
-sendMsgBtn.onclick=async()=>{const text=chatInput.value.trim();if(!text||!currentChatUser)return;await supabase.from('messages').insert({sender:myPrenom,receiver:currentChatUser,content:text});chatInput.value='';loadMessages();};
+sendMsgBtn.onclick=async()=>{const text=chatInput.value.trim();if(!text||!currentChatUser)return;await supabase.from('messages').insert({sender:myPrenom,receiver:currentChatUser,content:text});chatInput.value='';loadMessages();if(window.sendPushToUser)window.sendPushToUser(myPrenom||'Message',text,'owner.html');};
 let lastMsgId=null;
 setInterval(async()=>{if(!currentChatUser||!prenom)return;try{const{data}=await supabase.from('messages').select('*').eq('receiver',prenom).order('created_at',{ascending:false}).limit(1);if(data&&data[0]&&data[0].id!==lastMsgId){lastMsgId=data[0].id;const msg=data[0];if(msg.sender!==currentChatUser)showInAppNotification(msg.sender,msg.content);else loadMessages();}}catch(e){}},5000);
 async function loadChatUsers(){
@@ -799,6 +813,131 @@ window.addEventListener('pageshow',loadOwnerPhoto);
 refreshCreations();
 loadOwnerPhoto();
 loadChatUsers();
+</script>
+
+<!-- ===== MODAL NOTIFICATIONS ===== -->
+
+<div id="notifModal">
+  <div id="notifBox">
+    <div id="notifStatusIcon">🔔</div>
+    <h3>Notifications</h3>
+    <p id="notifStatusText">Recevez une alerte quand vous avez un nouveau message, même quand l'appli est fermée.</p>
+    <button class="notif-btn-yes" id="notifAllowBtn">Activer les notifications</button>
+    <button class="notif-btn-no" id="notifCloseBtn">Plus tard</button>
+  </div>
+</div>
+<button id="notifBellBtn" style="position:fixed;bottom:24px;right:20px;">
+  🔔<span class="notif-dot" id="notifDot"></span>
+</button>
+
+<script>
+// ===== SERVICE WORKER + PUSH NOTIFICATIONS =====
+const VAPID_PUBLIC_KEY = "BMTXkLk1z_pw1QYTR5v8ZJhmHud9HTRbTSUyrAN-XMsPYSSTIQY6srLkALsriF5pCd3PaBlsG_jNEJ1IC1h_7JI"; // remplacé automatiquement
+
+function urlBase64ToUint8Array(b64) {
+  const pad = '='.repeat((4 - b64.length % 4) % 4);
+  const base64 = (b64 + pad).replace(/-/g, '+').replace(/_/g, '/');
+  return Uint8Array.from(atob(base64), c => c.charCodeAt(0));
+}
+
+const SB_URL_N = "https://kdgxbmqwhpuctjtlygrt.supabase.co";
+const SB_KEY_N = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtkZ3hibXF3aHB1Y3RqdGx5Z3J0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUyMjY0NzQsImV4cCI6MjA5MDgwMjQ3NH0.9RsIj_bQgJskg9raRGN6uQJwUUlByTvWAFF2Eq9f6KM";
+
+async function saveSubscription(sub) {
+  const j = sub.toJSON();
+  await fetch(`${SB_URL_N}/rest/v1/push_subscriptions`, {
+    method: 'POST',
+    headers: { 'apikey': SB_KEY_N, 'Authorization': 'Bearer ' + SB_KEY_N, 'Content-Type': 'application/json', 'Prefer': 'resolution=merge-duplicates,return=minimal' },
+    body: JSON.stringify({ endpoint: j.endpoint, p256dh: j.keys.p256dh, auth: j.keys.auth })
+  });
+}
+
+async function subscribeIfGranted(reg) {
+  try {
+    let sub = await reg.pushManager.getSubscription();
+    if (!sub) sub = await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY) });
+    await saveSubscription(sub);
+  } catch(e) { console.warn('Subscribe error:', e); }
+}
+
+// Envoie notif push à un utilisateur (appelé après envoi de message)
+window.sendPushToUser = async function(title, body, url) {
+  try {
+    const res = await fetch(`${SB_URL_N}/rest/v1/push_subscriptions?select=*`, {
+      headers: { 'apikey': SB_KEY_N, 'Authorization': 'Bearer ' + SB_KEY_N }
+    });
+    const subs = await res.json();
+    if (!subs || !subs.length) return;
+    for (const s of subs) {
+      await fetch(`${SB_URL_N}/functions/v1/swift-task`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + SB_KEY_N },
+        body: JSON.stringify({ subscription: { endpoint: s.endpoint, keys: { p256dh: s.p256dh, auth: s.auth } }, title, body, url: url || 'owner.html' })
+      }).catch(() => {});
+    }
+  } catch(e) { console.warn('Push send error:', e); }
+};
+
+function updateBellUI(permission) {
+  const dot = document.getElementById('notifDot');
+  const icon = document.getElementById('notifStatusIcon');
+  const text = document.getElementById('notifStatusText');
+  const btn  = document.getElementById('notifAllowBtn');
+  if (!dot) return;
+  if (permission === 'granted') {
+    dot.classList.remove('show');
+    if (icon) icon.textContent = '✅';
+    if (text) text.textContent = 'Les notifications sont activées ! Vous recevrez une alerte pour chaque nouveau message.';
+    if (btn)  { btn.textContent = 'Parfait !'; btn.onclick = () => document.getElementById('notifModal').classList.remove('visible'); }
+  } else if (permission === 'denied') {
+    dot.classList.add('show');
+    if (icon) icon.textContent = '🔕';
+    if (text) text.textContent = 'Notifications bloquées. Pour les activer : Réglages → Safari → Notifications.';
+    if (btn)  { btn.textContent = 'OK compris'; btn.onclick = () => document.getElementById('notifModal').classList.remove('visible'); }
+  } else {
+    dot.classList.add('show');
+  }
+}
+
+// Init SW
+(async () => {
+  if (!('serviceWorker' in navigator) || !('PushManager' in window)) return;
+  let reg;
+  try { reg = await navigator.serviceWorker.register('/sw.js'); } catch(e) { return; }
+
+  // Efface badge quand appli au premier plan
+  const clearBadge = () => {
+    if (navigator.clearAppBadge) navigator.clearAppBadge().catch(()=>{});
+    if (reg.active) reg.active.postMessage('CLEAR_BADGE');
+  };
+  window.addEventListener('focus', clearBadge);
+  document.addEventListener('visibilitychange', () => { if (!document.hidden) clearBadge(); });
+
+  updateBellUI(Notification.permission);
+  if (Notification.permission === 'granted') await subscribeIfGranted(reg);
+
+  // Bouton cloche → ouvre modal
+  document.getElementById('notifBellBtn').onclick = () => {
+    document.getElementById('notifModal').classList.add('visible');
+  };
+
+  // Fermer modal
+  document.getElementById('notifCloseBtn').onclick = () => document.getElementById('notifModal').classList.remove('visible');
+  document.getElementById('notifModal').addEventListener('click', e => {
+    if (e.target === document.getElementById('notifModal')) document.getElementById('notifModal').classList.remove('visible');
+  });
+
+  // Activer notifications
+  document.getElementById('notifAllowBtn').onclick = async () => {
+    if (Notification.permission === 'granted') { document.getElementById('notifModal').classList.remove('visible'); return; }
+    const perm = await Notification.requestPermission();
+    updateBellUI(perm);
+    if (perm === 'granted') {
+      await subscribeIfGranted(reg);
+      setTimeout(() => document.getElementById('notifModal').classList.remove('visible'), 1200);
+    }
+  };
+})();
 </script>
 
 </body>
