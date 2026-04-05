@@ -3,8 +3,8 @@
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Notes</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>Notes ✦</title>
 
 <link rel="manifest" href="manifest.json">
 <link rel="icon" href="favicon.ico" type="image/x-icon">
@@ -13,204 +13,1001 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 
+<!-- Fonte manuscrite douce -->
+
+<link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;600;700&family=Nunito:wght@300;400;600&display=swap" rel="stylesheet">
+
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
-html,body{height:100%;font-family:'Comic Sans MS',cursive;overflow:hidden;}
+html,body{height:100%;overflow:hidden;touch-action:manipulation;}
 
-/* FOND FIXE */
+body{
+  font-family:'Nunito',sans-serif;
+  background:#fce8f0;
+}
+
+/* ── FOND ── */
 body::before{
   content:"";
-  position:fixed;
-  inset:0;
+  position:fixed;inset:0;
   background-image:url('Photoroom_20260107_192358.png');
   background-size:cover;
   background-position:center;
+  z-index:-2;
+}
+/* voile doux pour lisibilité */
+body::after{
+  content:"";
+  position:fixed;inset:0;
+  background:rgba(255,235,245,0.45);
+  backdrop-filter:blur(2px);
   z-index:-1;
 }
 
-/* ===== SIDEBAR ===== */
+/* ════════════════════════════════
+   BARRE HAUT — style "menu bar OS"
+   ════════════════════════════════ */
+#menubar{
+  position:fixed;top:0;left:0;right:0;height:44px;
+  background:rgba(255,220,235,0.75);
+  backdrop-filter:blur(14px);
+  border-bottom:1.5px solid rgba(182,115,133,0.35);
+  display:flex;align-items:center;gap:0;
+  padding:0 16px;
+  z-index:100;
+}
+
+#menubar .logo{
+  font-family:'Caveat',cursive;
+  font-size:22px;color:#c4567a;
+  font-weight:700;margin-right:18px;
+  letter-spacing:1px;
+}
+
+.menu-item{
+  font-family:'Caveat',cursive;
+  font-size:16px;color:#a84a6a;
+  padding:4px 12px;border-radius:8px;
+  cursor:pointer;transition:background .15s;
+  position:relative;
+}
+.menu-item:hover{background:rgba(255,182,193,0.4);}
+
+/* dropdown */
+.dropdown{
+  display:none;
+  position:absolute;top:calc(100% + 6px);left:0;
+  background:rgba(255,230,240,0.97);
+  border:1.5px solid #e8a0b8;
+  border-radius:14px;
+  padding:6px 0;
+  min-width:180px;
+  box-shadow:0 8px 24px rgba(180,80,120,0.15);
+  z-index:200;
+}
+.menu-item:hover .dropdown{display:block;}
+.dropdown-item{
+  padding:8px 18px;
+  font-family:'Caveat',cursive;font-size:15px;color:#a84a6a;
+  cursor:pointer;transition:background .1s;
+  display:flex;align-items:center;gap:10px;
+}
+.dropdown-item:hover{background:rgba(255,182,193,0.4);}
+.dropdown-sep{height:1px;background:#e8a0b8;margin:4px 14px;}
+
+/* barre droite */
+#menubar .right{
+  margin-left:auto;
+  display:flex;align-items:center;gap:12px;
+}
+#clock{
+  font-family:'Caveat',cursive;
+  font-size:17px;color:#c4567a;
+}
+
+/* bouton retour */
+#backBtn{
+  background:rgba(255,182,193,0.7);
+  border:1.5px solid #e8a0b8;
+  border-radius:20px;
+  padding:4px 14px;
+  font-family:'Caveat',cursive;font-size:15px;color:#a84a6a;
+  cursor:pointer;transition:background .2s;
+}
+#backBtn:hover{background:rgba(255,182,193,1);}
+
+/* ════════════════════════════════
+   SIDEBAR — tiroir latéral
+   ════════════════════════════════ */
 #sidebar{
-  position:fixed;
-  top:0;
-  left:-220px;
+  position:fixed;top:44px;left:-220px;bottom:0;
   width:220px;
-  height:100vh;
-  background:rgba(255,230,240,0.2);
-  border-right:2px solid #b67385;
-  padding:20px;
-  transition:left .3s;
-  z-index:10;
-}
-#sidebar.sidebar-open{left:0}
-
-#toggleSidebar{
-  position:absolute;
-  top:50%;
-  right:-30px;
-  width:30px;
-  height:60px;
-  background:#ffb6c1;
-  border-radius:0 12px 12px 0;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  cursor:pointer;
-  font-weight:bold;
-}
-
-#sidebar button{
-  padding:8px 16px;
-  border-radius:16px;
-  border:none;
-  background:#ffb6c1;
-  color:#fff;
-  cursor:pointer;
-  font-weight:bold;
-  margin-top:10px;
-}
-
-/* ===== ZONE NOTES ===== */
-.center-zone{
-  display:flex;
-  flex-wrap:wrap;
-  justify-content:flex-start;
-  gap:16px;
-  padding:2cm 1cm 1cm 1cm;
-  min-height:100vh;
+  background:rgba(255,220,235,0.7);
+  backdrop-filter:blur(14px);
+  border-right:1.5px solid rgba(182,115,133,0.3);
+  padding:16px 0;
+  transition:left .28s cubic-bezier(.4,0,.2,1);
+  z-index:80;
   overflow-y:auto;
 }
+#sidebar.open{left:0;}
 
-/* NOTE */
-.note{
-  width:180px;
-  min-height:180px;
-  background:#ffe6f0;
-  border:3px solid #b67385;
-  border-radius:12px;
-  padding:12px;
-  display:flex;
-  flex-direction:column;
+.sidebar-title{
+  font-family:'Caveat',cursive;
+  font-size:13px;color:#c08096;
+  letter-spacing:2px;text-transform:uppercase;
+  padding:6px 20px 2px;
+}
+.sidebar-item{
+  display:flex;align-items:center;gap:10px;
+  padding:9px 20px;
+  font-family:'Caveat',cursive;font-size:17px;color:#a84a6a;
+  cursor:pointer;border-radius:10px;margin:1px 8px;
+  transition:background .15s;
+}
+.sidebar-item:hover,.sidebar-item.active{background:rgba(255,182,193,0.5);}
+.sidebar-item .ic{font-size:18px;}
+.sidebar-sep{height:1px;background:rgba(182,115,133,0.2);margin:8px 20px;}
+
+/* toggle sidebar */
+#toggleSidebar{
+  position:fixed;top:50%;left:0;
+  transform:translateY(-50%);
+  width:22px;height:56px;
+  background:rgba(255,182,193,0.85);
+  border-radius:0 12px 12px 0;
+  border:1.5px solid #e8a0b8;border-left:none;
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;z-index:90;
+  transition:left .28s cubic-bezier(.4,0,.2,1);
+  font-size:11px;color:#a84a6a;
+}
+#toggleSidebar.shifted{left:220px;}
+
+/* ════════════════════════════════
+   ZONE PRINCIPALE
+   ════════════════════════════════ */
+#main{
+  position:fixed;top:44px;left:0;right:0;bottom:0;
+  overflow-y:auto;
+  padding:20px 20px 100px;
+  transition:left .28s cubic-bezier(.4,0,.2,1);
+}
+#main.shifted{left:220px;}
+
+/* BARRE OUTILS */
+#toolbar{
+  display:flex;align-items:center;gap:10px;
+  margin-bottom:18px;flex-wrap:wrap;
+}
+.tb-btn{
+  background:rgba(255,220,235,0.85);
+  border:1.5px solid #e8a0b8;
+  border-radius:20px;
+  padding:6px 16px;
+  font-family:'Caveat',cursive;font-size:16px;color:#a84a6a;
+  cursor:pointer;transition:all .15s;
+  display:flex;align-items:center;gap:6px;
+}
+.tb-btn:hover{background:rgba(255,182,193,0.9);transform:translateY(-1px);}
+.tb-btn.active{background:#ffb6c1;color:#fff;border-color:#d4778d;}
+
+#pathbar{
+  flex:1;min-width:120px;
+  background:rgba(255,240,248,0.7);
+  border:1.5px solid #e8a0b8;
+  border-radius:20px;
+  padding:6px 14px;
+  font-family:'Caveat',cursive;font-size:15px;color:#c4567a;
+}
+
+/* ════════════════════════════════
+   GRILLE & LISTE
+   ════════════════════════════════ */
+#filesContainer{
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(130px,1fr));
+  gap:16px;
+  transition:all .2s;
+}
+#filesContainer.list-view{
+  grid-template-columns:1fr;
   gap:6px;
-  box-shadow:0 0 0 3px #f6c2d1, 0 6px 14px rgba(0,0,0,0.25);
 }
 
-.note textarea{
-  flex:1;
-  border:2px solid #b67385;
-  border-radius:12px;
-  padding:6px;
-  background:#fff0f5;
-  color:#b84c6f;
-  font-size:14px;
-  resize:none;
-}
-
-.note img{
-  width:100%;
-  max-height:100px;
-  object-fit:cover;
-  border-radius:8px;
-}
-
-/* BOUTON AJOUT NOTE */
-#addNoteBtn{
-  position:fixed;
-  bottom:20px;
-  right:20px;
-  width:60px;
-  height:60px;
-  background:#ffb6c1;
-  border-radius:50%;
-  border:none;
+/* ── ITEM (dossier ou fichier) ── */
+.file-item{
+  background:rgba(255,235,245,0.85);
+  border:2px solid rgba(232,160,184,0.5);
+  border-radius:18px;
+  padding:14px 10px 10px;
+  display:flex;flex-direction:column;align-items:center;gap:8px;
   cursor:pointer;
-  font-size:28px;
-  color:#fff;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  box-shadow:0 4px 8px rgba(0,0,0,0.3);
-  z-index:20;
+  transition:all .18s;
+  position:relative;
+  animation:popIn .25s cubic-bezier(.34,1.56,.64,1) both;
+  user-select:none;
 }
+@keyframes popIn{
+  from{opacity:0;transform:scale(.8);}
+  to{opacity:1;transform:scale(1);}
+}
+.file-item:hover{
+  background:rgba(255,214,232,0.95);
+  border-color:#e8a0b8;
+  transform:translateY(-3px);
+  box-shadow:0 8px 20px rgba(180,80,120,0.15);
+}
+.file-item.selected{
+  background:rgba(255,182,193,0.6);
+  border-color:#d4778d;
+  box-shadow:0 0 0 3px rgba(255,182,193,0.4);
+}
+
+/* vue liste */
+.list-view .file-item{
+  flex-direction:row;
+  padding:10px 16px;
+  border-radius:14px;
+  justify-content:flex-start;
+  gap:14px;
+}
+.list-view .file-icon{font-size:24px;}
+.list-view .file-name{font-size:15px;text-align:left;}
+.list-view .file-meta{margin-left:auto;font-size:12px;}
+
+.file-icon{font-size:48px;line-height:1;}
+.file-name{
+  font-family:'Caveat',cursive;
+  font-size:14px;color:#a84a6a;
+  text-align:center;word-break:break-word;
+  font-weight:600;
+}
+.file-meta{
+  font-family:'Nunito',sans-serif;
+  font-size:11px;color:#c08096;
+}
+
+/* indicateur dossier */
+.folder-badge{
+  position:absolute;top:8px;right:10px;
+  background:#ffb6c1;color:#fff;
+  border-radius:10px;padding:1px 6px;
+  font-size:10px;font-family:'Nunito',sans-serif;
+}
+
+/* ── DRAG & DROP ── */
+.file-item.drag-over{
+  border:2.5px dashed #d4778d;
+  background:rgba(255,182,193,0.3);
+}
+.drop-zone{
+  grid-column:1/-1;
+  border:2.5px dashed rgba(232,160,184,0.6);
+  border-radius:20px;
+  padding:30px;
+  text-align:center;
+  font-family:'Caveat',cursive;font-size:20px;color:#c08096;
+  display:none;
+}
+.drop-zone.visible{display:flex;align-items:center;justify-content:center;gap:10px;}
+
+/* ════════════════════════════════
+   MODALE NOTE / FICHIER
+   ════════════════════════════════ */
+#modal-overlay{
+  position:fixed;inset:0;
+  background:rgba(180,80,120,0.18);
+  backdrop-filter:blur(6px);
+  z-index:300;
+  display:none;align-items:center;justify-content:center;
+}
+#modal-overlay.open{display:flex;}
+
+#modal{
+  background:rgba(255,235,245,0.97);
+  border:2px solid #e8a0b8;
+  border-radius:24px;
+  width:min(520px,92vw);
+  max-height:82vh;
+  overflow-y:auto;
+  box-shadow:0 20px 60px rgba(180,80,120,0.25);
+  animation:slideUp .3s cubic-bezier(.34,1.56,.64,1);
+}
+@keyframes slideUp{
+  from{opacity:0;transform:translateY(30px) scale(.95);}
+  to{opacity:1;transform:translateY(0) scale(1);}
+}
+
+#modal-header{
+  display:flex;align-items:center;gap:12px;
+  padding:18px 20px 14px;
+  border-bottom:1.5px solid rgba(232,160,184,0.4);
+}
+#modal-title-input{
+  flex:1;
+  background:transparent;border:none;outline:none;
+  font-family:'Caveat',cursive;font-size:22px;
+  color:#c4567a;font-weight:700;
+  caret-color:#e8a0b8;
+}
+#modal-title-input::placeholder{color:#e8a0b8;}
+
+.modal-close{
+  width:30px;height:30px;border-radius:50%;
+  background:#ffb6c1;border:none;
+  color:#fff;font-size:16px;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  transition:background .15s;flex-shrink:0;
+}
+.modal-close:hover{background:#e8a0b8;}
+
+#modal-body{padding:16px 20px 20px;}
+
+#modal-textarea{
+  width:100%;min-height:160px;
+  background:#fff5f8;
+  border:2px solid #e8a0b8;border-radius:16px;
+  padding:12px 14px;
+  font-family:'Caveat',cursive;font-size:17px;
+  color:#a84a6a;line-height:1.7;
+  resize:vertical;outline:none;
+  caret-color:#e8a0b8;
+}
+#modal-textarea::placeholder{color:#e8c0d0;}
+
+#modal-img-preview{
+  display:none;
+  width:100%;border-radius:14px;
+  margin-top:12px;object-fit:cover;max-height:200px;
+}
+
+.modal-actions{
+  display:flex;gap:10px;margin-top:16px;flex-wrap:wrap;
+}
+.modal-btn{
+  padding:8px 20px;border-radius:20px;border:none;
+  font-family:'Caveat',cursive;font-size:16px;
+  cursor:pointer;transition:all .15s;
+  display:flex;align-items:center;gap:6px;
+}
+.modal-btn.primary{background:#ffb6c1;color:#fff;}
+.modal-btn.primary:hover{background:#e8a0b8;}
+.modal-btn.secondary{background:rgba(255,182,193,0.2);color:#a84a6a;border:1.5px solid #e8a0b8;}
+.modal-btn.secondary:hover{background:rgba(255,182,193,0.5);}
+.modal-btn.danger{background:rgba(255,100,120,0.12);color:#c0445a;border:1.5px solid rgba(200,80,100,0.3);}
+.modal-btn.danger:hover{background:rgba(255,100,120,0.25);}
+
+/* ── TAG ── */
+.tag-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;}
+.tag{
+  background:rgba(255,182,193,0.35);
+  border:1.5px solid #e8a0b8;
+  border-radius:20px;padding:3px 12px;
+  font-family:'Caveat',cursive;font-size:14px;color:#a84a6a;
+  cursor:pointer;
+}
+.tag.active{background:#ffb6c1;color:#fff;border-color:#d4778d;}
+
+/* ════════════════════════════════
+   BOUTON + FLOTTANT
+   ════════════════════════════════ */
+#fab{
+  position:fixed;bottom:24px;right:24px;
+  width:58px;height:58px;
+  background:#ffb6c1;
+  border:2.5px solid #fff;
+  border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:28px;color:#fff;
+  cursor:pointer;z-index:200;
+  box-shadow:0 6px 20px rgba(180,80,120,0.35);
+  transition:all .2s;
+}
+#fab:hover{background:#e8a0b8;transform:scale(1.08);}
+
+/* FAB mini-menu */
+#fab-menu{
+  position:fixed;bottom:92px;right:24px;
+  display:flex;flex-direction:column;gap:10px;
+  z-index:200;
+  transform:scale(0);transform-origin:bottom right;
+  transition:transform .2s cubic-bezier(.34,1.56,.64,1);
+  pointer-events:none;
+}
+#fab-menu.open{transform:scale(1);pointer-events:all;}
+.fab-option{
+  display:flex;align-items:center;gap:10px;
+  background:rgba(255,235,245,0.95);
+  border:2px solid #e8a0b8;border-radius:20px;
+  padding:8px 16px;
+  font-family:'Caveat',cursive;font-size:17px;color:#a84a6a;
+  cursor:pointer;
+  box-shadow:0 4px 14px rgba(180,80,120,0.15);
+  transition:background .15s;
+  white-space:nowrap;
+}
+.fab-option:hover{background:rgba(255,214,232,0.99);}
+
+/* ════════════════════════════════
+   EMPTY STATE
+   ════════════════════════════════ */
+#empty-state{
+  grid-column:1/-1;
+  text-align:center;padding:60px 20px;
+  display:none;flex-direction:column;align-items:center;gap:12px;
+}
+#empty-state.visible{display:flex;}
+#empty-state .em-icon{font-size:60px;opacity:.5;}
+#empty-state p{
+  font-family:'Caveat',cursive;font-size:20px;color:#c08096;
+}
+
+/* scrollbar */
+::-webkit-scrollbar{width:6px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:#e8a0b8;border-radius:10px;}
 </style>
 
 </head>
-
 <body>
 
-<!-- ===== SIDEBAR ===== -->
+<!-- ══ BARRE MENU ══ -->
 
-<div id="sidebar">
-  <div id="toggleSidebar">☰</div>
-  <button id="backBtn">Retour</button>
+<div id="menubar">
+  <span class="logo">✦ mes notes</span>
+
+  <div class="menu-item">Fichier
+    <div class="dropdown">
+      <div class="dropdown-item" onclick="openNewNote()">📝 Nouvelle note</div>
+      <div class="dropdown-item" onclick="createFolder()">📁 Nouveau dossier</div>
+      <div class="dropdown-sep"></div>
+      <div class="dropdown-item" onclick="importFile()">📎 Importer une image</div>
+    </div>
+  </div>
+
+  <div class="menu-item">Affichage
+    <div class="dropdown">
+      <div class="dropdown-item" onclick="setView('grid')">⊞ Grille</div>
+      <div class="dropdown-item" onclick="setView('list')">☰ Liste</div>
+      <div class="dropdown-sep"></div>
+      <div class="dropdown-item" onclick="sortBy('name')">Aa Trier par nom</div>
+      <div class="dropdown-item" onclick="sortBy('date')">🕐 Trier par date</div>
+    </div>
+  </div>
+
+  <div class="menu-item">Modifier
+    <div class="dropdown">
+      <div class="dropdown-item" onclick="deleteSelected()">🗑 Supprimer</div>
+      <div class="dropdown-item" onclick="selectAll()">✓ Tout sélectionner</div>
+    </div>
+  </div>
+
+  <div class="right">
+    <span id="clock"></span>
+    <button id="backBtn" onclick="goBack()">← Retour</button>
+  </div>
 </div>
 
-<div class="center-zone" id="notesContainer"></div>
+<!-- ══ TOGGLE SIDEBAR ══ -->
 
-<button id="addNoteBtn">+</button>
+<div id="toggleSidebar" onclick="toggleSidebar()">❮</div>
 
-<script src="image-handler.js"></script>
+<!-- ══ SIDEBAR ══ -->
 
-<script type="module">
-import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
+<div id="sidebar">
+  <div class="sidebar-title">Emplacements</div>
+  <div class="sidebar-item active" onclick="navSidebar('all')">
+    <span class="ic">🌸</span> Toutes les notes
+  </div>
+  <div class="sidebar-item" onclick="navSidebar('recent')">
+    <span class="ic">🕐</span> Récentes
+  </div>
+  <div class="sidebar-item" onclick="navSidebar('images')">
+    <span class="ic">🌺</span> Images
+  </div>
+  <div class="sidebar-sep"></div>
+  <div class="sidebar-title">Tags</div>
+  <div class="sidebar-item" onclick="filterTag('idées')">
+    <span class="ic">💡</span> idées
+  </div>
+  <div class="sidebar-item" onclick="filterTag('important')">
+    <span class="ic">⭐</span> important
+  </div>
+  <div class="sidebar-item" onclick="filterTag('créations')">
+    <span class="ic">🎨</span> créations
+  </div>
+  <div class="sidebar-sep"></div>
+  <div class="sidebar-title">Dossiers</div>
+  <div id="sidebar-folders"></div>
+</div>
 
-const supabase = createClient(
-  "https://kdgxbmqwhpuctjtlygrt.supabase.co",
-  "sb_publishable_sqsxb-3Kl5o3-JQYv9oGFw_-g0EgwMa"
-);
+<!-- ══ ZONE PRINCIPALE ══ -->
 
-const notesContainer = document.getElementById('notesContainer');
-const addNoteBtn = document.getElementById('addNoteBtn');
-const sidebar = document.getElementById('sidebar');
-const toggleSidebar = document.getElementById('toggleSidebar');
+<div id="main">
+  <div id="toolbar">
+    <span id="pathbar">🌸 Toutes les notes</span>
+    <button class="tb-btn active" id="btn-grid" onclick="setView('grid')">⊞ Grille</button>
+    <button class="tb-btn" id="btn-list" onclick="setView('list')">☰ Liste</button>
+  </div>
 
-/* ===== SIDEBAR ===== */
-toggleSidebar.onclick = () => sidebar.classList.toggle('sidebar-open');
+  <div id="filesContainer">
+    <div id="empty-state">
+      <span class="em-icon">🌸</span>
+      <p>Aucune note pour l'instant…</p>
+      <p style="font-size:15px;opacity:.7">Clique sur + pour commencer ✦</p>
+    </div>
+    <div class="drop-zone" id="drop-zone">📎 Dépose une image ici</div>
+  </div>
+</div>
 
-// BOUTON RETOUR (fondu identique aux autres pages)
-document.getElementById('backBtn').onclick = () => {
-  document.body.style.transition = 'opacity 0.5s';
-  document.body.style.opacity = '0';
-  setTimeout(() => {
-    window.location.href = 'owner.html';
-  }, 500);
-};
+<!-- ══ FAB ══ -->
 
-/* ===== NOTES ===== */
-addNoteBtn.onclick = () => addNote();
+<div id="fab-menu">
+  <div class="fab-option" onclick="createFolder();closeFab()">📁 Nouveau dossier</div>
+  <div class="fab-option" onclick="openNewNote();closeFab()">📝 Nouvelle note</div>
+</div>
+<div id="fab" onclick="toggleFab()">+</div>
 
-function addNote(content='', imgUrl=''){
-  const note = document.createElement('div');
-  note.className = 'note';
+<!-- ══ MODALE ══ -->
 
-  const textarea = document.createElement('textarea');
-  textarea.value = content;
-  note.appendChild(textarea);
+<div id="modal-overlay" onclick="closeModal(event)">
+  <div id="modal">
+    <div id="modal-header">
+      <span id="modal-icon" style="font-size:24px;">📝</span>
+      <input id="modal-title-input" type="text" placeholder="Titre de la note…" maxlength="60">
+      <button class="modal-close" onclick="closeModal()">✕</button>
+    </div>
+    <div id="modal-body">
+      <textarea id="modal-textarea" placeholder="Écris tes pensées ici… 🌸"></textarea>
+      <img id="modal-img-preview" alt="aperçu">
 
-  if(imgUrl){
-    const img = document.createElement('img');
-    img.src = imgUrl;
-    note.appendChild(img);
-  }
+```
+  <div class="tag-row" id="tag-row">
+    <span style="font-family:'Caveat',cursive;font-size:14px;color:#c08096;">Tags :</span>
+    <span class="tag" onclick="toggleTag(this,'idées')">💡 idées</span>
+    <span class="tag" onclick="toggleTag(this,'important')">⭐ important</span>
+    <span class="tag" onclick="toggleTag(this,'créations')">🎨 créations</span>
+  </div>
 
-  notesContainer.appendChild(note);
+  <div class="modal-actions">
+    <button class="modal-btn primary" onclick="saveModal()">💾 Sauvegarder</button>
+    <button class="modal-btn secondary" id="modal-img-btn" onclick="addModalImage()">📎 Image</button>
+    <button class="modal-btn danger" id="modal-delete-btn" onclick="deleteCurrentItem()" style="display:none;">🗑 Supprimer</button>
+  </div>
+</div>
+```
+
+  </div>
+</div>
+
+<input type="file" id="fileInput" accept="image/*" style="display:none">
+
+<script>
+/* ═══════════════════════════════════════
+   ÉTAT
+   ═══════════════════════════════════════ */
+let items = JSON.parse(localStorage.getItem('notes_items') || '[]');
+let currentView = localStorage.getItem('notes_view') || 'grid';
+let currentFolder = null; // null = root
+let currentFilter = null;
+let editingId = null;
+let fabOpen = false;
+let sidebarOpen = false;
+let activeTags = [];
+
+function save(){localStorage.setItem('notes_items', JSON.stringify(items));}
+function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2);}
+
+/* ═══════════════════════════════════════
+   HORLOGE
+   ═══════════════════════════════════════ */
+function updateClock(){
+  const now = new Date();
+  document.getElementById('clock').textContent =
+    now.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});
+}
+setInterval(updateClock,1000); updateClock();
+
+/* ═══════════════════════════════════════
+   SIDEBAR
+   ═══════════════════════════════════════ */
+function toggleSidebar(){
+  sidebarOpen = !sidebarOpen;
+  document.getElementById('sidebar').classList.toggle('open', sidebarOpen);
+  document.getElementById('main').classList.toggle('shifted', sidebarOpen);
+  const t = document.getElementById('toggleSidebar');
+  t.classList.toggle('shifted', sidebarOpen);
+  t.textContent = sidebarOpen ? '❯' : '❮';
 }
 
-/* ===== CHARGEMENT PROJETS (facultatif) ===== */
-async function loadOwnerProjects(){
-  const { data } = await supabase
-    .from('creations')
-    .select('*')
-    .order('created_at',{ascending:false});
+function navSidebar(type){
+  document.querySelectorAll('.sidebar-item').forEach(e=>e.classList.remove('active'));
+  event.currentTarget.classList.add('active');
+  currentFilter = null; currentFolder = null;
+  if(type === 'recent'){
+    // trier par date, juste une vue
+    currentFilter = 'recent';
+  } else if(type === 'images'){
+    currentFilter = 'images';
+  }
+  updatePathbar();
+  render();
+}
 
-  data?.forEach(c=>{
-    addNote('', c.images?.[0]
-      ? supabase.storage.from('images').getPublicUrl(c.images[0]).data.publicUrl
-      : ''
-    );
+function filterTag(tag){
+  currentFilter = 'tag:'+tag;
+  currentFolder = null;
+  updatePathbar();
+  render();
+}
+
+/* ═══════════════════════════════════════
+   VUE
+   ═══════════════════════════════════════ */
+function setView(v){
+  currentView = v;
+  localStorage.setItem('notes_view', v);
+  document.getElementById('filesContainer').classList.toggle('list-view', v==='list');
+  document.getElementById('btn-grid').classList.toggle('active', v==='grid');
+  document.getElementById('btn-list').classList.toggle('active', v==='list');
+}
+
+/* ═══════════════════════════════════════
+   RENDU
+   ═══════════════════════════════════════ */
+function getVisible(){
+  let list = items.filter(i=>
+    currentFolder === null ? !i.folder : i.folder === currentFolder
+  );
+  if(currentFilter === 'recent'){
+    list = [...items].sort((a,b)=>b.createdAt - a.createdAt).slice(0,20);
+  } else if(currentFilter === 'images'){
+    list = items.filter(i=>i.imgData);
+  } else if(currentFilter && currentFilter.startsWith('tag:')){
+    const tag = currentFilter.slice(4);
+    list = items.filter(i=>i.tags && i.tags.includes(tag));
+  }
+  return list;
+}
+
+function render(){
+  const container = document.getElementById('filesContainer');
+  // Garder drop-zone et empty-state
+  const oldItems = container.querySelectorAll('.file-item');
+  oldItems.forEach(e=>e.remove());
+
+  const visible = getVisible();
+  const empty = document.getElementById('empty-state');
+  empty.classList.toggle('visible', visible.length === 0);
+
+  // dossiers d'abord
+  const folders = visible.filter(i=>i.type==='folder');
+  const files   = visible.filter(i=>i.type!=='folder');
+  [...folders,...files].forEach(item=>{
+    container.insertBefore(makeEl(item), document.getElementById('drop-zone'));
+  });
+
+  renderSidebarFolders();
+  setView(currentView);
+}
+
+function makeEl(item){
+  const el = document.createElement('div');
+  el.className = 'file-item';
+  el.dataset.id = item.id;
+
+  if(item.type === 'folder'){
+    el.innerHTML = `
+      <span class="file-icon">📁</span>
+      <span class="file-name">${item.title||'Dossier'}</span>
+      <span class="file-meta">${countInFolder(item.id)} élément(s)</span>
+    `;
+    el.ondblclick = ()=>openFolder(item.id);
+  } else {
+    const icon = item.imgData ? '🌺' : '📝';
+    const preview = item.content ? item.content.slice(0,40) : '';
+    el.innerHTML = `
+      <span class="file-icon">${icon}</span>
+      <span class="file-name">${item.title||'Sans titre'}</span>
+      <span class="file-meta">${preview}</span>
+    `;
+    el.ondblclick = ()=>openEditModal(item.id);
+  }
+
+  el.onclick = (e)=>{
+    if(e.detail === 1){
+      el.classList.toggle('selected');
+    }
+  };
+
+  // drag fichier dans dossier
+  if(item.type === 'folder'){
+    el.addEventListener('dragover', e=>{e.preventDefault();el.classList.add('drag-over');});
+    el.addEventListener('dragleave',()=>el.classList.remove('drag-over'));
+    el.addEventListener('drop', e=>{
+      e.preventDefault();el.classList.remove('drag-over');
+      const dragId = e.dataTransfer.getData('text/plain');
+      if(dragId && dragId !== item.id){
+        const target = items.find(i=>i.id===dragId);
+        if(target){target.folder=item.id;save();render();}
+      }
+    });
+  }
+  el.draggable = true;
+  el.addEventListener('dragstart', e=>{e.dataTransfer.setData('text/plain',item.id);});
+
+  return el;
+}
+
+function countInFolder(folderId){
+  return items.filter(i=>i.folder===folderId).length;
+}
+
+function renderSidebarFolders(){
+  const cont = document.getElementById('sidebar-folders');
+  cont.innerHTML='';
+  items.filter(i=>i.type==='folder'&&!i.folder).forEach(f=>{
+    const el = document.createElement('div');
+    el.className='sidebar-item';
+    el.innerHTML=`<span class="ic">📁</span> ${f.title||'Dossier'}`;
+    el.onclick=()=>openFolder(f.id);
+    cont.appendChild(el);
   });
 }
 
-loadOwnerProjects();
+/* ═══════════════════════════════════════
+   NAVIGATION DOSSIER
+   ═══════════════════════════════════════ */
+function openFolder(id){
+  currentFolder = id;
+  currentFilter = null;
+  const f = items.find(i=>i.id===id);
+  document.getElementById('pathbar').textContent = '📁 '+( f?.title||'Dossier');
+  render();
+}
+
+function updatePathbar(){
+  const map = {null:'🌸 Toutes les notes', recent:'🕐 Récentes', images:'🌺 Images'};
+  if(currentFilter && currentFilter.startsWith('tag:'))
+    document.getElementById('pathbar').textContent = '🏷 '+currentFilter.slice(4);
+  else
+    document.getElementById('pathbar').textContent = map[currentFilter] || map[null];
+}
+
+/* ═══════════════════════════════════════
+   CRÉER DOSSIER
+   ═══════════════════════════════════════ */
+function createFolder(){
+  const name = prompt('Nom du dossier :','Nouveau dossier');
+  if(!name) return;
+  items.push({id:uid(),type:'folder',title:name,folder:currentFolder,createdAt:Date.now()});
+  save(); render();
+}
+
+/* ═══════════════════════════════════════
+   MODALE NOTE
+   ═══════════════════════════════════════ */
+function openNewNote(){
+  editingId = null;
+  activeTags = [];
+  document.getElementById('modal-title-input').value = '';
+  document.getElementById('modal-textarea').value = '';
+  document.getElementById('modal-img-preview').style.display='none';
+  document.getElementById('modal-img-preview').src='';
+  document.getElementById('modal-delete-btn').style.display='none';
+  document.getElementById('modal-icon').textContent='📝';
+  document.querySelectorAll('.tag').forEach(t=>t.classList.remove('active'));
+  document.getElementById('modal-overlay').classList.add('open');
+  setTimeout(()=>document.getElementById('modal-title-input').focus(),100);
+}
+
+function openEditModal(id){
+  const item = items.find(i=>i.id===id);
+  if(!item)return;
+  editingId = id;
+  activeTags = item.tags ? [...item.tags] : [];
+  document.getElementById('modal-title-input').value = item.title||'';
+  document.getElementById('modal-textarea').value = item.content||'';
+  const prev = document.getElementById('modal-img-preview');
+  if(item.imgData){prev.src=item.imgData;prev.style.display='block';}
+  else{prev.style.display='none';}
+  document.getElementById('modal-delete-btn').style.display='';
+  document.querySelectorAll('.tag').forEach(t=>{
+    t.classList.toggle('active', activeTags.includes(t.dataset.tag||t.textContent.trim().replace(/\S+ /,'')));
+  });
+  document.getElementById('modal-overlay').classList.add('open');
+}
+
+function closeModal(e){
+  if(!e || e.target === document.getElementById('modal-overlay')){
+    document.getElementById('modal-overlay').classList.remove('open');
+  }
+}
+
+function saveModal(){
+  const title = document.getElementById('modal-title-input').value.trim() || 'Sans titre';
+  const content = document.getElementById('modal-textarea').value.trim();
+  const imgSrc = document.getElementById('modal-img-preview').src;
+  const imgData = imgSrc && imgSrc !== window.location.href ? imgSrc : null;
+
+  if(editingId){
+    const item = items.find(i=>i.id===editingId);
+    if(item){item.title=title;item.content=content;item.imgData=imgData;item.tags=activeTags;}
+  } else {
+    items.push({
+      id:uid(), type:'note', title, content,
+      imgData: imgData||null,
+      tags: activeTags,
+      folder: currentFolder,
+      createdAt: Date.now()
+    });
+  }
+  save(); render();
+  closeModal();
+}
+
+function deleteCurrentItem(){
+  if(!editingId) return;
+  if(!confirm('Supprimer cette note ?')) return;
+  items = items.filter(i=>i.id!==editingId);
+  save(); render(); closeModal();
+}
+
+function toggleTag(el, tag){
+  el.classList.toggle('active');
+  if(activeTags.includes(tag)) activeTags = activeTags.filter(t=>t!==tag);
+  else activeTags.push(tag);
+}
+
+/* ═══════════════════════════════════════
+   IMAGE
+   ═══════════════════════════════════════ */
+function addModalImage(){
+  document.getElementById('fileInput').click();
+}
+function importFile(){
+  document.getElementById('fileInput').click();
+}
+document.getElementById('fileInput').onchange = function(){
+  const file = this.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = e=>{
+    const prev = document.getElementById('modal-img-preview');
+    prev.src = e.target.result;
+    prev.style.display='block';
+    if(!document.getElementById('modal-overlay').classList.contains('open')){
+      // import direct → crée une note image
+      items.push({
+        id:uid(), type:'note', title: file.name.replace(/\.\w+$/,''),
+        content:'', imgData: e.target.result,
+        tags:[], folder: currentFolder, createdAt: Date.now()
+      });
+      save(); render();
+    }
+  };
+  reader.readAsDataURL(file);
+  this.value='';
+};
+
+/* ═══════════════════════════════════════
+   DRAG & DROP GLOBAL
+   ═══════════════════════════════════════ */
+const dz = document.getElementById('drop-zone');
+document.getElementById('main').addEventListener('dragover', e=>{
+  e.preventDefault(); dz.classList.add('visible');
+});
+document.getElementById('main').addEventListener('dragleave', e=>{
+  if(!e.relatedTarget || !document.getElementById('main').contains(e.relatedTarget))
+    dz.classList.remove('visible');
+});
+document.getElementById('main').addEventListener('drop', e=>{
+  e.preventDefault(); dz.classList.remove('visible');
+  const files = e.dataTransfer.files;
+  if(files.length){
+    [...files].forEach(f=>{
+      if(!f.type.startsWith('image/')) return;
+      const r = new FileReader();
+      r.onload = ev=>{
+        items.push({
+          id:uid(),type:'note',title:f.name.replace(/\.\w+$/,''),
+          content:'',imgData:ev.target.result,
+          tags:[],folder:currentFolder,createdAt:Date.now()
+        });
+        save(); render();
+      };
+      r.readAsDataURL(f);
+    });
+  }
+});
+
+/* ═══════════════════════════════════════
+   FAB
+   ═══════════════════════════════════════ */
+function toggleFab(){
+  fabOpen = !fabOpen;
+  document.getElementById('fab-menu').classList.toggle('open', fabOpen);
+  document.getElementById('fab').textContent = fabOpen ? '✕' : '+';
+}
+function closeFab(){
+  fabOpen = false;
+  document.getElementById('fab-menu').classList.remove('open');
+  document.getElementById('fab').textContent = '+';
+}
+
+/* ═══════════════════════════════════════
+   ACTIONS
+   ═══════════════════════════════════════ */
+function deleteSelected(){
+  const ids = [...document.querySelectorAll('.file-item.selected')].map(e=>e.dataset.id);
+  if(!ids.length){alert('Sélectionne d\'abord des éléments.');return;}
+  if(!confirm(`Supprimer ${ids.length} élément(s) ?`)) return;
+  items = items.filter(i=>!ids.includes(i.id));
+  save(); render();
+}
+
+function selectAll(){
+  document.querySelectorAll('.file-item').forEach(e=>e.classList.add('selected'));
+}
+
+function sortBy(type){
+  if(type==='name') items.sort((a,b)=>(a.title||'').localeCompare(b.title||''));
+  else items.sort((a,b)=>b.createdAt-a.createdAt);
+  save(); render();
+}
+
+function goBack(){
+  document.body.style.transition='opacity .5s';
+  document.body.style.opacity='0';
+  setTimeout(()=>{window.location.href='owner.html';},500);
+}
+
+/* ═══════════════════════════════════════
+   SUPABASE (facultatif)
+   ═══════════════════════════════════════ */
+(async()=>{
+  try{
+    const { createClient } = await import("https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm");
+    const supabase = createClient(
+      "https://kdgxbmqwhpuctjtlygrt.supabase.co",
+      "sb_publishable_sqsxb-3Kl5o3-JQYv9oGFw_-g0EgwMa"
+    );
+    const {data} = await supabase.from('creations').select('*').order('created_at',{ascending:false});
+    if(data && data.length){
+      const existing = new Set(items.map(i=>i.supabaseId));
+      data.forEach(c=>{
+        if(existing.has(c.id)) return;
+        const imgUrl = c.images?.[0]
+          ? supabase.storage.from('images').getPublicUrl(c.images[0]).data.publicUrl
+          : null;
+        items.push({
+          id:uid(), supabaseId:c.id, type:'note',
+          title: c.title||'Création',
+          content: c.description||'',
+          imgData: imgUrl,
+          tags:['créations'], folder:null,
+          createdAt: new Date(c.created_at).getTime()
+        });
+      });
+      save(); render();
+    }
+  }catch(e){console.log('Supabase ignoré',e);}
+})();
+
+/* ═══════════════════════════════════════
+   INIT
+   ═══════════════════════════════════════ */
+setView(currentView);
+render();
+
+// fermer fab si on clique ailleurs
+document.addEventListener('click', e=>{
+  if(!document.getElementById('fab').contains(e.target) &&
+     !document.getElementById('fab-menu').contains(e.target)){
+    closeFab();
+  }
+});
 </script>
 
 </body>
