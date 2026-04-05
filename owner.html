@@ -48,12 +48,20 @@ input, textarea, select { font-size: 16px !important; }
 .icon-btn:hover svg{transform:scale(1.2);}
 #likeCount,#commentCount{font-family:'Courier New',monospace;font-weight:bold;color:#b84c6f;font-size:14px;min-width:18px;}
 
-/* Photo profil */
 #ownerPhoto{width:76px;height:76px;border-radius:50%;position:fixed;top:10px;right:10px;z-index:10000;background:#ffe6f0;border:3px solid #b84c6f;cursor:pointer;box-shadow:0 2px 12px rgba(184,76,111,0.3);transition:transform 0.2s;object-fit:cover;}
 #ownerPhoto:hover{transform:scale(1.08);}
-#editPhotoBtn{display:none;}
 
-/* Anneaux pulsants */
+#editPhotoBtn{
+position:fixed;top:92px;right:6px;z-index:10001;
+background:linear-gradient(#ffd6e6,#ffb6c1);
+border:2px solid #b67385;border-radius:14px;
+padding:7px 13px;color:#b84c6f;font-weight:bold;font-size:13px;
+cursor:pointer;box-shadow:0 4px 12px rgba(184,76,111,0.3);
+display:none;white-space:nowrap;font-family:‘Comic Sans MS’,cursive;
+animation:popBtn 0.2s cubic-bezier(0.34,1.56,0.64,1);
+}
+@keyframes popBtn{from{transform:scale(0.5);opacity:0;}to{transform:scale(1);opacity:1;}}
+
 #ownerRings{position:fixed;top:10px;right:10px;width:76px;height:76px;pointer-events:none;z-index:9999;opacity:0;transition:opacity 0.3s;}
 .owner-ring{position:absolute;border-radius:50%;border:2px solid rgba(255,182,193,0.7);opacity:0;}
 .owner-ring:nth-child(1){width:76px;height:76px;top:0;left:0;}
@@ -100,8 +108,8 @@ body.modal-open{overflow:hidden;touch-action:none;}
 .overlay-ring:nth-child(3){width:320px;height:320px;animation-delay:1.2s;}
 @keyframes ringPulse{0%{opacity:0.6;transform:scale(0.9);}100%{opacity:0;transform:scale(1.15);}}
 #overlayChangeHint{font-size:12px;color:rgba(255,230,240,0.75);letter-spacing:2px;font-family:‘Georgia’,serif;font-style:italic;margin-top:-18px;animation:fadeIn 1.2s 0.5s ease both;}
-#overlayImg{width:200px;height:200px;border-radius:50%;object-fit:cover;border:4px solid #ffb6c1;box-shadow:0 0 50px rgba(255,100,150,0.7),0 0 100px rgba(255,100,150,0.3);position:relative;z-index:2;cursor:pointer;transition:transform 0.2s, box-shadow 0.2s;}
-#overlayImg:active{transform:scale(0.96);box-shadow:0 0 30px rgba(255,100,150,0.5);}
+#overlayImg{width:200px;height:200px;border-radius:50%;object-fit:cover;border:4px solid #ffb6c1;box-shadow:0 0 50px rgba(255,100,150,0.7),0 0 100px rgba(255,100,150,0.3);position:relative;z-index:2;cursor:pointer;transition:transform 0.2s,box-shadow 0.2s;}
+#overlayImg:active{transform:scale(0.96);}
 @keyframes popIn{from{transform:scale(0.1) rotateY(90deg);opacity:0;}to{transform:scale(1) rotateY(0deg);opacity:1;}}
 #overlayPrenom{font-family:‘Georgia’,‘Palatino’,serif;font-size:54px;font-weight:normal;font-style:italic;letter-spacing:8px;color:#ffe6f0;-webkit-text-stroke:1.5px #1a0005;text-shadow:0 1px 0 #c8637a,0 2px 0 #b84c6f,0 3px 0 #a03060,0 4px 0 #8a1a40,0 5px 8px rgba(0,0,0,0.6),0 10px 20px rgba(0,0,0,0.4);animation:prenomIn 0.7s 0.2s cubic-bezier(0.34,1.56,0.64,1) both,prenomFloat 5s 1s ease-in-out infinite;}
 @keyframes prenomIn{from{transform:translateY(30px) scale(0.6);opacity:0;}to{transform:translateY(0) scale(1);opacity:1;}}
@@ -109,345 +117,199 @@ body.modal-open{overflow:hidden;touch-action:none;}
 #overlayHint{font-size:11px;color:rgba(255,230,240,0.5);letter-spacing:3px;font-family:‘Georgia’,serif;font-style:italic;animation:fadeIn 1.5s 1s ease both;}
 @keyframes fadeIn{from{opacity:0}to{opacity:1}}
 
-/* =============================================
-BOUTON TIKTOK
-============================================= */
-#tiktokBtn {
-position: fixed;
-top: 94px; right: 10px;
-width: 42px; height: 42px;
-border-radius: 50%;
-background: linear-gradient(135deg, #ffd6e6, #ffb6c1);
-border: 2px solid #b67385;
-box-shadow: 0 2px 10px rgba(184,76,111,0.35);
-display: flex; align-items: center; justify-content: center;
-cursor: pointer; z-index: 10000;
-transition: transform 0.2s, box-shadow 0.2s;
+/* ===== BOUTON TIKTOK ===== */
+#tiktokBtn{
+position:fixed;top:148px;right:10px;
+width:42px;height:42px;border-radius:50%;
+background:linear-gradient(135deg,#ffd6e6,#ffb6c1);
+border:2px solid #b67385;
+box-shadow:0 2px 10px rgba(184,76,111,0.35);
+display:flex;align-items:center;justify-content:center;
+cursor:pointer;z-index:10000;
+transition:transform 0.2s,box-shadow 0.2s;
 }
-#tiktokBtn:hover { transform: scale(1.12); box-shadow: 0 4px 18px rgba(184,76,111,0.55); }
-#tiktokBtn svg { width: 20px; height: 20px; }
+#tiktokBtn:hover{transform:scale(1.12);box-shadow:0 4px 18px rgba(184,76,111,0.55);}
+#tiktokBtn svg{width:20px;height:20px;}
 
-/* =============================================
-OVERLAY TIKTOK
-============================================= */
-#tiktokOverlay {
-display: none;
-position: fixed; inset: 0;
-background: #0d0008;
-z-index: 50000;
-overflow: hidden;
+/* ===== OVERLAY TIKTOK ===== */
+#tiktokOverlay{
+display:none;position:fixed;inset:0;
+background:#0d0008;z-index:50000;overflow:hidden;
 }
-#tiktokOverlay.visible { display: block; }
+#tiktokOverlay.visible{display:block;}
 
-#tiktokFeed {
-width: 100%; height: 100%;
-overflow-y: scroll;
-scroll-snap-type: y mandatory;
--webkit-overflow-scrolling: touch;
-scrollbar-width: none;
-overscroll-behavior: contain;
+/* Scroll VERTICAL entre créations */
+#tiktokFeed{
+width:100%;height:100%;
+overflow-y:scroll;
+scroll-snap-type:y mandatory;
+-webkit-overflow-scrolling:touch;
+scrollbar-width:none;
+overscroll-behavior:contain;
 }
-#tiktokFeed::-webkit-scrollbar { display: none; }
+#tiktokFeed::-webkit-scrollbar{display:none;}
 
-.tiktok-slide {
-width: 100vw;
-height: 100svh;
-height: 100vh;
-scroll-snap-align: start;
-scroll-snap-stop: always;
-position: relative;
-overflow: hidden;
-background: #0d0008;
-flex-shrink: 0;
+.tiktok-slide{
+width:100vw;
+height:100vh;
+height:100svh;
+scroll-snap-align:start;
+scroll-snap-stop:always;
+position:relative;
+overflow:hidden;
+background:#0d0008;
+flex-shrink:0;
 }
 
-/* Carrousel horizontal */
-.tiktok-photos {
-display: flex;
-width: 100%; height: 100%;
-overflow-x: scroll;
-scroll-snap-type: x mandatory;
--webkit-overflow-scrolling: touch;
-scrollbar-width: none;
-touch-action: pan-x;
+/* Scroll HORIZONTAL entre photos d’une même création */
+.tiktok-photos{
+display:flex;
+width:100%;height:100%;
+overflow-x:scroll;
+scroll-snap-type:x mandatory;
+-webkit-overflow-scrolling:touch;
+scrollbar-width:none;
+touch-action:pan-x;
 }
-.tiktok-photos::-webkit-scrollbar { display: none; }
+.tiktok-photos::-webkit-scrollbar{display:none;}
 
-/* Photo item plein écran */
-.tiktok-photo-item {
-flex: 0 0 100vw;
-width: 100vw;
-height: 100svh;
-height: 100vh;
-scroll-snap-align: start;
-scroll-snap-stop: always;
-position: relative;
-overflow: hidden;
+.tiktok-photo-item{
+flex:0 0 100vw;width:100vw;
+height:100vh;height:100svh;
+scroll-snap-align:start;scroll-snap-stop:always;
+position:relative;overflow:hidden;
 }
-
-/* Fond flou */
-.tiktok-photo-item .photo-bg {
-position: absolute; inset: 0;
-background-size: cover;
-background-position: center;
-filter: blur(24px) brightness(0.35) saturate(1.4);
-transform: scale(1.1);
-z-index: 0;
-pointer-events: none;
+.tiktok-photo-item .photo-bg{
+position:absolute;inset:0;
+background-size:cover;background-position:center;
+filter:blur(24px) brightness(0.35) saturate(1.4);
+transform:scale(1.1);z-index:0;pointer-events:none;
 }
-
-/* Image COVER + totalement figée, impossible à déplacer */
-.tiktok-photo-item img {
-position: absolute;
-inset: 0;
-width: 100%;
-height: 100%;
-object-fit: cover;
-object-position: center;
-z-index: 1;
-pointer-events: none !important;
-touch-action: none !important;
-user-select: none;
--webkit-user-drag: none;
--webkit-touch-callout: none;
-display: block;
+.tiktok-photo-item img{
+position:absolute;inset:0;
+width:100%;height:100%;
+object-fit:cover;object-position:center;
+z-index:1;
+pointer-events:none !important;
+touch-action:none !important;
+user-select:none;
+-webkit-user-drag:none;
+-webkit-touch-callout:none;
+display:block;
+}
+.tiktok-slide::after{
+content:’’;position:absolute;bottom:0;left:0;right:0;height:62%;
+background:linear-gradient(to top,rgba(13,0,8,0.96) 0%,rgba(13,0,8,0.55) 45%,transparent 100%);
+pointer-events:none;z-index:2;
 }
 
-/* Dégradé bas */
-.tiktok-slide::after {
-content: ‘’;
-position: absolute; bottom: 0; left: 0; right: 0;
-height: 62%;
-background: linear-gradient(to top, rgba(13,0,8,0.96) 0%, rgba(13,0,8,0.55) 45%, transparent 100%);
-pointer-events: none;
-z-index: 2;
+.tiktok-photo-counter{
+position:absolute;top:14px;left:50%;transform:translateX(-50%);
+background:rgba(0,0,0,0.45);backdrop-filter:blur(6px);
+border:1px solid rgba(255,182,193,0.35);border-radius:20px;
+padding:4px 14px;font-size:12px;color:#ffe6f0;
+z-index:6;display:none;letter-spacing:1px;
 }
+.tiktok-photo-counter.multi{display:block;}
 
-/* Counter 1/N */
-.tiktok-photo-counter {
-position: absolute; top: 14px; left: 50%;
-transform: translateX(-50%);
-background: rgba(0,0,0,0.45);
-backdrop-filter: blur(6px);
-border: 1px solid rgba(255,182,193,0.35);
-border-radius: 20px; padding: 4px 14px;
-font-size: 12px; color: #ffe6f0;
-z-index: 6; display: none;
-letter-spacing: 1px;
-font-family: ‘Comic Sans MS’, cursive;
+.tiktok-dots{
+position:absolute;bottom:210px;left:50%;transform:translateX(-50%);
+display:flex;gap:6px;z-index:5;
 }
-.tiktok-photo-counter.multi { display: block; }
+.tiktok-dot{width:6px;height:6px;border-radius:50%;background:rgba(255,230,240,0.3);transition:background 0.25s,transform 0.25s;}
+.tiktok-dot.active{background:#ffb6c1;transform:scale(1.45);box-shadow:0 0 6px rgba(255,182,193,0.8);}
 
-/* Dots */
-.tiktok-dots {
-position: absolute;
-bottom: 210px;
-left: 50%;
-transform: translateX(-50%);
-display: flex; gap: 6px; z-index: 5;
+.tiktok-info{
+position:absolute;bottom:178px;left:14px;z-index:6;
+color:#ffe6f0;pointer-events:none;max-width:62%;
 }
-.tiktok-dot {
-width: 6px; height: 6px; border-radius: 50%;
-background: rgba(255,230,240,0.3);
-transition: background 0.25s, transform 0.25s;
-}
-.tiktok-dot.active {
-background: #ffb6c1;
-transform: scale(1.45);
-box-shadow: 0 0 6px rgba(255,182,193,0.8);
-}
+.tiktok-info .t-title{font-size:17px;font-weight:bold;text-shadow:0 2px 10px rgba(0,0,0,0.9);margin-bottom:5px;line-height:1.2;}
+.tiktok-info .t-legend{font-size:13px;color:rgba(255,230,240,0.82);text-shadow:0 1px 5px rgba(0,0,0,0.8);line-height:1.4;}
 
-/* Infos bas gauche */
-.tiktok-info {
-position: absolute;
-bottom: 178px; left: 14px;
-z-index: 6;
-color: #ffe6f0;
-pointer-events: none;
-max-width: 62%;
+/* Barre réactions droite comme TikTok */
+.tiktok-bar{
+position:absolute;bottom:40px;right:14px;
+z-index:6;
+display:flex;flex-direction:column;align-items:center;gap:18px;
 }
-.tiktok-info .t-title {
-font-family: ‘Comic Sans MS’, cursive;
-font-size: 17px; font-weight: bold;
-text-shadow: 0 2px 10px rgba(0,0,0,0.9);
-margin-bottom: 5px; line-height: 1.2;
+.tiktok-react-btn{
+display:flex;flex-direction:column;align-items:center;gap:4px;
+cursor:pointer;-webkit-tap-highlight-color:transparent;
+color:#ffe6f0;
 }
-.tiktok-info .t-legend {
-font-size: 13px;
-color: rgba(255,230,240,0.82);
-text-shadow: 0 1px 5px rgba(0,0,0,0.8);
-line-height: 1.4;
+.tiktok-react-btn svg{
+width:40px;height:40px;
+filter:drop-shadow(0 2px 6px rgba(0,0,0,0.7));
+transition:transform 0.18s cubic-bezier(0.34,1.56,0.64,1);
 }
-
-/* Barre réactions */
-.tiktok-bar {
-position: absolute;
-bottom: 0; left: 0; right: 0;
-z-index: 6;
-display: flex;
-flex-direction: column;
-align-items: center;
-justify-content: flex-end;
-padding-bottom: max(env(safe-area-inset-bottom, 0px), 16px);
-}
-
-.tiktok-react-row {
-display: flex;
-gap: 32px;
-align-items: center;
-margin-bottom: 16px;
-}
-
-.tiktok-react-btn {
-display: flex; flex-direction: column;
-align-items: center; gap: 4px;
-cursor: pointer;
--webkit-tap-highlight-color: transparent;
-color: #ffe6f0;
-font-family: ‘Comic Sans MS’, cursive;
-position: relative;
-}
-.tiktok-react-btn svg {
-width: 40px; height: 40px;
-filter: drop-shadow(0 2px 6px rgba(0,0,0,0.7));
-transition: transform 0.18s cubic-bezier(0.34,1.56,0.64,1);
-}
-.tiktok-react-btn:active svg { transform: scale(1.4); }
-.tiktok-react-btn.liked svg {
-stroke: #ff2d78; fill: #ff2d78;
-filter: drop-shadow(0 0 10px rgba(255,45,120,0.8));
-}
-.tiktok-react-btn span {
-font-size: 13px;
-font-weight: bold;
-text-shadow: 0 1px 4px rgba(0,0,0,0.9);
-}
-
-/* Panel commentaires : position fixed → par-dessus TOUT */
-.tiktok-comment-panel {
-position: fixed;
-bottom: 0; left: 0; right: 0;
-z-index: 60001;
-background: rgba(13,0,8,0.94);
-backdrop-filter: blur(16px);
-border-top: 2px solid rgba(255,182,193,0.3);
-border-radius: 22px 22px 0 0;
-display: none;
-flex-direction: column;
-gap: 8px;
-padding: 6px 14px max(env(safe-area-inset-bottom,0px),16px);
-max-height: 58vh;
-transform: translateY(100%);
-transition: transform 0.3s cubic-bezier(0.32,0.72,0,1);
-}
-.tiktok-comment-panel.open {
-display: flex;
-transform: translateY(0);
-}
-/* Poignée */
-.tiktok-comment-handle {
-width: 40px; height: 4px;
-background: rgba(255,182,193,0.45);
-border-radius: 2px;
-margin: 4px auto 8px;
-flex-shrink: 0;
-}
-.tiktok-comment-list {
-flex: 1;
-overflow-y: auto;
-display: flex;
-flex-direction: column;
-gap: 10px;
-max-height: 38vh;
-padding-bottom: 4px;
-}
-.tiktok-comment-item {
-display: flex; align-items: flex-start; gap: 8px;
-color: #ffe6f0; font-size: 13px;
-font-family: ‘Comic Sans MS’, cursive;
-}
-.tiktok-comment-item img {
-width: 26px; height: 26px;
-border-radius: 50%;
-object-fit: cover;
-flex-shrink: 0;
-pointer-events: none;
-}
-.tiktok-comment-input-row {
-display: flex; gap: 8px; align-items: center;
-margin-top: 6px;
-flex-shrink: 0;
-}
-.tiktok-comment-input-row input {
-flex: 1;
-background: rgba(255,230,240,0.1);
-border: 1px solid rgba(255,182,193,0.4);
-border-radius: 24px;
-color: #ffe6f0;
-font-size: 14px;
-font-family: ‘Comic Sans MS’, cursive;
-padding: 8px 14px;
-outline: none;
-}
-.tiktok-comment-input-row input::placeholder { color: rgba(255,230,240,0.38); }
-.tiktok-comment-send {
-background: linear-gradient(135deg,#ff2d78,#b84c6f);
-border: none;
-border-radius: 50%;
-width: 38px; height: 38px;
-display: flex; align-items: center; justify-content: center;
-cursor: pointer;
-flex-shrink: 0;
-color: #fff;
-font-size: 16px;
-box-shadow: 0 2px 8px rgba(255,45,120,0.5);
-}
-
-/* Fond sombre pour fermer le panel */
-.tiktok-comment-backdrop {
-display: none;
-position: fixed; inset: 0;
-z-index: 60000;
-background: rgba(0,0,0,0.5);
-}
-.tiktok-comment-backdrop.open { display: block; }
+.tiktok-react-btn:active svg{transform:scale(1.4);}
+.tiktok-react-btn.liked svg{stroke:#ff2d78;fill:#ff2d78;filter:drop-shadow(0 0 10px rgba(255,45,120,0.8));}
+.tiktok-react-btn span{font-size:13px;font-weight:bold;text-shadow:0 1px 4px rgba(0,0,0,0.9);}
 
 /* Cœurs animés */
-.tk-heart {
-position: fixed;
-pointer-events: none;
-z-index: 60002;
-animation: tkHeartFly var(–dur, 1s) ease-out forwards;
-will-change: transform, opacity;
-line-height: 1;
+.tk-heart{
+position:fixed;pointer-events:none;z-index:60002;
+animation:tkHeartFly var(–dur,1s) ease-out forwards;
+will-change:transform,opacity;line-height:1;
 }
-@keyframes tkHeartFly {
-0%   { opacity: 1; transform: translate(0,0) scale(1) rotate(var(–r0)); }
-70%  { opacity: 0.85; }
-100% { opacity: 0; transform: translate(var(–dx),var(–dy)) scale(var(–sf)) rotate(var(–r1)); }
+@keyframes tkHeartFly{
+0%{opacity:1;transform:translate(0,0) scale(1) rotate(var(–r0));}
+70%{opacity:0.85;}
+100%{opacity:0;transform:translate(var(–dx),var(–dy)) scale(var(–sf)) rotate(var(–r1));}
 }
 
-/* Bouton fermer */
-#closeTiktok {
-position: fixed; top: 14px; left: 14px;
-width: 38px; height: 38px;
-background: rgba(13,0,8,0.6);
-backdrop-filter: blur(8px);
-border: 2px solid rgba(255,182,193,0.5);
-border-radius: 50%;
-display: none; align-items: center; justify-content: center;
-color: #ffe6f0; font-size: 20px; font-weight: bold;
-cursor: pointer; z-index: 50001;
-transition: transform 0.2s, background 0.2s;
+/* Modal commentaires TikTok (par-dessus tout) */
+#tkCommentModal{
+display:none;position:fixed;inset:0;
+z-index:60001;
+background:rgba(0,0,0,0.55);
+align-items:flex-end;justify-content:center;
 }
-#closeTiktok.visible { display: flex; }
-#closeTiktok:hover { transform: scale(1.12); background: rgba(255,45,120,0.45); }
+#tkCommentModal.visible{display:flex;}
+#tkCommentBox{
+width:100%;max-width:500px;
+background:rgba(13,0,8,0.97);
+backdrop-filter:blur(20px);
+border-top:2px solid rgba(255,182,193,0.4);
+border-radius:22px 22px 0 0;
+padding:8px 16px max(env(safe-area-inset-bottom,0px),20px);
+max-height:70vh;
+display:flex;flex-direction:column;gap:8px;
+}
+#tkCommentHandle{width:40px;height:4px;background:rgba(255,182,193,0.45);border-radius:2px;margin:4px auto 8px;flex-shrink:0;}
+#tkCommentTitle{color:#ffb6c1;font-size:15px;font-weight:bold;text-align:center;margin-bottom:4px;flex-shrink:0;}
+#tkCommentList{
+flex:1;overflow-y:auto;
+display:flex;flex-direction:column;gap:10px;
+max-height:40vh;padding-bottom:4px;
+}
+.tk-comment-item{display:flex;align-items:flex-start;gap:8px;color:#ffe6f0;font-size:13px;}
+.tk-comment-item img{width:26px;height:26px;border-radius:50%;object-fit:cover;flex-shrink:0;}
+#tkCommentInputRow{display:flex;gap:8px;align-items:center;margin-top:6px;flex-shrink:0;}
+#tkCommentInputRow input{
+flex:1;background:rgba(255,230,240,0.1);
+border:1px solid rgba(255,182,193,0.4);border-radius:24px;
+color:#ffe6f0;font-size:14px;padding:8px 14px;outline:none;
+}
+#tkCommentInputRow input::placeholder{color:rgba(255,230,240,0.38);}
+#tkCommentSend{
+background:linear-gradient(135deg,#ff2d78,#b84c6f);
+border:none;border-radius:50%;width:38px;height:38px;
+display:flex;align-items:center;justify-content:center;
+cursor:pointer;color:#fff;font-size:16px;
+box-shadow:0 2px 8px rgba(255,45,120,0.5);flex-shrink:0;
+}
 
-@media (min-width: 600px) {
-.tiktok-info { max-width: 55%; }
-.tiktok-comment-panel { max-width: 480px; left: 50%; transform: translateX(-50%) translateY(100%); border-radius: 22px 22px 0 0; }
-.tiktok-comment-panel.open { transform: translateX(-50%) translateY(0); }
+#closeTiktok{
+position:fixed;top:14px;left:14px;width:38px;height:38px;
+background:rgba(13,0,8,0.6);backdrop-filter:blur(8px);
+border:2px solid rgba(255,182,193,0.5);border-radius:50%;
+display:none;align-items:center;justify-content:center;
+color:#ffe6f0;font-size:20px;font-weight:bold;
+cursor:pointer;z-index:50001;transition:transform 0.2s,background 0.2s;
 }
+#closeTiktok.visible{display:flex;}
+#closeTiktok:hover{transform:scale(1.12);background:rgba(255,45,120,0.45);}
 </style>
 
 </head>
@@ -458,11 +320,8 @@ transition: transform 0.2s, background 0.2s;
 <img id="ownerPhoto" alt="Owner">
 <button id="editPhotoBtn">✏️ Modifier photo</button>
 <input type="file" id="ownerFileInput" accept="image/*" style="display:none;">
-
 <div id="ownerRings">
-  <div class="owner-ring"></div>
-  <div class="owner-ring"></div>
-  <div class="owner-ring"></div>
+  <div class="owner-ring"></div><div class="owner-ring"></div><div class="owner-ring"></div>
 </div>
 
 <button id="tiktokBtn" title="Vue TikTok">
@@ -473,19 +332,27 @@ transition: transform 0.2s, background 0.2s;
   </svg>
 </button>
 
-<div id="tiktokOverlay">
-  <div id="tiktokFeed"></div>
-</div>
+<div id="tiktokOverlay"><div id="tiktokFeed"></div></div>
 <div id="closeTiktok">×</div>
 
-<!-- Backdrop commentaires TikTok (attaché au body) -->
+<!-- Modal commentaires TikTok -->
 
-<div class="tiktok-comment-backdrop" id="tkBackdrop"></div>
+<div id="tkCommentModal">
+  <div id="tkCommentBox">
+    <div id="tkCommentHandle"></div>
+    <div id="tkCommentTitle">Commentaires</div>
+    <div id="tkCommentList"></div>
+    <div id="tkCommentInputRow">
+      <input type="text" id="tkCommentInput" placeholder="Ajouter un commentaire…">
+      <button id="tkCommentSend">➤</button>
+    </div>
+  </div>
+</div>
 
 <div id="photoOverlay">
   <div class="overlay-ring-wrap">
     <div class="overlay-ring"></div><div class="overlay-ring"></div><div class="overlay-ring"></div>
-    <img id="overlayImg" src="" alt="photo" title="Appuyer pour changer la photo">
+    <img id="overlayImg" src="" alt="photo">
   </div>
   <div id="overlayPrenom"></div>
   <div id="overlayChangeHint">📷 appuyer pour changer</div>
@@ -596,26 +463,10 @@ const SB_URL="https://kdgxbmqwhpuctjtlygrt.supabase.co";
 const SB_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtkZ3hibXF3aHB1Y3RqdGx5Z3J0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUyMjY0NzQsImV4cCI6MjA5MDgwMjQ3NH0.9RsIj_bQgJskg9raRGN6uQJwUUlByTvWAFF2Eq9f6KM";
 const SB_HEADERS={"apikey":SB_KEY,"Authorization":"Bearer "+SB_KEY,"Content-Type":"application/json"};
 
-function resetViewport() {
-  setTimeout(() => {
-    const meta = document.querySelector('meta[name="viewport"]');
-    if (!meta) return;
-    meta.setAttribute('content', 'width=device-width, initial-scale=1.0, maximum-scale=1.0');
-    setTimeout(() => {
-      meta.setAttribute('content', 'width=device-width, initial-scale=1.0');
-      const bg = document.getElementById('bg');
-      if (bg) { bg.style.display = 'none'; bg.offsetHeight; bg.style.display = ''; }
-    }, 50);
-  }, 150);
-}
-document.addEventListener('focusout', resetViewport);
+function resetViewport(){setTimeout(()=>{const meta=document.querySelector('meta[name="viewport"]');if(!meta)return;meta.setAttribute('content','width=device-width, initial-scale=1.0, maximum-scale=1.0');setTimeout(()=>{meta.setAttribute('content','width=device-width, initial-scale=1.0');const bg=document.getElementById('bg');if(bg){bg.style.display='none';bg.offsetHeight;bg.style.display='';}},50);},150);}
+document.addEventListener('focusout',resetViewport);
 
-function parseJsonField(val){
-  if(Array.isArray(val))return val;
-  if(!val||val===''||val==='null')return[];
-  if(typeof val==='string'){try{const p=JSON.parse(val);return Array.isArray(p)?p:[];}catch(e){return[];}}
-  return[];
-}
+function parseJsonField(val){if(Array.isArray(val))return val;if(!val||val===''||val==='null')return[];if(typeof val==='string'){try{const p=JSON.parse(val);return Array.isArray(p)?p:[];}catch(e){return[];}}return[];}
 
 const supabase={
   from:(table)=>({
@@ -630,53 +481,100 @@ const supabase={
     }),
     insert:async(rows)=>{const r=await fetch(`${SB_URL}/rest/v1/${table}`,{method:'POST',headers:{...SB_HEADERS,"Prefer":"return=minimal"},body:JSON.stringify(Array.isArray(rows)?rows:[rows])});if(!r.ok){const d=await r.json();return{data:null,error:d};}return{data:true,error:null};},
     upsert:async(row,opts={})=>{const h={...SB_HEADERS,"Prefer":"resolution=merge-duplicates,return=minimal"};if(opts.onConflict)h["Prefer"]+=`,on_conflict=${opts.onConflict}`;const r=await fetch(`${SB_URL}/rest/v1/${table}`,{method:'POST',headers:h,body:JSON.stringify(row)});if(!r.ok){const d=await r.json();return{data:null,error:d};}return{data:true,error:null};},
-    update:(updates)=>({eq:async(col,val)=>{
-      const r=await fetch(`${SB_URL}/rest/v1/${table}?${col}=eq.${encodeURIComponent(String(val))}`,{method:'PATCH',headers:{...SB_HEADERS,"Prefer":"return=minimal"},body:JSON.stringify(updates)});
-      if(!r.ok){let d={};try{d=await r.json();}catch(e){}return{error:d};}
-      return{error:null};
-    }}),
+    update:(updates)=>({eq:async(col,val)=>{const r=await fetch(`${SB_URL}/rest/v1/${table}?${col}=eq.${encodeURIComponent(String(val))}`,{method:'PATCH',headers:{...SB_HEADERS,"Prefer":"return=minimal"},body:JSON.stringify(updates)});if(!r.ok){let d={};try{d=await r.json();}catch(e){}return{error:d};}return{error:null};}}),
     delete:()=>({eq:async(col,val)=>{const r=await fetch(`${SB_URL}/rest/v1/${table}?${col}=eq.${encodeURIComponent(val)}`,{method:'DELETE',headers:SB_HEADERS});return{error:r.ok?null:await r.json()};}})
   })
 };
 
-let creations=[],currentZoom=null,currentDelete=null,
-    currentChatUser=localStorage.getItem('currentChatUser')||null,userPhotos={};
-const ownerPhoto    = document.getElementById('ownerPhoto');
-const ownerRings    = document.getElementById('ownerRings');
-const editPhotoBtn  = document.getElementById('editPhotoBtn');
-const ownerFileInput= document.getElementById('ownerFileInput');
-const prenom        = localStorage.getItem('prenom');
-const myPrenom      = prenom;
-const chatUserList  = document.getElementById('chatUserList');
-const chatMessages  = document.getElementById('chatMessages');
-const chatInput     = document.getElementById('chatInput');
-const sendMsgBtn    = document.getElementById('sendMsgBtn');
-const addModal      = document.getElementById('addModal');
-const deleteModal   = document.getElementById('deleteModal');
-const zoomModal     = document.getElementById('zoomModal');
-const sidebar       = document.getElementById('sidebar');
-const mainZoom      = document.getElementById('mainZoom');
-const thumbs        = document.getElementById('thumbs');
-const likeCount     = document.getElementById('likeCount');
-const commentCount  = document.getElementById('commentCount');
-const likeModal     = document.getElementById('likeModal');
-const likeBubbles   = document.getElementById('likeBubbles');
-const confirmLike   = document.getElementById('confirmLike');
-const likeNameInput = document.getElementById('likeName');
-const commentModal  = document.getElementById('commentModal');
-const confirmComment= document.getElementById('confirmComment');
-const commentBubbles= document.getElementById('commentBubbles');
-const commentNameInput  = document.getElementById('commentName');
-const commentTextInput  = document.getElementById('commentText');
-const chatModal     = document.getElementById('chatModal');
-const toggleChatSize= document.getElementById('toggleChatSize');
-const icon          = document.getElementById('chatResizeIcon');
-const fileBtn       = document.getElementById('fileBtn');
-const fileInput     = document.getElementById('multiPhoto');
-const fileInfo      = document.getElementById('fileInfo');
-const zoomLegend    = document.getElementById('zoomLegend');
-const photoOverlay  = document.getElementById('photoOverlay');
-const overlayImg    = document.getElementById('overlayImg');
+let creations=[],currentZoom=null,currentDelete=null,currentChatUser=localStorage.getItem('currentChatUser')||null,userPhotos={};
+const ownerPhoto=document.getElementById('ownerPhoto');
+const ownerRings=document.getElementById('ownerRings');
+const editPhotoBtn=document.getElementById('editPhotoBtn');
+const ownerFileInput=document.getElementById('ownerFileInput');
+const prenom=localStorage.getItem('prenom');
+const myPrenom=prenom;
+const chatUserList=document.getElementById('chatUserList');
+const chatMessages=document.getElementById('chatMessages');
+const chatInput=document.getElementById('chatInput');
+const sendMsgBtn=document.getElementById('sendMsgBtn');
+const addModal=document.getElementById('addModal');
+const deleteModal=document.getElementById('deleteModal');
+const zoomModal=document.getElementById('zoomModal');
+const sidebar=document.getElementById('sidebar');
+const mainZoom=document.getElementById('mainZoom');
+const thumbs=document.getElementById('thumbs');
+const likeCount=document.getElementById('likeCount');
+const commentCount=document.getElementById('commentCount');
+const likeModal=document.getElementById('likeModal');
+const likeBubbles=document.getElementById('likeBubbles');
+const confirmLike=document.getElementById('confirmLike');
+const likeNameInput=document.getElementById('likeName');
+const commentModal=document.getElementById('commentModal');
+const confirmComment=document.getElementById('confirmComment');
+const commentBubbles=document.getElementById('commentBubbles');
+const commentNameInput=document.getElementById('commentName');
+const commentTextInput=document.getElementById('commentText');
+const chatModal=document.getElementById('chatModal');
+const toggleChatSize=document.getElementById('toggleChatSize');
+const icon=document.getElementById('chatResizeIcon');
+const fileBtn=document.getElementById('fileBtn');
+const fileInput=document.getElementById('multiPhoto');
+const fileInfo=document.getElementById('fileInfo');
+const zoomLegend=document.getElementById('zoomLegend');
+const photoOverlay=document.getElementById('photoOverlay');
+const overlayImg=document.getElementById('overlayImg');
+
+// Modal commentaires TikTok
+const tkCommentModal=document.getElementById('tkCommentModal');
+const tkCommentList=document.getElementById('tkCommentList');
+const tkCommentInput=document.getElementById('tkCommentInput');
+const tkCommentSend=document.getElementById('tkCommentSend');
+let tkCurrentCreation=null;
+let tkCurrentCommentBtn=null;
+
+function openTkComments(creation, commentBtn) {
+  tkCurrentCreation = creation;
+  tkCurrentCommentBtn = commentBtn;
+  tkCommentList.innerHTML = '';
+  (creation.comments||[]).forEach(cm => {
+    const item = document.createElement('div');
+    item.className = 'tk-comment-item';
+    item.innerHTML = `${cm.photo?`<img src="${cm.photo}" alt="">`:''}<span><strong>${cm.name}</strong> ${cm.text}</span>`;
+    tkCommentList.appendChild(item);
+  });
+  tkCommentList.scrollTop = tkCommentList.scrollHeight;
+  tkCommentInput.value = '';
+  tkCommentModal.classList.add('visible');
+  setTimeout(() => tkCommentInput.focus(), 300);
+}
+
+function closeTkComments() {
+  tkCommentModal.classList.remove('visible');
+  tkCurrentCreation = null;
+}
+
+tkCommentModal.addEventListener('click', e => { if(e.target===tkCommentModal) closeTkComments(); });
+document.getElementById('tkCommentBox').addEventListener('click', e => e.stopPropagation());
+
+tkCommentSend.onclick = async () => {
+  const text = tkCommentInput.value.trim();
+  if (!text || !tkCurrentCreation) return;
+  const cr = creations.find(x => x.id === tkCurrentCreation.id);
+  if (!cr) return;
+  if (!Array.isArray(cr.comments)) cr.comments = [];
+  const newCom = { name: myPrenom||'?', text, photo: ownerPhoto.src||'' };
+  cr.comments.push(newCom);
+  await supabase.from('creations').update({ comments: cr.comments }).eq('id', cr.id);
+  const item = document.createElement('div');
+  item.className = 'tk-comment-item';
+  item.innerHTML = `${newCom.photo?`<img src="${newCom.photo}" alt="">`:''}<span><strong>${newCom.name}</strong> ${newCom.text}</span>`;
+  tkCommentList.appendChild(item);
+  tkCommentList.scrollTop = tkCommentList.scrollHeight;
+  tkCommentInput.value = '';
+  if (tkCurrentCommentBtn) tkCurrentCommentBtn.querySelector('span').textContent = cr.comments.length;
+  if (currentZoom && currentZoom.id === cr.id) currentZoom.comments = [...cr.comments];
+};
+tkCommentInput.addEventListener('keydown', e => { if(e.key==='Enter') tkCommentSend.onclick(); });
 
 mainZoom.addEventListener('mousedown',e=>e.stopPropagation());
 mainZoom.addEventListener('touchstart',e=>e.stopPropagation());
@@ -685,16 +583,9 @@ zoomLegend.addEventListener('touchstart',e=>e.stopPropagation());
 fileBtn.onclick=()=>fileInput.click();
 fileInput.onchange=()=>{fileInfo.textContent=fileInput.files.length?`${fileInput.files.length} photo(s) sélectionnée(s)`:''};
 
-window.addEventListener('resize',()=>{
-  if(mainZoom.dataset.scale&&parseFloat(mainZoom.dataset.scale)!==1){
-    mainZoom.dataset.scale=1;mainZoom.dataset.x=0;mainZoom.dataset.y=0;
-    mainZoom.style.transform='translate(0px,0px) scale(1)';
-  }
-});
+window.addEventListener('resize',()=>{if(mainZoom.dataset.scale&&parseFloat(mainZoom.dataset.scale)!==1){mainZoom.dataset.scale=1;mainZoom.dataset.x=0;mainZoom.dataset.y=0;mainZoom.style.transform='translate(0px,0px) scale(1)';}});
 
-// =============================================
-// OWNER PHOTO
-// =============================================
+// ===== OWNER PHOTO =====
 function loadOwnerPhoto(){
   const p=prenom||localStorage.getItem('prenom');
   const cached=localStorage.getItem('photo_url')||(p?localStorage.getItem('photo_url_'+p):null);
@@ -708,94 +599,64 @@ function openOverlay(){
   photoOverlay.classList.add('visible');
 }
 
-ownerPhoto.addEventListener('click', () => { openOverlay(); });
-overlayImg.addEventListener('click', (e) => { e.stopPropagation(); ownerFileInput.click(); });
-photoOverlay.addEventListener('click', () => { photoOverlay.classList.remove('visible'); });
+document.addEventListener('click',e=>{if(e.target!==ownerPhoto&&e.target!==editPhotoBtn)editPhotoBtn.style.display='none';});
 
-ownerFileInput.onchange = async () => {
-  const file = ownerFileInput.files[0];
-  if (!file) return;
-  try {
-    const compressed = await new Promise(resolve => {
-      const reader = new FileReader();
-      reader.onload = e2 => {
-        const img = new Image();
-        img.onload = () => {
-          const canvas = document.createElement('canvas');
-          let w = img.width, h = img.height, max = 400;
-          if (w > h && w > max) { h = h * max / w; w = max; }
-          else if (h > max) { w = w * max / h; h = max; }
-          canvas.width = w; canvas.height = h;
-          canvas.getContext('2d').drawImage(img, 0, 0, w, h);
-          canvas.toBlob(blob => resolve(new File([blob], 'photo.jpg', { type: 'image/jpeg' })), 'image/jpeg', 0.8);
-        };
-        img.src = e2.target.result;
-      };
-      reader.readAsDataURL(file);
-    });
-    const formData = new FormData();
-    formData.append('image', compressed);
-    const res = await fetch('https://api.imgbb.com/1/upload?key=1612fdd94e39f24c3d14f1864f41d591', { method: 'POST', body: formData });
-    const json = await res.json();
-    if (!json.success) throw new Error('ImgBB error');
-    const url = json.data.url;
-    ownerPhoto.src = url;
-    overlayImg.src = url;
-    localStorage.setItem('photo_url', url);
-    if (prenom) localStorage.setItem('photo_url_' + prenom, url);
-    if (prenom) { await supabase.from('profiles').upsert({ prenom, photo_url: url }, { onConflict: 'prenom' }); }
+ownerPhoto.addEventListener('click',()=>{
+  if(editPhotoBtn.style.display==='block'){editPhotoBtn.style.display='none';return;}
+  openOverlay();
+});
+
+let longPressTimer=null,longPressTriggered=false;
+function startLongPress(){longPressTriggered=false;ownerRings.style.opacity='1';ownerRings.classList.add('pulsing');longPressTimer=setTimeout(()=>{longPressTriggered=true;ownerRings.classList.remove('pulsing');ownerRings.style.opacity='0';editPhotoBtn.style.display='block';},800);}
+function endLongPress(){clearTimeout(longPressTimer);ownerRings.classList.remove('pulsing');ownerRings.style.opacity='0';}
+
+ownerPhoto.addEventListener('mousedown',startLongPress);
+ownerPhoto.addEventListener('mouseup',endLongPress);
+ownerPhoto.addEventListener('mouseleave',endLongPress);
+ownerPhoto.addEventListener('touchstart',startLongPress,{passive:true});
+ownerPhoto.addEventListener('touchend',e=>{endLongPress();if(!longPressTriggered)openOverlay();longPressTriggered=false;});
+ownerPhoto.addEventListener('touchcancel',endLongPress);
+
+editPhotoBtn.onclick=()=>{editPhotoBtn.style.display='none';ownerFileInput.click();};
+
+ownerFileInput.onchange=async()=>{
+  const file=ownerFileInput.files[0];if(!file)return;
+  try{
+    const compressed=await new Promise(resolve=>{const reader=new FileReader();reader.onload=e2=>{const img=new Image();img.onload=()=>{const canvas=document.createElement('canvas');let w=img.width,h=img.height,max=400;if(w>h&&w>max){h=h*max/w;w=max;}else if(h>max){w=w*max/h;h=max;}canvas.width=w;canvas.height=h;canvas.getContext('2d').drawImage(img,0,0,w,h);canvas.toBlob(blob=>resolve(new File([blob],'photo.jpg',{type:'image/jpeg'})),'image/jpeg',0.8);};img.src=e2.target.result;};reader.readAsDataURL(file);});
+    const formData=new FormData();formData.append('image',compressed);
+    const res=await fetch('https://api.imgbb.com/1/upload?key=1612fdd94e39f24c3d14f1864f41d591',{method:'POST',body:formData});
+    const json=await res.json();if(!json.success)throw new Error('ImgBB error');
+    const url=json.data.url;ownerPhoto.src=url;overlayImg.src=url;
+    localStorage.setItem('photo_url',url);
+    if(prenom){localStorage.setItem('photo_url_'+prenom,url);await supabase.from('profiles').upsert({prenom,photo_url:url},{onConflict:'prenom'});}
     photoOverlay.classList.remove('visible');
-  } catch (err) {
-    alert('Erreur upload photo : ' + (err?.message || err));
-  }
+  }catch(err){alert('Erreur upload photo : '+(err?.message||err));}
 };
 
-// =============================================
-// MESSAGES
-// =============================================
+overlayImg.addEventListener('click',e=>{e.stopPropagation();ownerFileInput.click();});
+photoOverlay.addEventListener('click',()=>photoOverlay.classList.remove('visible'));
+
+// ===== MESSAGES =====
 async function loadMessages(){
   if(!currentChatUser)return;
   const{data,error}=await supabase.from('messages').select('*').or(`and(sender.eq.${myPrenom},receiver.eq.${currentChatUser}),and(sender.eq.${currentChatUser},receiver.eq.${myPrenom})`).order('created_at',{ascending:true});
   if(error)return;
   chatMessages.innerHTML='';
-  data.forEach(msg=>{
-    const div=document.createElement('div');
-    div.className='msg '+(msg.sender===myPrenom?'msg-me':'msg-them');
-    const circle=document.createElement('img');
-    circle.style.cssText='width:24px;height:24px;border-radius:50%;margin-right:6px;vertical-align:middle;';
-    circle.src=msg.sender===myPrenom?ownerPhoto.src||'icon-152.png':userPhotos[msg.sender]||'icon-152.png';
-    const p=document.createElement('p');p.style.cssText='display:inline-block;margin:0;';p.textContent=msg.content;
-    div.appendChild(circle);div.appendChild(p);chatMessages.appendChild(div);
-  });
+  data.forEach(msg=>{const div=document.createElement('div');div.className='msg '+(msg.sender===myPrenom?'msg-me':'msg-them');const circle=document.createElement('img');circle.style.cssText='width:24px;height:24px;border-radius:50%;margin-right:6px;vertical-align:middle;';circle.src=msg.sender===myPrenom?ownerPhoto.src||'icon-152.png':userPhotos[msg.sender]||'icon-152.png';const p=document.createElement('p');p.style.cssText='display:inline-block;margin:0;';p.textContent=msg.content;div.appendChild(circle);div.appendChild(p);chatMessages.appendChild(div);});
   chatMessages.scrollTop=chatMessages.scrollHeight;
 }
 
-sendMsgBtn.onclick=async()=>{
-  const text=chatInput.value.trim();if(!text||!currentChatUser)return;
-  await supabase.from('messages').insert({sender:myPrenom,receiver:currentChatUser,content:text});
-  chatInput.value='';loadMessages();
-};
+sendMsgBtn.onclick=async()=>{const text=chatInput.value.trim();if(!text||!currentChatUser)return;await supabase.from('messages').insert({sender:myPrenom,receiver:currentChatUser,content:text});chatInput.value='';loadMessages();};
 
 let lastMsgId=null;
-setInterval(async()=>{
-  if(!currentChatUser||!prenom)return;
-  try{const{data}=await supabase.from('messages').select('*').eq('receiver',prenom).order('created_at',{ascending:false}).limit(1);if(data&&data[0]&&data[0].id!==lastMsgId){lastMsgId=data[0].id;const msg=data[0];if(msg.sender!==currentChatUser)showInAppNotification(msg.sender,msg.content);else loadMessages();}}catch(e){}
-},5000);
+setInterval(async()=>{if(!currentChatUser||!prenom)return;try{const{data}=await supabase.from('messages').select('*').eq('receiver',prenom).order('created_at',{ascending:false}).limit(1);if(data&&data[0]&&data[0].id!==lastMsgId){lastMsgId=data[0].id;const msg=data[0];if(msg.sender!==currentChatUser)showInAppNotification(msg.sender,msg.content);else loadMessages();}}catch(e){}},5000);
 
 async function loadChatUsers(){
   try{
     const{data:users,error}=await supabase.from('profiles').select('prenom, photo_url').neq('prenom',myPrenom);
     if(error)throw error;
     chatUserList.innerHTML='';
-    users.forEach(u=>{
-      userPhotos[u.prenom]=u.photo_url||'icon-152.png';
-      const div=document.createElement('div');div.className='chat-user';
-      const img=document.createElement('img');img.src=u.photo_url||'icon-152.png';img.alt=u.prenom;
-      const span=document.createElement('span');span.textContent=u.prenom;
-      div.appendChild(img);div.appendChild(span);
-      div.onclick=()=>{currentChatUser=u.prenom;localStorage.setItem('currentChatUser',u.prenom);loadMessages();document.querySelectorAll('.chat-user').forEach(el=>el.classList.remove('active'));div.classList.add('active');};
-      chatUserList.appendChild(div);
-    });
+    users.forEach(u=>{userPhotos[u.prenom]=u.photo_url||'icon-152.png';const div=document.createElement('div');div.className='chat-user';const img=document.createElement('img');img.src=u.photo_url||'icon-152.png';img.alt=u.prenom;const span=document.createElement('span');span.textContent=u.prenom;div.appendChild(img);div.appendChild(span);div.onclick=()=>{currentChatUser=u.prenom;localStorage.setItem('currentChatUser',u.prenom);loadMessages();document.querySelectorAll('.chat-user').forEach(el=>el.classList.remove('active'));div.classList.add('active');};chatUserList.appendChild(div);});
     if(currentChatUser){setTimeout(()=>{document.querySelectorAll('.chat-user').forEach(el=>{if(el.textContent.includes(currentChatUser))el.classList.add('active');});},500);loadMessages();}
   }catch(err){console.error(err);}
 }
@@ -806,9 +667,7 @@ function showInAppNotification(sender,message){
 }
 if('Notification'in window&&Notification.permission!=='granted')Notification.requestPermission();
 
-// =============================================
-// CREATIONS
-// =============================================
+// ===== CREATIONS =====
 async function refreshCreations(){
   try{
     const{data,error}=await supabase.from('creations').select('*').order('created_at',{ascending:false});
@@ -817,14 +676,7 @@ async function refreshCreations(){
       let zoomGroup=[];
       if(Array.isArray(c.images)&&c.images.length)zoomGroup=c.images;
       else if(c.image_path)zoomGroup=[c.image_path];
-      return{
-        id:c.id,name:c.titre||c.name||'',legend:c.legend||'',
-        imgUrl:zoomGroup[0]||'',zoomGroup,
-        likes:parseJsonField(c.likes),
-        comments:parseJsonField(c.comments),
-        x:c.x||0,y:c.y||0,scale:c.scale||1,
-        x_legend:c.x_legend||0,y_legend:c.y_legend||0,scale_legend:c.scale_legend||1
-      };
+      return{id:c.id,name:c.titre||c.name||'',legend:c.legend||'',imgUrl:zoomGroup[0]||'',zoomGroup,likes:parseJsonField(c.likes),comments:parseJsonField(c.comments),x:c.x||0,y:c.y||0,scale:c.scale||1,x_legend:c.x_legend||0,y_legend:c.y_legend||0,scale_legend:c.scale_legend||1};
     });
     renderCreations(creations);
   }catch(e){console.error('refreshCreations:',e?.message);}
@@ -835,18 +687,10 @@ async function savePosition(x,y,isLegend){
   if(!currentZoom||!currentZoom.id)return;
   clearTimeout(saveTimeout);
   saveTimeout=setTimeout(async()=>{
-    if(isLegend){
-      currentZoom.x_legend=parseFloat(x);currentZoom.y_legend=parseFloat(y);currentZoom.scale_legend=parseFloat(zoomLegend.dataset.scale)||1;
-      await supabase.from('creations').update({x_legend:currentZoom.x_legend,y_legend:currentZoom.y_legend,scale_legend:currentZoom.scale_legend}).eq('id',currentZoom.id);
-    }else{
-      currentZoom.x=parseFloat(x);currentZoom.y=parseFloat(y);currentZoom.scale=parseFloat(mainZoom.dataset.scale)||1;
-      await supabase.from('creations').update({x:currentZoom.x,y:currentZoom.y,scale:currentZoom.scale}).eq('id',currentZoom.id);
-    }
+    if(isLegend){currentZoom.x_legend=parseFloat(x);currentZoom.y_legend=parseFloat(y);currentZoom.scale_legend=parseFloat(zoomLegend.dataset.scale)||1;await supabase.from('creations').update({x_legend:currentZoom.x_legend,y_legend:currentZoom.y_legend,scale_legend:currentZoom.scale_legend}).eq('id',currentZoom.id);}
+    else{currentZoom.x=parseFloat(x);currentZoom.y=parseFloat(y);currentZoom.scale=parseFloat(mainZoom.dataset.scale)||1;await supabase.from('creations').update({x:currentZoom.x,y:currentZoom.y,scale:currentZoom.scale}).eq('id',currentZoom.id);}
     const idx=creations.findIndex(c=>c.id===currentZoom.id);
-    if(idx!==-1){
-      if(isLegend){creations[idx].x_legend=currentZoom.x_legend;creations[idx].y_legend=currentZoom.y_legend;creations[idx].scale_legend=currentZoom.scale_legend;}
-      else{creations[idx].x=currentZoom.x;creations[idx].y=currentZoom.y;creations[idx].scale=currentZoom.scale;}
-    }
+    if(idx!==-1){if(isLegend){creations[idx].x_legend=currentZoom.x_legend;creations[idx].y_legend=currentZoom.y_legend;creations[idx].scale_legend=currentZoom.scale_legend;}else{creations[idx].x=currentZoom.x;creations[idx].y=currentZoom.y;creations[idx].scale=currentZoom.scale;}}
   },600);
 }
 
@@ -899,35 +743,27 @@ function openZoom(c){
   zoomModal.style.display='flex';document.body.classList.add('modal-open');document.body.style.overflow='hidden';
 }
 
-document.getElementById('likeBtn').onclick=()=>{
-  if(!currentZoom){alert("Sélectionnez d'abord une image!");return;}
-  likeNameInput.value=myPrenom||'';
-  renderLikeList();likeModal.style.display='flex';
-};
+document.getElementById('likeBtn').onclick=()=>{if(!currentZoom){alert("Sélectionnez d'abord une image!");return;}likeNameInput.value=myPrenom||'';renderLikeList();likeModal.style.display='flex';};
 
 confirmLike.onclick=async()=>{
-  if(!currentZoom)return;
-  const name=likeNameInput.value.trim();if(!name)return;
+  if(!currentZoom)return;const name=likeNameInput.value.trim();if(!name)return;
   if(!Array.isArray(currentZoom.likes))currentZoom.likes=parseJsonField(currentZoom.likes);
   if(!currentZoom.likes.some(l=>l.name===name))currentZoom.likes.push({name,photo:ownerPhoto.src||''});
   const{error}=await supabase.from('creations').update({likes:currentZoom.likes}).eq('id',currentZoom.id);
   if(error){alert('❌ Like error: '+JSON.stringify(error));return;}
-  const idx=creations.findIndex(x=>x.id===currentZoom.id);
-  if(idx!==-1)creations[idx].likes=[...currentZoom.likes];
+  const idx=creations.findIndex(x=>x.id===currentZoom.id);if(idx!==-1)creations[idx].likes=[...currentZoom.likes];
   renderLikeList();likeModal.style.display='none';
 };
 
 document.getElementById('commentBtn').onclick=()=>{if(!currentZoom)return;commentNameInput.value=myPrenom||'';commentTextInput.value='';renderCommentList();commentModal.style.display='flex';};
 
 confirmComment.onclick=async()=>{
-  if(!currentZoom)return;
-  const name=commentNameInput.value.trim();const text=commentTextInput.value.trim();if(!name||!text)return;
+  if(!currentZoom)return;const name=commentNameInput.value.trim();const text=commentTextInput.value.trim();if(!name||!text)return;
   if(!Array.isArray(currentZoom.comments))currentZoom.comments=parseJsonField(currentZoom.comments);
   currentZoom.comments.push({name,text,photo:ownerPhoto.src||''});
   const{error}=await supabase.from('creations').update({comments:currentZoom.comments}).eq('id',currentZoom.id);
   if(error){console.error('Comment error:',JSON.stringify(error));return;}
-  const idx=creations.findIndex(x=>x.id===currentZoom.id);
-  if(idx!==-1)creations[idx].comments=[...currentZoom.comments];
+  const idx=creations.findIndex(x=>x.id===currentZoom.id);if(idx!==-1)creations[idx].comments=[...currentZoom.comments];
   renderCommentList();commentTextInput.value='';commentCount.textContent=currentZoom.comments.length;
 };
 
@@ -947,14 +783,10 @@ document.getElementById('confirmAdd').onclick=async()=>{
     const imageUrls=[];
     for(let i=0;i<files.length;i++){
       try{
-        const compressed=await new Promise(resolve=>{
-          const reader=new FileReader();
-          reader.onload=e2=>{const img=new Image();img.onload=()=>{const canvas=document.createElement('canvas');let w=img.width,h=img.height,max=1200;if(w>h&&w>max){h=h*max/w;w=max;}else if(h>max){w=w*max/h;h=max;}canvas.width=w;canvas.height=h;canvas.getContext('2d').drawImage(img,0,0,w,h);canvas.toBlob(blob=>resolve(new File([blob],'photo.jpg',{type:'image/jpeg'})),'image/jpeg',0.75);};img.src=e2.target.result;};reader.readAsDataURL(files[i]);
-        });
+        const compressed=await new Promise(resolve=>{const reader=new FileReader();reader.onload=e2=>{const img=new Image();img.onload=()=>{const canvas=document.createElement('canvas');let w=img.width,h=img.height,max=1200;if(w>h&&w>max){h=h*max/w;w=max;}else if(h>max){w=w*max/h;h=max;}canvas.width=w;canvas.height=h;canvas.getContext('2d').drawImage(img,0,0,w,h);canvas.toBlob(blob=>resolve(new File([blob],'photo.jpg',{type:'image/jpeg'})),'image/jpeg',0.75);};img.src=e2.target.result;};reader.readAsDataURL(files[i]);});
         const formData=new FormData();formData.append('image',compressed);
         const res=await fetch('https://api.imgbb.com/1/upload?key=1612fdd94e39f24c3d14f1864f41d591',{method:'POST',body:formData});
-        const json=await res.json();
-        if(!json.success)throw new Error('ImgBB: '+JSON.stringify(json));
+        const json=await res.json();if(!json.success)throw new Error('ImgBB: '+JSON.stringify(json));
         imageUrls.push(json.data.url);
       }catch(err){alert('❌ Erreur photo '+(i+1)+': '+(err?.message||String(err)));}
     }
@@ -988,291 +820,144 @@ chatModal.addEventListener('touchstart',e=>{if(e.touches.length===2)initialDista
 chatModal.addEventListener('touchmove',e=>{if(e.touches.length===2&&initialDistance){const cd=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);if(cd-initialDistance>40)chatModal.classList.add('expanded');if(initialDistance-cd>40)chatModal.classList.remove('expanded');}});
 chatModal.addEventListener('touchend',()=>{initialDistance=null;});
 
-// =============================================
-// VUE TIKTOK
-// =============================================
-const tiktokBtn     = document.getElementById('tiktokBtn');
-const tiktokOverlay = document.getElementById('tiktokOverlay');
-const tiktokFeed    = document.getElementById('tiktokFeed');
-const closeTiktok   = document.getElementById('closeTiktok');
-const tkBackdrop    = document.getElementById('tkBackdrop');
-
-// Panels commentaires ouverts (un seul à la fois)
-let currentOpenPanel = null;
-
-function openCommentPanel(panel, inputEl) {
-  if (currentOpenPanel && currentOpenPanel !== panel) {
-    currentOpenPanel.classList.remove('open');
-    setTimeout(() => { if (currentOpenPanel && !currentOpenPanel.classList.contains('open')) currentOpenPanel.style.display = 'none'; }, 320);
-  }
-  currentOpenPanel = panel;
-  panel.style.display = 'flex';
-  panel.offsetHeight; // reflow pour transition
-  panel.classList.add('open');
-  tkBackdrop.classList.add('open');
-  setTimeout(() => inputEl && inputEl.focus(), 320);
-}
-
-function closeCommentPanel() {
-  if (currentOpenPanel) {
-    currentOpenPanel.classList.remove('open');
-    const p = currentOpenPanel;
-    setTimeout(() => { if (!p.classList.contains('open')) p.style.display = 'none'; }, 320);
-    currentOpenPanel = null;
-  }
-  tkBackdrop.classList.remove('open');
-}
-
-tkBackdrop.addEventListener('click', closeCommentPanel);
-tkBackdrop.addEventListener('touchstart', e => { e.preventDefault(); closeCommentPanel(); }, { passive: false });
+// ===== VUE TIKTOK =====
+const tiktokBtn=document.getElementById('tiktokBtn');
+const tiktokOverlay=document.getElementById('tiktokOverlay');
+const tiktokFeed=document.getElementById('tiktokFeed');
+const closeTiktok=document.getElementById('closeTiktok');
 
 // Cœurs animés
-function spawnHearts(btn) {
-  const rect = btn.getBoundingClientRect();
-  const cx = rect.left + rect.width / 2;
-  const cy = rect.top  + rect.height / 2;
-  const emojis = ['❤️','🩷','💕','💗','💖','💓','🌸','✨'];
-  const count = 12 + Math.floor(Math.random() * 6);
-
-  for (let i = 0; i < count; i++) {
-    setTimeout(() => {
-      const el = document.createElement('span');
-      el.className = 'tk-heart';
-      const dx  = (Math.random() - 0.5) * 160;
-      const dy  = -(90 + Math.random() * 200);
-      const r0  = (Math.random() - 0.5) * 30;
-      const r1  = r0 + (Math.random() - 0.5) * 50;
-      const sf  = 0.5 + Math.random() * 1.1;
-      const dur = 900 + Math.random() * 500;
-      const fs  = 18 + Math.random() * 20;
-      el.textContent = emojis[Math.floor(Math.random() * emojis.length)];
-      el.style.cssText =
-        `left:${cx + dx - fs/2}px;top:${cy - fs/2}px;font-size:${fs}px;` +
-        `--dx:${dx}px;--dy:${dy}px;--r0:${r0}deg;--r1:${r1}deg;--sf:${sf};--dur:${dur}ms;` +
-        `animation-duration:${dur}ms;`;
-      document.body.appendChild(el);
-      setTimeout(() => el.remove(), dur + 60);
-    }, i * 55);
+function spawnHearts(btn){
+  const rect=btn.getBoundingClientRect();
+  const cx=rect.left+rect.width/2,cy=rect.top+rect.height/2;
+  const emojis=['❤️','🩷','💕','💗','💖','💓','🌸','✨'];
+  const count=12+Math.floor(Math.random()*6);
+  for(let i=0;i<count;i++){
+    setTimeout(()=>{
+      const el=document.createElement('span');el.className='tk-heart';
+      const dx=(Math.random()-0.5)*160,dy=-(90+Math.random()*200);
+      const r0=(Math.random()-0.5)*30,r1=r0+(Math.random()-0.5)*50;
+      const sf=0.5+Math.random()*1.1,dur=900+Math.random()*500,fs=18+Math.random()*20;
+      el.textContent=emojis[Math.floor(Math.random()*emojis.length)];
+      el.style.cssText=`left:${cx+dx-fs/2}px;top:${cy-fs/2}px;font-size:${fs}px;--dx:${dx}px;--dy:${dy}px;--r0:${r0}deg;--r1:${r1}deg;--sf:${sf};--dur:${dur}ms;animation-duration:${dur}ms;`;
+      document.body.appendChild(el);setTimeout(()=>el.remove(),dur+60);
+    },i*55);
   }
 }
 
-function buildTiktokFeed(list) {
-  tiktokFeed.innerHTML = '';
-  // Nettoyer les anciens panels commentaires TikTok
-  document.querySelectorAll('.tiktok-comment-panel').forEach(p => p.remove());
+function buildTiktokFeed(list){
+  tiktokFeed.innerHTML='';
+  list.forEach(c=>{
+    const photos=(c.zoomGroup&&c.zoomGroup.length)?c.zoomGroup:(c.imgUrl?[c.imgUrl]:[]);
+    if(!photos.length)return;
 
-  list.forEach((c) => {
-    const photos = (c.zoomGroup && c.zoomGroup.length) ? c.zoomGroup : (c.imgUrl ? [c.imgUrl] : []);
-    if (!photos.length) return;
+    const slide=document.createElement('div');
+    slide.className='tiktok-slide';
+    slide.dataset.id=c.id;
 
-    const slide = document.createElement('div');
-    slide.className = 'tiktok-slide';
-    slide.dataset.id = c.id;
+    // Carrousel HORIZONTAL (photos d'une même création)
+    const carousel=document.createElement('div');
+    carousel.className='tiktok-photos';
 
-    // Carrousel horizontal
-    const carousel = document.createElement('div');
-    carousel.className = 'tiktok-photos';
-
-    photos.forEach(url => {
-      const item = document.createElement('div');
-      item.className = 'tiktok-photo-item';
-
-      const bg = document.createElement('div');
-      bg.className = 'photo-bg';
-      bg.style.backgroundImage = `url(${url})`;
-      item.appendChild(bg);
-
-      const img = document.createElement('img');
-      img.src = url;
-      img.alt = c.name || '';
-      img.loading = 'lazy';
-      img.draggable = false;
-      // Bloquer tout mouvement de l'image
-      img.addEventListener('touchstart',  e => e.stopPropagation(), { passive: false });
-      img.addEventListener('touchmove',   e => { e.stopPropagation(); e.preventDefault(); }, { passive: false });
-      img.addEventListener('pointerdown', e => e.stopPropagation());
-      item.appendChild(img);
-      carousel.appendChild(item);
+    photos.forEach(url=>{
+      const item=document.createElement('div');item.className='tiktok-photo-item';
+      const bg=document.createElement('div');bg.className='photo-bg';bg.style.backgroundImage=`url(${url})`;item.appendChild(bg);
+      const img=document.createElement('img');img.src=url;img.alt=c.name||'';img.loading='lazy';img.draggable=false;
+      img.addEventListener('touchstart',e=>e.stopPropagation(),{passive:false});
+      img.addEventListener('touchmove',e=>{e.stopPropagation();e.preventDefault();},{passive:false});
+      img.addEventListener('pointerdown',e=>e.stopPropagation());
+      item.appendChild(img);carousel.appendChild(item);
     });
     slide.appendChild(carousel);
 
     // Counter
-    const counter = document.createElement('div');
-    counter.className = 'tiktok-photo-counter' + (photos.length > 1 ? ' multi' : '');
-    counter.textContent = `1 / ${photos.length}`;
+    const counter=document.createElement('div');
+    counter.className='tiktok-photo-counter'+(photos.length>1?' multi':'');
+    counter.textContent=`1 / ${photos.length}`;
     slide.appendChild(counter);
 
     // Dots
-    if (photos.length > 1) {
-      const dots = document.createElement('div');
-      dots.className = 'tiktok-dots';
-      photos.forEach((_, i) => {
-        const dot = document.createElement('div');
-        dot.className = 'tiktok-dot' + (i === 0 ? ' active' : '');
-        dots.appendChild(dot);
-      });
+    if(photos.length>1){
+      const dots=document.createElement('div');dots.className='tiktok-dots';
+      photos.forEach((_,i)=>{const dot=document.createElement('div');dot.className='tiktok-dot'+(i===0?' active':'');dots.appendChild(dot);});
       slide.appendChild(dots);
-      carousel.addEventListener('scroll', () => {
-        const idx2 = Math.round(carousel.scrollLeft / carousel.clientWidth);
-        dots.querySelectorAll('.tiktok-dot').forEach((d, i) => d.classList.toggle('active', i === idx2));
-        counter.textContent = `${idx2 + 1} / ${photos.length}`;
-      }, { passive: true });
+      carousel.addEventListener('scroll',()=>{
+        const idx2=Math.round(carousel.scrollLeft/carousel.clientWidth);
+        dots.querySelectorAll('.tiktok-dot').forEach((d,i)=>d.classList.toggle('active',i===idx2));
+        counter.textContent=`${idx2+1} / ${photos.length}`;
+      },{passive:true});
     }
 
     // Infos bas gauche
-    const info = document.createElement('div');
-    info.className = 'tiktok-info';
-    info.innerHTML = `<div class="t-title">${c.name || ''}</div><div class="t-legend">${c.legend || ''}</div>`;
+    const info=document.createElement('div');info.className='tiktok-info';
+    info.innerHTML=`<div class="t-title">${c.name||''}</div><div class="t-legend">${c.legend||''}</div>`;
     slide.appendChild(info);
 
-    // Barre réactions
-    const bar = document.createElement('div');
-    bar.className = 'tiktok-bar';
-    const reactRow = document.createElement('div');
-    reactRow.className = 'tiktok-react-row';
+    // Barre réactions DROITE
+    const bar=document.createElement('div');bar.className='tiktok-bar';
 
-    // ── Like avec cœurs ──
-    const cr0 = creations.find(x => x.id === c.id) || c;
-    const alreadyLiked = (cr0.likes || []).some(l => l.name === myPrenom);
-    const likeBtn2 = document.createElement('div');
-    likeBtn2.className = 'tiktok-react-btn' + (alreadyLiked ? ' liked' : '');
-    const lS = alreadyLiked ? '#ff2d78' : '#ffe6f0';
-    const lF = alreadyLiked ? '#ff2d78' : 'none';
-    likeBtn2.innerHTML = `
-      <svg viewBox="0 0 24 24" fill="${lF}" stroke="${lS}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8z"/>
-      </svg>
-      <span>${(cr0.likes || []).length}</span>`;
+    // Like avec cœurs
+    const cr0=creations.find(x=>x.id===c.id)||c;
+    const alreadyLiked=(cr0.likes||[]).some(l=>l.name===myPrenom);
+    const likeBtn2=document.createElement('div');
+    likeBtn2.className='tiktok-react-btn'+(alreadyLiked?' liked':'');
+    const lS=alreadyLiked?'#ff2d78':'#ffe6f0',lF=alreadyLiked?'#ff2d78':'none';
+    likeBtn2.innerHTML=`<svg viewBox="0 0 24 24" fill="${lF}" stroke="${lS}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg><span>${(cr0.likes||[]).length}</span>`;
 
-    likeBtn2.onclick = async (e) => {
+    likeBtn2.onclick=async(e)=>{
       e.stopPropagation();
-      const cr = creations.find(x => x.id === c.id);
-      if (!cr) return;
-      if (!Array.isArray(cr.likes)) cr.likes = [];
-      const svg2  = likeBtn2.querySelector('svg');
-      const span2 = likeBtn2.querySelector('span');
-      const wasLiked = cr.likes.some(l => l.name === myPrenom);
-      if (wasLiked) {
-        cr.likes = cr.likes.filter(l => l.name !== myPrenom);
-        likeBtn2.classList.remove('liked');
-        svg2.setAttribute('stroke', '#ffe6f0');
-        svg2.setAttribute('fill', 'none');
-      } else {
-        cr.likes.push({ name: myPrenom, photo: ownerPhoto.src || '' });
-        likeBtn2.classList.add('liked');
-        svg2.setAttribute('stroke', '#ff2d78');
-        svg2.setAttribute('fill', '#ff2d78');
-        spawnHearts(likeBtn2); // 🩷
+      const cr=creations.find(x=>x.id===c.id);if(!cr)return;
+      if(!Array.isArray(cr.likes))cr.likes=[];
+      const svg2=likeBtn2.querySelector('svg'),span2=likeBtn2.querySelector('span');
+      const wasLiked=cr.likes.some(l=>l.name===myPrenom);
+      if(wasLiked){
+        cr.likes=cr.likes.filter(l=>l.name!==myPrenom);
+        likeBtn2.classList.remove('liked');svg2.setAttribute('stroke','#ffe6f0');svg2.setAttribute('fill','none');
+      }else{
+        cr.likes.push({name:myPrenom,photo:ownerPhoto.src||''});
+        likeBtn2.classList.add('liked');svg2.setAttribute('stroke','#ff2d78');svg2.setAttribute('fill','#ff2d78');
+        spawnHearts(likeBtn2);
       }
-      span2.textContent = cr.likes.length;
-      await supabase.from('creations').update({ likes: cr.likes }).eq('id', cr.id);
-      if (currentZoom && currentZoom.id === cr.id) currentZoom.likes = [...cr.likes];
+      span2.textContent=cr.likes.length;
+      await supabase.from('creations').update({likes:cr.likes}).eq('id',cr.id);
+      if(currentZoom&&currentZoom.id===cr.id)currentZoom.likes=[...cr.likes];
     };
-    reactRow.appendChild(likeBtn2);
+    bar.appendChild(likeBtn2);
 
-    // ── Commentaire inline (panel fixed) ──
-    const commentBtn2 = document.createElement('div');
-    commentBtn2.className = 'tiktok-react-btn';
-    commentBtn2.innerHTML = `
-      <svg viewBox="0 0 24 24" fill="none" stroke="#ffe6f0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
-      </svg>
-      <span>${(cr0.comments || []).length}</span>`;
+    // Commentaire → ouvre modal
+    const commentBtn2=document.createElement('div');
+    commentBtn2.className='tiktok-react-btn';
+    commentBtn2.innerHTML=`<svg viewBox="0 0 24 24" fill="none" stroke="#ffe6f0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg><span>${(cr0.comments||[]).length}</span>`;
 
-    // Panel attaché au body (position:fixed → toujours visible)
-    const commentPanel = document.createElement('div');
-    commentPanel.className = 'tiktok-comment-panel';
-    commentPanel.style.display = 'none';
-
-    const handle = document.createElement('div');
-    handle.className = 'tiktok-comment-handle';
-    commentPanel.appendChild(handle);
-
-    const commentList = document.createElement('div');
-    commentList.className = 'tiktok-comment-list';
-    (cr0.comments || []).forEach(cm => {
-      const item = document.createElement('div');
-      item.className = 'tiktok-comment-item';
-      item.innerHTML = `${cm.photo ? `<img src="${cm.photo}" alt="" loading="lazy">` : ''}<span><strong>${cm.name}</strong> ${cm.text}</span>`;
-      commentList.appendChild(item);
-    });
-    commentPanel.appendChild(commentList);
-
-    const inputRow = document.createElement('div');
-    inputRow.className = 'tiktok-comment-input-row';
-    const commentInput2 = document.createElement('input');
-    commentInput2.type = 'text';
-    commentInput2.placeholder = 'Ajouter un commentaire…';
-    commentInput2.addEventListener('click', e => e.stopPropagation());
-    commentInput2.addEventListener('touchstart', e => e.stopPropagation());
-    const sendBtn2 = document.createElement('button');
-    sendBtn2.className = 'tiktok-comment-send';
-    sendBtn2.innerHTML = '➤';
-    inputRow.appendChild(commentInput2);
-    inputRow.appendChild(sendBtn2);
-    commentPanel.appendChild(inputRow);
-
-    sendBtn2.onclick = async (e) => {
+    commentBtn2.onclick=(e)=>{
       e.stopPropagation();
-      const text = commentInput2.value.trim();
-      if (!text) return;
-      const cr = creations.find(x => x.id === c.id);
-      if (!cr) return;
-      if (!Array.isArray(cr.comments)) cr.comments = [];
-      const newCom = { name: myPrenom || '?', text, photo: ownerPhoto.src || '' };
-      cr.comments.push(newCom);
-      await supabase.from('creations').update({ comments: cr.comments }).eq('id', cr.id);
-      const item = document.createElement('div');
-      item.className = 'tiktok-comment-item';
-      item.innerHTML = `${newCom.photo ? `<img src="${newCom.photo}" alt="">` : ''}<span><strong>${newCom.name}</strong> ${newCom.text}</span>`;
-      commentList.appendChild(item);
-      commentList.scrollTop = commentList.scrollHeight;
-      commentInput2.value = '';
-      commentBtn2.querySelector('span').textContent = cr.comments.length;
-      if (currentZoom && currentZoom.id === cr.id) currentZoom.comments = [...cr.comments];
+      const cr=creations.find(x=>x.id===c.id)||c;
+      openTkComments(cr, commentBtn2);
     };
-
-    document.body.appendChild(commentPanel);
-
-    commentBtn2.onclick = (e) => {
-      e.stopPropagation();
-      if (commentPanel.classList.contains('open')) {
-        closeCommentPanel();
-      } else {
-        openCommentPanel(commentPanel, commentInput2);
-        commentList.scrollTop = commentList.scrollHeight;
-      }
-    };
-
-    reactRow.appendChild(commentBtn2);
-    bar.appendChild(reactRow);
+    bar.appendChild(commentBtn2);
     slide.appendChild(bar);
     tiktokFeed.appendChild(slide);
   });
 }
 
-tiktokBtn.onclick = () => {
+tiktokBtn.onclick=()=>{
   buildTiktokFeed(creations);
   tiktokOverlay.classList.add('visible');
   closeTiktok.classList.add('visible');
-  document.body.style.overflow = 'hidden';
-  tiktokFeed.scrollTop = 0;
+  document.body.style.overflow='hidden';
+  tiktokFeed.scrollTop=0;
 };
 
-closeTiktok.onclick = () => {
-  closeCommentPanel();
+closeTiktok.onclick=()=>{
+  closeTkComments();
   tiktokOverlay.classList.remove('visible');
   closeTiktok.classList.remove('visible');
-  document.body.style.overflow = '';
-  // Supprimer les panels du DOM
-  document.querySelectorAll('.tiktok-comment-panel').forEach(p => p.remove());
+  document.body.style.overflow='';
 };
 
-// =============================================
-// INIT
-// =============================================
-document.addEventListener('DOMContentLoaded', loadOwnerPhoto);
-window.addEventListener('pageshow', loadOwnerPhoto);
+// ===== INIT =====
+document.addEventListener('DOMContentLoaded',loadOwnerPhoto);
+window.addEventListener('pageshow',loadOwnerPhoto);
 refreshCreations();
 loadOwnerPhoto();
 loadChatUsers();
