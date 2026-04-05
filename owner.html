@@ -146,6 +146,7 @@ scroll-snap-type:y mandatory;
 -webkit-overflow-scrolling:touch;
 scrollbar-width:none;
 overscroll-behavior:contain;
+touch-action:pan-y;
 }
 #tiktokFeed::-webkit-scrollbar{display:none;}
 
@@ -159,6 +160,7 @@ position:relative;
 overflow:hidden;
 background:#0d0008;
 flex-shrink:0;
+touch-action:pan-y;
 }
 
 /* Scroll HORIZONTAL entre photos d’une même création */
@@ -523,59 +525,59 @@ const fileInfo=document.getElementById('fileInfo');
 const zoomLegend=document.getElementById('zoomLegend');
 const photoOverlay=document.getElementById('photoOverlay');
 const overlayImg=document.getElementById('overlayImg');
-
-// Modal commentaires TikTok
+const tiktokBtn=document.getElementById('tiktokBtn');
+const tiktokOverlay=document.getElementById('tiktokOverlay');
+const tiktokFeed=document.getElementById('tiktokFeed');
+const closeTiktok=document.getElementById('closeTiktok');
 const tkCommentModal=document.getElementById('tkCommentModal');
 const tkCommentList=document.getElementById('tkCommentList');
 const tkCommentInput=document.getElementById('tkCommentInput');
 const tkCommentSend=document.getElementById('tkCommentSend');
-let tkCurrentCreation=null;
-let tkCurrentCommentBtn=null;
+let tkCurrentCreation=null,tkCurrentCommentBtn=null;
 
-function openTkComments(creation, commentBtn) {
-  tkCurrentCreation = creation;
-  tkCurrentCommentBtn = commentBtn;
-  tkCommentList.innerHTML = '';
-  (creation.comments||[]).forEach(cm => {
-    const item = document.createElement('div');
-    item.className = 'tk-comment-item';
-    item.innerHTML = `${cm.photo?`<img src="${cm.photo}" alt="">`:''}<span><strong>${cm.name}</strong> ${cm.text}</span>`;
+// ===== MODAL COMMENTAIRES TIKTOK =====
+function openTkComments(creation,commentBtn){
+  tkCurrentCreation=creation;tkCurrentCommentBtn=commentBtn;
+  tkCommentList.innerHTML='';
+  (creation.comments||[]).forEach(cm=>{
+    const item=document.createElement('div');item.className='tk-comment-item';
+    item.innerHTML=`${cm.photo?`<img src="${cm.photo}" alt="">`:''}<span><strong>${cm.name}</strong> ${cm.text}</span>`;
     tkCommentList.appendChild(item);
   });
-  tkCommentList.scrollTop = tkCommentList.scrollHeight;
-  tkCommentInput.value = '';
+  tkCommentList.scrollTop=tkCommentList.scrollHeight;
+  tkCommentInput.value='';
   tkCommentModal.classList.add('visible');
-  setTimeout(() => tkCommentInput.focus(), 300);
+  setTimeout(()=>tkCommentInput.focus(),300);
 }
 
-function closeTkComments() {
+function closeTkComments(){
   tkCommentModal.classList.remove('visible');
-  tkCurrentCreation = null;
+  tkCurrentCreation=null;
 }
 
-tkCommentModal.addEventListener('click', e => { if(e.target===tkCommentModal) closeTkComments(); });
-document.getElementById('tkCommentBox').addEventListener('click', e => e.stopPropagation());
+tkCommentModal.addEventListener('click',e=>{if(e.target===tkCommentModal)closeTkComments();});
+document.getElementById('tkCommentBox').addEventListener('click',e=>e.stopPropagation());
 
-tkCommentSend.onclick = async () => {
-  const text = tkCommentInput.value.trim();
-  if (!text || !tkCurrentCreation) return;
-  const cr = creations.find(x => x.id === tkCurrentCreation.id);
-  if (!cr) return;
-  if (!Array.isArray(cr.comments)) cr.comments = [];
-  const newCom = { name: myPrenom||'?', text, photo: ownerPhoto.src||'' };
+tkCommentSend.onclick=async()=>{
+  const text=tkCommentInput.value.trim();
+  if(!text||!tkCurrentCreation)return;
+  const cr=creations.find(x=>x.id===tkCurrentCreation.id);
+  if(!cr)return;
+  if(!Array.isArray(cr.comments))cr.comments=[];
+  const newCom={name:myPrenom||'?',text,photo:ownerPhoto.src||''};
   cr.comments.push(newCom);
-  await supabase.from('creations').update({ comments: cr.comments }).eq('id', cr.id);
-  const item = document.createElement('div');
-  item.className = 'tk-comment-item';
-  item.innerHTML = `${newCom.photo?`<img src="${newCom.photo}" alt="">`:''}<span><strong>${newCom.name}</strong> ${newCom.text}</span>`;
+  await supabase.from('creations').update({comments:cr.comments}).eq('id',cr.id);
+  const item=document.createElement('div');item.className='tk-comment-item';
+  item.innerHTML=`${newCom.photo?`<img src="${newCom.photo}" alt="">`:''}<span><strong>${newCom.name}</strong> ${newCom.text}</span>`;
   tkCommentList.appendChild(item);
-  tkCommentList.scrollTop = tkCommentList.scrollHeight;
-  tkCommentInput.value = '';
-  if (tkCurrentCommentBtn) tkCurrentCommentBtn.querySelector('span').textContent = cr.comments.length;
-  if (currentZoom && currentZoom.id === cr.id) currentZoom.comments = [...cr.comments];
+  tkCommentList.scrollTop=tkCommentList.scrollHeight;
+  tkCommentInput.value='';
+  if(tkCurrentCommentBtn)tkCurrentCommentBtn.querySelector('span').textContent=cr.comments.length;
+  if(currentZoom&&currentZoom.id===cr.id)currentZoom.comments=[...cr.comments];
 };
-tkCommentInput.addEventListener('keydown', e => { if(e.key==='Enter') tkCommentSend.onclick(); });
+tkCommentInput.addEventListener('keydown',e=>{if(e.key==='Enter')tkCommentSend.onclick();});
 
+// ===== DRAG ZOOM =====
 mainZoom.addEventListener('mousedown',e=>e.stopPropagation());
 mainZoom.addEventListener('touchstart',e=>e.stopPropagation());
 zoomLegend.addEventListener('mousedown',e=>e.stopPropagation());
@@ -820,13 +822,7 @@ chatModal.addEventListener('touchstart',e=>{if(e.touches.length===2)initialDista
 chatModal.addEventListener('touchmove',e=>{if(e.touches.length===2&&initialDistance){const cd=Math.hypot(e.touches[0].clientX-e.touches[1].clientX,e.touches[0].clientY-e.touches[1].clientY);if(cd-initialDistance>40)chatModal.classList.add('expanded');if(initialDistance-cd>40)chatModal.classList.remove('expanded');}});
 chatModal.addEventListener('touchend',()=>{initialDistance=null;});
 
-// ===== VUE TIKTOK =====
-const tiktokBtn=document.getElementById('tiktokBtn');
-const tiktokOverlay=document.getElementById('tiktokOverlay');
-const tiktokFeed=document.getElementById('tiktokFeed');
-const closeTiktok=document.getElementById('closeTiktok');
-
-// Cœurs animés
+// ===== COEURS ANIMES =====
 function spawnHearts(btn){
   const rect=btn.getBoundingClientRect();
   const cx=rect.left+rect.width/2,cy=rect.top+rect.height/2;
@@ -845,6 +841,7 @@ function spawnHearts(btn){
   }
 }
 
+// ===== VUE TIKTOK =====
 function buildTiktokFeed(list){
   tiktokFeed.innerHTML='';
   list.forEach(c=>{
@@ -855,7 +852,7 @@ function buildTiktokFeed(list){
     slide.className='tiktok-slide';
     slide.dataset.id=c.id;
 
-    // Carrousel HORIZONTAL (photos d'une même création)
+    // Carrousel HORIZONTAL
     const carousel=document.createElement('div');
     carousel.className='tiktok-photos';
 
@@ -863,11 +860,40 @@ function buildTiktokFeed(list){
       const item=document.createElement('div');item.className='tiktok-photo-item';
       const bg=document.createElement('div');bg.className='photo-bg';bg.style.backgroundImage=`url(${url})`;item.appendChild(bg);
       const img=document.createElement('img');img.src=url;img.alt=c.name||'';img.loading='lazy';img.draggable=false;
-      img.addEventListener('touchstart',e=>e.stopPropagation(),{passive:false});
-      img.addEventListener('touchmove',e=>{e.stopPropagation();e.preventDefault();},{passive:false});
-      img.addEventListener('pointerdown',e=>e.stopPropagation());
-      item.appendChild(img);carousel.appendChild(item);
+      item.appendChild(img);
+      carousel.appendChild(item);
     });
+
+    // ===== FIX SCROLL DIRECTIONNEL =====
+    // Détecte si le swipe est H ou V et délègue au bon conteneur
+    let tkTouchStartX=0,tkTouchStartY=0,tkDir=null;
+
+    carousel.addEventListener('touchstart',e=>{
+      tkTouchStartX=e.touches[0].clientX;
+      tkTouchStartY=e.touches[0].clientY;
+      tkDir=null;
+    },{passive:true});
+
+    carousel.addEventListener('touchmove',e=>{
+      if(!tkDir){
+        const dx=Math.abs(e.touches[0].clientX-tkTouchStartX);
+        const dy=Math.abs(e.touches[0].clientY-tkTouchStartY);
+        if(dx>6||dy>6) tkDir=dx>dy?'h':'v';
+      }
+      if(tkDir==='v'){
+        // Bloquer le carousel et scroller le feed manuellement
+        e.preventDefault();
+        const delta=e.touches[0].clientY-tkTouchStartY;
+        tiktokFeed.scrollTop-=delta;
+        tkTouchStartX=e.touches[0].clientX;
+        tkTouchStartY=e.touches[0].clientY;
+      }
+      // Si horizontal → le carousel scroll naturellement, on ne fait rien
+    },{passive:false});
+
+    carousel.addEventListener('touchend',()=>{tkDir=null;},{passive:true});
+    // ===== FIN FIX =====
+
     slide.appendChild(carousel);
 
     // Counter
@@ -893,10 +919,9 @@ function buildTiktokFeed(list){
     info.innerHTML=`<div class="t-title">${c.name||''}</div><div class="t-legend">${c.legend||''}</div>`;
     slide.appendChild(info);
 
-    // Barre réactions DROITE
+    // Barre réactions droite
     const bar=document.createElement('div');bar.className='tiktok-bar';
 
-    // Like avec cœurs
     const cr0=creations.find(x=>x.id===c.id)||c;
     const alreadyLiked=(cr0.likes||[]).some(l=>l.name===myPrenom);
     const likeBtn2=document.createElement('div');
@@ -924,7 +949,6 @@ function buildTiktokFeed(list){
     };
     bar.appendChild(likeBtn2);
 
-    // Commentaire → ouvre modal
     const commentBtn2=document.createElement('div');
     commentBtn2.className='tiktok-react-btn';
     commentBtn2.innerHTML=`<svg viewBox="0 0 24 24" fill="none" stroke="#ffe6f0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg><span>${(cr0.comments||[]).length}</span>`;
@@ -932,7 +956,7 @@ function buildTiktokFeed(list){
     commentBtn2.onclick=(e)=>{
       e.stopPropagation();
       const cr=creations.find(x=>x.id===c.id)||c;
-      openTkComments(cr, commentBtn2);
+      openTkComments(cr,commentBtn2);
     };
     bar.appendChild(commentBtn2);
     slide.appendChild(bar);
