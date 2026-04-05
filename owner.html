@@ -49,26 +49,12 @@ input, textarea, select { font-size: 16px !important; }
 #likeCount,#commentCount{font-family:'Courier New',monospace;font-weight:bold;color:#b84c6f;font-size:14px;min-width:18px;}
 
 /* Photo profil */
-#ownerPhoto{
-width:76px;height:76px;border-radius:50%;
-position:fixed;top:10px;right:10px;
-z-index:10000;background:#ffe6f0;
-border:3px solid #b84c6f;cursor:pointer;
-box-shadow:0 2px 12px rgba(184,76,111,0.3);
-transition:transform 0.2s;
-object-fit:cover;
-}
+#ownerPhoto{width:76px;height:76px;border-radius:50%;position:fixed;top:10px;right:10px;z-index:10000;background:#ffe6f0;border:3px solid #b84c6f;cursor:pointer;box-shadow:0 2px 12px rgba(184,76,111,0.3);transition:transform 0.2s;object-fit:cover;}
 #ownerPhoto:hover{transform:scale(1.08);}
-
 #editPhotoBtn{display:none;}
 
 /* Anneaux pulsants */
-#ownerRings{
-position:fixed;top:10px;right:10px;
-width:76px;height:76px;
-pointer-events:none;z-index:9999;
-opacity:0;transition:opacity 0.3s;
-}
+#ownerRings{position:fixed;top:10px;right:10px;width:76px;height:76px;pointer-events:none;z-index:9999;opacity:0;transition:opacity 0.3s;}
 .owner-ring{position:absolute;border-radius:50%;border:2px solid rgba(255,182,193,0.7);opacity:0;}
 .owner-ring:nth-child(1){width:76px;height:76px;top:0;left:0;}
 .owner-ring:nth-child(2){width:96px;height:96px;top:-10px;left:-10px;}
@@ -128,8 +114,7 @@ BOUTON TIKTOK
 ============================================= */
 #tiktokBtn {
 position: fixed;
-top: 94px;
-right: 10px;
+top: 94px; right: 10px;
 width: 42px; height: 42px;
 border-radius: 50%;
 background: linear-gradient(135deg, #ffd6e6, #ffb6c1);
@@ -155,69 +140,109 @@ overflow: hidden;
 #tiktokOverlay.visible { display: block; }
 
 #tiktokFeed {
-height: 100%;
+width: 100%; height: 100%;
 overflow-y: scroll;
 scroll-snap-type: y mandatory;
 -webkit-overflow-scrolling: touch;
 scrollbar-width: none;
+overscroll-behavior: contain;
 }
 #tiktokFeed::-webkit-scrollbar { display: none; }
 
 .tiktok-slide {
-height: 100vh; width: 100vw;
+width: 100vw;
+height: 100svh;
+height: 100vh;
 scroll-snap-align: start;
+scroll-snap-stop: always;
 position: relative;
 overflow: hidden;
 background: #0d0008;
+flex-shrink: 0;
 }
 
-/* Carrousel horizontal photos */
+/* Carrousel horizontal */
 .tiktok-photos {
 display: flex;
-height: 100%; width: 100%;
+width: 100%; height: 100%;
 overflow-x: scroll;
 scroll-snap-type: x mandatory;
 -webkit-overflow-scrolling: touch;
 scrollbar-width: none;
+touch-action: pan-x;
 }
 .tiktok-photos::-webkit-scrollbar { display: none; }
 
+/* Photo item plein écran */
 .tiktok-photo-item {
-flex: 0 0 100vw; height: 100vh;
+flex: 0 0 100vw;
+width: 100vw;
+height: 100svh;
+height: 100vh;
 scroll-snap-align: start;
+scroll-snap-stop: always;
 position: relative;
-display: flex; align-items: center; justify-content: center;
-background: #0d0008;
+overflow: hidden;
 }
 
-/* Image en fond flou + image nette au centre */
+/* Fond flou */
 .tiktok-photo-item .photo-bg {
 position: absolute; inset: 0;
 background-size: cover;
 background-position: center;
-filter: blur(22px) brightness(0.4) saturate(1.4);
-transform: scale(1.08);
+filter: blur(24px) brightness(0.35) saturate(1.4);
+transform: scale(1.1);
 z-index: 0;
+pointer-events: none;
 }
+
+/* Image COVER + totalement figée, impossible à déplacer */
 .tiktok-photo-item img {
-position: relative; z-index: 1;
-max-width: 100%; max-height: 100%;
-object-fit: contain;
+position: absolute;
+inset: 0;
+width: 100%;
+height: 100%;
+object-fit: cover;
+object-position: center;
+z-index: 1;
+pointer-events: none !important;
+touch-action: none !important;
+user-select: none;
+-webkit-user-drag: none;
+-webkit-touch-callout: none;
+display: block;
 }
 
 /* Dégradé bas */
 .tiktok-slide::after {
 content: ‘’;
 position: absolute; bottom: 0; left: 0; right: 0;
-height: 55%;
-background: linear-gradient(to top, rgba(13,0,8,0.92) 0%, rgba(13,0,8,0.5) 50%, transparent 100%);
+height: 62%;
+background: linear-gradient(to top, rgba(13,0,8,0.96) 0%, rgba(13,0,8,0.55) 45%, transparent 100%);
 pointer-events: none;
 z-index: 2;
 }
 
-/* Dots horizontaux */
+/* Counter 1/N */
+.tiktok-photo-counter {
+position: absolute; top: 14px; left: 50%;
+transform: translateX(-50%);
+background: rgba(0,0,0,0.45);
+backdrop-filter: blur(6px);
+border: 1px solid rgba(255,182,193,0.35);
+border-radius: 20px; padding: 4px 14px;
+font-size: 12px; color: #ffe6f0;
+z-index: 6; display: none;
+letter-spacing: 1px;
+font-family: ‘Comic Sans MS’, cursive;
+}
+.tiktok-photo-counter.multi { display: block; }
+
+/* Dots */
 .tiktok-dots {
-position: absolute; bottom: 88px; left: 50%;
+position: absolute;
+bottom: 210px;
+left: 50%;
 transform: translateX(-50%);
 display: flex; gap: 6px; z-index: 5;
 }
@@ -228,82 +253,185 @@ transition: background 0.25s, transform 0.25s;
 }
 .tiktok-dot.active {
 background: #ffb6c1;
-transform: scale(1.4);
+transform: scale(1.45);
 box-shadow: 0 0 6px rgba(255,182,193,0.8);
 }
 
 /* Infos bas gauche */
 .tiktok-info {
-position: absolute; bottom: 100px; left: 14px;
-z-index: 6; color: #ffe6f0;
+position: absolute;
+bottom: 178px; left: 14px;
+z-index: 6;
+color: #ffe6f0;
 pointer-events: none;
 max-width: 62%;
 }
 .tiktok-info .t-title {
 font-family: ‘Comic Sans MS’, cursive;
 font-size: 17px; font-weight: bold;
-text-shadow: 0 2px 8px rgba(0,0,0,0.8);
-margin-bottom: 5px;
-line-height: 1.2;
+text-shadow: 0 2px 10px rgba(0,0,0,0.9);
+margin-bottom: 5px; line-height: 1.2;
 }
 .tiktok-info .t-legend {
 font-size: 13px;
-color: rgba(255,230,240,0.8);
-text-shadow: 0 1px 4px rgba(0,0,0,0.7);
+color: rgba(255,230,240,0.82);
+text-shadow: 0 1px 5px rgba(0,0,0,0.8);
 line-height: 1.4;
 }
 
-/* Counter photos */
-.tiktok-photo-counter {
-position: absolute; top: 14px; left: 50%;
-transform: translateX(-50%);
-background: rgba(0,0,0,0.4);
-backdrop-filter: blur(6px);
-border: 1px solid rgba(255,182,193,0.3);
-border-radius: 20px; padding: 4px 12px;
-font-size: 12px; color: #ffe6f0;
-z-index: 6; display: none;
-letter-spacing: 1px;
+/* Barre réactions */
+.tiktok-bar {
+position: absolute;
+bottom: 0; left: 0; right: 0;
+z-index: 6;
+display: flex;
+flex-direction: column;
+align-items: center;
+justify-content: flex-end;
+padding-bottom: max(env(safe-area-inset-bottom, 0px), 16px);
 }
-.tiktok-photo-counter.multi { display: block; }
 
-/* Actions droite */
-.tiktok-actions {
-position: absolute; right: 12px; bottom: 100px;
-display: flex; flex-direction: column;
-align-items: center; gap: 20px; z-index: 6;
+.tiktok-react-row {
+display: flex;
+gap: 32px;
+align-items: center;
+margin-bottom: 16px;
 }
-.tiktok-action-btn {
+
+.tiktok-react-btn {
 display: flex; flex-direction: column;
 align-items: center; gap: 4px;
 cursor: pointer;
-color: #ffe6f0;
-font-size: 12px;
-font-family: ‘Comic Sans MS’, cursive;
 -webkit-tap-highlight-color: transparent;
+color: #ffe6f0;
+font-family: ‘Comic Sans MS’, cursive;
+position: relative;
 }
-.tiktok-action-btn svg {
-width: 34px; height: 34px;
-filter: drop-shadow(0 2px 6px rgba(0,0,0,0.6));
+.tiktok-react-btn svg {
+width: 40px; height: 40px;
+filter: drop-shadow(0 2px 6px rgba(0,0,0,0.7));
 transition: transform 0.18s cubic-bezier(0.34,1.56,0.64,1);
 }
-.tiktok-action-btn:active svg { transform: scale(1.35); }
-.tiktok-action-btn.liked svg {
-stroke: #ff2d78;
-fill: #ff2d78;
-filter: drop-shadow(0 0 8px rgba(255,45,120,0.7));
+.tiktok-react-btn:active svg { transform: scale(1.4); }
+.tiktok-react-btn.liked svg {
+stroke: #ff2d78; fill: #ff2d78;
+filter: drop-shadow(0 0 10px rgba(255,45,120,0.8));
 }
-.tiktok-action-btn span {
-font-size: 12px;
-text-shadow: 0 1px 4px rgba(0,0,0,0.8);
+.tiktok-react-btn span {
+font-size: 13px;
 font-weight: bold;
+text-shadow: 0 1px 4px rgba(0,0,0,0.9);
+}
+
+/* Panel commentaires : position fixed → par-dessus TOUT */
+.tiktok-comment-panel {
+position: fixed;
+bottom: 0; left: 0; right: 0;
+z-index: 60001;
+background: rgba(13,0,8,0.94);
+backdrop-filter: blur(16px);
+border-top: 2px solid rgba(255,182,193,0.3);
+border-radius: 22px 22px 0 0;
+display: none;
+flex-direction: column;
+gap: 8px;
+padding: 6px 14px max(env(safe-area-inset-bottom,0px),16px);
+max-height: 58vh;
+transform: translateY(100%);
+transition: transform 0.3s cubic-bezier(0.32,0.72,0,1);
+}
+.tiktok-comment-panel.open {
+display: flex;
+transform: translateY(0);
+}
+/* Poignée */
+.tiktok-comment-handle {
+width: 40px; height: 4px;
+background: rgba(255,182,193,0.45);
+border-radius: 2px;
+margin: 4px auto 8px;
+flex-shrink: 0;
+}
+.tiktok-comment-list {
+flex: 1;
+overflow-y: auto;
+display: flex;
+flex-direction: column;
+gap: 10px;
+max-height: 38vh;
+padding-bottom: 4px;
+}
+.tiktok-comment-item {
+display: flex; align-items: flex-start; gap: 8px;
+color: #ffe6f0; font-size: 13px;
+font-family: ‘Comic Sans MS’, cursive;
+}
+.tiktok-comment-item img {
+width: 26px; height: 26px;
+border-radius: 50%;
+object-fit: cover;
+flex-shrink: 0;
+pointer-events: none;
+}
+.tiktok-comment-input-row {
+display: flex; gap: 8px; align-items: center;
+margin-top: 6px;
+flex-shrink: 0;
+}
+.tiktok-comment-input-row input {
+flex: 1;
+background: rgba(255,230,240,0.1);
+border: 1px solid rgba(255,182,193,0.4);
+border-radius: 24px;
+color: #ffe6f0;
+font-size: 14px;
+font-family: ‘Comic Sans MS’, cursive;
+padding: 8px 14px;
+outline: none;
+}
+.tiktok-comment-input-row input::placeholder { color: rgba(255,230,240,0.38); }
+.tiktok-comment-send {
+background: linear-gradient(135deg,#ff2d78,#b84c6f);
+border: none;
+border-radius: 50%;
+width: 38px; height: 38px;
+display: flex; align-items: center; justify-content: center;
+cursor: pointer;
+flex-shrink: 0;
+color: #fff;
+font-size: 16px;
+box-shadow: 0 2px 8px rgba(255,45,120,0.5);
+}
+
+/* Fond sombre pour fermer le panel */
+.tiktok-comment-backdrop {
+display: none;
+position: fixed; inset: 0;
+z-index: 60000;
+background: rgba(0,0,0,0.5);
+}
+.tiktok-comment-backdrop.open { display: block; }
+
+/* Cœurs animés */
+.tk-heart {
+position: fixed;
+pointer-events: none;
+z-index: 60002;
+animation: tkHeartFly var(–dur, 1s) ease-out forwards;
+will-change: transform, opacity;
+line-height: 1;
+}
+@keyframes tkHeartFly {
+0%   { opacity: 1; transform: translate(0,0) scale(1) rotate(var(–r0)); }
+70%  { opacity: 0.85; }
+100% { opacity: 0; transform: translate(var(–dx),var(–dy)) scale(var(–sf)) rotate(var(–r1)); }
 }
 
 /* Bouton fermer */
 #closeTiktok {
 position: fixed; top: 14px; left: 14px;
 width: 38px; height: 38px;
-background: rgba(13,0,8,0.55);
+background: rgba(13,0,8,0.6);
 backdrop-filter: blur(8px);
 border: 2px solid rgba(255,182,193,0.5);
 border-radius: 50%;
@@ -313,14 +441,13 @@ cursor: pointer; z-index: 50001;
 transition: transform 0.2s, background 0.2s;
 }
 #closeTiktok.visible { display: flex; }
-#closeTiktok:hover { transform: scale(1.12); background: rgba(255,45,120,0.4); }
+#closeTiktok:hover { transform: scale(1.12); background: rgba(255,45,120,0.45); }
 
-/* Animation entrée slide */
-@keyframes tiktokSlideIn {
-from { opacity: 0; transform: scale(0.97); }
-to   { opacity: 1; transform: scale(1); }
+@media (min-width: 600px) {
+.tiktok-info { max-width: 55%; }
+.tiktok-comment-panel { max-width: 480px; left: 50%; transform: translateX(-50%) translateY(100%); border-radius: 22px 22px 0 0; }
+.tiktok-comment-panel.open { transform: translateX(-50%) translateY(0); }
 }
-.tiktok-slide { animation: tiktokSlideIn 0.3s ease both; }
 </style>
 
 </head>
@@ -338,8 +465,6 @@ to   { opacity: 1; transform: scale(1); }
   <div class="owner-ring"></div>
 </div>
 
-<!-- Bouton TikTok -->
-
 <button id="tiktokBtn" title="Vue TikTok">
   <svg viewBox="0 0 24 24" fill="none" stroke="#b84c6f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
     <rect x="2" y="3" width="20" height="14" rx="3"/>
@@ -348,12 +473,14 @@ to   { opacity: 1; transform: scale(1); }
   </svg>
 </button>
 
-<!-- Overlay TikTok -->
-
 <div id="tiktokOverlay">
   <div id="tiktokFeed"></div>
 </div>
 <div id="closeTiktok">×</div>
+
+<!-- Backdrop commentaires TikTok (attaché au body) -->
+
+<div class="tiktok-comment-backdrop" id="tkBackdrop"></div>
 
 <div id="photoOverlay">
   <div class="overlay-ring-wrap">
@@ -568,7 +695,6 @@ window.addEventListener('resize',()=>{
 // =============================================
 // OWNER PHOTO
 // =============================================
-
 function loadOwnerPhoto(){
   const p=prenom||localStorage.getItem('prenom');
   const cached=localStorage.getItem('photo_url')||(p?localStorage.getItem('photo_url_'+p):null);
@@ -583,15 +709,8 @@ function openOverlay(){
 }
 
 ownerPhoto.addEventListener('click', () => { openOverlay(); });
-
-overlayImg.addEventListener('click', (e) => {
-  e.stopPropagation();
-  ownerFileInput.click();
-});
-
-photoOverlay.addEventListener('click', () => {
-  photoOverlay.classList.remove('visible');
-});
+overlayImg.addEventListener('click', (e) => { e.stopPropagation(); ownerFileInput.click(); });
+photoOverlay.addEventListener('click', () => { photoOverlay.classList.remove('visible'); });
 
 ownerFileInput.onchange = async () => {
   const file = ownerFileInput.files[0];
@@ -624,9 +743,7 @@ ownerFileInput.onchange = async () => {
     overlayImg.src = url;
     localStorage.setItem('photo_url', url);
     if (prenom) localStorage.setItem('photo_url_' + prenom, url);
-    if (prenom) {
-      await supabase.from('profiles').upsert({ prenom, photo_url: url }, { onConflict: 'prenom' });
-    }
+    if (prenom) { await supabase.from('profiles').upsert({ prenom, photo_url: url }, { onConflict: 'prenom' }); }
     photoOverlay.classList.remove('visible');
   } catch (err) {
     alert('Erreur upload photo : ' + (err?.message || err));
@@ -636,7 +753,6 @@ ownerFileInput.onchange = async () => {
 // =============================================
 // MESSAGES
 // =============================================
-
 async function loadMessages(){
   if(!currentChatUser)return;
   const{data,error}=await supabase.from('messages').select('*').or(`and(sender.eq.${myPrenom},receiver.eq.${currentChatUser}),and(sender.eq.${currentChatUser},receiver.eq.${myPrenom})`).order('created_at',{ascending:true});
@@ -693,7 +809,6 @@ if('Notification'in window&&Notification.permission!=='granted')Notification.req
 // =============================================
 // CREATIONS
 // =============================================
-
 async function refreshCreations(){
   try{
     const{data,error}=await supabase.from('creations').select('*').order('created_at',{ascending:false});
@@ -876,14 +991,75 @@ chatModal.addEventListener('touchend',()=>{initialDistance=null;});
 // =============================================
 // VUE TIKTOK
 // =============================================
-
 const tiktokBtn     = document.getElementById('tiktokBtn');
 const tiktokOverlay = document.getElementById('tiktokOverlay');
 const tiktokFeed    = document.getElementById('tiktokFeed');
 const closeTiktok   = document.getElementById('closeTiktok');
+const tkBackdrop    = document.getElementById('tkBackdrop');
+
+// Panels commentaires ouverts (un seul à la fois)
+let currentOpenPanel = null;
+
+function openCommentPanel(panel, inputEl) {
+  if (currentOpenPanel && currentOpenPanel !== panel) {
+    currentOpenPanel.classList.remove('open');
+    setTimeout(() => { if (currentOpenPanel && !currentOpenPanel.classList.contains('open')) currentOpenPanel.style.display = 'none'; }, 320);
+  }
+  currentOpenPanel = panel;
+  panel.style.display = 'flex';
+  panel.offsetHeight; // reflow pour transition
+  panel.classList.add('open');
+  tkBackdrop.classList.add('open');
+  setTimeout(() => inputEl && inputEl.focus(), 320);
+}
+
+function closeCommentPanel() {
+  if (currentOpenPanel) {
+    currentOpenPanel.classList.remove('open');
+    const p = currentOpenPanel;
+    setTimeout(() => { if (!p.classList.contains('open')) p.style.display = 'none'; }, 320);
+    currentOpenPanel = null;
+  }
+  tkBackdrop.classList.remove('open');
+}
+
+tkBackdrop.addEventListener('click', closeCommentPanel);
+tkBackdrop.addEventListener('touchstart', e => { e.preventDefault(); closeCommentPanel(); }, { passive: false });
+
+// Cœurs animés
+function spawnHearts(btn) {
+  const rect = btn.getBoundingClientRect();
+  const cx = rect.left + rect.width / 2;
+  const cy = rect.top  + rect.height / 2;
+  const emojis = ['❤️','🩷','💕','💗','💖','💓','🌸','✨'];
+  const count = 12 + Math.floor(Math.random() * 6);
+
+  for (let i = 0; i < count; i++) {
+    setTimeout(() => {
+      const el = document.createElement('span');
+      el.className = 'tk-heart';
+      const dx  = (Math.random() - 0.5) * 160;
+      const dy  = -(90 + Math.random() * 200);
+      const r0  = (Math.random() - 0.5) * 30;
+      const r1  = r0 + (Math.random() - 0.5) * 50;
+      const sf  = 0.5 + Math.random() * 1.1;
+      const dur = 900 + Math.random() * 500;
+      const fs  = 18 + Math.random() * 20;
+      el.textContent = emojis[Math.floor(Math.random() * emojis.length)];
+      el.style.cssText =
+        `left:${cx + dx - fs/2}px;top:${cy - fs/2}px;font-size:${fs}px;` +
+        `--dx:${dx}px;--dy:${dy}px;--r0:${r0}deg;--r1:${r1}deg;--sf:${sf};--dur:${dur}ms;` +
+        `animation-duration:${dur}ms;`;
+      document.body.appendChild(el);
+      setTimeout(() => el.remove(), dur + 60);
+    }, i * 55);
+  }
+}
 
 function buildTiktokFeed(list) {
   tiktokFeed.innerHTML = '';
+  // Nettoyer les anciens panels commentaires TikTok
+  document.querySelectorAll('.tiktok-comment-panel').forEach(p => p.remove());
 
   list.forEach((c) => {
     const photos = (c.zoomGroup && c.zoomGroup.length) ? c.zoomGroup : (c.imgUrl ? [c.imgUrl] : []);
@@ -893,7 +1069,7 @@ function buildTiktokFeed(list) {
     slide.className = 'tiktok-slide';
     slide.dataset.id = c.id;
 
-    // --- Carrousel horizontal ---
+    // Carrousel horizontal
     const carousel = document.createElement('div');
     carousel.className = 'tiktok-photos';
 
@@ -901,7 +1077,6 @@ function buildTiktokFeed(list) {
       const item = document.createElement('div');
       item.className = 'tiktok-photo-item';
 
-      // Fond flou
       const bg = document.createElement('div');
       bg.className = 'photo-bg';
       bg.style.backgroundImage = `url(${url})`;
@@ -911,18 +1086,23 @@ function buildTiktokFeed(list) {
       img.src = url;
       img.alt = c.name || '';
       img.loading = 'lazy';
+      img.draggable = false;
+      // Bloquer tout mouvement de l'image
+      img.addEventListener('touchstart',  e => e.stopPropagation(), { passive: false });
+      img.addEventListener('touchmove',   e => { e.stopPropagation(); e.preventDefault(); }, { passive: false });
+      img.addEventListener('pointerdown', e => e.stopPropagation());
       item.appendChild(img);
       carousel.appendChild(item);
     });
     slide.appendChild(carousel);
 
-    // --- Counter (si plusieurs photos) ---
+    // Counter
     const counter = document.createElement('div');
     counter.className = 'tiktok-photo-counter' + (photos.length > 1 ? ' multi' : '');
     counter.textContent = `1 / ${photos.length}`;
     slide.appendChild(counter);
 
-    // --- Dots ---
+    // Dots
     if (photos.length > 1) {
       const dots = document.createElement('div');
       dots.className = 'tiktok-dots';
@@ -932,7 +1112,6 @@ function buildTiktokFeed(list) {
         dots.appendChild(dot);
       });
       slide.appendChild(dots);
-
       carousel.addEventListener('scroll', () => {
         const idx2 = Math.round(carousel.scrollLeft / carousel.clientWidth);
         dots.querySelectorAll('.tiktok-dot').forEach((d, i) => d.classList.toggle('active', i === idx2));
@@ -940,94 +1119,134 @@ function buildTiktokFeed(list) {
       }, { passive: true });
     }
 
-    // --- Infos bas gauche ---
+    // Infos bas gauche
     const info = document.createElement('div');
     info.className = 'tiktok-info';
     info.innerHTML = `<div class="t-title">${c.name || ''}</div><div class="t-legend">${c.legend || ''}</div>`;
     slide.appendChild(info);
 
-    // --- Actions droite ---
-    const actions = document.createElement('div');
-    actions.className = 'tiktok-actions';
+    // Barre réactions
+    const bar = document.createElement('div');
+    bar.className = 'tiktok-bar';
+    const reactRow = document.createElement('div');
+    reactRow.className = 'tiktok-react-row';
 
-    // Like (toggle direct, pas de modale)
-    const likeAction = document.createElement('div');
-    const alreadyLiked = (c.likes || []).some(l => l.name === myPrenom);
-    likeAction.className = 'tiktok-action-btn' + (alreadyLiked ? ' liked' : '');
-
-    const likeHeartColor = alreadyLiked ? '#ff2d78' : '#ffe6f0';
-    const likeHeartFill  = alreadyLiked ? '#ff2d78' : 'none';
-    likeAction.innerHTML = `
-      <svg viewBox="0 0 24 24" fill="${likeHeartFill}" stroke="${likeHeartColor}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+    // ── Like avec cœurs ──
+    const cr0 = creations.find(x => x.id === c.id) || c;
+    const alreadyLiked = (cr0.likes || []).some(l => l.name === myPrenom);
+    const likeBtn2 = document.createElement('div');
+    likeBtn2.className = 'tiktok-react-btn' + (alreadyLiked ? ' liked' : '');
+    const lS = alreadyLiked ? '#ff2d78' : '#ffe6f0';
+    const lF = alreadyLiked ? '#ff2d78' : 'none';
+    likeBtn2.innerHTML = `
+      <svg viewBox="0 0 24 24" fill="${lF}" stroke="${lS}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8z"/>
       </svg>
-      <span>${(c.likes || []).length}</span>`;
+      <span>${(cr0.likes || []).length}</span>`;
 
-    likeAction.onclick = async () => {
-      const creation = creations.find(x => x.id === c.id);
-      if (!creation) return;
-      if (!Array.isArray(creation.likes)) creation.likes = [];
-
-      const svg = likeAction.querySelector('svg');
-      const span = likeAction.querySelector('span');
-      const wasLiked = creation.likes.some(l => l.name === myPrenom);
-
+    likeBtn2.onclick = async (e) => {
+      e.stopPropagation();
+      const cr = creations.find(x => x.id === c.id);
+      if (!cr) return;
+      if (!Array.isArray(cr.likes)) cr.likes = [];
+      const svg2  = likeBtn2.querySelector('svg');
+      const span2 = likeBtn2.querySelector('span');
+      const wasLiked = cr.likes.some(l => l.name === myPrenom);
       if (wasLiked) {
-        creation.likes = creation.likes.filter(l => l.name !== myPrenom);
-        likeAction.classList.remove('liked');
-        svg.setAttribute('stroke', '#ffe6f0');
-        svg.setAttribute('fill', 'none');
+        cr.likes = cr.likes.filter(l => l.name !== myPrenom);
+        likeBtn2.classList.remove('liked');
+        svg2.setAttribute('stroke', '#ffe6f0');
+        svg2.setAttribute('fill', 'none');
       } else {
-        creation.likes.push({ name: myPrenom, photo: ownerPhoto.src || '' });
-        likeAction.classList.add('liked');
-        svg.setAttribute('stroke', '#ff2d78');
-        svg.setAttribute('fill', '#ff2d78');
+        cr.likes.push({ name: myPrenom, photo: ownerPhoto.src || '' });
+        likeBtn2.classList.add('liked');
+        svg2.setAttribute('stroke', '#ff2d78');
+        svg2.setAttribute('fill', '#ff2d78');
+        spawnHearts(likeBtn2); // 🩷
       }
-      span.textContent = creation.likes.length;
-      await supabase.from('creations').update({ likes: creation.likes }).eq('id', creation.id);
-      if (currentZoom && currentZoom.id === creation.id) currentZoom.likes = [...creation.likes];
+      span2.textContent = cr.likes.length;
+      await supabase.from('creations').update({ likes: cr.likes }).eq('id', cr.id);
+      if (currentZoom && currentZoom.id === cr.id) currentZoom.likes = [...cr.likes];
     };
-    actions.appendChild(likeAction);
+    reactRow.appendChild(likeBtn2);
 
-    // Commentaire (ouvre la modale existante)
-    const commentAction = document.createElement('div');
-    commentAction.className = 'tiktok-action-btn';
-    commentAction.innerHTML = `
+    // ── Commentaire inline (panel fixed) ──
+    const commentBtn2 = document.createElement('div');
+    commentBtn2.className = 'tiktok-react-btn';
+    commentBtn2.innerHTML = `
       <svg viewBox="0 0 24 24" fill="none" stroke="#ffe6f0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
       </svg>
-      <span>${(c.comments || []).length}</span>`;
+      <span>${(cr0.comments || []).length}</span>`;
 
-    commentAction.onclick = () => {
-      currentZoom = creations.find(x => x.id === c.id);
-      if (!currentZoom) return;
-      commentNameInput.value = myPrenom || '';
-      commentTextInput.value = '';
-      renderCommentList();
-      commentModal.style.display = 'flex';
+    // Panel attaché au body (position:fixed → toujours visible)
+    const commentPanel = document.createElement('div');
+    commentPanel.className = 'tiktok-comment-panel';
+    commentPanel.style.display = 'none';
 
-      // Après envoi, met à jour le compteur dans le slide
-      const _prev = confirmComment.onclick;
-      confirmComment.onclick = async () => {
-        if (!currentZoom) return;
-        const name = commentNameInput.value.trim();
-        const text = commentTextInput.value.trim();
-        if (!name || !text) return;
-        if (!Array.isArray(currentZoom.comments)) currentZoom.comments = parseJsonField(currentZoom.comments);
-        currentZoom.comments.push({ name, text, photo: ownerPhoto.src || '' });
-        const { error } = await supabase.from('creations').update({ comments: currentZoom.comments }).eq('id', currentZoom.id);
-        if (error) { console.error('Comment error:', JSON.stringify(error)); return; }
-        const idx = creations.findIndex(x => x.id === currentZoom.id);
-        if (idx !== -1) creations[idx].comments = [...currentZoom.comments];
-        renderCommentList();
-        commentTextInput.value = '';
-        commentCount.textContent = currentZoom.comments.length;
-        commentAction.querySelector('span').textContent = currentZoom.comments.length;
-      };
+    const handle = document.createElement('div');
+    handle.className = 'tiktok-comment-handle';
+    commentPanel.appendChild(handle);
+
+    const commentList = document.createElement('div');
+    commentList.className = 'tiktok-comment-list';
+    (cr0.comments || []).forEach(cm => {
+      const item = document.createElement('div');
+      item.className = 'tiktok-comment-item';
+      item.innerHTML = `${cm.photo ? `<img src="${cm.photo}" alt="" loading="lazy">` : ''}<span><strong>${cm.name}</strong> ${cm.text}</span>`;
+      commentList.appendChild(item);
+    });
+    commentPanel.appendChild(commentList);
+
+    const inputRow = document.createElement('div');
+    inputRow.className = 'tiktok-comment-input-row';
+    const commentInput2 = document.createElement('input');
+    commentInput2.type = 'text';
+    commentInput2.placeholder = 'Ajouter un commentaire…';
+    commentInput2.addEventListener('click', e => e.stopPropagation());
+    commentInput2.addEventListener('touchstart', e => e.stopPropagation());
+    const sendBtn2 = document.createElement('button');
+    sendBtn2.className = 'tiktok-comment-send';
+    sendBtn2.innerHTML = '➤';
+    inputRow.appendChild(commentInput2);
+    inputRow.appendChild(sendBtn2);
+    commentPanel.appendChild(inputRow);
+
+    sendBtn2.onclick = async (e) => {
+      e.stopPropagation();
+      const text = commentInput2.value.trim();
+      if (!text) return;
+      const cr = creations.find(x => x.id === c.id);
+      if (!cr) return;
+      if (!Array.isArray(cr.comments)) cr.comments = [];
+      const newCom = { name: myPrenom || '?', text, photo: ownerPhoto.src || '' };
+      cr.comments.push(newCom);
+      await supabase.from('creations').update({ comments: cr.comments }).eq('id', cr.id);
+      const item = document.createElement('div');
+      item.className = 'tiktok-comment-item';
+      item.innerHTML = `${newCom.photo ? `<img src="${newCom.photo}" alt="">` : ''}<span><strong>${newCom.name}</strong> ${newCom.text}</span>`;
+      commentList.appendChild(item);
+      commentList.scrollTop = commentList.scrollHeight;
+      commentInput2.value = '';
+      commentBtn2.querySelector('span').textContent = cr.comments.length;
+      if (currentZoom && currentZoom.id === cr.id) currentZoom.comments = [...cr.comments];
     };
-    actions.appendChild(commentAction);
 
-    slide.appendChild(actions);
+    document.body.appendChild(commentPanel);
+
+    commentBtn2.onclick = (e) => {
+      e.stopPropagation();
+      if (commentPanel.classList.contains('open')) {
+        closeCommentPanel();
+      } else {
+        openCommentPanel(commentPanel, commentInput2);
+        commentList.scrollTop = commentList.scrollHeight;
+      }
+    };
+
+    reactRow.appendChild(commentBtn2);
+    bar.appendChild(reactRow);
+    slide.appendChild(bar);
     tiktokFeed.appendChild(slide);
   });
 }
@@ -1037,41 +1256,21 @@ tiktokBtn.onclick = () => {
   tiktokOverlay.classList.add('visible');
   closeTiktok.classList.add('visible');
   document.body.style.overflow = 'hidden';
-  // Reset au premier slide
   tiktokFeed.scrollTop = 0;
 };
 
 closeTiktok.onclick = () => {
+  closeCommentPanel();
   tiktokOverlay.classList.remove('visible');
   closeTiktok.classList.remove('visible');
   document.body.style.overflow = '';
-  // Restore confirmComment original
-  confirmComment.onclick = async () => {
-    if (!currentZoom) return;
-    const name = commentNameInput.value.trim();
-    const text = commentTextInput.value.trim();
-    if (!name || !text) return;
-    if (!Array.isArray(currentZoom.comments)) currentZoom.comments = parseJsonField(currentZoom.comments);
-    currentZoom.comments.push({ name, text, photo: ownerPhoto.src || '' });
-    const { error } = await supabase.from('creations').update({ comments: currentZoom.comments }).eq('id', currentZoom.id);
-    if (error) { console.error('Comment error:', JSON.stringify(error)); return; }
-    const idx = creations.findIndex(x => x.id === currentZoom.id);
-    if (idx !== -1) creations[idx].comments = [...currentZoom.comments];
-    renderCommentList();
-    commentTextInput.value = '';
-    commentCount.textContent = currentZoom.comments.length;
-  };
+  // Supprimer les panels du DOM
+  document.querySelectorAll('.tiktok-comment-panel').forEach(p => p.remove());
 };
-
-// Fermeture modale commentaire depuis TikTok (clic en dehors)
-commentModal.addEventListener('click', e => {
-  if (e.target === commentModal) commentModal.style.display = 'none';
-});
 
 // =============================================
 // INIT
 // =============================================
-
 document.addEventListener('DOMContentLoaded', loadOwnerPhoto);
 window.addEventListener('pageshow', loadOwnerPhoto);
 refreshCreations();
