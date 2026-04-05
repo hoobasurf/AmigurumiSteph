@@ -13,8 +13,6 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 
-<!-- Fonte manuscrite douce -->
-
 <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@400;600;700&family=Nunito:wght@300;400;600&display=swap" rel="stylesheet">
 
 <style>
@@ -26,7 +24,6 @@ body{
   background:#fce8f0;
 }
 
-/* ── FOND ── */
 body::before{
   content:"";
   position:fixed;inset:0;
@@ -35,7 +32,6 @@ body::before{
   background-position:center;
   z-index:-2;
 }
-/* voile doux pour lisibilité */
 body::after{
   content:"";
   position:fixed;inset:0;
@@ -44,9 +40,6 @@ body::after{
   z-index:-1;
 }
 
-/* ════════════════════════════════
-   BARRE HAUT — style "menu bar OS"
-   ════════════════════════════════ */
 #menubar{
   position:fixed;top:0;left:0;right:0;height:44px;
   background:rgba(255,220,235,0.75);
@@ -73,7 +66,6 @@ body::after{
 }
 .menu-item:hover{background:rgba(255,182,193,0.4);}
 
-/* dropdown */
 .dropdown{
   display:none;
   position:absolute;top:calc(100% + 6px);left:0;
@@ -95,7 +87,6 @@ body::after{
 .dropdown-item:hover{background:rgba(255,182,193,0.4);}
 .dropdown-sep{height:1px;background:#e8a0b8;margin:4px 14px;}
 
-/* barre droite */
 #menubar .right{
   margin-left:auto;
   display:flex;align-items:center;gap:12px;
@@ -105,7 +96,6 @@ body::after{
   font-size:17px;color:#c4567a;
 }
 
-/* bouton retour */
 #backBtn{
   background:rgba(255,182,193,0.7);
   border:1.5px solid #e8a0b8;
@@ -116,9 +106,6 @@ body::after{
 }
 #backBtn:hover{background:rgba(255,182,193,1);}
 
-/* ════════════════════════════════
-   SIDEBAR — tiroir latéral
-   ════════════════════════════════ */
 #sidebar{
   position:fixed;top:44px;left:-220px;bottom:0;
   width:220px;
@@ -149,7 +136,6 @@ body::after{
 .sidebar-item .ic{font-size:18px;}
 .sidebar-sep{height:1px;background:rgba(182,115,133,0.2);margin:8px 20px;}
 
-/* toggle sidebar */
 #toggleSidebar{
   position:fixed;top:50%;left:0;
   transform:translateY(-50%);
@@ -164,9 +150,6 @@ body::after{
 }
 #toggleSidebar.shifted{left:220px;}
 
-/* ════════════════════════════════
-   ZONE PRINCIPALE
-   ════════════════════════════════ */
 #main{
   position:fixed;top:44px;left:0;right:0;bottom:0;
   overflow-y:auto;
@@ -175,7 +158,6 @@ body::after{
 }
 #main.shifted{left:220px;}
 
-/* BARRE OUTILS */
 #toolbar{
   display:flex;align-items:center;gap:10px;
   margin-bottom:18px;flex-wrap:wrap;
@@ -201,9 +183,6 @@ body::after{
   font-family:'Caveat',cursive;font-size:15px;color:#c4567a;
 }
 
-/* ════════════════════════════════
-   GRILLE & LISTE
-   ════════════════════════════════ */
 #filesContainer{
   display:grid;
   grid-template-columns:repeat(auto-fill,minmax(130px,1fr));
@@ -215,7 +194,6 @@ body::after{
   gap:6px;
 }
 
-/* ── ITEM (dossier ou fichier) ── */
 .file-item{
   background:rgba(255,235,245,0.85);
   border:2px solid rgba(232,160,184,0.5);
@@ -227,6 +205,7 @@ body::after{
   position:relative;
   animation:popIn .25s cubic-bezier(.34,1.56,.64,1) both;
   user-select:none;
+  -webkit-user-select:none;
 }
 @keyframes popIn{
   from{opacity:0;transform:scale(.8);}
@@ -238,13 +217,15 @@ body::after{
   transform:translateY(-3px);
   box-shadow:0 8px 20px rgba(180,80,120,0.15);
 }
+.file-item:active{
+  transform:scale(0.96);
+}
 .file-item.selected{
   background:rgba(255,182,193,0.6);
   border-color:#d4778d;
   box-shadow:0 0 0 3px rgba(255,182,193,0.4);
 }
 
-/* vue liste */
 .list-view .file-item{
   flex-direction:row;
   padding:10px 16px;
@@ -268,7 +249,6 @@ body::after{
   font-size:11px;color:#c08096;
 }
 
-/* indicateur dossier */
 .folder-badge{
   position:absolute;top:8px;right:10px;
   background:#ffb6c1;color:#fff;
@@ -276,7 +256,6 @@ body::after{
   font-size:10px;font-family:'Nunito',sans-serif;
 }
 
-/* ── DRAG & DROP ── */
 .file-item.drag-over{
   border:2.5px dashed #d4778d;
   background:rgba(255,182,193,0.3);
@@ -292,9 +271,6 @@ body::after{
 }
 .drop-zone.visible{display:flex;align-items:center;justify-content:center;gap:10px;}
 
-/* ════════════════════════════════
-   MODALE NOTE / FICHIER
-   ════════════════════════════════ */
 #modal-overlay{
   position:fixed;inset:0;
   background:rgba(180,80,120,0.18);
@@ -378,7 +354,6 @@ body::after{
 .modal-btn.danger{background:rgba(255,100,120,0.12);color:#c0445a;border:1.5px solid rgba(200,80,100,0.3);}
 .modal-btn.danger:hover{background:rgba(255,100,120,0.25);}
 
-/* ── TAG ── */
 .tag-row{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px;}
 .tag{
   background:rgba(255,182,193,0.35);
@@ -389,9 +364,6 @@ body::after{
 }
 .tag.active{background:#ffb6c1;color:#fff;border-color:#d4778d;}
 
-/* ════════════════════════════════
-   BOUTON + FLOTTANT
-   ════════════════════════════════ */
 #fab{
   position:fixed;bottom:24px;right:24px;
   width:58px;height:58px;
@@ -406,7 +378,6 @@ body::after{
 }
 #fab:hover{background:#e8a0b8;transform:scale(1.08);}
 
-/* FAB mini-menu */
 #fab-menu{
   position:fixed;bottom:92px;right:24px;
   display:flex;flex-direction:column;gap:10px;
@@ -429,9 +400,6 @@ body::after{
 }
 .fab-option:hover{background:rgba(255,214,232,0.99);}
 
-/* ════════════════════════════════
-   EMPTY STATE
-   ════════════════════════════════ */
 #empty-state{
   grid-column:1/-1;
   text-align:center;padding:60px 20px;
@@ -443,7 +411,6 @@ body::after{
   font-family:'Caveat',cursive;font-size:20px;color:#c08096;
 }
 
-/* scrollbar */
 ::-webkit-scrollbar{width:6px;}
 ::-webkit-scrollbar-track{background:transparent;}
 ::-webkit-scrollbar-thumb{background:#e8a0b8;border-radius:10px;}
@@ -497,13 +464,13 @@ body::after{
 
 <div id="sidebar">
   <div class="sidebar-title">Emplacements</div>
-  <div class="sidebar-item active" onclick="navSidebar('all')">
+  <div class="sidebar-item active" onclick="navSidebar('all', this)">
     <span class="ic">🌸</span> Toutes les notes
   </div>
-  <div class="sidebar-item" onclick="navSidebar('recent')">
+  <div class="sidebar-item" onclick="navSidebar('recent', this)">
     <span class="ic">🕐</span> Récentes
   </div>
-  <div class="sidebar-item" onclick="navSidebar('images')">
+  <div class="sidebar-item" onclick="navSidebar('images', this)">
     <span class="ic">🌺</span> Images
   </div>
   <div class="sidebar-sep"></div>
@@ -565,9 +532,9 @@ body::after{
 ```
   <div class="tag-row" id="tag-row">
     <span style="font-family:'Caveat',cursive;font-size:14px;color:#c08096;">Tags :</span>
-    <span class="tag" onclick="toggleTag(this,'idées')">💡 idées</span>
-    <span class="tag" onclick="toggleTag(this,'important')">⭐ important</span>
-    <span class="tag" onclick="toggleTag(this,'créations')">🎨 créations</span>
+    <span class="tag" data-tag="idées" onclick="toggleTag(this,'idées')">💡 idées</span>
+    <span class="tag" data-tag="important" onclick="toggleTag(this,'important')">⭐ important</span>
+    <span class="tag" data-tag="créations" onclick="toggleTag(this,'créations')">🎨 créations</span>
   </div>
 
   <div class="modal-actions">
@@ -589,15 +556,15 @@ body::after{
    ═══════════════════════════════════════ */
 let items = JSON.parse(localStorage.getItem('notes_items') || '[]');
 let currentView = localStorage.getItem('notes_view') || 'grid';
-let currentFolder = null; // null = root
+let currentFolder = null;
 let currentFilter = null;
 let editingId = null;
 let fabOpen = false;
 let sidebarOpen = false;
 let activeTags = [];
 
-function save(){localStorage.setItem('notes_items', JSON.stringify(items));}
-function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2);}
+function save(){ localStorage.setItem('notes_items', JSON.stringify(items)); }
+function uid(){ return Date.now().toString(36) + Math.random().toString(36).slice(2); }
 
 /* ═══════════════════════════════════════
    HORLOGE
@@ -605,9 +572,10 @@ function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2
 function updateClock(){
   const now = new Date();
   document.getElementById('clock').textContent =
-    now.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});
+    now.toLocaleTimeString('fr-FR', {hour:'2-digit', minute:'2-digit'});
 }
-setInterval(updateClock,1000); updateClock();
+setInterval(updateClock, 1000);
+updateClock();
 
 /* ═══════════════════════════════════════
    SIDEBAR
@@ -621,22 +589,19 @@ function toggleSidebar(){
   t.textContent = sidebarOpen ? '❯' : '❮';
 }
 
-function navSidebar(type){
-  document.querySelectorAll('.sidebar-item').forEach(e=>e.classList.remove('active'));
-  event.currentTarget.classList.add('active');
-  currentFilter = null; currentFolder = null;
-  if(type === 'recent'){
-    // trier par date, juste une vue
-    currentFilter = 'recent';
-  } else if(type === 'images'){
-    currentFilter = 'images';
-  }
+function navSidebar(type, el){
+  document.querySelectorAll('.sidebar-item').forEach(e => e.classList.remove('active'));
+  if(el) el.classList.add('active');
+  currentFilter = null;
+  currentFolder = null;
+  if(type === 'recent') currentFilter = 'recent';
+  else if(type === 'images') currentFilter = 'images';
   updatePathbar();
   render();
 }
 
 function filterTag(tag){
-  currentFilter = 'tag:'+tag;
+  currentFilter = 'tag:' + tag;
   currentFolder = null;
   updatePathbar();
   render();
@@ -648,43 +613,40 @@ function filterTag(tag){
 function setView(v){
   currentView = v;
   localStorage.setItem('notes_view', v);
-  document.getElementById('filesContainer').classList.toggle('list-view', v==='list');
-  document.getElementById('btn-grid').classList.toggle('active', v==='grid');
-  document.getElementById('btn-list').classList.toggle('active', v==='list');
+  document.getElementById('filesContainer').classList.toggle('list-view', v === 'list');
+  document.getElementById('btn-grid').classList.toggle('active', v === 'grid');
+  document.getElementById('btn-list').classList.toggle('active', v === 'list');
 }
 
 /* ═══════════════════════════════════════
    RENDU
    ═══════════════════════════════════════ */
 function getVisible(){
-  let list = items.filter(i=>
+  let list = items.filter(i =>
     currentFolder === null ? !i.folder : i.folder === currentFolder
   );
   if(currentFilter === 'recent'){
-    list = [...items].sort((a,b)=>b.createdAt - a.createdAt).slice(0,20);
+    list = [...items].sort((a,b) => b.createdAt - a.createdAt).slice(0, 20);
   } else if(currentFilter === 'images'){
-    list = items.filter(i=>i.imgData);
+    list = items.filter(i => i.imgData);
   } else if(currentFilter && currentFilter.startsWith('tag:')){
     const tag = currentFilter.slice(4);
-    list = items.filter(i=>i.tags && i.tags.includes(tag));
+    list = items.filter(i => i.tags && i.tags.includes(tag));
   }
   return list;
 }
 
 function render(){
   const container = document.getElementById('filesContainer');
-  // Garder drop-zone et empty-state
-  const oldItems = container.querySelectorAll('.file-item');
-  oldItems.forEach(e=>e.remove());
+  container.querySelectorAll('.file-item').forEach(e => e.remove());
 
   const visible = getVisible();
   const empty = document.getElementById('empty-state');
   empty.classList.toggle('visible', visible.length === 0);
 
-  // dossiers d'abord
-  const folders = visible.filter(i=>i.type==='folder');
-  const files   = visible.filter(i=>i.type!=='folder');
-  [...folders,...files].forEach(item=>{
+  const folders = visible.filter(i => i.type === 'folder');
+  const files   = visible.filter(i => i.type !== 'folder');
+  [...folders, ...files].forEach(item => {
     container.insertBefore(makeEl(item), document.getElementById('drop-zone'));
   });
 
@@ -700,58 +662,103 @@ function makeEl(item){
   if(item.type === 'folder'){
     el.innerHTML = `
       <span class="file-icon">📁</span>
-      <span class="file-name">${item.title||'Dossier'}</span>
+      <span class="file-name">${item.title || 'Dossier'}</span>
       <span class="file-meta">${countInFolder(item.id)} élément(s)</span>
     `;
-    el.ondblclick = ()=>openFolder(item.id);
   } else {
     const icon = item.imgData ? '🌺' : '📝';
-    const preview = item.content ? item.content.slice(0,40) : '';
+    const preview = item.content ? item.content.slice(0, 40) : '';
     el.innerHTML = `
       <span class="file-icon">${icon}</span>
-      <span class="file-name">${item.title||'Sans titre'}</span>
+      <span class="file-name">${item.title || 'Sans titre'}</span>
       <span class="file-meta">${preview}</span>
     `;
-    el.ondblclick = ()=>openEditModal(item.id);
   }
 
-  el.onclick = (e)=>{
-    if(e.detail === 1){
-      el.classList.toggle('selected');
-    }
-  };
+  /* ── GESTION DES CLICS : simple = ouvre, long press = sélectionne ── */
+  let pressTimer = null;
+  let isLongPress = false;
 
-  // drag fichier dans dossier
+  // Tactile : long press pour sélectionner
+  el.addEventListener('touchstart', () => {
+    isLongPress = false;
+    pressTimer = setTimeout(() => {
+      isLongPress = true;
+      el.classList.toggle('selected');
+      if(navigator.vibrate) navigator.vibrate(30);
+    }, 500);
+  }, { passive: true });
+
+  el.addEventListener('touchend', (e) => {
+    clearTimeout(pressTimer);
+    if(isLongPress){
+      e.preventDefault(); // empêche le clic de se déclencher
+      isLongPress = false;
+    }
+  });
+
+  el.addEventListener('touchmove', () => {
+    clearTimeout(pressTimer);
+    isLongPress = false;
+  }, { passive: true });
+
+  // Clic souris/tap (sans long press)
+  el.addEventListener('click', (e) => {
+    if(isLongPress) return;
+
+    // Ctrl/Cmd+clic = sélection multiple
+    if(e.ctrlKey || e.metaKey){
+      el.classList.toggle('selected');
+      return;
+    }
+
+    // Si des items sont déjà sélectionnés, le clic ajoute/retire de la sélection
+    const anySelected = document.querySelectorAll('.file-item.selected').length > 0;
+    if(anySelected){
+      el.classList.toggle('selected');
+      return;
+    }
+
+    // Sinon : ouvrir
+    if(item.type === 'folder'){
+      openFolder(item.id);
+    } else {
+      openEditModal(item.id);
+    }
+  });
+
+  // Drag & drop : dossier comme cible
   if(item.type === 'folder'){
-    el.addEventListener('dragover', e=>{e.preventDefault();el.classList.add('drag-over');});
-    el.addEventListener('dragleave',()=>el.classList.remove('drag-over'));
-    el.addEventListener('drop', e=>{
-      e.preventDefault();el.classList.remove('drag-over');
+    el.addEventListener('dragover', e => { e.preventDefault(); el.classList.add('drag-over'); });
+    el.addEventListener('dragleave', () => el.classList.remove('drag-over'));
+    el.addEventListener('drop', e => {
+      e.preventDefault();
+      el.classList.remove('drag-over');
       const dragId = e.dataTransfer.getData('text/plain');
       if(dragId && dragId !== item.id){
-        const target = items.find(i=>i.id===dragId);
-        if(target){target.folder=item.id;save();render();}
+        const target = items.find(i => i.id === dragId);
+        if(target){ target.folder = item.id; save(); render(); }
       }
     });
   }
   el.draggable = true;
-  el.addEventListener('dragstart', e=>{e.dataTransfer.setData('text/plain',item.id);});
+  el.addEventListener('dragstart', e => { e.dataTransfer.setData('text/plain', item.id); });
 
   return el;
 }
 
 function countInFolder(folderId){
-  return items.filter(i=>i.folder===folderId).length;
+  return items.filter(i => i.folder === folderId).length;
 }
 
 function renderSidebarFolders(){
   const cont = document.getElementById('sidebar-folders');
-  cont.innerHTML='';
-  items.filter(i=>i.type==='folder'&&!i.folder).forEach(f=>{
+  cont.innerHTML = '';
+  items.filter(i => i.type === 'folder' && !i.folder).forEach(f => {
     const el = document.createElement('div');
-    el.className='sidebar-item';
-    el.innerHTML=`<span class="ic">📁</span> ${f.title||'Dossier'}`;
-    el.onclick=()=>openFolder(f.id);
+    el.className = 'sidebar-item';
+    el.innerHTML = `<span class="ic">📁</span> ${f.title || 'Dossier'}`;
+    el.onclick = () => openFolder(f.id);
     cont.appendChild(el);
   });
 }
@@ -762,15 +769,15 @@ function renderSidebarFolders(){
 function openFolder(id){
   currentFolder = id;
   currentFilter = null;
-  const f = items.find(i=>i.id===id);
-  document.getElementById('pathbar').textContent = '📁 '+( f?.title||'Dossier');
+  const f = items.find(i => i.id === id);
+  document.getElementById('pathbar').textContent = '📁 ' + (f?.title || 'Dossier');
   render();
 }
 
 function updatePathbar(){
-  const map = {null:'🌸 Toutes les notes', recent:'🕐 Récentes', images:'🌺 Images'};
+  const map = { null:'🌸 Toutes les notes', recent:'🕐 Récentes', images:'🌺 Images' };
   if(currentFilter && currentFilter.startsWith('tag:'))
-    document.getElementById('pathbar').textContent = '🏷 '+currentFilter.slice(4);
+    document.getElementById('pathbar').textContent = '🏷 ' + currentFilter.slice(4);
   else
     document.getElementById('pathbar').textContent = map[currentFilter] || map[null];
 }
@@ -779,10 +786,11 @@ function updatePathbar(){
    CRÉER DOSSIER
    ═══════════════════════════════════════ */
 function createFolder(){
-  const name = prompt('Nom du dossier :','Nouveau dossier');
+  const name = prompt('Nom du dossier :', 'Nouveau dossier');
   if(!name) return;
-  items.push({id:uid(),type:'folder',title:name,folder:currentFolder,createdAt:Date.now()});
-  save(); render();
+  items.push({ id:uid(), type:'folder', title:name, folder:currentFolder, createdAt:Date.now() });
+  save();
+  render();
 }
 
 /* ═══════════════════════════════════════
@@ -793,28 +801,29 @@ function openNewNote(){
   activeTags = [];
   document.getElementById('modal-title-input').value = '';
   document.getElementById('modal-textarea').value = '';
-  document.getElementById('modal-img-preview').style.display='none';
-  document.getElementById('modal-img-preview').src='';
-  document.getElementById('modal-delete-btn').style.display='none';
-  document.getElementById('modal-icon').textContent='📝';
-  document.querySelectorAll('.tag').forEach(t=>t.classList.remove('active'));
+  document.getElementById('modal-img-preview').style.display = 'none';
+  document.getElementById('modal-img-preview').src = '';
+  document.getElementById('modal-delete-btn').style.display = 'none';
+  document.getElementById('modal-icon').textContent = '📝';
+  document.querySelectorAll('.tag').forEach(t => t.classList.remove('active'));
   document.getElementById('modal-overlay').classList.add('open');
-  setTimeout(()=>document.getElementById('modal-title-input').focus(),100);
+  setTimeout(() => document.getElementById('modal-title-input').focus(), 100);
 }
 
 function openEditModal(id){
-  const item = items.find(i=>i.id===id);
-  if(!item)return;
+  const item = items.find(i => i.id === id);
+  if(!item) return;
   editingId = id;
   activeTags = item.tags ? [...item.tags] : [];
-  document.getElementById('modal-title-input').value = item.title||'';
-  document.getElementById('modal-textarea').value = item.content||'';
+  document.getElementById('modal-title-input').value = item.title || '';
+  document.getElementById('modal-textarea').value = item.content || '';
   const prev = document.getElementById('modal-img-preview');
-  if(item.imgData){prev.src=item.imgData;prev.style.display='block';}
-  else{prev.style.display='none';}
-  document.getElementById('modal-delete-btn').style.display='';
-  document.querySelectorAll('.tag').forEach(t=>{
-    t.classList.toggle('active', activeTags.includes(t.dataset.tag||t.textContent.trim().replace(/\S+ /,'')));
+  if(item.imgData){ prev.src = item.imgData; prev.style.display = 'block'; }
+  else { prev.style.display = 'none'; }
+  document.getElementById('modal-delete-btn').style.display = '';
+  document.querySelectorAll('.tag').forEach(t => {
+    const tagVal = t.dataset.tag;
+    t.classList.toggle('active', activeTags.includes(tagVal));
   });
   document.getElementById('modal-overlay').classList.add('open');
 }
@@ -832,31 +841,34 @@ function saveModal(){
   const imgData = imgSrc && imgSrc !== window.location.href ? imgSrc : null;
 
   if(editingId){
-    const item = items.find(i=>i.id===editingId);
-    if(item){item.title=title;item.content=content;item.imgData=imgData;item.tags=activeTags;}
+    const item = items.find(i => i.id === editingId);
+    if(item){ item.title = title; item.content = content; item.imgData = imgData; item.tags = activeTags; }
   } else {
     items.push({
-      id:uid(), type:'note', title, content,
-      imgData: imgData||null,
+      id: uid(), type:'note', title, content,
+      imgData: imgData || null,
       tags: activeTags,
       folder: currentFolder,
       createdAt: Date.now()
     });
   }
-  save(); render();
+  save();
+  render();
   closeModal();
 }
 
 function deleteCurrentItem(){
   if(!editingId) return;
   if(!confirm('Supprimer cette note ?')) return;
-  items = items.filter(i=>i.id!==editingId);
-  save(); render(); closeModal();
+  items = items.filter(i => i.id !== editingId);
+  save();
+  render();
+  closeModal();
 }
 
 function toggleTag(el, tag){
   el.classList.toggle('active');
-  if(activeTags.includes(tag)) activeTags = activeTags.filter(t=>t!==tag);
+  if(activeTags.includes(tag)) activeTags = activeTags.filter(t => t !== tag);
   else activeTags.push(tag);
 }
 
@@ -873,49 +885,52 @@ document.getElementById('fileInput').onchange = function(){
   const file = this.files[0];
   if(!file) return;
   const reader = new FileReader();
-  reader.onload = e=>{
+  reader.onload = e => {
     const prev = document.getElementById('modal-img-preview');
     prev.src = e.target.result;
-    prev.style.display='block';
+    prev.style.display = 'block';
     if(!document.getElementById('modal-overlay').classList.contains('open')){
-      // import direct → crée une note image
       items.push({
-        id:uid(), type:'note', title: file.name.replace(/\.\w+$/,''),
+        id: uid(), type:'note', title: file.name.replace(/\.\w+$/, ''),
         content:'', imgData: e.target.result,
         tags:[], folder: currentFolder, createdAt: Date.now()
       });
-      save(); render();
+      save();
+      render();
     }
   };
   reader.readAsDataURL(file);
-  this.value='';
+  this.value = '';
 };
 
 /* ═══════════════════════════════════════
-   DRAG & DROP GLOBAL
+   DRAG & DROP GLOBAL (images)
    ═══════════════════════════════════════ */
 const dz = document.getElementById('drop-zone');
-document.getElementById('main').addEventListener('dragover', e=>{
-  e.preventDefault(); dz.classList.add('visible');
+document.getElementById('main').addEventListener('dragover', e => {
+  e.preventDefault();
+  dz.classList.add('visible');
 });
-document.getElementById('main').addEventListener('dragleave', e=>{
+document.getElementById('main').addEventListener('dragleave', e => {
   if(!e.relatedTarget || !document.getElementById('main').contains(e.relatedTarget))
     dz.classList.remove('visible');
 });
-document.getElementById('main').addEventListener('drop', e=>{
-  e.preventDefault(); dz.classList.remove('visible');
+document.getElementById('main').addEventListener('drop', e => {
+  e.preventDefault();
+  dz.classList.remove('visible');
   const files = e.dataTransfer.files;
   if(files.length){
-    [...files].forEach(f=>{
+    [...files].forEach(f => {
       if(!f.type.startsWith('image/')) return;
       const r = new FileReader();
-      r.onload = ev=>{
+      r.onload = ev => {
         items.push({
-          id:uid(),type:'note',title:f.name.replace(/\.\w+$/,''),
-          content:'',imgData:ev.target.result,
-          tags:[],folder:currentFolder,createdAt:Date.now()
+          id: uid(), type:'note', title: f.name.replace(/\.\w+$/, ''),
+          content:'', imgData: ev.target.result,
+          tags:[], folder: currentFolder, createdAt: Date.now()
         });
-        save(); render();
+        save();
+        render();
       };
       r.readAsDataURL(f);
     });
@@ -940,59 +955,62 @@ function closeFab(){
    ACTIONS
    ═══════════════════════════════════════ */
 function deleteSelected(){
-  const ids = [...document.querySelectorAll('.file-item.selected')].map(e=>e.dataset.id);
-  if(!ids.length){alert('Sélectionne d\'abord des éléments.');return;}
+  const ids = [...document.querySelectorAll('.file-item.selected')].map(e => e.dataset.id);
+  if(!ids.length){ alert('Sélectionne d\'abord des éléments.'); return; }
   if(!confirm(`Supprimer ${ids.length} élément(s) ?`)) return;
-  items = items.filter(i=>!ids.includes(i.id));
-  save(); render();
+  items = items.filter(i => !ids.includes(i.id));
+  save();
+  render();
 }
 
 function selectAll(){
-  document.querySelectorAll('.file-item').forEach(e=>e.classList.add('selected'));
+  document.querySelectorAll('.file-item').forEach(e => e.classList.add('selected'));
 }
 
 function sortBy(type){
-  if(type==='name') items.sort((a,b)=>(a.title||'').localeCompare(b.title||''));
-  else items.sort((a,b)=>b.createdAt-a.createdAt);
-  save(); render();
+  if(type === 'name') items.sort((a,b) => (a.title||'').localeCompare(b.title||''));
+  else items.sort((a,b) => b.createdAt - a.createdAt);
+  save();
+  render();
 }
 
 function goBack(){
-  document.body.style.transition='opacity .5s';
-  document.body.style.opacity='0';
-  setTimeout(()=>{window.location.href='owner.html';},500);
+  document.body.style.transition = 'opacity .5s';
+  document.body.style.opacity = '0';
+  setTimeout(() => { window.location.href = 'owner.html'; }, 500);
 }
 
 /* ═══════════════════════════════════════
    SUPABASE (facultatif)
    ═══════════════════════════════════════ */
-(async()=>{
-  try{
+(async () => {
+  try {
     const { createClient } = await import("https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm");
     const supabase = createClient(
       "https://kdgxbmqwhpuctjtlygrt.supabase.co",
       "sb_publishable_sqsxb-3Kl5o3-JQYv9oGFw_-g0EgwMa"
     );
-    const {data} = await supabase.from('creations').select('*').order('created_at',{ascending:false});
+    const { data } = await supabase.from('creations').select('*').order('created_at', { ascending:false });
     if(data && data.length){
-      const existing = new Set(items.map(i=>i.supabaseId));
-      data.forEach(c=>{
+      const existing = new Set(items.map(i => i.supabaseId));
+      data.forEach(c => {
         if(existing.has(c.id)) return;
         const imgUrl = c.images?.[0]
           ? supabase.storage.from('images').getPublicUrl(c.images[0]).data.publicUrl
           : null;
         items.push({
-          id:uid(), supabaseId:c.id, type:'note',
-          title: c.title||'Création',
-          content: c.description||'',
+          id: uid(), supabaseId: c.id, type:'note',
+          title: c.title || 'Création',
+          content: c.description || '',
           imgData: imgUrl,
-          tags:['créations'], folder:null,
+          tags: ['créations'], folder: null,
           createdAt: new Date(c.created_at).getTime()
         });
       });
-      save(); render();
+      save();
+      render();
     }
-  }catch(e){console.log('Supabase ignoré',e);}
+  } catch(e) { console.log('Supabase ignoré', e); }
 })();
 
 /* ═══════════════════════════════════════
@@ -1001,11 +1019,19 @@ function goBack(){
 setView(currentView);
 render();
 
-// fermer fab si on clique ailleurs
-document.addEventListener('click', e=>{
+// Fermer fab si clic ailleurs
+document.addEventListener('click', e => {
   if(!document.getElementById('fab').contains(e.target) &&
      !document.getElementById('fab-menu').contains(e.target)){
     closeFab();
+  }
+});
+
+// Désélectionner tout si clic sur le fond
+document.getElementById('main').addEventListener('click', e => {
+  if(e.target === document.getElementById('main') ||
+     e.target === document.getElementById('filesContainer')){
+    document.querySelectorAll('.file-item.selected').forEach(el => el.classList.remove('selected'));
   }
 });
 </script>
