@@ -48,47 +48,56 @@ input, textarea, select { font-size: 16px !important; }
 .icon-btn:hover svg{transform:scale(1.2);}
 #likeCount,#commentCount{font-family:'Courier New',monospace;font-weight:bold;color:#b84c6f;font-size:14px;min-width:18px;}
 
-/* ✅ ownerPhoto — bloque menu contextuel iOS */
+/* Photo profil */
 #ownerPhoto{
 width:76px;height:76px;border-radius:50%;
 position:fixed;top:10px;right:10px;
 z-index:10000;background:#ffe6f0;
 border:3px solid #b84c6f;cursor:pointer;
 box-shadow:0 2px 12px rgba(184,76,111,0.3);
-transition:transform 0.2s,box-shadow 0.3s;
+transition:transform 0.2s;
 object-fit:cover;
--webkit-touch-callout:none;
--webkit-user-select:none;
-user-select:none;
 }
 #ownerPhoto:hover{transform:scale(1.08);}
 
+/* Bouton modifier photo — apparaît au long press */
+#editPhotoBtn{
+position:fixed;
+top:92px;right:6px;
+z-index:10001;
+background:linear-gradient(#ffd6e6,#ffb6c1);
+border:2px solid #b67385;
+border-radius:14px;
+padding:7px 13px;
+color:#b84c6f;
+font-weight:bold;
+font-size:13px;
+cursor:pointer;
+box-shadow:0 4px 12px rgba(184,76,111,0.3);
+display:none;
+white-space:nowrap;
+animation:popBtn 0.2s cubic-bezier(0.34,1.56,0.64,1);
+}
+@keyframes popBtn{
+from{transform:scale(0.5);opacity:0;}
+to{transform:scale(1);opacity:1;}
+}
+
 /* Anneaux pulsants pendant le long press */
 #ownerRings{
-position:fixed;
-top:10px;right:10px;
+position:fixed;top:10px;right:10px;
 width:76px;height:76px;
-pointer-events:none;
-z-index:9999;
-opacity:0;
-transition:opacity 0.3s;
+pointer-events:none;z-index:9999;
+opacity:0;transition:opacity 0.3s;
 }
-.owner-ring{
-position:absolute;
-border-radius:50%;
-border:2px solid rgba(255,182,193,0.7);
-opacity:0;
-}
+.owner-ring{position:absolute;border-radius:50%;border:2px solid rgba(255,182,193,0.7);opacity:0;}
 .owner-ring:nth-child(1){width:76px;height:76px;top:0;left:0;}
 .owner-ring:nth-child(2){width:96px;height:96px;top:-10px;left:-10px;}
 .owner-ring:nth-child(3){width:116px;height:116px;top:-20px;left:-20px;}
 #ownerRings.pulsing .owner-ring:nth-child(1){animation:ownerRing 1.2s ease-out infinite;}
 #ownerRings.pulsing .owner-ring:nth-child(2){animation:ownerRing 1.2s ease-out 0.3s infinite;}
 #ownerRings.pulsing .owner-ring:nth-child(3){animation:ownerRing 1.2s ease-out 0.6s infinite;}
-@keyframes ownerRing{
-0%{opacity:0.8;transform:scale(0.85);}
-100%{opacity:0;transform:scale(1.2);}
-}
+@keyframes ownerRing{0%{opacity:0.8;transform:scale(0.85);}100%{opacity:0;transform:scale(1.2);}}
 
 .pink-file-btn{background:linear-gradient(#ffd6e6,#ffb6c1);border:2px solid #b67385;border-radius:16px;padding:8px 14px;color:#b84c6f;font-weight:bold;cursor:pointer;width:100%;transition:transform 0.15s,box-shadow 0.15s;}
 .pink-file-btn:hover{transform:scale(1.03);box-shadow:0 4px 10px rgba(0,0,0,0.15);}
@@ -140,6 +149,11 @@ body.modal-open{overflow:hidden;touch-action:none;}
 <div id="bg" style="position:fixed;top:0;left:0;width:100vw;height:100vh;background-image:url('Photoroom_20251223_114401.jpeg');background-size:cover;background-position:center center;background-repeat:no-repeat;z-index:-1;pointer-events:none;"></div>
 
 <img id="ownerPhoto" alt="Owner">
+
+<!-- Bouton modifier photo (apparaît au long press) -->
+
+<button id="editPhotoBtn">✏️ Modifier photo</button>
+<input type="file" id="ownerFileInput" accept="image/*" style="display:none;">
 
 <!-- Anneaux pulsants pendant le long press -->
 
@@ -307,38 +321,40 @@ const supabase={
 
 let creations=[],currentZoom=null,currentDelete=null,
     currentChatUser=localStorage.getItem('currentChatUser')||null,userPhotos={};
-const ownerPhoto=document.getElementById('ownerPhoto');
-const ownerRings=document.getElementById('ownerRings');
-const prenom=localStorage.getItem('prenom');
-const myPrenom=prenom;
-const chatUserList=document.getElementById('chatUserList');
-const chatMessages=document.getElementById('chatMessages');
-const chatInput=document.getElementById('chatInput');
-const sendMsgBtn=document.getElementById('sendMsgBtn');
-const addModal=document.getElementById('addModal');
-const deleteModal=document.getElementById('deleteModal');
-const zoomModal=document.getElementById('zoomModal');
-const sidebar=document.getElementById('sidebar');
-const mainZoom=document.getElementById('mainZoom');
-const thumbs=document.getElementById('thumbs');
-const likeCount=document.getElementById('likeCount');
-const commentCount=document.getElementById('commentCount');
-const likeModal=document.getElementById('likeModal');
-const likeBubbles=document.getElementById('likeBubbles');
-const confirmLike=document.getElementById('confirmLike');
-const likeNameInput=document.getElementById('likeName');
-const commentModal=document.getElementById('commentModal');
-const confirmComment=document.getElementById('confirmComment');
-const commentBubbles=document.getElementById('commentBubbles');
-const commentNameInput=document.getElementById('commentName');
-const commentTextInput=document.getElementById('commentText');
-const chatModal=document.getElementById('chatModal');
-const toggleChatSize=document.getElementById('toggleChatSize');
-const icon=document.getElementById('chatResizeIcon');
-const fileBtn=document.getElementById('fileBtn');
-const fileInput=document.getElementById('multiPhoto');
-const fileInfo=document.getElementById('fileInfo');
-const zoomLegend=document.getElementById('zoomLegend');
+const ownerPhoto    = document.getElementById('ownerPhoto');
+const ownerRings    = document.getElementById('ownerRings');
+const editPhotoBtn  = document.getElementById('editPhotoBtn');
+const ownerFileInput= document.getElementById('ownerFileInput');
+const prenom        = localStorage.getItem('prenom');
+const myPrenom      = prenom;
+const chatUserList  = document.getElementById('chatUserList');
+const chatMessages  = document.getElementById('chatMessages');
+const chatInput     = document.getElementById('chatInput');
+const sendMsgBtn    = document.getElementById('sendMsgBtn');
+const addModal      = document.getElementById('addModal');
+const deleteModal   = document.getElementById('deleteModal');
+const zoomModal     = document.getElementById('zoomModal');
+const sidebar       = document.getElementById('sidebar');
+const mainZoom      = document.getElementById('mainZoom');
+const thumbs        = document.getElementById('thumbs');
+const likeCount     = document.getElementById('likeCount');
+const commentCount  = document.getElementById('commentCount');
+const likeModal     = document.getElementById('likeModal');
+const likeBubbles   = document.getElementById('likeBubbles');
+const confirmLike   = document.getElementById('confirmLike');
+const likeNameInput = document.getElementById('likeName');
+const commentModal  = document.getElementById('commentModal');
+const confirmComment= document.getElementById('confirmComment');
+const commentBubbles= document.getElementById('commentBubbles');
+const commentNameInput  = document.getElementById('commentName');
+const commentTextInput  = document.getElementById('commentText');
+const chatModal     = document.getElementById('chatModal');
+const toggleChatSize= document.getElementById('toggleChatSize');
+const icon          = document.getElementById('chatResizeIcon');
+const fileBtn       = document.getElementById('fileBtn');
+const fileInput     = document.getElementById('multiPhoto');
+const fileInfo      = document.getElementById('fileInfo');
+const zoomLegend    = document.getElementById('zoomLegend');
 
 mainZoom.addEventListener('mousedown',e=>e.stopPropagation());
 mainZoom.addEventListener('touchstart',e=>e.stopPropagation());
@@ -355,15 +371,83 @@ window.addEventListener('resize',()=>{
 });
 
 // =============================================
-// OWNER PHOTO — tap court = overlay, long press 2s = changer photo
+// OWNER PHOTO
+// - tap court  → overlay plein écran
+// - long press → bouton "Modifier photo" apparaît
 // =============================================
 
-const ownerFileInput = document.createElement('input');
-ownerFileInput.type = 'file';
-ownerFileInput.accept = 'image/*';
-ownerFileInput.style.display = 'none';
-document.body.appendChild(ownerFileInput);
+function loadOwnerPhoto(){
+  const p=prenom||localStorage.getItem('prenom');
+  const cached=localStorage.getItem('photo_url')||(p?localStorage.getItem('photo_url_'+p):null);
+  if(cached){ownerPhoto.src=cached;ownerPhoto.style.opacity='1';}
+  else{ownerPhoto.src='icon-152.png';ownerPhoto.style.opacity='0.8';}
+}
 
+function openOverlay(){
+  document.getElementById('overlayImg').src=ownerPhoto.src||'icon-152.png';
+  document.getElementById('overlayPrenom').textContent=prenom||'';
+  document.getElementById('photoOverlay').classList.add('visible');
+}
+
+// Cacher le bouton si on clique ailleurs
+document.addEventListener('click', e => {
+  if (e.target !== ownerPhoto && e.target !== editPhotoBtn) {
+    editPhotoBtn.style.display = 'none';
+  }
+});
+
+// Click simple sur la photo → overlay
+ownerPhoto.addEventListener('click', () => {
+  if (editPhotoBtn.style.display === 'block') {
+    editPhotoBtn.style.display = 'none';
+    return;
+  }
+  openOverlay();
+});
+
+// Long press → affiche le bouton modifier
+let longPressTimer = null;
+let longPressTriggered = false;
+
+function startLongPress() {
+  longPressTriggered = false;
+  ownerRings.style.opacity = '1';
+  ownerRings.classList.add('pulsing');
+  longPressTimer = setTimeout(() => {
+    longPressTriggered = true;
+    ownerRings.classList.remove('pulsing');
+    ownerRings.style.opacity = '0';
+    editPhotoBtn.style.display = 'block';
+  }, 800);
+}
+
+function endLongPress() {
+  clearTimeout(longPressTimer);
+  ownerRings.classList.remove('pulsing');
+  ownerRings.style.opacity = '0';
+}
+
+ownerPhoto.addEventListener('mousedown', startLongPress);
+ownerPhoto.addEventListener('mouseup', endLongPress);
+ownerPhoto.addEventListener('mouseleave', endLongPress);
+ownerPhoto.addEventListener('touchstart', startLongPress, { passive: true });
+ownerPhoto.addEventListener('touchend', e => {
+  endLongPress();
+  // Si ce n'était pas un long press → ouvrir overlay
+  if (!longPressTriggered) {
+    openOverlay();
+  }
+  longPressTriggered = false;
+});
+ownerPhoto.addEventListener('touchcancel', endLongPress);
+
+// Bouton modifier photo → ouvre le sélecteur de fichier
+editPhotoBtn.onclick = () => {
+  editPhotoBtn.style.display = 'none';
+  ownerFileInput.click();
+};
+
+// Upload de la nouvelle photo — même logique que index.html
 ownerFileInput.onchange = async () => {
   const file = ownerFileInput.files[0];
   if (!file) return;
@@ -402,84 +486,11 @@ ownerFileInput.onchange = async () => {
   }
 };
 
-function openOverlay() {
-  document.getElementById('overlayImg').src = ownerPhoto.src || 'icon-152.png';
-  document.getElementById('overlayPrenom').textContent = prenom || '';
-  document.getElementById('photoOverlay').classList.add('visible');
-}
-
-let ownerLongPressTimer = null;
-let ownerLongPressed = false;
-
-function startOwnerLongPress() {
-  ownerLongPressed = false;
-  ownerRings.style.opacity = '1';
-  ownerRings.classList.add('pulsing');
-  ownerLongPressTimer = setTimeout(() => {
-    ownerLongPressed = true;
-    ownerRings.classList.remove('pulsing');
-    ownerRings.style.opacity = '0';
-    ownerPhoto.style.transform = 'scale(1.15)';
-    ownerPhoto.style.boxShadow = '0 0 0 4px #b84c6f, 0 0 20px rgba(184,76,111,0.5)';
-    setTimeout(() => {
-      ownerPhoto.style.transform = '';
-      ownerPhoto.style.boxShadow = '';
-    }, 300);
-    ownerFileInput.click();
-  }, 2000);
-}
-
-function cancelOwnerLongPress() {
-  clearTimeout(ownerLongPressTimer);
-  ownerRings.classList.remove('pulsing');
-  ownerRings.style.opacity = '0';
-}
-
-// --- MOUSE (desktop) ---
-ownerPhoto.addEventListener('mousedown', startOwnerLongPress);
-ownerPhoto.addEventListener('mouseup', cancelOwnerLongPress);
-ownerPhoto.addEventListener('mouseleave', cancelOwnerLongPress);
-ownerPhoto.addEventListener('click', () => {
-  if (ownerLongPressed) { ownerLongPressed = false; return; }
-  openOverlay();
-});
-
-// --- TOUCH (iOS/mobile) ---
-// preventDefault bloque le menu contextuel iOS ET le click natif
-// On gère donc le tap court manuellement dans touchend
-ownerPhoto.addEventListener('touchstart', e => {
-  e.preventDefault();
-  startOwnerLongPress();
-}, { passive: false });
-
-ownerPhoto.addEventListener('touchend', e => {
-  e.preventDefault();
-  const wasLongPress = ownerLongPressed;
-  cancelOwnerLongPress();
-  if (!wasLongPress) {
-    // Tap court → ouvrir l'overlay
-    openOverlay();
-  }
-  ownerLongPressed = false;
-}, { passive: false });
-
-ownerPhoto.addEventListener('touchcancel', () => {
-  cancelOwnerLongPress();
-  ownerLongPressed = false;
-});
-
-// =============================================
-
 document.getElementById('photoOverlay').addEventListener('click', () => {
   document.getElementById('photoOverlay').classList.remove('visible');
 });
 
-function loadOwnerPhoto(){
-  const p=prenom||localStorage.getItem('prenom');
-  const cached=localStorage.getItem('photo_url')||(p?localStorage.getItem('photo_url_'+p):null);
-  if(cached){ownerPhoto.src=cached;ownerPhoto.style.opacity='1';}
-  else{ownerPhoto.src='icon-152.png';ownerPhoto.style.opacity='0.8';}
-}
+// =============================================
 
 async function loadMessages(){
   if(!currentChatUser)return;
