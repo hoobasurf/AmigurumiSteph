@@ -16,61 +16,6 @@ html, body {
   overflow-y:auto; 
 }
 
-/* ====== DEBUG OVERLAY ====== */
-#debugBox {
-position:fixed;
-bottom:0;
-left:0;
-right:0;
-max-height:40vh;
-overflow-y:auto;
-background:rgba(13,0,8,0.92);
-border-top:3px solid #ff2d78;
-z-index:99999;
-padding:10px;
-font-family:monospace;
-font-size:12px;
-color:#ffe6f0;
-display:none;
-}
-#debugBox.visible { display:block; }
-#debugTitle {
-color:#ff2d78;
-font-weight:bold;
-margin-bottom:6px;
-display:flex;
-justify-content:space-between;
-}
-#debugClose {
-cursor:pointer;
-background:#ff2d78;
-color:#fff;
-border:none;
-border-radius:4px;
-padding:2px 8px;
-font-size:11px;
-}
-.debug-line { margin:2px 0; line-height:1.4; }
-.debug-ok { color:#7fff7f; }
-.debug-err { color:#ff6b6b; }
-.debug-info { color:#ffe6f0; }
-
-#debugToggle {
-position:fixed;
-bottom:10px;
-right:10px;
-z-index:99998;
-background:#ff2d78;
-color:#fff;
-border:none;
-border-radius:50%;
-width:44px;
-height:44px;
-font-size:20px;
-cursor:pointer;
-box-shadow:0 2px 10px rgba(255,45,120,0.5);
-}
-
 /* ====== HEADER ====== */
 header {
 position:sticky; top:0;
@@ -268,18 +213,6 @@ font-family:‘Comic Sans MS’,cursive;
   <img id="viewerImage" src="" alt="">
 </div>
 
-<!-- DEBUG OVERLAY -->
-
-<button id="debugToggle">🐞</button>
-
-<div id="debugBox">
-  <div id="debugTitle">
-    <span>🐞 Debug Owner</span>
-    <button id="debugClose">Fermer</button>
-  </div>
-  <div id="debugLines"></div>
-</div>
-
 <script>
 async function uploadMultipleImages(files, onProgress) {
   const urls = [];
@@ -316,22 +249,7 @@ async function uploadMultipleImages(files, onProgress) {
 <script type="module">
 import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
 
-// ===== DEBUG =====
-const debugBox = document.getElementById('debugBox');
-const debugLines = document.getElementById('debugLines');
-document.getElementById('debugToggle').onclick = () => debugBox.classList.toggle('visible');
-document.getElementById('debugClose').onclick = () => debugBox.classList.remove('visible');
-
-function log(msg, type='info') {
-  debugBox.classList.add('visible');
-  const line = document.createElement('div');
-  line.className = `debug-line debug-${type}`;
-  const time = new Date().toLocaleTimeString('fr-FR');
-  line.textContent = `[${time}] ${msg}`;
-  debugLines.appendChild(line);
-  debugLines.scrollTop = debugLines.scrollHeight;
-  console.log(msg);
-}
+function log(msg) { console.log(msg); }
 
 // ===== SUPABASE =====
 const supabase = createClient(
