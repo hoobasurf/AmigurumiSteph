@@ -899,11 +899,33 @@ function updateBellUI(permission) {
   }
 }
 
-// Init SW
+// Bouton cloche → toujours fonctionnel, même sans SW
+document.getElementById('notifBellBtn').onclick = () => {
+  document.getElementById('notifModal').classList.add('visible');
+};
+document.getElementById('notifCloseBtn').onclick = () => document.getElementById('notifModal').classList.remove('visible');
+document.getElementById('notifModal').addEventListener('click', e => {
+  if (e.target === document.getElementById('notifModal')) document.getElementById('notifModal').classList.remove('visible');
+});
+
+// Init SW + push
 (async () => {
-  if (!('serviceWorker' in navigator) || !('PushManager' in window)) return;
+  // Affiche état actuel même sans SW
+  if ('Notification' in window) updateBellUI(Notification.permission);
+
+  if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
+    // iOS < 16.4 ou navigateur sans support push
+    const icon = document.getElementById('notifStatusIcon');
+    const text = document.getElementById('notifStatusText');
+    const btn  = document.getElementById('notifAllowBtn');
+    if (icon) icon.textContent = '📱';
+    if (text) text.textContent = 'Pour recevoir des notifications, installez l\'appli sur votre écran d\'accueil (iOS 16.4+ requis).';
+    if (btn)  { btn.textContent = 'OK compris'; btn.onclick = () => document.getElementById('notifModal').classList.remove('visible'); }
+    return;
+  }
+
   let reg;
-  try { reg = await navigator.serviceWorker.register('/sw.js'); } catch(e) { return; }
+  try { reg = await navigator.serviceWorker.register('/sw.js'); } catch(e) { console.warn('SW error:', e); return; }
 
   // Efface badge quand appli au premier plan
   const clearBadge = () => {
@@ -915,17 +937,6 @@ function updateBellUI(permission) {
 
   updateBellUI(Notification.permission);
   if (Notification.permission === 'granted') await subscribeIfGranted(reg);
-
-  // Bouton cloche → ouvre modal
-  document.getElementById('notifBellBtn').onclick = () => {
-    document.getElementById('notifModal').classList.add('visible');
-  };
-
-  // Fermer modal
-  document.getElementById('notifCloseBtn').onclick = () => document.getElementById('notifModal').classList.remove('visible');
-  document.getElementById('notifModal').addEventListener('click', e => {
-    if (e.target === document.getElementById('notifModal')) document.getElementById('notifModal').classList.remove('visible');
-  });
 
   // Activer notifications
   document.getElementById('notifAllowBtn').onclick = async () => {
