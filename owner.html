@@ -899,55 +899,58 @@ function updateBellUI(permission) {
   }
 }
 
-// Bouton cloche → toujours fonctionnel, même sans SW
+// ---- Tous les onclick de la modal : toujours assignés, sans condition ----
 document.getElementById('notifBellBtn').onclick = () => {
   document.getElementById('notifModal').classList.add('visible');
 };
-document.getElementById('notifCloseBtn').onclick = () => document.getElementById('notifModal').classList.remove('visible');
+document.getElementById('notifCloseBtn').onclick = () => {
+  document.getElementById('notifModal').classList.remove('visible');
+};
 document.getElementById('notifModal').addEventListener('click', e => {
-  if (e.target === document.getElementById('notifModal')) document.getElementById('notifModal').classList.remove('visible');
+  if (e.target === document.getElementById('notifModal'))
+    document.getElementById('notifModal').classList.remove('visible');
 });
 
-// Init SW + push
-(async () => {
-  // Affiche état actuel même sans SW
-  if ('Notification' in window) updateBellUI(Notification.permission);
-
-  if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
-    // iOS < 16.4 ou navigateur sans support push
-    const icon = document.getElementById('notifStatusIcon');
-    const text = document.getElementById('notifStatusText');
-    const btn  = document.getElementById('notifAllowBtn');
-    if (icon) icon.textContent = '📱';
-    if (text) text.textContent = 'Pour recevoir des notifications, installez l\'appli sur votre écran d\'accueil (iOS 16.4+ requis).';
-    if (btn)  { btn.textContent = 'OK compris'; btn.onclick = () => document.getElementById('notifModal').classList.remove('visible'); }
+document.getElementById('notifAllowBtn').onclick = async () => {
+  // Pas de support push
+  if (!('Notification' in window) || !('serviceWorker' in navigator) || !('PushManager' in window)) {
+    document.getElementById('notifStatusIcon').textContent = '📱';
+    document.getElementById('notifStatusText').textContent = 'Notifications non supportées. Installez l\'appli depuis Safari (iOS 16.4+).';
+    document.getElementById('notifAllowBtn').textContent = 'OK compris';
+    document.getElementById('notifAllowBtn').onclick = () => document.getElementById('notifModal').classList.remove('visible');
     return;
   }
-
-  let reg;
-  try { reg = await navigator.serviceWorker.register('/sw.js'); } catch(e) { console.warn('SW error:', e); return; }
-
-  // Efface badge quand appli au premier plan
-  const clearBadge = () => {
-    if (navigator.clearAppBadge) navigator.clearAppBadge().catch(()=>{});
-    if (reg.active) reg.active.postMessage('CLEAR_BADGE');
-  };
-  window.addEventListener('focus', clearBadge);
-  document.addEventListener('visibilitychange', () => { if (!document.hidden) clearBadge(); });
-
-  updateBellUI(Notification.permission);
-  if (Notification.permission === 'granted') await subscribeIfGranted(reg);
-
-  // Activer notifications
-  document.getElementById('notifAllowBtn').onclick = async () => {
-    if (Notification.permission === 'granted') { document.getElementById('notifModal').classList.remove('visible'); return; }
-    const perm = await Notification.requestPermission();
-    updateBellUI(perm);
-    if (perm === 'granted') {
+  // Déjà accordé
+  if (Notification.permission === 'granted') {
+    document.getElementById('notifModal').classList.remove('visible');
+    return;
+  }
+  // Demande permission
+  const perm = await Notification.requestPermission();
+  updateBellUI(perm);
+  if (perm === 'granted') {
+    try {
+      const reg = await navigator.serviceWorker.ready;
       await subscribeIfGranted(reg);
-      setTimeout(() => document.getElementById('notifModal').classList.remove('visible'), 1200);
-    }
-  };
+    } catch(e) { console.warn(e); }
+    setTimeout(() => document.getElementById('notifModal').classList.remove('visible'), 1200);
+  }
+};
+
+// Init SW silencieux en arrière-plan
+(async () => {
+  if (!('serviceWorker' in navigator) || !('PushManager' in window)) return;
+  if ('Notification' in window) updateBellUI(Notification.permission);
+  try {
+    const reg = await navigator.serviceWorker.register('/sw.js');
+    const clearBadge = () => {
+      if (navigator.clearAppBadge) navigator.clearAppBadge().catch(()=>{});
+      if (reg.active) reg.active.postMessage('CLEAR_BADGE');
+    };
+    window.addEventListener('focus', clearBadge);
+    document.addEventListener('visibilitychange', () => { if (!document.hidden) clearBadge(); });
+    if (Notification.permission === 'granted') await subscribeIfGranted(reg);
+  } catch(e) { console.warn('SW error:', e); }
 })();
 </script>
 
