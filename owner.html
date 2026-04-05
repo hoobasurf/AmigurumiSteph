@@ -131,10 +131,23 @@ width:200px;height:200px;border-radius:50%;object-fit:cover;
 border:4px solid #ffb6c1;
 box-shadow:0 0 50px rgba(255,100,150,0.7),0 0 100px rgba(255,100,150,0.3);
 position:relative;z-index:2;
-cursor:pointer;
-transition:transform 0.2s, box-shadow 0.2s;
+pointer-events:none; /* le bouton capture le clic, pas l’image */
 }
-#overlayImg:active{transform:scale(0.96);box-shadow:0 0 30px rgba(255,100,150,0.5);}
+
+/* Bouton transparent par-dessus la photo — même pattern que index.html */
+#overlayPhotoBtn{
+position:absolute;
+width:200px;height:200px;
+border-radius:50%;
+border:none;
+background:transparent;
+cursor:pointer;
+z-index:3;
+top:50%;left:50%;
+transform:translate(-50%,-50%);
+-webkit-appearance:none;
+appearance:none;
+}
 
 @keyframes popIn{from{transform:scale(0.1) rotateY(90deg);opacity:0;}to{transform:scale(1) rotateY(0deg);opacity:1;}}
 #overlayPrenom{font-family:‘Georgia’,‘Palatino’,serif;font-size:54px;font-weight:normal;font-style:italic;letter-spacing:8px;color:#ffe6f0;-webkit-text-stroke:1.5px #1a0005;text-shadow:0 1px 0 #c8637a,0 2px 0 #b84c6f,0 3px 0 #a03060,0 4px 0 #8a1a40,0 5px 8px rgba(0,0,0,0.6),0 10px 20px rgba(0,0,0,0.4);animation:prenomIn 0.7s 0.2s cubic-bezier(0.34,1.56,0.64,1) both,prenomFloat 5s 1s ease-in-out infinite;}
@@ -167,8 +180,9 @@ transition:transform 0.2s, box-shadow 0.2s;
 <div id="photoOverlay">
   <div class="overlay-ring-wrap">
     <div class="overlay-ring"></div><div class="overlay-ring"></div><div class="overlay-ring"></div>
-    <!-- ✅ MODIF 1 : cursor pointer + title pour indiquer que c'est cliquable -->
-    <img id="overlayImg" src="" alt="photo" title="Appuyer pour changer la photo">
+    <img id="overlayImg" src="" alt="photo">
+    <!-- Bouton transparent par-dessus la photo — même pattern que index.html / photoBtn -->
+    <button id="overlayPhotoBtn" title="Choisir une photo"></button>
   </div>
   <div id="overlayPrenom"></div>
   <!-- Hint "appuyer pour changer" -->
@@ -400,11 +414,10 @@ ownerPhoto.addEventListener('click', () => {
   openOverlay();
 });
 
-// ✅ MODIF 2 : Clic sur la photo DANS l'overlay → ouvre le sélecteur de fichier natif iOS
-overlayImg.addEventListener('click', (e) => {
-  e.stopPropagation(); // empêche la fermeture de l'overlay
-  ownerFileInput.click(); // iOS affiche : Photothèque / Prendre une photo / Choisir le fichier
-});
+// ✅ Bouton transparent sur la photo dans l'overlay → même pattern que index.html
+// iOS Safari respecte input.click() quand c'est un vrai <button> qui le déclenche
+const overlayPhotoBtn = document.getElementById('overlayPhotoBtn');
+overlayPhotoBtn.onclick = () => ownerFileInput.click();
 
 // Clic sur le fond de l'overlay → ferme
 photoOverlay.addEventListener('click', () => {
