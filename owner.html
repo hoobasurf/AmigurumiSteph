@@ -60,28 +60,8 @@ object-fit:cover;
 }
 #ownerPhoto:hover{transform:scale(1.08);}
 
-/* Bouton modifier photo — apparaît au long press */
-#editPhotoBtn{
-position:fixed;
-top:92px;right:6px;
-z-index:10001;
-background:linear-gradient(#ffd6e6,#ffb6c1);
-border:2px solid #b67385;
-border-radius:14px;
-padding:7px 13px;
-color:#b84c6f;
-font-weight:bold;
-font-size:13px;
-cursor:pointer;
-box-shadow:0 4px 12px rgba(184,76,111,0.3);
-display:none;
-white-space:nowrap;
-animation:popBtn 0.2s cubic-bezier(0.34,1.56,0.64,1);
-}
-@keyframes popBtn{
-from{transform:scale(0.5);opacity:0;}
-to{transform:scale(1);opacity:1;}
-}
+/* Bouton modifier photo — supprimé du long press, gardé masqué */
+#editPhotoBtn{display:none;}
 
 /* Anneaux pulsants pendant le long press */
 #ownerRings{
@@ -134,44 +114,34 @@ body.modal-open{overflow:hidden;touch-action:none;}
 .overlay-ring:nth-child(2){width:270px;height:270px;animation-delay:0.6s;}
 .overlay-ring:nth-child(3){width:320px;height:320px;animation-delay:1.2s;}
 @keyframes ringPulse{0%{opacity:0.6;transform:scale(0.9);}100%{opacity:0;transform:scale(1.15);}}
-#overlayImg{width:200px;height:200px;border-radius:50%;object-fit:cover;border:4px solid #ffb6c1;box-shadow:0 0 50px rgba(255,100,150,0.7),0 0 100px rgba(255,100,150,0.3);position:relative;z-index:2;}
+
+/* Hint “appuyer pour changer” sous la photo dans l’overlay */
+#overlayChangeHint{
+font-size:12px;
+color:rgba(255,230,240,0.75);
+letter-spacing:2px;
+font-family:‘Georgia’,serif;
+font-style:italic;
+margin-top:-18px;
+animation:fadeIn 1.2s 0.5s ease both;
+}
+
+#overlayImg{
+width:200px;height:200px;border-radius:50%;object-fit:cover;
+border:4px solid #ffb6c1;
+box-shadow:0 0 50px rgba(255,100,150,0.7),0 0 100px rgba(255,100,150,0.3);
+position:relative;z-index:2;
+cursor:pointer;
+transition:transform 0.2s, box-shadow 0.2s;
+}
+#overlayImg:active{transform:scale(0.96);box-shadow:0 0 30px rgba(255,100,150,0.5);}
+
 @keyframes popIn{from{transform:scale(0.1) rotateY(90deg);opacity:0;}to{transform:scale(1) rotateY(0deg);opacity:1;}}
 #overlayPrenom{font-family:‘Georgia’,‘Palatino’,serif;font-size:54px;font-weight:normal;font-style:italic;letter-spacing:8px;color:#ffe6f0;-webkit-text-stroke:1.5px #1a0005;text-shadow:0 1px 0 #c8637a,0 2px 0 #b84c6f,0 3px 0 #a03060,0 4px 0 #8a1a40,0 5px 8px rgba(0,0,0,0.6),0 10px 20px rgba(0,0,0,0.4);animation:prenomIn 0.7s 0.2s cubic-bezier(0.34,1.56,0.64,1) both,prenomFloat 5s 1s ease-in-out infinite;}
 @keyframes prenomIn{from{transform:translateY(30px) scale(0.6);opacity:0;}to{transform:translateY(0) scale(1);opacity:1;}}
 @keyframes prenomFloat{0%,100%{transform:translateY(0) rotate(-1deg);}50%{transform:translateY(-9px) rotate(1deg);}}
 #overlayHint{font-size:11px;color:rgba(255,230,240,0.5);letter-spacing:3px;font-family:‘Georgia’,serif;font-style:italic;animation:fadeIn 1.5s 1s ease both;}
 @keyframes fadeIn{from{opacity:0}to{opacity:1}}
-
-/* ===== AJOUT UNIQUEMENT : viewer plein écran ===== */
-#fullscreenViewer{
-position:fixed;inset:0;background:#000;
-display:none;z-index:99998;
-align-items:center;justify-content:center;
-touch-action:none;
-}
-#fullscreenViewer.active{display:flex;}
-#fsImg{
-max-width:100vw;max-height:100vh;
-object-fit:contain;
-user-select:none;
-cursor:pointer;
-transition:opacity 0.15s;
-}
-#fsCounter{
-position:fixed;bottom:24px;left:50%;transform:translateX(-50%);
-color:rgba(255,255,255,0.6);font-size:13px;letter-spacing:2px;
-pointer-events:none;font-family:‘Comic Sans MS’,cursive;
-}
-#fsPrev,#fsNext{
-position:fixed;top:50%;transform:translateY(-50%);
-width:40px;height:60px;background:rgba(255,182,193,0.5);
-border:none;border-radius:8px;color:#fff;font-size:28px;
-cursor:pointer;z-index:99999;
-display:flex;align-items:center;justify-content:center;
-}
-#fsPrev{left:6px;}#fsNext{right:6px;}
-@media(max-width:480px){#fsPrev,#fsNext{display:none;}}
-/* ===== FIN AJOUT ===== */
 </style>
 
 </head>
@@ -181,12 +151,12 @@ display:flex;align-items:center;justify-content:center;
 
 <img id="ownerPhoto" alt="Owner">
 
-<!-- Bouton modifier photo (apparaît au long press) -->
+<!-- Bouton modifier photo (masqué, plus utilisé via long press) -->
 
 <button id="editPhotoBtn">✏️ Modifier photo</button>
 <input type="file" id="ownerFileInput" accept="image/*" style="display:none;">
 
-<!-- Anneaux pulsants pendant le long press -->
+<!-- Anneaux pulsants -->
 
 <div id="ownerRings">
   <div class="owner-ring"></div>
@@ -197,21 +167,14 @@ display:flex;align-items:center;justify-content:center;
 <div id="photoOverlay">
   <div class="overlay-ring-wrap">
     <div class="overlay-ring"></div><div class="overlay-ring"></div><div class="overlay-ring"></div>
-    <img id="overlayImg" src="" alt="photo">
+    <!-- ✅ MODIF 1 : cursor pointer + title pour indiquer que c'est cliquable -->
+    <img id="overlayImg" src="" alt="photo" title="Appuyer pour changer la photo">
   </div>
   <div id="overlayPrenom"></div>
-  <div id="overlayHint">toucher pour fermer</div>
+  <!-- Hint "appuyer pour changer" -->
+  <div id="overlayChangeHint">📷 appuyer pour changer</div>
+  <div id="overlayHint">toucher le fond pour fermer</div>
 </div>
-
-<!-- AJOUT UNIQUEMENT : viewer plein écran -->
-
-<div id="fullscreenViewer">
-  <img id="fsImg" src="" alt="">
-  <button id="fsPrev">‹</button>
-  <button id="fsNext">›</button>
-  <div id="fsCounter"></div>
-</div>
-<!-- FIN AJOUT -->
 
 <div class="center-zone"><div id="visitor-list-container"></div></div>
 
@@ -396,6 +359,8 @@ const fileBtn       = document.getElementById('fileBtn');
 const fileInput     = document.getElementById('multiPhoto');
 const fileInfo      = document.getElementById('fileInfo');
 const zoomLegend    = document.getElementById('zoomLegend');
+const photoOverlay  = document.getElementById('photoOverlay');
+const overlayImg    = document.getElementById('overlayImg');
 
 mainZoom.addEventListener('mousedown',e=>e.stopPropagation());
 mainZoom.addEventListener('touchstart',e=>e.stopPropagation());
@@ -413,6 +378,8 @@ window.addEventListener('resize',()=>{
 
 // =============================================
 // OWNER PHOTO
+// - tap court sur ownerPhoto → overlay plein écran
+// - tap sur la photo DANS l'overlay → menu natif iOS (Photothèque / Caméra / Fichier)
 // =============================================
 
 function loadOwnerPhoto(){
@@ -423,67 +390,26 @@ function loadOwnerPhoto(){
 }
 
 function openOverlay(){
-  document.getElementById('overlayImg').src=ownerPhoto.src||'icon-152.png';
+  overlayImg.src=ownerPhoto.src||'icon-152.png';
   document.getElementById('overlayPrenom').textContent=prenom||'';
-  document.getElementById('photoOverlay').classList.add('visible');
+  photoOverlay.classList.add('visible');
 }
 
-// Cacher le bouton si on clique ailleurs
-document.addEventListener('click', e => {
-  if (e.target !== ownerPhoto && e.target !== editPhotoBtn) {
-    editPhotoBtn.style.display = 'none';
-  }
-});
-
-// Click simple sur la photo → overlay
+// Clic sur ownerPhoto → ouvre l'overlay
 ownerPhoto.addEventListener('click', () => {
-  if (editPhotoBtn.style.display === 'block') {
-    editPhotoBtn.style.display = 'none';
-    return;
-  }
   openOverlay();
 });
 
-// Long press → affiche le bouton modifier
-let longPressTimer = null;
-let longPressTriggered = false;
-
-function startLongPress() {
-  longPressTriggered = false;
-  ownerRings.style.opacity = '1';
-  ownerRings.classList.add('pulsing');
-  longPressTimer = setTimeout(() => {
-    longPressTriggered = true;
-    ownerRings.classList.remove('pulsing');
-    ownerRings.style.opacity = '0';
-    editPhotoBtn.style.display = 'block';
-  }, 800);
-}
-
-function endLongPress() {
-  clearTimeout(longPressTimer);
-  ownerRings.classList.remove('pulsing');
-  ownerRings.style.opacity = '0';
-}
-
-ownerPhoto.addEventListener('mousedown', startLongPress);
-ownerPhoto.addEventListener('mouseup', endLongPress);
-ownerPhoto.addEventListener('mouseleave', endLongPress);
-ownerPhoto.addEventListener('touchstart', startLongPress, { passive: true });
-ownerPhoto.addEventListener('touchend', e => {
-  endLongPress();
-  if (!longPressTriggered) {
-    openOverlay();
-  }
-  longPressTriggered = false;
+// ✅ MODIF 2 : Clic sur la photo DANS l'overlay → ouvre le sélecteur de fichier natif iOS
+overlayImg.addEventListener('click', (e) => {
+  e.stopPropagation(); // empêche la fermeture de l'overlay
+  ownerFileInput.click(); // iOS affiche : Photothèque / Prendre une photo / Choisir le fichier
 });
-ownerPhoto.addEventListener('touchcancel', endLongPress);
 
-// Bouton modifier photo → ouvre le sélecteur de fichier
-editPhotoBtn.onclick = () => {
-  editPhotoBtn.style.display = 'none';
-  ownerFileInput.click();
-};
+// Clic sur le fond de l'overlay → ferme
+photoOverlay.addEventListener('click', () => {
+  photoOverlay.classList.remove('visible');
+});
 
 // Upload de la nouvelle photo
 ownerFileInput.onchange = async () => {
@@ -514,79 +440,19 @@ ownerFileInput.onchange = async () => {
     if (!json.success) throw new Error('ImgBB error');
     const url = json.data.url;
     ownerPhoto.src = url;
+    overlayImg.src = url; // met à jour la photo dans l'overlay aussi
     localStorage.setItem('photo_url', url);
     if (prenom) localStorage.setItem('photo_url_' + prenom, url);
     if (prenom) {
       await supabase.from('profiles').upsert({ prenom, photo_url: url }, { onConflict: 'prenom' });
     }
+    // ✅ MODIF 3 : ferme l'overlay après l'upload
+    photoOverlay.classList.remove('visible');
   } catch (err) {
     alert('Erreur upload photo : ' + (err?.message || err));
   }
 };
 
-document.getElementById('photoOverlay').addEventListener('click', () => {
-  document.getElementById('photoOverlay').classList.remove('visible');
-});
-
-// =============================================
-// AJOUT UNIQUEMENT : viewer plein écran
-// - clic sur mainZoom → plein écran
-// - swipe gauche/droite → photo suivante/précédente
-// - clic sur photo en plein écran → retour zoomModal
-// =============================================
-const fsViewer  = document.getElementById('fullscreenViewer');
-const fsImg     = document.getElementById('fsImg');
-const fsPrev    = document.getElementById('fsPrev');
-const fsNext    = document.getElementById('fsNext');
-const fsCounter = document.getElementById('fsCounter');
-let fsIndex = 0;
-let fsGroup = [];
-
-function openFs(group, index) {
-  fsGroup = group;
-  fsIndex = index;
-  fsImg.src = fsGroup[fsIndex];
-  fsCounter.textContent = fsGroup.length > 1 ? (fsIndex+1)+' / '+fsGroup.length : '';
-  fsViewer.classList.add('active');
-}
-
-function closeFs() {
-  fsViewer.classList.remove('active');
-}
-
-function fsGo(dir) {
-  fsIndex = (fsIndex + dir + fsGroup.length) % fsGroup.length;
-  fsImg.style.opacity = '0';
-  setTimeout(() => {
-    fsImg.src = fsGroup[fsIndex];
-    fsCounter.textContent = (fsIndex+1)+' / '+fsGroup.length;
-    fsImg.style.opacity = '1';
-  }, 120);
-}
-
-// Clic sur mainZoom → plein écran sur la photo affichée
-mainZoom.addEventListener('click', () => {
-  if (!currentZoom?.zoomGroup?.length) return;
-  const src = mainZoom.src;
-  let idx = currentZoom.zoomGroup.findIndex(u => src === u || src.endsWith(u.split('/').pop()));
-  openFs(currentZoom.zoomGroup, idx >= 0 ? idx : 0);
-});
-
-// Clic sur photo plein écran → retour
-fsImg.addEventListener('click', closeFs);
-fsPrev.addEventListener('click', e => { e.stopPropagation(); fsGo(-1); });
-fsNext.addEventListener('click', e => { e.stopPropagation(); fsGo(1); });
-
-// Swipe tactile
-let fsSwipeX = null;
-fsViewer.addEventListener('touchstart', e => { fsSwipeX = e.touches[0].clientX; }, { passive: true });
-fsViewer.addEventListener('touchend', e => {
-  if (fsSwipeX === null) return;
-  const dx = e.changedTouches[0].clientX - fsSwipeX;
-  fsSwipeX = null;
-  if (Math.abs(dx) < 40) { closeFs(); return; } // tap court = fermer
-  fsGo(dx < 0 ? 1 : -1);
-});
 // =============================================
 
 async function loadMessages(){
@@ -632,7 +498,7 @@ async function loadChatUsers(){
       div.onclick=()=>{currentChatUser=u.prenom;localStorage.setItem('currentChatUser',u.prenom);loadMessages();document.querySelectorAll('.chat-user').forEach(el=>el.classList.remove('active'));div.classList.add('active');};
       chatUserList.appendChild(div);
     });
-    if(currentChatUser){setTimeout(()=>{document.querySelectorAll('.chat-user').forEach(el=>{if(el.textContent.includes(currentChatUser))el.classList.add('active'));});},500);loadMessages();}
+    if(currentChatUser){setTimeout(()=>{document.querySelectorAll('.chat-user').forEach(el=>{if(el.textContent.includes(currentChatUser))el.classList.add('active');});},500);loadMessages();}
   }catch(err){console.error(err);}
 }
 
