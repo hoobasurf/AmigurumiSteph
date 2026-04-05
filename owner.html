@@ -34,19 +34,63 @@ input, textarea, select { font-size: 16px !important; }
 .modal .modal-box{background:#ffe6f0;padding:16px 24px;border-radius:20px;border:3px solid #b67385;display:flex;flex-direction:column;gap:10px;align-items:center;min-width:200px;font-family:'Comic Sans MS',cursive;}
 .modal input{padding:6px 12px;border-radius:10px;border:2px solid #b67385;width:100%;}
 .modal button{padding:6px 14px;border:none;background:#ffb6c1;color:#fff;border-radius:12px;cursor:pointer;font-weight:bold;width:100%;}
-#zoomModal{position:fixed;inset:0;background:rgba(0,0,0,0.7);display:none;justify-content:center;align-items:center;flex-direction:column;z-index:10000;overflow:hidden;}
-.zoom-content{position:relative;width:80vw;height:60vh;overflow:hidden;display:flex;align-items:center;gap:20px;margin-bottom:20px;}
-#mainZoom{position:absolute;top:0;left:0;max-width:60%;max-height:60vh;border:4px solid #b67385;border-radius:24px;cursor:grab;user-select:none;}
-#zoomLegend{position:absolute;top:10px;right:10px;min-width:150px;max-width:30%;background:#ffe6f0;border:2px solid #b84c6f;border-radius:12px;padding:8px;color:#b84c6f;font-size:14px;cursor:grab;user-select:none;z-index:2;}
-#zoomModal .thumbs{display:flex;gap:8px;max-width:80%;overflow-x:auto;margin-bottom:20px;}
-#zoomModal .thumbs img{width:50px;height:50px;object-fit:cover;border-radius:12px;border:2px solid #b67385;cursor:pointer;}
-.closeZoom{position:absolute;top:12px;right:12px;width:28px;height:28px;background:#ffb6c1;color:#fff;border-radius:50%;display:flex;justify-content:center;align-items:center;cursor:pointer;font-size:18px;font-weight:bold;z-index:10001;transition:transform 0.2s;}
+/* ===== MODAL PROJET ===== */
+#zoomModal{position:fixed;inset:0;background:rgba(0,0,0,0.75);display:none;justify-content:flex-start;align-items:center;flex-direction:column;z-index:10000;overflow-y:auto;overflow-x:hidden;padding:16px 12px 24px;}
+.zoom-content{position:relative;width:100%;max-width:420px;display:flex;flex-direction:column;align-items:center;gap:14px;margin-top:44px;}
+/* Photo principale cliquable */
+#mainZoom{width:100%;max-width:380px;max-height:55vw;object-fit:cover;border:3px solid #b67385;border-radius:20px;cursor:pointer;user-select:none;display:block;transition:transform 0.15s;}
+#mainZoom:active{transform:scale(0.97);}
+#zoomLegend{width:100%;max-width:380px;background:#ffe6f0;border:2px solid #b84c6f;border-radius:12px;padding:8px 12px;color:#b84c6f;font-size:14px;text-align:center;}
+#zoomModal .thumbs{display:flex;gap:8px;max-width:380px;overflow-x:auto;-webkit-overflow-scrolling:touch;padding:4px 0;}
+#zoomModal .thumbs img{width:56px;height:56px;object-fit:cover;border-radius:10px;border:2px solid #b67385;cursor:pointer;flex-shrink:0;transition:border-color 0.2s;}
+#zoomModal .thumbs img.active-thumb{border-color:#e94f9a;border-width:3px;}
+.closeZoom{position:fixed;top:12px;right:12px;width:30px;height:30px;background:#ffb6c1;color:#fff;border-radius:50%;display:flex;justify-content:center;align-items:center;cursor:pointer;font-size:20px;font-weight:bold;z-index:10002;transition:transform 0.2s;}
 .closeZoom:hover{transform:scale(1.2);}
-.actions{display:flex;gap:12px;align-items:center;}
+.actions{display:flex;gap:12px;align-items:center;margin-top:4px;}
 .icon-btn{background:none!important;border:none;padding:4px;display:flex;align-items:center;justify-content:center;cursor:pointer;}
 .icon-btn svg{background:none!important;fill:none;stroke:#b84c6f;width:22px;height:22px;transition:transform 0.2s;}
 .icon-btn:hover svg{transform:scale(1.2);}
 #likeCount,#commentCount{font-family:'Courier New',monospace;font-weight:bold;color:#b84c6f;font-size:14px;min-width:18px;}
+
+/* ===== VIEWER PLEIN ÉCRAN ===== */
+#fullscreenViewer{
+position:fixed;inset:0;background:#000;
+display:none;z-index:20000;
+align-items:center;justify-content:center;
+overflow:hidden;
+touch-action:none;
+}
+#fullscreenViewer.active{display:flex;}
+#fsImg{
+max-width:100vw;max-height:100vh;
+object-fit:contain;
+user-select:none;
+pointer-events:none;
+transition:opacity 0.2s;
+}
+#fsClose{
+position:fixed;top:14px;right:14px;
+width:34px;height:34px;background:rgba(255,182,193,0.85);
+color:#fff;border-radius:50%;
+display:flex;align-items:center;justify-content:center;
+cursor:pointer;font-size:22px;font-weight:bold;z-index:20001;
+}
+#fsCounter{
+position:fixed;bottom:20px;left:50%;transform:translateX(-50%);
+color:rgba(255,255,255,0.7);font-size:13px;letter-spacing:2px;
+z-index:20001;
+}
+/* Flèches (visibles sur desktop) */
+#fsPrev,#fsNext{
+position:fixed;top:50%;transform:translateY(-50%);
+width:40px;height:60px;background:rgba(255,182,193,0.5);
+border:none;border-radius:8px;
+color:#fff;font-size:24px;cursor:pointer;
+z-index:20001;display:flex;align-items:center;justify-content:center;
+}
+#fsPrev{left:8px;}
+#fsNext{right:8px;}
+@media(max-width:480px){#fsPrev,#fsNext{display:none;}}
 
 /* Photo profil */
 #ownerPhoto{
@@ -262,6 +306,16 @@ appearance:none;
     </button>
     <span id="commentCount">0</span>
   </div>
+</div>
+
+<!-- ===== VIEWER PLEIN ÉCRAN ===== -->
+
+<div id="fullscreenViewer">
+  <img id="fsImg" src="" alt="">
+  <div id="fsClose">×</div>
+  <button id="fsPrev">‹</button>
+  <button id="fsNext">›</button>
+  <div id="fsCounter"></div>
 </div>
 
 <div id="chatModal" class="chat-overlay">
