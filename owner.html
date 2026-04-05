@@ -82,7 +82,6 @@ opacity:0;
 .owner-ring:nth-child(1){width:76px;height:76px;top:0;left:0;}
 .owner-ring:nth-child(2){width:96px;height:96px;top:-10px;left:-10px;}
 .owner-ring:nth-child(3){width:116px;height:116px;top:-20px;left:-20px;}
-
 #ownerRings.pulsing .owner-ring:nth-child(1){animation:ownerRing 1.2s ease-out infinite;}
 #ownerRings.pulsing .owner-ring:nth-child(2){animation:ownerRing 1.2s ease-out 0.3s infinite;}
 #ownerRings.pulsing .owner-ring:nth-child(3){animation:ownerRing 1.2s ease-out 0.6s infinite;}
@@ -356,7 +355,7 @@ window.addEventListener('resize',()=>{
 });
 
 // =============================================
-// OWNER PHOTO — click = overlay, long press 2s = changer photo
+// OWNER PHOTO — tap court = overlay, long press 2s = changer photo
 // =============================================
 
 const ownerFileInput = document.createElement('input');
@@ -403,7 +402,12 @@ ownerFileInput.onchange = async () => {
   }
 };
 
-// Long press
+function openOverlay() {
+  document.getElementById('overlayImg').src = ownerPhoto.src || 'icon-152.png';
+  document.getElementById('overlayPrenom').textContent = prenom || '';
+  document.getElementById('photoOverlay').classList.add('visible');
+}
+
 let ownerLongPressTimer = null;
 let ownerLongPressed = false;
 
@@ -411,7 +415,6 @@ function startOwnerLongPress() {
   ownerLongPressed = false;
   ownerRings.style.opacity = '1';
   ownerRings.classList.add('pulsing');
-
   ownerLongPressTimer = setTimeout(() => {
     ownerLongPressed = true;
     ownerRings.classList.remove('pulsing');
@@ -432,30 +435,44 @@ function cancelOwnerLongPress() {
   ownerRings.style.opacity = '0';
 }
 
+// --- MOUSE (desktop) ---
 ownerPhoto.addEventListener('mousedown', startOwnerLongPress);
 ownerPhoto.addEventListener('mouseup', cancelOwnerLongPress);
 ownerPhoto.addEventListener('mouseleave', cancelOwnerLongPress);
+ownerPhoto.addEventListener('click', () => {
+  if (ownerLongPressed) { ownerLongPressed = false; return; }
+  openOverlay();
+});
 
-// ✅ preventDefault bloque le menu contextuel iOS Safari
+// --- TOUCH (iOS/mobile) ---
+// preventDefault bloque le menu contextuel iOS ET le click natif
+// On gère donc le tap court manuellement dans touchend
 ownerPhoto.addEventListener('touchstart', e => {
   e.preventDefault();
   startOwnerLongPress();
 }, { passive: false });
-ownerPhoto.addEventListener('touchend', cancelOwnerLongPress);
-ownerPhoto.addEventListener('touchcancel', cancelOwnerLongPress);
 
-ownerPhoto.addEventListener('click', () => {
-  if (ownerLongPressed) { ownerLongPressed = false; return; }
-  document.getElementById('overlayImg').src = ownerPhoto.src || 'icon-152.png';
-  document.getElementById('overlayPrenom').textContent = prenom || '';
-  document.getElementById('photoOverlay').classList.add('visible');
+ownerPhoto.addEventListener('touchend', e => {
+  e.preventDefault();
+  const wasLongPress = ownerLongPressed;
+  cancelOwnerLongPress();
+  if (!wasLongPress) {
+    // Tap court → ouvrir l'overlay
+    openOverlay();
+  }
+  ownerLongPressed = false;
+}, { passive: false });
+
+ownerPhoto.addEventListener('touchcancel', () => {
+  cancelOwnerLongPress();
+  ownerLongPressed = false;
 });
+
+// =============================================
 
 document.getElementById('photoOverlay').addEventListener('click', () => {
   document.getElementById('photoOverlay').classList.remove('visible');
 });
-
-// =============================================
 
 function loadOwnerPhoto(){
   const p=prenom||localStorage.getItem('prenom');
