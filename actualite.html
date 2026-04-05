@@ -280,7 +280,38 @@ font-family:‘Comic Sans MS’,cursive;
   <div id="debugLines"></div>
 </div>
 
-<script src="image-handler.js"></script>
+<script>
+async function uploadMultipleImages(files, onProgress) {
+  const urls = [];
+  for (let i = 0; i < files.length; i++) {
+    const file = files[i];
+    if (onProgress) onProgress(i + 1, files.length);
+    const compressed = await new Promise(resolve => {
+      const reader = new FileReader();
+      reader.onload = e2 => {
+        const img = new Image();
+        img.onload = () => {
+          const canvas = document.createElement('canvas');
+          let w = img.width, h = img.height, max = 1200;
+          if (w > h && w > max) { h = h * max / w; w = max; }
+          else if (h > max) { w = w * max / h; h = max; }
+          canvas.width = w; canvas.height = h;
+          canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+          canvas.toBlob(blob => resolve(new File([blob], 'photo.jpg', { type: 'image/jpeg' })), 'image/jpeg', 0.75);
+        };
+        img.src = e2.target.result;
+      };
+      reader.readAsDataURL(file);
+    });
+    const formData = new FormData();
+    formData.append('image', compressed);
+    const res = await fetch('https://api.imgbb.com/1/upload?key=1612fdd94e39f24c3d14f1864f41d591', { method: 'POST', body: formData });
+    const json = await res.json();
+    if (json.success) urls.push(json.data.url);
+  }
+  return urls;
+}
+</script>
 
 <script type="module">
 import { createClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
