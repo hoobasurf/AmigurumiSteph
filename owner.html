@@ -325,6 +325,7 @@ body.modal-open{overflow:hidden;touch-action:none;}
 <script src="image-handler.js"></script>
 
 <script type="module">
+import { createClient as createSupabaseClient } from "https://cdn.jsdelivr.net/npm/@supabase/supabase-js/+esm";
 const SB_URL="https://kdgxbmqwhpuctjtlygrt.supabase.co";
 const SB_KEY="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtkZ3hibXF3aHB1Y3RqdGx5Z3J0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUyMjY0NzQsImV4cCI6MjA5MDgwMjQ3NH0.9RsIj_bQgJskg9raRGN6uQJwUUlByTvWAFF2Eq9f6KM";
 const SB_HEADERS={"apikey":SB_KEY,"Authorization":"Bearer "+SB_KEY,"Content-Type":"application/json"};
@@ -700,9 +701,7 @@ closeTiktok.onclick=()=>{closeTkComments();tiktokOverlay.classList.remove('visib
 
 // ===== REALTIME =====
 function setupRealtime() {
-  const { createClient: createRealtimeClient } = window.__supabaseSDK || {};
-  if (!createRealtimeClient) return;
-  const rt = createRealtimeClient(SB_URL, SB_KEY);
+  const rt = createSupabaseClient(SB_URL, SB_KEY);
   rt.channel('realtime-messages')
     .on('postgres_changes', { event: 'INSERT', schema: 'public', table: 'messages', filter: `receiver=eq.${prenom}` }, (payload) => {
       const msg = payload.new;
@@ -713,13 +712,17 @@ function setupRealtime() {
         else loadMessages();
       }
     })
-    .subscribe();
+    .subscribe((status) => { window.__rtStatus = 'messages: ' + status; });
   rt.channel('realtime-creations')
     .on('postgres_changes', { event: '*', schema: 'public', table: 'creations' }, () => {
       refreshCreations();
     })
-    .subscribe();
+    .subscribe((status) => { window.__rtStatus += ' | creations: ' + status; });
 }
+
+setTimeout(() => {
+  alert('Realtime: ' + (window.__rtStatus || 'non connecté'));
+}, 3000);
 
 // ===== INIT =====
 document.addEventListener('DOMContentLoaded',loadOwnerPhoto);
@@ -729,12 +732,6 @@ loadOwnerPhoto();
 loadChatUsers();
 setTimeout(setupRealtime, 500);
 </script>
-
-<!-- SDK Supabase pour Realtime -->
-
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/dist/umd/supabase.js"></script>
-
-<script>window.__supabaseSDK = window.supabase;</script>
 
 <!-- NOTIFICATIONS - script séparé non-module pour éviter tout conflit iOS -->
 
