@@ -712,17 +712,13 @@ function setupRealtime() {
         else loadMessages();
       }
     })
-    .subscribe((status) => { window.__rtStatus = 'messages: ' + status; });
+    .subscribe();
   rt.channel('realtime-creations')
     .on('postgres_changes', { event: '*', schema: 'public', table: 'creations' }, () => {
       refreshCreations();
     })
-    .subscribe((status) => { window.__rtStatus += ' | creations: ' + status; });
+    .subscribe();
 }
-
-setTimeout(() => {
-  alert('Realtime: ' + (window.__rtStatus || 'non connecté'));
-}, 3000);
 
 // ===== INIT =====
 document.addEventListener('DOMContentLoaded',loadOwnerPhoto);
