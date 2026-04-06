@@ -667,14 +667,23 @@ document.querySelectorAll('.closeModal').forEach(btn => {
 likesModal.onclick = e => { if (e.target === likesModal) likesModal.style.display = 'none'; };
 photoViewer.onclick = e => { if (e.target === photoViewer) photoViewer.style.display = 'none'; };
 
+// ===== REALTIME =====
+function setupRealtime() {
+  supabase
+    .channel('realtime-posts')
+    .on('postgres_changes', { event: '*', schema: 'public', table: 'posts' }, () => {
+      loadPosts();
+    })
+    .subscribe();
+}
+
 // ===== INIT =====
 (async () => {
   await loadMyProfile();
   await loadUserPhotos();
   await loadPosts();
+  setupRealtime();
 })();
-
-setInterval(() => loadPosts(), 30000);
 </script>
 
 </body>
