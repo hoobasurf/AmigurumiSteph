@@ -104,62 +104,20 @@ body.modal-open{overflow:hidden;touch-action:none;}
 @keyframes prenomFloat{0%,100%{transform:translateY(0) rotate(-1deg);}50%{transform:translateY(-9px) rotate(1deg);}}
 #overlayHint{font-size:11px;color:rgba(255,230,240,0.5);letter-spacing:3px;font-family:'Georgia',serif;font-style:italic;animation:fadeIn 1.5s 1s ease both;}
 @keyframes fadeIn{from{opacity:0}to{opacity:1}}
-
-/* ===== BOUTON TIKTOK ===== */
 #tiktokBtn{position:fixed;top:148px;right:10px;width:42px;height:42px;border-radius:50%;background:linear-gradient(135deg,#ffd6e6,#ffb6c1);border:2px solid #b67385;box-shadow:0 2px 10px rgba(184,76,111,0.35);display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:10000;transition:transform 0.2s,box-shadow 0.2s;}
 #tiktokBtn:hover{transform:scale(1.12);box-shadow:0 4px 18px rgba(184,76,111,0.55);}
 #tiktokBtn svg{width:20px;height:20px;}
-
-/* ===== OVERLAY TIKTOK ===== */
 #tiktokOverlay{display:none;position:fixed;inset:0;background:#0d0008;z-index:50000;overflow:hidden;}
 #tiktokOverlay.visible{display:block;}
-
-/* Le feed ne scroll PAS — tout est géré par translateY sur le track */
-#tiktokFeed{
-position:relative;width:100%;height:100%;
-overflow:hidden;
-touch-action:none;
-}
-
-/* Track : toutes les slides empilées verticalement */
-#tiktokTrack{
-position:absolute;top:0;left:0;width:100%;
-will-change:transform;
-transition:transform 0.38s cubic-bezier(0.4,0,0.2,1);
-}
-
-.tiktok-slide{
-width:100vw;height:100vh;height:100svh;
-position:relative;overflow:hidden;background:#0d0008;
-}
-.tiktok-photos{
-display:flex;width:100%;height:100%;
-overflow-x:scroll;scroll-snap-type:x mandatory;
--webkit-overflow-scrolling:touch;scrollbar-width:none;
-touch-action:pan-x;
-}
+#tiktokFeed{position:relative;width:100%;height:100%;overflow:hidden;touch-action:none;}
+#tiktokTrack{position:absolute;top:0;left:0;width:100%;will-change:transform;transition:transform 0.38s cubic-bezier(0.4,0,0.2,1);}
+.tiktok-slide{width:100vw;height:100vh;height:100svh;position:relative;overflow:hidden;background:#0d0008;}
+.tiktok-photos{display:flex;width:100%;height:100%;overflow-x:scroll;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;scrollbar-width:none;touch-action:pan-x;}
 .tiktok-photos::-webkit-scrollbar{display:none;}
-.tiktok-photo-item{
-flex:0 0 100vw;width:100vw;height:100vh;height:100svh;
-scroll-snap-align:start;scroll-snap-stop:always;
-position:relative;overflow:hidden;
-}
-.tiktok-photo-item .photo-bg{
-position:absolute;inset:0;background-size:cover;background-position:center;
-filter:blur(24px) brightness(0.35) saturate(1.4);
-transform:scale(1.1);z-index:0;pointer-events:none;
-}
-.tiktok-photo-item img{
-position:absolute;inset:0;width:100%;height:100%;
-object-fit:cover;object-position:center;z-index:1;
-pointer-events:none;user-select:none;
--webkit-user-drag:none;-webkit-touch-callout:none;display:block;
-}
-.tiktok-slide::after{
-content:’’;position:absolute;bottom:0;left:0;right:0;height:62%;
-background:linear-gradient(to top,rgba(13,0,8,0.96) 0%,rgba(13,0,8,0.55) 45%,transparent 100%);
-pointer-events:none;z-index:2;
-}
+.tiktok-photo-item{flex:0 0 100vw;width:100vw;height:100vh;height:100svh;scroll-snap-align:start;scroll-snap-stop:always;position:relative;overflow:hidden;}
+.tiktok-photo-item .photo-bg{position:absolute;inset:0;background-size:cover;background-position:center;filter:blur(24px) brightness(0.35) saturate(1.4);transform:scale(1.1);z-index:0;pointer-events:none;}
+.tiktok-photo-item img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center;z-index:1;pointer-events:none;user-select:none;-webkit-user-drag:none;-webkit-touch-callout:none;display:block;}
+.tiktok-slide::after{content:'';position:absolute;bottom:0;left:0;right:0;height:62%;background:linear-gradient(to top,rgba(13,0,8,0.96) 0%,rgba(13,0,8,0.55) 45%,transparent 100%);pointer-events:none;z-index:2;}
 .tiktok-photo-counter{position:absolute;top:14px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.45);backdrop-filter:blur(6px);border:1px solid rgba(255,182,193,0.35);border-radius:20px;padding:4px 14px;font-size:12px;color:#ffe6f0;z-index:6;display:none;letter-spacing:1px;}
 .tiktok-photo-counter.multi{display:block;}
 .tiktok-dots{position:absolute;bottom:210px;left:50%;transform:translateX(-50%);display:flex;gap:6px;z-index:5;}
@@ -174,10 +132,8 @@ pointer-events:none;z-index:2;
 .tiktok-react-btn:active svg{transform:scale(1.4);}
 .tiktok-react-btn.liked svg{stroke:#ff2d78;fill:#ff2d78;filter:drop-shadow(0 0 10px rgba(255,45,120,0.8));}
 .tiktok-react-btn span{font-size:13px;font-weight:bold;text-shadow:0 1px 4px rgba(0,0,0,0.9);}
-
-.tk-heart{position:fixed;pointer-events:none;z-index:60002;animation:tkHeartFly var(–dur,1s) ease-out forwards;will-change:transform,opacity;line-height:1;}
-@keyframes tkHeartFly{0%{opacity:1;transform:translate(0,0) scale(1) rotate(var(–r0));}70%{opacity:0.85;}100%{opacity:0;transform:translate(var(–dx),var(–dy)) scale(var(–sf)) rotate(var(–r1));}}
-
+.tk-heart{position:fixed;pointer-events:none;z-index:60002;animation:tkHeartFly var(--dur,1s) ease-out forwards;will-change:transform,opacity;line-height:1;}
+@keyframes tkHeartFly{0%{opacity:1;transform:translate(0,0) scale(1) rotate(var(--r0));}70%{opacity:0.85;}100%{opacity:0;transform:translate(var(--dx),var(--dy)) scale(var(--sf)) rotate(var(--r1));}}
 #tkCommentModal{display:none;position:fixed;inset:0;z-index:60001;background:rgba(0,0,0,0.55);align-items:flex-end;justify-content:center;}
 #tkCommentModal.visible{display:flex;}
 #tkCommentBox{width:100%;max-width:500px;background:rgba(13,0,8,0.97);backdrop-filter:blur(20px);border-top:2px solid rgba(255,182,193,0.4);border-radius:22px 22px 0 0;padding:8px 16px max(env(safe-area-inset-bottom,0px),20px);max-height:70vh;display:flex;flex-direction:column;gap:8px;}
@@ -190,26 +146,23 @@ pointer-events:none;z-index:2;
 #tkCommentInputRow input{flex:1;background:rgba(255,230,240,0.1);border:1px solid rgba(255,182,193,0.4);border-radius:24px;color:#ffe6f0;font-size:14px;padding:8px 14px;outline:none;}
 #tkCommentInputRow input::placeholder{color:rgba(255,230,240,0.38);}
 #tkCommentSend{background:linear-gradient(135deg,#ff2d78,#b84c6f);border:none;border-radius:50%;width:38px;height:38px;display:flex;align-items:center;justify-content:center;cursor:pointer;color:#fff;font-size:16px;box-shadow:0 2px 8px rgba(255,45,120,0.5);flex-shrink:0;}
-
 #closeTiktok{position:fixed;top:14px;left:14px;width:38px;height:38px;background:rgba(13,0,8,0.6);backdrop-filter:blur(8px);border:2px solid rgba(255,182,193,0.5);border-radius:50%;display:none;align-items:center;justify-content:center;color:#ffe6f0;font-size:20px;font-weight:bold;cursor:pointer;z-index:50001;transition:transform 0.2s,background 0.2s;}
 #closeTiktok.visible{display:flex;}
 #closeTiktok:hover{transform:scale(1.12);background:rgba(255,45,120,0.45);}
-
-/* ===== MODAL NOTIFICATIONS ===== */
+/* MODAL NOTIFICATIONS */
 #notifModal{position:fixed;inset:0;background:rgba(0,0,0,0.6);display:none;justify-content:center;align-items:center;z-index:199999;}
 #notifModal.visible{display:flex;}
-#notifBox{background:#ffe6f0;border:3px solid #b67385;border-radius:24px;padding:24px;max-width:300px;width:90%;display:flex;flex-direction:column;align-items:center;gap:14px;font-family:‘Comic Sans MS’,cursive;text-align:center;}
+#notifBox{background:#ffe6f0;border:3px solid #b67385;border-radius:24px;padding:24px;max-width:300px;width:90%;display:flex;flex-direction:column;align-items:center;gap:14px;font-family:'Comic Sans MS',cursive;text-align:center;}
 #notifBox h3{color:#b84c6f;font-size:18px;}
 #notifBox p{color:#b84c6f;font-size:13px;line-height:1.5;}
 #notifStatusIcon{font-size:44px;}
-.notif-btn-yes{background:linear-gradient(#ffd6e6,#ffb6c1);border:2px solid #b67385;border-radius:14px;padding:10px 24px;color:#b84c6f;font-weight:bold;font-size:15px;cursor:pointer;width:100%;font-family:‘Comic Sans MS’,cursive;}
-.notif-btn-no{background:none;border:none;color:rgba(184,76,111,0.5);font-size:12px;cursor:pointer;font-family:‘Comic Sans MS’,cursive;margin-top:-6px;}
-#notifBellBtn{position:fixed;bottom:24px;right:20px;width:50px;height:50px;border-radius:50%;background:linear-gradient(135deg,#ffd6e6,#ffb6c1);border:2px solid #b67385;box-shadow:0 2px 12px rgba(184,76,111,0.4);display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:10000;font-size:22px;transition:transform 0.2s;position:fixed;}
+.notif-btn-yes{background:linear-gradient(#ffd6e6,#ffb6c1);border:2px solid #b67385;border-radius:14px;padding:10px 24px;color:#b84c6f;font-weight:bold;font-size:15px;cursor:pointer;width:100%;font-family:'Comic Sans MS',cursive;}
+.notif-btn-no{background:none;border:none;color:rgba(184,76,111,0.5);font-size:12px;cursor:pointer;font-family:'Comic Sans MS',cursive;margin-top:-6px;}
+#notifBellBtn{position:fixed;bottom:24px;right:20px;width:50px;height:50px;border-radius:50%;background:linear-gradient(135deg,#ffd6e6,#ffb6c1);border:2px solid #b67385;box-shadow:0 2px 12px rgba(184,76,111,0.4);display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:10000;font-size:22px;transition:transform 0.2s;}
 #notifBellBtn:hover{transform:scale(1.1);}
 .notif-dot{position:absolute;top:4px;right:4px;width:11px;height:11px;border-radius:50%;background:#ff2d78;border:2px solid #fff;display:none;}
 .notif-dot.show{display:block;}
 </style>
-
 </head>
 <body>
 
@@ -356,6 +309,19 @@ pointer-events:none;z-index:2;
   </div>
 </div>
 
+<!-- MODAL NOTIFICATIONS -->
+
+<div id="notifModal">
+  <div id="notifBox">
+    <div id="notifStatusIcon">🔔</div>
+    <h3>Notifications</h3>
+    <p id="notifStatusText">Recevez une alerte quand vous avez un nouveau message, même quand l'appli est fermée.</p>
+    <button class="notif-btn-yes" id="notifAllowBtn">Activer les notifications</button>
+    <button class="notif-btn-no" id="notifCloseBtn">Plus tard</button>
+  </div>
+</div>
+<button id="notifBellBtn">🔔<span class="notif-dot" id="notifDot"></span></button>
+
 <script src="image-handler.js"></script>
 
 <script type="module">
@@ -425,7 +391,6 @@ const photoOverlay=document.getElementById('photoOverlay');
 const overlayImg=document.getElementById('overlayImg');
 const tiktokBtn=document.getElementById('tiktokBtn');
 const tiktokOverlay=document.getElementById('tiktokOverlay');
-const tiktokFeed=document.getElementById('tiktokFeed');
 const tiktokTrack=document.getElementById('tiktokTrack');
 const closeTiktok=document.getElementById('closeTiktok');
 const tkCommentModal=document.getElementById('tkCommentModal');
@@ -434,73 +399,39 @@ const tkCommentInput=document.getElementById('tkCommentInput');
 const tkCommentSend=document.getElementById('tkCommentSend');
 let tkCurrentCreation=null,tkCurrentCommentBtn=null;
 
-// ===== TIKTOK VERTICAL SWIPE (translateY — zéro scroll natif) =====
+// ===== TIKTOK =====
 let tkCurrentIndex=0,tkTotalSlides=0;
-
 function tkGoTo(index,animate=true){
   if(index<0||index>=tkTotalSlides)return;
   tkCurrentIndex=index;
   tiktokTrack.style.transition=animate?'transform 0.38s cubic-bezier(0.4,0,0.2,1)':'none';
   tiktokTrack.style.transform=`translateY(${-index*window.innerHeight}px)`;
 }
-
 function initTkSwipe(){
-  // Supprimer les anciens listeners en recréant le nœud (évite les doublons)
-  const newFeed=tiktokFeed.cloneNode(false);
-  newFeed.appendChild(tiktokTrack);
-  tiktokFeed.parentNode.replaceChild(newFeed,tiktokFeed);
-  // Réaffectation locale (la référence globale est devenue stale mais on utilise newFeed)
-  const feed=newFeed;
-
+  const feed=document.getElementById('tiktokFeed');
   let startX=0,startY=0,isDragging=false,dragDy=0,lockedDir=null;
-
   feed.addEventListener('touchstart',e=>{
     if(tkCommentModal.classList.contains('visible'))return;
-    startX=e.touches[0].clientX;
-    startY=e.touches[0].clientY;
+    startX=e.touches[0].clientX;startY=e.touches[0].clientY;
     isDragging=true;dragDy=0;lockedDir=null;
     tiktokTrack.style.transition='none';
   },{passive:true});
-
   feed.addEventListener('touchmove',e=>{
     if(!isDragging||tkCommentModal.classList.contains('visible'))return;
-    const dx=e.touches[0].clientX-startX;
-    const dy=e.touches[0].clientY-startY;
-    if(!lockedDir){
-      if(Math.abs(dx)>8||Math.abs(dy)>8) lockedDir=Math.abs(dy)>=Math.abs(dx)?'v':'h';
-      else return;
-    }
-    if(lockedDir==='v'){
-      e.preventDefault();
-      dragDy=dy;
-      const base=-tkCurrentIndex*window.innerHeight;
-      // Résistance aux bords
-      const resistance=(tkCurrentIndex===0&&dy>0)||(tkCurrentIndex===tkTotalSlides-1&&dy<0)?0.2:0.85;
-      tiktokTrack.style.transform=`translateY(${base+dragDy*resistance}px)`;
-    }
-    // Si 'h' → pas d'intervention, le carousel scroll librement
+    const dx=e.touches[0].clientX-startX;const dy=e.touches[0].clientY-startY;
+    if(!lockedDir){if(Math.abs(dx)>8||Math.abs(dy)>8)lockedDir=Math.abs(dy)>=Math.abs(dx)?'v':'h';else return;}
+    if(lockedDir==='v'){e.preventDefault();dragDy=dy;const base=-tkCurrentIndex*window.innerHeight;const res=(tkCurrentIndex===0&&dy>0)||(tkCurrentIndex===tkTotalSlides-1&&dy<0)?0.2:0.85;tiktokTrack.style.transform=`translateY(${base+dragDy*res}px)`;}
   },{passive:false});
-
   feed.addEventListener('touchend',()=>{
-    if(!isDragging)return;
-    isDragging=false;
-    if(lockedDir==='v'){
-      if(dragDy<-60) tkGoTo(tkCurrentIndex+1);
-      else if(dragDy>60) tkGoTo(tkCurrentIndex-1);
-      else tkGoTo(tkCurrentIndex);
-    }
+    if(!isDragging)return;isDragging=false;
+    if(lockedDir==='v'){if(dragDy<-60)tkGoTo(tkCurrentIndex+1);else if(dragDy>60)tkGoTo(tkCurrentIndex-1);else tkGoTo(tkCurrentIndex);}
     lockedDir=null;dragDy=0;
   },{passive:true});
 }
-
-// ===== MODAL COMMENTAIRES TIKTOK =====
 function openTkComments(creation,commentBtn){
-  tkCurrentCreation=creation;tkCurrentCommentBtn=commentBtn;
-  tkCommentList.innerHTML='';
+  tkCurrentCreation=creation;tkCurrentCommentBtn=commentBtn;tkCommentList.innerHTML='';
   (creation.comments||[]).forEach(cm=>{const item=document.createElement('div');item.className='tk-comment-item';item.innerHTML=`${cm.photo?`<img src="${cm.photo}" alt="">`:''}<span><strong>${cm.name}</strong> ${cm.text}</span>`;tkCommentList.appendChild(item);});
-  tkCommentList.scrollTop=tkCommentList.scrollHeight;
-  tkCommentInput.value='';tkCommentModal.classList.add('visible');
-  setTimeout(()=>tkCommentInput.focus(),300);
+  tkCommentList.scrollTop=tkCommentList.scrollHeight;tkCommentInput.value='';tkCommentModal.classList.add('visible');setTimeout(()=>tkCommentInput.focus(),300);
 }
 function closeTkComments(){tkCommentModal.classList.remove('visible');tkCurrentCreation=null;}
 tkCommentModal.addEventListener('click',e=>{if(e.target===tkCommentModal)closeTkComments();});
@@ -509,13 +440,11 @@ tkCommentSend.onclick=async()=>{
   const text=tkCommentInput.value.trim();if(!text||!tkCurrentCreation)return;
   const cr=creations.find(x=>x.id===tkCurrentCreation.id);if(!cr)return;
   if(!Array.isArray(cr.comments))cr.comments=[];
-  const newCom={name:myPrenom||'?',text,photo:ownerPhoto.src||''};
-  cr.comments.push(newCom);
+  const newCom={name:myPrenom||'?',text,photo:ownerPhoto.src||''};cr.comments.push(newCom);
   await supabase.from('creations').update({comments:cr.comments}).eq('id',cr.id);
   const item=document.createElement('div');item.className='tk-comment-item';
   item.innerHTML=`${newCom.photo?`<img src="${newCom.photo}" alt="">`:''}<span><strong>${newCom.name}</strong> ${newCom.text}</span>`;
-  tkCommentList.appendChild(item);tkCommentList.scrollTop=tkCommentList.scrollHeight;
-  tkCommentInput.value='';
+  tkCommentList.appendChild(item);tkCommentList.scrollTop=tkCommentList.scrollHeight;tkCommentInput.value='';
   if(tkCurrentCommentBtn)tkCurrentCommentBtn.querySelector('span').textContent=cr.comments.length;
   if(currentZoom&&currentZoom.id===cr.id)currentZoom.comments=[...cr.comments];
 };
@@ -567,9 +496,16 @@ async function loadMessages(){
   data.forEach(msg=>{const div=document.createElement('div');div.className='msg '+(msg.sender===myPrenom?'msg-me':'msg-them');const circle=document.createElement('img');circle.style.cssText='width:24px;height:24px;border-radius:50%;margin-right:6px;vertical-align:middle;';circle.src=msg.sender===myPrenom?ownerPhoto.src||'icon-152.png':userPhotos[msg.sender]||'icon-152.png';const p=document.createElement('p');p.style.cssText='display:inline-block;margin:0;';p.textContent=msg.content;div.appendChild(circle);div.appendChild(p);chatMessages.appendChild(div);});
   chatMessages.scrollTop=chatMessages.scrollHeight;
 }
-sendMsgBtn.onclick=async()=>{const text=chatInput.value.trim();if(!text||!currentChatUser)return;await supabase.from('messages').insert({sender:myPrenom,receiver:currentChatUser,content:text});chatInput.value='';loadMessages();if(window.sendPushToUser)window.sendPushToUser(myPrenom||'Message',text,'owner.html');};
+sendMsgBtn.onclick=async()=>{
+  const text=chatInput.value.trim();if(!text||!currentChatUser)return;
+  await supabase.from('messages').insert({sender:myPrenom,receiver:currentChatUser,content:text});
+  chatInput.value='';loadMessages();
+  // Notif push
+  try{if(window.sendPushToUser)window.sendPushToUser(myPrenom||'Message',text,'owner.html');}catch(e){}
+};
 let lastMsgId=null;
 setInterval(async()=>{if(!currentChatUser||!prenom)return;try{const{data}=await supabase.from('messages').select('*').eq('receiver',prenom).order('created_at',{ascending:false}).limit(1);if(data&&data[0]&&data[0].id!==lastMsgId){lastMsgId=data[0].id;const msg=data[0];if(msg.sender!==currentChatUser)showInAppNotification(msg.sender,msg.content);else loadMessages();}}catch(e){}},5000);
+
 async function loadChatUsers(){
   try{
     const{data:users,error}=await supabase.from('profiles').select('prenom, photo_url').neq('prenom',myPrenom);
@@ -580,10 +516,10 @@ async function loadChatUsers(){
   }catch(err){console.error(err);}
 }
 function showInAppNotification(sender,message){
-  if(document.hidden){if(Notification.permission==='granted')new Notification(sender,{body:message,icon:userPhotos[sender]||'icon-152.png'});}
-  else{const notif=document.createElement('div');notif.textContent=`${sender} : ${message}`;notif.style.cssText='position:fixed;bottom:20px;right:20px;background:#ffb6c1;color:#fff;padding:10px 14px;border-radius:12px;z-index:99999;font-size:12px;';document.body.appendChild(notif);setTimeout(()=>notif.remove(),3000);}
+  if(document.hidden){try{if(Notification.permission==='granted')new Notification(sender,{body:message,icon:userPhotos[sender]||'icon-152.png'});}catch(e){}}
+  else{const notif=document.createElement('div');notif.textContent=`${sender} : ${message}`;notif.style.cssText='position:fixed;bottom:80px;right:20px;background:#ffb6c1;color:#fff;padding:10px 14px;border-radius:12px;z-index:99999;font-size:12px;';document.body.appendChild(notif);setTimeout(()=>notif.remove(),3000);}
 }
-if('Notification'in window&&Notification.permission!=='granted')Notification.requestPermission();
+// ⚠️ SUPPRIMÉ : Notification.requestPermission() automatique — cassait l'appli en PWA iOS
 
 // ===== CREATIONS =====
 async function refreshCreations(){
@@ -720,18 +656,15 @@ function spawnHearts(btn){
   for(let i=0;i<count;i++){setTimeout(()=>{const el=document.createElement('span');el.className='tk-heart';const dx=(Math.random()-0.5)*160,dy=-(90+Math.random()*200);const r0=(Math.random()-0.5)*30,r1=r0+(Math.random()-0.5)*50;const sf=0.5+Math.random()*1.1,dur=900+Math.random()*500,fs=18+Math.random()*20;el.textContent=emojis[Math.floor(Math.random()*emojis.length)];el.style.cssText=`left:${cx+dx-fs/2}px;top:${cy-fs/2}px;font-size:${fs}px;--dx:${dx}px;--dy:${dy}px;--r0:${r0}deg;--r1:${r1}deg;--sf:${sf};--dur:${dur}ms;animation-duration:${dur}ms;`;document.body.appendChild(el);setTimeout(()=>el.remove(),dur+60);},i*55);}
 }
 
-// ===== BUILD TIKTOK FEED =====
+// ===== BUILD TIKTOK =====
 function buildTiktokFeed(list){
   tiktokTrack.innerHTML='';
   const slides=list.filter(c=>(c.zoomGroup&&c.zoomGroup.length)||c.imgUrl);
-  tkTotalSlides=slides.length;
-  tkCurrentIndex=0;
+  tkTotalSlides=slides.length;tkCurrentIndex=0;
   tiktokTrack.style.height=`${slides.length*100}vh`;
-
   slides.forEach(c=>{
     const photos=(c.zoomGroup&&c.zoomGroup.length)?c.zoomGroup:[c.imgUrl];
     const slide=document.createElement('div');slide.className='tiktok-slide';slide.dataset.id=c.id;
-
     const carousel=document.createElement('div');carousel.className='tiktok-photos';
     photos.forEach(url=>{
       const item=document.createElement('div');item.className='tiktok-photo-item';
@@ -740,72 +673,31 @@ function buildTiktokFeed(list){
       item.appendChild(img);carousel.appendChild(item);
     });
     slide.appendChild(carousel);
-
-    const counter=document.createElement('div');
-    counter.className='tiktok-photo-counter'+(photos.length>1?' multi':'');
-    counter.textContent=`1 / ${photos.length}`;slide.appendChild(counter);
-
+    const counter=document.createElement('div');counter.className='tiktok-photo-counter'+(photos.length>1?' multi':'');counter.textContent=`1 / ${photos.length}`;slide.appendChild(counter);
     if(photos.length>1){
       const dots=document.createElement('div');dots.className='tiktok-dots';
       photos.forEach((_,i)=>{const dot=document.createElement('div');dot.className='tiktok-dot'+(i===0?' active':'');dots.appendChild(dot);});
       slide.appendChild(dots);
-      carousel.addEventListener('scroll',()=>{
-        const idx2=Math.round(carousel.scrollLeft/carousel.clientWidth);
-        dots.querySelectorAll('.tiktok-dot').forEach((d,i)=>d.classList.toggle('active',i===idx2));
-        counter.textContent=`${idx2+1} / ${photos.length}`;
-      },{passive:true});
+      carousel.addEventListener('scroll',()=>{const idx2=Math.round(carousel.scrollLeft/carousel.clientWidth);dots.querySelectorAll('.tiktok-dot').forEach((d,i)=>d.classList.toggle('active',i===idx2));counter.textContent=`${idx2+1} / ${photos.length}`;},{passive:true});
     }
-
-    const info=document.createElement('div');info.className='tiktok-info';
-    info.innerHTML=`<div class="t-title">${c.name||''}</div><div class="t-legend">${c.legend||''}</div>`;
-    slide.appendChild(info);
-
+    const info=document.createElement('div');info.className='tiktok-info';info.innerHTML=`<div class="t-title">${c.name||''}</div><div class="t-legend">${c.legend||''}</div>`;slide.appendChild(info);
     const bar=document.createElement('div');bar.className='tiktok-bar';
     const cr0=creations.find(x=>x.id===c.id)||c;
     const alreadyLiked=(cr0.likes||[]).some(l=>l.name===myPrenom);
-    const likeBtn2=document.createElement('div');
-    likeBtn2.className='tiktok-react-btn'+(alreadyLiked?' liked':'');
+    const likeBtn2=document.createElement('div');likeBtn2.className='tiktok-react-btn'+(alreadyLiked?' liked':'');
     const lS=alreadyLiked?'#ff2d78':'#ffe6f0',lF=alreadyLiked?'#ff2d78':'none';
     likeBtn2.innerHTML=`<svg viewBox="0 0 24 24" fill="${lF}" stroke="${lS}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.6l-1-1a5.5 5.5 0 0 0-7.8 7.8l1 1L12 21l7.8-7.6 1-1a5.5 5.5 0 0 0 0-7.8z"/></svg><span>${(cr0.likes||[]).length}</span>`;
-    likeBtn2.onclick=async(e)=>{
-      e.stopPropagation();
-      const cr=creations.find(x=>x.id===c.id);if(!cr)return;
-      if(!Array.isArray(cr.likes))cr.likes=[];
-      const svg2=likeBtn2.querySelector('svg'),span2=likeBtn2.querySelector('span');
-      const wasLiked=cr.likes.some(l=>l.name===myPrenom);
-      if(wasLiked){cr.likes=cr.likes.filter(l=>l.name!==myPrenom);likeBtn2.classList.remove('liked');svg2.setAttribute('stroke','#ffe6f0');svg2.setAttribute('fill','none');}
-      else{cr.likes.push({name:myPrenom,photo:ownerPhoto.src||''});likeBtn2.classList.add('liked');svg2.setAttribute('stroke','#ff2d78');svg2.setAttribute('fill','#ff2d78');spawnHearts(likeBtn2);}
-      span2.textContent=cr.likes.length;
-      await supabase.from('creations').update({likes:cr.likes}).eq('id',cr.id);
-      if(currentZoom&&currentZoom.id===cr.id)currentZoom.likes=[...cr.likes];
-    };
+    likeBtn2.onclick=async(e)=>{e.stopPropagation();const cr=creations.find(x=>x.id===c.id);if(!cr)return;if(!Array.isArray(cr.likes))cr.likes=[];const svg2=likeBtn2.querySelector('svg'),span2=likeBtn2.querySelector('span');const wasLiked=cr.likes.some(l=>l.name===myPrenom);if(wasLiked){cr.likes=cr.likes.filter(l=>l.name!==myPrenom);likeBtn2.classList.remove('liked');svg2.setAttribute('stroke','#ffe6f0');svg2.setAttribute('fill','none');}else{cr.likes.push({name:myPrenom,photo:ownerPhoto.src||''});likeBtn2.classList.add('liked');svg2.setAttribute('stroke','#ff2d78');svg2.setAttribute('fill','#ff2d78');spawnHearts(likeBtn2);}span2.textContent=cr.likes.length;await supabase.from('creations').update({likes:cr.likes}).eq('id',cr.id);if(currentZoom&&currentZoom.id===cr.id)currentZoom.likes=[...cr.likes];};
     bar.appendChild(likeBtn2);
-
     const commentBtn2=document.createElement('div');commentBtn2.className='tiktok-react-btn';
     commentBtn2.innerHTML=`<svg viewBox="0 0 24 24" fill="none" stroke="#ffe6f0" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg><span>${(cr0.comments||[]).length}</span>`;
     commentBtn2.onclick=(e)=>{e.stopPropagation();const cr=creations.find(x=>x.id===c.id)||c;openTkComments(cr,commentBtn2);};
-    bar.appendChild(commentBtn2);
-    slide.appendChild(bar);
-    tiktokTrack.appendChild(slide);
+    bar.appendChild(commentBtn2);slide.appendChild(bar);tiktokTrack.appendChild(slide);
   });
-
   tkGoTo(0,false);
 }
-
-tiktokBtn.onclick=()=>{
-  buildTiktokFeed(creations);
-  initTkSwipe();
-  tiktokOverlay.classList.add('visible');
-  closeTiktok.classList.add('visible');
-  document.body.style.overflow='hidden';
-};
-
-closeTiktok.onclick=()=>{
-  closeTkComments();
-  tiktokOverlay.classList.remove('visible');
-  closeTiktok.classList.remove('visible');
-  document.body.style.overflow='';
-};
+tiktokBtn.onclick=()=>{buildTiktokFeed(creations);initTkSwipe();tiktokOverlay.classList.add('visible');closeTiktok.classList.add('visible');document.body.style.overflow='hidden';};
+closeTiktok.onclick=()=>{closeTkComments();tiktokOverlay.classList.remove('visible');closeTiktok.classList.remove('visible');document.body.style.overflow='';};
 
 // ===== INIT =====
 document.addEventListener('DOMContentLoaded',loadOwnerPhoto);
@@ -815,150 +707,65 @@ loadOwnerPhoto();
 loadChatUsers();
 </script>
 
-<!-- ===== MODAL NOTIFICATIONS ===== -->
-
-<div id="notifModal">
-  <div id="notifBox">
-    <div id="notifStatusIcon">🔔</div>
-    <h3>Notifications</h3>
-    <p id="notifStatusText">Recevez une alerte quand vous avez un nouveau message, même quand l'appli est fermée.</p>
-    <button class="notif-btn-yes" id="notifAllowBtn">Activer les notifications</button>
-    <button class="notif-btn-no" id="notifCloseBtn">Plus tard</button>
-  </div>
-</div>
-<button id="notifBellBtn" style="position:fixed;bottom:24px;right:20px;">
-  🔔<span class="notif-dot" id="notifDot"></span>
-</button>
+<!-- NOTIFICATIONS - script séparé non-module pour éviter tout conflit iOS -->
 
 <script>
-// ===== SERVICE WORKER + PUSH NOTIFICATIONS =====
-const VAPID_PUBLIC_KEY = "BMTXkLk1z_pw1QYTR5v8ZJhmHud9HTRbTSUyrAN-XMsPYSSTIQY6srLkALsriF5pCd3PaBlsG_jNEJ1IC1h_7JI"; // remplacé automatiquement
+(function(){
+  const VAPID_PUBLIC_KEY="BMTXkLk1z_pw1QYTR5v8ZJhmHud9HTRbTSUyrAN-XMsPYSSTIQY6srLkALsriF5pCd3PaBlsG_jNEJ1IC1h_7JI";
+  const SB_URL_N="https://kdgxbmqwhpuctjtlygrt.supabase.co";
+  const SB_KEY_N="eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtkZ3hibXF3aHB1Y3RqdGx5Z3J0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUyMjY0NzQsImV4cCI6MjA5MDgwMjQ3NH0.9RsIj_bQgJskg9raRGN6uQJwUUlByTvWAFF2Eq9f6KM";
 
-function urlBase64ToUint8Array(b64) {
-  const pad = '='.repeat((4 - b64.length % 4) % 4);
-  const base64 = (b64 + pad).replace(/-/g, '+').replace(/_/g, '/');
-  return Uint8Array.from(atob(base64), c => c.charCodeAt(0));
-}
+  function u2a(b64){const p='='.repeat((4-b64.length%4)%4);const b=(b64+p).replace(/-/g,'+').replace(/_/g,'/');return Uint8Array.from(atob(b),c=>c.charCodeAt(0));}
 
-const SB_URL_N = "https://kdgxbmqwhpuctjtlygrt.supabase.co";
-const SB_KEY_N = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtkZ3hibXF3aHB1Y3RqdGx5Z3J0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUyMjY0NzQsImV4cCI6MjA5MDgwMjQ3NH0.9RsIj_bQgJskg9raRGN6uQJwUUlByTvWAFF2Eq9f6KM";
+  async function saveSub(sub){const j=sub.toJSON();await fetch(`${SB_URL_N}/rest/v1/push_subscriptions`,{method:'POST',headers:{'apikey':SB_KEY_N,'Authorization':'Bearer '+SB_KEY_N,'Content-Type':'application/json','Prefer':'resolution=merge-duplicates,return=minimal'},body:JSON.stringify({endpoint:j.endpoint,p256dh:j.keys.p256dh,auth:j.keys.auth})}).catch(()=>{});}
 
-async function saveSubscription(sub) {
-  const j = sub.toJSON();
-  await fetch(`${SB_URL_N}/rest/v1/push_subscriptions`, {
-    method: 'POST',
-    headers: { 'apikey': SB_KEY_N, 'Authorization': 'Bearer ' + SB_KEY_N, 'Content-Type': 'application/json', 'Prefer': 'resolution=merge-duplicates,return=minimal' },
-    body: JSON.stringify({ endpoint: j.endpoint, p256dh: j.keys.p256dh, auth: j.keys.auth })
-  });
-}
+  window.sendPushToUser=async function(title,body,url){
+    try{
+      const r=await fetch(`${SB_URL_N}/rest/v1/push_subscriptions?select=*`,{headers:{'apikey':SB_KEY_N,'Authorization':'Bearer '+SB_KEY_N}});
+      const subs=await r.json();if(!subs||!subs.length)return;
+      for(const s of subs){await fetch(`${SB_URL_N}/functions/v1/swift-task`,{method:'POST',headers:{'Content-Type':'application/json','Authorization':'Bearer '+SB_KEY_N},body:JSON.stringify({subscription:{endpoint:s.endpoint,keys:{p256dh:s.p256dh,auth:s.auth}},title,body,url:url||'owner.html'})}).catch(()=>{});}
+    }catch(e){}
+  };
 
-async function subscribeIfGranted(reg) {
-  try {
-    let sub = await reg.pushManager.getSubscription();
-    if (!sub) sub = await reg.pushManager.subscribe({ userVisibleOnly: true, applicationServerKey: urlBase64ToUint8Array(VAPID_PUBLIC_KEY) });
-    await saveSubscription(sub);
-  } catch(e) { console.warn('Subscribe error:', e); }
-}
+  function updateBellUI(perm){
+    const dot=document.getElementById('notifDot');const icon=document.getElementById('notifStatusIcon');const text=document.getElementById('notifStatusText');const btn=document.getElementById('notifAllowBtn');
+    if(!dot)return;
+    if(perm==='granted'){dot.classList.remove('show');if(icon)icon.textContent='✅';if(text)text.textContent='Notifications activées ! Vous recevrez une alerte pour chaque message.';if(btn){btn.textContent='Parfait !';btn.onclick=()=>document.getElementById('notifModal').classList.remove('visible');}}
+    else if(perm==='denied'){dot.classList.add('show');if(icon)icon.textContent='🔕';if(text)text.textContent='Notifications bloquées. Allez dans Réglages → Safari → Notifications.';if(btn){btn.textContent='OK compris';btn.onclick=()=>document.getElementById('notifModal').classList.remove('visible');}}
+    else{dot.classList.add('show');}
+  }
 
-// Envoie notif push à un utilisateur (appelé après envoi de message)
-window.sendPushToUser = async function(title, body, url) {
-  try {
-    const res = await fetch(`${SB_URL_N}/rest/v1/push_subscriptions?select=*`, {
-      headers: { 'apikey': SB_KEY_N, 'Authorization': 'Bearer ' + SB_KEY_N }
-    });
-    const subs = await res.json();
-    if (!subs || !subs.length) return;
-    for (const s of subs) {
-      await fetch(`${SB_URL_N}/functions/v1/swift-task`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + SB_KEY_N },
-        body: JSON.stringify({ subscription: { endpoint: s.endpoint, keys: { p256dh: s.p256dh, auth: s.auth } }, title, body, url: url || 'owner.html' })
-      }).catch(() => {});
+  // Bouton cloche — toujours fonctionnel
+  document.getElementById('notifBellBtn').onclick=()=>document.getElementById('notifModal').classList.add('visible');
+  document.getElementById('notifCloseBtn').onclick=()=>document.getElementById('notifModal').classList.remove('visible');
+  document.getElementById('notifModal').onclick=function(e){if(e.target===this)this.classList.remove('visible');};
+
+  document.getElementById('notifAllowBtn').onclick=async function(){
+    if(!('Notification'in window)||!('serviceWorker'in navigator)||!('PushManager'in window)){
+      document.getElementById('notifStatusIcon').textContent='📱';
+      document.getElementById('notifStatusText').textContent="Installez l'appli depuis Safari iOS 16.4+ pour les notifications.";
+      this.textContent='OK';this.onclick=()=>document.getElementById('notifModal').classList.remove('visible');return;
     }
-  } catch(e) { console.warn('Push send error:', e); }
-};
-
-function updateBellUI(permission) {
-  const dot = document.getElementById('notifDot');
-  const icon = document.getElementById('notifStatusIcon');
-  const text = document.getElementById('notifStatusText');
-  const btn  = document.getElementById('notifAllowBtn');
-  if (!dot) return;
-  if (permission === 'granted') {
-    dot.classList.remove('show');
-    if (icon) icon.textContent = '✅';
-    if (text) text.textContent = 'Les notifications sont activées ! Vous recevrez une alerte pour chaque nouveau message.';
-    if (btn)  { btn.textContent = 'Parfait !'; btn.onclick = () => document.getElementById('notifModal').classList.remove('visible'); }
-  } else if (permission === 'denied') {
-    dot.classList.add('show');
-    if (icon) icon.textContent = '🔕';
-    if (text) text.textContent = 'Notifications bloquées. Pour les activer : Réglages → Safari → Notifications.';
-    if (btn)  { btn.textContent = 'OK compris'; btn.onclick = () => document.getElementById('notifModal').classList.remove('visible'); }
-  } else {
-    dot.classList.add('show');
-  }
-}
-
-// ---- Tous les onclick de la modal : toujours assignés, sans condition ----
-document.getElementById('notifBellBtn').onclick = () => {
-  document.getElementById('notifModal').classList.add('visible');
-};
-document.getElementById('notifCloseBtn').onclick = () => {
-  document.getElementById('notifModal').classList.remove('visible');
-};
-document.getElementById('notifModal').addEventListener('click', e => {
-  if (e.target === document.getElementById('notifModal'))
-    document.getElementById('notifModal').classList.remove('visible');
-});
-
-document.getElementById('notifAllowBtn').onclick = async () => {
-  // Pas de support push
-  if (!('Notification' in window) || !('serviceWorker' in navigator) || !('PushManager' in window)) {
-    document.getElementById('notifStatusIcon').textContent = '📱';
-    document.getElementById('notifStatusText').textContent = 'Notifications non supportées. Installez l\'appli depuis Safari (iOS 16.4+).';
-    document.getElementById('notifAllowBtn').textContent = 'OK compris';
-    document.getElementById('notifAllowBtn').onclick = () => document.getElementById('notifModal').classList.remove('visible');
-    return;
-  }
-  // Déjà accordé
-  if (Notification.permission === 'granted') {
-    document.getElementById('notifModal').classList.remove('visible');
-    return;
-  }
-  // Demande permission
-  const perm = await Notification.requestPermission();
-  updateBellUI(perm);
-  if (perm === 'granted') {
-    try {
-      const reg = await navigator.serviceWorker.ready;
-      await subscribeIfGranted(reg);
-    } catch(e) { console.warn(e); }
-    setTimeout(() => document.getElementById('notifModal').classList.remove('visible'), 1200);
-  }
-};
-
-// Init SW silencieux en arrière-plan
-(async () => {
-  if (!('serviceWorker' in navigator) || !('PushManager' in window)) return;
-  if ('Notification' in window) updateBellUI(Notification.permission);
-  try {
-    // Désinstaller tous les anciens SW d'abord
-    const regs = await navigator.serviceWorker.getRegistrations();
-    for (const r of regs) {
-      if (!r.active || !r.active.scriptURL.includes('sw.js')) {
-        await r.unregister();
-      }
+    if(Notification.permission==='granted'){document.getElementById('notifModal').classList.remove('visible');return;}
+    const perm=await Notification.requestPermission();
+    updateBellUI(perm);
+    if(perm==='granted'){
+      try{const reg=await navigator.serviceWorker.ready;let sub=await reg.pushManager.getSubscription();if(!sub)sub=await reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:u2a(VAPID_PUBLIC_KEY)});await saveSub(sub);}catch(e){console.warn(e);}
+      setTimeout(()=>document.getElementById('notifModal').classList.remove('visible'),1200);
     }
-    const reg = await navigator.serviceWorker.register('/sw.js', { updateViaCache: 'none' });
-    reg.update(); // Force la vérification de mise à jour
-    const clearBadge = () => {
-      if (navigator.clearAppBadge) navigator.clearAppBadge().catch(()=>{});
-      if (reg.active) reg.active.postMessage('CLEAR_BADGE');
-    };
-    window.addEventListener('focus', clearBadge);
-    document.addEventListener('visibilitychange', () => { if (!document.hidden) clearBadge(); });
-    if (Notification.permission === 'granted') await subscribeIfGranted(reg);
-  } catch(e) { console.warn('SW error:', e); }
+  };
+
+  // Init SW en arrière-plan — silencieux
+  if('serviceWorker'in navigator&&'PushManager'in window){
+    if('Notification'in window)updateBellUI(Notification.permission);
+    navigator.serviceWorker.register('/sw.js',{updateViaCache:'none'}).then(reg=>{
+      reg.update();
+      const clear=()=>{if(navigator.clearAppBadge)navigator.clearAppBadge().catch(()=>{});if(reg.active)reg.active.postMessage('CLEAR_BADGE');};
+      window.addEventListener('focus',clear);
+      document.addEventListener('visibilitychange',()=>{if(!document.hidden)clear();});
+      if(Notification.permission==='granted'){reg.pushManager.getSubscription().then(sub=>{if(!sub)reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:u2a(VAPID_PUBLIC_KEY)}).then(saveSub).catch(()=>{});else saveSub(sub);}).catch(()=>{});}
+    }).catch(e=>console.warn('SW:',e));
+  }
 })();
 </script>
 
