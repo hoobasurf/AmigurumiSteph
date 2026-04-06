@@ -46,9 +46,9 @@ body {
   transition: all 0.2s;
 }
 
-/* Effet hover pour visualiser les zones */
+/* Effet hover désactivé */
 .clickable-btn:hover {
-  background: rgba(255, 255, 0, 0.3);
+  background: transparent;
 }
 
 /* ===== SIDEBAR ===== */
@@ -693,7 +693,7 @@ document.getElementById('viewAllBtn').addEventListener('click', showAllDrawers);
 
 // BOUTON HOBBII
 document.getElementById('hobbii-board').addEventListener('click', function() {
-  window.open('https://hobbii.fr', '_blank');
+  window.location.href = 'https://hobbii.fr';
 });
 
 // EVENT LISTENERS POUR LES TIROIRS
