@@ -942,7 +942,15 @@ document.getElementById('notifAllowBtn').onclick = async () => {
   if (!('serviceWorker' in navigator) || !('PushManager' in window)) return;
   if ('Notification' in window) updateBellUI(Notification.permission);
   try {
-    const reg = await navigator.serviceWorker.register('/sw.js');
+    // Désinstaller tous les anciens SW d'abord
+    const regs = await navigator.serviceWorker.getRegistrations();
+    for (const r of regs) {
+      if (!r.active || !r.active.scriptURL.includes('sw.js')) {
+        await r.unregister();
+      }
+    }
+    const reg = await navigator.serviceWorker.register('/sw.js', { updateViaCache: 'none' });
+    reg.update(); // Force la vérification de mise à jour
     const clearBadge = () => {
       if (navigator.clearAppBadge) navigator.clearAppBadge().catch(()=>{});
       if (reg.active) reg.active.postMessage('CLEAR_BADGE');
