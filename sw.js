@@ -1,4 +1,12 @@
 // sw.js — Service Worker notifications push + badge
+// IMPORTANT : pas de cache — toujours réseau pour éviter les bugs
+
+// Ne jamais intercepter les requêtes — toujours aller sur le réseau
+self.addEventListener(‘fetch’, event => {
+event.respondWith(
+fetch(event.request).catch(() => new Response(’’, { status: 503 }))
+);
+});
 
 self.addEventListener(‘push’, event => {
 let data = {};
@@ -41,4 +49,10 @@ if (navigator.clearAppBadge) navigator.clearAppBadge().catch(()=>{});
 });
 
 self.addEventListener(‘install’, () => self.skipWaiting());
-self.addEventListener(‘activate’, event => event.waitUntil(clients.claim()));
+self.addEventListener(‘activate’, event => {
+event.waitUntil(
+caches.keys()
+.then(keys => Promise.all(keys.map(k => caches.delete(k))))
+.then(() => clients.claim())
+);
+});
