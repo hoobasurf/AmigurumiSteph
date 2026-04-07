@@ -110,8 +110,27 @@ body.modal-open{overflow:hidden;touch-action:none;}
 #tiktokBtn:hover{transform:scale(1.12);box-shadow:0 4px 18px rgba(184,76,111,0.55);}
 #tiktokBtn svg{width:20px;height:20px;}
 
-/* BOUTON DIAPORAMA — apparait à côté du bouton TikTok */
-#slideshowBtn{position:fixed;top:148px;right:60px;background:linear-gradient(135deg,#ffd6e6,#ffb6c1);border:2px solid #b67385;border-radius:20px;padding:7px 12px;color:#b84c6f;font-weight:bold;font-size:12px;cursor:pointer;z-index:10000;display:none;box-shadow:0 2px 10px rgba(184,76,111,0.35);transition:transform 0.2s,box-shadow 0.2s;white-space:nowrap;font-family:‘Comic Sans MS’,cursive;animation:popBtn 0.25s cubic-bezier(0.34,1.56,0.64,1);}
+/* BOUTON DIAPORAMA — dans l’overlay TikTok, en bas à gauche */
+#slideshowBtn{
+position:fixed;
+bottom:40px;
+left:14px;
+background:linear-gradient(135deg,#ffd6e6,#ffb6c1);
+border:2px solid #b67385;
+border-radius:20px;
+padding:7px 12px;
+color:#b84c6f;
+font-weight:bold;
+font-size:12px;
+cursor:pointer;
+z-index:50001;
+display:none;
+box-shadow:0 2px 10px rgba(184,76,111,0.35);
+transition:transform 0.2s,box-shadow 0.2s;
+white-space:nowrap;
+font-family:‘Comic Sans MS’,cursive;
+animation:popBtn 0.25s cubic-bezier(0.34,1.56,0.64,1);
+}
 #slideshowBtn:hover{transform:scale(1.07);box-shadow:0 4px 18px rgba(184,76,111,0.5);}
 
 /* TIKTOK OVERLAY */
@@ -240,7 +259,7 @@ body.modal-open{overflow:hidden;touch-action:none;}
   </svg>
 </button>
 
-<!-- BOUTON DIAPORAMA (apparait après clic TikTok) -->
+<!-- BOUTON DIAPORAMA (apparait dans la vue TikTok, en bas à gauche) -->
 
 <button id="slideshowBtn">🎬 Diaporama</button>
 
@@ -830,7 +849,6 @@ tiktokBtn.onclick=()=>{
   tiktokOverlay.classList.add('visible');
   closeTiktok.classList.add('visible');
   document.body.style.overflow='hidden';
-  // Afficher le bouton Diaporama
   slideshowBtn.style.display='block';
 };
 closeTiktok.onclick=()=>{
@@ -854,7 +872,6 @@ document.querySelectorAll('.music-option').forEach(opt=>{
 });
 
 slideshowBtn.onclick=()=>{
-  // Réinitialiser la sélection
   document.querySelectorAll('.music-option').forEach(o=>o.classList.remove('selected'));
   selectedMusicSrc=null;
   startSlideshowBtn.disabled=true;
@@ -872,8 +889,8 @@ startSlideshowBtn.onclick=()=>{
 };
 
 // ===== SLIDESHOW ENGINE =====
-let ssAudio=null,ssTimer=null,ssIndex=0,ssSlides=[],ssPaused=false,ssProgressStart=null,ssProgressRaf=null;
-const SS_DURATION=6000; // ms par slide
+let ssAudio=null,ssTimer=null,ssIndex=0,ssSlides=[],ssPaused=false;
+const SS_DURATION=6000;
 
 function buildSlideshowSlides(){
   return creations.filter(c=>c.imgUrl||(c.zoomGroup&&c.zoomGroup.length)).map(c=>{
@@ -893,7 +910,6 @@ function ssShowSlide(index,crossfade=true){
     slideshowImgNext.src=slide.url;
     slideshowImgNext.style.opacity='0';
     slideshowImgNext.style.transition='opacity 0.8s ease';
-    // swap
     setTimeout(()=>{
       slideshowImg.src=slide.url;
       slideshowImgNext.style.opacity='0';
@@ -908,7 +924,6 @@ function ssShowSlide(index,crossfade=true){
 function ssStartProgress(){
   slideshowProgress.style.transition='none';
   slideshowProgress.style.width='0%';
-  // force reflow
   slideshowProgress.getBoundingClientRect();
   slideshowProgress.style.transition=`width ${SS_DURATION}ms linear`;
   slideshowProgress.style.width='100%';
@@ -920,33 +935,28 @@ function ssNext(){
   ssStartProgress();
 }
 
-function ssScheduleNext(){
-  clearTimeout(ssTimer);
-  if(!ssPaused)ssTimer=setTimeout(ssNext,SS_DURATION);
-}
-
 function launchSlideshow(musicSrc){
   ssSlides=buildSlideshowSlides();
   if(!ssSlides.length){alert('Aucune création à afficher !');return;}
   ssIndex=0;ssPaused=false;
   slideshowPause.textContent='⏸';
 
-  // Fermer TikTok si ouvert
   closeTkComments();
   tiktokOverlay.classList.remove('visible');
   closeTiktok.classList.remove('visible');
   slideshowBtn.style.display='none';
 
-  // Musique
   if(ssAudio){ssAudio.pause();ssAudio=null;}
   ssAudio=new Audio(musicSrc);
   ssAudio.loop=true;ssAudio.volume=0;
   ssAudio.play().catch(()=>{});
-  // Fade in audio
   let vol=0;const fadeIn=setInterval(()=>{vol=Math.min(vol+0.05,1);ssAudio.volume=vol;if(vol>=1)clearInterval(fadeIn);},100);
 
-  // Nom musique
-  const names={'Christina Perri A Thousand Years Piano Cello Cover The Piano Guys.mp3':'🎹 A Thousand Years','juliush-cinderella-waltz-warm-grand-piano-and-seattle-strings-8283.mp3':'🎻 Cinderella Waltz','victorvantast-fionax27s-fairy-song-152743.mp3':'🧚 Fiona\'s Fairy Song'};
+  const names={
+    'Christina Perri A Thousand Years Piano Cello Cover The Piano Guys.mp3':'🎹 A Thousand Years',
+    'juliush-cinderella-waltz-warm-grand-piano-and-seattle-strings-8283.mp3':'🎻 Cinderella Waltz',
+    'victorvantast-fionax27s-fairy-song-152743.mp3':'🧚 Fiona\'s Fairy Song'
+  };
   slideshowMusicName.textContent=names[musicSrc]||musicSrc;
 
   slideshowOverlay.classList.add('visible');
@@ -960,7 +970,6 @@ function launchSlideshow(musicSrc){
 function stopSlideshow(){
   clearTimeout(ssTimer);
   if(ssAudio){
-    // Fade out
     let vol=ssAudio.volume;
     const fadeOut=setInterval(()=>{vol=Math.max(vol-0.08,0);ssAudio.volume=vol;if(vol<=0){clearInterval(fadeOut);ssAudio.pause();ssAudio=null;}},80);
   }
@@ -969,7 +978,6 @@ function stopSlideshow(){
   document.body.style.overflow='';
   ssPaused=false;
   slideshowPause.textContent='⏸';
-  // Réafficher bouton TikTok si on veut y retourner — on laisse fermé
 }
 
 closeSlideshow.onclick=()=>stopSlideshow();
@@ -980,22 +988,17 @@ slideshowPause.onclick=()=>{
   if(ssPaused){
     clearTimeout(ssTimer);
     slideshowProgress.style.transition='none';
-    // Garder la largeur actuelle
     const w=getComputedStyle(slideshowProgress).width;
-    const total=slideshowProgress.parentElement.clientWidth||window.innerWidth;
     slideshowProgress.style.width=w;
     if(ssAudio)ssAudio.pause();
   }else{
-    // Reprendre
     if(ssAudio)ssAudio.play().catch(()=>{});
-    // Relancer depuis début de slide courante
     ssShowSlide(ssIndex,false);
     ssStartProgress();
     ssTimer=setTimeout(ssNext,SS_DURATION);
   }
 };
 
-// Swipe gauche/droite sur slideshow pour naviguer
 (()=>{
   let sx=0,sy=0;
   slideshowOverlay.addEventListener('touchstart',e=>{sx=e.touches[0].clientX;sy=e.touches[0].clientY;},{passive:true});
@@ -1043,7 +1046,7 @@ loadChatUsers();
 setTimeout(setupRealtime, 500);
 </script>
 
-<!-- NOTIFICATIONS - script séparé non-module pour éviter tout conflit iOS -->
+<!-- NOTIFICATIONS -->
 
 <script>
 (function(){
