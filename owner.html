@@ -104,9 +104,17 @@ body.modal-open{overflow:hidden;touch-action:none;}
 @keyframes prenomFloat{0%,100%{transform:translateY(0) rotate(-1deg);}50%{transform:translateY(-9px) rotate(1deg);}}
 #overlayHint{font-size:11px;color:rgba(255,230,240,0.5);letter-spacing:3px;font-family:'Georgia',serif;font-style:italic;animation:fadeIn 1.5s 1s ease both;}
 @keyframes fadeIn{from{opacity:0}to{opacity:1}}
+
+/* BOUTON TIKTOK */
 #tiktokBtn{position:fixed;top:148px;right:10px;width:42px;height:42px;border-radius:50%;background:linear-gradient(135deg,#ffd6e6,#ffb6c1);border:2px solid #b67385;box-shadow:0 2px 10px rgba(184,76,111,0.35);display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:10000;transition:transform 0.2s,box-shadow 0.2s;}
 #tiktokBtn:hover{transform:scale(1.12);box-shadow:0 4px 18px rgba(184,76,111,0.55);}
 #tiktokBtn svg{width:20px;height:20px;}
+
+/* BOUTON DIAPORAMA — apparait à côté du bouton TikTok */
+#slideshowBtn{position:fixed;top:148px;right:60px;background:linear-gradient(135deg,#ffd6e6,#ffb6c1);border:2px solid #b67385;border-radius:20px;padding:7px 12px;color:#b84c6f;font-weight:bold;font-size:12px;cursor:pointer;z-index:10000;display:none;box-shadow:0 2px 10px rgba(184,76,111,0.35);transition:transform 0.2s,box-shadow 0.2s;white-space:nowrap;font-family:‘Comic Sans MS’,cursive;animation:popBtn 0.25s cubic-bezier(0.34,1.56,0.64,1);}
+#slideshowBtn:hover{transform:scale(1.07);box-shadow:0 4px 18px rgba(184,76,111,0.5);}
+
+/* TIKTOK OVERLAY */
 #tiktokOverlay{display:none;position:fixed;inset:0;background:#0d0008;z-index:50000;overflow:hidden;}
 #tiktokOverlay.visible{display:block;}
 #tiktokFeed{position:relative;width:100%;height:100%;overflow:hidden;touch-action:none;}
@@ -117,7 +125,7 @@ body.modal-open{overflow:hidden;touch-action:none;}
 .tiktok-photo-item{flex:0 0 100vw;width:100vw;height:100vh;height:100svh;scroll-snap-align:start;scroll-snap-stop:always;position:relative;overflow:hidden;}
 .tiktok-photo-item .photo-bg{position:absolute;inset:0;background-size:cover;background-position:center;filter:blur(24px) brightness(0.35) saturate(1.4);transform:scale(1.1);z-index:0;pointer-events:none;}
 .tiktok-photo-item img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center;z-index:1;pointer-events:none;user-select:none;-webkit-user-drag:none;-webkit-touch-callout:none;display:block;}
-.tiktok-slide::after{content:'';position:absolute;bottom:0;left:0;right:0;height:62%;background:linear-gradient(to top,rgba(13,0,8,0.96) 0%,rgba(13,0,8,0.55) 45%,transparent 100%);pointer-events:none;z-index:2;}
+.tiktok-slide::after{content:’’;position:absolute;bottom:0;left:0;right:0;height:62%;background:linear-gradient(to top,rgba(13,0,8,0.96) 0%,rgba(13,0,8,0.55) 45%,transparent 100%);pointer-events:none;z-index:2;}
 .tiktok-photo-counter{position:absolute;top:14px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.45);backdrop-filter:blur(6px);border:1px solid rgba(255,182,193,0.35);border-radius:20px;padding:4px 14px;font-size:12px;color:#ffe6f0;z-index:6;display:none;letter-spacing:1px;}
 .tiktok-photo-counter.multi{display:block;}
 .tiktok-dots{position:absolute;bottom:210px;left:50%;transform:translateX(-50%);display:flex;gap:6px;z-index:5;}
@@ -132,8 +140,8 @@ body.modal-open{overflow:hidden;touch-action:none;}
 .tiktok-react-btn:active svg{transform:scale(1.4);}
 .tiktok-react-btn.liked svg{stroke:#ff2d78;fill:#ff2d78;filter:drop-shadow(0 0 10px rgba(255,45,120,0.8));}
 .tiktok-react-btn span{font-size:13px;font-weight:bold;text-shadow:0 1px 4px rgba(0,0,0,0.9);}
-.tk-heart{position:fixed;pointer-events:none;z-index:60002;animation:tkHeartFly var(--dur,1s) ease-out forwards;will-change:transform,opacity;line-height:1;}
-@keyframes tkHeartFly{0%{opacity:1;transform:translate(0,0) scale(1) rotate(var(--r0));}70%{opacity:0.85;}100%{opacity:0;transform:translate(var(--dx),var(--dy)) scale(var(--sf)) rotate(var(--r1));}}
+.tk-heart{position:fixed;pointer-events:none;z-index:60002;animation:tkHeartFly var(–dur,1s) ease-out forwards;will-change:transform,opacity;line-height:1;}
+@keyframes tkHeartFly{0%{opacity:1;transform:translate(0,0) scale(1) rotate(var(–r0));}70%{opacity:0.85;}100%{opacity:0;transform:translate(var(–dx),var(–dy)) scale(var(–sf)) rotate(var(–r1));}}
 #tkCommentModal{display:none;position:fixed;inset:0;z-index:60001;background:rgba(0,0,0,0.55);align-items:flex-end;justify-content:center;}
 #tkCommentModal.visible{display:flex;}
 #tkCommentBox{width:100%;max-width:500px;background:rgba(13,0,8,0.97);backdrop-filter:blur(20px);border-top:2px solid rgba(255,182,193,0.4);border-radius:22px 22px 0 0;padding:8px 16px max(env(safe-area-inset-bottom,0px),20px);max-height:70vh;display:flex;flex-direction:column;gap:8px;}
@@ -149,20 +157,67 @@ body.modal-open{overflow:hidden;touch-action:none;}
 #closeTiktok{position:fixed;top:14px;left:14px;width:38px;height:38px;background:rgba(13,0,8,0.6);backdrop-filter:blur(8px);border:2px solid rgba(255,182,193,0.5);border-radius:50%;display:none;align-items:center;justify-content:center;color:#ffe6f0;font-size:20px;font-weight:bold;cursor:pointer;z-index:50001;transition:transform 0.2s,background 0.2s;}
 #closeTiktok.visible{display:flex;}
 #closeTiktok:hover{transform:scale(1.12);background:rgba(255,45,120,0.45);}
+
+/* ===== MUSIC PICKER ===== */
+#musicPicker{position:fixed;inset:0;background:rgba(0,0,0,0.65);z-index:60000;display:none;justify-content:center;align-items:flex-end;}
+#musicPicker.visible{display:flex;}
+#musicPickerBox{width:100%;max-width:480px;background:linear-gradient(160deg,#1a0010,#0d0008);border-top:2px solid rgba(255,182,193,0.4);border-radius:24px 24px 0 0;padding:20px 20px max(env(safe-area-inset-bottom,0px),28px);display:flex;flex-direction:column;gap:14px;animation:slideUpPicker 0.3s cubic-bezier(0.34,1.3,0.64,1);}
+@keyframes slideUpPicker{from{transform:translateY(100%);}to{transform:translateY(0);}}
+#musicPickerHandle{width:40px;height:4px;background:rgba(255,182,193,0.4);border-radius:2px;margin:0 auto 6px;}
+#musicPickerTitle{color:#ffb6c1;font-size:16px;font-weight:bold;text-align:center;font-family:‘Comic Sans MS’,cursive;letter-spacing:1px;}
+.music-option{display:flex;align-items:center;gap:12px;background:rgba(255,182,193,0.07);border:1.5px solid rgba(255,182,193,0.2);border-radius:16px;padding:12px 14px;cursor:pointer;transition:background 0.2s,border-color 0.2s,transform 0.15s;}
+.music-option:hover{transform:scale(1.01);}
+.music-option.selected{background:rgba(255,182,193,0.18);border-color:#ffb6c1;box-shadow:0 0 12px rgba(255,182,193,0.2);}
+.music-option .music-icon{font-size:28px;flex-shrink:0;}
+.music-option .music-label{color:#ffe6f0;font-size:12px;font-family:‘Comic Sans MS’,cursive;line-height:1.4;}
+.music-option .music-label strong{display:block;font-size:14px;color:#ffb6c1;margin-bottom:2px;}
+#startSlideshowBtn{background:linear-gradient(135deg,#ff2d78,#b84c6f);border:none;border-radius:16px;padding:13px;color:#fff;font-size:15px;font-weight:bold;cursor:pointer;font-family:‘Comic Sans MS’,cursive;box-shadow:0 4px 14px rgba(255,45,120,0.45);transition:transform 0.15s,opacity 0.2s;}
+#startSlideshowBtn:hover:not(:disabled){transform:scale(1.03);}
+#startSlideshowBtn:disabled{opacity:0.35;cursor:not-allowed;}
+#cancelMusicPicker{background:none;border:none;color:rgba(255,182,193,0.45);font-size:12px;cursor:pointer;font-family:‘Comic Sans MS’,cursive;text-align:center;margin-top:-6px;}
+
+/* ===== SLIDESHOW OVERLAY ===== */
+#slideshowOverlay{display:none;position:fixed;inset:0;background:#0d0008;z-index:70000;overflow:hidden;}
+#slideshowOverlay.visible{display:block;}
+#slideshowBg{position:absolute;inset:0;background-size:cover;background-position:center;filter:blur(30px) brightness(0.28) saturate(1.5);transform:scale(1.1);z-index:0;transition:background-image 1s ease;}
+#slideshowImg{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center;z-index:1;transition:opacity 0.8s ease;}
+#slideshowImgNext{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center;z-index:1;opacity:0;transition:opacity 0.8s ease;}
+#slideshowGrad{position:absolute;inset:0;background:linear-gradient(to top,rgba(13,0,8,0.94) 0%,rgba(13,0,8,0.3) 50%,transparent 100%);z-index:2;pointer-events:none;}
+#slideshowProgress{position:absolute;top:0;left:0;height:3px;width:0%;background:linear-gradient(90deg,#ff2d78,#ffb6c1);z-index:5;transition:none;}
+#slideshowCounter{position:absolute;top:18px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.45);backdrop-filter:blur(6px);border:1px solid rgba(255,182,193,0.3);border-radius:20px;padding:4px 16px;font-size:12px;color:#ffe6f0;z-index:4;letter-spacing:1px;}
+#slideshowInfo{position:absolute;bottom:88px;left:18px;right:80px;z-index:3;color:#ffe6f0;}
+#slideshowInfo .s-title{font-size:20px;font-weight:bold;text-shadow:0 2px 10px rgba(0,0,0,0.9);margin-bottom:6px;line-height:1.2;}
+#slideshowInfo .s-legend{font-size:14px;color:rgba(255,230,240,0.75);text-shadow:0 1px 5px rgba(0,0,0,0.8);line-height:1.4;}
+#slideshowMusicBar{position:absolute;bottom:28px;left:18px;right:70px;z-index:3;display:flex;align-items:center;gap:10px;}
+#slideshowMusicName{color:rgba(255,230,240,0.55);font-size:11px;font-family:‘Comic Sans MS’,cursive;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+#slideshowMusicWave{display:flex;gap:3px;align-items:center;flex-shrink:0;}
+.wave-bar{width:3px;border-radius:2px;background:#ffb6c1;animation:waveAnim 0.8s ease-in-out infinite alternate;}
+.wave-bar:nth-child(1){height:8px;animation-delay:0s;}
+.wave-bar:nth-child(2){height:14px;animation-delay:0.15s;}
+.wave-bar:nth-child(3){height:10px;animation-delay:0.3s;}
+.wave-bar:nth-child(4){height:16px;animation-delay:0.1s;}
+.wave-bar:nth-child(5){height:8px;animation-delay:0.25s;}
+@keyframes waveAnim{from{transform:scaleY(0.4);}to{transform:scaleY(1);}}
+#closeSlideshow{position:absolute;top:14px;right:14px;width:38px;height:38px;background:rgba(13,0,8,0.6);backdrop-filter:blur(8px);border:2px solid rgba(255,182,193,0.5);border-radius:50%;display:flex;align-items:center;justify-content:center;color:#ffe6f0;font-size:20px;font-weight:bold;cursor:pointer;z-index:5;transition:transform 0.2s,background 0.2s;}
+#closeSlideshow:hover{transform:scale(1.12);background:rgba(255,45,120,0.4);}
+#slideshowPause{position:absolute;bottom:80px;right:18px;width:44px;height:44px;background:rgba(255,182,193,0.12);border:2px solid rgba(255,182,193,0.4);border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:4;font-size:18px;transition:background 0.2s;}
+#slideshowPause:hover{background:rgba(255,182,193,0.28);}
+
 /* MODAL NOTIFICATIONS */
 #notifModal{position:fixed;inset:0;background:rgba(0,0,0,0.6);display:none;justify-content:center;align-items:center;z-index:199999;}
 #notifModal.visible{display:flex;}
-#notifBox{background:#ffe6f0;border:3px solid #b67385;border-radius:24px;padding:24px;max-width:300px;width:90%;display:flex;flex-direction:column;align-items:center;gap:14px;font-family:'Comic Sans MS',cursive;text-align:center;}
+#notifBox{background:#ffe6f0;border:3px solid #b67385;border-radius:24px;padding:24px;max-width:300px;width:90%;display:flex;flex-direction:column;align-items:center;gap:14px;font-family:‘Comic Sans MS’,cursive;text-align:center;}
 #notifBox h3{color:#b84c6f;font-size:18px;}
 #notifBox p{color:#b84c6f;font-size:13px;line-height:1.5;}
 #notifStatusIcon{font-size:44px;}
-.notif-btn-yes{background:linear-gradient(#ffd6e6,#ffb6c1);border:2px solid #b67385;border-radius:14px;padding:10px 24px;color:#b84c6f;font-weight:bold;font-size:15px;cursor:pointer;width:100%;font-family:'Comic Sans MS',cursive;}
-.notif-btn-no{background:none;border:none;color:rgba(184,76,111,0.5);font-size:12px;cursor:pointer;font-family:'Comic Sans MS',cursive;margin-top:-6px;}
+.notif-btn-yes{background:linear-gradient(#ffd6e6,#ffb6c1);border:2px solid #b67385;border-radius:14px;padding:10px 24px;color:#b84c6f;font-weight:bold;font-size:15px;cursor:pointer;width:100%;font-family:‘Comic Sans MS’,cursive;}
+.notif-btn-no{background:none;border:none;color:rgba(184,76,111,0.5);font-size:12px;cursor:pointer;font-family:‘Comic Sans MS’,cursive;margin-top:-6px;}
 #notifBellBtn{position:fixed;bottom:24px;right:20px;width:50px;height:50px;border-radius:50%;background:linear-gradient(135deg,#ffd6e6,#ffb6c1);border:2px solid #b67385;box-shadow:0 2px 12px rgba(184,76,111,0.4);display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:10000;font-size:22px;transition:transform 0.2s;}
 #notifBellBtn:hover{transform:scale(1.1);}
 .notif-dot{position:absolute;top:4px;right:4px;width:11px;height:11px;border-radius:50%;background:#ff2d78;border:2px solid #fff;display:none;}
 .notif-dot.show{display:block;}
 </style>
+
 </head>
 <body>
 
@@ -175,6 +230,8 @@ body.modal-open{overflow:hidden;touch-action:none;}
   <div class="owner-ring"></div><div class="owner-ring"></div><div class="owner-ring"></div>
 </div>
 
+<!-- BOUTON TIKTOK -->
+
 <button id="tiktokBtn" title="Vue TikTok">
   <svg viewBox="0 0 24 24" fill="none" stroke="#b84c6f" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
     <rect x="2" y="3" width="20" height="14" rx="3"/>
@@ -183,12 +240,20 @@ body.modal-open{overflow:hidden;touch-action:none;}
   </svg>
 </button>
 
+<!-- BOUTON DIAPORAMA (apparait après clic TikTok) -->
+
+<button id="slideshowBtn">🎬 Diaporama</button>
+
+<!-- TIKTOK OVERLAY -->
+
 <div id="tiktokOverlay">
   <div id="tiktokFeed">
     <div id="tiktokTrack"></div>
   </div>
 </div>
 <div id="closeTiktok">×</div>
+
+<!-- COMMENTAIRES TIKTOK -->
 
 <div id="tkCommentModal">
   <div id="tkCommentBox">
@@ -200,6 +265,54 @@ body.modal-open{overflow:hidden;touch-action:none;}
       <button id="tkCommentSend">➤</button>
     </div>
   </div>
+</div>
+
+<!-- MUSIC PICKER -->
+
+<div id="musicPicker">
+  <div id="musicPickerBox">
+    <div id="musicPickerHandle"></div>
+    <div id="musicPickerTitle">🎵 Choisir la musique</div>
+    <div class="music-option" data-src="Christina Perri A Thousand Years Piano Cello Cover The Piano Guys.mp3">
+      <span class="music-icon">🎹</span>
+      <div class="music-label"><strong>A Thousand Years</strong>Christina Perri – The Piano Guys</div>
+    </div>
+    <div class="music-option" data-src="juliush-cinderella-waltz-warm-grand-piano-and-seattle-strings-8283.mp3">
+      <span class="music-icon">🎻</span>
+      <div class="music-label"><strong>Cinderella Waltz</strong>Julius H. – Grand Piano &amp; Strings</div>
+    </div>
+    <div class="music-option" data-src="victorvantast-fionax27s-fairy-song-152743.mp3">
+      <span class="music-icon">🧚</span>
+      <div class="music-label"><strong>Fiona's Fairy Song</strong>Victor Van Tast</div>
+    </div>
+    <button id="startSlideshowBtn" disabled>▶ Lancer le diaporama</button>
+    <button id="cancelMusicPicker">Annuler</button>
+  </div>
+</div>
+
+<!-- SLIDESHOW OVERLAY -->
+
+<div id="slideshowOverlay">
+  <div id="slideshowBg"></div>
+  <img id="slideshowImg" alt="" src="">
+  <img id="slideshowImgNext" alt="" src="">
+  <div id="slideshowGrad"></div>
+  <div id="slideshowProgress"></div>
+  <div id="slideshowCounter">1 / 1</div>
+  <div id="slideshowInfo">
+    <div class="s-title"></div>
+    <div class="s-legend"></div>
+  </div>
+  <div id="slideshowMusicBar">
+    <div id="slideshowMusicWave">
+      <div class="wave-bar"></div><div class="wave-bar"></div>
+      <div class="wave-bar"></div><div class="wave-bar"></div>
+      <div class="wave-bar"></div>
+    </div>
+    <div id="slideshowMusicName"></div>
+  </div>
+  <div id="closeSlideshow">×</div>
+  <div id="slideshowPause">⏸</div>
 </div>
 
 <div id="photoOverlay">
@@ -398,6 +511,21 @@ const tkCommentModal=document.getElementById('tkCommentModal');
 const tkCommentList=document.getElementById('tkCommentList');
 const tkCommentInput=document.getElementById('tkCommentInput');
 const tkCommentSend=document.getElementById('tkCommentSend');
+const slideshowBtn=document.getElementById('slideshowBtn');
+const musicPicker=document.getElementById('musicPicker');
+const startSlideshowBtn=document.getElementById('startSlideshowBtn');
+const cancelMusicPicker=document.getElementById('cancelMusicPicker');
+const slideshowOverlay=document.getElementById('slideshowOverlay');
+const slideshowImg=document.getElementById('slideshowImg');
+const slideshowImgNext=document.getElementById('slideshowImgNext');
+const slideshowBg=document.getElementById('slideshowBg');
+const slideshowProgress=document.getElementById('slideshowProgress');
+const slideshowCounter=document.getElementById('slideshowCounter');
+const slideshowInfoTitle=document.querySelector('#slideshowInfo .s-title');
+const slideshowInfoLegend=document.querySelector('#slideshowInfo .s-legend');
+const slideshowMusicName=document.getElementById('slideshowMusicName');
+const closeSlideshow=document.getElementById('closeSlideshow');
+const slideshowPause=document.getElementById('slideshowPause');
 let tkCurrentCreation=null,tkCurrentCommentBtn=null;
 
 // ===== TIKTOK =====
@@ -501,7 +629,6 @@ sendMsgBtn.onclick=async()=>{
   const text=chatInput.value.trim();if(!text||!currentChatUser)return;
   await supabase.from('messages').insert({sender:myPrenom,receiver:currentChatUser,content:text});
   chatInput.value='';loadMessages();
-  // Notif push
   try{if(window.sendPushToUser)window.sendPushToUser(myPrenom||'Message',text,'owner.html');}catch(e){}
 };
 let lastMsgId=null;
@@ -519,7 +646,6 @@ function showInAppNotification(sender,message){
   if(document.hidden){try{if(Notification.permission==='granted')new Notification(sender,{body:message,icon:userPhotos[sender]||'icon-152.png'});}catch(e){}}
   else{const notif=document.createElement('div');notif.textContent=`${sender} : ${message}`;notif.style.cssText='position:fixed;bottom:80px;right:20px;background:#ffb6c1;color:#fff;padding:10px 14px;border-radius:12px;z-index:99999;font-size:12px;';document.body.appendChild(notif);setTimeout(()=>notif.remove(),3000);}
 }
-// ⚠️ SUPPRIMÉ : Notification.requestPermission() automatique — cassait l'appli en PWA iOS
 
 // ===== CREATIONS =====
 async function refreshCreations(){
@@ -696,8 +822,196 @@ function buildTiktokFeed(list){
   });
   tkGoTo(0,false);
 }
-tiktokBtn.onclick=()=>{buildTiktokFeed(creations);initTkSwipe();tiktokOverlay.classList.add('visible');closeTiktok.classList.add('visible');document.body.style.overflow='hidden';};
-closeTiktok.onclick=()=>{closeTkComments();tiktokOverlay.classList.remove('visible');closeTiktok.classList.remove('visible');document.body.style.overflow='';};
+
+// ===== TIKTOK OPEN/CLOSE =====
+tiktokBtn.onclick=()=>{
+  buildTiktokFeed(creations);
+  initTkSwipe();
+  tiktokOverlay.classList.add('visible');
+  closeTiktok.classList.add('visible');
+  document.body.style.overflow='hidden';
+  // Afficher le bouton Diaporama
+  slideshowBtn.style.display='block';
+};
+closeTiktok.onclick=()=>{
+  closeTkComments();
+  tiktokOverlay.classList.remove('visible');
+  closeTiktok.classList.remove('visible');
+  document.body.style.overflow='';
+  slideshowBtn.style.display='none';
+};
+
+// ===== MUSIC PICKER =====
+let selectedMusicSrc=null;
+
+document.querySelectorAll('.music-option').forEach(opt=>{
+  opt.addEventListener('click',()=>{
+    document.querySelectorAll('.music-option').forEach(o=>o.classList.remove('selected'));
+    opt.classList.add('selected');
+    selectedMusicSrc=opt.dataset.src;
+    startSlideshowBtn.disabled=false;
+  });
+});
+
+slideshowBtn.onclick=()=>{
+  // Réinitialiser la sélection
+  document.querySelectorAll('.music-option').forEach(o=>o.classList.remove('selected'));
+  selectedMusicSrc=null;
+  startSlideshowBtn.disabled=true;
+  musicPicker.classList.add('visible');
+};
+
+cancelMusicPicker.onclick=()=>{musicPicker.classList.remove('visible');};
+musicPicker.addEventListener('click',e=>{if(e.target===musicPicker)musicPicker.classList.remove('visible');});
+document.getElementById('musicPickerBox').addEventListener('click',e=>e.stopPropagation());
+
+startSlideshowBtn.onclick=()=>{
+  if(!selectedMusicSrc)return;
+  musicPicker.classList.remove('visible');
+  launchSlideshow(selectedMusicSrc);
+};
+
+// ===== SLIDESHOW ENGINE =====
+let ssAudio=null,ssTimer=null,ssIndex=0,ssSlides=[],ssPaused=false,ssProgressStart=null,ssProgressRaf=null;
+const SS_DURATION=6000; // ms par slide
+
+function buildSlideshowSlides(){
+  return creations.filter(c=>c.imgUrl||(c.zoomGroup&&c.zoomGroup.length)).map(c=>{
+    const photos=(c.zoomGroup&&c.zoomGroup.length)?c.zoomGroup:[c.imgUrl];
+    return photos.map(url=>({url,name:c.name||'',legend:c.legend||''}));
+  }).flat();
+}
+
+function ssShowSlide(index,crossfade=true){
+  if(!ssSlides.length)return;
+  const slide=ssSlides[index];
+  slideshowCounter.textContent=`${index+1} / ${ssSlides.length}`;
+  slideshowInfoTitle.textContent=slide.name;
+  slideshowInfoLegend.textContent=slide.legend;
+  slideshowBg.style.backgroundImage=`url(${slide.url})`;
+  if(crossfade){
+    slideshowImgNext.src=slide.url;
+    slideshowImgNext.style.opacity='0';
+    slideshowImgNext.style.transition='opacity 0.8s ease';
+    // swap
+    setTimeout(()=>{
+      slideshowImg.src=slide.url;
+      slideshowImgNext.style.opacity='0';
+    },800);
+    slideshowImgNext.style.opacity='1';
+  }else{
+    slideshowImg.src=slide.url;
+    slideshowImgNext.style.opacity='0';
+  }
+}
+
+function ssStartProgress(){
+  slideshowProgress.style.transition='none';
+  slideshowProgress.style.width='0%';
+  // force reflow
+  slideshowProgress.getBoundingClientRect();
+  slideshowProgress.style.transition=`width ${SS_DURATION}ms linear`;
+  slideshowProgress.style.width='100%';
+}
+
+function ssNext(){
+  ssIndex=(ssIndex+1)%ssSlides.length;
+  ssShowSlide(ssIndex,true);
+  ssStartProgress();
+}
+
+function ssScheduleNext(){
+  clearTimeout(ssTimer);
+  if(!ssPaused)ssTimer=setTimeout(ssNext,SS_DURATION);
+}
+
+function launchSlideshow(musicSrc){
+  ssSlides=buildSlideshowSlides();
+  if(!ssSlides.length){alert('Aucune création à afficher !');return;}
+  ssIndex=0;ssPaused=false;
+  slideshowPause.textContent='⏸';
+
+  // Fermer TikTok si ouvert
+  closeTkComments();
+  tiktokOverlay.classList.remove('visible');
+  closeTiktok.classList.remove('visible');
+  slideshowBtn.style.display='none';
+
+  // Musique
+  if(ssAudio){ssAudio.pause();ssAudio=null;}
+  ssAudio=new Audio(musicSrc);
+  ssAudio.loop=true;ssAudio.volume=0;
+  ssAudio.play().catch(()=>{});
+  // Fade in audio
+  let vol=0;const fadeIn=setInterval(()=>{vol=Math.min(vol+0.05,1);ssAudio.volume=vol;if(vol>=1)clearInterval(fadeIn);},100);
+
+  // Nom musique
+  const names={'Christina Perri A Thousand Years Piano Cello Cover The Piano Guys.mp3':'🎹 A Thousand Years','juliush-cinderella-waltz-warm-grand-piano-and-seattle-strings-8283.mp3':'🎻 Cinderella Waltz','victorvantast-fionax27s-fairy-song-152743.mp3':'🧚 Fiona\'s Fairy Song'};
+  slideshowMusicName.textContent=names[musicSrc]||musicSrc;
+
+  slideshowOverlay.classList.add('visible');
+  document.body.style.overflow='hidden';
+
+  ssShowSlide(0,false);
+  ssStartProgress();
+  ssTimer=setTimeout(ssNext,SS_DURATION);
+}
+
+function stopSlideshow(){
+  clearTimeout(ssTimer);
+  if(ssAudio){
+    // Fade out
+    let vol=ssAudio.volume;
+    const fadeOut=setInterval(()=>{vol=Math.max(vol-0.08,0);ssAudio.volume=vol;if(vol<=0){clearInterval(fadeOut);ssAudio.pause();ssAudio=null;}},80);
+  }
+  slideshowOverlay.classList.remove('visible');
+  slideshowProgress.style.width='0%';
+  document.body.style.overflow='';
+  ssPaused=false;
+  slideshowPause.textContent='⏸';
+  // Réafficher bouton TikTok si on veut y retourner — on laisse fermé
+}
+
+closeSlideshow.onclick=()=>stopSlideshow();
+
+slideshowPause.onclick=()=>{
+  ssPaused=!ssPaused;
+  slideshowPause.textContent=ssPaused?'▶':'⏸';
+  if(ssPaused){
+    clearTimeout(ssTimer);
+    slideshowProgress.style.transition='none';
+    // Garder la largeur actuelle
+    const w=getComputedStyle(slideshowProgress).width;
+    const total=slideshowProgress.parentElement.clientWidth||window.innerWidth;
+    slideshowProgress.style.width=w;
+    if(ssAudio)ssAudio.pause();
+  }else{
+    // Reprendre
+    if(ssAudio)ssAudio.play().catch(()=>{});
+    // Relancer depuis début de slide courante
+    ssShowSlide(ssIndex,false);
+    ssStartProgress();
+    ssTimer=setTimeout(ssNext,SS_DURATION);
+  }
+};
+
+// Swipe gauche/droite sur slideshow pour naviguer
+(()=>{
+  let sx=0,sy=0;
+  slideshowOverlay.addEventListener('touchstart',e=>{sx=e.touches[0].clientX;sy=e.touches[0].clientY;},{passive:true});
+  slideshowOverlay.addEventListener('touchend',e=>{
+    const dx=e.changedTouches[0].clientX-sx;
+    const dy=e.changedTouches[0].clientY-sy;
+    if(Math.abs(dx)>Math.abs(dy)&&Math.abs(dx)>40){
+      clearTimeout(ssTimer);
+      if(dx<0)ssIndex=(ssIndex+1)%ssSlides.length;
+      else ssIndex=(ssIndex-1+ssSlides.length)%ssSlides.length;
+      ssShowSlide(ssIndex,true);
+      ssStartProgress();
+      if(!ssPaused)ssTimer=setTimeout(ssNext,SS_DURATION);
+    }
+  },{passive:true});
+})();
 
 // ===== REALTIME =====
 function setupRealtime() {
@@ -757,7 +1071,6 @@ setTimeout(setupRealtime, 500);
     else{dot.classList.add('show');}
   }
 
-  // Bouton cloche — toujours fonctionnel
   document.getElementById('notifBellBtn').onclick=()=>document.getElementById('notifModal').classList.add('visible');
   document.getElementById('notifCloseBtn').onclick=()=>document.getElementById('notifModal').classList.remove('visible');
   document.getElementById('notifModal').onclick=function(e){if(e.target===this)this.classList.remove('visible');};
@@ -777,7 +1090,6 @@ setTimeout(setupRealtime, 500);
     }
   };
 
-  // Init SW en arrière-plan — silencieux
   if('serviceWorker'in navigator&&'PushManager'in window){
     if('Notification'in window)updateBellUI(Notification.permission);
     navigator.serviceWorker.register('/sw.js',{updateViaCache:'none'}).then(reg=>{
