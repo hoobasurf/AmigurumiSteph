@@ -271,7 +271,7 @@ document.getElementById('viewAllBtn').addEventListener('click', showAllDrawers);
 
 // HOBBII
 document.getElementById('hobbii-board').addEventListener('click', () => {
-  window.location.href = 'https://hobbii.fr';
+  window.open('https://hobbii.fr', '_blank');
 });
 
 // TIROIRS
@@ -283,8 +283,10 @@ document.querySelectorAll('.drawer-btn').forEach(btn => {
 
 function openDrawer(num, name) {
   const d = drawersData[num];
+
   const overlay = document.createElement('div');
   overlay.className = 'overlay';
+
   const modal = document.createElement('div');
   modal.className = 'drawer-modal';
 
@@ -292,7 +294,7 @@ function openDrawer(num, name) {
     '<h2>Tiroir ' + num + ' \u2013 ' + name + '</h2>' +
     '<div class="modal-content">' +
       '<div class="counter-section">' +
-        '<div class="counter-label">\uD83E\uDDF6 Nombre de pelotes</div>' +
+        '<div class="counter-label">🧶 Nombre de pelotes</div>' +
         '<div class="counter-controls">' +
           '<button class="counter-btn" id="dec' + num + '">\u2212</button>' +
           '<div class="counter-value" id="cnt' + num + '">' + (d.count || 0) + '</div>' +
@@ -301,20 +303,22 @@ function openDrawer(num, name) {
       '</div>' +
       '<div class="photo-section">' +
         '<div class="photo-preview" id="prev' + num + '">' +
-          (d.photo ? '<img src="' + d.photo + '" alt="">' : '<div class="photo-preview-empty">Aucune photo</div>') +
+          (d.photo
+            ? '<img src="' + d.photo + '" alt="">'
+            : '<div class="photo-preview-empty">Aucune photo</div>') +
         '</div>' +
         '<input type="file" id="file' + num + '" accept="image/*">' +
-        '<button class="photo-btn" id="pbtn' + num + '">\uD83D\uDCF7 ' + (d.photo ? 'Changer' : 'Ajouter') + ' une photo</button>' +
+        '<button class="photo-btn" id="pbtn' + num + '">📷 ' + (d.photo ? 'Changer' : 'Ajouter') + ' une photo</button>' +
       '</div>' +
       '<div class="notes-section">' +
-        '<label>Notes / R\u00e9f\u00e9rences :</label>' +
-        '<textarea id="notes' + num + '" placeholder="Marque, num\u00e9ro de lot...">' + (d.notes || '') + '</textarea>' +
+        '<label>Notes / Références :</label>' +
+        '<textarea id="notes' + num + '" placeholder="Marque, numéro de lot...">' + (d.notes || '') + '</textarea>' +
 
 ```
   '</div>' +
 '</div>' +
 '<div class="modal-buttons">' +
-  '<button class="save-btn" id="save' + num + '">\uD83D\uDCBE Enregistrer</button>' +
+  '<button class="save-btn" id="save' + num + '">💾 Enregistrer</button>' +
   '<button class="close-btn" id="cls' + num + '">Fermer</button>' +
 '</div>';
 ```
@@ -327,10 +331,17 @@ d.count = (d.count || 0) + 1;
 document.getElementById(‘cnt’ + num).textContent = d.count;
 await saveDrawer(num);
 };
+
 document.getElementById(‘dec’ + num).onclick = async () => {
-if (d.count > 0) { d.count–; document.getElementById(‘cnt’ + num).textContent = d.count; await saveDrawer(num); }
+if (d.count > 0) {
+d.count–;
+document.getElementById(‘cnt’ + num).textContent = d.count;
+await saveDrawer(num);
+}
 };
+
 document.getElementById(‘pbtn’ + num).onclick = () => document.getElementById(‘file’ + num).click();
+
 document.getElementById(‘file’ + num).onchange = async (e) => {
 const file = e.target.files[0];
 if (!file) return;
@@ -340,15 +351,19 @@ const url = await window.uploadImage(file);
 document.getElementById(‘prev’ + num).innerHTML = ‘<img src="' + url + '" alt="">’;
 d.photo = url;
 await saveDrawer(num);
-alert(’\u2705 Photo upload\u00e9e !’);
-} catch(err) { alert(’\u274C Erreur: ’ + err.message); }
+alert(‘✅ Photo uploadée !’);
+} catch(err) {
+alert(’❌ Erreur: ’ + err.message);
+}
 document.getElementById(‘loading’).style.display = ‘none’;
 };
+
 document.getElementById(‘save’ + num).onclick = async () => {
 d.notes = document.getElementById(‘notes’ + num).value;
 await saveDrawer(num);
-alert(’\u2705 Tiroir sauvegard\u00e9 !’);
+alert(‘✅ Tiroir sauvegardé !’);
 };
+
 const close = () => { modal.remove(); overlay.remove(); };
 document.getElementById(‘cls’ + num).onclick = close;
 overlay.onclick = (e) => { if (e.target === overlay) close(); };
@@ -357,19 +372,21 @@ overlay.onclick = (e) => { if (e.target === overlay) close(); };
 function showAllDrawers() {
 const overlay = document.createElement(‘div’);
 overlay.className = ‘overlay’;
-overlay.id = ‘ov-all’;
+
 const modal = document.createElement(‘div’);
 modal.className = ‘drawers-grid-modal’;
-modal.id = ‘modal-all’;
 
-let html = ‘<h2>\uD83D\uDCE6 Tous les tiroirs</h2><div class="drawers-grid">’;
+let html = ‘<h2>📦 Tous les tiroirs</h2><div class="drawers-grid">’;
 for (let i = 1; i <= 16; i++) {
 const d = drawersData[i];
-html += ‘<div class="drawer-card" data-drawer="' + i + '" data-name="' + d.name + '">’ +
+html +=
+‘<div class="drawer-card" data-drawer="' + i + '" data-name="' + d.name + '">’ +
 ’<div class="drawer-card-num">Tiroir ’ + i + ‘</div>’ +
 ‘<div class="drawer-card-name">’ + d.name + ‘</div>’ +
-‘<div class="drawer-card-count">\uD83E\uDDF6 ’ + (d.count || 0) + ’ pelote(s)</div>’ +
-‘<div class="drawer-card-preview">’ + (d.photo ? ‘<img src="' + d.photo + '">’ : ‘\uD83D\uDCF7’) + ‘</div>’ +
+‘<div class="drawer-card-count">🧶 ’ + (d.count || 0) + ’ pelote(s)</div>’ +
+‘<div class="drawer-card-preview">’ +
+(d.photo ? ‘<img src="' + d.photo + '">’ : ‘📷’) +
+‘</div>’ +
 ‘</div>’;
 }
 html += ‘</div><div class="modal-buttons"><button class="close-btn" id="cls-all">Fermer</button></div>’;
@@ -384,6 +401,7 @@ modal.remove(); overlay.remove();
 openDrawer(parseInt(card.dataset.drawer), card.dataset.name);
 });
 });
+
 const closeAll = () => { modal.remove(); overlay.remove(); };
 document.getElementById(‘cls-all’).onclick = closeAll;
 overlay.onclick = (e) => { if (e.target === overlay) closeAll(); };
