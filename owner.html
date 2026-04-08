@@ -899,26 +899,16 @@ function buildSlideshowSlides(){
   }).flat();
 }
 
-function ssShowSlide(index,crossfade=true){
+function ssShowSlide(index){
   if(!ssSlides.length)return;
   const slide=ssSlides[index];
   slideshowCounter.textContent=`${index+1} / ${ssSlides.length}`;
   slideshowInfoTitle.textContent=slide.name;
   slideshowInfoLegend.textContent=slide.legend;
   slideshowBg.style.backgroundImage=`url(${slide.url})`;
-  if(crossfade){
-    slideshowImgNext.src=slide.url;
-    slideshowImgNext.style.opacity='0';
-    slideshowImgNext.style.transition='opacity 0.8s ease';
-    setTimeout(()=>{
-      slideshowImg.src=slide.url;
-      slideshowImgNext.style.opacity='0';
-    },800);
-    slideshowImgNext.style.opacity='1';
-  }else{
-    slideshowImg.src=slide.url;
-    slideshowImgNext.style.opacity='0';
-  }
+  slideshowImg.style.opacity='0';
+  slideshowImg.src=slide.url;
+  slideshowImg.onload=()=>{slideshowImg.style.transition='opacity 0.6s ease';slideshowImg.style.opacity='1';};
 }
 
 function ssStartProgress(){
@@ -930,9 +920,11 @@ function ssStartProgress(){
 }
 
 function ssNext(){
+  clearTimeout(ssTimer);
   ssIndex=(ssIndex+1)%ssSlides.length;
-  ssShowSlide(ssIndex,true);
+  ssShowSlide(ssIndex);
   ssStartProgress();
+  ssTimer=setTimeout(ssNext,SS_DURATION);
 }
 
 function launchSlideshow(musicSrc){
@@ -962,7 +954,7 @@ function launchSlideshow(musicSrc){
   slideshowOverlay.classList.add('visible');
   document.body.style.overflow='hidden';
 
-  ssShowSlide(0,false);
+  ssShowSlide(0);
   ssStartProgress();
   ssTimer=setTimeout(ssNext,SS_DURATION);
 }
@@ -993,7 +985,7 @@ slideshowPause.onclick=()=>{
     if(ssAudio)ssAudio.pause();
   }else{
     if(ssAudio)ssAudio.play().catch(()=>{});
-    ssShowSlide(ssIndex,false);
+    ssShowSlide(ssIndex);
     ssStartProgress();
     ssTimer=setTimeout(ssNext,SS_DURATION);
   }
@@ -1009,7 +1001,7 @@ slideshowPause.onclick=()=>{
       clearTimeout(ssTimer);
       if(dx<0)ssIndex=(ssIndex+1)%ssSlides.length;
       else ssIndex=(ssIndex-1+ssSlides.length)%ssSlides.length;
-      ssShowSlide(ssIndex,true);
+      ssShowSlide(ssIndex);
       ssStartProgress();
       if(!ssPaused)ssTimer=setTimeout(ssNext,SS_DURATION);
     }
