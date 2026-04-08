@@ -104,6 +104,7 @@ body {
   padding:10px;
   border-top:2px solid #b67385;
   background:#fff0f5;
+  align-items:center;
 }
 
 #input-bar input {
@@ -141,9 +142,38 @@ body {
 <div id="chat-container"></div>
 
 <div id="input-bar">
+
+  <div style="position:relative;">
+    <button id="media-btn" style="width:44px;height:44px;border:none;background:none;cursor:pointer;padding:0;flex-shrink:0;">
+      <div style="width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,#ff8fab,#ffb6c1,#ffc8dd);display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(255,100,150,0.35);transition:transform .15s;">
+        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+          <rect x="3" y="5" width="13" height="10" rx="2" fill="white" opacity="0.9"/>
+          <circle cx="6.5" cy="8" r="1.2" fill="#ffb6c1"/>
+          <polyline points="3,13 7,9 10,12 13,8.5 16,13" fill="none" stroke="#ffb6c1" stroke-width="1.2" stroke-linejoin="round"/>
+          <circle cx="18" cy="17" r="4.5" fill="#ff8fab"/>
+          <line x1="18" y1="14.5" x2="18" y2="19.5" stroke="white" stroke-width="1.8" stroke-linecap="round"/>
+          <line x1="15.5" y1="17" x2="20.5" y2="17" stroke="white" stroke-width="1.8" stroke-linecap="round"/>
+        </svg>
+      </div>
+    </button>
+
+```
+<div id="media-menu" style="display:none;position:absolute;bottom:58px;left:0;background:#fff0f5;border:2px solid #ffb6c1;border-radius:16px;padding:8px 6px;box-shadow:0 4px 18px rgba(255,100,150,0.2);z-index:500;flex-direction:column;gap:4px;min-width:150px;">
+  <button id="opt-photo" style="display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:12px;cursor:pointer;font-family:'Comic Sans MS',cursive;font-size:13px;color:#b84c6f;border:none;background:transparent;width:100%;">📷 Photo</button>
+  <button id="opt-video" style="display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:12px;cursor:pointer;font-family:'Comic Sans MS',cursive;font-size:13px;color:#b84c6f;border:none;background:transparent;width:100%;">🎬 Vidéo</button>
+  <button id="opt-file"  style="display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:12px;cursor:pointer;font-family:'Comic Sans MS',cursive;font-size:13px;color:#b84c6f;border:none;background:transparent;width:100%;">📎 Fichier</button>
+</div>
+```
+
+  </div>
+
   <input id="message-input" placeholder="Écrire un message...">
   <button id="send-btn">Envoyer</button>
 </div>
+
+<input type="file" id="file-input-photo" accept="image/*" style="display:none">
+<input type="file" id="file-input-video" accept="video/*" style="display:none">
+<input type="file" id="file-input-file" style="display:none">
 
 <script src="image-handler.js"></script>
 
@@ -190,6 +220,49 @@ document.getElementById('backBtn').onclick = () => {
     window.location.href = 'owner.html';
   }, 500);
 };
+
+/* ===== MEDIA BUTTON ===== */
+const mediaMenu = document.getElementById('media-menu');
+
+document.getElementById('media-btn').onclick = (e) => {
+  e.stopPropagation();
+  mediaMenu.style.display = mediaMenu.style.display === 'flex' ? 'none' : 'flex';
+};
+document.addEventListener('click', () => mediaMenu.style.display = 'none');
+mediaMenu.addEventListener('click', e => e.stopPropagation());
+
+document.getElementById('opt-photo').onclick = () => { mediaMenu.style.display='none'; document.getElementById('file-input-photo').click(); };
+document.getElementById('opt-video').onclick = () => { mediaMenu.style.display='none'; document.getElementById('file-input-video').click(); };
+document.getElementById('opt-file').onclick  = () => { mediaMenu.style.display='none'; document.getElementById('file-input-file').click(); };
+
+document.getElementById('file-input-photo').onchange = (e) => {
+  const file = e.target.files[0]; if(!file) return;
+  const url = URL.createObjectURL(file);
+  const msg = document.createElement('div'); msg.className='message you';
+  msg.innerHTML=`<img src="${url}" style="max-width:200px;max-height:200px;border-radius:10px;display:block;">`;
+  chatContainer.appendChild(msg); chatContainer.scrollTop=chatContainer.scrollHeight;
+  e.target.value="";
+};
+
+document.getElementById('file-input-video').onchange = (e) => {
+  const file = e.target.files[0]; if(!file) return;
+  const url = URL.createObjectURL(file);
+  const msg = document.createElement('div'); msg.className='message you';
+  msg.innerHTML=`<video src="${url}" controls style="max-width:220px;border-radius:10px;display:block;"></video>`;
+  chatContainer.appendChild(msg); chatContainer.scrollTop=chatContainer.scrollHeight;
+  e.target.value="";
+};
+
+document.getElementById('file-input-file').onchange = (e) => {
+  const file = e.target.files[0]; if(!file) return;
+  const url = URL.createObjectURL(file);
+  const size = (file.size/1024).toFixed(1);
+  const msg = document.createElement('div'); msg.className='message you';
+  msg.innerHTML=`<div style="display:flex;align-items:center;gap:8px;font-size:13px;">📎 <div><div style="font-weight:bold">${file.name}</div><div style="opacity:.7">${size} Ko</div></div> <a href="${url}" download="${file.name}" style="color:#ff8fab;">⬇</a></div>`;
+  chatContainer.appendChild(msg); chatContainer.scrollTop=chatContainer.scrollHeight;
+  e.target.value="";
+};
+
 </script>
 
 </body>
