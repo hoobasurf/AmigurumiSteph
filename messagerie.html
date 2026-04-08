@@ -157,15 +157,30 @@ body {
       </div>
     </button>
 
-```
-<div id="media-menu" style="display:none;position:absolute;bottom:58px;left:0;background:#fff0f5;border:2px solid #ffb6c1;border-radius:16px;padding:8px 6px;box-shadow:0 4px 18px rgba(255,100,150,0.2);z-index:500;flex-direction:column;gap:4px;min-width:150px;">
-  <button id="opt-photo" style="display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:12px;cursor:pointer;font-family:'Comic Sans MS',cursive;font-size:13px;color:#b84c6f;border:none;background:transparent;width:100%;">📷 Photo</button>
-  <button id="opt-video" style="display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:12px;cursor:pointer;font-family:'Comic Sans MS',cursive;font-size:13px;color:#b84c6f;border:none;background:transparent;width:100%;">🎬 Vidéo</button>
-  <button id="opt-file"  style="display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:12px;cursor:pointer;font-family:'Comic Sans MS',cursive;font-size:13px;color:#b84c6f;border:none;background:transparent;width:100%;">📎 Fichier</button>
-</div>
-```
-
+    <div id="media-menu" style="display:none;position:absolute;bottom:58px;left:0;background:#fff0f5;border:2px solid #ffb6c1;border-radius:16px;padding:8px 6px;box-shadow:0 4px 18px rgba(255,100,150,0.2);z-index:500;flex-direction:column;gap:4px;min-width:150px;">
+      <button id="opt-photo" style="display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:12px;cursor:pointer;font-family:'Comic Sans MS',cursive;font-size:13px;color:#b84c6f;border:none;background:transparent;width:100%;">📷 Photo</button>
+      <button id="opt-video" style="display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:12px;cursor:pointer;font-family:'Comic Sans MS',cursive;font-size:13px;color:#b84c6f;border:none;background:transparent;width:100%;">🎬 Vidéo</button>
+      <button id="opt-file"  style="display:flex;align-items:center;gap:10px;padding:8px 12px;border-radius:12px;cursor:pointer;font-family:'Comic Sans MS',cursive;font-size:13px;color:#b84c6f;border:none;background:transparent;width:100%;">📎 Fichier</button>
+    </div>
   </div>
+
+  <!-- ===== NOUVEAU BOUTON ENVOYER PHOTO ===== -->
+  <button id="quick-photo-btn" style="width:44px;height:44px;border:none;background:none;cursor:pointer;padding:0;flex-shrink:0;">
+    <div style="width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,#c9a0dc,#e0b8f5,#f3d6ff);display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(180,100,255,0.35);">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+        <rect x="2" y="6" width="20" height="14" rx="3" fill="white" opacity="0.9"/>
+        <circle cx="12" cy="13" r="4" fill="none" stroke="#c9a0dc" stroke-width="1.8"/>
+        <circle cx="12" cy="13" r="1.8" fill="#c9a0dc"/>
+        <rect x="8" y="4" width="8" height="3" rx="1.5" fill="white" opacity="0.9"/>
+        <circle cx="18.5" cy="8.5" r="1" fill="#c9a0dc"/>
+        <!-- flèche vers le haut = envoyer -->
+        <circle cx="19" cy="19" r="4.5" fill="#c9a0dc"/>
+        <polyline points="19,21.5 19,16.5" stroke="white" stroke-width="1.8" stroke-linecap="round"/>
+        <polyline points="16.8,18.3 19,16.5 21.2,18.3" fill="none" stroke="white" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </div>
+  </button>
+  <!-- ===== FIN NOUVEAU BOUTON ===== -->
 
   <input id="message-input" placeholder="Écrire un message...">
   <button id="send-btn">Envoyer</button>
@@ -174,6 +189,7 @@ body {
 <input type="file" id="file-input-photo" accept="image/*" style="display:none">
 <input type="file" id="file-input-video" accept="video/*" style="display:none">
 <input type="file" id="file-input-file" style="display:none">
+<input type="file" id="file-input-quick-photo" accept="image/*" style="display:none">
 
 <script src="image-handler.js"></script>
 
@@ -262,6 +278,21 @@ document.getElementById('file-input-file').onchange = (e) => {
   chatContainer.appendChild(msg); chatContainer.scrollTop=chatContainer.scrollHeight;
   e.target.value="";
 };
+
+/* ===== NOUVEAU BOUTON QUICK PHOTO ===== */
+document.getElementById('quick-photo-btn').onclick = () => {
+  document.getElementById('file-input-quick-photo').click();
+};
+
+document.getElementById('file-input-quick-photo').onchange = (e) => {
+  const file = e.target.files[0]; if(!file) return;
+  const url = URL.createObjectURL(file);
+  const msg = document.createElement('div'); msg.className='message you';
+  msg.innerHTML=`<img src="${url}" style="max-width:200px;max-height:200px;border-radius:10px;display:block;">`;
+  chatContainer.appendChild(msg); chatContainer.scrollTop=chatContainer.scrollHeight;
+  e.target.value="";
+};
+/* ===== FIN NOUVEAU BOUTON ===== */
 
 </script>
 
