@@ -101,7 +101,7 @@ display:none;
 box-shadow:0 2px 10px rgba(184,76,111,0.35);
 transition:transform 0.2s,box-shadow 0.2s;
 white-space:nowrap;
-font-family:‘Comic Sans MS’,cursive;
+font-family:'Comic Sans MS',cursive;
 animation:popBtn 0.25s cubic-bezier(0.34,1.56,0.64,1);
 }
 #slideshowBtn:hover{transform:scale(1.07);box-shadow:0 4px 18px rgba(184,76,111,0.5);}
@@ -117,7 +117,7 @@ animation:popBtn 0.25s cubic-bezier(0.34,1.56,0.64,1);
 .tiktok-photo-item{flex:0 0 100vw;width:100vw;height:100vh;height:100svh;scroll-snap-align:start;scroll-snap-stop:always;position:relative;overflow:hidden;}
 .tiktok-photo-item .photo-bg{position:absolute;inset:0;background-size:cover;background-position:center;filter:blur(24px) brightness(0.35) saturate(1.4);transform:scale(1.1);z-index:0;pointer-events:none;}
 .tiktok-photo-item img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center;z-index:1;pointer-events:none;user-select:none;-webkit-user-drag:none;-webkit-touch-callout:none;display:block;}
-.tiktok-slide::after{content:’’;position:absolute;bottom:0;left:0;right:0;height:62%;background:linear-gradient(to top,rgba(13,0,8,0.96) 0%,rgba(13,0,8,0.55) 45%,transparent 100%);pointer-events:none;z-index:2;}
+.tiktok-slide::after{content:'';position:absolute;bottom:0;left:0;right:0;height:62%;background:linear-gradient(to top,rgba(13,0,8,0.96) 0%,rgba(13,0,8,0.55) 45%,transparent 100%);pointer-events:none;z-index:2;}
 .tiktok-photo-counter{position:absolute;top:14px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.45);backdrop-filter:blur(6px);border:1px solid rgba(255,182,193,0.35);border-radius:20px;padding:4px 14px;font-size:12px;color:#ffe6f0;z-index:6;display:none;letter-spacing:1px;}
 .tiktok-photo-counter.multi{display:block;}
 .tiktok-dots{position:absolute;bottom:210px;left:50%;transform:translateX(-50%);display:flex;gap:6px;z-index:5;}
@@ -131,8 +131,6 @@ animation:popBtn 0.25s cubic-bezier(0.34,1.56,0.64,1);
 .tiktok-react-btn svg{width:40px;height:40px;filter:drop-shadow(0 2px 6px rgba(0,0,0,0.7));transition:transform 0.18s cubic-bezier(0.34,1.56,0.64,1);}
 .tiktok-react-btn:active svg{transform:scale(1.4);}
 .tiktok-react-btn.liked svg{stroke:#ff2d78;fill:#ff2d78;filter:drop-shadow(0 0 10px rgba(255,45,120,0.8));}
-.tiktok-react-btn span{font-size:13px;font-weight:bold;text-shadow:0 1px 4px rgba(0,0,0,0.9);}
-
 .tk-heart{position:fixed;pointer-events:none;z-index:60002;animation:tkHeartFly var(–dur,1s) ease-out forwards;will-change:transform,opacity;line-height:1;}
 @keyframes tkHeartFly{0%{opacity:1;transform:translate(0,0) scale(1) rotate(var(–r0));}70%{opacity:0.85;}100%{opacity:0;transform:translate(var(–dx),var(–dy)) scale(var(–sf)) rotate(var(–r1));}}
 
@@ -159,17 +157,17 @@ animation:popBtn 0.25s cubic-bezier(0.34,1.56,0.64,1);
 #musicPickerBox{width:100%;max-width:480px;background:linear-gradient(160deg,#1a0010,#0d0008);border-top:2px solid rgba(255,182,193,0.4);border-radius:24px 24px 0 0;padding:20px 20px max(env(safe-area-inset-bottom,0px),28px);display:flex;flex-direction:column;gap:14px;animation:slideUpPicker 0.3s cubic-bezier(0.34,1.3,0.64,1);}
 @keyframes slideUpPicker{from{transform:translateY(100%);}to{transform:translateY(0);}}
 #musicPickerHandle{width:40px;height:4px;background:rgba(255,182,193,0.4);border-radius:2px;margin:0 auto 6px;}
-#musicPickerTitle{color:#ffb6c1;font-size:16px;font-weight:bold;text-align:center;font-family:‘Comic Sans MS’,cursive;letter-spacing:1px;}
+#musicPickerTitle{color:#ffb6c1;font-size:16px;font-weight:bold;text-align:center;font-family:'Comic Sans MS',cursive;letter-spacing:1px;}
 .music-option{display:flex;align-items:center;gap:12px;background:rgba(255,182,193,0.07);border:1.5px solid rgba(255,182,193,0.2);border-radius:16px;padding:12px 14px;cursor:pointer;transition:background 0.2s,border-color 0.2s,transform 0.15s;}
 .music-option:hover{transform:scale(1.01);}
 .music-option.selected{background:rgba(255,182,193,0.18);border-color:#ffb6c1;box-shadow:0 0 12px rgba(255,182,193,0.2);}
 .music-option .music-icon{font-size:28px;flex-shrink:0;}
-.music-option .music-label{color:#ffe6f0;font-size:12px;font-family:‘Comic Sans MS’,cursive;line-height:1.4;}
+.music-option .music-label{color:#ffe6f0;font-size:12px;font-family:'Comic Sans MS',cursive;line-height:1.4;}
 .music-option .music-label strong{display:block;font-size:14px;color:#ffb6c1;margin-bottom:2px;}
-#startSlideshowBtn{background:linear-gradient(135deg,#ff2d78,#b84c6f);border:none;border-radius:16px;padding:13px;color:#fff;font-size:15px;font-weight:bold;cursor:pointer;font-family:‘Comic Sans MS’,cursive;box-shadow:0 4px 14px rgba(255,45,120,0.45);transition:transform 0.15s,opacity 0.2s;}
+#startSlideshowBtn{background:linear-gradient(135deg,#ff2d78,#b84c6f);border:none;border-radius:16px;padding:13px;color:#fff;font-size:15px;font-weight:bold;cursor:pointer;font-family:'Comic Sans MS',cursive;box-shadow:0 4px 14px rgba(255,45,120,0.45);transition:transform 0.15s,opacity 0.2s;}
 #startSlideshowBtn:hover:not(:disabled){transform:scale(1.03);}
 #startSlideshowBtn:disabled{opacity:0.35;cursor:not-allowed;}
-#cancelMusicPicker{background:none;border:none;color:rgba(255,182,193,0.45);font-size:12px;cursor:pointer;font-family:‘Comic Sans MS’,cursive;text-align:center;margin-top:-6px;}
+#cancelMusicPicker{background:none;border:none;color:rgba(255,182,193,0.45);font-size:12px;cursor:pointer;font-family:'Comic Sans MS',cursive;text-align:center;margin-top:-6px;}
 
 /* ===== SLIDESHOW OVERLAY ===== */
 #slideshowOverlay{display:none;position:fixed;inset:0;background:#0d0008;z-index:70000;overflow:hidden;}
@@ -184,7 +182,7 @@ animation:popBtn 0.25s cubic-bezier(0.34,1.56,0.64,1);
 #slideshowInfo .s-title{font-size:20px;font-weight:bold;text-shadow:0 2px 10px rgba(0,0,0,0.9);margin-bottom:6px;line-height:1.2;}
 #slideshowInfo .s-legend{font-size:14px;color:rgba(255,230,240,0.75);text-shadow:0 1px 5px rgba(0,0,0,0.8);line-height:1.4;}
 #slideshowMusicBar{position:absolute;bottom:28px;left:18px;right:70px;z-index:3;display:flex;align-items:center;gap:10px;}
-#slideshowMusicName{color:rgba(255,230,240,0.55);font-size:11px;font-family:‘Comic Sans MS’,cursive;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+#slideshowMusicName{color:rgba(255,230,240,0.55);font-size:11px;font-family:'Comic Sans MS',cursive;flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 #slideshowMusicWave{display:flex;gap:3px;align-items:center;flex-shrink:0;}
 .wave-bar{width:3px;border-radius:2px;background:#ffb6c1;animation:waveAnim 0.8s ease-in-out infinite alternate;}
 .wave-bar:nth-child(1){height:8px;animation-delay:0s;}
@@ -492,16 +490,93 @@ function loadOwnerPhoto(){
   if(cached){ownerPhoto.src=cached;}
   else{ownerPhoto.src='icon-152.png';}
 }
-function openOverlay(){overlayImg.src=ownerPhoto.src||'icon-152.png';document.getElementById('overlayPrenom').textContent=prenom||'';photoOverlay.classList.add('visible');}
-document.addEventListener('click',e=>{if(e.target!==ownerPhoto&&e.target!==editPhotoBtn)editPhotoBtn.style.display='none';});
-let longPressTimer=null,longPressTriggered=false;
-function startLongPress(){longPressTriggered=false;ownerRings.style.opacity='1';ownerRings.classList.add('pulsing');longPressTimer=setTimeout(()=>{longPressTriggered=true;ownerRings.classList.remove('pulsing');ownerRings.style.opacity='0';editPhotoBtn.style.display='block';},800);}
-function endLongPress(){clearTimeout(longPressTimer);ownerRings.classList.remove('pulsing');ownerRings.style.opacity='0';}
-ownerPhoto.addEventListener('mousedown',startLongPress);ownerPhoto.addEventListener('mouseup',endLongPress);ownerPhoto.addEventListener('mouseleave',endLongPress);
-ownerPhoto.addEventListener('click',()=>{if(editPhotoBtn.style.display==='block'){editPhotoBtn.style.display='none';return;}openOverlay();});
-ownerPhoto.addEventListener('touchstart',startLongPress,{passive:true});
-ownerPhoto.addEventListener('touchend',e=>{endLongPress();if(!longPressTriggered)openOverlay();longPressTriggered=false;});
-ownerPhoto.addEventListener('touchcancel',endLongPress);
+
+function openOverlay(){
+  overlayImg.src=ownerPhoto.src||'icon-152.png';
+  document.getElementById('overlayPrenom').textContent=prenom||'';
+  photoOverlay.classList.add('visible');
+}
+
+// =====================================================
+// CORRECTION ANDROID/iOS : gestion unifiée touch/click
+// =====================================================
+let longPressTimer=null;
+let longPressTriggered=false;
+let touchHandled=false; // flag pour bloquer le click fantôme Android
+
+function startLongPress(){
+  longPressTriggered=false;
+  ownerRings.style.opacity='1';
+  ownerRings.classList.add('pulsing');
+  longPressTimer=setTimeout(()=>{
+    longPressTriggered=true;
+    ownerRings.classList.remove('pulsing');
+    ownerRings.style.opacity='0';
+    editPhotoBtn.style.display='block';
+  },800);
+}
+
+function cancelLongPress(){
+  clearTimeout(longPressTimer);
+  ownerRings.classList.remove('pulsing');
+  ownerRings.style.opacity='0';
+}
+
+// Touch events (iOS + Android)
+ownerPhoto.addEventListener('touchstart', e=>{
+  touchHandled=true;
+  startLongPress();
+}, {passive:true});
+
+ownerPhoto.addEventListener('touchend', e=>{
+  cancelLongPress();
+  if(!longPressTriggered){
+    // tap court → overlay
+    openOverlay();
+  }
+  longPressTriggered=false;
+  // Bloquer le click fantôme Android pendant 400ms
+  setTimeout(()=>{ touchHandled=false; }, 400);
+}, {passive:true});
+
+ownerPhoto.addEventListener('touchcancel', e=>{
+  cancelLongPress();
+  longPressTriggered=false;
+  setTimeout(()=>{ touchHandled=false; }, 400);
+}, {passive:true});
+
+// Mouse events (desktop uniquement, ignorés si touch déjà géré)
+ownerPhoto.addEventListener('mousedown', e=>{
+  if(touchHandled) return;
+  startLongPress();
+});
+ownerPhoto.addEventListener('mouseup', e=>{
+  if(touchHandled) return;
+  cancelLongPress();
+});
+ownerPhoto.addEventListener('mouseleave', e=>{
+  if(touchHandled) return;
+  cancelLongPress();
+});
+
+// Click (desktop uniquement — bloqué sur mobile via touchHandled)
+ownerPhoto.addEventListener('click', e=>{
+  if(touchHandled) return;
+  if(editPhotoBtn.style.display==='block'){
+    editPhotoBtn.style.display='none';
+    return;
+  }
+  openOverlay();
+});
+
+// Fermer editPhotoBtn au clic ailleurs
+document.addEventListener('click', e=>{
+  if(e.target!==ownerPhoto && e.target!==editPhotoBtn){
+    editPhotoBtn.style.display='none';
+  }
+});
+// =====================================================
+
 editPhotoBtn.onclick=()=>{editPhotoBtn.style.display='none';ownerFileInput.click();};
 ownerFileInput.onchange=async()=>{
   const file=ownerFileInput.files[0];if(!file)return;
