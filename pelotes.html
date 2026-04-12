@@ -9,7 +9,6 @@
 * { margin:0; padding:0; box-sizing:border-box; }
 body { font-family:'Comic Sans MS',cursive; overflow:hidden; }
 
-/* SIDEBAR */
 #sidebar {
 position:fixed; top:0; left:-220px;
 width:220px; height:100vh;
@@ -43,21 +42,18 @@ font-family:‘Comic Sans MS’,cursive;
 }
 #sidebar button:hover { background:#ff69b4; }
 
-/* BOUTONS ZONES CLIQUABLES */
 .clickable-btn {
 position:fixed;
 background:transparent; border:none;
 cursor:pointer; z-index:500;
 }
 
-/* OVERLAY */
 .overlay {
 position:fixed; inset:0;
 background:rgba(0,0,0,0.7);
 z-index:9999; backdrop-filter:blur(3px);
 }
 
-/* MODALE TIROIR */
 .drawer-modal {
 position:fixed; top:50%; left:50%;
 transform:translate(-50%,-50%);
@@ -83,7 +79,6 @@ background:#ffb6c1; border:none; color:white;
 width:40px; height:40px; border-radius:50%;
 font-size:22px; font-weight:bold; cursor:pointer;
 }
-.counter-btn:hover { background:#ff69b4; }
 .counter-value {
 background:white; color:#ff69b4;
 padding:6px 20px; border-radius:20px;
@@ -107,7 +102,6 @@ padding:7px 14px; background:#ffb6c1; border:none;
 border-radius:8px; color:white; cursor:pointer; font-size:11px; font-weight:bold;
 font-family:‘Comic Sans MS’,cursive;
 }
-.photo-btn:hover { background:#ff69b4; }
 
 .notes-section { display:flex; flex-direction:column; gap:6px; }
 .notes-section label { color:#b67385; font-weight:bold; font-size:13px; }
@@ -125,10 +119,8 @@ font-weight:bold; cursor:pointer; font-size:13px;
 font-family:‘Comic Sans MS’,cursive;
 }
 .save-btn { background:#ffb6c1; color:white; }
-.save-btn:hover { background:#ff69b4; }
 .close-btn { background:#ddd; color:#666; }
 
-/* GRILLE TOUS LES TIROIRS */
 .drawers-grid-modal {
 position:fixed; top:50%; left:50%;
 transform:translate(-50%,-50%);
@@ -144,7 +136,6 @@ border:3px solid #ffb6c1;
 background:white; border:2px solid #ffb6c1; border-radius:12px;
 padding:15px; cursor:pointer; transition:all 0.2s;
 }
-.drawer-card:hover { transform:translateY(-3px); border-color:#ff69b4; }
 .drawer-card-num { font-size:18px; font-weight:bold; color:#ff69b4; margin-bottom:5px; }
 .drawer-card-name { font-size:14px; color:#b67385; }
 .drawer-card-count { font-size:13px; color:#ff69b4; font-weight:bold; margin-top:5px; }
@@ -164,16 +155,25 @@ color:white; font-size:18px; z-index:10001;
 background:rgba(0,0,0,0.8); padding:20px 40px;
 border-radius:12px; display:none;
 }
+
+/* DEBUG */
+#debugBox {
+position:fixed; bottom:10px; left:10px; right:10px;
+background:rgba(0,0,0,0.8); color:#0f0;
+font-family:monospace; font-size:11px;
+padding:8px; border-radius:8px;
+z-index:99999; max-height:120px; overflow-y:auto;
+display:block;
+}
 </style>
 
 </head>
 <body>
 
-<!-- FOND IMAGE -->
-
 <div style="position:fixed;top:0;left:0;width:100vw;height:100vh;background-image:url('Photoroom_20260118_214442.png');background-size:cover;background-position:center;background-repeat:no-repeat;z-index:0;pointer-events:none;"></div>
 
 <div id="loading">Chargement...</div>
+<div id="debugBox">⏳ Init...</div>
 
 <div id="sidebar">
   <button id="backBtn">← Retour</button>
@@ -213,6 +213,12 @@ border-radius:12px; display:none;
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <script>
+function dbg(msg) {
+  const box = document.getElementById('debugBox');
+  if (box) box.innerHTML += '<br>' + msg;
+  console.log(msg);
+}
+
 const SUPABASE_URL = 'https://kdgxbmqwhpuctjtlygrt.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtkZ3hibXF3aHB1Y3RqdGx5Z3J0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUyMjY0NzQsImV4cCI6MjA5MDgwMjQ3NH0.9RsIj_bQgJskg9raRGN6uQJwUUlByTvWAFF2Eq9f6KM';
 let sb = null;
@@ -224,24 +230,35 @@ for (let i = 1; i <= 16; i++) {
 }
 
 window.addEventListener('load', () => {
+  dbg('✅ window.load OK');
+  dbg('supabase lib: ' + (typeof window.supabase));
+  dbg('uploadImage: ' + (typeof window.uploadImage));
+
   if (window.supabase) {
     sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+    dbg('✅ Supabase client créé');
     loadAll();
+  } else {
+    dbg('❌ window.supabase manquant');
   }
 });
 
 async function loadAll() {
   document.getElementById('loading').style.display = 'block';
   try {
-    const { data } = await sb.from('drawers').select('*');
-    if (data) data.forEach(d => {
-      if (drawersData[d.drawer_number]) {
-        drawersData[d.drawer_number].photo = d.photo_url || null;
-        drawersData[d.drawer_number].notes = d.notes || '';
-        drawersData[d.drawer_number].count = d.count || 0;
-      }
-    });
-  } catch(e) { console.error(e); }
+    const { data, error } = await sb.from('drawers').select('*');
+    if (error) { dbg('❌ Supabase erreur: ' + error.message); }
+    else {
+      dbg('✅ Drawers chargés: ' + (data ? data.length : 0));
+      if (data) data.forEach(d => {
+        if (drawersData[d.drawer_number]) {
+          drawersData[d.drawer_number].photo = d.photo_url || null;
+          drawersData[d.drawer_number].notes = d.notes || '';
+          drawersData[d.drawer_number].count = d.count || 0;
+        }
+      });
+    }
+  } catch(e) { dbg('❌ Exception: ' + e.message); }
   document.getElementById('loading').style.display = 'none';
 }
 
@@ -261,6 +278,7 @@ const sidebar = document.getElementById('sidebar');
 const toggle = document.getElementById('toggleSidebar');
 
 toggle.addEventListener('click', () => {
+  dbg('Toggle cliqué');
   sidebar.classList.toggle('open');
   toggle.classList.toggle('open');
 });
@@ -272,14 +290,18 @@ document.getElementById('backBtn').addEventListener('click', () => {
 document.getElementById('viewAllBtn').addEventListener('click', showAllDrawers);
 
 document.getElementById('hobbii-board').addEventListener('click', () => {
+  dbg('Hobbii cliqué');
   window.open('https://hobbii.fr', '_blank');
 });
 
 document.querySelectorAll('.drawer-btn').forEach(btn => {
   btn.addEventListener('click', () => {
+    dbg('Tiroir ' + btn.dataset.drawer + ' cliqué');
     openDrawer(parseInt(btn.dataset.drawer), btn.dataset.name);
   });
 });
+
+dbg('✅ Listeners attachés');
 
 function openDrawer(num, name) {
   const d = drawersData[num];
@@ -370,7 +392,6 @@ overlay.onclick = (e) => { if (e.target === overlay) close(); };
 function showAllDrawers() {
 const overlay = document.createElement(‘div’);
 overlay.className = ‘overlay’;
-
 const modal = document.createElement(‘div’);
 modal.className = ‘drawers-grid-modal’;
 
