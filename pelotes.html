@@ -136,6 +136,7 @@ border:3px solid #ffb6c1;
 background:white; border:2px solid #ffb6c1; border-radius:12px;
 padding:15px; cursor:pointer; transition:all 0.2s;
 }
+.drawer-card:hover { transform:scale(1.03); box-shadow:0 4px 12px rgba(255,182,193,0.4); }
 .drawer-card-num { font-size:18px; font-weight:bold; color:#ff69b4; margin-bottom:5px; }
 .drawer-card-name { font-size:14px; color:#b67385; }
 .drawer-card-count { font-size:13px; color:#ff69b4; font-weight:bold; margin-top:5px; }
@@ -155,16 +156,6 @@ color:white; font-size:18px; z-index:10001;
 background:rgba(0,0,0,0.8); padding:20px 40px;
 border-radius:12px; display:none;
 }
-
-/* DEBUG */
-#debugBox {
-position:fixed; bottom:10px; left:10px; right:10px;
-background:rgba(0,0,0,0.8); color:#0f0;
-font-family:monospace; font-size:11px;
-padding:8px; border-radius:8px;
-z-index:99999; max-height:120px; overflow-y:auto;
-display:block;
-}
 </style>
 
 </head>
@@ -173,7 +164,6 @@ display:block;
 <div style="position:fixed;top:0;left:0;width:100vw;height:100vh;background-image:url('Photoroom_20260118_214442.png');background-size:cover;background-position:center;background-repeat:no-repeat;z-index:0;pointer-events:none;"></div>
 
 <div id="loading">Chargement...</div>
-<div id="debugBox">⏳ Init...</div>
 
 <div id="sidebar">
   <button id="backBtn">← Retour</button>
@@ -188,7 +178,7 @@ display:block;
   </button>
 </div>
 
-<div id="toggleSidebar">☰</div>
+<button id="toggleSidebar">☰</button>
 
 <button class="clickable-btn" id="hobbii-board"  style="top:9.7%;left:26.5%;width:48.3%;height:19.8%"></button>
 <button class="clickable-btn drawer-btn" data-drawer="1"  data-name="Blanc"        style="top:45.6%;left:4.9%;width:20.6%;height:5.3%"></button>
@@ -213,12 +203,6 @@ display:block;
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <script>
-function dbg(msg) {
-  const box = document.getElementById('debugBox');
-  if (box) box.innerHTML += '<br>' + msg;
-  console.log(msg);
-}
-
 const SUPABASE_URL = 'https://kdgxbmqwhpuctjtlygrt.supabase.co';
 const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtkZ3hibXF3aHB1Y3RqdGx5Z3J0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUyMjY0NzQsImV4cCI6MjA5MDgwMjQ3NH0.9RsIj_bQgJskg9raRGN6uQJwUUlByTvWAFF2Eq9f6KM';
 let sb = null;
@@ -229,181 +213,194 @@ for (let i = 1; i <= 16; i++) {
   drawersData[i] = { name: NAMES[i], photo: null, notes: '', count: 0 };
 }
 
-window.addEventListener('load', () => {
-  dbg('✅ window.load OK');
-  dbg('supabase lib: ' + (typeof window.supabase));
-  dbg('uploadImage: ' + (typeof window.uploadImage));
-
+window.addEventListener('load', function() {
   if (window.supabase) {
     sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-    dbg('✅ Supabase client créé');
     loadAll();
-  } else {
-    dbg('❌ window.supabase manquant');
   }
 });
 
 async function loadAll() {
   document.getElementById('loading').style.display = 'block';
   try {
-    const { data, error } = await sb.from('drawers').select('*');
-    if (error) { dbg('❌ Supabase erreur: ' + error.message); }
-    else {
-      dbg('✅ Drawers chargés: ' + (data ? data.length : 0));
-      if (data) data.forEach(d => {
+    var res = await sb.from('drawers').select('*');
+    if (!res.error && res.data) {
+      res.data.forEach(function(d) {
         if (drawersData[d.drawer_number]) {
-          drawersData[d.drawer_number].photo = d.photo_url || null;
-          drawersData[d.drawer_number].notes = d.notes || '';
-          drawersData[d.drawer_number].count = d.count || 0;
+          drawersData[d.drawer_number].photo  = d.photo_url || null;
+          drawersData[d.drawer_number].notes  = d.notes    || '';
+          drawersData[d.drawer_number].count  = d.count    || 0;
         }
       });
     }
-  } catch(e) { dbg('❌ Exception: ' + e.message); }
+  } catch(e) {}
   document.getElementById('loading').style.display = 'none';
 }
 
 async function saveDrawer(num) {
   if (!sb) return;
-  const d = drawersData[num];
-  const { data: ex } = await sb.from('drawers').select('id').eq('drawer_number', num).single();
-  if (ex) {
-    await sb.from('drawers').update({ photo_url: d.photo, notes: d.notes, count: d.count, updated_at: new Date().toISOString() }).eq('drawer_number', num);
+  var d = drawersData[num];
+  var ex = await sb.from('drawers').select('id').eq('drawer_number', num).single();
+  if (ex.data) {
+    await sb.from('drawers').update({
+      photo_url:  d.photo,
+      notes:      d.notes,
+      count:      d.count,
+      updated_at: new Date().toISOString()
+    }).eq('drawer_number', num);
   } else {
-    await sb.from('drawers').insert({ drawer_number: num, name: d.name, photo_url: d.photo, notes: d.notes, count: d.count });
+    await sb.from('drawers').insert({
+      drawer_number: num,
+      name:      d.name,
+      photo_url: d.photo,
+      notes:     d.notes,
+      count:     d.count
+    });
   }
 }
 
-// SIDEBAR
-const sidebar = document.getElementById('sidebar');
-const toggle = document.getElementById('toggleSidebar');
+// ===== SIDEBAR =====
+var sidebar  = document.getElementById('sidebar');
+var toggleBtn = document.getElementById('toggleSidebar');
 
-toggle.addEventListener('click', () => {
-  dbg('Toggle cliqué');
+toggleBtn.addEventListener('click', function() {
   sidebar.classList.toggle('open');
-  toggle.classList.toggle('open');
+  toggleBtn.classList.toggle('open');
 });
 
-document.getElementById('backBtn').addEventListener('click', () => {
+document.getElementById('backBtn').addEventListener('click', function() {
   window.location.href = 'owner.html';
 });
 
 document.getElementById('viewAllBtn').addEventListener('click', showAllDrawers);
 
-document.getElementById('hobbii-board').addEventListener('click', () => {
-  dbg('Hobbii cliqué');
+document.getElementById('hobbii-board').addEventListener('click', function() {
   window.open('https://hobbii.fr', '_blank');
 });
 
-document.querySelectorAll('.drawer-btn').forEach(btn => {
-  btn.addEventListener('click', () => {
-    dbg('Tiroir ' + btn.dataset.drawer + ' cliqué');
+document.querySelectorAll('.drawer-btn').forEach(function(btn) {
+  btn.addEventListener('click', function() {
     openDrawer(parseInt(btn.dataset.drawer), btn.dataset.name);
   });
 });
 
-dbg('✅ Listeners attachés');
-
+// ===== OPEN DRAWER MODAL =====
 function openDrawer(num, name) {
-  const d = drawersData[num];
+  var d = drawersData[num];
 
-  const overlay = document.createElement('div');
+  var overlay = document.createElement('div');
   overlay.className = 'overlay';
 
-  const modal = document.createElement('div');
+  var modal = document.createElement('div');
   modal.className = 'drawer-modal';
+
+  var photoHtml = d.photo
+    ? '<img src="' + d.photo + '" alt="">'
+    : '<div class="photo-preview-empty">Aucune photo</div>';
 
   modal.innerHTML =
     '<h2>Tiroir ' + num + ' \u2013 ' + name + '</h2>' +
     '<div class="modal-content">' +
       '<div class="counter-section">' +
-        '<div class="counter-label">🧶 Nombre de pelotes</div>' +
+        '<div class="counter-label">\uD83E\uDDF6 Nombre de pelotes</div>' +
         '<div class="counter-controls">' +
-          '<button class="counter-btn" id="dec' + num + '">\u2212</button>' +
-          '<div class="counter-value" id="cnt' + num + '">' + (d.count || 0) + '</div>' +
-          '<button class="counter-btn" id="inc' + num + '">+</button>' +
+          '<button class="counter-btn" id="btn-dec-' + num + '">\u2212</button>' +
+          '<div class="counter-value"  id="cnt-'     + num + '">' + (d.count || 0) + '</div>' +
+          '<button class="counter-btn" id="btn-inc-' + num + '">+</button>' +
         '</div>' +
       '</div>' +
       '<div class="photo-section">' +
-        '<div class="photo-preview" id="prev' + num + '">' +
-          (d.photo ? '<img src="' + d.photo + '" alt="">' : '<div class="photo-preview-empty">Aucune photo</div>') +
-        '</div>' +
-        '<input type="file" id="file' + num + '" accept="image/*">' +
-        '<button class="photo-btn" id="pbtn' + num + '">📷 ' + (d.photo ? 'Changer' : 'Ajouter') + ' une photo</button>' +
+        '<div class="photo-preview" id="prev-' + num + '">' + photoHtml + '</div>' +
+        '<input type="file" id="file-' + num + '" accept="image/*">' +
+        '<button class="photo-btn"  id="pbtn-' + num + '">\uD83D\uDCF7 ' + (d.photo ? 'Changer' : 'Ajouter') + ' une photo</button>' +
       '</div>' +
       '<div class="notes-section">' +
-        '<label>Notes / Références :</label>' +
-        '<textarea id="notes' + num + '" placeholder="Marque, numéro de lot...">' + (d.notes || '') + '</textarea>' +
+        '<label>Notes / R\u00e9f\u00e9rences :</label>' +
+        '<textarea id="notes-' + num + '" placeholder="Marque, num\u00e9ro de lot...">' + (d.notes || '') + '</textarea>' +
 
 ```
   '</div>' +
 '</div>' +
 '<div class="modal-buttons">' +
-  '<button class="save-btn" id="save' + num + '">💾 Enregistrer</button>' +
-  '<button class="close-btn" id="cls' + num + '">Fermer</button>' +
+  '<button class="save-btn"  id="save-' + num + '">\uD83D\uDCBE Enregistrer</button>' +
+  '<button class="close-btn" id="cls-'  + num + '">Fermer</button>' +
 '</div>';
 ```
 
 document.body.appendChild(overlay);
 document.body.appendChild(modal);
 
-document.getElementById(‘inc’ + num).onclick = async () => {
+// Compteur +
+document.getElementById(‘btn-inc-’ + num).onclick = async function() {
 d.count = (d.count || 0) + 1;
-document.getElementById(‘cnt’ + num).textContent = d.count;
+document.getElementById(‘cnt-’ + num).textContent = d.count;
 await saveDrawer(num);
 };
 
-document.getElementById(‘dec’ + num).onclick = async () => {
+// Compteur -
+document.getElementById(‘btn-dec-’ + num).onclick = async function() {
 if (d.count > 0) {
 d.count–;
-document.getElementById(‘cnt’ + num).textContent = d.count;
+document.getElementById(‘cnt-’ + num).textContent = d.count;
 await saveDrawer(num);
 }
 };
 
-document.getElementById(‘pbtn’ + num).onclick = () => document.getElementById(‘file’ + num).click();
+// Photo
+document.getElementById(‘pbtn-’ + num).onclick = function() {
+document.getElementById(‘file-’ + num).click();
+};
 
-document.getElementById(‘file’ + num).onchange = async (e) => {
-const file = e.target.files[0];
+document.getElementById(‘file-’ + num).onchange = async function(e) {
+var file = e.target.files[0];
 if (!file) return;
 document.getElementById(‘loading’).style.display = ‘block’;
 try {
-const url = await window.uploadImage(file);
-document.getElementById(‘prev’ + num).innerHTML = ‘<img src="' + url + '" alt="">’;
+var url = await window.uploadImage(file);
+document.getElementById(‘prev-’ + num).innerHTML = ‘<img src="' + url + '" alt="">’;
 d.photo = url;
 await saveDrawer(num);
-alert(‘✅ Photo uploadée !’);
+alert(’\u2705 Photo upload\u00e9e !’);
 } catch(err) {
-alert(’❌ Erreur: ’ + err.message);
+alert(’\u274C Erreur: ’ + err.message);
 }
 document.getElementById(‘loading’).style.display = ‘none’;
 };
 
-document.getElementById(‘save’ + num).onclick = async () => {
-d.notes = document.getElementById(‘notes’ + num).value;
+// Sauvegarder notes
+document.getElementById(‘save-’ + num).onclick = async function() {
+d.notes = document.getElementById(‘notes-’ + num).value;
 await saveDrawer(num);
-alert(‘✅ Tiroir sauvegardé !’);
+alert(’\u2705 Tiroir sauvegard\u00e9 !’);
 };
 
-const close = () => { modal.remove(); overlay.remove(); };
-document.getElementById(‘cls’ + num).onclick = close;
-overlay.onclick = (e) => { if (e.target === overlay) close(); };
+// Fermer
+function closeModal() {
+modal.remove();
+overlay.remove();
+}
+document.getElementById(‘cls-’ + num).onclick = closeModal;
+overlay.onclick = function(e) { if (e.target === overlay) closeModal(); };
 }
 
+// ===== SHOW ALL DRAWERS =====
 function showAllDrawers() {
-const overlay = document.createElement(‘div’);
+var overlay = document.createElement(‘div’);
 overlay.className = ‘overlay’;
-const modal = document.createElement(‘div’);
+
+var modal = document.createElement(‘div’);
 modal.className = ‘drawers-grid-modal’;
 
-let html = ‘<h2>📦 Tous les tiroirs</h2><div class="drawers-grid">’;
-for (let i = 1; i <= 16; i++) {
-const d = drawersData[i];
+var html = ‘<h2>\uD83D\uDCE6 Tous les tiroirs</h2><div class="drawers-grid">’;
+for (var i = 1; i <= 16; i++) {
+var d = drawersData[i];
+var previewHtml = d.photo ? ‘<img src="' + d.photo + '">’ : ‘\uD83D\uDCF7’;
 html +=
 ‘<div class="drawer-card" data-drawer="' + i + '" data-name="' + d.name + '">’ +
 ’<div class="drawer-card-num">Tiroir ’ + i + ‘</div>’ +
 ‘<div class="drawer-card-name">’ + d.name + ‘</div>’ +
-‘<div class="drawer-card-count">🧶 ’ + (d.count || 0) + ’ pelote(s)</div>’ +
-‘<div class="drawer-card-preview">’ + (d.photo ? ‘<img src="' + d.photo + '">’ : ‘📷’) + ‘</div>’ +
+‘<div class="drawer-card-count">\uD83E\uDDF6 ’ + (d.count || 0) + ’ pelote(s)</div>’ +
+‘<div class="drawer-card-preview">’ + previewHtml + ‘</div>’ +
 ‘</div>’;
 }
 html += ‘</div><div class="modal-buttons"><button class="close-btn" id="cls-all">Fermer</button></div>’;
@@ -412,16 +409,17 @@ modal.innerHTML = html;
 document.body.appendChild(overlay);
 document.body.appendChild(modal);
 
-modal.querySelectorAll(’.drawer-card’).forEach(card => {
-card.addEventListener(‘click’, () => {
-modal.remove(); overlay.remove();
+modal.querySelectorAll(’.drawer-card’).forEach(function(card) {
+card.addEventListener(‘click’, function() {
+modal.remove();
+overlay.remove();
 openDrawer(parseInt(card.dataset.drawer), card.dataset.name);
 });
 });
 
-const closeAll = () => { modal.remove(); overlay.remove(); };
+function closeAll() { modal.remove(); overlay.remove(); }
 document.getElementById(‘cls-all’).onclick = closeAll;
-overlay.onclick = (e) => { if (e.target === overlay) closeAll(); };
+overlay.onclick = function(e) { if (e.target === overlay) closeAll(); };
 }
 </script>
 
