@@ -8,17 +8,7 @@
 <style>
 html, body { margin:0; padding:0; height:100%; font-family:'Comic Sans MS', cursive; transition: opacity 0.5s; }
 
-/* FOND IMAGE */
-body::before {
-content:””;
-position:fixed;
-inset:0;
-background-image:url(‘Photoroom_20260106_224222.png’);
-background-size:cover;
-background-position:center;
-background-repeat:no-repeat;
-z-index:-1;
-}
+/* FOND IMAGE : via div inline */
 
 /* BOUTON RETOUR HAUT DROITE */
 #returnBtnFixed {
@@ -162,6 +152,7 @@ overflow: hidden;
 
 <!-- BOUTON RETOUR FIXE HAUT DROITE -->
 
+<div id="bg" style="position:fixed;top:0;left:0;width:100vw;height:100vh;background-image:url('Photoroom_20260106_224222.png');background-size:cover;background-position:center center;background-repeat:no-repeat;z-index:-1;pointer-events:none;"></div>
 <button id="returnBtnFixed">← Retour</button>
 
 <div id="sidebar">
