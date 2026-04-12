@@ -1,393 +1,287 @@
 <!DOCTYPE html>
-
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Tiroirs Hobbii</title>
+<title>Accueil</title>
 <style>
-* { margin:0; padding:0; box-sizing:border-box; }
-body { font-family:'Comic Sans MS',cursive; overflow:hidden; background:#000; }
+* { box-sizing: border-box; margin:0; padding:0; font-family:'Comic Sans MS',cursive; }
 
-#background {
-position:fixed; inset:0;
-background-image:url(‘Photoroom_20260118_214442.png’);
-background-size:cover; background-position:center;
-z-index:1; pointer-events:none;
-}
-
-/* SIDEBAR */
-#sidebar {
-position:fixed; top:0; left:-220px;
-width:220px; height:100vh;
-background:rgba(255,230,240,0.97);
-border-right:2px solid #b67385;
-padding:60px 20px 20px;
-transition:left .3s; z-index:9000;
-}
-#sidebar.open { left:0; }
-
-#toggleSidebar {
-position:fixed; top:50%; left:0;
-transform:translateY(-50%);
-width:30px; height:60px;
-background:#ffb6c1;
-border-radius:0 12px 12px 0;
-display:flex; align-items:center; justify-content:center;
-cursor:pointer; font-weight:bold; z-index:9001;
-transition:left .3s;
-}
-#toggleSidebar.open { left:220px; }
-
-#sidebar button {
-display:flex; align-items:center; justify-content:center; gap:8px;
-width:100%; padding:10px 16px; margin-top:12px;
-border:none; border-radius:16px;
-background:#ffb6c1; color:#fff;
-font-weight:bold; font-size:14px; cursor:pointer;
-}
-#sidebar button:hover { background:#ff69b4; }
-
-/* BOUTONS ZONES CLIQUABLES */
-.clickable-btn {
-position:fixed;
-background:transparent; border:none;
-cursor:pointer; z-index:100;
+html, body {
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex-direction: column;
+  background: linear-gradient(135deg, #ffe6f0, #ffb6c1, #ffc0cb);
+  background-size: 600% 600%;
+  animation: gradientShift 20s ease infinite;
+  color: #b84c6f;
+  overflow: hidden;
 }
 
-/* OVERLAY */
-.overlay {
-position:fixed; inset:0;
-background:rgba(0,0,0,0.7);
-z-index:9999; backdrop-filter:blur(3px);
+@keyframes gradientShift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
 }
 
-/* MODALE TIROIR */
-.drawer-modal {
-position:fixed; top:50%; left:50%;
-transform:translate(-50%,-50%);
-background:linear-gradient(145deg,#ffe6f0,#ffd6e8);
-padding:25px; border-radius:20px;
-box-shadow:0 10px 40px rgba(0,0,0,0.3);
-z-index:10000;
-min-width:300px; max-width:90vw;
-max-height:90vh; overflow-y:auto;
-border:3px solid #ffb6c1;
-}
-.drawer-modal h2 { color:#ff69b4; margin-bottom:15px; text-align:center; font-size:20px; }
-.modal-content { display:flex; flex-direction:column; gap:12px; }
-
-.counter-section {
-background:rgba(255,182,193,0.3); border:2px solid #ffb6c1;
-padding:15px; border-radius:12px; text-align:center;
-}
-.counter-label { color:#ff69b4; font-size:14px; font-weight:bold; margin-bottom:10px; }
-.counter-controls { display:flex; justify-content:center; align-items:center; gap:12px; }
-.counter-btn {
-background:#ffb6c1; border:none; color:white;
-width:40px; height:40px; border-radius:50%;
-font-size:22px; font-weight:bold; cursor:pointer;
-}
-.counter-btn:hover { background:#ff69b4; }
-.counter-value {
-background:white; color:#ff69b4;
-padding:6px 20px; border-radius:20px;
-font-size:24px; font-weight:bold; min-width:60px; text-align:center;
+h2 {
+  margin-bottom: 30px;
+  font-size: 36px;
+  text-align: center;
+  text-shadow: 1px 1px 2px rgba(255,255,255,0.7);
 }
 
-.photo-section { display:flex; flex-direction:column; gap:8px; }
-.photo-preview {
-width:100%; height:150px;
-display:flex; align-items:center; justify-content:center; overflow:hidden;
-}
-.photo-preview img { width:100%; height:100%; object-fit:contain; }
-.photo-preview-empty {
-color:#ffb6c1; font-size:13px; text-align:center;
-background:#fff0f5; border:2px dashed #ffb6c1; border-radius:12px;
-width:100%; height:100%;
-display:flex; align-items:center; justify-content:center;
-}
-.photo-btn {
-padding:7px 14px; background:#ffb6c1; border:none;
-border-radius:8px; color:white; cursor:pointer; font-size:11px; font-weight:bold;
-}
-.photo-btn:hover { background:#ff69b4; }
-
-.notes-section { display:flex; flex-direction:column; gap:6px; }
-.notes-section label { color:#b67385; font-weight:bold; font-size:13px; }
-.notes-section textarea {
-width:100%; min-height:80px; padding:10px;
-border:2px solid #ffb6c1; border-radius:12px;
-background:#fff0f5; color:#b84c6f;
-font-family:‘Comic Sans MS’,cursive; font-size:13px; resize:vertical;
+/* Cercle central chat */
+#appLogo {
+  width: 180px;
+  height: 180px;
+  border-radius: 50%;
+  border: 3px solid #b67385;
+  object-fit: cover;
+  margin-bottom: 30px;
+  animation: glow 3s ease-in-out infinite alternate;
 }
 
-.modal-buttons { display:flex; gap:8px; margin-top:8px; }
-.modal-buttons button {
-flex:1; padding:10px; border:none; border-radius:10px;
-font-weight:bold; cursor:pointer; font-size:13px;
+@keyframes glow {
+  0% { box-shadow: 0 0 10px rgba(233,79,154,0.3); }
+  100% { box-shadow: 0 0 25px rgba(233,79,154,0.5); }
 }
-.save-btn { background:#ffb6c1; color:white; }
-.save-btn:hover { background:#ff69b4; }
-.close-btn { background:#ddd; color:#666; }
 
-/* GRILLE TOUS LES TIROIRS */
-.drawers-grid-modal {
-position:fixed; top:50%; left:50%;
-transform:translate(-50%,-50%);
-background:linear-gradient(145deg,#ffe6f0,#ffd6e8);
-padding:30px; border-radius:20px;
-z-index:10000; width:90%; max-width:800px;
-max-height:85vh; overflow-y:auto;
-border:3px solid #ffb6c1;
+/* Mini cercle profil haut droite */
+#ownerPhoto {
+  width:32px;
+  height:32px;
+  border-radius:50%;
+  position:fixed;
+  top:10px;
+  right:10px;
+  z-index:10000;
+  background:#ffe6f0;
+  border:2px solid #b84c6f;
+  display:block;
 }
-.drawers-grid-modal h2 { color:#ff69b4; margin-bottom:20px; text-align:center; font-size:24px; }
-.drawers-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); gap:15px; margin-bottom:20px; }
-.drawer-card {
-background:white; border:2px solid #ffb6c1; border-radius:12px;
-padding:15px; cursor:pointer; transition:all 0.2s;
-}
-.drawer-card:hover { transform:translateY(-3px); border-color:#ff69b4; }
-.drawer-card-num { font-size:18px; font-weight:bold; color:#ff69b4; margin-bottom:5px; }
-.drawer-card-name { font-size:14px; color:#b67385; }
-.drawer-card-count { font-size:13px; color:#ff69b4; font-weight:bold; margin-top:5px; }
-.drawer-card-preview {
-margin-top:10px; width:100%; height:80px;
-display:flex; align-items:center; justify-content:center;
-font-size:12px; color:#ffb6c1; overflow:hidden;
-}
-.drawer-card-preview img { width:100%; height:100%; object-fit:contain; }
 
-input[type=“file”] { display:none; }
+/* Champs et boutons */
+.input-group {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+}
 
-#loading {
-position:fixed; top:50%; left:50%;
-transform:translate(-50%,-50%);
-color:white; font-size:18px; z-index:10001;
-background:rgba(0,0,0,0.8); padding:20px 40px;
-border-radius:12px; display:none;
+input[type="text"], input[type="password"] {
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 2px solid #b67385;
+  outline: none;
+  width: 200px;
+  font-size: 16px;
+}
+
+input[type="text"]:focus, input[type="password"]:focus {
+  border-color: #e94f9a;
+  box-shadow: 0 0 6px rgba(233,79,154,0.4);
+}
+
+button {
+  padding: 10px 16px;
+  border-radius: 12px;
+  border: none;
+  background: #ffb6c1;
+  color: #fff;
+  font-weight: bold;
+  cursor: pointer;
+  margin: 6px;
+  transition: background 0.3s;
+  font-size: 16px;
+}
+
+button:hover { background: #e94f9a; }
+
+#photoBtn {
+  background: #fff0f5;
+  color: #b84c6f;
+  border: 2px solid #b67385;
+}
+
+#photoBtn:hover { background: #ffe6f0; }
+
+#profilePreview {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 2px solid #b67385;
+  object-fit: cover;
+  display: none;
+}
+
+/* MODAL */
+.modal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.5);
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+.modal-content {
+  background: #ffe6f0;
+  border: 2px solid #b67385;
+  border-radius: 16px;
+  padding: 20px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.loading {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: rgba(0,0,0,0.8);
+  color: white;
+  padding: 20px 40px;
+  border-radius: 12px;
+  z-index: 10001;
+  display: none;
 }
 </style>
-
 </head>
 <body>
 
-<div id="background"></div>
-<div id="loading">Chargement...</div>
+<div class="loading" id="loading">Chargement...</div>
 
-<div id="sidebar">
-  <button id="backBtn">← Retour</button>
-  <button id="viewAllBtn">
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-      <rect x="3" y="3" width="7" height="7" rx="1"/>
-      <rect x="14" y="3" width="7" height="7" rx="1"/>
-      <rect x="3" y="14" width="7" height="7" rx="1"/>
-      <rect x="14" y="14" width="7" height="7" rx="1"/>
-    </svg>
-    Tous les tiroirs
-  </button>
+<h2>Bienvenue</h2>
+
+<!-- Cercle central -->
+<img id="appLogo" src="Photoroom_20260107_185314.png" alt="Logo chat">
+
+<!-- Mini cercle haut droite -->
+<img id="ownerPhoto" src="" alt="Owner">
+
+<!-- Prénom / mot de passe -->
+<div class="input-group">
+  <input type="text" id="prenom" placeholder="Prénom" required>
+  <img id="profilePreview" alt="Photo de profil">
+</div>
+<input type="password" id="password" placeholder="Mot de passe">
+
+<button type="button" id="photoBtn">Choisir Photo</button>
+<input type="file" id="photoInput" accept="image/*" style="display:none;">
+
+<div>
+  <button id="connexionBtn">Connexion</button>
 </div>
 
-<div id="toggleSidebar">☰</div>
-
-<button class="clickable-btn" id="hobbii-board"  style="top:9.7%;left:26.5%;width:48.3%;height:19.8%"></button>
-<button class="clickable-btn drawer-btn" data-drawer="1"  data-name="Blanc"        style="top:45.6%;left:4.9%;width:20.6%;height:5.3%"></button>
-<button class="clickable-btn drawer-btn" data-drawer="2"  data-name="Écru/Ivoire"  style="top:45.8%;left:27.8%;width:20.8%;height:5.2%"></button>
-<button class="clickable-btn drawer-btn" data-drawer="3"  data-name="Beige"        style="top:45.7%;left:51.0%;width:21.2%;height:5.3%"></button>
-<button class="clickable-btn drawer-btn" data-drawer="4"  data-name="Marron"       style="top:45.7%;left:74.0%;width:21.7%;height:5.4%"></button>
-<button class="clickable-btn drawer-btn" data-drawer="5"  data-name="Gris"         style="top:52.0%;left:4.7%;width:20.9%;height:5.6%"></button>
-<button class="clickable-btn drawer-btn" data-drawer="6"  data-name="Noir"         style="top:52.2%;left:27.4%;width:21.5%;height:5.3%"></button>
-<button class="clickable-btn drawer-btn" data-drawer="7"  data-name="Jaune"        style="top:52.2%;left:51.0%;width:21.0%;height:5.1%"></button>
-<button class="clickable-btn drawer-btn" data-drawer="8"  data-name="Orange"       style="top:52.2%;left:74.1%;width:21.7%;height:5.5%"></button>
-<button class="clickable-btn drawer-btn" data-drawer="9"  data-name="Rouge"        style="top:58.7%;left:5.3%;width:20.0%;height:5.5%"></button>
-<button class="clickable-btn drawer-btn" data-drawer="10" data-name="Rose"         style="top:58.7%;left:27.6%;width:21.7%;height:5.8%"></button>
-<button class="clickable-btn drawer-btn" data-drawer="11" data-name="Violet"       style="top:58.8%;left:51.0%;width:20.9%;height:5.6%"></button>
-<button class="clickable-btn drawer-btn" data-drawer="12" data-name="Bleu"         style="top:58.9%;left:74.1%;width:21.7%;height:5.5%"></button>
-<button class="clickable-btn drawer-btn" data-drawer="13" data-name="Vert"         style="top:65.5%;left:5.3%;width:20.1%;height:5.5%"></button>
-<button class="clickable-btn drawer-btn" data-drawer="14" data-name="Turquoise"    style="top:65.5%;left:27.5%;width:21.7%;height:5.6%"></button>
-<button class="clickable-btn drawer-btn" data-drawer="15" data-name="Multicolore"  style="top:65.7%;left:50.7%;width:21.7%;height:5.4%"></button>
-<button class="clickable-btn drawer-btn" data-drawer="16" data-name="Metal/Argent" style="top:65.7%;left:73.8%;width:21.7%;height:5.5%"></button>
+<!-- MODAL CHOIX CREATION / VISITE -->
+<div id="choiceModal" class="modal">
+  <div class="modal-content">
+    <h3>Bonjour Steph !</h3>
+    <p>Voulez-vous accéder à :</p>
+    <button id="creationBtn">Création</button>
+    <button id="visiteBtn">Visite</button>
+  </div>
+</div>
 
 <script src="image-handler.js"></script>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  
+</script>
 
-<script>
-const SUPABASE_URL = 'https://kdgxbmqwhpuctjtlygrt.supabase.co';
-const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtkZ3hibXF3aHB1Y3RqdGx5Z3J0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUyMjY0NzQsImV4cCI6MjA5MDgwMjQ3NH0.9RsIj_bQgJskg9raRGN6uQJwUUlByTvWAFF2Eq9f6KM';
-let sb = null;
 
-const NAMES = ['','Blanc','Écru/Ivoire','Beige','Marron','Gris','Noir','Jaune','Orange','Rouge','Rose','Violet','Bleu','Vert','Turquoise','Multicolore','Metal/Argent'];
-const drawersData = {};
-for (let i = 1; i <= 16; i++) {
-  drawersData[i] = { name: NAMES[i], photo: null, notes: '', count: 0 };
-}
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getFirestore, doc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 
-window.addEventListener('load', () => {
-  if (window.supabase) {
-    sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
-    loadAll();
-  }
-});
+const FIREBASE_CONFIG = {
+  apiKey: "REMPLACE_PAR_TON_API_KEY",
+  authDomain: "REMPLACE.firebaseapp.com",
+  projectId: "REMPLACE_PAR_TON_PROJECT_ID",
+  storageBucket: "REMPLACE.appspot.com",
+  messagingSenderId: "REMPLACE",
+  appId: "REMPLACE"
+};
 
-async function loadAll() {
-  document.getElementById('loading').style.display = 'block';
+const app = initializeApp(FIREBASE_CONFIG);
+const db  = getFirestore(app);
+
+const photoBtn      = document.getElementById('photoBtn');
+const photoInput    = document.getElementById('photoInput');
+const profilePreview= document.getElementById('profilePreview');
+const prenomInput   = document.getElementById('prenom');
+const ownerPhoto    = document.getElementById('ownerPhoto');
+const loading       = document.getElementById('loading');
+
+// ====== Charger photo de profil existante ======
+prenomInput.addEventListener('blur', async () => {
+  const prenom = prenomInput.value.trim();
+  if (!prenom) return;
   try {
-    const { data } = await sb.from('drawers').select('*');
-    if (data) data.forEach(d => {
-      if (drawersData[d.drawer_number]) {
-        drawersData[d.drawer_number].photo = d.photo_url || null;
-        drawersData[d.drawer_number].notes = d.notes || '';
-        drawersData[d.drawer_number].count = d.count || 0;
-      }
-    });
-  } catch(e) { console.error(e); }
-  document.getElementById('loading').style.display = 'none';
-}
+    const snap = await getDoc(doc(db, 'profiles', prenom));
+    if (snap.exists() && snap.data().photo_url) {
+      const url = snap.data().photo_url;
+      profilePreview.src = url;
+      profilePreview.style.display = 'block';
+      ownerPhoto.src = url;
+    }
+  } catch (err) { console.log('Pas de profil existant'); }
+});
 
-async function saveDrawer(num) {
-  if (!sb) return;
-  const d = drawersData[num];
-  const { data: ex } = await sb.from('drawers').select('id').eq('drawer_number', num).single();
-  if (ex) {
-    await sb.from('drawers').update({ photo_url: d.photo, notes: d.notes, count: d.count, updated_at: new Date().toISOString() }).eq('drawer_number', num);
-  } else {
-    await sb.from('drawers').insert({ drawer_number: num, name: d.name, photo_url: d.photo, notes: d.notes, count: d.count });
+// ====== Choisir photo — upload ImgBB ======
+photoBtn.onclick = () => photoInput.click();
+
+photoInput.onchange = async (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+  const prenom = prenomInput.value.trim();
+  if (!prenom) return alert("Veuillez saisir votre prénom avant de choisir une photo");
+  try {
+    loading.style.display = 'block';
+    const imgbbUrl = await window.uploadImage(file);
+    // Sauvegarde dans Firestore (doc id = prenom)
+    await setDoc(doc(db, 'profiles', prenom), { prenom, photo_url: imgbbUrl }, { merge: true });
+    profilePreview.src = imgbbUrl;
+    profilePreview.style.display = 'block';
+    ownerPhoto.src = imgbbUrl;
+    localStorage.setItem('prenom', prenom);
+    loading.style.display = 'none';
+  } catch (error) {
+    console.error('Erreur upload:', error);
+    loading.style.display = 'none';
+    alert('❌ Erreur lors de l\'upload: ' + error.message);
   }
-}
+};
 
-// SIDEBAR
-const sidebar = document.getElementById('sidebar');
-const toggle = document.getElementById('toggleSidebar');
-toggle.addEventListener('click', () => {
-  sidebar.classList.toggle('open');
-  toggle.classList.toggle('open');
-});
+// ====== Connexion ======
+document.getElementById('connexionBtn').onclick = () => {
+  const prenom = prenomInput.value.trim();
+  const password = document.getElementById('password').value;
+  if (!prenom) return alert("Veuillez saisir votre prénom");
+  if (prenom === "Steph" && password === "Steph1511") {
+    document.getElementById('choiceModal').style.display = 'flex';
+  } else {
+    localStorage.setItem('prenom', prenom);
+    window.location.href = 'visitor.html';
+  }
+};
 
-document.getElementById('backBtn').addEventListener('click', () => {
+document.getElementById('creationBtn').onclick = () => {
+  localStorage.setItem('prenom', prenomInput.value.trim());
   window.location.href = 'owner.html';
-});
-document.getElementById('viewAllBtn').addEventListener('click', showAllDrawers);
-
-// HOBBII
-document.getElementById('hobbii-board').addEventListener('click', () => {
-  window.location.href = 'https://hobbii.fr';
-});
-
-// TIROIRS
-document.querySelectorAll('.drawer-btn').forEach(btn => {
-  btn.addEventListener('click', () => {
-    openDrawer(parseInt(btn.dataset.drawer), btn.dataset.name);
-  });
-});
-
-function openDrawer(num, name) {
-  const d = drawersData[num];
-  const overlay = document.createElement('div');
-  overlay.className = 'overlay';
-  const modal = document.createElement('div');
-  modal.className = 'drawer-modal';
-
-  modal.innerHTML =
-    '<h2>Tiroir ' + num + ' \u2013 ' + name + '</h2>' +
-    '<div class="modal-content">' +
-      '<div class="counter-section">' +
-        '<div class="counter-label">\uD83E\uDDF6 Nombre de pelotes</div>' +
-        '<div class="counter-controls">' +
-          '<button class="counter-btn" id="dec' + num + '">\u2212</button>' +
-          '<div class="counter-value" id="cnt' + num + '">' + (d.count || 0) + '</div>' +
-          '<button class="counter-btn" id="inc' + num + '">+</button>' +
-        '</div>' +
-      '</div>' +
-      '<div class="photo-section">' +
-        '<div class="photo-preview" id="prev' + num + '">' +
-          (d.photo ? '<img src="' + d.photo + '" alt="">' : '<div class="photo-preview-empty">Aucune photo</div>') +
-        '</div>' +
-        '<input type="file" id="file' + num + '" accept="image/*">' +
-        '<button class="photo-btn" id="pbtn' + num + '">\uD83D\uDCF7 ' + (d.photo ? 'Changer' : 'Ajouter') + ' une photo</button>' +
-      '</div>' +
-      '<div class="notes-section">' +
-        '<label>Notes / R\u00e9f\u00e9rences :</label>' +
-        '<textarea id="notes' + num + '" placeholder="Marque, num\u00e9ro de lot...">' + (d.notes || '') + '</textarea>' +
-
-```
-  '</div>' +
-'</div>' +
-'<div class="modal-buttons">' +
-  '<button class="save-btn" id="save' + num + '">\uD83D\uDCBE Enregistrer</button>' +
-  '<button class="close-btn" id="cls' + num + '">Fermer</button>' +
-'</div>';
-```
-
-document.body.appendChild(overlay);
-document.body.appendChild(modal);
-
-document.getElementById(‘inc’ + num).onclick = async () => {
-d.count = (d.count || 0) + 1;
-document.getElementById(‘cnt’ + num).textContent = d.count;
-await saveDrawer(num);
 };
-document.getElementById(‘dec’ + num).onclick = async () => {
-if (d.count > 0) { d.count–; document.getElementById(‘cnt’ + num).textContent = d.count; await saveDrawer(num); }
+document.getElementById('visiteBtn').onclick = () => {
+  localStorage.setItem('prenom', prenomInput.value.trim());
+  window.location.href = 'visitor.html';
 };
-document.getElementById(‘pbtn’ + num).onclick = () => document.getElementById(‘file’ + num).click();
-document.getElementById(‘file’ + num).onchange = async (e) => {
-const file = e.target.files[0];
-if (!file) return;
-document.getElementById(‘loading’).style.display = ‘block’;
-try {
-const url = await window.uploadImage(file);
-document.getElementById(‘prev’ + num).innerHTML = ‘<img src="' + url + '" alt="">’;
-d.photo = url;
-await saveDrawer(num);
-alert(’\u2705 Photo upload\u00e9e !’);
-} catch(err) { alert(’\u274C Erreur: ’ + err.message); }
-document.getElementById(‘loading’).style.display = ‘none’;
+document.getElementById('choiceModal').onclick = e => {
+  if (e.target === document.getElementById('choiceModal'))
+    document.getElementById('choiceModal').style.display = 'none';
 };
-document.getElementById(‘save’ + num).onclick = async () => {
-d.notes = document.getElementById(‘notes’ + num).value;
-await saveDrawer(num);
-alert(’\u2705 Tiroir sauvegard\u00e9 !’);
-};
-const close = () => { modal.remove(); overlay.remove(); };
-document.getElementById(‘cls’ + num).onclick = close;
-overlay.onclick = (e) => { if (e.target === overlay) close(); };
-}
-
-function showAllDrawers() {
-const overlay = document.createElement(‘div’);
-overlay.className = ‘overlay’;
-overlay.id = ‘ov-all’;
-const modal = document.createElement(‘div’);
-modal.className = ‘drawers-grid-modal’;
-modal.id = ‘modal-all’;
-
-let html = ‘<h2>\uD83D\uDCE6 Tous les tiroirs</h2><div class="drawers-grid">’;
-for (let i = 1; i <= 16; i++) {
-const d = drawersData[i];
-html += ‘<div class="drawer-card" data-drawer="' + i + '" data-name="' + d.name + '">’ +
-’<div class="drawer-card-num">Tiroir ’ + i + ‘</div>’ +
-‘<div class="drawer-card-name">’ + d.name + ‘</div>’ +
-‘<div class="drawer-card-count">\uD83E\uDDF6 ’ + (d.count || 0) + ’ pelote(s)</div>’ +
-‘<div class="drawer-card-preview">’ + (d.photo ? ‘<img src="' + d.photo + '">’ : ‘\uD83D\uDCF7’) + ‘</div>’ +
-‘</div>’;
-}
-html += ‘</div><div class="modal-buttons"><button class="close-btn" id="cls-all">Fermer</button></div>’;
-modal.innerHTML = html;
-
-document.body.appendChild(overlay);
-document.body.appendChild(modal);
-
-modal.querySelectorAll(’.drawer-card’).forEach(card => {
-card.addEventListener(‘click’, () => {
-modal.remove(); overlay.remove();
-openDrawer(parseInt(card.dataset.drawer), card.dataset.name);
-});
-});
-const closeAll = () => { modal.remove(); overlay.remove(); };
-document.getElementById(‘cls-all’).onclick = closeAll;
-overlay.onclick = (e) => { if (e.target === overlay) closeAll(); };
-}
 </script>
 
 </body>
