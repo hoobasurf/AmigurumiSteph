@@ -7,14 +7,7 @@
 <title>Tiroirs Hobbii</title>
 <style>
 * { margin:0; padding:0; box-sizing:border-box; }
-body { font-family:'Comic Sans MS',cursive; overflow:hidden; background:#000; }
-
-#background {
-position:fixed; inset:0;
-background-image:url(‘Photoroom_20260118_214442.png’);
-background-size:cover; background-position:center;
-z-index:1; pointer-events:none;
-}
+body { font-family:'Comic Sans MS',cursive; overflow:hidden; }
 
 /* SIDEBAR */
 #sidebar {
@@ -172,7 +165,10 @@ border-radius:12px; display:none;
 </head>
 <body>
 
-<div id="background"></div>
+<!-- FOND IMAGE inline comme owner.html -->
+
+<div style="position:fixed;top:0;left:0;width:100vw;height:100vh;background-image:url('Photoroom_20260118_214442.png');background-size:cover;background-position:center center;background-repeat:no-repeat;z-index:-1;pointer-events:none;"></div>
+
 <div id="loading">Chargement...</div>
 
 <div id="sidebar">
@@ -256,7 +252,7 @@ async function saveDrawer(num) {
   }
 }
 
-// SIDEBAR
+// SIDEBAR TOGGLE
 const sidebar = document.getElementById('sidebar');
 const toggle = document.getElementById('toggleSidebar');
 toggle.addEventListener('click', () => {
@@ -269,12 +265,10 @@ document.getElementById('backBtn').addEventListener('click', () => {
 });
 document.getElementById('viewAllBtn').addEventListener('click', showAllDrawers);
 
-// HOBBII
 document.getElementById('hobbii-board').addEventListener('click', () => {
   window.open('https://hobbii.fr', '_blank');
 });
 
-// TIROIRS
 document.querySelectorAll('.drawer-btn').forEach(btn => {
   btn.addEventListener('click', () => {
     openDrawer(parseInt(btn.dataset.drawer), btn.dataset.name);
