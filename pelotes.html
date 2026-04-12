@@ -7,14 +7,13 @@
 <title>Tiroirs Hobbii</title>
 <style>
 * { margin:0; padding:0; box-sizing:border-box; }
-body { font-family:'Comic Sans MS',cursive; overflow:hidden; }
+body { font-family:'Comic Sans MS',cursive; overflow:hidden; background:#000; }
 
-/* FOND — z-index:0 et pointer-events:none pour ne pas bloquer les clics */
 #background {
 position:fixed; inset:0;
 background-image:url(‘Photoroom_20260118_214442.png’);
 background-size:cover; background-position:center;
-z-index:0; pointer-events:none;
+z-index:1; pointer-events:none;
 }
 
 /* SIDEBAR */
@@ -24,27 +23,19 @@ width:220px; height:100vh;
 background:rgba(255,230,240,0.97);
 border-right:2px solid #b67385;
 padding:60px 20px 20px;
-transition:left .3s;
-z-index:9000;
+transition:left .3s; z-index:9000;
 }
 #sidebar.open { left:0; }
 
-/* TOGGLE — position:fixed obligatoire pour que z-index fonctionne sur iOS */
 #toggleSidebar {
-position:fixed;
-top:50%; left:0;
+position:fixed; top:50%; left:0;
 transform:translateY(-50%);
 width:30px; height:60px;
 background:#ffb6c1;
 border-radius:0 12px 12px 0;
 display:flex; align-items:center; justify-content:center;
-cursor:pointer; font-weight:bold;
-z-index:9001;
-border:none; color:white; font-size:18px;
+cursor:pointer; font-weight:bold; z-index:9001;
 transition:left .3s;
-/* iOS Safari : -webkit-tap pour éviter délai 300ms */
--webkit-tap-highlight-color:transparent;
-touch-action:manipulation;
 }
 #toggleSidebar.open { left:220px; }
 
@@ -54,8 +45,6 @@ width:100%; padding:10px 16px; margin-top:12px;
 border:none; border-radius:16px;
 background:#ffb6c1; color:#fff;
 font-weight:bold; font-size:14px; cursor:pointer;
-font-family:‘Comic Sans MS’,cursive;
-touch-action:manipulation;
 }
 #sidebar button:hover { background:#ff69b4; }
 
@@ -63,19 +52,14 @@ touch-action:manipulation;
 .clickable-btn {
 position:fixed;
 background:transparent; border:none;
-cursor:pointer;
-z-index:500;
--webkit-tap-highlight-color:transparent;
-touch-action:manipulation;
+cursor:pointer; z-index:100;
 }
 
-/* OVERLAY MODAL */
+/* OVERLAY */
 .overlay {
 position:fixed; inset:0;
 background:rgba(0,0,0,0.7);
-z-index:9999;
-backdrop-filter:blur(3px);
--webkit-backdrop-filter:blur(3px);
+z-index:9999; backdrop-filter:blur(3px);
 }
 
 /* MODALE TIROIR */
@@ -90,32 +74,25 @@ min-width:300px; max-width:90vw;
 max-height:90vh; overflow-y:auto;
 border:3px solid #ffb6c1;
 }
-.drawer-modal h2 {
-color:#ff69b4; margin-bottom:15px;
-text-align:center; font-size:20px;
-}
+.drawer-modal h2 { color:#ff69b4; margin-bottom:15px; text-align:center; font-size:20px; }
 .modal-content { display:flex; flex-direction:column; gap:12px; }
 
 .counter-section {
-background:rgba(255,182,193,0.3);
-border:2px solid #ffb6c1;
+background:rgba(255,182,193,0.3); border:2px solid #ffb6c1;
 padding:15px; border-radius:12px; text-align:center;
 }
 .counter-label { color:#ff69b4; font-size:14px; font-weight:bold; margin-bottom:10px; }
 .counter-controls { display:flex; justify-content:center; align-items:center; gap:12px; }
 .counter-btn {
 background:#ffb6c1; border:none; color:white;
-width:44px; height:44px; border-radius:50%;
+width:40px; height:40px; border-radius:50%;
 font-size:22px; font-weight:bold; cursor:pointer;
-touch-action:manipulation;
--webkit-tap-highlight-color:transparent;
 }
 .counter-btn:hover { background:#ff69b4; }
 .counter-value {
 background:white; color:#ff69b4;
 padding:6px 20px; border-radius:20px;
-font-size:24px; font-weight:bold;
-min-width:60px; text-align:center;
+font-size:24px; font-weight:bold; min-width:60px; text-align:center;
 }
 
 .photo-section { display:flex; flex-direction:column; gap:8px; }
@@ -131,11 +108,8 @@ width:100%; height:100%;
 display:flex; align-items:center; justify-content:center;
 }
 .photo-btn {
-padding:8px 14px; background:#ffb6c1; border:none;
-border-radius:8px; color:white; cursor:pointer;
-font-size:12px; font-weight:bold;
-font-family:‘Comic Sans MS’,cursive;
-touch-action:manipulation;
+padding:7px 14px; background:#ffb6c1; border:none;
+border-radius:8px; color:white; cursor:pointer; font-size:11px; font-weight:bold;
 }
 .photo-btn:hover { background:#ff69b4; }
 
@@ -145,19 +119,16 @@ touch-action:manipulation;
 width:100%; min-height:80px; padding:10px;
 border:2px solid #ffb6c1; border-radius:12px;
 background:#fff0f5; color:#b84c6f;
-font-family:‘Comic Sans MS’,cursive;
-font-size:14px; resize:vertical;
+font-family:‘Comic Sans MS’,cursive; font-size:13px; resize:vertical;
 }
 
 .modal-buttons { display:flex; gap:8px; margin-top:8px; }
 .modal-buttons button {
 flex:1; padding:10px; border:none; border-radius:10px;
 font-weight:bold; cursor:pointer; font-size:13px;
-font-family:‘Comic Sans MS’,cursive;
-touch-action:manipulation;
 }
-.save-btn  { background:#ffb6c1; color:white; }
-.save-btn:hover  { background:#ff69b4; }
+.save-btn { background:#ffb6c1; color:white; }
+.save-btn:hover { background:#ff69b4; }
 .close-btn { background:#ddd; color:#666; }
 
 /* GRILLE TOUS LES TIROIRS */
@@ -170,28 +141,20 @@ z-index:10000; width:90%; max-width:800px;
 max-height:85vh; overflow-y:auto;
 border:3px solid #ffb6c1;
 }
-.drawers-grid-modal h2 {
-color:#ff69b4; margin-bottom:20px;
-text-align:center; font-size:24px;
-}
-.drawers-grid {
-display:grid;
-grid-template-columns:repeat(auto-fill,minmax(140px,1fr));
-gap:15px; margin-bottom:20px;
-}
+.drawers-grid-modal h2 { color:#ff69b4; margin-bottom:20px; text-align:center; font-size:24px; }
+.drawers-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); gap:15px; margin-bottom:20px; }
 .drawer-card {
 background:white; border:2px solid #ffb6c1; border-radius:12px;
 padding:15px; cursor:pointer; transition:all 0.2s;
-touch-action:manipulation;
 }
 .drawer-card:hover { transform:translateY(-3px); border-color:#ff69b4; }
-.drawer-card-num  { font-size:18px; font-weight:bold; color:#ff69b4; margin-bottom:5px; }
+.drawer-card-num { font-size:18px; font-weight:bold; color:#ff69b4; margin-bottom:5px; }
 .drawer-card-name { font-size:14px; color:#b67385; }
-.drawer-card-count{ font-size:13px; color:#ff69b4; font-weight:bold; margin-top:5px; }
+.drawer-card-count { font-size:13px; color:#ff69b4; font-weight:bold; margin-top:5px; }
 .drawer-card-preview {
 margin-top:10px; width:100%; height:80px;
 display:flex; align-items:center; justify-content:center;
-font-size:20px; color:#ffb6c1; overflow:hidden;
+font-size:12px; color:#ffb6c1; overflow:hidden;
 }
 .drawer-card-preview img { width:100%; height:100%; object-fit:contain; }
 
@@ -213,7 +176,7 @@ border-radius:12px; display:none;
 <div id="loading">Chargement...</div>
 
 <div id="sidebar">
-  <button id="backBtn">&#8592; Retour</button>
+  <button id="backBtn">← Retour</button>
   <button id="viewAllBtn">
     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
       <rect x="3" y="3" width="7" height="7" rx="1"/>
@@ -225,277 +188,205 @@ border-radius:12px; display:none;
   </button>
 </div>
 
-<button id="toggleSidebar">☰</button>
+<div id="toggleSidebar">☰</div>
 
-<button class="clickable-btn" id="hobbii-board"
-style="top:9.7%;left:26.5%;width:48.3%;height:19.8%"></button>
-
-<button class="clickable-btn drawer-btn" data-drawer="1"  data-name="Blanc"
-style="top:45.6%;left:4.9%;width:20.6%;height:5.3%"></button>
-<button class="clickable-btn drawer-btn" data-drawer="2"  data-name="Ecru/Ivoire"
-style="top:45.8%;left:27.8%;width:20.8%;height:5.2%"></button>
-<button class="clickable-btn drawer-btn" data-drawer="3"  data-name="Beige"
-style="top:45.7%;left:51.0%;width:21.2%;height:5.3%"></button>
-<button class="clickable-btn drawer-btn" data-drawer="4"  data-name="Marron"
-style="top:45.7%;left:74.0%;width:21.7%;height:5.4%"></button>
-<button class="clickable-btn drawer-btn" data-drawer="5"  data-name="Gris"
-style="top:52.0%;left:4.7%;width:20.9%;height:5.6%"></button>
-<button class="clickable-btn drawer-btn" data-drawer="6"  data-name="Noir"
-style="top:52.2%;left:27.4%;width:21.5%;height:5.3%"></button>
-<button class="clickable-btn drawer-btn" data-drawer="7"  data-name="Jaune"
-style="top:52.2%;left:51.0%;width:21.0%;height:5.1%"></button>
-<button class="clickable-btn drawer-btn" data-drawer="8"  data-name="Orange"
-style="top:52.2%;left:74.1%;width:21.7%;height:5.5%"></button>
-<button class="clickable-btn drawer-btn" data-drawer="9"  data-name="Rouge"
-style="top:58.7%;left:5.3%;width:20.0%;height:5.5%"></button>
-<button class="clickable-btn drawer-btn" data-drawer="10" data-name="Rose"
-style="top:58.7%;left:27.6%;width:21.7%;height:5.8%"></button>
-<button class="clickable-btn drawer-btn" data-drawer="11" data-name="Violet"
-style="top:58.8%;left:51.0%;width:20.9%;height:5.6%"></button>
-<button class="clickable-btn drawer-btn" data-drawer="12" data-name="Bleu"
-style="top:58.9%;left:74.1%;width:21.7%;height:5.5%"></button>
-<button class="clickable-btn drawer-btn" data-drawer="13" data-name="Vert"
-style="top:65.5%;left:5.3%;width:20.1%;height:5.5%"></button>
-<button class="clickable-btn drawer-btn" data-drawer="14" data-name="Turquoise"
-style="top:65.5%;left:27.5%;width:21.7%;height:5.6%"></button>
-<button class="clickable-btn drawer-btn" data-drawer="15" data-name="Multicolore"
-style="top:65.7%;left:50.7%;width:21.7%;height:5.4%"></button>
-<button class="clickable-btn drawer-btn" data-drawer="16" data-name="Metal/Argent"
-style="top:65.7%;left:73.8%;width:21.7%;height:5.5%"></button>
+<button class="clickable-btn" id="hobbii-board"  style="top:9.7%;left:26.5%;width:48.3%;height:19.8%"></button>
+<button class="clickable-btn drawer-btn" data-drawer="1"  data-name="Blanc"        style="top:45.6%;left:4.9%;width:20.6%;height:5.3%"></button>
+<button class="clickable-btn drawer-btn" data-drawer="2"  data-name="Écru/Ivoire"  style="top:45.8%;left:27.8%;width:20.8%;height:5.2%"></button>
+<button class="clickable-btn drawer-btn" data-drawer="3"  data-name="Beige"        style="top:45.7%;left:51.0%;width:21.2%;height:5.3%"></button>
+<button class="clickable-btn drawer-btn" data-drawer="4"  data-name="Marron"       style="top:45.7%;left:74.0%;width:21.7%;height:5.4%"></button>
+<button class="clickable-btn drawer-btn" data-drawer="5"  data-name="Gris"         style="top:52.0%;left:4.7%;width:20.9%;height:5.6%"></button>
+<button class="clickable-btn drawer-btn" data-drawer="6"  data-name="Noir"         style="top:52.2%;left:27.4%;width:21.5%;height:5.3%"></button>
+<button class="clickable-btn drawer-btn" data-drawer="7"  data-name="Jaune"        style="top:52.2%;left:51.0%;width:21.0%;height:5.1%"></button>
+<button class="clickable-btn drawer-btn" data-drawer="8"  data-name="Orange"       style="top:52.2%;left:74.1%;width:21.7%;height:5.5%"></button>
+<button class="clickable-btn drawer-btn" data-drawer="9"  data-name="Rouge"        style="top:58.7%;left:5.3%;width:20.0%;height:5.5%"></button>
+<button class="clickable-btn drawer-btn" data-drawer="10" data-name="Rose"         style="top:58.7%;left:27.6%;width:21.7%;height:5.8%"></button>
+<button class="clickable-btn drawer-btn" data-drawer="11" data-name="Violet"       style="top:58.8%;left:51.0%;width:20.9%;height:5.6%"></button>
+<button class="clickable-btn drawer-btn" data-drawer="12" data-name="Bleu"         style="top:58.9%;left:74.1%;width:21.7%;height:5.5%"></button>
+<button class="clickable-btn drawer-btn" data-drawer="13" data-name="Vert"         style="top:65.5%;left:5.3%;width:20.1%;height:5.5%"></button>
+<button class="clickable-btn drawer-btn" data-drawer="14" data-name="Turquoise"    style="top:65.5%;left:27.5%;width:21.7%;height:5.6%"></button>
+<button class="clickable-btn drawer-btn" data-drawer="15" data-name="Multicolore"  style="top:65.7%;left:50.7%;width:21.7%;height:5.4%"></button>
+<button class="clickable-btn drawer-btn" data-drawer="16" data-name="Metal/Argent" style="top:65.7%;left:73.8%;width:21.7%;height:5.5%"></button>
 
 <script src="image-handler.js"></script>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
 <script>
-var SUPABASE_URL = 'https://kdgxbmqwhpuctjtlygrt.supabase.co';
-var SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtkZ3hibXF3aHB1Y3RqdGx5Z3J0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUyMjY0NzQsImV4cCI6MjA5MDgwMjQ3NH0.9RsIj_bQgJskg9raRGN6uQJwUUlByTvWAFF2Eq9f6KM';
-var sb = null;
+const SUPABASE_URL = 'https://kdgxbmqwhpuctjtlygrt.supabase.co';
+const SUPABASE_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtkZ3hibXF3aHB1Y3RqdGx5Z3J0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUyMjY0NzQsImV4cCI6MjA5MDgwMjQ3NH0.9RsIj_bQgJskg9raRGN6uQJwUUlByTvWAFF2Eq9f6KM';
+let sb = null;
 
-var NAMES = ['','Blanc','Ecru/Ivoire','Beige','Marron','Gris','Noir','Jaune',
-             'Orange','Rouge','Rose','Violet','Bleu','Vert','Turquoise','Multicolore','Metal/Argent'];
-
-var drawersData = {};
-for (var i = 1; i <= 16; i++) {
+const NAMES = ['','Blanc','Écru/Ivoire','Beige','Marron','Gris','Noir','Jaune','Orange','Rouge','Rose','Violet','Bleu','Vert','Turquoise','Multicolore','Metal/Argent'];
+const drawersData = {};
+for (let i = 1; i <= 16; i++) {
   drawersData[i] = { name: NAMES[i], photo: null, notes: '', count: 0 };
 }
 
-/* ===== INIT ===== */
-window.addEventListener('load', function() {
+window.addEventListener('load', () => {
   if (window.supabase) {
     sb = window.supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
     loadAll();
   }
-
-  /* --- Toggle sidebar --- */
-  var sidebarEl = document.getElementById('sidebar');
-  var toggleEl  = document.getElementById('toggleSidebar');
-
-  function openSidebar() {
-    sidebarEl.classList.add('open');
-    toggleEl.classList.add('open');
-  }
-  function closeSidebar() {
-    sidebarEl.classList.remove('open');
-    toggleEl.classList.remove('open');
-  }
-
-  toggleEl.addEventListener('click', function(e) {
-    e.stopPropagation();
-    if (sidebarEl.classList.contains('open')) closeSidebar();
-    else openSidebar();
-  });
-
-  /* Fermer sidebar en cliquant ailleurs */
-  document.addEventListener('click', function(e) {
-    if (sidebarEl.classList.contains('open') &&
-        !sidebarEl.contains(e.target) &&
-        e.target !== toggleEl) {
-      closeSidebar();
-    }
-  });
-
-  /* --- Boutons sidebar --- */
-  document.getElementById('backBtn').addEventListener('click', function() {
-    window.location.href = 'owner.html';
-  });
-  document.getElementById('viewAllBtn').addEventListener('click', function() {
-    closeSidebar();
-    showAllDrawers();
-  });
-
-  /* --- Hobbii --- */
-  document.getElementById('hobbii-board').addEventListener('click', function() {
-    window.open('https://hobbii.fr', '_blank');
-  });
-
-  /* --- Boutons tiroirs --- */
-  document.querySelectorAll('.drawer-btn').forEach(function(btn) {
-    btn.addEventListener('click', function() {
-      openDrawer(parseInt(btn.dataset.drawer), btn.dataset.name);
-    });
-  });
 });
 
-/* ===== SUPABASE ===== */
 async function loadAll() {
   document.getElementById('loading').style.display = 'block';
   try {
-    var res = await sb.from('drawers').select('*');
-    if (res.data) {
-      res.data.forEach(function(row) {
-        if (drawersData[row.drawer_number]) {
-          drawersData[row.drawer_number].photo = row.photo_url || null;
-          drawersData[row.drawer_number].notes = row.notes    || '';
-          drawersData[row.drawer_number].count = row.count    || 0;
-        }
-      });
-    }
-  } catch(e) { console.error('loadAll:', e); }
+    const { data } = await sb.from('drawers').select('*');
+    if (data) data.forEach(d => {
+      if (drawersData[d.drawer_number]) {
+        drawersData[d.drawer_number].photo = d.photo_url || null;
+        drawersData[d.drawer_number].notes = d.notes || '';
+        drawersData[d.drawer_number].count = d.count || 0;
+      }
+    });
+  } catch(e) { console.error(e); }
   document.getElementById('loading').style.display = 'none';
 }
 
 async function saveDrawer(num) {
   if (!sb) return;
-  var d = drawersData[num];
-  try {
-    var ex = await sb.from('drawers').select('id').eq('drawer_number', num).single();
-    if (ex.data) {
-      await sb.from('drawers').update({
-        photo_url:  d.photo,
-        notes:      d.notes,
-        count:      d.count,
-        updated_at: new Date().toISOString()
-      }).eq('drawer_number', num);
-    } else {
-      await sb.from('drawers').insert({
-        drawer_number: num,
-        name:      d.name,
-        photo_url: d.photo,
-        notes:     d.notes,
-        count:     d.count
-      });
-    }
-  } catch(e) { console.error('saveDrawer:', e); }
+  const d = drawersData[num];
+  const { data: ex } = await sb.from('drawers').select('id').eq('drawer_number', num).single();
+  if (ex) {
+    await sb.from('drawers').update({ photo_url: d.photo, notes: d.notes, count: d.count, updated_at: new Date().toISOString() }).eq('drawer_number', num);
+  } else {
+    await sb.from('drawers').insert({ drawer_number: num, name: d.name, photo_url: d.photo, notes: d.notes, count: d.count });
+  }
 }
 
-/* ===== OPEN DRAWER ===== */
-function openDrawer(num, name) {
-  var d = drawersData[num];
+// SIDEBAR
+const sidebar = document.getElementById('sidebar');
+const toggle = document.getElementById('toggleSidebar');
+toggle.addEventListener('click', () => {
+  sidebar.classList.toggle('open');
+  toggle.classList.toggle('open');
+});
 
-  var overlay = document.createElement('div');
+document.getElementById('backBtn').addEventListener('click', () => {
+  window.location.href = 'owner.html';
+});
+document.getElementById('viewAllBtn').addEventListener('click', showAllDrawers);
+
+// HOBBII
+document.getElementById('hobbii-board').addEventListener('click', () => {
+  window.open('https://hobbii.fr', '_blank');
+});
+
+// TIROIRS
+document.querySelectorAll('.drawer-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    openDrawer(parseInt(btn.dataset.drawer), btn.dataset.name);
+  });
+});
+
+function openDrawer(num, name) {
+  const d = drawersData[num];
+
+  const overlay = document.createElement('div');
   overlay.className = 'overlay';
 
-  var modal = document.createElement('div');
+  const modal = document.createElement('div');
   modal.className = 'drawer-modal';
-
-  var photoHtml = d.photo
-    ? '<img src="' + d.photo + '" alt="">'
-    : '<div class="photo-preview-empty">Aucune photo</div>';
 
   modal.innerHTML =
     '<h2>Tiroir ' + num + ' \u2013 ' + name + '</h2>' +
     '<div class="modal-content">' +
       '<div class="counter-section">' +
-        '<div class="counter-label">\uD83E\uDDF6 Nombre de pelotes</div>' +
+        '<div class="counter-label">🧶 Nombre de pelotes</div>' +
         '<div class="counter-controls">' +
-          '<button class="counter-btn" id="m-dec-' + num + '">\u2212</button>' +
-          '<div class="counter-value" id="m-cnt-' + num + '">' + (d.count || 0) + '</div>' +
-          '<button class="counter-btn" id="m-inc-' + num + '">+</button>' +
+          '<button class="counter-btn" id="dec' + num + '">\u2212</button>' +
+          '<div class="counter-value" id="cnt' + num + '">' + (d.count || 0) + '</div>' +
+          '<button class="counter-btn" id="inc' + num + '">+</button>' +
         '</div>' +
       '</div>' +
       '<div class="photo-section">' +
-        '<div class="photo-preview" id="m-prev-' + num + '">' + photoHtml + '</div>' +
-        '<input type="file" id="m-file-' + num + '" accept="image/*">' +
-        '<button class="photo-btn" id="m-pbtn-' + num + '">\uD83D\uDCF7 ' +
-          (d.photo ? 'Changer' : 'Ajouter') + ' une photo</button>' +
+        '<div class="photo-preview" id="prev' + num + '">' +
+          (d.photo
+            ? '<img src="' + d.photo + '" alt="">'
+            : '<div class="photo-preview-empty">Aucune photo</div>') +
+        '</div>' +
+        '<input type="file" id="file' + num + '" accept="image/*">' +
+        '<button class="photo-btn" id="pbtn' + num + '">📷 ' + (d.photo ? 'Changer' : 'Ajouter') + ' une photo</button>' +
       '</div>' +
       '<div class="notes-section">' +
-        '<label>Notes / R\u00e9f\u00e9rences :</label>' +
-        '<textarea id="m-notes-' + num + '" placeholder="Marque, num\u00e9ro de lot...">' +
-          (d.notes || '') +
-        '</textarea>' +
+        '<label>Notes / Références :</label>' +
+        '<textarea id="notes' + num + '" placeholder="Marque, numéro de lot...">' + (d.notes || '') + '</textarea>' +
 
 ```
   '</div>' +
 '</div>' +
 '<div class="modal-buttons">' +
-  '<button class="save-btn"  id="m-save-' + num + '">\uD83D\uDCBE Enregistrer</button>' +
-  '<button class="close-btn" id="m-cls-'  + num + '">Fermer</button>' +
+  '<button class="save-btn" id="save' + num + '">💾 Enregistrer</button>' +
+  '<button class="close-btn" id="cls' + num + '">Fermer</button>' +
 '</div>';
 ```
 
 document.body.appendChild(overlay);
 document.body.appendChild(modal);
 
-/* Compteur + */
-document.getElementById(‘m-inc-’ + num).onclick = async function() {
+document.getElementById(‘inc’ + num).onclick = async () => {
 d.count = (d.count || 0) + 1;
-document.getElementById(‘m-cnt-’ + num).textContent = d.count;
+document.getElementById(‘cnt’ + num).textContent = d.count;
 await saveDrawer(num);
 };
 
-/* Compteur - */
-document.getElementById(‘m-dec-’ + num).onclick = async function() {
-if ((d.count || 0) > 0) {
-d.count = d.count - 1;
-document.getElementById(‘m-cnt-’ + num).textContent = d.count;
+document.getElementById(‘dec’ + num).onclick = async () => {
+if (d.count > 0) {
+d.count–;
+document.getElementById(‘cnt’ + num).textContent = d.count;
 await saveDrawer(num);
 }
 };
 
-/* Photo */
-document.getElementById(‘m-pbtn-’ + num).onclick = function() {
-document.getElementById(‘m-file-’ + num).click();
-};
-document.getElementById(‘m-file-’ + num).onchange = async function(e) {
-var file = e.target.files[0];
+document.getElementById(‘pbtn’ + num).onclick = () => document.getElementById(‘file’ + num).click();
+
+document.getElementById(‘file’ + num).onchange = async (e) => {
+const file = e.target.files[0];
 if (!file) return;
 document.getElementById(‘loading’).style.display = ‘block’;
 try {
-var url = await window.uploadImage(file);
-document.getElementById(‘m-prev-’ + num).innerHTML = ‘<img src="' + url + '" alt="">’;
+const url = await window.uploadImage(file);
+document.getElementById(‘prev’ + num).innerHTML = ‘<img src="' + url + '" alt="">’;
 d.photo = url;
-document.getElementById(‘m-pbtn-’ + num).textContent = ‘\uD83D\uDCF7 Changer une photo’;
 await saveDrawer(num);
-alert(’\u2705 Photo upload\u00e9e !’);
+alert(‘✅ Photo uploadée !’);
 } catch(err) {
-alert(’\u274C Erreur : ’ + err.message);
+alert(’❌ Erreur: ’ + err.message);
 }
 document.getElementById(‘loading’).style.display = ‘none’;
 };
 
-/* Sauvegarder */
-document.getElementById(‘m-save-’ + num).onclick = async function() {
-d.notes = document.getElementById(‘m-notes-’ + num).value;
+document.getElementById(‘save’ + num).onclick = async () => {
+d.notes = document.getElementById(‘notes’ + num).value;
 await saveDrawer(num);
-alert(’\u2705 Sauvegard\u00e9 !’);
+alert(‘✅ Tiroir sauvegardé !’);
 };
 
-/* Fermer */
-function closeModal() { modal.remove(); overlay.remove(); }
-document.getElementById(‘m-cls-’ + num).onclick = closeModal;
-overlay.onclick = function(e) { if (e.target === overlay) closeModal(); };
+const close = () => { modal.remove(); overlay.remove(); };
+document.getElementById(‘cls’ + num).onclick = close;
+overlay.onclick = (e) => { if (e.target === overlay) close(); };
 }
 
-/* ===== TOUS LES TIROIRS ===== */
 function showAllDrawers() {
-var overlay = document.createElement(‘div’);
+const overlay = document.createElement(‘div’);
 overlay.className = ‘overlay’;
 
-var modal = document.createElement(‘div’);
+const modal = document.createElement(‘div’);
 modal.className = ‘drawers-grid-modal’;
 
-var html = ‘<h2>\uD83D\uDCE6 Tous les tiroirs</h2><div class="drawers-grid">’;
-for (var j = 1; j <= 16; j++) {
-var dd = drawersData[j];
-var preview = dd.photo ? ‘<img src="' + dd.photo + '">’ : ‘\uD83D\uDCF7’;
+let html = ‘<h2>📦 Tous les tiroirs</h2><div class="drawers-grid">’;
+for (let i = 1; i <= 16; i++) {
+const d = drawersData[i];
 html +=
-‘<div class="drawer-card" data-drawer="' + j + '" data-name="' + dd.name + '">’ +
-’<div class="drawer-card-num">Tiroir ’ + j + ‘</div>’ +
-‘<div class="drawer-card-name">’  + dd.name + ‘</div>’ +
-‘<div class="drawer-card-count">\uD83E\uDDF6 ’ + (dd.count || 0) + ’ pelote(s)</div>’ +
-‘<div class="drawer-card-preview">’ + preview + ‘</div>’ +
+‘<div class="drawer-card" data-drawer="' + i + '" data-name="' + d.name + '">’ +
+’<div class="drawer-card-num">Tiroir ’ + i + ‘</div>’ +
+‘<div class="drawer-card-name">’ + d.name + ‘</div>’ +
+‘<div class="drawer-card-count">🧶 ’ + (d.count || 0) + ’ pelote(s)</div>’ +
+‘<div class="drawer-card-preview">’ +
+(d.photo ? ‘<img src="' + d.photo + '">’ : ‘📷’) +
+‘</div>’ +
 ‘</div>’;
 }
 html += ‘</div><div class="modal-buttons"><button class="close-btn" id="cls-all">Fermer</button></div>’;
@@ -504,16 +395,16 @@ modal.innerHTML = html;
 document.body.appendChild(overlay);
 document.body.appendChild(modal);
 
-modal.querySelectorAll(’.drawer-card’).forEach(function(card) {
-card.addEventListener(‘click’, function() {
+modal.querySelectorAll(’.drawer-card’).forEach(card => {
+card.addEventListener(‘click’, () => {
 modal.remove(); overlay.remove();
 openDrawer(parseInt(card.dataset.drawer), card.dataset.name);
 });
 });
 
-function closeAll() { modal.remove(); overlay.remove(); }
+const closeAll = () => { modal.remove(); overlay.remove(); };
 document.getElementById(‘cls-all’).onclick = closeAll;
-overlay.onclick = function(e) { if (e.target === overlay) closeAll(); };
+overlay.onclick = (e) => { if (e.target === overlay) closeAll(); };
 }
 </script>
 
