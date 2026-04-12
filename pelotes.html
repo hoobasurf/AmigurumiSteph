@@ -23,8 +23,9 @@ background:rgba(255,230,240,0.97);
 border-right:2px solid #b67385;
 padding:60px 20px 20px;
 transition:left .3s; z-index:9000;
+pointer-events:none;
 }
-#sidebar.open { left:0; }
+#sidebar.open { left:0; pointer-events:auto; }
 
 #toggleSidebar {
 position:fixed; top:50%; left:0;
