@@ -43,7 +43,6 @@ background:#ffb6c1; color:#fff;
 font-weight:bold; font-size:14px; cursor:pointer;
 font-family:‘Comic Sans MS’,cursive;
 }
-#sidebar button:hover { background:#ff69b4; }
 
 .clickable-btn {
 position:fixed;
@@ -82,7 +81,6 @@ background:#ffb6c1; border:none; color:white;
 width:44px; height:44px; border-radius:50%;
 font-size:22px; font-weight:bold; cursor:pointer;
 }
-.counter-btn:hover { background:#ff69b4; }
 .counter-value {
 background:white; color:#ff69b4;
 padding:6px 20px; border-radius:20px;
@@ -135,10 +133,7 @@ max-height:85vh; overflow-y:auto;
 border:3px solid #ffb6c1;
 }
 .drawers-grid-modal h2 { color:#ff69b4; margin-bottom:20px; text-align:center; font-size:24px; }
-.drawers-grid {
-display:grid; grid-template-columns:repeat(auto-fill,minmax(150px,1fr));
-gap:15px; margin-bottom:20px;
-}
+.drawers-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); gap:15px; margin-bottom:20px; }
 .drawer-card {
 background:white; border:2px solid #ffb6c1; border-radius:12px;
 padding:15px; cursor:pointer; transition:all 0.2s;
@@ -147,11 +142,7 @@ padding:15px; cursor:pointer; transition:all 0.2s;
 .drawer-card-num { font-size:18px; font-weight:bold; color:#ff69b4; margin-bottom:5px; }
 .drawer-card-name { font-size:14px; color:#b67385; }
 .drawer-card-count { font-size:13px; color:#ff69b4; font-weight:bold; margin-top:5px; }
-.drawer-card-preview {
-margin-top:10px; width:100%; height:80px;
-display:flex; align-items:center; justify-content:center;
-font-size:20px; color:#ffb6c1; overflow:hidden;
-}
+.drawer-card-preview { margin-top:10px; width:100%; height:80px; display:flex; align-items:center; justify-content:center; font-size:20px; color:#ffb6c1; overflow:hidden; }
 .drawer-card-preview img { width:100%; height:100%; object-fit:contain; }
 
 input[type=“file”] { display:none; }
@@ -172,97 +163,109 @@ border-radius:12px; display:none;
 
 <div id="loading">Chargement...</div>
 
-<script>
-window.onerror = function(msg, src, line) { alert("ERREUR: " + msg + " ligne " + line); };
-var SB_URL  = 'https://kdgxbmqwhpuctjtlygrt.supabase.co';
-var SB_KEY  = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtkZ3hibXF3aHB1Y3RqdGx5Z3J0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUyMjY0NzQsImV4cCI6MjA5MDgwMjQ3NH0.9RsIj_bQgJskg9raRGN6uQJwUUlByTvWAFF2Eq9f6KM';
-var IMGBB   = '1612fdd94e39f24c3d14f1864f41d591';
+<div id="sidebar">
+  <button id="backBtn">&#8592; Retour</button>
+  <button id="viewAllBtn">Tous les tiroirs</button>
+</div>
 
-var NAMES = ['','Blanc','Ecru/Ivoire','Beige','Marron','Gris','Noir','Jaune','Orange','Rouge','Rose','Violet','Bleu','Vert','Turquoise','Multicolore','Metal/Argent'];
+<button id="toggleSidebar">☰</button>
+
+<button class="clickable-btn" id="hobbii-board" style="top:9.7%;left:26.5%;width:48.3%;height:19.8%"></button>
+<button class="clickable-btn drawer-btn" data-drawer="1"  data-name="Blanc"        style="top:45.6%;left:4.9%;width:20.6%;height:5.3%"></button>
+<button class="clickable-btn drawer-btn" data-drawer="2"  data-name="Ecru/Ivoire"  style="top:45.8%;left:27.8%;width:20.8%;height:5.2%"></button>
+<button class="clickable-btn drawer-btn" data-drawer="3"  data-name="Beige"        style="top:45.7%;left:51.0%;width:21.2%;height:5.3%"></button>
+<button class="clickable-btn drawer-btn" data-drawer="4"  data-name="Marron"       style="top:45.7%;left:74.0%;width:21.7%;height:5.4%"></button>
+<button class="clickable-btn drawer-btn" data-drawer="5"  data-name="Gris"         style="top:52.0%;left:4.7%;width:20.9%;height:5.6%"></button>
+<button class="clickable-btn drawer-btn" data-drawer="6"  data-name="Noir"         style="top:52.2%;left:27.4%;width:21.5%;height:5.3%"></button>
+<button class="clickable-btn drawer-btn" data-drawer="7"  data-name="Jaune"        style="top:52.2%;left:51.0%;width:21.0%;height:5.1%"></button>
+<button class="clickable-btn drawer-btn" data-drawer="8"  data-name="Orange"       style="top:52.2%;left:74.1%;width:21.7%;height:5.5%"></button>
+<button class="clickable-btn drawer-btn" data-drawer="9"  data-name="Rouge"        style="top:58.7%;left:5.3%;width:20.0%;height:5.5%"></button>
+<button class="clickable-btn drawer-btn" data-drawer="10" data-name="Rose"         style="top:58.7%;left:27.6%;width:21.7%;height:5.8%"></button>
+<button class="clickable-btn drawer-btn" data-drawer="11" data-name="Violet"       style="top:58.8%;left:51.0%;width:20.9%;height:5.6%"></button>
+<button class="clickable-btn drawer-btn" data-drawer="12" data-name="Bleu"         style="top:58.9%;left:74.1%;width:21.7%;height:5.5%"></button>
+<button class="clickable-btn drawer-btn" data-drawer="13" data-name="Vert"         style="top:65.5%;left:5.3%;width:20.1%;height:5.5%"></button>
+<button class="clickable-btn drawer-btn" data-drawer="14" data-name="Turquoise"    style="top:65.5%;left:27.5%;width:21.7%;height:5.6%"></button>
+<button class="clickable-btn drawer-btn" data-drawer="15" data-name="Multicolore"  style="top:65.7%;left:50.7%;width:21.7%;height:5.4%"></button>
+<button class="clickable-btn drawer-btn" data-drawer="16" data-name="Metal/Argent" style="top:65.7%;left:73.8%;width:21.7%;height:5.5%"></button>
+
+<script>
+var SB_URL = 'https://kdgxbmqwhpuctjtlygrt.supabase.co';
+var SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtkZ3hibXF3aHB1Y3RqdGx5Z3J0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUyMjY0NzQsImV4cCI6MjA5MDgwMjQ3NH0.9RsIj_bQgJskg9raRGN6uQJwUUlByTvWAFF2Eq9f6KM';
+var IMGBB  = '1612fdd94e39f24c3d14f1864f41d591';
+var NAMES  = ['','Blanc','Ecru/Ivoire','Beige','Marron','Gris','Noir','Jaune','Orange','Rouge','Rose','Violet','Bleu','Vert','Turquoise','Multicolore','Metal/Argent'];
 var D = {};
 for (var i = 1; i <= 16; i++) D[i] = { name:NAMES[i], photo:null, notes:'', count:0 };
 
-// Charger Supabase au démarrage
-(async function() {
-  try {
-    var r = await fetch(SB_URL + '/rest/v1/drawers?select=*', {
-      headers: { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY }
-    });
-    var rows = await r.json();
-    if (Array.isArray(rows)) rows.forEach(function(row) {
-      if (D[row.drawer_number]) {
-        D[row.drawer_number].photo = row.photo_url || null;
-        D[row.drawer_number].notes = row.notes || '';
-        D[row.drawer_number].count = row.count || 0;
-      }
-    });
-  } catch(e) {}
-})();
+// Charger Supabase
+fetch(SB_URL + '/rest/v1/drawers?select=*', {
+  headers: { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY }
+}).then(function(r) { return r.json(); }).then(function(rows) {
+  if (!Array.isArray(rows)) return;
+  rows.forEach(function(row) {
+    if (D[row.drawer_number]) {
+      D[row.drawer_number].photo = row.photo_url || null;
+      D[row.drawer_number].notes = row.notes || '';
+      D[row.drawer_number].count = row.count || 0;
+    }
+  });
+}).catch(function() {});
 
-async function sbSave(num) {
+function sbSave(num) {
   var d = D[num];
-  try {
-    var r = await fetch(SB_URL + '/rest/v1/drawers?drawer_number=eq.' + num + '&select=id', {
-      headers: { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY }
-    });
-    var rows = await r.json();
+  fetch(SB_URL + '/rest/v1/drawers?drawer_number=eq.' + num + '&select=id', {
+    headers: { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY }
+  }).then(function(r) { return r.json(); }).then(function(rows) {
     if (rows && rows.length > 0) {
-      await fetch(SB_URL + '/rest/v1/drawers?drawer_number=eq.' + num, {
+      fetch(SB_URL + '/rest/v1/drawers?drawer_number=eq.' + num, {
         method: 'PATCH',
         headers: { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY, 'Content-Type': 'application/json' },
         body: JSON.stringify({ photo_url: d.photo, notes: d.notes, count: d.count })
       });
     } else {
-      await fetch(SB_URL + '/rest/v1/drawers', {
+      fetch(SB_URL + '/rest/v1/drawers', {
         method: 'POST',
         headers: { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
         body: JSON.stringify({ drawer_number: num, name: d.name, photo_url: d.photo, notes: d.notes, count: d.count })
       });
     }
-  } catch(e) {}
+  }).catch(function() {});
 }
 
-async function uploadPhoto(file) {
-  var reader = new FileReader();
-  var b64 = await new Promise(function(res) {
-    reader.onload = function(e) { res(e.target.result.split(',')[1]); };
-    reader.readAsDataURL(file);
-  });
-  var r = await fetch('https://api.imgbb.com/1/upload?key=' + IMGBB, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-    body: 'image=' + encodeURIComponent(b64)
-  });
-  var j = await r.json();
-  if (j.success) return j.data.url;
-  throw new Error('ImgBB failed');
-}
-
-function toggleSidebar() {
-  alert("toggleSidebar");
+// Toggle sidebar
+document.getElementById('toggleSidebar').addEventListener('click', function() {
   var s = document.getElementById('sidebar');
   var t = document.getElementById('toggleSidebar');
   if (s.classList.contains('open')) {
-    s.classList.remove('open');
-    t.classList.remove('open');
+    s.classList.remove('open'); t.classList.remove('open');
   } else {
-    s.classList.add('open');
-    t.classList.add('open');
+    s.classList.add('open'); t.classList.add('open');
   }
-}
+});
 
-function closeSidebar() {
+document.getElementById('backBtn').addEventListener('click', function() {
+  window.location.href = 'owner.html';
+});
+
+document.getElementById('viewAllBtn').addEventListener('click', function() {
   document.getElementById('sidebar').classList.remove('open');
   document.getElementById('toggleSidebar').classList.remove('open');
-}
+  showAllDrawers();
+});
+
+document.getElementById('hobbii-board').addEventListener('click', function() {
+  window.open('https://hobbii.fr', '_blank');
+});
+
+document.querySelectorAll('.drawer-btn').forEach(function(btn) {
+  btn.addEventListener('click', function() {
+    openDrawer(parseInt(btn.dataset.drawer), btn.dataset.name);
+  });
+});
 
 function openDrawer(num, name) {
-  alert("openDrawer " + num);
   var d = D[num];
   var overlay = document.createElement('div');
   overlay.className = 'overlay';
-  overlay.onclick = function(e) { if (e.target === overlay) { overlay.remove(); modal.remove(); } };
-
   var modal = document.createElement('div');
   modal.className = 'drawer-modal';
 
@@ -302,42 +305,53 @@ function openDrawer(num, name) {
 document.body.appendChild(overlay);
 document.body.appendChild(modal);
 
-document.getElementById(‘inc’ + num).onclick = async function() {
+function closeModal() { overlay.remove(); modal.remove(); }
+
+document.getElementById(‘inc’ + num).addEventListener(‘click’, function() {
 d.count = (d.count||0) + 1;
 document.getElementById(‘cnt’ + num).textContent = d.count;
-await sbSave(num);
-};
-document.getElementById(‘dec’ + num).onclick = async function() {
+sbSave(num);
+});
+document.getElementById(‘dec’ + num).addEventListener(‘click’, function() {
 if ((d.count||0) > 0) {
 d.count = d.count - 1;
 document.getElementById(‘cnt’ + num).textContent = d.count;
-await sbSave(num);
+sbSave(num);
 }
-};
-document.getElementById(‘pbtn’ + num).onclick = function() {
+});
+document.getElementById(‘pbtn’ + num).addEventListener(‘click’, function() {
 document.getElementById(‘file’ + num).click();
-};
-document.getElementById(‘file’ + num).onchange = async function(e) {
+});
+document.getElementById(‘file’ + num).addEventListener(‘change’, function(e) {
 var file = e.target.files[0];
 if (!file) return;
 document.getElementById(‘loading’).style.display = ‘block’;
-try {
-var url = await uploadPhoto(file);
-d.photo = url;
-document.getElementById(‘prev’ + num).innerHTML = ‘<img src="' + url + '" alt="">’;
-await sbSave(num);
+var reader = new FileReader();
+reader.onload = function(ev) {
+var b64 = ev.target.result.split(’,’)[1];
+fetch(‘https://api.imgbb.com/1/upload?key=’ + IMGBB, {
+method: ‘POST’,
+headers: { ‘Content-Type’: ‘application/x-www-form-urlencoded’ },
+body: ‘image=’ + encodeURIComponent(b64)
+}).then(function(r) { return r.json(); }).then(function(j) {
+if (j.success) {
+d.photo = j.data.url;
+document.getElementById(‘prev’ + num).innerHTML = ‘<img src="' + j.data.url + '" alt="">’;
+sbSave(num);
 alert(’\u2705 Photo upload\u00e9e !’);
-} catch(err) { alert(’\u274C ’ + err.message); }
-document.getElementById(‘loading’).style.display = ‘none’;
+}
+}).catch(function(err) { alert(’\u274C ’ + err.message); })
+.finally(function() { document.getElementById(‘loading’).style.display = ‘none’; });
 };
-document.getElementById(‘sav’ + num).onclick = async function() {
+reader.readAsDataURL(file);
+});
+document.getElementById(‘sav’ + num).addEventListener(‘click’, function() {
 d.notes = document.getElementById(‘txt’ + num).value;
-await sbSave(num);
+sbSave(num);
 alert(’\u2705 Sauvegard\u00e9 !’);
-};
-document.getElementById(‘cls’ + num).onclick = function() {
-overlay.remove(); modal.remove();
-};
+});
+document.getElementById(‘cls’ + num).addEventListener(‘click’, closeModal);
+overlay.addEventListener(‘click’, function(e) { if (e.target === overlay) closeModal(); });
 }
 
 function showAllDrawers() {
@@ -349,54 +363,31 @@ modal.className = ‘drawers-grid-modal’;
 var html = ‘<h2>\uD83D\uDCE6 Tous les tiroirs</h2><div class="drawers-grid">’;
 for (var j = 1; j <= 16; j++) {
 var dd = D[j];
-html += ‘<div class="drawer-card" onclick="this.closest(\'.drawers-grid-modal\').remove();document.querySelector(\'.overlay\').remove();openDrawer(' + j + ',\'' + dd.name + '\')">’ +
+html += ‘<div class="drawer-card" data-num="' + j + '" data-name="' + dd.name + '">’ +
 ’<div class="drawer-card-num">Tiroir ’ + j + ‘</div>’ +
 ‘<div class="drawer-card-name">’ + dd.name + ‘</div>’ +
 ‘<div class="drawer-card-count">\uD83E\uDDF6 ’ + (dd.count||0) + ’ pelote(s)</div>’ +
 ‘<div class="drawer-card-preview">’ + (dd.photo ? ‘<img src="' + dd.photo + '">’ : ‘\uD83D\uDCF7’) + ‘</div>’ +
 ‘</div>’;
 }
-html += ‘</div><div class="modal-buttons"><button class="close-btn" onclick="this.closest(\'.drawers-grid-modal\').remove();document.querySelector(\'.overlay\').remove()">Fermer</button></div>’;
+html += ‘</div><div class="modal-buttons"><button class="close-btn" id="cls-all">Fermer</button></div>’;
 modal.innerHTML = html;
 
-overlay.onclick = function(e) { if (e.target === overlay) { overlay.remove(); modal.remove(); } };
+function closeAll() { overlay.remove(); modal.remove(); }
+
 document.body.appendChild(overlay);
 document.body.appendChild(modal);
+
+modal.querySelectorAll(’.drawer-card’).forEach(function(card) {
+card.addEventListener(‘click’, function() {
+closeAll();
+openDrawer(parseInt(card.dataset.num), card.dataset.name);
+});
+});
+document.getElementById(‘cls-all’).addEventListener(‘click’, closeAll);
+overlay.addEventListener(‘click’, function(e) { if (e.target === overlay) closeAll(); });
 }
 </script>
-
-<div id="sidebar">
-  <button onclick="window.location.href='owner.html'">&#8592; Retour</button>
-  <button onclick="closeSidebar(); showAllDrawers();">
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-      <rect x="3" y="3" width="7" height="7" rx="1"/>
-      <rect x="14" y="3" width="7" height="7" rx="1"/>
-      <rect x="3" y="14" width="7" height="7" rx="1"/>
-      <rect x="14" y="14" width="7" height="7" rx="1"/>
-    </svg>
-    Tous les tiroirs
-  </button>
-</div>
-
-<button id="toggleSidebar" onclick="toggleSidebar()">☰</button>
-
-<button class="clickable-btn" style="top:9.7%;left:26.5%;width:48.3%;height:19.8%" onclick="window.open('https://hobbii.fr','_blank')"></button>
-<button class="clickable-btn" style="top:45.6%;left:4.9%;width:20.6%;height:5.3%"  onclick="openDrawer(1,'Blanc')"></button>
-<button class="clickable-btn" style="top:45.8%;left:27.8%;width:20.8%;height:5.2%" onclick="openDrawer(2,'Ecru/Ivoire')"></button>
-<button class="clickable-btn" style="top:45.7%;left:51.0%;width:21.2%;height:5.3%" onclick="openDrawer(3,'Beige')"></button>
-<button class="clickable-btn" style="top:45.7%;left:74.0%;width:21.7%;height:5.4%" onclick="openDrawer(4,'Marron')"></button>
-<button class="clickable-btn" style="top:52.0%;left:4.7%;width:20.9%;height:5.6%"  onclick="openDrawer(5,'Gris')"></button>
-<button class="clickable-btn" style="top:52.2%;left:27.4%;width:21.5%;height:5.3%" onclick="openDrawer(6,'Noir')"></button>
-<button class="clickable-btn" style="top:52.2%;left:51.0%;width:21.0%;height:5.1%" onclick="openDrawer(7,'Jaune')"></button>
-<button class="clickable-btn" style="top:52.2%;left:74.1%;width:21.7%;height:5.5%" onclick="openDrawer(8,'Orange')"></button>
-<button class="clickable-btn" style="top:58.7%;left:5.3%;width:20.0%;height:5.5%"  onclick="openDrawer(9,'Rouge')"></button>
-<button class="clickable-btn" style="top:58.7%;left:27.6%;width:21.7%;height:5.8%" onclick="openDrawer(10,'Rose')"></button>
-<button class="clickable-btn" style="top:58.8%;left:51.0%;width:20.9%;height:5.6%" onclick="openDrawer(11,'Violet')"></button>
-<button class="clickable-btn" style="top:58.9%;left:74.1%;width:21.7%;height:5.5%" onclick="openDrawer(12,'Bleu')"></button>
-<button class="clickable-btn" style="top:65.5%;left:5.3%;width:20.1%;height:5.5%"  onclick="openDrawer(13,'Vert')"></button>
-<button class="clickable-btn" style="top:65.5%;left:27.5%;width:21.7%;height:5.6%" onclick="openDrawer(14,'Turquoise')"></button>
-<button class="clickable-btn" style="top:65.7%;left:50.7%;width:21.7%;height:5.4%" onclick="openDrawer(15,'Multicolore')"></button>
-<button class="clickable-btn" style="top:65.7%;left:73.8%;width:21.7%;height:5.5%" onclick="openDrawer(16,'Metal/Argent')"></button>
 
 </body>
 </html>
