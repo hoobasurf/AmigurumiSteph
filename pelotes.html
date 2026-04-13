@@ -17,8 +17,9 @@ border-right:2px solid #b67385;
 padding:60px 20px 20px;
 transition:left .3s;
 z-index:9000;
+pointer-events:none;
 }
-#sidebar.open { left:0; }
+#sidebar.open { left:0; pointer-events:auto; }
 
 #toggleSidebar {
 position:fixed; top:50%; left:0;
@@ -325,14 +326,6 @@ document.addEventListener('DOMContentLoaded', function() {
     } else {
       sidebarEl.classList.add('open');
       toggleEl.classList.add('open');
-    }
-  });
-
-  // Fermer sidebar si clic dehors
-  document.addEventListener('click', function(e) {
-    if (sidebarEl.classList.contains('open') && !sidebarEl.contains(e.target) && e.target !== toggleEl) {
-      sidebarEl.classList.remove('open');
-      toggleEl.classList.remove('open');
     }
   });
 
