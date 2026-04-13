@@ -173,6 +173,7 @@ border-radius:12px; display:none;
 <div id="loading">Chargement...</div>
 
 <script>
+window.onerror = function(msg, src, line) { alert("ERREUR: " + msg + " ligne " + line); };
 var SB_URL  = 'https://kdgxbmqwhpuctjtlygrt.supabase.co';
 var SB_KEY  = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtkZ3hibXF3aHB1Y3RqdGx5Z3J0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUyMjY0NzQsImV4cCI6MjA5MDgwMjQ3NH0.9RsIj_bQgJskg9raRGN6uQJwUUlByTvWAFF2Eq9f6KM';
 var IMGBB   = '1612fdd94e39f24c3d14f1864f41d591';
