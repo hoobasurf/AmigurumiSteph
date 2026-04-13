@@ -9,13 +9,6 @@
 * { margin:0; padding:0; box-sizing:border-box; }
 body { font-family:'Comic Sans MS',cursive; overflow:hidden; }
 
-#background {
-position:fixed; inset:0;
-background-image:url(‘Photoroom_20260118_214442.png’);
-background-size:cover; background-position:center;
-z-index:-1; pointer-events:none;
-}
-
 #sidebar {
 position:fixed; top:0; left:-220px;
 width:220px; height:100vh;
@@ -186,7 +179,7 @@ border-radius:12px; display:none;
 </head>
 <body>
 
-<div id="background"></div>
+<div style="position:fixed;top:0;left:0;width:100vw;height:100vh;background-image:url('Photoroom_20260118_214442.png');background-size:cover;background-position:center center;background-repeat:no-repeat;z-index:-1;pointer-events:none;"></div>
 <div id="loading">Chargement...</div>
 
 <div id="sidebar">
@@ -227,6 +220,7 @@ var IMGBB_KEY = '1612fdd94e39f24c3d14f1864f41d591';
 var SB_URL    = 'https://kdgxbmqwhpuctjtlygrt.supabase.co';
 var SB_KEY    = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtkZ3hibXF3aHB1Y3RqdGx5Z3J0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUyMjY0NzQsImV4cCI6MjA5MDgwMjQ3NH0.9RsIj_bQgJskg9raRGN6uQJwUUlByTvWAFF2Eq9f6KM';
 var SB_HEADS  = { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY, 'Content-Type': 'application/json' };
+var SB_HEADS_GET = { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY };
 
 var NAMES = ['','Blanc','Ecru/Ivoire','Beige','Marron','Gris','Noir','Jaune','Orange','Rouge','Rose','Violet','Bleu','Vert','Turquoise','Multicolore','Metal/Argent'];
 var drawersData = {};
@@ -276,7 +270,7 @@ function compressImg(file) {
 // ===== SUPABASE =====
 async function sbLoad() {
   try {
-    var res = await fetch(SB_URL + '/rest/v1/drawers?select=*', { headers: SB_HEADS });
+    var res = await fetch(SB_URL + '/rest/v1/drawers?select=*', { headers: SB_HEADS_GET });
     var data = await res.json();
     if (Array.isArray(data)) {
       data.forEach(function(row) {
@@ -293,7 +287,7 @@ async function sbLoad() {
 async function sbSave(num) {
   var d = drawersData[num];
   try {
-    var check = await fetch(SB_URL + '/rest/v1/drawers?drawer_number=eq.' + num + '&select=id', { headers: SB_HEADS });
+    var check = await fetch(SB_URL + '/rest/v1/drawers?drawer_number=eq.' + num + '&select=id', { headers: SB_HEADS_GET });
     var rows = await check.json();
     if (rows && rows.length > 0) {
       await fetch(SB_URL + '/rest/v1/drawers?drawer_number=eq.' + num, {
