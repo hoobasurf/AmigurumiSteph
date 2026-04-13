@@ -32,8 +32,6 @@ cursor:pointer; font-weight:bold;
 z-index:9002;
 border:none; color:white; font-size:18px;
 transition:left .3s;
-touch-action:manipulation;
--webkit-tap-highlight-color:transparent;
 }
 #toggleSidebar.open { left:220px; }
 
@@ -44,7 +42,6 @@ border:none; border-radius:16px;
 background:#ffb6c1; color:#fff;
 font-weight:bold; font-size:14px; cursor:pointer;
 font-family:‘Comic Sans MS’,cursive;
-touch-action:manipulation;
 }
 #sidebar button:hover { background:#ff69b4; }
 
@@ -52,8 +49,6 @@ touch-action:manipulation;
 position:fixed;
 background:transparent; border:none;
 cursor:pointer; z-index:500;
-touch-action:manipulation;
--webkit-tap-highlight-color:transparent;
 }
 
 .overlay {
@@ -86,7 +81,6 @@ padding:15px; border-radius:12px; text-align:center;
 background:#ffb6c1; border:none; color:white;
 width:44px; height:44px; border-radius:50%;
 font-size:22px; font-weight:bold; cursor:pointer;
-touch-action:manipulation;
 }
 .counter-btn:hover { background:#ff69b4; }
 .counter-value {
@@ -111,9 +105,7 @@ display:flex; align-items:center; justify-content:center;
 padding:7px 14px; background:#ffb6c1; border:none;
 border-radius:8px; color:white; cursor:pointer; font-size:11px; font-weight:bold;
 font-family:‘Comic Sans MS’,cursive;
-touch-action:manipulation;
 }
-.photo-btn:hover { background:#ff69b4; }
 
 .notes-section { display:flex; flex-direction:column; gap:6px; }
 .notes-section label { color:#b67385; font-weight:bold; font-size:13px; }
@@ -129,10 +121,8 @@ font-family:‘Comic Sans MS’,cursive; font-size:13px; resize:vertical;
 flex:1; padding:10px; border:none; border-radius:10px;
 font-weight:bold; cursor:pointer; font-size:13px;
 font-family:‘Comic Sans MS’,cursive;
-touch-action:manipulation;
 }
 .save-btn { background:#ffb6c1; color:white; }
-.save-btn:hover { background:#ff69b4; }
 .close-btn { background:#ddd; color:#666; }
 
 .drawers-grid-modal {
@@ -152,7 +142,6 @@ gap:15px; margin-bottom:20px;
 .drawer-card {
 background:white; border:2px solid #ffb6c1; border-radius:12px;
 padding:15px; cursor:pointer; transition:all 0.2s;
-touch-action:manipulation;
 }
 .drawer-card:hover { transform:translateY(-3px); border-color:#ff69b4; }
 .drawer-card-num { font-size:18px; font-weight:bold; color:#ff69b4; margin-bottom:5px; }
@@ -180,11 +169,12 @@ border-radius:12px; display:none;
 <body>
 
 <div style="position:fixed;top:0;left:0;width:100vw;height:100vh;background-image:url('Photoroom_20260118_214442.png');background-size:cover;background-position:center center;background-repeat:no-repeat;z-index:-1;pointer-events:none;"></div>
+
 <div id="loading">Chargement...</div>
 
 <div id="sidebar">
-  <button id="backBtn">&#8592; Retour</button>
-  <button id="viewAllBtn">
+  <button onclick="window.location.href='owner.html'">&#8592; Retour</button>
+  <button onclick="closeSidebar(); showAllDrawers();">
     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
       <rect x="3" y="3" width="7" height="7" rx="1"/>
       <rect x="14" y="3" width="7" height="7" rx="1"/>
@@ -195,162 +185,114 @@ border-radius:12px; display:none;
   </button>
 </div>
 
-<button id="toggleSidebar">☰</button>
+<button id="toggleSidebar" onclick="toggleSidebar()">☰</button>
 
-<button class="clickable-btn" id="hobbii-board" style="top:9.7%;left:26.5%;width:48.3%;height:19.8%"></button>
-<button class="clickable-btn drawer-btn" data-drawer="1"  data-name="Blanc"        style="top:45.6%;left:4.9%;width:20.6%;height:5.3%"></button>
-<button class="clickable-btn drawer-btn" data-drawer="2"  data-name="Ecru/Ivoire"  style="top:45.8%;left:27.8%;width:20.8%;height:5.2%"></button>
-<button class="clickable-btn drawer-btn" data-drawer="3"  data-name="Beige"        style="top:45.7%;left:51.0%;width:21.2%;height:5.3%"></button>
-<button class="clickable-btn drawer-btn" data-drawer="4"  data-name="Marron"       style="top:45.7%;left:74.0%;width:21.7%;height:5.4%"></button>
-<button class="clickable-btn drawer-btn" data-drawer="5"  data-name="Gris"         style="top:52.0%;left:4.7%;width:20.9%;height:5.6%"></button>
-<button class="clickable-btn drawer-btn" data-drawer="6"  data-name="Noir"         style="top:52.2%;left:27.4%;width:21.5%;height:5.3%"></button>
-<button class="clickable-btn drawer-btn" data-drawer="7"  data-name="Jaune"        style="top:52.2%;left:51.0%;width:21.0%;height:5.1%"></button>
-<button class="clickable-btn drawer-btn" data-drawer="8"  data-name="Orange"       style="top:52.2%;left:74.1%;width:21.7%;height:5.5%"></button>
-<button class="clickable-btn drawer-btn" data-drawer="9"  data-name="Rouge"        style="top:58.7%;left:5.3%;width:20.0%;height:5.5%"></button>
-<button class="clickable-btn drawer-btn" data-drawer="10" data-name="Rose"         style="top:58.7%;left:27.6%;width:21.7%;height:5.8%"></button>
-<button class="clickable-btn drawer-btn" data-drawer="11" data-name="Violet"       style="top:58.8%;left:51.0%;width:20.9%;height:5.6%"></button>
-<button class="clickable-btn drawer-btn" data-drawer="12" data-name="Bleu"         style="top:58.9%;left:74.1%;width:21.7%;height:5.5%"></button>
-<button class="clickable-btn drawer-btn" data-drawer="13" data-name="Vert"         style="top:65.5%;left:5.3%;width:20.1%;height:5.5%"></button>
-<button class="clickable-btn drawer-btn" data-drawer="14" data-name="Turquoise"    style="top:65.5%;left:27.5%;width:21.7%;height:5.6%"></button>
-<button class="clickable-btn drawer-btn" data-drawer="15" data-name="Multicolore"  style="top:65.7%;left:50.7%;width:21.7%;height:5.4%"></button>
-<button class="clickable-btn drawer-btn" data-drawer="16" data-name="Metal/Argent" style="top:65.7%;left:73.8%;width:21.7%;height:5.5%"></button>
+<button class="clickable-btn" style="top:9.7%;left:26.5%;width:48.3%;height:19.8%" onclick="window.open('https://hobbii.fr','_blank')"></button>
+<button class="clickable-btn" style="top:45.6%;left:4.9%;width:20.6%;height:5.3%"  onclick="openDrawer(1,'Blanc')"></button>
+<button class="clickable-btn" style="top:45.8%;left:27.8%;width:20.8%;height:5.2%" onclick="openDrawer(2,'Ecru/Ivoire')"></button>
+<button class="clickable-btn" style="top:45.7%;left:51.0%;width:21.2%;height:5.3%" onclick="openDrawer(3,'Beige')"></button>
+<button class="clickable-btn" style="top:45.7%;left:74.0%;width:21.7%;height:5.4%" onclick="openDrawer(4,'Marron')"></button>
+<button class="clickable-btn" style="top:52.0%;left:4.7%;width:20.9%;height:5.6%"  onclick="openDrawer(5,'Gris')"></button>
+<button class="clickable-btn" style="top:52.2%;left:27.4%;width:21.5%;height:5.3%" onclick="openDrawer(6,'Noir')"></button>
+<button class="clickable-btn" style="top:52.2%;left:51.0%;width:21.0%;height:5.1%" onclick="openDrawer(7,'Jaune')"></button>
+<button class="clickable-btn" style="top:52.2%;left:74.1%;width:21.7%;height:5.5%" onclick="openDrawer(8,'Orange')"></button>
+<button class="clickable-btn" style="top:58.7%;left:5.3%;width:20.0%;height:5.5%"  onclick="openDrawer(9,'Rouge')"></button>
+<button class="clickable-btn" style="top:58.7%;left:27.6%;width:21.7%;height:5.8%" onclick="openDrawer(10,'Rose')"></button>
+<button class="clickable-btn" style="top:58.8%;left:51.0%;width:20.9%;height:5.6%" onclick="openDrawer(11,'Violet')"></button>
+<button class="clickable-btn" style="top:58.9%;left:74.1%;width:21.7%;height:5.5%" onclick="openDrawer(12,'Bleu')"></button>
+<button class="clickable-btn" style="top:65.5%;left:5.3%;width:20.1%;height:5.5%"  onclick="openDrawer(13,'Vert')"></button>
+<button class="clickable-btn" style="top:65.5%;left:27.5%;width:21.7%;height:5.6%" onclick="openDrawer(14,'Turquoise')"></button>
+<button class="clickable-btn" style="top:65.7%;left:50.7%;width:21.7%;height:5.4%" onclick="openDrawer(15,'Multicolore')"></button>
+<button class="clickable-btn" style="top:65.7%;left:73.8%;width:21.7%;height:5.5%" onclick="openDrawer(16,'Metal/Argent')"></button>
 
 <script>
-var IMGBB_KEY = '1612fdd94e39f24c3d14f1864f41d591';
-var SB_URL    = 'https://kdgxbmqwhpuctjtlygrt.supabase.co';
-var SB_KEY    = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtkZ3hibXF3aHB1Y3RqdGx5Z3J0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUyMjY0NzQsImV4cCI6MjA5MDgwMjQ3NH0.9RsIj_bQgJskg9raRGN6uQJwUUlByTvWAFF2Eq9f6KM';
-var SB_HEADS  = { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY, 'Content-Type': 'application/json' };
-var SB_HEADS_GET = { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY };
+var SB_URL  = 'https://kdgxbmqwhpuctjtlygrt.supabase.co';
+var SB_KEY  = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtkZ3hibXF3aHB1Y3RqdGx5Z3J0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUyMjY0NzQsImV4cCI6MjA5MDgwMjQ3NH0.9RsIj_bQgJskg9raRGN6uQJwUUlByTvWAFF2Eq9f6KM';
+var IMGBB   = '1612fdd94e39f24c3d14f1864f41d591';
 
 var NAMES = ['','Blanc','Ecru/Ivoire','Beige','Marron','Gris','Noir','Jaune','Orange','Rouge','Rose','Violet','Bleu','Vert','Turquoise','Multicolore','Metal/Argent'];
-var drawersData = {};
-for (var i = 1; i <= 16; i++) {
-  drawersData[i] = { name: NAMES[i], photo: null, notes: '', count: 0 };
-}
+var D = {};
+for (var i = 1; i <= 16; i++) D[i] = { name:NAMES[i], photo:null, notes:'', count:0 };
 
-// ===== IMGBB UPLOAD =====
-async function uploadPhoto(file) {
-  var compressed = await compressImg(file);
-  var fd = new FormData();
-  fd.append('image', compressed);
-  for (var attempt = 0; attempt < 3; attempt++) {
-    try {
-      var res = await fetch('https://api.imgbb.com/1/upload?key=' + IMGBB_KEY, { method: 'POST', body: fd });
-      var json = await res.json();
-      if (json.success) return json.data.url;
-    } catch(e) {
-      await new Promise(function(r) { setTimeout(r, 1500); });
-    }
-  }
-  throw new Error('Upload ImgBB echoue');
-}
-
-function compressImg(file) {
-  return new Promise(function(resolve) {
-    var reader = new FileReader();
-    reader.onload = function(e) {
-      var img = new Image();
-      img.onload = function() {
-        var canvas = document.createElement('canvas');
-        var w = img.width, h = img.height, max = 1200;
-        if (w > h && w > max) { h = h * max / w; w = max; }
-        else if (h > max) { w = w * max / h; h = max; }
-        canvas.width = w; canvas.height = h;
-        canvas.getContext('2d').drawImage(img, 0, 0, w, h);
-        canvas.toBlob(function(blob) {
-          resolve(new File([blob], 'photo.jpg', { type: 'image/jpeg' }));
-        }, 'image/jpeg', 0.75);
-      };
-      img.src = e.target.result;
-    };
-    reader.readAsDataURL(file);
-  });
-}
-
-// ===== SUPABASE =====
-async function sbLoad() {
+// Charger Supabase au démarrage
+(async function() {
   try {
-    var res = await fetch(SB_URL + '/rest/v1/drawers?select=*', { headers: SB_HEADS_GET });
-    var data = await res.json();
-    if (Array.isArray(data)) {
-      data.forEach(function(row) {
-        if (drawersData[row.drawer_number]) {
-          drawersData[row.drawer_number].photo = row.photo_url || null;
-          drawersData[row.drawer_number].notes = row.notes    || '';
-          drawersData[row.drawer_number].count = row.count    || 0;
-        }
-      });
-    }
-  } catch(e) { console.error('sbLoad:', e); }
-}
+    var r = await fetch(SB_URL + '/rest/v1/drawers?select=*', {
+      headers: { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY }
+    });
+    var rows = await r.json();
+    if (Array.isArray(rows)) rows.forEach(function(row) {
+      if (D[row.drawer_number]) {
+        D[row.drawer_number].photo = row.photo_url || null;
+        D[row.drawer_number].notes = row.notes || '';
+        D[row.drawer_number].count = row.count || 0;
+      }
+    });
+  } catch(e) {}
+})();
 
 async function sbSave(num) {
-  var d = drawersData[num];
+  var d = D[num];
   try {
-    var check = await fetch(SB_URL + '/rest/v1/drawers?drawer_number=eq.' + num + '&select=id', { headers: SB_HEADS_GET });
-    var rows = await check.json();
+    var r = await fetch(SB_URL + '/rest/v1/drawers?drawer_number=eq.' + num + '&select=id', {
+      headers: { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY }
+    });
+    var rows = await r.json();
     if (rows && rows.length > 0) {
       await fetch(SB_URL + '/rest/v1/drawers?drawer_number=eq.' + num, {
         method: 'PATCH',
-        headers: SB_HEADS,
+        headers: { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY, 'Content-Type': 'application/json' },
         body: JSON.stringify({ photo_url: d.photo, notes: d.notes, count: d.count })
       });
     } else {
       await fetch(SB_URL + '/rest/v1/drawers', {
         method: 'POST',
-        headers: Object.assign({}, SB_HEADS, { 'Prefer': 'return=minimal' }),
+        headers: { 'apikey': SB_KEY, 'Authorization': 'Bearer ' + SB_KEY, 'Content-Type': 'application/json', 'Prefer': 'return=minimal' },
         body: JSON.stringify({ drawer_number: num, name: d.name, photo_url: d.photo, notes: d.notes, count: d.count })
       });
     }
-  } catch(e) { console.error('sbSave:', e); }
+  } catch(e) {}
 }
 
-// ===== INIT =====
-window.addEventListener('load', function() {
-
-  document.getElementById('loading').style.display = 'block';
-  sbLoad().then(function() {
-    document.getElementById('loading').style.display = 'none';
-  }).catch(function() {
-    document.getElementById('loading').style.display = 'none';
+async function uploadPhoto(file) {
+  var reader = new FileReader();
+  var b64 = await new Promise(function(res) {
+    reader.onload = function(e) { res(e.target.result.split(',')[1]); };
+    reader.readAsDataURL(file);
   });
-
-  // Toggle sidebar
-  var sidebarEl = document.getElementById('sidebar');
-  var toggleEl  = document.getElementById('toggleSidebar');
-  toggleEl.addEventListener('click', function() {
-    var open = sidebarEl.classList.contains('open');
-    if (open) {
-      sidebarEl.classList.remove('open');
-      toggleEl.classList.remove('open');
-    } else {
-      sidebarEl.classList.add('open');
-      toggleEl.classList.add('open');
-    }
+  var r = await fetch('https://api.imgbb.com/1/upload?key=' + IMGBB, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+    body: 'image=' + encodeURIComponent(b64)
   });
+  var j = await r.json();
+  if (j.success) return j.data.url;
+  throw new Error('ImgBB failed');
+}
 
-  document.getElementById('backBtn').onclick = function() { window.location.href = 'owner.html'; };
-  document.getElementById('viewAllBtn').onclick = function() {
-    sidebarEl.classList.remove('open');
-    toggleEl.classList.remove('open');
-    showAllDrawers();
-  };
-  document.getElementById('hobbii-board').onclick = function() { window.open('https://hobbii.fr', '_blank'); };
+function toggleSidebar() {
+  var s = document.getElementById('sidebar');
+  var t = document.getElementById('toggleSidebar');
+  if (s.classList.contains('open')) {
+    s.classList.remove('open');
+    t.classList.remove('open');
+  } else {
+    s.classList.add('open');
+    t.classList.add('open');
+  }
+}
 
-  document.querySelectorAll('.drawer-btn').forEach(function(btn) {
-    btn.addEventListener('click', function() {
-      openDrawer(parseInt(btn.dataset.drawer), btn.dataset.name);
-    });
-  });
+function closeSidebar() {
+  document.getElementById('sidebar').classList.remove('open');
+  document.getElementById('toggleSidebar').classList.remove('open');
+}
 
-});
-
-// ===== OPEN DRAWER =====
 function openDrawer(num, name) {
-  var d = drawersData[num];
-
+  var d = D[num];
   var overlay = document.createElement('div');
   overlay.className = 'overlay';
+  overlay.onclick = function(e) { if (e.target === overlay) { overlay.remove(); modal.remove(); } };
+
   var modal = document.createElement('div');
   modal.className = 'drawer-modal';
 
@@ -364,79 +306,70 @@ function openDrawer(num, name) {
       '<div class="counter-section">' +
         '<div class="counter-label">\uD83E\uDDF6 Nombre de pelotes</div>' +
         '<div class="counter-controls">' +
-          '<button class="counter-btn" id="d-dec-' + num + '">\u2212</button>' +
-          '<div class="counter-value" id="d-cnt-' + num + '">' + (d.count || 0) + '</div>' +
-          '<button class="counter-btn" id="d-inc-' + num + '">+</button>' +
+          '<button class="counter-btn" id="dec' + num + '">\u2212</button>' +
+          '<div class="counter-value" id="cnt' + num + '">' + (d.count||0) + '</div>' +
+          '<button class="counter-btn" id="inc' + num + '">+</button>' +
         '</div>' +
       '</div>' +
       '<div class="photo-section">' +
-        '<div class="photo-preview" id="d-prev-' + num + '">' + photoHtml + '</div>' +
-        '<input type="file" id="d-file-' + num + '" accept="image/*">' +
-        '<button class="photo-btn" id="d-pbtn-' + num + '">\uD83D\uDCF7 ' + (d.photo ? 'Changer' : 'Ajouter') + ' une photo</button>' +
+        '<div class="photo-preview" id="prev' + num + '">' + photoHtml + '</div>' +
+        '<input type="file" id="file' + num + '" accept="image/*">' +
+        '<button class="photo-btn" id="pbtn' + num + '">\uD83D\uDCF7 ' + (d.photo ? 'Changer' : 'Ajouter') + ' une photo</button>' +
       '</div>' +
       '<div class="notes-section">' +
         '<label>Notes / R\u00e9f\u00e9rences :</label>' +
-        '<textarea id="d-notes-' + num + '" placeholder="Marque, num\u00e9ro de lot...">' + (d.notes || '') + '</textarea>' +
+        '<textarea id="txt' + num + '">' + (d.notes||'') + '</textarea>' +
 
 ```
   '</div>' +
 '</div>' +
 '<div class="modal-buttons">' +
-  '<button class="save-btn" id="d-save-' + num + '">\uD83D\uDCBE Enregistrer</button>' +
-  '<button class="close-btn" id="d-cls-' + num + '">Fermer</button>' +
+  '<button class="save-btn" id="sav' + num + '">\uD83D\uDCBE Enregistrer</button>' +
+  '<button class="close-btn" id="cls' + num + '">Fermer</button>' +
 '</div>';
 ```
 
 document.body.appendChild(overlay);
 document.body.appendChild(modal);
 
-document.getElementById(‘d-inc-’ + num).onclick = async function() {
-d.count = (d.count || 0) + 1;
-document.getElementById(‘d-cnt-’ + num).textContent = d.count;
+document.getElementById(‘inc’ + num).onclick = async function() {
+d.count = (d.count||0) + 1;
+document.getElementById(‘cnt’ + num).textContent = d.count;
 await sbSave(num);
 };
-
-document.getElementById(‘d-dec-’ + num).onclick = async function() {
-if ((d.count || 0) > 0) {
+document.getElementById(‘dec’ + num).onclick = async function() {
+if ((d.count||0) > 0) {
 d.count = d.count - 1;
-document.getElementById(‘d-cnt-’ + num).textContent = d.count;
+document.getElementById(‘cnt’ + num).textContent = d.count;
 await sbSave(num);
 }
 };
-
-document.getElementById(‘d-pbtn-’ + num).onclick = function() {
-document.getElementById(‘d-file-’ + num).click();
+document.getElementById(‘pbtn’ + num).onclick = function() {
+document.getElementById(‘file’ + num).click();
 };
-
-document.getElementById(‘d-file-’ + num).onchange = async function(e) {
+document.getElementById(‘file’ + num).onchange = async function(e) {
 var file = e.target.files[0];
 if (!file) return;
 document.getElementById(‘loading’).style.display = ‘block’;
 try {
 var url = await uploadPhoto(file);
 d.photo = url;
-document.getElementById(‘d-prev-’ + num).innerHTML = ‘<img src="' + url + '" alt="">’;
-document.getElementById(‘d-pbtn-’ + num).textContent = ‘\uD83D\uDCF7 Changer une photo’;
+document.getElementById(‘prev’ + num).innerHTML = ‘<img src="' + url + '" alt="">’;
 await sbSave(num);
 alert(’\u2705 Photo upload\u00e9e !’);
-} catch(err) {
-alert(’\u274C Erreur : ’ + err.message);
-}
+} catch(err) { alert(’\u274C ’ + err.message); }
 document.getElementById(‘loading’).style.display = ‘none’;
 };
-
-document.getElementById(‘d-save-’ + num).onclick = async function() {
-d.notes = document.getElementById(‘d-notes-’ + num).value;
+document.getElementById(‘sav’ + num).onclick = async function() {
+d.notes = document.getElementById(‘txt’ + num).value;
 await sbSave(num);
 alert(’\u2705 Sauvegard\u00e9 !’);
 };
-
-function closeModal() { modal.remove(); overlay.remove(); }
-document.getElementById(‘d-cls-’ + num).onclick = closeModal;
-overlay.onclick = function(e) { if (e.target === overlay) closeModal(); };
+document.getElementById(‘cls’ + num).onclick = function() {
+overlay.remove(); modal.remove();
+};
 }
 
-// ===== SHOW ALL =====
 function showAllDrawers() {
 var overlay = document.createElement(‘div’);
 overlay.className = ‘overlay’;
@@ -445,32 +378,20 @@ modal.className = ‘drawers-grid-modal’;
 
 var html = ‘<h2>\uD83D\uDCE6 Tous les tiroirs</h2><div class="drawers-grid">’;
 for (var j = 1; j <= 16; j++) {
-var dd = drawersData[j];
-var preview = dd.photo ? ‘<img src="' + dd.photo + '">’ : ‘\uD83D\uDCF7’;
-html +=
-‘<div class="drawer-card" data-drawer="' + j + '" data-name="' + dd.name + '">’ +
+var dd = D[j];
+html += ‘<div class="drawer-card" onclick="this.closest(\'.drawers-grid-modal\').remove();document.querySelector(\'.overlay\').remove();openDrawer(' + j + ',\'' + dd.name + '\')">’ +
 ’<div class="drawer-card-num">Tiroir ’ + j + ‘</div>’ +
 ‘<div class="drawer-card-name">’ + dd.name + ‘</div>’ +
-‘<div class="drawer-card-count">\uD83E\uDDF6 ’ + (dd.count || 0) + ’ pelote(s)</div>’ +
-‘<div class="drawer-card-preview">’ + preview + ‘</div>’ +
+‘<div class="drawer-card-count">\uD83E\uDDF6 ’ + (dd.count||0) + ’ pelote(s)</div>’ +
+‘<div class="drawer-card-preview">’ + (dd.photo ? ‘<img src="' + dd.photo + '">’ : ‘\uD83D\uDCF7’) + ‘</div>’ +
 ‘</div>’;
 }
-html += ‘</div><div class="modal-buttons"><button class="close-btn" id="cls-all">Fermer</button></div>’;
+html += ‘</div><div class="modal-buttons"><button class="close-btn" onclick="this.closest(\'.drawers-grid-modal\').remove();document.querySelector(\'.overlay\').remove()">Fermer</button></div>’;
 modal.innerHTML = html;
 
+overlay.onclick = function(e) { if (e.target === overlay) { overlay.remove(); modal.remove(); } };
 document.body.appendChild(overlay);
 document.body.appendChild(modal);
-
-modal.querySelectorAll(’.drawer-card’).forEach(function(card) {
-card.addEventListener(‘click’, function() {
-modal.remove(); overlay.remove();
-openDrawer(parseInt(card.dataset.drawer), card.dataset.name);
-});
-});
-
-function closeAll() { modal.remove(); overlay.remove(); }
-document.getElementById(‘cls-all’).onclick = closeAll;
-overlay.onclick = function(e) { if (e.target === overlay) closeAll(); };
 }
 </script>
 
