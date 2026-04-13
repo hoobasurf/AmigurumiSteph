@@ -172,39 +172,6 @@ border-radius:12px; display:none;
 
 <div id="loading">Chargement...</div>
 
-<div id="sidebar">
-  <button onclick="window.location.href='owner.html'">&#8592; Retour</button>
-  <button onclick="closeSidebar(); showAllDrawers();">
-    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-      <rect x="3" y="3" width="7" height="7" rx="1"/>
-      <rect x="14" y="3" width="7" height="7" rx="1"/>
-      <rect x="3" y="14" width="7" height="7" rx="1"/>
-      <rect x="14" y="14" width="7" height="7" rx="1"/>
-    </svg>
-    Tous les tiroirs
-  </button>
-</div>
-
-<button id="toggleSidebar" onclick="toggleSidebar()">☰</button>
-
-<button class="clickable-btn" style="top:9.7%;left:26.5%;width:48.3%;height:19.8%" onclick="window.open('https://hobbii.fr','_blank')"></button>
-<button class="clickable-btn" style="top:45.6%;left:4.9%;width:20.6%;height:5.3%"  onclick="openDrawer(1,'Blanc')"></button>
-<button class="clickable-btn" style="top:45.8%;left:27.8%;width:20.8%;height:5.2%" onclick="openDrawer(2,'Ecru/Ivoire')"></button>
-<button class="clickable-btn" style="top:45.7%;left:51.0%;width:21.2%;height:5.3%" onclick="openDrawer(3,'Beige')"></button>
-<button class="clickable-btn" style="top:45.7%;left:74.0%;width:21.7%;height:5.4%" onclick="openDrawer(4,'Marron')"></button>
-<button class="clickable-btn" style="top:52.0%;left:4.7%;width:20.9%;height:5.6%"  onclick="openDrawer(5,'Gris')"></button>
-<button class="clickable-btn" style="top:52.2%;left:27.4%;width:21.5%;height:5.3%" onclick="openDrawer(6,'Noir')"></button>
-<button class="clickable-btn" style="top:52.2%;left:51.0%;width:21.0%;height:5.1%" onclick="openDrawer(7,'Jaune')"></button>
-<button class="clickable-btn" style="top:52.2%;left:74.1%;width:21.7%;height:5.5%" onclick="openDrawer(8,'Orange')"></button>
-<button class="clickable-btn" style="top:58.7%;left:5.3%;width:20.0%;height:5.5%"  onclick="openDrawer(9,'Rouge')"></button>
-<button class="clickable-btn" style="top:58.7%;left:27.6%;width:21.7%;height:5.8%" onclick="openDrawer(10,'Rose')"></button>
-<button class="clickable-btn" style="top:58.8%;left:51.0%;width:20.9%;height:5.6%" onclick="openDrawer(11,'Violet')"></button>
-<button class="clickable-btn" style="top:58.9%;left:74.1%;width:21.7%;height:5.5%" onclick="openDrawer(12,'Bleu')"></button>
-<button class="clickable-btn" style="top:65.5%;left:5.3%;width:20.1%;height:5.5%"  onclick="openDrawer(13,'Vert')"></button>
-<button class="clickable-btn" style="top:65.5%;left:27.5%;width:21.7%;height:5.6%" onclick="openDrawer(14,'Turquoise')"></button>
-<button class="clickable-btn" style="top:65.7%;left:50.7%;width:21.7%;height:5.4%" onclick="openDrawer(15,'Multicolore')"></button>
-<button class="clickable-btn" style="top:65.7%;left:73.8%;width:21.7%;height:5.5%" onclick="openDrawer(16,'Metal/Argent')"></button>
-
 <script>
 var SB_URL  = 'https://kdgxbmqwhpuctjtlygrt.supabase.co';
 var SB_KEY  = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtkZ3hibXF3aHB1Y3RqdGx5Z3J0Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzUyMjY0NzQsImV4cCI6MjA5MDgwMjQ3NH0.9RsIj_bQgJskg9raRGN6uQJwUUlByTvWAFF2Eq9f6KM';
@@ -394,6 +361,39 @@ document.body.appendChild(overlay);
 document.body.appendChild(modal);
 }
 </script>
+
+<div id="sidebar">
+  <button onclick="window.location.href='owner.html'">&#8592; Retour</button>
+  <button onclick="closeSidebar(); showAllDrawers();">
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <rect x="3" y="3" width="7" height="7" rx="1"/>
+      <rect x="14" y="3" width="7" height="7" rx="1"/>
+      <rect x="3" y="14" width="7" height="7" rx="1"/>
+      <rect x="14" y="14" width="7" height="7" rx="1"/>
+    </svg>
+    Tous les tiroirs
+  </button>
+</div>
+
+<button id="toggleSidebar" onclick="toggleSidebar()">☰</button>
+
+<button class="clickable-btn" style="top:9.7%;left:26.5%;width:48.3%;height:19.8%" onclick="window.open('https://hobbii.fr','_blank')"></button>
+<button class="clickable-btn" style="top:45.6%;left:4.9%;width:20.6%;height:5.3%"  onclick="openDrawer(1,'Blanc')"></button>
+<button class="clickable-btn" style="top:45.8%;left:27.8%;width:20.8%;height:5.2%" onclick="openDrawer(2,'Ecru/Ivoire')"></button>
+<button class="clickable-btn" style="top:45.7%;left:51.0%;width:21.2%;height:5.3%" onclick="openDrawer(3,'Beige')"></button>
+<button class="clickable-btn" style="top:45.7%;left:74.0%;width:21.7%;height:5.4%" onclick="openDrawer(4,'Marron')"></button>
+<button class="clickable-btn" style="top:52.0%;left:4.7%;width:20.9%;height:5.6%"  onclick="openDrawer(5,'Gris')"></button>
+<button class="clickable-btn" style="top:52.2%;left:27.4%;width:21.5%;height:5.3%" onclick="openDrawer(6,'Noir')"></button>
+<button class="clickable-btn" style="top:52.2%;left:51.0%;width:21.0%;height:5.1%" onclick="openDrawer(7,'Jaune')"></button>
+<button class="clickable-btn" style="top:52.2%;left:74.1%;width:21.7%;height:5.5%" onclick="openDrawer(8,'Orange')"></button>
+<button class="clickable-btn" style="top:58.7%;left:5.3%;width:20.0%;height:5.5%"  onclick="openDrawer(9,'Rouge')"></button>
+<button class="clickable-btn" style="top:58.7%;left:27.6%;width:21.7%;height:5.8%" onclick="openDrawer(10,'Rose')"></button>
+<button class="clickable-btn" style="top:58.8%;left:51.0%;width:20.9%;height:5.6%" onclick="openDrawer(11,'Violet')"></button>
+<button class="clickable-btn" style="top:58.9%;left:74.1%;width:21.7%;height:5.5%" onclick="openDrawer(12,'Bleu')"></button>
+<button class="clickable-btn" style="top:65.5%;left:5.3%;width:20.1%;height:5.5%"  onclick="openDrawer(13,'Vert')"></button>
+<button class="clickable-btn" style="top:65.5%;left:27.5%;width:21.7%;height:5.6%" onclick="openDrawer(14,'Turquoise')"></button>
+<button class="clickable-btn" style="top:65.7%;left:50.7%;width:21.7%;height:5.4%" onclick="openDrawer(15,'Multicolore')"></button>
+<button class="clickable-btn" style="top:65.7%;left:73.8%;width:21.7%;height:5.5%" onclick="openDrawer(16,'Metal/Argent')"></button>
 
 </body>
 </html>
