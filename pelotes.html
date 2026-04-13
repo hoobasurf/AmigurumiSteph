@@ -239,6 +239,7 @@ async function uploadPhoto(file) {
 }
 
 function toggleSidebar() {
+  alert("toggleSidebar");
   var s = document.getElementById('sidebar');
   var t = document.getElementById('toggleSidebar');
   if (s.classList.contains('open')) {
@@ -256,6 +257,7 @@ function closeSidebar() {
 }
 
 function openDrawer(num, name) {
+  alert("openDrawer " + num);
   var d = D[num];
   var overlay = document.createElement('div');
   overlay.className = 'overlay';
