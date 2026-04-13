@@ -17,9 +17,8 @@ border-right:2px solid #b67385;
 padding:60px 20px 20px;
 transition:left .3s;
 z-index:9000;
-pointer-events:none;
 }
-#sidebar.open { left:0; pointer-events:auto; }
+#sidebar.open { left:0; }
 
 #toggleSidebar {
 position:fixed; top:50%; left:0;
@@ -308,10 +307,12 @@ async function sbSave(num) {
 // ===== INIT =====
 document.addEventListener('DOMContentLoaded', function() {
 
+  document.getElementById('loading').style.display = 'block';
   sbLoad().then(function() {
     document.getElementById('loading').style.display = 'none';
+  }).catch(function() {
+    document.getElementById('loading').style.display = 'none';
   });
-  document.getElementById('loading').style.display = 'block';
 
   // Toggle sidebar
   var sidebarEl = document.getElementById('sidebar');
